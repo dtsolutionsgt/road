@@ -57,8 +57,8 @@ public class ComWS extends PBase {
 	private clsFinDia claseFindia;
     private DateUtils DU;
 	
-	// Web Service - La muerte siendo la muerte, temio el oyo.
-	
+	// Web Service -
+
 	public AsyncCallRec wsRtask;
 	public AsyncCallSend wsStask;
 	public AsyncCallConfirm wsCtask;

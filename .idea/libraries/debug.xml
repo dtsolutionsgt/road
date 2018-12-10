@@ -1,0 +1,26 @@
+<component name="libraryTable">
+  <library name="debug">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/commons-logging-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/httpcore-4.4.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/android-core-3.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/ZSDK_ANDROID_API.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/httpclient-win-4.5.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/do_androidsdk.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/jna-4.4.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/apache-commons-lang.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/android-support-v4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/jna-platform-4.4.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/fluent-hc-4.5.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/ePOS-Device.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/httpclient-4.5.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/httpmime-4.5.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/commons-codec-1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/httpclient-cache-4.5.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/jniLibs/debug/commons-io-2.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

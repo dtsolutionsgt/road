@@ -1,0 +1,26 @@
+<component name="libraryTable">
+  <library name="jniLibs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/fluent-hc-4.5.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/android-support-v4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/jna-platform-4.4.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/commons-logging-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/commons-codec-1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/ePOS-Device.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/httpclient-win-4.5.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/httpclient-cache-4.5.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/jna-4.4.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/httpcore-4.4.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/ZSDK_ANDROID_API.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/apache-commons-lang.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/httpclient-4.5.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/do_androidsdk.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/httpmime-4.5.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/android-core-3.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/src/main/jniLibs/commons-io-2.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

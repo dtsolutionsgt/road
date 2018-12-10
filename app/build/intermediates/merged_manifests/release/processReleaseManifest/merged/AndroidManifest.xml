@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.dts.roadp"
+    android:installLocation="preferExternal"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="21"
+        android:targetSdkVersion="21" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <application
+        android:name="com.dts.roadp.appGlobals"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.dts.roadp.MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.dts.roadp.Menu"
+            android:label="@string/title_activity_menu"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.dts.roadp.Clientes"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_clientes"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.CliDet"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_cli_det"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.Venta"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_venta"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.dts.roadp.ComDrop"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_com_drop"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.MessageBox"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_message"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.Producto"
+            android:label="@string/title_activity_producto"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name="com.dts.roadp.ProdCant"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_prod_cant"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateVisible" />
+        <activity
+            android:name="com.dts.roadp.PedidoRes"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_pedido_res"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.dts.roadp.ObjRuta"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_obj_ruta"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.ObjProd"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_obj_prod"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.InvBodega"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_inv_bodega"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.ConsPrecio"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_cons_precio"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.Pago"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_pago"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.Cobro"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_cobro"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.dts.roadp.Reimpresion"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_reimpresion"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.Anulacion"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_anulacion"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.Deposito"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_deposito"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateVisible" />
+        <activity
+            android:name="com.dts.roadp.ListaPromo"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_lista_promo"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.DeposDoc"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_depos_doc"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.DescBon"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_desc_bon"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.dts.roadp.PicView"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_pic_view"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.ComWS"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_com_ws"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.dts.roadp.DevolCli"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_devol_cli"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.DevCliCant"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_dev_cli_cant"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateVisible" />
+        <activity
+            android:name="com.dts.roadp.Exist"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_exist"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name="com.dts.roadp.DevolBod"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_devol_bod"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.ActDisp"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_act_disp"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.MercLista"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_merc_lista"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.MercProp"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_merc_prop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.MercComp"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_merc_comp"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.MercPreg"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_merc_preg"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.MercAct"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_merc"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.CliNuevo"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_cli_nuevo"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.Recarga"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_recarga"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.RecargCant"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_recarg_cant"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.FacturaRes"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_factura_res"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.FinDia"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_fin_dia"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.DepositoParc"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_deposito_parc"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateVisible" />
+        <activity
+            android:name="com.dts.roadp.UtilPrint"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_util_print"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.dts.roadp.PrintDialog"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_print_dialog"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.dts.roadp.BonList"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_bon_list"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.dts.roadp.BonVenta"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_bon_venta"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.dts.roadp.DemoData"
+            android:label="@string/title_activity_demo_data"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.DemoDataDlg"
+            android:label="@string/title_activity_demo_data_dlg"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateVisible" />
+        <activity
+            android:name="com.dts.roadp.CliPos"
+            android:label="@string/title_activity_cli_pos"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateVisible" />
+        <activity
+            android:name="com.dts.roadp.CliGPS"
+            android:label="@string/title_activity_cli_gps"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.dts.roadp.LicRegis"
+            android:label="@string/title_activity_lic_regis"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.dts.roadp.RecargaAuto"
+            android:label="@string/title_activity_recarga_auto"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.CliNuevoApr"
+            android:label="@string/title_activity_cli_nuevo_apr"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.SolicInv"
+            android:label="@string/title_activity_solic_inv"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.Aprofam1"
+            android:label="@string/title_activity_aprofam1"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.Municipio"
+            android:label="@string/title_activity_municipio" />
+        <activity
+            android:name="com.dts.roadp.CliNuevoAprEdit"
+            android:label="@string/title_activity_cli_nuevo_apr_edit"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name="com.dts.roadp.ComWSExist"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_com_wsexist"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.dts.roadp.Tablas"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="Tablas"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+    </application>
+
+</manifest>

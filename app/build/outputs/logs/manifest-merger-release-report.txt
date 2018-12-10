@@ -1,0 +1,774 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:2:1-363:12
+INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:2:1-363:12
+INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:2:1-363:12
+INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:2:1-363:12
+MERGED from [com.android.support:appcompat-v7:22.1.0] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\appcompat-v7-22.1.0.aar\d70bc13f84b9010f1df6f7f7c26a1558\AndroidManifest.xml:17:1-24:12
+MERGED from [com.android.support:support-v4:22.1.0] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\support-v4-22.1.0.aar\3b4a456017fe719158ecb485f7ca2f73\AndroidManifest.xml:17:1-24:12
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.1.3.aar\167636972ac169b0ca97d732a59148c1\AndroidManifest.xml:2:1-11:12
+INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:2:1-363:12
+INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:2:1-363:12
+INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:2:1-363:12
+	package
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:3:5-28
+		INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+		INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+	android:versionName
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:6:5-30
+		INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+		INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:2:11-69
+	android:versionCode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:5:5-28
+		INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+		INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+	android:installLocation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:4:5-45
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:8:5-81
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:8:22-78
+uses-permission#android.permission.CALL_PHONE
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:9:5-69
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:9:22-66
+uses-permission#android.permission.SEND_SMS
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:10:5-67
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:10:22-64
+uses-permission#android.permission.INTERNET
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:11:5-67
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:11:22-64
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:12:5-79
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:12:22-76
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:13:5-79
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:13:22-76
+uses-permission#android.permission.ACCESS_COARSE_LOCATION
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:14:5-81
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:14:22-78
+uses-permission#android.permission.BLUETOOTH_ADMIN
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:15:5-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:15:22-71
+uses-permission#android.permission.BLUETOOTH
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:16:5-68
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:16:22-65
+uses-permission#android.permission.ACCESS_WIFI_STATE
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:17:5-76
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:17:22-73
+application
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:19:5-361:21
+MERGED from [com.android.support:appcompat-v7:22.1.0] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\appcompat-v7-22.1.0.aar\d70bc13f84b9010f1df6f7f7c26a1558\AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:appcompat-v7:22.1.0] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\appcompat-v7-22.1.0.aar\d70bc13f84b9010f1df6f7f7c26a1558\AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:22.1.0] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\support-v4-22.1.0.aar\3b4a456017fe719158ecb485f7ca2f73\AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:22.1.0] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\support-v4-22.1.0.aar\3b4a456017fe719158ecb485f7ca2f73\AndroidManifest.xml:22:5-20
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.1.3.aar\167636972ac169b0ca97d732a59148c1\AndroidManifest.xml:9:5-20
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.1.3.aar\167636972ac169b0ca97d732a59148c1\AndroidManifest.xml:9:5-20
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:23:9-41
+	android:largeHeap
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:24:9-33
+	android:icon
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:22:9-45
+	android:allowBackup
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:21:9-35
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:25:9-40
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:20:9-35
+activity#com.dts.roadp.MainActivity
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:26:9-37:20
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:30:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:29:13-45
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:28:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:31:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:27:13-41
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:32:13-36:29
+action#android.intent.action.MAIN
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:33:17-69
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:33:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:35:17-77
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:35:27-74
+activity#com.dts.roadp.Menu
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:38:9-43:57
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:41:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:40:13-56
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:43:13-54
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:42:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:39:13-33
+activity#com.dts.roadp.Clientes
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:44:9-49:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:48:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:47:13-60
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:46:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:49:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:45:13-37
+activity#com.dts.roadp.CliDet
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:50:9-55:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:54:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:53:13-59
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:52:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:55:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:51:13-35
+activity#com.dts.roadp.Venta
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:56:9-62:57
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:60:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:59:13-57
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:62:13-54
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:58:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:61:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:57:13-34
+activity#com.dts.roadp.ComDrop
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:63:9-68:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:67:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:66:13-60
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:65:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:68:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:64:13-36
+activity#com.dts.roadp.MessageBox
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:69:9-73:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:73:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:72:13-59
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:71:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:70:13-39
+activity#com.dts.roadp.Producto
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:74:9-79:63
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:77:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:76:13-60
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:79:13-60
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:78:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:75:13-37
+activity#com.dts.roadp.ProdCant
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:80:9-86:58
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:84:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:83:13-61
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:86:13-55
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:82:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:85:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:81:13-37
+activity#com.dts.roadp.PedidoRes
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:87:9-93:57
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:91:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:90:13-62
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:93:13-54
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:89:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:92:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:88:13-38
+activity#com.dts.roadp.ObjRuta
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:94:9-98:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:98:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:97:13-60
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:96:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:95:13-36
+activity#com.dts.roadp.ObjProd
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:99:9-103:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:103:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:102:13-60
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:101:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:100:13-36
+activity#com.dts.roadp.InvBodega
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:104:9-108:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:108:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:107:13-62
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:106:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:105:13-38
+activity#com.dts.roadp.ConsPrecio
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:109:9-113:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:113:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:112:13-63
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:111:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:110:13-39
+activity#com.dts.roadp.Pago
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:114:9-119:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:118:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:117:13-56
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:116:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:119:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:115:13-33
+activity#com.dts.roadp.Cobro
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:120:9-126:57
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:124:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:123:13-57
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:126:13-54
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:122:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:125:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:121:13-34
+activity#com.dts.roadp.Reimpresion
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:127:9-132:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:131:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:130:13-63
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:129:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:132:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:128:13-40
+activity#com.dts.roadp.Anulacion
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:133:9-138:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:137:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:136:13-61
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:135:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:138:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:134:13-38
+activity#com.dts.roadp.Deposito
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:139:9-145:58
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:143:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:142:13-60
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:145:13-55
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:141:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:144:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:140:13-37
+activity#com.dts.roadp.ListaPromo
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:146:9-150:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:150:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:149:13-63
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:148:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:147:13-39
+activity#com.dts.roadp.DeposDoc
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:151:9-156:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:155:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:154:13-61
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:153:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:156:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:152:13-37
+activity#com.dts.roadp.DescBon
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:157:9-162:86
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:161:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:160:13-60
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:159:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:162:13-83
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:158:13-36
+activity#com.dts.roadp.PicView
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:163:9-167:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:167:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:166:13-60
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:165:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:164:13-36
+activity#com.dts.roadp.ComWS
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:168:9-174:57
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:172:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:171:13-58
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:174:13-54
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:170:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:173:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:169:13-34
+activity#com.dts.roadp.DevolCli
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:175:9-180:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:179:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:178:13-61
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:177:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:180:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:176:13-37
+activity#com.dts.roadp.DevCliCant
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:181:9-187:58
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:185:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:184:13-64
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:187:13-55
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:183:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:186:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:182:13-39
+activity#com.dts.roadp.Exist
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:188:9-194:63
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:192:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:191:13-57
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:194:13-60
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:190:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:193:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:189:13-34
+activity#com.dts.roadp.DevolBod
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:195:9-200:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:199:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:198:13-61
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:197:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:200:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:196:13-37
+activity#com.dts.roadp.ActDisp
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:201:9-205:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:205:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:204:13-60
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:203:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:202:13-36
+activity#com.dts.roadp.MercLista
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:206:9-210:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:210:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:209:13-62
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:208:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:207:13-38
+activity#com.dts.roadp.MercProp
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:211:9-215:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:215:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:214:13-61
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:213:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:212:13-37
+activity#com.dts.roadp.MercComp
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:216:9-220:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:220:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:219:13-61
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:218:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:217:13-37
+activity#com.dts.roadp.MercPreg
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:221:9-225:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:225:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:224:13-61
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:223:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:222:13-37
+activity#com.dts.roadp.MercAct
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:226:9-230:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:230:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:229:13-56
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:228:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:227:13-36
+activity#com.dts.roadp.CliNuevo
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:231:9-235:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:235:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:234:13-61
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:233:13-74
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:232:13-37
+activity#com.dts.roadp.Recarga
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:236:9-241:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:240:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:239:13-59
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:238:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:241:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:237:13-36
+activity#com.dts.roadp.RecargCant
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:242:9-247:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:246:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:245:13-63
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:244:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:247:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:243:13-39
+activity#com.dts.roadp.FacturaRes
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:248:9-253:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:252:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:251:13-63
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:250:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:253:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:249:13-39
+activity#com.dts.roadp.FinDia
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:254:9-259:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:258:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:257:13-59
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:256:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:259:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:255:13-35
+activity#com.dts.roadp.DepositoParc
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:260:9-266:58
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:264:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:263:13-65
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:266:13-55
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:262:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:265:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:261:13-41
+activity#com.dts.roadp.UtilPrint
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:267:9-273:57
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:271:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:270:13-62
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:273:13-54
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:269:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:272:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:268:13-38
+activity#com.dts.roadp.PrintDialog
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:274:9-279:86
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:278:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:277:13-64
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:276:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:279:13-83
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:275:13-40
+activity#com.dts.roadp.BonList
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:280:9-285:86
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:284:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:283:13-60
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:282:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:285:13-83
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:281:13-36
+activity#com.dts.roadp.BonVenta
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:286:9-291:86
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:290:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:289:13-61
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:288:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:291:13-83
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:287:13-37
+activity#com.dts.roadp.DemoData
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:292:9-295:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:295:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:294:13-61
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:293:13-37
+activity#com.dts.roadp.DemoDataDlg
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:296:9-301:58
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:299:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:298:13-65
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:301:13-55
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:300:13-83
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:297:13-40
+activity#com.dts.roadp.CliPos
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:302:9-307:58
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:305:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:304:13-59
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:307:13-55
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:306:13-83
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:303:13-35
+activity#com.dts.roadp.CliGPS
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:308:9-311:52
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:311:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:310:13-59
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:309:13-35
+activity#com.dts.roadp.LicRegis
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:312:9-317:57
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:315:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:314:13-61
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:317:13-54
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:316:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:313:13-37
+activity#com.dts.roadp.RecargaAuto
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:318:9-322:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:321:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:320:13-64
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:322:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:319:13-40
+activity#com.dts.roadp.CliNuevoApr
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:323:9-327:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:326:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:325:13-65
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:327:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:324:13-40
+activity#com.dts.roadp.SolicInv
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:328:9-332:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:331:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:330:13-61
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:332:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:329:13-37
+activity#com.dts.roadp.Aprofam1
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:333:9-337:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:336:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:335:13-60
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:337:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:334:13-37
+activity#com.dts.roadp.Municipio
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:338:9-340:64
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:340:13-61
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:339:13-38
+activity#com.dts.roadp.CliNuevoAprEdit
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:341:9-345:75
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:344:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:343:13-70
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:345:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:342:13-44
+activity#com.dts.roadp.ComWSExist
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:346:9-352:57
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:350:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:349:13-63
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:352:13-54
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:348:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:351:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:347:13-39
+activity#com.dts.roadp.Tablas
+ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:353:9-360:15
+	android:screenOrientation
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:357:13-49
+	android:label
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:356:13-35
+	android:windowSoftInputMode
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:359:13-54
+	android:configChanges
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:355:13-74
+	android:theme
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:358:13-72
+	android:name
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml:354:13-35
+uses-sdk
+INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+MERGED from [com.android.support:appcompat-v7:22.1.0] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\appcompat-v7-22.1.0.aar\d70bc13f84b9010f1df6f7f7c26a1558\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:appcompat-v7:22.1.0] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\appcompat-v7-22.1.0.aar\d70bc13f84b9010f1df6f7f7c26a1558\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:22.1.0] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\support-v4-22.1.0.aar\3b4a456017fe719158ecb485f7ca2f73\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:22.1.0] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\support-v4-22.1.0.aar\3b4a456017fe719158ecb485f7ca2f73\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.1.3.aar\167636972ac169b0ca97d732a59148c1\AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\Jaroslav\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.1.3.aar\167636972ac169b0ca97d732a59148c1\AndroidManifest.xml:5:5-7:41
+INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+		INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+		ADDED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml
+		INJECTED from C:\AndrProj\Road\app\src\main\AndroidManifest.xml

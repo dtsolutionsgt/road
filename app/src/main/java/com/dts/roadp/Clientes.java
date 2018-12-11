@@ -81,6 +81,7 @@ public class Clientes extends PBase {
 		closekeyb();
 
 		gl.escaneo="N";
+
 	}
 
 	
@@ -266,7 +267,7 @@ public class Clientes extends PBase {
 	    		
 	    		tl=txtFiltro.getText().toString().length();
 
-	    		if (tl>1) gl.escaneo="";
+	    		if (tl>1) gl.escaneo="S";
 	    		if (tl==0 || tl>1) listItems();
 	    	}
 	    });	

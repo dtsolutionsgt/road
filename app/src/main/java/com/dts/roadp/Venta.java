@@ -812,7 +812,7 @@ public class Venta extends PBase {
 			ins.add("CODOPER","X");
 			ins.add("COREL","");
 			
-			ins.add("SCANNED","N");
+			ins.add("SCANNED",gl.escaneo);
 			ins.add("STATCOM","N");
 			ins.add("LLEGO_COMPETENCIA_ANTES",0);
 			

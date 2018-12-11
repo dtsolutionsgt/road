@@ -64,7 +64,7 @@ public class MainActivity extends PBase {
 		//#HS_20181206 Obtiene el supervisor de la ruta
 		supervisorRuta();
 		
-		//txtUser.setText("1");txtPass.setText("1");
+		txtUser.setText("00100993");txtPass.setText("2613");
 		//txtUser.setText("Venta");txtPass.setText("Venta");
 		
 		gl.contlic=false;

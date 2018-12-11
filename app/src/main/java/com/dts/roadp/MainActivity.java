@@ -184,8 +184,8 @@ public class MainActivity extends PBase {
 		}
 
 		try {
-			//#HS_20181120_1616 Se agrego el campo UNIDAD_MEDIDA_PESO.
-			sql = "SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO FROM P_EMPRESA";
+			//#HS_20181120_1616 Se agrego el campo UNIDAD_MEDIDA_PESO.//campo INCIDENCIA_NO_LECTURA
+			sql = "SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO,INCIDENCIA_NO_LECTURA FROM P_EMPRESA";
 			DT = Con.OpenDT(sql);
 			DT.moveToFirst();
 
@@ -196,6 +196,7 @@ public class MainActivity extends PBase {
 			gl.usarpeso = s.equalsIgnoreCase("S");
 			gl.banderafindia=DT.getInt(4) == 1;
 			gl.umpeso = DT.getString(6);
+			gl.incNoLectura = DT.getInt(7)==1; //#HS_20181211 Agregue campo incNoLectura para validacion en cliente.
 			gl.depparc = DT.getInt(5)==1;
 		} catch (Exception e) {
 			gl.emp = "0";

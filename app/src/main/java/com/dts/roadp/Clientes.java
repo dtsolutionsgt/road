@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -31,6 +32,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.widget.Toast;
 
 
 public class Clientes extends PBase {
@@ -43,6 +45,10 @@ public class Clientes extends PBase {
 	private ArrayList<clsCDB> items= new ArrayList<clsCDB>();
 	private ArrayList<String> cobros= new ArrayList<String>();
 	private ArrayList<String> ppago= new ArrayList<String>();
+
+	private AlertDialog.Builder mMenuDlg;
+	private ArrayList<String> listcode = new ArrayList<String>();
+	private ArrayList<String> listname = new ArrayList<String>();
 
 	private ListAdaptCliList adapter;
 	private clsCDB selitem;
@@ -93,7 +99,79 @@ public class Clientes extends PBase {
 		startActivity(intent);
 	}
 	
-	
+	//#HS_20181211 Agregue funcion que lista las opciones de incidencia de no lectura
+	private void listNoLectura(){
+		Cursor DT;
+		String code,name;
+
+		listcode.clear();listname.clear();
+
+		try {
+
+			sql="SELECT Codigo,Nombre FROM P_CODNOLEC ORDER BY Nombre";
+
+			DT=Con.OpenDT(sql);
+			if (DT.getCount()==0) {return;}
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				try {
+					code=String.valueOf(DT.getInt(0));
+					name=DT.getString(1);
+
+					listcode.add(code);
+					listname.add(name);
+				} catch (Exception e) {
+					mu.msgbox(e.getMessage());
+				}
+				DT.moveToNext();
+			}
+		} catch (Exception e) {
+			mu.msgbox( e.getMessage());return;
+		}
+
+		showIncNoLectura();
+
+	}
+	//#HS_20181211 Funcion que abre el dialogo, opciones de incidencia de no lectura
+	public void showIncNoLectura() {
+		final AlertDialog Dialog;
+
+		final String[] selitems = new String[listname.size()];
+
+		for (int i = 0; i < listname.size(); i++) {
+			selitems[i] = listname.get(i);
+		}
+
+		mMenuDlg = new AlertDialog.Builder(this);
+		mMenuDlg.setTitle("Incidencia de no lectura");
+
+		mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+				try {
+					//String opcion=listcode.get(item);
+					showCliente();
+
+				} catch (Exception e) {
+				}
+			}
+		});
+
+		mMenuDlg.setNegativeButton("Regresar", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+			}
+		});
+
+		Dialog = mMenuDlg.create();
+		Dialog.show();
+
+		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+		nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+		nbutton.setTextColor(Color.WHITE);
+	}
+
 	// Main
 	
 	private void setHandlers(){
@@ -108,8 +186,14 @@ public class Clientes extends PBase {
 	           
 				selid=sitem.Cod;selidx=position;
 				adapter.setSelectedIndex(position);
-				
-				showCliente();
+
+				//#HS_20181211 Carga la lista de incidencias por no lectura y muestra el dialogo
+				if(gl.incNoLectura == true) {
+					listNoLectura();
+				}else {
+					showCliente();
+				}
+
 			};
 	    });
 	
@@ -155,7 +239,7 @@ public class Clientes extends PBase {
 			    	dweek=position;
 			    	
 			    	listItems();
-		    
+
 		        } catch (Exception e) {
 			   	   mu.msgbox( e.getMessage());
 		        }

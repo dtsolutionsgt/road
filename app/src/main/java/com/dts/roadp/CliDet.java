@@ -32,7 +32,7 @@ public class CliDet extends PBase {
 	private RelativeLayout relV,relP,relD;
 	private ImageView imgCobro,imgDevol;
 	private Exist Existencia = new Exist();
-	private String cod,tel;
+	private String cod,tel, Nombre, NIT;;
 	private double clim,cused,cdisp;
 	private int nivel,browse,merc;
 	private boolean porcentaje = false;
@@ -193,6 +193,7 @@ public class CliDet extends PBase {
 
 	//#HS_20181207 Cuadro de dialogo para editar datos del cliente
 	private void inputCliente() {
+
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		alert.setTitle("Editar Cliente");
@@ -225,7 +226,10 @@ public class CliDet extends PBase {
 
 		alert.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-
+				String corel=mu.getCorelBase();
+				Nombre = editNombre.getText().toString();
+				NIT = editNit.getText().toString();
+				ActualizarCliente(corel,Nombre, NIT);
 			}
 		});
 
@@ -237,6 +241,19 @@ public class CliDet extends PBase {
 
 		alert.show();
 	}
+
+	//#HS_20181211 agregue funcion para actualizar los campos de Nombre y NIT del cliente
+
+	private void ActualizarCliente(String corel, String NombreEdit, String NitEdit){
+		Cursor DT;
+		try {
+			db.execSQL("INSERT INTO D_FACTURAF(COREL, NOMBRE, NIT, DIRECCION) VALUES('"+corel+"','"+NombreEdit+"','"+NitEdit+"','')");
+			mu.msgbox("Registro actualizado");
+		}catch (Exception e){
+			mu.msgbox("ActualizarCliente: "+e.getMessage());
+		}
+	}
+
 	/////
 
 	public void setGPS(View view) {

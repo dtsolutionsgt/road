@@ -1144,6 +1144,7 @@ public class BaseDatosScript {
 					"[PRODUCTO_ERROR_SUMA] TEXT NOT NULL,"+
 					"[UNIDAD_MEDIDA_PESO] TEXT NOT NULL,"+
 					"[LOTE_POR_DEFECTO] TEXT NOT NULL,"+
+					"[INCIDENCIA_NO_LECTURA] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
 			database.execSQL(vSQL);
@@ -1199,8 +1200,15 @@ public class BaseDatosScript {
 			database.execSQL(vSQL);
 
 			vSQL="CREATE INDEX P_CODATEN_idx1 ON P_CODATEN(CODIGO)";
-			database.execSQL(vSQL);   
-			
+			database.execSQL(vSQL);
+
+			vSQL="CREATE TABLE [P_CODNOLEC] ("+
+					"[CODIGO] INTEGER NOT NULL,"+
+					"[NOMBRE] TEXT NOT NULL,"+
+					"PRIMARY KEY ([CODIGO])"+
+					");";
+			database.execSQL(vSQL);
+
 
 			vSQL="CREATE TABLE [P_CODDEV] ("+
 					"[CODIGO] TEXT NOT NULL,"+

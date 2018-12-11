@@ -613,6 +613,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_STOCKINV")) return false;
 			if (!AddTable("P_CODATEN")) return false;
 			if (!AddTable("P_CODDEV")) return false;
+            if (!AddTable("P_CODNOLEC")) return false;
 			if (!AddTable("P_NIVELPRECIO")) return false;
 			if (!AddTable("P_COREL")) return false;
 			if (!AddTable("P_CORELNC")) return false;
@@ -952,7 +953,14 @@ public class ComWS extends PBase {
          SQL = "SELECT * FROM P_CODATEN";
          return SQL;  
        }
-       
+
+        if (TN.equalsIgnoreCase("P_CODNOLEC")) {
+            SQL = "SELECT * FROM P_CODNOLEC";
+            return SQL;
+        }
+
+
+
        if (TN.equalsIgnoreCase("P_CODDEV")) {
            SQL = "SELECT * FROM P_CODDEV";
            return SQL;  

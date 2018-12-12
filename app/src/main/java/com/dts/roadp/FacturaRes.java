@@ -352,8 +352,14 @@ public class FacturaRes extends PBase {
 				fdoc.buildPrintExt(corel,2,"APR");
 			} else if (gl.peModal.equalsIgnoreCase("...")) {	
 				//
-			} else {	
-				fdoc.buildPrint(corel,0);
+			} else {
+
+				//#HS_20181212 Condicion para imprimir facturas pendientes de pago
+				if (!gl.cobroPendiente) {
+					fdoc.buildPrint(corel, 0);
+				}else{
+					fdoc.buildPrint(corel,4);
+				}
 			}
 
 			prn.printask(printclose);

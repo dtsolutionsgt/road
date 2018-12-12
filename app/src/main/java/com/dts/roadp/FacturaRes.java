@@ -13,10 +13,12 @@ import android.os.Handler;
 import android.text.InputType;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebHistoryItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class FacturaRes extends PBase {
 
@@ -64,6 +66,7 @@ public class FacturaRes extends PBase {
 		rutapos=gl.rutapos;
 		media=gl.media;
 		credito=gl.credito;
+		gl.cobroPendiente = false;
 			
 		if (rutapos) {
 			lblMPago.setVisibility(View.INVISIBLE);
@@ -378,7 +381,11 @@ public class FacturaRes extends PBase {
 		
 		/*
 		if (prn.isEnabled()) {
+
+
 			fdoc.buildPrint(corel);
+
+
 			singlePrint();
 		} else {
 			gl.closeCliDet=true;
@@ -393,7 +400,12 @@ public class FacturaRes extends PBase {
  	private void singlePrint() {
  		prn.printask(printcallback);
  	}
-	
+
+ 	//#HS_20181212 Funcion para proceso pendiente de pago.
+	public void pendientePago(View view){
+		askPendientePago();
+	}
+
 	private boolean saveOrder(){
 		Cursor DT;
 		double peso;
@@ -500,30 +512,65 @@ public class FacturaRes extends PBase {
 			}
 
 			// Pago
-				
-			sql="SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
-			DT=Con.OpenDT(sql);
-	
-			DT.moveToFirst();
-			while (!DT.isAfterLast()) {
-						
-			  	ins.init("D_FACTURAP");
-				ins.add("COREL",corel);
-				ins.add("ITEM",DT.getInt(0));
-				ins.add("ANULADO","N");
-				ins.add("EMPRESA",gl.emp);
-				ins.add("CODPAGO",DT.getInt(1));
-				ins.add("TIPO",DT.getString(2));
-				ins.add("VALOR",DT.getDouble(3));
-				ins.add("DESC1",DT.getString(4));
-				ins.add("DESC2",DT.getString(5));
-				ins.add("DESC3",DT.getString(6));
-				ins.add("DEPOS","");
-			
-			    db.execSQL(ins.sql());
-								
-			    DT.moveToNext();
+
+			if(!gl.cobroPendiente) {
+
+				sql = "SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
+				DT = Con.OpenDT(sql);
+
+				DT.moveToFirst();
+				while (!DT.isAfterLast()) {
+
+					ins.init("D_FACTURAP");
+					ins.add("COREL", corel);
+					ins.add("ITEM", DT.getInt(0));
+					ins.add("ANULADO", "N");
+					ins.add("EMPRESA", gl.emp);
+					ins.add("CODPAGO", DT.getInt(1));
+					ins.add("TIPO", DT.getString(2));
+					ins.add("VALOR", DT.getDouble(3));
+					ins.add("DESC1", DT.getString(4));
+					ins.add("DESC2", DT.getString(5));
+					ins.add("DESC3", DT.getString(6));
+					ins.add("DEPOS", "");
+
+					db.execSQL(ins.sql());
+
+					DT.moveToNext();
+				}
+
+			}else{
+
+				try {
+
+						ins.init("P_COBRO");
+
+						ins.add("DOCUMENTO", corel);
+						ins.add("EMPRESA", gl.emp);
+						ins.add("RUTA", gl.ruta);
+						ins.add("CLIENTE", gl.cliente);
+						ins.add("TIPODOC", "R");
+						ins.add("VALORORIG", tot);
+						ins.add("SALDO", tot);
+						ins.add("CANCELADO", 0);
+						ins.add("FECHAEMIT", fecha);
+						ins.add("FECHAV", fecha);
+						ins.add("CONTRASENA", corel);
+						ins.add("ID_TRANSACCION", 0);
+						ins.add("REFERENCIA", 0);
+						ins.add("ASIGNACION", 0);
+
+						db.execSQL(ins.sql());
+
+					Toast.makeText(this, "Se guardo la factura pendiente de pago",Toast.LENGTH_LONG).show();
+
+				}catch (Exception e){
+					mu.msgbox("PendientePago: "+e.getMessage());
+				}
+
 			}
+
+
 			
 			// Datos facturacion
 
@@ -1244,7 +1291,27 @@ public class FacturaRes extends PBase {
 		dialog.show();
 			
 	}
-	
+
+	//#HS_20181212 Dialogo para Pendiente de pago
+	private void askPendientePago() {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle("Road");
+		dialog.setMessage("¿Esta seguro de cobrar despues?");
+
+		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				gl.cobroPendiente = true;
+				finishOrder();
+			}
+		});
+
+		dialog.setNegativeButton("Cancelar", null);
+
+		dialog.show();
+
+	}
+
 	private void askPrint() {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	

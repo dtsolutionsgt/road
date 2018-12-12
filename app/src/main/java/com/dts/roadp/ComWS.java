@@ -984,8 +984,9 @@ public class ComWS extends PBase {
       	   return SQL;		   
        }
 
+       //#HS_20181212 Agregue campos ID_TRANSACCION, REFERENCIA, ASIGNACION.
        if (TN.equalsIgnoreCase("P_COBRO")) {
-    	   SQL = "SELECT  DOCUMENTO, EMPRESA, RUTA, CLIENTE, TIPODOC, VALORORIG, SALDO, CANCELADO, dbo.AndrDate(FECHAEMIT),dbo.AndrDate(FECHAV),'' AS CONTRASENA ";
+    	   SQL = "SELECT  DOCUMENTO, EMPRESA, RUTA, CLIENTE, TIPODOC, VALORORIG, SALDO, CANCELADO, dbo.AndrDate(FECHAEMIT),dbo.AndrDate(FECHAV),'' AS CONTRASENA, ID_TRANSACCION, REFERENCIA, ASIGNACION ";
     	   SQL += "FROM P_COBRO WHERE (RUTA='" + ActRuta + "') AND CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "')) ";
     	   //idbg=SQL;
     	   return SQL;

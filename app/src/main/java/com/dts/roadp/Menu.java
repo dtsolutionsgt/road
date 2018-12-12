@@ -261,11 +261,7 @@ public class Menu extends PBase {
 						if(gl.vnivel == 2){
 							msgAskSupervisor1();
 						}else {
-							if (cantidad == 0) {
-								mu.msgbox("No hay existencias disponibles.");
-							} else {
 								startActivity(intent);
-							}
 						}
 					}
 

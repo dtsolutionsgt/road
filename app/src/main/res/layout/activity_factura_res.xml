@@ -28,9 +28,46 @@
         android:paddingBottom="5dp" >
 
         <ImageView
+            android:id="@+id/imageView12"
+            android:layout_width="128dp"
+            android:layout_height="48dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="0dp"
+            android:layout_toStartOf="@+id/imageView2"
+            android:layout_toEndOf="@+id/imageView1"
+            android:clickable="true"
+            android:onClick="pendientePago"
+            android:src="@drawable/pago_pend" />
+
+        <TextView
+            android:id="@+id/lblCVence2"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageView1"
+            android:layout_alignRight="@+id/imageView1"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="1dp"
+            android:layout_marginLeft="129dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="-1dp"
+            android:layout_marginRight="-129dp"
+            android:layout_toStartOf="@+id/textView4"
+            android:layout_toEndOf="@+id/lblCVence"
+            android:clickable="true"
+            android:gravity="center"
+            android:onClick="pendientePago"
+            android:text="Pago Pendiente"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="15sp" />
+
+        <ImageView
             android:id="@+id/imageView1"
             android:layout_width="128dp"
             android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             android:layout_marginTop="5dp"
             android:clickable="true"
             android:onClick="paySelect"

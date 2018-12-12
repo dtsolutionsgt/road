@@ -357,7 +357,13 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".InicioDia"></activity>
+        <activity
+            android:name=".InicioDia"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="Tablas"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
     </application>
 
 </manifest>

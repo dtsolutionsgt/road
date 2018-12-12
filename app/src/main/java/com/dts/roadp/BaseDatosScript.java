@@ -1303,7 +1303,7 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX P_MERESTADO_idx1 ON P_MERESTADO(NOMBRE)";
 			database.execSQL(vSQL);
 			
-
+			//#HS_20181212 Agregue campos ID_TRANSACCION, REFERENCIA, ASIGNACION.
 			vSQL="CREATE TABLE [P_COBRO] ("+
 					"[DOCUMENTO] TEXT NOT NULL,"+
 					"[EMPRESA] TEXT NOT NULL,"+
@@ -1316,6 +1316,9 @@ public class BaseDatosScript {
 					"[FECHAEMIT] INTEGER NOT NULL,"+
 					"[FECHAV] INTEGER NOT NULL,"+
 					"[CONTRASENA] TEXT NOT NULL,"+
+					"[ID_TRANSACCION] INTEGER NOT NULL,"+
+					"[REFERENCIA] TEXT NOT NULL,"+
+					"[ASIGNACION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([DOCUMENTO],[EMPRESA])"+
 					");";
 			database.execSQL(vSQL);

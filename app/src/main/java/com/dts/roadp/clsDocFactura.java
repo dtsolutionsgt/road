@@ -70,6 +70,9 @@ public class clsDocFactura extends clsDocument {
 		rep.add("");
 		rep.add("Sujeto a Pagos Trimestrales");
 		rep.add("");
+
+
+
 		
 		return super.buildFooter();
 	}	

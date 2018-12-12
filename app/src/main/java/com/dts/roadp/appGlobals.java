@@ -19,7 +19,7 @@ public class appGlobals extends Application {
 	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo;
 	
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,contlic,devol,modoadmin;
-	public boolean usarpeso,banderafindia,depparc,incNoLectura;//#HS_20181211 Agregue incNoLectura
+	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente;//#HS_20181211 Agregue incNoLectura, cobroPendiente
 	
 	// Parametros Extra
 	public String peModal,peMon;

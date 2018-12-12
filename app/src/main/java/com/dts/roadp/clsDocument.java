@@ -13,7 +13,7 @@ public class clsDocument {
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="";
 	public clsRepBuilder rep;
 	public boolean docfactura,docrecibo=false,docanul=false,docpedido=false;
-	public int ffecha;
+	public int ffecha,pendiente;
 	
 	protected android.database.sqlite.SQLiteDatabase db;
 	protected BaseDatos Con;
@@ -36,6 +36,7 @@ public class clsDocument {
 		rep=new clsRepBuilder(cont,prw,true,cursym,decimpres);
 		DU=new DateUtils();
 		decfrm = new DecimalFormat("#,##0.00");
+
 	}
 	
 	public boolean buildPrint(String corel,int reimpres) {
@@ -222,6 +223,11 @@ public class clsDocument {
 		//if (docfactura && (reimpres==2)) rep.add("------  C O N T A B I L I T A D  ------");
 		if (docfactura && (reimpres==2)) rep.add("------  C O P I A  ------");
 		if (docfactura && (reimpres==3)) rep.add("------       A N U L A D O      ------");
+		//#HS_20181212 condición para factura pendiente de pago
+		if(docfactura && (reimpres==4)) {
+			rep.add("- P E N D I E N T E  D E  P A G O -");
+			pendiente = reimpres;
+		}
 		
 	}
 	

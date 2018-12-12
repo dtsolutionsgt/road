@@ -71,9 +71,14 @@ public class clsDocFactura extends clsDocument {
 		rep.add("Sujeto a Pagos Trimestrales");
 		rep.add("");
 
+		//#HS_20181212 Validación para factura pendiente de pago
+		if(pendiente == 4){
+			rep.add("");
+			rep.add("ESTE NO ES UN DOCUMENTO LEGAL");
+			rep.add("EXIJA SU FACTURA ORIGINAL");
+			rep.add("");
+		}
 
-
-		
 		return super.buildFooter();
 	}	
 		

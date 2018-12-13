@@ -32,6 +32,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
     final int dia = c.get(Calendar.DAY_OF_MONTH);
     final int anio = c.get(Calendar.YEAR);
     private int cyear, cmonth, cday, fechae;
+    private boolean seleccionFecha;
 
     //#HS_20181212 para imprimir el inventario
     private clsDocExist doc;
@@ -40,8 +41,8 @@ public class InicioDia extends PBase implements View.OnClickListener{
     private int lns;
     private ArrayList<clsClasses.clsExist> items= new ArrayList<clsClasses.clsExist>();
     private clsRepBuilder rep;
-    public int yy;
-    public String mm,dd;
+    public int yy, impcorel;
+    public String mm,dd,impserie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +57,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
 
         super.InitBase();
 
+        seleccionFecha = false;
         setActDate();
         fechae=fecha;etFecha.setText(du.sfecha(fechae));
 
@@ -70,6 +72,8 @@ public class InicioDia extends PBase implements View.OnClickListener{
         rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp);
 
         listItems();
+
+        obtenerCorel();
 
     }
 
@@ -100,6 +104,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
                 String mesFormateado = (mesActual < 10)? CERO + String.valueOf(mesActual):String.valueOf(mesActual);
                 etFecha.setText(diaFormateado + BARRA + mesFormateado + BARRA + year);
                 yy = year;mm = mesFormateado; dd = diaFormateado;
+                seleccionFecha = true;
             }
         },anio, mes, dia);
 
@@ -113,7 +118,6 @@ public class InicioDia extends PBase implements View.OnClickListener{
         cday = c.get(Calendar.DAY_OF_MONTH);
         fecha=du.cfecha(cyear,cmonth,cday);
     }
-
 
     private void askFinalizar() {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -139,7 +143,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
 
         try {
 
-            if (yy != 00) {
+            if (seleccionFecha) {
 
                 yy = yy - 2000;
 
@@ -208,8 +212,12 @@ public class InicioDia extends PBase implements View.OnClickListener{
 
             try {
                 rep.add("Total lineas : "+lns);
-                rep.add("");rep.add("");rep.add("");rep.add("");
-
+                rep.add("");
+                rep.line();
+                rep.add("");
+                rep.add("Serie: "+impserie);
+                rep.add("Próximo correlativo: "+(impcorel + 1));
+                rep.add("");rep.add("");rep.add("");
                 return true;
             } catch (Exception e) {
                 return false;
@@ -217,6 +225,27 @@ public class InicioDia extends PBase implements View.OnClickListener{
 
         }
 
+    }
+
+    private void obtenerCorel(){
+        Cursor DT;
+
+        try{
+
+            sql = "SELECT SERIE, CORELULT FROM P_COREL";
+
+            DT = Con.OpenDT(sql);
+
+            if(DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                impserie = DT.getString(0);
+                impcorel = DT.getInt(1);
+            }
+
+        }catch (Exception e){
+            mu.msgbox("obtenerCorel: "+e.getMessage());
+        }
     }
 
     private void listItems() {

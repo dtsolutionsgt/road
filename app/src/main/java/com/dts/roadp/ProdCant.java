@@ -274,15 +274,12 @@ public class ProdCant extends PBase {
 			dt.moveToFirst();
 			
 			umstock=um;umfactor=1;
-  			return dt.getDouble(0);
-		}
-		catch (Exception e)
-		{
+			disp=dt.getDouble(0);
 
-	    }		
+			if (disp>0) return disp;
+		} catch (Exception e){ }
 		
-		try
-		{
+		try {
 			sql="SELECT UNIDADMEDIDA FROM P_STOCK WHERE (CODIGO='"+prodid+"')";	
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
@@ -327,7 +324,7 @@ public class ProdCant extends PBase {
 			
 			umfactor=umf1/umf2;			
 			
-			sql="SELECT CANT FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";	
+			sql="SELECT SUM(CANT) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			

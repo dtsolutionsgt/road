@@ -34,15 +34,12 @@ public class Menu extends PBase {
 	private ArrayList<clsMenu> items= new ArrayList<clsMenu>();
 
 	//#HS_20181207 Controles para seleccionar el ayudante y vehiculo.
-	private Spinner Ayudante;
-	private Spinner Vehiculo;
+	private Spinner Ayudante,Vehiculo;
+	private TextView lblAyudante,lblVehiculo;
 	private ArrayList<String> listIDAyudante = new ArrayList<String>();
 	private ArrayList<String> listAyudante = new ArrayList<String>();
 	private ArrayList<String> listIDVehiculo = new ArrayList<String>();
 	private ArrayList<String> listVehiculo = new ArrayList<String>();
-	private TextView lblAyudante;
-	private TextView lblVehiculo;
-	///
 
 	private ListAdaptMenuGrid adaptergrid;
 	private AlertDialog.Builder menudlg;
@@ -114,10 +111,7 @@ public class Menu extends PBase {
 		this.setTitle("ROAD");
 		listItems();
 
-		getlistAyudante();
-		getlistVehiculo();
-		getAyudante();
-		getVehiculo();
+		if (gl.peVehAyud) AyudanteVehiculo();
 
 		ConfImpresora();
 	}
@@ -194,8 +188,6 @@ public class Menu extends PBase {
 
         //#HS_20181206 agrega el vendedor en lblVendedor
         lblVendedor.setText(gl.vendnom);
-
-        inputAyudanteVehiculo();
 
 	}
 		
@@ -390,6 +382,7 @@ public class Menu extends PBase {
 
 	}
 
+
 	// Validacion de inicio.
 
 	//#HS_20181122_1527 Se agrego la funcion GetTipoImpresora().
@@ -426,8 +419,7 @@ public class Menu extends PBase {
 	}
 
 	//#HS_20181122_1517 Se agrego el mensaje de configuracion de impresora.
-	private void msgAskImpresora()
-	{
+	private void msgAskImpresora() 	{
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -493,6 +485,16 @@ public class Menu extends PBase {
 	}
 
 	//#HS_20181207 Mensaje que muestra los ayudantes y vehiculos disponibles.
+
+	private void AyudanteVehiculo() {
+		inputAyudanteVehiculo();
+
+		getlistAyudante();
+		getlistVehiculo();
+		getAyudante();
+		getVehiculo();
+	}
+
 	private void inputAyudanteVehiculo() {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
@@ -710,7 +712,8 @@ public class Menu extends PBase {
 		dialog.show();
 
 	}
-	
+
+
 	// Reimpresion
 	
 	public void showPrintMenuTodo() {
@@ -1120,8 +1123,7 @@ public class Menu extends PBase {
 	
 	// Inventario
 	
-	public void showInvMenuVenta()
-	{
+	public void showInvMenuVenta() 	{
 		final AlertDialog Dialog;
 		int itemcnt=1,itempos=0;		
 				
@@ -1497,7 +1499,8 @@ public class Menu extends PBase {
 
 		dialog.show();
 	}
-	
+
+
 	// Aux
 	
 	private void setPrintWidth() {

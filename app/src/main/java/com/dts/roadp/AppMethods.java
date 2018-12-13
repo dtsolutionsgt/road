@@ -45,20 +45,18 @@ public class AppMethods {
 	
 	// Public
 	
-	public void parametrosExtra()
-	{
-
-		Cursor DT;
+	public void parametrosExtra() {
+		Cursor dt;
 		String sql,val="";
 		int ival;
 
 		try {
 
-			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=2";	
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=2";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 
-			val=DT.getString(0);
+			val=dt.getString(0);
 
 		} catch (Exception e) {
 			val="N";
@@ -69,10 +67,10 @@ public class AppMethods {
 		try {
 
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=3";	
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 
-			gl.peModal=DT.getString(0).toUpperCase();
+			gl.peModal=dt.getString(0).toUpperCase();
 
 		} catch (Exception e) {
 			gl.peModal="-";
@@ -82,10 +80,10 @@ public class AppMethods {
 		
 		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=4";	
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 
-			val=DT.getString(0);			
+			val=dt.getString(0);
 		} catch (Exception e) {
 			val="N";
 		}	
@@ -95,50 +93,50 @@ public class AppMethods {
 
 		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=5";	
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 
-			gl.peAceptarCarga=DT.getString(0).equalsIgnoreCase("S");			
+			gl.peAceptarCarga=dt.getString(0).equalsIgnoreCase("S");
 		} catch (Exception e) {
 			gl.peAceptarCarga=false;
 		}	
 
 		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=6";	
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 
-			gl.peBotInv=DT.getString(0).equalsIgnoreCase("S");			
+			gl.peBotInv=dt.getString(0).equalsIgnoreCase("S");
 		} catch (Exception e) {
 			gl.peBotInv=false;
 		}
 
 		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=7";	
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 
-			gl.peBotPrec=DT.getString(0).equalsIgnoreCase("S");			
+			gl.peBotPrec=dt.getString(0).equalsIgnoreCase("S");
 		} catch (Exception e) {
 			gl.peBotPrec=false;
 		}
 
 		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=8";	
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 
-			gl.peBotStock=DT.getString(0).equalsIgnoreCase("S");			
+			gl.peBotStock=dt.getString(0).equalsIgnoreCase("S");
 		} catch (Exception e) {
 			gl.peBotStock=false;
 		}
 
 		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=9";	
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 
-			val=DT.getString(0);
+			val=dt.getString(0);
 			ival=Integer.parseInt(val);
 			if (ival<2)  ival=2;
 			if (ival>10) ival=-1;
@@ -149,10 +147,10 @@ public class AppMethods {
 
 		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=10";	
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 
-			val=DT.getString(0);
+			val=dt.getString(0);
 			ival=Integer.parseInt(val);
 			if (ival<0)  ival=0;
 			if (ival>10) ival=10;
@@ -163,10 +161,10 @@ public class AppMethods {
 
 		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=11";	
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 
-			val=DT.getString(0);
+			val=dt.getString(0);
 			ival=Integer.parseInt(val);
 			if (ival<1) ival=0;
 			gl.peDecCant=ival;
@@ -176,10 +174,10 @@ public class AppMethods {
 
 		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=12";	
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 
-			val=DT.getString(0);
+			val=dt.getString(0);
 			if (emptystr(val)) throw new Exception();
 
 			gl.peMon=val;
@@ -187,7 +185,20 @@ public class AppMethods {
 			Locale defaultLocale = Locale.getDefault();
 			Currency currency = Currency.getInstance(defaultLocale);
 			gl.peMon=currency.getSymbol();		
-		}	
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=13";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) throw new Exception();
+
+			gl.peVehAyud=val.equalsIgnoreCase("S");
+		} catch (Exception e) {
+			gl.peVehAyud=false;
+		}
 
 	}
 

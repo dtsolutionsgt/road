@@ -702,13 +702,14 @@ public class ComWS extends PBase {
 		    for (int i = 0; i < rc; i++) {
 
                 sql = listItems.get(i);
-
                 dbT.execSQL(sql);
 
                 try {
-                    fprog = "Procesando: " + i + " de: " + (rc-1);
-                    wsRtask.onProgressUpdate();
-                    SystemClock.sleep(20);
+                	if (i % 10==0) {
+						fprog = "Procesando: " + i + " de: " + (rc-1);
+						wsRtask.onProgressUpdate();
+						SystemClock.sleep(20);
+					}
                 } catch (Exception e) {
                     Log.e("z", e.getMessage());
                 }
@@ -1413,11 +1414,8 @@ public class ComWS extends PBase {
         protected void onProgressUpdate(Void... values) {
     		try {
                 synchronized (this) {
-                    if (!lblInfo.getText().toString().matches(""))
-                    {
-                        lblInfo.setText(fprog);
-                    }
-                }
+                    if (!lblInfo.getText().toString().matches(""))  lblInfo.setText(fprog);
+                 }
     		} catch (Exception e) {
 
     		}
@@ -1458,6 +1456,7 @@ public class ComWS extends PBase {
 	}
 	return true;
 	}
+
 
 	// WEB SERVICE - ENVIO
 	
@@ -1500,8 +1499,7 @@ public class ComWS extends PBase {
 		return true;
 	}
 
-	public void envioFacturas()
-    {
+	public void envioFacturas()     {
 
 		Cursor DT;
 		String cor,fruta;
@@ -2225,7 +2223,6 @@ public class ComWS extends PBase {
 		}
 
 	}
-
 
 	public void updateAcumulados() {
 		int ff,oyear,omonth,rslt;

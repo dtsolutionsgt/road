@@ -11,9 +11,11 @@ import android.widget.Adapter;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import com.dts.roadp.clsClasses.clsExist;
 
 
 public class InicioDia extends PBase implements View.OnClickListener{
@@ -31,8 +33,15 @@ public class InicioDia extends PBase implements View.OnClickListener{
     final int anio = c.get(Calendar.YEAR);
     private int cyear, cmonth, cday, fechae;
 
-    //#HS_20181212 Clase Exit para imprimir el inventario
-
+    //#HS_20181212 para imprimir el inventario
+    private clsDocExist doc;
+    private printer prn;
+    private Runnable printclose;
+    private int lns;
+    private ArrayList<clsClasses.clsExist> items= new ArrayList<clsClasses.clsExist>();
+    private clsRepBuilder rep;
+    public int yy;
+    public String mm,dd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +58,18 @@ public class InicioDia extends PBase implements View.OnClickListener{
 
         setActDate();
         fechae=fecha;etFecha.setText(du.sfecha(fechae));
+
+        printclose= new Runnable() {
+            public void run() {
+                InicioDia.super.finish();
+            }
+        };
+
+        prn=new printer(this,printclose);
+        doc=new clsDocExist(this,prn.prw);
+        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp);
+
+        listItems();
 
     }
 
@@ -70,6 +91,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
     }
 
     private void obtenerFecha(){
+
         DatePickerDialog recogerFecha = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -77,6 +99,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
                 String diaFormateado = (dayOfMonth < 10)? CERO + String.valueOf(dayOfMonth):String.valueOf(dayOfMonth);
                 String mesFormateado = (mesActual < 10)? CERO + String.valueOf(mesActual):String.valueOf(mesActual);
                 etFecha.setText(diaFormateado + BARRA + mesFormateado + BARRA + year);
+                yy = year;mm = mesFormateado; dd = diaFormateado;
             }
         },anio, mes, dia);
 
@@ -100,7 +123,8 @@ public class InicioDia extends PBase implements View.OnClickListener{
 
         dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                //printDoc();
+                printDoc();
+                fechaNueva();
             }
         });
 
@@ -110,10 +134,173 @@ public class InicioDia extends PBase implements View.OnClickListener{
 
     }
 
+    private void fechaNueva(){
+        int fecha;
 
-    ////////////////////////////////////////////////////////////
+        try {
 
+            if (yy != 00) {
 
+                yy = yy - 2000;
+
+                fecha = Integer.valueOf(String.valueOf(yy) + mm + dd + "0000");
+
+                gl.nuevaFecha = fecha;
+
+            } else {
+
+                gl.nuevaFecha = fechae;
+
+            }
+
+        }catch (Exception e){
+            mu.msgbox("fechaNueva: " + e.getMessage());
+        }
+
+    }
+
+    ////////////////// Proceso para impresión //////////////////
+
+    public void printDoc() {
+        if (doc.buildPrint("0",0)) prn.printask();
+    }
+
+    private class clsDocExist extends clsDocument {
+
+        public clsDocExist(Context context, int printwidth) {
+            super(context, printwidth,gl.peMon,gl.peDecImp);
+
+            nombre="Existencias";
+            numero="";
+            serie="";
+            ruta=gl.ruta;
+            vendedor=gl.vendnom;
+            cliente="";
+
+        }
+
+        protected boolean buildDetail() {
+            clsExist item;
+            String s1,s2;
+
+            try {
+
+                rep.add("REPORTE DE EXISTENCIAS");
+                rep.line();lns=items.size();
+
+                for (int i = 0; i <items.size(); i++) {
+                    item=items.get(i);
+                    rep.add(item.Desc);
+                    rep.add3lrr(item.Cod,item.Peso,item.Valor);
+                    if (item.flag==1) rep.add3lrr("Est.malo" ,item.PesoM,item.ValorM);
+                }
+
+                rep.line();
+
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+
+        }
+
+        protected boolean buildFooter() {
+
+            try {
+                rep.add("Total lineas : "+lns);
+                rep.add("");rep.add("");rep.add("");rep.add("");
+
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+
+        }
+
+    }
+
+    private void listItems() {
+        Cursor DT;
+        clsClasses.clsExist item;
+        String vF, cod, name, um, ump, sc, scm, sct, sp, spm, spt;
+        double val, valm, valt,peso,pesom,pesot;
+
+        items.clear();
+
+        try {
+
+            //vSQL="SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT),SUM(P_STOCK.CANTM) "+
+            //     "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
+            //if (vF.length()>0) vSQL=vSQL+"AND ((P_PRODUCTO.DESCLARGA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
+            //vSQL+="GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA ORDER BY P_PRODUCTO.DESCLARGA";
+
+            sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.CANT,P_STOCK.CANTM,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
+                    "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
+            sql += "ORDER BY P_PRODUCTO.DESCLARGA,P_STOCK.UNIDADMEDIDA";
+
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() == 0) return;
+
+            DT.moveToFirst();
+            while (!DT.isAfterLast()) {
+
+                cod = DT.getString(0);
+                name = DT.getString(1);
+                val = DT.getDouble(2);
+                valm = DT.getDouble(3);
+                um = DT.getString(4);
+                peso=0;
+                pesom=0;
+
+                valt=val+valm;
+                pesot=peso+pesom;
+
+                ump = "";
+                sp = mu.frmdecimal(peso, gl.peDecImp) + " " + rep.ltrim(ump, 3);
+                if (!gl.usarpeso) sp = "";
+                spm = mu.frmdecimal(pesom, gl.peDecImp) + " " + rep.ltrim(ump, 3);
+                if (!gl.usarpeso) spm = "";
+                spt = mu.frmdecimal(pesot, gl.peDecImp) + " " + rep.ltrim(ump, 3);
+                if (!gl.usarpeso) spt = "";
+
+                sc = mu.frmdecimal(val, gl.peDecImp) + " " + rep.ltrim(um, 6);
+                scm = mu.frmdecimal(valm, gl.peDecImp) + " " + rep.ltrim(um, 6);
+                sct = mu.frmdecimal(valt, gl.peDecImp) + " " + rep.ltrim(um, 6);
+
+                item = clsCls.new clsExist();
+
+                item.Cod = cod;
+                item.Fecha = cod;
+                item.Desc = name;
+                item.cant = val;
+                item.cantm = valm;
+
+                item.Valor = sc;
+                item.ValorM = scm;
+                item.ValorT = sct;
+
+                item.Peso = sp;
+                item.PesoM = spm;
+                item.PesoT = spt;
+
+                item.Lote = DT.getString(5);
+                item.Doc = DT.getString(6);
+                item.Centro = DT.getString(7);
+                item.Stat = DT.getString(8);
+
+                if (valm == 0) item.flag = 0;
+                else item.flag = 1;
+
+                items.add(item);
+
+                DT.moveToNext();
+            }
+        } catch (Exception e) {
+            mu.msgbox(e.getMessage());
+        }
+
+    }
 
     ////////////////////////////////////////////////////////////
 

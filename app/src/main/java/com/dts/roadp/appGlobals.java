@@ -14,7 +14,7 @@ public class appGlobals extends Application {
 	//#HS_20181122_1507 Se agregaron la variables impresora, tipoImpresora, supervisor, ayudante, ayudanteID, vehiculo, vehiculoID.
 	public String ruta,rutatipo,rutatipog,vend,vendnom,gstr,gstr2,prod,um,umstock,cliente,ubas,emp,imgpath,umpeso,impresora, tipoImpresora, codSupervisor, ayudante, ayudanteID, vehiculo, vehiculoID;
 	public String devtipo,devrazon,wsURL,bonprodid,pprodname,contrib,ateninistr,tcorel;
-	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,atentini,vnivel,vnivprec,media,autocom;
+	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,atentini,vnivel,vnivprec,media,autocom,nuevaFecha;//#HS_20181213 Variable nuevaFecha
 	public double dval,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor;
 	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo;
 	

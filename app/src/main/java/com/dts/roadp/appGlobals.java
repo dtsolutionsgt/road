@@ -24,7 +24,7 @@ public class appGlobals extends Application {
 	// Parametros Extra
 	public String peModal,peMon;
 	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec;
-	public Boolean peBotStock,peVehAyud,peEscCliente;
+	public Boolean peBotStock,peVehAyud;
 	public int peDec,peDecCant,peDecImp;
 	
 	// Descuentos

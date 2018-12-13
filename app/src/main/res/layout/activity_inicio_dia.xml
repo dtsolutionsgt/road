@@ -50,7 +50,7 @@
         android:layout_marginStart="40dp"
         android:layout_marginTop="130dp"
         android:clickable="true"
-        android:onClick="showDatePickerDialog"
+        android:onClick="CalendarioFecha"
         android:paddingTop="10dp"
         android:src="@drawable/calendario" />
 

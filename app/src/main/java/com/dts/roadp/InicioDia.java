@@ -1,19 +1,25 @@
 package com.dts.roadp;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 
 public class InicioDia extends PBase implements View.OnClickListener{
 
     private TextView etFecha;
-    private ImageView ibObtenerFecha;
+    private ImageView ibObtenerFecha,  imgIniciar;
 
     private static final String CERO = "0";
     private static final String BARRA = "/";
@@ -25,6 +31,8 @@ public class InicioDia extends PBase implements View.OnClickListener{
     final int anio = c.get(Calendar.YEAR);
     private int cyear, cmonth, cday, fechae;
 
+    //#HS_20181212 Clase Exit para imprimir el inventario
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +42,8 @@ public class InicioDia extends PBase implements View.OnClickListener{
         etFecha = (TextView)findViewById(R.id.lblFecha);
         ibObtenerFecha = (ImageView)findViewById(R.id.imgCalendario);
         ibObtenerFecha.setOnClickListener(this);
+        imgIniciar = (ImageView)findViewById(R.id.imgSiguiente);
+        imgIniciar.setOnClickListener(this);
 
         super.InitBase();
 
@@ -48,6 +58,14 @@ public class InicioDia extends PBase implements View.OnClickListener{
             case R.id.imgCalendario:
                 obtenerFecha();
                 break;
+
+            case R.id.imgSiguiente:
+                try {
+                    askFinalizar();
+                    break;
+                }catch (Exception e){
+                    mu.msgbox("InicioDia Imp: "+e.getMessage());
+                }
         }
     }
 
@@ -72,6 +90,32 @@ public class InicioDia extends PBase implements View.OnClickListener{
         cday = c.get(Calendar.DAY_OF_MONTH);
         fecha=du.cfecha(cyear,cmonth,cday);
     }
+
+
+    private void askFinalizar() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+        dialog.setTitle("Road");
+        dialog.setMessage("¿Esta seguro de cambiar la fecha de las factura e imprimir el invetario disponible?");
+
+        dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                //printDoc();
+            }
+        });
+
+        dialog.setNegativeButton("Cancelar", null);
+
+        dialog.show();
+
+    }
+
+
+    ////////////////////////////////////////////////////////////
+
+
+
+    ////////////////////////////////////////////////////////////
 
     @Override
     protected void onResume() {

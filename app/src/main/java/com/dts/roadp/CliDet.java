@@ -1,10 +1,13 @@
 package com.dts.roadp;
 
+import java.io.File;
 import java.text.NumberFormat;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -29,7 +32,7 @@ public class CliDet extends PBase {
 
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol;
-	private RelativeLayout relV,relP,relD;
+	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol;
 	private Exist Existencia = new Exist();
 	private String cod,tel, Nombre, NIT;;
@@ -67,6 +70,7 @@ public class CliDet extends PBase {
 		relV= (RelativeLayout) findViewById(R.id.relVenta);
 		relP= (RelativeLayout) findViewById(R.id.relPreventa);
 		relD= (RelativeLayout) findViewById(R.id.relDespacho);
+		relCamara = (RelativeLayout) findViewById(R.id.relCamara);
 		
 		imgCobro= (ImageView) findViewById(R.id.imageView2);
 		imgDevol= (ImageView) findViewById(R.id.imageView1);
@@ -592,7 +596,25 @@ public class CliDet extends PBase {
 		toast.setGravity(Gravity.CENTER, 0, 0);
 		toast.show();
 	}
-	
+
+	//#HS_20181213 Proceso para tomar foto de la fachada
+	// Camara
+
+	public void tomarFoto(View view){
+
+		try {
+
+			Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+			File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+			intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
+			startActivity(intento1);
+
+		}catch (Exception e){
+			mu.msgbox("tomarFoto: "+ e.getMessage());
+		}
+
+	}
+
 	// GPS
 	
 	private void defineGeoPos(){

@@ -20,10 +20,11 @@ public class appGlobals extends Application {
 	
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,contlic,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente;//#HS_20181211 Agregue incNoLectura, cobroPendiente
-	
+
 	// Parametros Extra
 	public String peModal,peMon;
-	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec,peBotStock;
+	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec;
+	public Boolean peBotStock,peVehAyud,peEscCliente;
 	public int peDec,peDecCant,peDecImp;
 	
 	// Descuentos

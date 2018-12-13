@@ -630,79 +630,96 @@ public class FacturaRes extends PBase {
 	}
 	
 	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa) {
-		Cursor DT;
-		double acant,val,disp,cantapl;
+		Cursor dt;
+		double acant,dcant,disp,cantapl;
 		String lote,doc,stat;
 
 		acant=cant*factor;
 
-		sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV FROM P_STOCK WHERE (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"')";
-		DT=Con.OpenDT(sql);
-		DT.moveToFirst();
-	
-		val=DT.getDouble(0);
-		lote=DT.getString(4);
-		doc=DT.getString(5);
-		stat=DT.getString(9);
-
-		cantapl=acant;
-		disp=val-acant;
-		acant=acant-val;
-
-
-		// Stock
-
-		sql="UPDATE P_STOCK SET CANT="+disp+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"') AND (UNIDADMEDIDA='"+umstock+"')";
-		db.execSQL(sql);
-
-		// Factura Stock
-
-		ins.init("D_FACTURA_STOCK");
-
-		ins.add("COREL",corel);
-		ins.add("CODIGO",prid );
-		ins.add("CANT",cantapl );
-		ins.add("CANTM",DT.getDouble(1));
-		ins.add("PESO",DT.getDouble(2));
-		ins.add("plibra",DT.getDouble(3));
-		ins.add("LOTE",lote );
-
-		ins.add("DOCUMENTO",doc);
-		ins.add("FECHA",DT.getInt(6));
-		ins.add("ANULADO",DT.getInt(7));
-		ins.add("CENTRO",DT.getString(8));
-		ins.add("STATUS",stat);
-		ins.add("ENVIADO",DT.getInt(10));
-		ins.add("CODIGOLIQUIDACION",DT.getInt(11));
-		ins.add("COREL_D_MOV",DT.getString(12));
-		ins.add("UNIDADMEDIDA",umstock);
-
-		db.execSQL(ins.sql());
-
-		// Factura lotes
-
 		try {
-			ins.init("D_FACTURAD_LOTES");
 
-			ins.add("COREL",corel);
-			ins.add("PRODUCTO",prid );
-			ins.add("LOTE",lote );
-			ins.add("CANTIDAD",cantapl);
-			ins.add("PESO",0);
-			ins.add("UMSTOCK",umstock);
-			ins.add("UMPESO",gl.umpeso);
-			ins.add("UMVENTA",umventa);
+			sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
+					"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') ORDER BY LOTE,CANT";
+			dt=Con.OpenDT(sql);
 
-			db.execSQL(ins.sql());
+			if (dt.getCount()==0) return;
 
-			//Toast.makeText(this,ins.SQL(),Toast.LENGTH_LONG).show();
+			dt.moveToFirst();
+			while (!dt.isAfterLast()) {
 
-		} catch (SQLException e) {
-			mu.msgbox(e.getMessage()+"\n"+ins.sql());
+				dcant=dt.getDouble(0);
+				lote=dt.getString(4);
+				doc=dt.getString(5);
+				stat=dt.getString(9);
+
+				if (acant>dcant) cantapl=dcant;else cantapl=acant;
+				disp=dcant-acant;if (disp<0) disp=0;
+				acant=acant-dcant;
+
+
+				// Stock
+
+				sql="UPDATE P_STOCK SET CANT="+disp+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"') AND (UNIDADMEDIDA='"+umstock+"')";
+				db.execSQL(sql);
+
+				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0)";
+				db.execSQL(sql);
+
+
+				// Factura Stock
+
+				ins.init("D_FACTURA_STOCK");
+
+				ins.add("COREL",corel);
+				ins.add("CODIGO",prid );
+				ins.add("CANT",cantapl );
+				ins.add("CANTM",dt.getDouble(1));
+				ins.add("PESO",dt.getDouble(2));
+				ins.add("plibra",dt.getDouble(3));
+				ins.add("LOTE",lote );
+
+				ins.add("DOCUMENTO",doc);
+				ins.add("FECHA",dt.getInt(6));
+				ins.add("ANULADO",dt.getInt(7));
+				ins.add("CENTRO",dt.getString(8));
+				ins.add("STATUS",stat);
+				ins.add("ENVIADO",dt.getInt(10));
+				ins.add("CODIGOLIQUIDACION",dt.getInt(11));
+				ins.add("COREL_D_MOV",dt.getString(12));
+				ins.add("UNIDADMEDIDA",umstock);
+
+				db.execSQL(ins.sql());
+
+				// Factura lotes
+
+				try {
+					ins.init("D_FACTURAD_LOTES");
+
+					ins.add("COREL",corel);
+					ins.add("PRODUCTO",prid );
+					ins.add("LOTE",lote );
+					ins.add("CANTIDAD",cantapl);
+					ins.add("PESO",0);
+					ins.add("UMSTOCK",umstock);
+					ins.add("UMPESO",gl.umpeso);
+					ins.add("UMVENTA",umventa);
+
+					db.execSQL(ins.sql());
+
+					//Toast.makeText(this,ins.SQL(),Toast.LENGTH_LONG).show();
+
+				} catch (SQLException e) {
+					mu.msgbox(e.getMessage()+"\n"+ins.sql());
+				}
+
+				if (acant<=0) return;
+
+				dt.moveToNext();
+			}
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
-
-		if (acant<=0) return;
-
 	}
 	
 	private void rebajaStock(String prid,double cant) {

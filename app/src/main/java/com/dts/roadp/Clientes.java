@@ -270,7 +270,8 @@ public class Clientes extends PBase {
 	    		if (tl>1) gl.escaneo="S";
 	    		if (tl==0 || tl>1) listItems();
 	    	}
-	    });	
+	    });
+
 	}	
 	
 	public void listItems() {

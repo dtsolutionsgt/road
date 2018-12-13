@@ -292,61 +292,61 @@ public class Exist extends PBase {
 	}
 	
 	// Print
-	
+
 	private class clsDocExist extends clsDocument {
 
 		public clsDocExist(Context context, int printwidth) {
 			super(context, printwidth,gl.peMon,gl.peDecImp);
-			
+
 			nombre="Existencias";
 			numero="";
 			serie="";
 			ruta=gl.ruta;
 			vendedor=gl.vendnom;
 			cliente="";
-			
+
 		}
-		
+
 		protected boolean buildDetail() {
 			clsExist item;
 			String s1,s2;
-		
+
 			try {
 				String vf=txtFilter.getText().toString();
 				if (!mu.emptystr(vf)) rep.add("Filtro : "+vf);
-				
+
 				rep.add("REPORTE DE EXISTENCIAS");
 				rep.line();lns=items.size();
-				
-				for (int i = 0; i <items.size(); i++) {	
+
+				for (int i = 0; i <items.size(); i++) {
 					item=items.get(i);
 					rep.add(item.Desc);
 					rep.add3lrr(item.Cod,item.Peso,item.Valor);
-					if (item.flag==1) rep.add3lrr("Est.malo" ,item.PesoM,item.ValorM);					
+					if (item.flag==1) rep.add3lrr("Est.malo" ,item.PesoM,item.ValorM);
 				}
-				
+
 				rep.line();
-				
+
 				return true;
 			} catch (Exception e) {
 				return false;
 			}
-			
-		} 
 
-		protected boolean buildFooter() {		
+		}
+
+		protected boolean buildFooter() {
 
 			try {
-				rep.add("Total lineas : "+lns);				
+				rep.add("Total lineas : "+lns);
 				rep.add("");rep.add("");rep.add("");rep.add("");
-				
+
 				return true;
 			} catch (Exception e) {
 				return false;
 			}
-			
-		}	
-		
+
+		}
+
 	}
 
 	@Override

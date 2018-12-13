@@ -212,6 +212,12 @@ public class MainActivity extends PBase {
 		} catch (Exception e) {
 		}
 
+		try {
+			File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos");
+			directory.mkdirs();
+		} catch (Exception e) {
+		}
+
 
 		try {
 			AppMethods app = new AppMethods(this, gl, Con, db);

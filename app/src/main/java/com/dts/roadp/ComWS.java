@@ -706,7 +706,7 @@ public class ComWS extends PBase {
                 dbT.execSQL(sql);
 
                 try {
-                    fprog = "Procesando: " + i + " de:" + (rc-1);
+                    fprog = "Procesando: " + i + " de: " + (rc-1);
                     wsRtask.onProgressUpdate();
                     SystemClock.sleep(20);
                 } catch (Exception e) {
@@ -742,9 +742,7 @@ public class ComWS extends PBase {
 
 			try {
 				ConT.close();  
-			} catch (Exception ee)
-			{
-
+			} catch (Exception ee) {
 			}
 			
 			sstr=e.getMessage();
@@ -1260,12 +1258,12 @@ public class ComWS extends PBase {
 	
 	private void estandartInventario() {
 		Cursor dt,df;
-		String cod,ub,us;
+		String cod,ub,us,lote,doc,stat;
 		double cant,fact;
 	
 		try {
 
-			sql="SELECT P_STOCK.CODIGO,P_STOCK.UNIDADMEDIDA, P_PRODUCTO.UNIDBAS, P_STOCK.CANT " +
+			sql="SELECT P_STOCK.CODIGO,P_STOCK.UNIDADMEDIDA, P_PRODUCTO.UNIDBAS, P_STOCK.CANT,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.STATUS  " +
 					"FROM  P_STOCK INNER JOIN P_PRODUCTO ON P_STOCK.CODIGO=P_PRODUCTO.CODIGO";
 			dt=Con.OpenDT(sql);
 		
@@ -1278,8 +1276,10 @@ public class ComWS extends PBase {
 				us=dt.getString(1);
 				ub=dt.getString(2);
 				cant=dt.getDouble(3);
-			
-				
+				lote = dt.getString(4);
+				doc = dt.getString(5);
+				stat = dt.getString(6);
+
 				if (!ub.equalsIgnoreCase(us)) {
 					
 					sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+us+"') AND (UNIDADMINIMA='"+ub+"')";	
@@ -1290,7 +1290,8 @@ public class ComWS extends PBase {
 						df.moveToFirst();
 						fact=df.getDouble(0);cant=cant*fact;
 						
-						sql="UPDATE P_STOCK SET CANT="+cant+",UNIDADMEDIDA='"+ub+"' WHERE CODIGO='"+cod+"'";
+						sql="UPDATE P_STOCK SET CANT="+cant+",UNIDADMEDIDA='"+ub+"'  " +
+							"WHERE (CODIGO='"+cod+"') AND (UNIDADMEDIDA='"+us+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
 						db.execSQL(sql);
 					} else {
 						msgbox("No existe factor conversion para el producto : "+cod);
@@ -1535,15 +1536,15 @@ public class ComWS extends PBase {
 
 					i+=1;fprog="Factura "+i;wsStask.onProgressUpdate();
 					
-					if(gl.banderafindia == false){ dbld.clear(); }
+					//if(gl.banderafindia == false){ dbld.clear(); }
+					dbld.clear();
 
 					dbld.insert("D_FACTURA" ,"WHERE COREL='"+cor+"'");
 					dbld.insert("D_FACTURAD","WHERE COREL='"+cor+"'");
 					dbld.insert("D_FACTURAP","WHERE COREL='"+cor+"'");
 					dbld.insert("D_FACTURAD_LOTES","WHERE COREL='"+cor+"'");
 					dbld.insert("D_FACTURAF","WHERE COREL='"+cor+"'");
-					//dbld.insert("D_FACTURAD_LOTES","WHERE COREL='"+cor+"'");
-					
+
 					dbld.insert("D_BONIF" ,"WHERE COREL='"+cor+"'");
 					dbld.insert("D_BONIF_LOTES","WHERE COREL='"+cor+"'");
 					dbld.insert("D_REL_PROD_BON","WHERE COREL='"+cor+"'");
@@ -1551,7 +1552,7 @@ public class ComWS extends PBase {
 					
 					dbld.add("UPDATE P_COREL SET CORELULT="+ccorel+"  WHERE RUTA='"+fruta+"'");	
 
-					if(gl.banderafindia == false) {
+					//if(gl.banderafindia == false) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_FACTURA SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -1560,7 +1561,7 @@ public class ComWS extends PBase {
 							fterr += "\n" + sstr;
 							dbg = sstr;
 						}
-					}
+					//}
 							
 				} catch (Exception e) {
 					fterr+="\n"+e.getMessage();
@@ -1574,14 +1575,16 @@ public class ComWS extends PBase {
 			fstr=e.getMessage();dbg=fstr;
 		}
 
-		if(gl.banderafindia == false) {
+
+		//if (gl.banderafindia == false) {
 			if (pc != pcc) {
 				int pf = pcc - pc;
 				senv += "Facturas : " + pc + " , NO ENVIADO : " + pf + "\n";
 			} else {
 				senv += "Facturas : " + pc + "\n";
 			}
-		}
+		//}
+
 	}	
 		
 	public void envioPedidos(){
@@ -2345,7 +2348,7 @@ public class ComWS extends PBase {
 		}
 		
 		mu.msgbox(senv);
-		//mu.msgbox(dbg);
+		if (!dbg.equalsIgnoreCase("::")) mu.msgbox(dbg);
 		
 		//updateLicencePush();
 

@@ -269,7 +269,7 @@ public class ProdCant extends PBase {
 			
 		try {
 
-			sql="SELECT CANT FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";	
+			sql="SELECT SUM(CANT) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			

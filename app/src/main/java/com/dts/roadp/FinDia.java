@@ -249,6 +249,8 @@ public class FinDia extends PBase {
 					sql="DELETE FROM D_FACTURAD WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_FACTURAP WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_FACTURAD_LOTES WHERE COREL='"+corel+"'";db.execSQL(sql);
+					sql="DELETE FROM D_FACTURAF WHERE COREL='"+corel+"'";db.execSQL(sql);
+					sql="DELETE FROM D_FACTURA_STOCK WHERE COREL='"+corel+"'";db.execSQL(sql);
 					
 					sql="DELETE FROM D_BONIF";db.execSQL(sql);
 					sql="DELETE FROM D_BONIF_LOTES";db.execSQL(sql);

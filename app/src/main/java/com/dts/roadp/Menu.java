@@ -111,7 +111,11 @@ public class Menu extends PBase {
 		this.setTitle("ROAD");
 		listItems();
 
-		if (gl.peVehAyud) AyudanteVehiculo();
+		if (gl.peVehAyud) {
+			AyudanteVehiculo();
+		} else {
+			gl.ayudanteID="";gl.vehiculoID="";
+		}
 
 		ConfImpresora();
 	}

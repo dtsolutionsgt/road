@@ -248,9 +248,9 @@ public class CliDet extends PBase {
 		alert.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String corel=mu.getCorelBase();
-				Nombre = editNombre.getText().toString();
-				NIT = editNit.getText().toString();
-				ActualizarCliente(corel,Nombre, NIT);
+				gl.fnombre = editNombre.getText().toString();
+				gl.fnit = editNit.getText().toString();
+				ActualizarCliente(corel,gl.fnombre, gl.fnit);
 			}
 		});
 

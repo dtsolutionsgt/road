@@ -575,8 +575,6 @@ public class FacturaRes extends PBase {
 				}
 
 			}
-
-
 			
 			// Datos facturacion
 

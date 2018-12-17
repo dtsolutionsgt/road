@@ -399,7 +399,6 @@
                 android:id="@+id/imgCamara"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_below="@+id/relDespacho"
                 android:layout_alignParentStart="true"
                 android:layout_marginStart="0dp"
                 android:paddingEnd="6dp"
@@ -503,6 +502,18 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#FFFFFF"
             android:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/imageView18"
+            android:layout_width="38dp"
+            android:layout_height="33dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="9dp"
+            android:onClick="mostrarFachada"
+            android:src="@drawable/prod_foto" />
     </RelativeLayout>
 
     <RelativeLayout

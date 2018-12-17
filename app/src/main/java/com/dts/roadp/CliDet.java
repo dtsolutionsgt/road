@@ -1,8 +1,24 @@
 package com.dts.roadp;
 
 import java.io.File;
-import java.text.NumberFormat;
+import org.apache.commons.io. IOUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.KeyStore;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -39,6 +55,7 @@ public class CliDet extends PBase {
 	private double clim,cused,cdisp;
 	private int nivel,browse,merc;
 	private boolean porcentaje = false;
+	private byte[] imagenBit;
 	
 	private double gpx,gpy;
 	
@@ -614,6 +631,145 @@ public class CliDet extends PBase {
 		}
 
 	}
+
+	public void mostrarFachada(View view){
+
+		try {
+
+            String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+            File archivo = new File(paht);
+
+            if(archivo.exists()){
+                inputFachada();
+            }else {
+                Toast.makeText(this,"Fachada no disponible",Toast.LENGTH_LONG).show();
+            }
+
+		}catch (Exception e){
+				mu.msgbox("inputFachada: " + e.getMessage());
+		}
+
+	}
+
+	public Bitmap redimensionarImagen(Bitmap mBitmap, float newWidth, float newHeigth){
+
+			int width = mBitmap.getWidth();
+			int height = mBitmap.getHeight();
+			float scaleWidth = ((float) newWidth) / width;
+			float scaleHeight = ((float) newHeigth) / height;
+			Matrix matrix = new Matrix();
+			matrix.postScale(scaleWidth, scaleHeight);
+			return Bitmap.createBitmap(mBitmap, 0, 0, width, height, matrix, false);
+
+	}
+
+	public void inputFachada() {
+
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+		final ImageView imgFachada = new ImageView(this);
+
+        String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+        Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
+
+        imgFachada.setImageBitmap(redimensionarImagen(bitmap1,1000,1000));
+
+		alert.setView(imgFachada);
+
+		alert.show();
+	}
+
+	//#HS_20181214 Convierte la imagen a un arreglo de tipo bytes.
+	public void bytesImagen(View view) throws IOException {
+
+		try {
+
+			String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+			FileInputStream imagen = new FileInputStream(paht);
+
+			byte[] imageInBytes = IOUtils.toByteArray(imagen);
+			imagenBit = imageInBytes;
+
+			//Toast.makeText(this, "Bytes: " + imageInBytes.toString(), Toast.LENGTH_LONG).show();
+
+            crearJSON();
+
+		}catch (Exception e){
+			mu.msgbox("bytesImagen: " + e.getMessage());
+		}
+	}
+
+	//#HS_20181214 Crea la estructura JSON para almacenar las imagenes.
+	public void crearJSON() {
+
+		try {
+
+			JSONObject json = new JSONObject();
+			JSONObject json2 = new JSONObject();
+			JSONArray json_Array = new JSONArray();
+
+			json.put("CODIGO",cod);
+			json.put("IMAGEN",imagenBit);
+
+			json_Array.put(json);
+
+			json2.put("P_CLIENTE_FACHADA",json_Array);
+
+			mu.msgbox(json2.toString());
+
+		}catch (JSONException e){
+			mu.msgbox("crearJSON: " + e.getMessage());
+		}
+
+	}
+
+	//#HS_20181214 Devuelve JSON: lista de fotos en ROADFOTOS.
+	public void listaFachada(View view){
+
+	    Cursor DT;
+	    String codigo;
+        JSONObject json = new JSONObject();
+        JSONObject json2 = new JSONObject();
+        JSONArray json_Array = new JSONArray();
+
+	    try {
+            sql = "SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA = '"+gl.ruta+"'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+
+                DT.moveToFirst();
+
+                while (!DT.isAfterLast()){
+
+                    codigo = DT.getString(0);
+
+                    String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + codigo + ".jpg");
+                    File archivo = new File(paht);
+
+                    if(archivo.exists()){
+
+                        FileInputStream imagen = new FileInputStream(paht);
+                        byte[] imageInBytes = IOUtils.toByteArray(imagen);
+
+                        json.put("CODIGO",codigo);
+                        json.put("IMAGEN",imageInBytes);
+						json_Array.put(json);
+                    }
+                    DT.moveToNext();
+                }
+
+
+                json2.put("P_CLIENTE_FACHADA",json_Array);
+
+            }
+
+            mu.msgbox(json2.toString());
+
+        }catch (Exception e){
+	        mu.msgbox("listaFachada: " + e.getMessage());
+        }
+    }
 
 	// GPS
 	

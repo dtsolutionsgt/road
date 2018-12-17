@@ -116,7 +116,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/gps_symb" />
+                android:src="@drawable/iconoubicacion" />
 
             <TextView
                 android:id="@+id/textView2"
@@ -637,7 +637,7 @@
             android:layout_alignLeft="@+id/imageView1"
             android:layout_alignRight="@+id/imageView1"
             android:gravity="center_horizontal"
-            android:text="Devoluc."
+            android:text="Devolución"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="10sp" />
 

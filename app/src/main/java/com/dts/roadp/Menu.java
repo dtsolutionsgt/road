@@ -610,7 +610,7 @@ public class Menu extends PBase {
             }
 
 		}catch (Exception e){
-			Log.d("ObtenerAyudante error: ", e.getMessage());
+			Log.d("getAyudanteVehiculo error: ", e.getMessage());
 		}
 	}
 

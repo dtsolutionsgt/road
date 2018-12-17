@@ -29,7 +29,7 @@ public class Menu extends PBase {
 
 	private GridView gridView;
 	private RelativeLayout relbotpan;
-	private TextView lblVendedor;
+	private TextView lblVendedor,lblRuta;
 	
 	private ArrayList<clsMenu> items= new ArrayList<clsMenu>();
 
@@ -64,6 +64,8 @@ public class Menu extends PBase {
 
 		//#HS_20181206_0945 Agregue lblVendedor que se muestra en el menú.
 		lblVendedor = (TextView) findViewById(R.id.lblVendedor);
+		lblRuta = (TextView) findViewById(R.id.textView9);
+
 		Ayudante = new Spinner(this);
 		Vehiculo = new Spinner(this);
 		lblAyudante = new TextView(this);
@@ -190,8 +192,9 @@ public class Menu extends PBase {
 		gridView.setAdapter(adaptergrid);	
 		adaptergrid.setSelectedIndex(selIdx);
 
-        //#HS_20181206 agrega el vendedor en lblVendedor
+        //#HS_20181206 agrega el vendedor en lblVendedor y la ruta.
         lblVendedor.setText(gl.vendnom);
+        lblRuta.setText(gl.ruta);
 
 	}
 		

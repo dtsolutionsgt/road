@@ -200,6 +200,11 @@ public class clsRepBuilder {
 		ts=ltrim(s1,prwh)+rtrim(s2,prwq)+rtrim(s3,prwq);
 		items.add(ts);
 	}
+
+	public void add3fact(String s1,String s2,String s3) {
+		ts=ltrim(s1,prwh)+rtrim(s2,prwq)+rtrim(s3,prwq);
+		items.add(ts);
+	}
 	
 	public void addtot(String s1,String val) {
 		ts=ltrim(s1,prw-13)+" "+rtrim(val,12);

@@ -28,6 +28,8 @@ public class clsDocFactura extends clsDocument {
 		String cu,cp;
 		
 		rep.line();
+		rep.add3fact("Cantidad  Peso","Precio","Total");
+		rep.line();
 		//rep.empty();
 		
 		for (int i = 0; i <items.size(); i++) {

@@ -453,7 +453,8 @@ public class Exist extends PBase {
 
 		protected boolean buildDetail() {
 			clsExist item;
-			String s1,s2;
+			String s1,s2,lote;
+            int ic;
 
 			try {
 				String vf=txtFilter.getText().toString();
@@ -463,26 +464,36 @@ public class Exist extends PBase {
 				rep.line();lns=items.size();
 
 				for (int i = 0; i <items.size(); i++) {
+
 					item=items.get(i);
+                    ic=item.items;
+                    lote=item.Lote;
 
                     switch (item.flag) {
+                        case 0:
+                            rep.add(item.Desc);
+                            if (ic<2) {
+                                if (!(lote==null || lote.isEmpty())) rep.add(item.Cod);
+                            } else {
+                                rep.add(item.Cod);
+                            }
+                            break;
                         case 1:
-                            rep.add(item.Desc);break;
+                            rep.add3lrr(item.Lote,item.Peso,item.Valor);break;
                         case 2:
-                            ;break;
+                            rep.add("Estado malo");
+                            rep.add3lrr(item.Lote,item.PesoM,item.ValorM);break;
                         case 3:
-                            ;break;
-                        case 4:
-                            ;break;
+                            rep.add3lrr("Total",item.PesoT,item.ValorT);break;
                     }
 
 					//rep.add3lrr(item.Cod,item.Peso,item.Valor);
 					//if (item.flag==1) rep.add3lrr("Est.malo" ,item.PesoM,item.ValorM);
 				}
   			rep.line();
-
 				return true;
 			} catch (Exception e) {
+			    msgbox(e.getMessage());
 				return false;
 			}
 

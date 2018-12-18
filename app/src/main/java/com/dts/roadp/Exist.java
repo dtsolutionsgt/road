@@ -476,8 +476,6 @@ public class Exist extends PBase {
                             ;break;
                     }
 
-
-
 					//rep.add3lrr(item.Cod,item.Peso,item.Valor);
 					//if (item.flag==1) rep.add3lrr("Est.malo" ,item.PesoM,item.ValorM);
 				}

@@ -32,6 +32,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebSettings;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,6 +47,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.ZoomControls;
+
+import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 public class CliDet extends PBase {
 
@@ -671,6 +675,7 @@ public class CliDet extends PBase {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		final ImageView imgFachada = new ImageView(this);
+		imgFachada.setScaleType(CENTER_CROP);
 
         String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
         Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
@@ -680,6 +685,7 @@ public class CliDet extends PBase {
 		alert.setView(imgFachada);
 
 		alert.show();
+
 	}
 
 	//#HS_20181214 Convierte la imagen a un arreglo de tipo bytes.
@@ -758,12 +764,14 @@ public class CliDet extends PBase {
                         json.put("CODIGO",codigo);
                         json.put("IMAGEN",imageInBytes);
 						json_Array.put(json);
+
                     }
+
                     DT.moveToNext();
+
                 }
 
-
-                json2.put("P_CLIENTE_FACHADA",json_Array);
+                json2.put("D_CLIENTE_FACHADA",json_Array);
 
             }
 

@@ -119,6 +119,7 @@ public class clsDocument {
 	
 	// Private
 	
+
 	private boolean buildHeader(String corel,int reimpres) {
 		
 		lines.clear();
@@ -129,7 +130,7 @@ public class clsDocument {
 			
 			if (!corel.equalsIgnoreCase("0")) {
 				loadDocData(corel);
-				loadHeadData(corel);	
+				loadHeadData(corel);
 			}
 			loadHeadLines();
 			
@@ -145,7 +146,8 @@ public class clsDocument {
 		
 		return true;
 	}
-	
+
+
 	private boolean buildHeader(String corel,int reimpres,BaseDatos pCon,android.database.sqlite.SQLiteDatabase pdb) {
 		
 		lines.clear();
@@ -156,7 +158,7 @@ public class clsDocument {
 			
 			if (!corel.equalsIgnoreCase("0")) {
 				loadDocData(corel);
-				loadHeadData(corel);	
+				loadHeadData(corel);
 			}
 			loadHeadLines();
 						

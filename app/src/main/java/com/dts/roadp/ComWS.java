@@ -147,7 +147,7 @@ public class ComWS extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		
 		dialog.setTitle("Recepcion");
-		dialog.setMessage("Recibir datos nuevos ?");
+		dialog.setMessage("¿Recibir datos nuevos?");
 					
 		dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	
@@ -177,7 +177,7 @@ public class ComWS extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle("Envio");
-		dialog.setMessage("Enviar datos ?");
+		dialog.setMessage("¿Enviar datos?");
 					
 		dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	
@@ -200,7 +200,7 @@ public class ComWS extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		
 		dialog.setTitle("Existencias bodega");
-		dialog.setMessage("Actualizar existencias ?");
+		dialog.setMessage("¿Actualizar existencias?");
 					
 		dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	

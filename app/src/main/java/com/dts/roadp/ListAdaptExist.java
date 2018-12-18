@@ -51,21 +51,27 @@ public class ListAdaptExist extends BaseAdapter {
 
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder;
+		int ic;
+		String lote;
 	
 		if (convertView == null) {
 			
 			convertView = l_Inflater.inflate(R.layout.activity_list_view_exist, null);
 			holder = new ViewHolder();
-			
-			holder.lblFecha  = (TextView) convertView.findViewById(R.id.lblETipo);
+
 			holder.lblDesc = (TextView) convertView.findViewById(R.id.lblPNum);
+			holder.lblCod = (TextView) convertView.findViewById(R.id.textView18);
+			holder.lblLote  = (TextView) convertView.findViewById(R.id.lblETipo);
+            holder.lblLotem  = (TextView) convertView.findViewById(R.id.textView19);
 			holder.lblValor = (TextView) convertView.findViewById(R.id.lblPValor);
 			holder.lblValorM = (TextView) convertView.findViewById(R.id.lblValorM);
             holder.lblValorT = (TextView) convertView.findViewById(R.id.lblValorT);
 			holder.lblPeso = (TextView) convertView.findViewById(R.id.lblepeso);
 			holder.lblPesoM = (TextView) convertView.findViewById(R.id.lblepesom);
             holder.lblPesoT = (TextView) convertView.findViewById(R.id.lblepesoT);
-			
+
+			holder.reltitle= (RelativeLayout) convertView.findViewById(R.id.relexitit);
+			holder.relbueno= (RelativeLayout) convertView.findViewById(R.id.relexist);
 			holder.relmalo = (RelativeLayout) convertView.findViewById(R.id.relexistm);
 			holder.reltot = (RelativeLayout) convertView.findViewById(R.id.relexistt);
 			
@@ -73,22 +79,50 @@ public class ListAdaptExist extends BaseAdapter {
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-					
-		holder.lblFecha.setText(items.get(position).Fecha);
+
 		holder.lblDesc.setText(items.get(position).Desc);
-		holder.lblValor.setText(items.get(position).Valor);
-		holder.lblValorM.setText(items.get(position).ValorM);
-        holder.lblValorT.setText(items.get(position).ValorT);
+		holder.lblCod.setText(items.get(position).Cod);
+
+		holder.lblLote.setText(items.get(position).Lote);
+        holder.lblLotem.setText(items.get(position).Lote);
 		holder.lblPeso.setText(items.get(position).Peso);
+		holder.lblValor.setText(items.get(position).Valor);
+
 		holder.lblPesoM.setText(items.get(position).PesoM);
+		holder.lblValorM.setText(items.get(position).ValorM);
+
         holder.lblPesoT.setText(items.get(position).PesoT);
-		
-		if (items.get(position).flag==1) {
-			holder.relmalo.setVisibility(View.VISIBLE);
-            holder.reltot.setVisibility(View.VISIBLE);
-		} else {	
-			holder.relmalo.setVisibility(View.GONE);
-            holder.reltot.setVisibility(View.GONE);
+		holder.lblValorT.setText(items.get(position).ValorT);
+
+		holder.reltitle.setVisibility(View.GONE);
+		holder.relbueno.setVisibility(View.GONE);
+		holder.relmalo.setVisibility(View.GONE);
+		holder.reltot.setVisibility(View.GONE);
+
+		ic=items.get(position).items;
+		lote=items.get(position).Lote;
+
+		switch (items.get(position).flag) {
+			case 0:
+				holder.reltitle.setVisibility(View.VISIBLE);
+
+				if (ic<2) {
+					if (lote==null || lote.isEmpty()) {
+						holder.lblCod.setVisibility(View.GONE);
+						//holder.lblCod.setVisibility(View.VISIBLE);
+					} else {
+						holder.lblCod.setVisibility(View.VISIBLE);
+					}
+				} else {
+					holder.lblCod.setVisibility(View.VISIBLE);
+				}
+				break;
+			case 1:
+				holder.relbueno.setVisibility(View.VISIBLE);break;
+            case 2:
+                holder.relmalo.setVisibility(View.VISIBLE);break;
+            case 3:
+                holder.reltot.setVisibility(View.VISIBLE);break;
 		}
 		
 		if(selectedIndex!= -1 && position == selectedIndex) {
@@ -102,8 +136,8 @@ public class ListAdaptExist extends BaseAdapter {
 	
 	
 	static class ViewHolder {
-		TextView  lblFecha,lblDesc,lblValor,lblValorM,lblValorT,lblPeso,lblPesoM,lblPesoT;
-		RelativeLayout relmalo,reltot;
+		TextView  lblLote,lblLotem,lblCod,lblDesc,lblValor,lblValorM,lblValorT,lblPeso,lblPesoM,lblPesoT;
+		RelativeLayout reltitle,relbueno,relmalo,reltot;
 	}
 	
 }

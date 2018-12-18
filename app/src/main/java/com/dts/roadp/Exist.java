@@ -106,7 +106,7 @@ public class Exist extends PBase {
 					
 					adapter.setSelectedIndex(position);
 					
-					appProd();
+					//appProd();
 		        } catch (Exception e) {
 			   	   mu.msgbox( e.getMessage());
 		        }
@@ -123,7 +123,7 @@ public class Exist extends PBase {
 					clsClasses.clsExist item = (clsClasses.clsExist) lvObj;
 
 					adapter.setSelectedIndex(position);
-					itemDetail(item);
+					if (item.flag==1 | item.flag==2) itemDetail(item);
 				} catch (Exception e) {
 				}
 				return true;
@@ -174,6 +174,150 @@ public class Exist extends PBase {
 	}
 
 	private void listItems() {
+		Cursor dt, dp;
+		clsClasses.clsExist item,itemm,itemt;
+		String vF,pcod, cod, name, um, ump, sc, scm, sct="", sp, spm, spt="";
+		double val, valm, valt, peso, pesom, pesot;
+		int icnt;
+
+		items.clear();lblReg.setText(" ( 0 ) ");
+
+		vF = txtFilter.getText().toString().replace("'", "");
+
+		try {
+
+			//vSQL="SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT),SUM(P_STOCK.CANTM) "+
+			//     "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
+			//if (vF.length()>0) vSQL=vSQL+"AND ((P_PRODUCTO.DESCLARGA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
+			//vSQL+="GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA ORDER BY P_PRODUCTO.DESCLARGA";
+
+			sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA " +
+					"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
+			if (vF.length() > 0)
+				sql = sql + "AND ((P_PRODUCTO.DESCLARGA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
+			sql += "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA ORDER BY P_PRODUCTO.DESCLARGA ";
+			dp = Con.OpenDT(sql);
+
+			if (dp.getCount() == 0) {
+				adapter = new ListAdaptExist(this, items);
+				listView.setAdapter(adapter);
+				return;
+			}
+
+			lblReg.setText(" ( " + dp.getCount() + " ) ");
+			dp.moveToFirst();
+
+			while (!dp.isAfterLast()) {
+
+				pcod=dp.getString(0);
+                valt=0;pesot=0;
+
+				sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT),SUM(P_STOCK.CANTM),P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
+						"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  ";
+				sql += "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
+                        "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
+                        "ORDER BY P_STOCK.CANT";
+				dt = Con.OpenDT(sql);
+				icnt=dt.getCount();
+                if (icnt==1) {
+                    dt.moveToFirst();
+                    if (dt.getDouble(2)>0 && dt.getDouble(3)>0) icnt=2;
+                }
+
+				item = clsCls.new clsExist();
+				item.Cod = pcod;
+				item.Desc = dp.getString(1);
+				item.flag = 0;
+				item.items=icnt;
+				items.add(item);
+
+				if (dt.getCount() == 0) return;
+
+				dt.moveToFirst();
+				while (!dt.isAfterLast()) {
+
+					cod = dt.getString(0);
+					name = dt.getString(1);
+					val = dt.getDouble(2);
+					valm = dt.getDouble(3);
+					um = dt.getString(4);
+					peso = 0;
+					pesom = 0;
+
+					valt += val + valm;
+					pesot += peso + pesom;
+
+					ump = "";
+					sp = mu.frmdecimal(peso, gl.peDecImp) + " " + rep.ltrim(ump, 3);
+					if (!gl.usarpeso) sp = "";
+					spm = mu.frmdecimal(pesom, gl.peDecImp) + " " + rep.ltrim(ump, 3);
+					if (!gl.usarpeso) spm = "";
+					spt = mu.frmdecimal(pesot, gl.peDecImp) + " " + rep.ltrim(ump, 3);
+					if (!gl.usarpeso) spt = "";
+
+					sc = mu.frmdecimal(val, gl.peDecImp) + " " + rep.ltrim(um, 6);
+					scm = mu.frmdecimal(valm, gl.peDecImp) + " " + rep.ltrim(um, 6);
+					sct = mu.frmdecimal(valt, gl.peDecImp) + " " + rep.ltrim(um, 6);
+
+					item = clsCls.new clsExist();
+					itemm = clsCls.new clsExist();
+
+					item.Cod = cod;itemm.Cod = cod;
+					item.Fecha = cod;itemm.Fecha = cod;
+					item.Desc = name;itemm.Desc = name;
+					item.cant = val;itemm.cant = val;
+					item.cantm = valm;itemm.cantm = valm;
+
+					item.Valor = sc;itemm.Valor = sc;
+					item.ValorM = scm;itemm.ValorM = scm;
+					item.ValorT = sct;itemm.ValorT = sct;
+
+					item.Peso = sp;itemm.Peso = sp;
+					item.PesoM = spm;itemm.PesoM = spm;
+					item.PesoT = spt;item.PesoT = spt;
+
+					item.Lote = dt.getString(5);if (mu.emptystr(item.Lote)) item.Lote =cod;
+                    itemm.Lote = item.Lote;
+					item.Doc = dt.getString(6);itemm.Doc = dt.getString(6);
+					item.Centro = dt.getString(7);itemm.Centro = dt.getString(7);
+					item.Stat = dt.getString(8);itemm.Stat = dt.getString(8);
+
+					if (val>0) {
+						item.flag = 1;
+						items.add(item);
+
+						if (valm > 0) {
+						    icnt++;
+							itemm.flag = 2;
+							items.add(itemm);
+  						}
+					} else {
+  						item.flag = 2;
+						items.add(item);
+					}
+					dt.moveToNext();
+				}
+
+				if (icnt>1) {
+                    itemt = clsCls.new clsExist();
+                    itemt.ValorT = sct;
+                    itemt.PesoT = spt;
+                    itemt.flag = 3;
+                    items.add(itemt);
+                }
+
+				dp.moveToNext();
+			}
+		} catch (Exception e) {
+			mu.msgbox(e.getMessage());
+		}
+
+		adapter = new ListAdaptExist(this, items);
+		listView.setAdapter(adapter);
+
+	}
+
+	private void listItemsOld() {
 		Cursor DT;
 		clsClasses.clsExist item;
 		String vF, cod, name, um, ump, sc, scm, sct, sp, spm, spt;
@@ -309,7 +453,8 @@ public class Exist extends PBase {
 
 		protected boolean buildDetail() {
 			clsExist item;
-			String s1,s2;
+			String s1,s2,lote;
+            int ic;
 
 			try {
 				String vf=txtFilter.getText().toString();
@@ -319,16 +464,36 @@ public class Exist extends PBase {
 				rep.line();lns=items.size();
 
 				for (int i = 0; i <items.size(); i++) {
+
 					item=items.get(i);
-					rep.add(item.Desc);
-					rep.add3lrr(item.Cod,item.Peso,item.Valor);
-					if (item.flag==1) rep.add3lrr("Est.malo" ,item.PesoM,item.ValorM);
+                    ic=item.items;
+                    lote=item.Lote;
+
+                    switch (item.flag) {
+                        case 0:
+                            rep.add(item.Desc);
+                            if (ic<2) {
+                                if (!(lote==null || lote.isEmpty())) rep.add(item.Cod);
+                            } else {
+                                rep.add(item.Cod);
+                            }
+                            break;
+                        case 1:
+                            rep.add3lrr(item.Lote,item.Peso,item.Valor);break;
+                        case 2:
+                            rep.add("Estado malo");
+                            rep.add3lrr(item.Lote,item.PesoM,item.ValorM);break;
+                        case 3:
+                            rep.add3lrr("Total",item.PesoT,item.ValorT);break;
+                    }
+
+					//rep.add3lrr(item.Cod,item.Peso,item.Valor);
+					//if (item.flag==1) rep.add3lrr("Est.malo" ,item.PesoM,item.ValorM);
 				}
-
-				rep.line();
-
+  			rep.line();
 				return true;
 			} catch (Exception e) {
+			    msgbox(e.getMessage());
 				return false;
 			}
 

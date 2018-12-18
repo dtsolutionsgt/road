@@ -20,7 +20,7 @@ public class clsClasses {
 	public class clsExist {
 		public String Cod,Desc,Fecha,Valor,ValorM,ValorT,Peso,PesoM,PesoT,Lote,Doc,Centro,Stat;
 		public double cant,cantm;
-		public int id,flag;
+		public int id,flag,items;
 	}
 	
 	public class clsMenu {

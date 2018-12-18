@@ -28,7 +28,7 @@ public class clsDocFactura extends clsDocument {
 		String cu,cp;
 		
 		rep.line();
-		rep.add3fact("Cantidad  Peso","Precio","Total");
+		rep.add3fact("Cantidad      Peso","  Precio","Total");
 		rep.line();
 		//rep.empty();
 		
@@ -66,7 +66,7 @@ public class clsDocFactura extends clsDocument {
 				rep.addtotsp("Subtotal", stot);
 				rep.addtotsp("Descuento", -desc);	
 			}		
-			rep.addtotsp("TOTAL A PAGAR", tot);			
+			rep.addtotsp("TOTAL A PAGAR ", tot);
 		}
 		
 		rep.add("");

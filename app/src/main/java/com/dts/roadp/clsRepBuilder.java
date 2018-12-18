@@ -223,7 +223,7 @@ public class clsRepBuilder {
 		String sval;
 		
 		sval=cursym+decfrm.format(val);
-		ts=ltrim(s1,prw-14)+" "+rtrim(sval,12)+" ";
+		ts=ltrim(s1,prw-14)+"  "+rtrim(sval,12)+" ";
 		items.add(ts);
 	}
 	

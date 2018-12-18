@@ -207,10 +207,8 @@ public class clsDocument {
 
 		if (!emptystr(nit)) rep.add("NIT : "+nit);
 		if (!emptystr(clidir)) rep.add("Dir : "+clidir);
-
 		if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
-		
-		
+
 		
 		if (!emptystr(add1)) {
 			rep.add("");

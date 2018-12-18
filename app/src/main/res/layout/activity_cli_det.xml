@@ -116,6 +116,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
+                android:layout_marginLeft="5dp"
                 android:src="@drawable/iconoubicacion" />
 
             <TextView
@@ -125,7 +126,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginLeft="5dp"
+                android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/imageView3"
                 android:ellipsize="end"
                 android:gravity="left|center_vertical"

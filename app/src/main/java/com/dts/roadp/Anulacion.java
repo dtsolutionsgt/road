@@ -325,7 +325,9 @@ public class Anulacion extends PBase {
 		 	prod=DT.getString(0);
 		 	um=DT.getString(1);
 
-			if (valexist(prod)) revertStock(itemid,prod,um);
+			if (valexist(prod)) {
+			    revertStock(itemid,prod,um);
+            }
 	
 			DT.moveToNext();
 		}	
@@ -389,43 +391,49 @@ public class Anulacion extends PBase {
         sql = "SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV FROM D_FACTURA_STOCK " +
               "WHERE (COREL='" + corel + "') AND (CODIGO='" + pcod + "') AND (UNIDADMEDIDA='" + um + "')";
         dt = Con.OpenDT(sql);
+        if (dt.getCount()==0) return;
+
         dt.moveToFirst();
 
-        cant = dt.getInt(0);
-        lot = dt.getString(4);
-        doc = dt.getString(5);
-        stat = dt.getString(9);
+        while (!dt.isAfterLast()) {
 
-	    try {
-	      	
-	     	ins.init("P_STOCK");
-		  	
-			ins.add("CODIGO",pcod);
-			ins.add("CANT",0);
-			ins.add("CANTM",dt.getDouble(1));
-			ins.add("PESO",dt.getDouble(2));
-			ins.add("plibra",dt.getDouble(3));
-			ins.add("LOTE",lot);
-			ins.add("DOCUMENTO",doc);
-			
-			ins.add("FECHA",dt.getInt(6));
-			ins.add("ANULADO",dt.getInt(7));
-			ins.add("CENTRO",dt.getString(8));
-			ins.add("STATUS",stat);
-			ins.add("ENVIADO",dt.getInt(10));
-			ins.add("CODIGOLIQUIDACION",dt.getInt(11));
-			ins.add("COREL_D_MOV",dt.getString(12));
-			ins.add("UNIDADMEDIDA",um);
+            cant = dt.getInt(0);
+            lot = dt.getString(4);
+            doc = dt.getString(5);
+            stat = dt.getString(9);
 
-	    	db.execSQL(ins.sql());
-	    	
-	    } catch (Exception e) {
-	    	//mu.msgbox(e.getMessage());
-	    }
+            try {
 
-        sql="UPDATE P_STOCK SET CANT=CANT+"+cant+" WHERE (CODIGO='"+pcod + "') AND (UNIDADMEDIDA='" + um + "') AND (LOTE='"+lot+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
-	    db.execSQL(sql);	
-	    
+                ins.init("P_STOCK");
+
+                ins.add("CODIGO", pcod);
+                ins.add("CANT", 0);
+                ins.add("CANTM", dt.getDouble(1));
+                ins.add("PESO", dt.getDouble(2));
+                ins.add("plibra", dt.getDouble(3));
+                ins.add("LOTE", lot);
+                ins.add("DOCUMENTO", doc);
+
+                ins.add("FECHA", dt.getInt(6));
+                ins.add("ANULADO", dt.getInt(7));
+                ins.add("CENTRO", dt.getString(8));
+                ins.add("STATUS", stat);
+                ins.add("ENVIADO", dt.getInt(10));
+                ins.add("CODIGOLIQUIDACION", dt.getInt(11));
+                ins.add("COREL_D_MOV", dt.getString(12));
+                ins.add("UNIDADMEDIDA", um);
+
+                db.execSQL(ins.sql());
+
+            } catch (Exception e) {
+                //mu.msgbox(e.getMessage());
+            }
+
+            sql = "UPDATE P_STOCK SET CANT=CANT+" + cant + " WHERE (CODIGO='" + pcod + "') AND (UNIDADMEDIDA='" + um + "') AND (LOTE='" + lot + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
+            db.execSQL(sql);
+
+            dt.moveToNext();
+        }
 	}
 			
 	private void anulDepos(String itemid) {

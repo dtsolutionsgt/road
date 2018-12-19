@@ -134,11 +134,22 @@ public class clsRepBuilder {
 	}
 	
 	public String rtrim(String ss,int sw) {
-		int l=ss.length();
-		if (l>sw) {
-			ss=ss.substring(0,sw);	
+		int sl,l;
+		String sp="";
+
+		ss=ss.trim();
+        l=ss.length();
+
+		if (l>=sw) {
+			ss=ss.substring(0,sw);
 		} else {
-			frmstr="%"+sw+"s";	
+		    /*
+		    sl=sw-l;
+            for (int i = 0; i <sl; i++) {
+                sp=sp+" ";
+            }
+            ss=sp+ss;  */
+			frmstr="%"+sw+"s";
 			ss=String.format(frmstr,ss);
 		}
 		

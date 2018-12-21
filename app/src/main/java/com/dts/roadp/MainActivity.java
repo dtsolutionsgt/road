@@ -155,7 +155,7 @@ public class MainActivity extends PBase {
 
 		try {
 			//#HS_20181122_1505 Se agrego el campo Impresion.
-			sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION FROM P_RUTA";
+			sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL FROM P_RUTA";
 			DT = Con.OpenDT(sql);
 			DT.moveToFirst();
 
@@ -165,6 +165,7 @@ public class MainActivity extends PBase {
 			s = DT.getString(3);
 			gl.wsURL = DT.getString(4);
 			gl.impresora = DT.getString(5);
+			gl.sucur = DT.getString(6);
 
 			rutapos = s.equalsIgnoreCase("R");
 

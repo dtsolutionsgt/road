@@ -629,7 +629,7 @@ public class FacturaRes extends PBase {
 	
 	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa) {
 		Cursor dt;
-		double acant,dcant,disp,cantapl;
+		double acant,dcant,disp,cantapl,peso;
 		String lote,doc,stat;
 
 		acant=cant*factor;
@@ -637,7 +637,7 @@ public class FacturaRes extends PBase {
 		try {
 
 			sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
-					"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') ORDER BY LOTE,CANT";
+					"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') ORDER BY CANT";
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()==0) return;
@@ -646,6 +646,7 @@ public class FacturaRes extends PBase {
 			while (!dt.isAfterLast()) {
 
 				dcant=dt.getDouble(0);
+				peso=dt.getDouble(2);
 				lote=dt.getString(4);
 				doc=dt.getString(5);
 				stat=dt.getString(9);
@@ -672,7 +673,7 @@ public class FacturaRes extends PBase {
 				ins.add("CODIGO",prid );
 				ins.add("CANT",cantapl );
 				ins.add("CANTM",dt.getDouble(1));
-				ins.add("PESO",dt.getDouble(2));
+				ins.add("PESO",peso);
 				ins.add("plibra",dt.getDouble(3));
 				ins.add("LOTE",lote );
 
@@ -697,17 +698,19 @@ public class FacturaRes extends PBase {
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
 					ins.add("CANTIDAD",cantapl);
-					ins.add("PESO",0);
+					ins.add("PESO",peso);
 					ins.add("UMSTOCK",umstock);
 					ins.add("UMPESO",gl.umpeso);
 					ins.add("UMVENTA",umventa);
 
 					db.execSQL(ins.sql());
 
-					//Toast.makeText(this,ins.SQL(),Toast.LENGTH_LONG).show();
-
 				} catch (SQLException e) {
-					mu.msgbox(e.getMessage()+"\n"+ins.sql());
+
+					sql="UPDATE D_FACTURAD_LOTES SET CANTIDAD=CANTIDAD+"+cantapl+",PESO=PESO+"+peso+"  " +
+						"WHERE (COREL='"+corel+"') AND (PRODUCTO='"+prid+"') AND (LOTE='"+lote+"')";
+					db.execSQL(sql);
+					//mu.msgbox(e.getMessage()+"\n"+ins.sql());
 				}
 
 				if (acant<=0) return;

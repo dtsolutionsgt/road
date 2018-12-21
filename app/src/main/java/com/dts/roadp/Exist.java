@@ -255,9 +255,9 @@ public class Exist extends PBase {
 					spt = mu.frmdecimal(pesot, gl.peDecImp) + " " + rep.ltrim(ump, 3);
 					if (!gl.usarpeso) spt = "";
 
-					sc = mu.frmdecimal(val, gl.peDecImp) + " " + rep.ltrim(um, 6);
-					scm = mu.frmdecimal(valm, gl.peDecImp) + " " + rep.ltrim(um, 6);
-					sct = mu.frmdecimal(valt, gl.peDecImp) + " " + rep.ltrim(um, 6);
+					sc = mu.frmdecimal(val, gl.peDecImp) + " " + rep.ltrim(um, 2);
+					scm = mu.frmdecimal(valm, gl.peDecImp) + " " + rep.ltrim(um, 2);
+					sct = mu.frmdecimal(valt, gl.peDecImp) + " " + rep.ltrim(um, 2);
 
 					item = clsCls.new clsExist();
 					itemm = clsCls.new clsExist();

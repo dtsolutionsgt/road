@@ -291,12 +291,16 @@ public class clsDocument {
 	
 	private boolean loadHeadLines() {
 		Cursor DT;	
-		String s;
+		String s,sucur;
 		
 		try {
 
-			sql="SELECT TEXTO FROM P_ENCABEZADO_REPORTESHH ORDER BY CODIGO";
+			sql = "SELECT SUCURSAL FROM P_RUTA";
+			DT = Con.OpenDT(sql);
+			DT.moveToFirst();
+			sucur = DT.getString(0);
 
+			sql="SELECT TEXTO FROM P_ENCABEZADO_REPORTESHH WHERE SUCURSAL='"+sucur+"' ORDER BY CODIGO";
 			DT=Con.OpenDT(sql);
 			if (DT.getCount()==0) return false;
 

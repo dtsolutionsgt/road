@@ -2,6 +2,7 @@ package com.dts.roadp;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import org.apache.commons.io. IOUtils;
 import org.json.JSONArray;
@@ -10,13 +11,18 @@ import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.security.KeyStore;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.arch.lifecycle.Lifecycle;
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -28,6 +34,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.InputType;
+import android.util.Base64;
+import android.util.JsonToken;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -49,6 +57,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.ZoomControls;
 
+import static android.app.Activity.RESULT_OK;
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 public class CliDet extends PBase {
@@ -58,7 +67,11 @@ public class CliDet extends PBase {
 	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol;
 	private Exist Existencia = new Exist();
-	private String cod,tel, Nombre, NIT;;
+	private String cod,tel, Nombre, NIT;
+	//#HS_20181220 Variables para fachada;
+	private String imagenbase64,path;
+	private Boolean imgPath, imgDB;
+	////
 	private double clim,cused,cdisp;
 	private int nivel,browse,merc;
 	private boolean porcentaje = false;
@@ -625,13 +638,14 @@ public class CliDet extends PBase {
 	// Camara
 
 	public void tomarFoto(View view){
-
+		int codResult = 1;
 		try {
 
 			Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
 			intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
-			startActivity(intento1);
+			//startActivity(intento1);
+			startActivityForResult(intento1,codResult);
 
 		}catch (Exception e){
 			mu.msgbox("tomarFoto: "+ e.getMessage());
@@ -639,16 +653,55 @@ public class CliDet extends PBase {
 
 	}
 
-	public void mostrarFachada(View view){
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+		if (requestCode == 1) {
+
+			try {
+
+				ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+				Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
+
+				bitmap1 = redimensionarImagen(bitmap1, 640, 360);
+
+				FileOutputStream out = new FileOutputStream(paht);
+				bitmap1.compress(Bitmap.CompressFormat.JPEG, 50, out);
+				out.flush();
+				out.close();
+
+			}catch (Exception e){
+				mu.msgbox("onActivityResult: " + e.getMessage());
+			}
+
+		}
+
+	}
+
+	public void mostrarFachada(View view){
+		Cursor DT;
+		imgDB = false; imgPath=false;
 		try {
 
-            String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-            File archivo = new File(paht);
+            path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+            File archivo = new File(path);
+
+            sql = "SELECT IMAGEN FROM P_CLIENTE_FACHADA WHERE CODIGO ='"+ cod +"'";
+			DT=Con.OpenDT(sql);
+
+			if(DT.getCount() > 0){
+				DT.moveToFirst();
+				imagenbase64 = DT.getString(0);
+				imgDB = true;
+			}
 
             if(archivo.exists()){
+            	imgPath = true;
                 inputFachada();
-            }else {
+            }else if(imgDB == true){
+				inputFachada();
+			}else{
                 Toast.makeText(this,"Fachada no disponible",Toast.LENGTH_LONG).show();
             }
 
@@ -670,17 +723,21 @@ public class CliDet extends PBase {
 
 	}
 
-	public void inputFachada() {
+	public void inputFachada(){
 
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		final ImageView imgFachada = new ImageView(this);
 		imgFachada.setScaleType(CENTER_CROP);
 
-        String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-        Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
-
-        imgFachada.setImageBitmap(redimensionarImagen(bitmap1,1000,1000));
+        if(imgPath == true) {
+			Bitmap bitmap1 = BitmapFactory.decodeFile(path);
+			imgFachada.setImageBitmap(redimensionarImagen(bitmap1, 1000, 600));
+		}else if(imgDB == true) {
+			byte[] btImagen = Base64.decode(imagenbase64, Base64.DEFAULT);
+			Bitmap bitm = BitmapFactory.decodeByteArray(btImagen,0,btImagen.length);
+			imgFachada.setImageBitmap(redimensionarImagen(bitm,1000,600));
+		}
 
 		alert.setView(imgFachada);
 
@@ -688,55 +745,11 @@ public class CliDet extends PBase {
 
 	}
 
-	//#HS_20181214 Convierte la imagen a un arreglo de tipo bytes.
-	public void bytesImagen(View view) throws IOException {
-
-		try {
-
-			String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-			FileInputStream imagen = new FileInputStream(paht);
-
-			byte[] imageInBytes = IOUtils.toByteArray(imagen);
-			imagenBit = imageInBytes;
-
-			//Toast.makeText(this, "Bytes: " + imageInBytes.toString(), Toast.LENGTH_LONG).show();
-
-            crearJSON();
-
-		}catch (Exception e){
-			mu.msgbox("bytesImagen: " + e.getMessage());
-		}
-	}
-
-	//#HS_20181214 Crea la estructura JSON para almacenar las imagenes.
-	public void crearJSON() {
-
-		try {
-
-			JSONObject json = new JSONObject();
-			JSONObject json2 = new JSONObject();
-			JSONArray json_Array = new JSONArray();
-
-			json.put("CODIGO",cod);
-			json.put("IMAGEN",imagenBit);
-
-			json_Array.put(json);
-
-			json2.put("P_CLIENTE_FACHADA",json_Array);
-
-			mu.msgbox(json2.toString());
-
-		}catch (JSONException e){
-			mu.msgbox("crearJSON: " + e.getMessage());
-		}
-
-	}
-
 	//#HS_20181214 Devuelve JSON: lista de fotos en ROADFOTOS.
 	public void listaFachada(View view){
 
 	    Cursor DT;
-	    String codigo;
+	    String codigo,imagen64;
         JSONObject json = new JSONObject();
         JSONObject json2 = new JSONObject();
         JSONArray json_Array = new JSONArray();
@@ -758,11 +771,15 @@ public class CliDet extends PBase {
 
                     if(archivo.exists()){
 
-                        FileInputStream imagen = new FileInputStream(paht);
-                        byte[] imageInBytes = IOUtils.toByteArray(imagen);
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						Bitmap bitmap = BitmapFactory.decodeFile(paht);
+						bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+						byte[] imageBytes = baos.toByteArray();
+						imagen64 = Base64.encodeToString(imageBytes,Base64.NO_PADDING);
 
+                        json = new JSONObject();
                         json.put("CODIGO",codigo);
-                        json.put("IMAGEN",imageInBytes);
+                        json.put("IMAGEN",imagen64);
 						json_Array.put(json);
 
                     }
@@ -771,7 +788,7 @@ public class CliDet extends PBase {
 
                 }
 
-                json2.put("D_CLIENTE_FACHADA",json_Array);
+                json2.put("P_CLIENTE_FACHADA",json_Array);
 
             }
 

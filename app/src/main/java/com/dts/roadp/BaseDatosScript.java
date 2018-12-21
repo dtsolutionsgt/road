@@ -967,7 +967,15 @@ public class BaseDatosScript {
 
 			vSQL="CREATE INDEX P_CLIENTE_idx1 ON P_CLIENTE(NOMBRE)";
 			database.execSQL(vSQL);
-			
+
+			//#HS_20181220 Tabla para las imagenes de fachada//
+			vSQL="CREATE TABLE [P_CLIENTE_FACHADA] ("+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[IMAGEN]  TEXT NOT NULL,"+
+					"PRIMARY KEY ([CODIGO])"+
+					");";
+			database.execSQL(vSQL);
+			///////////////////////////////////////////////////
 
 			vSQL="CREATE TABLE [P_CLIDIR] ("+
 					"[CODIGO_CLIENTE] TEXT NOT NULL,"+

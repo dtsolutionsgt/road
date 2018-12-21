@@ -1,7 +1,13 @@
 package com.dts.roadp;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 
+import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
@@ -14,13 +20,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -56,6 +67,7 @@ public class ComWS extends PBase {
 	private clsLicence lic;
 	private clsFinDia claseFindia;
     private DateUtils DU;
+    private String jsonWS;
 	
 	// Web Service -
 
@@ -97,7 +109,7 @@ public class ComWS extends PBase {
 		relExist=(RelativeLayout) findViewById(R.id.relExist);
 		relPrecio=(RelativeLayout) findViewById(R.id.relPrecio);
 		relStock=(RelativeLayout) findViewById(R.id.relStock);
-		
+
 		isbusy=0;
 //Its working
 
@@ -133,6 +145,7 @@ public class ComWS extends PBase {
 		txtRuta.setText("8001-1");
 		txtEmp.setText("03");
 		//txtWS.setText("http://192.168.1.69/wsAndr/wsandr.asmx");
+
 	}
 
 	
@@ -212,10 +225,10 @@ public class ComWS extends PBase {
 		
 		dialog.show();
 			
-	}	
-	
-	
+	}
+
 	// Main
+
 	
 	private void runRecep() {
 
@@ -236,7 +249,7 @@ public class ComWS extends PBase {
 	}
 	
 	private void runSend() {
-		
+
 		if (isbusy==1) {return;}
 		
 		if (!setComParams()) return;
@@ -394,10 +407,14 @@ public class ComWS extends PBase {
 	        
 	         
 	        for (int i = 0; i < rc; i++) {
-	        	
-	        	String str = ((SoapObject)result.getProperty(0)).getPropertyAsString(i);
-	        	//s=s+str+"\n";
-	        	
+				String str = "";
+	        	try {
+					str = ((SoapObject) result.getProperty(0)).getPropertyAsString(i);
+					//s=s+str+"\n";
+				}catch (Exception e){
+	        		mu.msgbox("error: " + e.getMessage());
+				}
+
 	        	if (i==0) {
 	        		
 	        		 idbg=idbg+" ret " +str +"  ";
@@ -562,8 +579,47 @@ public class ComWS extends PBase {
 		
 		return 0;
 	}	
-		
-	
+
+	//#HS_20181219 Funcion para enviar JSON al Web Service.
+
+	public int envioFachada() {
+		String METHOD_NAME="GuardaFachada";
+		s="";
+
+		fprog="Enviando ...";wsStask.onProgressUpdate();
+
+		try {
+
+			SoapObject request = new SoapObject(NAMESPACE,METHOD_NAME);
+			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+			envelope.dotNet = true;
+
+			PropertyInfo param = new PropertyInfo();
+			param.setType(String.class);
+			param.setName("JSONFachadas");param.setValue(jsonWS);
+
+			request.addProperty(param);
+			envelope.setOutputSoapObject(request);
+
+			HttpTransportSE transport = new HttpTransportSE(URL);
+			transport.call(NAMESPACE+METHOD_NAME, envelope);
+			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+			s = response.toString();
+
+			sstr = "#";
+			if (s.equalsIgnoreCase("#")) return 1;
+
+			sstr = s;
+			return 0;
+		} catch (Exception e) {
+			sstr=e.getMessage();
+		}
+
+		return 0;
+
+	}
+
 	// WEB SERVICE - RECEPCION
 
 	private boolean getData(){
@@ -601,6 +657,7 @@ public class ComWS extends PBase {
 
 			if (!AddTable("P_RUTA")) return false;
 			if (!AddTable("P_CLIENTE")) return false;
+			if (!AddTable("P_CLIENTE_FACHADA")) return false;
 			if (!AddTable("P_CLIRUTA")) return false;
 			if (!AddTable("P_CLIDIR")) return false;
 			if (!AddTable("P_PRODUCTO")) return false;
@@ -872,9 +929,15 @@ public class ComWS extends PBase {
              SQL += "FROM P_CLIENTE ";
              SQL += "WHERE (CODIGO IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') )) ";
              return SQL;  
-       }        
-        
-       if (TN.equalsIgnoreCase("P_CLIDIR")) {
+       }
+
+       //#HS_20181220 Tabla de Fachadas cliente.
+		if (TN.equalsIgnoreCase("P_CLIENTE_FACHADA")) {
+			SQL = " SELECT * FROM P_CLIENTE_FACHADA ";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CLIDIR")) {
             SQL = " SELECT * FROM P_CLIDIR ";
             SQL += " WHERE (P_CLIDIR.CODIGO_CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') ))";
             return SQL;  
@@ -890,8 +953,8 @@ public class ComWS extends PBase {
        
        if (TN.equalsIgnoreCase("P_PRODUCTO")) {
            SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
-           SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, DESCUENTO,BONIFICACION, ";
-           SQL += "IMP1, IMP2, IMP3, VENCOMP, DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN ";
+           SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, ISNULL(DESCUENTO,'N') AS DESCUENTO, ISNULL(BONIFICACION,'N') AS BONIFICACION, ";
+           SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN ";
            SQL += "FROM P_PRODUCTO WHERE (CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "')) ";
            SQL += "OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) ";
            return SQL;  
@@ -1053,7 +1116,7 @@ public class ComWS extends PBase {
 
        //#HS_20181206 Agregue Ruta.
        if (TN.equalsIgnoreCase("P_VENDEDOR")) {
-     		SQL="SELECT CODIGO,NOMBRE,CLAVE,RUTA,NIVEL,NIVELPRECIO,BODEGA,SUBBODEGA,COD_VEHICULO,LIQUIDANDO,BLOQUEADO,DEVOLUCION_SAP  " +
+     		SQL="SELECT CODIGO,NOMBRE,CLAVE,RUTA,NIVEL,NIVELPRECIO,ISNULL(BODEGA,0) AS BODEGA,ISNULL(SUBBODEGA,0) AS SUBBODEGA,COD_VEHICULO,LIQUIDANDO,BLOQUEADO,DEVOLUCION_SAP  " +
     			"FROM P_VENDEDOR  WHERE (RUTA='"+ActRuta+"') OR (NIVEL<3) ";
            return SQL;  
        }
@@ -1318,7 +1381,7 @@ public class ComWS extends PBase {
 		running=1;fstr="No connect";scon=0;
 					
 		try {
-					
+
 			if (getTest()==1) {
 				scon=1;
 			} else {
@@ -1380,7 +1443,7 @@ public class ComWS extends PBase {
 		comparaCorrel();
 		
 		paramsExtra();
-		//mu.msgbox("::"+dbg);
+		//mu.msgbox("::"+sstr);
 		
 		if (ftflag) msgbox(ftmsg);
 		
@@ -1495,6 +1558,8 @@ public class ComWS extends PBase {
 			claseFindia.eliminarTablasD();
 
 		}
+
+		listaFachada();
 
 		return true;
 	}
@@ -2300,8 +2365,85 @@ public class ComWS extends PBase {
 			//msgbox(e.getMessage());
 		}
 	}
-	
-	
+
+	//#HS_20181219 funcion para crear JSON de fotos fachada.
+
+	public void listaFachada(){
+
+		Cursor DT;
+		String codigo, imagen64,strImagen;
+		JSONObject json = new JSONObject();
+		JSONObject json2 = new JSONObject();
+		JSONArray json_Array = new JSONArray();
+
+		System.setProperty("line.separator","\r\n");
+
+		try {
+			sql = "SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA = '"+gl.ruta+"'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+
+				DT.moveToFirst();
+
+				while (!DT.isAfterLast()){
+
+					codigo = DT.getString(0);
+
+					String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + codigo + ".jpg");
+					File archivo = new File(paht);
+
+					if(archivo.exists()){
+
+						/*LO CONVIERTE A BASE64*/
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						Bitmap bitmap = BitmapFactory.decodeFile(paht);
+						bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+						byte[] imageBytes = baos.toByteArray();
+						imagen64 = Base64.encodeToString(imageBytes,Base64.NO_PADDING);
+
+						json = new JSONObject();
+						json.put("CODIGO",codigo);
+						json.put("IMAGEN",imagen64);
+						json_Array.put(json);
+
+					}
+
+					DT.moveToNext();
+
+				}
+
+				json2.put("P_CLIENTE_FACHADA",json_Array);
+
+			}
+
+			jsonWS = json2.toString();
+
+			//#HS_20181221 Se envian las fotos.
+			if(envioFachada() == 1){
+				String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos");
+				File archivo = new File(paht);
+				EliminarArchivos(archivo);
+			}
+
+		}catch (Exception e){
+			mu.msgbox("listaFachada: " + e.getMessage());
+		}
+	}
+
+	//#HS_20181221 Elimina las fotos de ROADFOTOS
+
+	public void EliminarArchivos(File ArchivoDirectorio) {
+		if (ArchivoDirectorio.isDirectory())
+		{
+			for (File hijo : ArchivoDirectorio.listFiles())
+				EliminarArchivos(hijo);
+		}
+		else
+			ArchivoDirectorio.delete();
+	}
+
+
 	// Web Service handling Methods
 	
 	public void wsSendExecute(){
@@ -2309,11 +2451,12 @@ public class ComWS extends PBase {
 		running=1;fstr="No connect";scon=0;
 					
 		try {
-						
+
 			if (getTest()==1) {scon=1;}
-					
+
 			if (scon==1) {
-				fstr="Sync OK";	
+				fstr="Sync OK";
+
 				if (!sendData()) {
 					fstr="Envio incompleto : "+sstr;
 				}else{
@@ -2521,9 +2664,13 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			//MU.msgbox(e.getMessage());
 			//URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
-			URL="*";txtWS.setText("http://192.168.1.112/WSANDR/wsandr.asmx");
+			URL="*";txtWS.setText("http://192.168.1.142/wsAndr/wsandr.asmx");
+			//URL="*";txtWS.setText("http://192.168.1.142/wsimagen/baktun1.asmx");
 			//txtWS.setText("");
 			return;
+
+
+
 		}
 		
 	}
@@ -2543,7 +2690,8 @@ public class ComWS extends PBase {
 		}
 		gEmpresa=ss;
 		
-		ss=txtWS.getText().toString().trim();
+		//ss=txtWS.getText().toString().trim();
+		ss="http://192.168.1.142/wsAndr/wsandr.asmx";
 		if (mu.emptystr(ss) || ss.equalsIgnoreCase("*")) {
 			mu.msgbox("La direccion de Web service no esta definida.");return false;
 		}

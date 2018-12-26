@@ -53,6 +53,7 @@ import android.app.Application;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import uk.co.senab.photoview.PhotoViewAttacher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.ZoomControls;
@@ -65,12 +66,13 @@ public class CliDet extends PBase {
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol;
 	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
-	private ImageView imgCobro,imgDevol;
+	private ImageView imgCobro,imgDevol,imgRoadTit;
 	private Exist Existencia = new Exist();
 	private String cod,tel, Nombre, NIT;
 	//#HS_20181220 Variables para fachada;
 	private String imagenbase64,path;
 	private Boolean imgPath, imgDB;
+	private PhotoViewAttacher zoomFoto;
 	////
 	private double clim,cused,cdisp;
 	private int nivel,browse,merc;
@@ -111,6 +113,7 @@ public class CliDet extends PBase {
 		
 		imgCobro= (ImageView) findViewById(R.id.imageView2);
 		imgDevol= (ImageView) findViewById(R.id.imageView1);
+		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
 		
 		/*
 		Con = new BaseDatos(this);
@@ -139,6 +142,8 @@ public class CliDet extends PBase {
 		habilitaOpciones();
 		
 		defineGeoPos();
+
+		miniFachada();
 
 		//Toast.makeText(this, "Create activity : ", Toast.LENGTH_SHORT).show();
 	}
@@ -546,7 +551,38 @@ public class CliDet extends PBase {
 		return true;
 		
 	}
-	
+
+	private void miniFachada(){
+		Cursor DT;
+		imgDB = false;
+		try {
+
+			path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+			File archivo = new File(path);
+
+			sql = "SELECT IMAGEN FROM P_CLIENTE_FACHADA WHERE CODIGO ='"+ cod +"'";
+			DT=Con.OpenDT(sql);
+
+			if(DT.getCount() > 0){
+				DT.moveToFirst();
+				imagenbase64 = DT.getString(0);
+				imgDB = true;
+			}
+
+			if(archivo.exists()){
+				imgRoadTit.setImageURI(Uri.fromFile(archivo));
+			}else if(imgDB == true){
+				byte[] btImagen = Base64.decode(imagenbase64, Base64.DEFAULT);
+				Bitmap bitm = BitmapFactory.decodeByteArray(btImagen,0,btImagen.length);
+				imgRoadTit.setImageBitmap(redimensionarImagen(bitm,200,200));
+			}else{
+				imgRoadTit.setImageResource(R.drawable.cliente);
+			}
+
+		}catch (Exception e){
+			mu.msgbox("inputFachada: " + e.getMessage());
+		}
+	}
 	
 	// Aux
 	
@@ -743,61 +779,13 @@ public class CliDet extends PBase {
 
 		alert.show();
 
+		imgFachada.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				zoomFoto = new PhotoViewAttacher(imgFachada);
+			}
+		});
+
 	}
-
-	//#HS_20181214 Devuelve JSON: lista de fotos en ROADFOTOS.
-	public void listaFachada(View view){
-
-	    Cursor DT;
-	    String codigo,imagen64;
-        JSONObject json = new JSONObject();
-        JSONObject json2 = new JSONObject();
-        JSONArray json_Array = new JSONArray();
-
-	    try {
-            sql = "SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA = '"+gl.ruta+"'";
-            DT = Con.OpenDT(sql);
-
-            if (DT.getCount() > 0) {
-
-                DT.moveToFirst();
-
-                while (!DT.isAfterLast()){
-
-                    codigo = DT.getString(0);
-
-                    String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + codigo + ".jpg");
-                    File archivo = new File(paht);
-
-                    if(archivo.exists()){
-
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						Bitmap bitmap = BitmapFactory.decodeFile(paht);
-						bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-						byte[] imageBytes = baos.toByteArray();
-						imagen64 = Base64.encodeToString(imageBytes,Base64.NO_PADDING);
-
-                        json = new JSONObject();
-                        json.put("CODIGO",codigo);
-                        json.put("IMAGEN",imagen64);
-						json_Array.put(json);
-
-                    }
-
-                    DT.moveToNext();
-
-                }
-
-                json2.put("P_CLIENTE_FACHADA",json_Array);
-
-            }
-
-            mu.msgbox(json2.toString());
-
-        }catch (Exception e){
-	        mu.msgbox("listaFachada: " + e.getMessage());
-        }
-    }
 
 	// GPS
 	

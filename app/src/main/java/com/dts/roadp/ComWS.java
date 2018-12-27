@@ -1599,8 +1599,8 @@ public class ComWS extends PBase {
 
 					i+=1;fprog="Factura "+i;wsStask.onProgressUpdate();
 					
-					//if(gl.banderafindia == false){ dbld.clear(); }
-					dbld.clear();
+					if (gl.banderafindia == false) dbld.clear();
+					//dbld.clear();
 
 					dbld.insert("D_FACTURA" ,"WHERE COREL='"+cor+"'");
 					dbld.insert("D_FACTURAD","WHERE COREL='"+cor+"'");
@@ -1615,7 +1615,7 @@ public class ComWS extends PBase {
 					
 					dbld.add("UPDATE P_COREL SET CORELULT="+ccorel+"  WHERE RUTA='"+fruta+"'");	
 
-					//if(gl.banderafindia == false) {
+					if (gl.banderafindia == false) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_FACTURA SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -1624,7 +1624,7 @@ public class ComWS extends PBase {
 							fterr += "\n" + sstr;
 							dbg = sstr;
 						}
-					//}
+					}
 							
 				} catch (Exception e) {
 					fterr+="\n"+e.getMessage();
@@ -2235,12 +2235,12 @@ public class ComWS extends PBase {
 		
 		try {
 				
-			if(gl.banderafindia == false){ dbld.clear(); }
+			if(gl.banderafindia == false) dbld.clear();
 
 			dbld.add("DELETE FROM D_REPFINDIA WHERE RUTA='"+gl.ruta+"'");
 			dbld.insert("D_REPFINDIA" ,"WHERE (LINEA>=0)");
 
-			if(gl.banderafindia == false){ commitSQL(); }
+			if(gl.banderafindia == false) commitSQL();
 
 
 		} catch (Exception e) {

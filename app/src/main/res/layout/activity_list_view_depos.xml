@@ -17,11 +17,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/lblETipo"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
         android:maxLines="1"
         android:paddingLeft="5dp"
-        android:text="Descripcion"
+        android:text="Descripción"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textSize="18sp"
         android:textStyle="normal" />

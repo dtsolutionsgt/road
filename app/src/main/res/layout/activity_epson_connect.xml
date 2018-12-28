@@ -83,7 +83,7 @@
             android:layout_toRightOf="@+id/imgRoadTit"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:text="Conexion Epson"
+            android:text="Conexión Epson"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#1A8AC6" />
     </RelativeLayout>

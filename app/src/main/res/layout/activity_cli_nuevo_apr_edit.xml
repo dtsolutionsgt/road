@@ -71,9 +71,9 @@
                     android:id="@+id/TextView02"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
                     android:layout_below="@+id/txtCNDir"
-                    android:text="Telefono"
+                    android:layout_alignParentLeft="true"
+                    android:text="Télefono"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textSize="16sp" />
 
@@ -188,7 +188,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
-                android:text="Religion"
+                android:text="Religión"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Spinner
@@ -202,7 +202,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
-                android:text="Grupo Etnico"
+                android:text="Grupo Étnico"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Spinner
@@ -258,7 +258,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
-                android:text="Numero de hijos"
+                android:text="Número de hijos"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Spinner

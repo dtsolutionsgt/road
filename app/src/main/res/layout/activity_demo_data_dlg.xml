@@ -21,7 +21,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_margin="5dp"
-            android:text="Descripcion"
+            android:text="Descripción"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="15sp" />
 

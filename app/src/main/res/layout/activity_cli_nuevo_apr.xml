@@ -86,7 +86,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
-                android:text="Religion"
+                android:text="Religión"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Spinner
@@ -100,7 +100,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
-                android:text="Grupo Etnico"
+                android:text="Grupo Étnico"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Spinner
@@ -156,7 +156,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
-                android:text="Numero de hijos"
+                android:text="Número de hijos"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Spinner

@@ -39,7 +39,7 @@ public class BaseDatosVersion {
 			updateVersion(version);	
 		}	
 		
-		if (processDBUpdates()) Toast.makeText(cont,"La base de datos ha sido actualizada a version "+aver+".", Toast.LENGTH_SHORT).show();;
+		if (processDBUpdates()) Toast.makeText(cont,"La base de datos ha sido actualizada a versión "+aver+".", Toast.LENGTH_SHORT).show();;
 		
 	}
 	

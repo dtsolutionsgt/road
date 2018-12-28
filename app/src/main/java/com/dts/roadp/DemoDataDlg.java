@@ -39,7 +39,7 @@ public class DemoDataDlg extends PBase {
 		
 		s=txtNom.getText().toString();
 		if (mu.emptystr(s)) {
-			toasttop("Descripcion incorrecta.");return;
+			toasttop("Descripción incorrecta.");return;
 		}
 		
 		

@@ -76,7 +76,7 @@ public class FacturaRes extends PBase {
 		} else {
 			lblMPago.setVisibility(View.VISIBLE);
 			imgMPago.setVisibility(View.VISIBLE);
-			lblCred.setText("Pago\nCredito");	
+			lblCred.setText("Pago\nCrédito");
 			//imgCred.setImageResource(R.drawable.credit);
 		}	
 		
@@ -291,7 +291,7 @@ public class FacturaRes extends PBase {
 		
 				if (gl.contrib.equalsIgnoreCase("C")) {
 					item = clsCls.new clsCDB();
-					item.Cod="Percepcion";item.Desc=mu.frmcur(totperc);item.Bandera=0;
+					item.Cod="Percepción";item.Desc=mu.frmcur(totperc);item.Bandera=0;
 					items.add(item);
 				}
 				
@@ -1082,7 +1082,7 @@ public class FacturaRes extends PBase {
 	private void inputCredito() {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		alert.setTitle("Pago Credito");
+		alert.setTitle("Pago Crédito");
 		alert.setMessage("Valor a pagar");
 		
 		final EditText input = new EditText(this);
@@ -1158,7 +1158,7 @@ public class FacturaRes extends PBase {
 	private void inputCard() {
 	
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-		alert.setTitle("Numero de tarjeta");
+		alert.setTitle("Número de tarjeta");
 		
 		final EditText input = new EditText(this);
 		alert.setView(input);
@@ -1188,7 +1188,7 @@ public class FacturaRes extends PBase {
 		if (mu.emptystr(s)) {
 			showkeyb();
 			inputCard(); 
-			mu.msgbox("Numero incorrecto");showkeyb();
+			mu.msgbox("Número incorrecto");showkeyb();
 			return false;
 		}
 		
@@ -1265,7 +1265,7 @@ public class FacturaRes extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle("Road");
-		dialog.setMessage("Guardar la factura ?");
+		dialog.setMessage("¿Guardar la factura?");
 					
 		dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	
@@ -1302,7 +1302,7 @@ public class FacturaRes extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle("Road");
-		dialog.setMessage(sv+"Guardar la factura ?");
+		dialog.setMessage(sv+"¿Guardar la factura?");
 					
 		dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	
@@ -1340,7 +1340,7 @@ public class FacturaRes extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle("Road");
-		dialog.setMessage("Impresión correcta ?");
+		dialog.setMessage("¿Impresión correcta?");
 					
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {	

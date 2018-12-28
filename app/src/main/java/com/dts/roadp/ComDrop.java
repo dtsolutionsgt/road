@@ -126,7 +126,7 @@ public class ComDrop extends Activity {
 			
 		} else {	
 			isbusy=0;
-			MU.msgbox("No hay parametros");
+			MU.msgbox("No hay parámetros");
 			btnSend.setVisibility(View.VISIBLE);
 			btnRec.setVisibility(View.VISIBLE);
 		}
@@ -444,7 +444,7 @@ public class ComDrop extends Activity {
 		File myFile;
 		BufferedReader myReader = null;
 		
-		lblParam.setText("No hay parametros");
+		lblParam.setText("No hay parámetros");
 		fFlag=false;
 		
 		try {
@@ -480,7 +480,7 @@ public class ComDrop extends Activity {
 	public void askRec(View view) {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
-		dialog.setTitle("Recibir datos nuevos ?");
+		dialog.setTitle("¿Recibir datos nuevos?");
 					
 		dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	
@@ -497,7 +497,7 @@ public class ComDrop extends Activity {
 	public void askSend(View view) {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
-		dialog.setTitle("Enviar datos ?");
+		dialog.setTitle("¿Enviar datos?");
 					
 		dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	
@@ -514,7 +514,7 @@ public class ComDrop extends Activity {
 	public void askSendOK() {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
-		dialog.setTitle("Envio correcto ?");
+		dialog.setTitle("¿Envio correcto?");
 					
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	
@@ -531,7 +531,7 @@ public class ComDrop extends Activity {
 	public void askSendOK2() {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
-		dialog.setTitle("Está seguro ?");
+		dialog.setTitle("¿Está seguro?");
 					
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	

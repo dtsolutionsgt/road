@@ -84,7 +84,7 @@ public class DepositoParc extends PBase {
 	}
 	
 	public void saveDepos(View view){
-		if (checkValues()) msgAskSave("Guardar deposito");
+		if (checkValues()) msgAskSave("Guardar depósito");
 	}
 
 	
@@ -375,7 +375,7 @@ public class DepositoParc extends PBase {
 			db.setTransactionSuccessful();
 			db.endTransaction();
 			
-			Toast.makeText(this,"Deposito guardado", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this,"Depósito guardado", Toast.LENGTH_SHORT).show();
 			doExit();
 			
 		} catch (Exception e) {	
@@ -479,7 +479,7 @@ public class DepositoParc extends PBase {
 		}
 		
 		if (ttot>limit) {
-			mu.msgbox("Monto mayor que limite");return false;	
+			mu.msgbox("Monto mayor que límite");return false;
 		}
 		
 		if (mu.emptystr(bancoid)) {
@@ -498,7 +498,7 @@ public class DepositoParc extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg  + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					
@@ -522,7 +522,7 @@ public class DepositoParc extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					
@@ -551,7 +551,7 @@ public class DepositoParc extends PBase {
 	
 	@Override
 	public void onBackPressed() {
-		msgAskExit("Salir sin guardar deposito");
+		msgAskExit("Salir sin guardar depósito");
 	}
 		
 	

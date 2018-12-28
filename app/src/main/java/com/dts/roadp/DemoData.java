@@ -130,7 +130,7 @@ public class DemoData extends PBase {
 				item.Desc=DT.getString(1);
 				item.val=DT.getDouble(2);
 				
-				if (iid==1) item.Valor="Producto con descuento"; else item.Valor="Producto con bonificacion";
+				if (iid==1) item.Valor="Producto con descuento"; else item.Valor="Producto con bonificación";
 				item.id=iid;iid++;
 				
 				items.add(item);	

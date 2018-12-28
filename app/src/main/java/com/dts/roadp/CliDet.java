@@ -322,7 +322,7 @@ public class CliDet extends PBase {
 		//to="42161467";
 		
 		if (to.length()==0) {
-			msgbox("Numero incorrecto ");return;
+			msgbox("Número incorrecto ");return;
 		}
 		
 		try {
@@ -346,7 +346,7 @@ public class CliDet extends PBase {
 		//to="42161467";
 		
 		if (to.length()==0) {
-			msgbox("Numero incorrecto ");return;
+			msgbox("Número incorrecto ");return;
 		}
 		
 		try {

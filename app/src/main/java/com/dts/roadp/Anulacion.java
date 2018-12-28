@@ -61,10 +61,10 @@ public class Anulacion extends PBase {
 		
 		if (tipo==0) lblTipo.setText("Pedido"); 
 		if (tipo==1) lblTipo.setText("Recibo");	
-		if (tipo==2) lblTipo.setText("Deposito");
+		if (tipo==2) lblTipo.setText("Depósito");
 		if (tipo==3) lblTipo.setText("Factura");
 		if (tipo==4) lblTipo.setText("Recarga");
-		if (tipo==5) lblTipo.setText("Devoluci�n a bodega");
+		if (tipo==5) lblTipo.setText("Devolución a bodega");
 		
 		itemid="*";
 				
@@ -641,7 +641,7 @@ public class Anulacion extends PBase {
 			cf=DT.getInt(3);
 	
 			if (ca1>=cf) {
-				msgbox("Se ha acabado el talonario de notas de credito. No se puede continuar con la anulacion de factura.");
+				msgbox("Se ha acabado el talonario de notas de crédito. No se puede continuar con la anulación de factura.");
 				return false;
 			}
 			
@@ -649,11 +649,11 @@ public class Anulacion extends PBase {
 			ca2=ci+((int) dd);
 			
 			if (ca1>ca2) {
-				toastcent("Queda menos que 25% de talonario de notas de credito.");
+				toastcent("Queda menos que 25% de talonario de notas de crédito.");
 			}
 			
 		} catch (Exception e) {
-			msgbox("No esta definido correlativo de notas de credito. No se puede continuar con la anulacion de factura.\n"+e.getMessage());
+			msgbox("No esta definido correlativo de notas de crédito. No se puede continuar con la anulación de factura.\n"+e.getMessage());
 			return false;
 		}	
 					
@@ -983,16 +983,16 @@ public class Anulacion extends PBase {
 			fcorel=ca1+1;
 		} catch (Exception e) {
 			fcorel=0;fserie="";
-			msgbox("No existe un correlativo disponible, no se puede emitir la nota de credito");
+			msgbox("No existe correlativo disponible, no se puede emitir la nota de crédito");
 			return;
 		}	
 						
 		if (fcorel>cf) {
-			msgbox("Se ha acabado el talonario de notas de credito. No se puede continuar con la anulacion de factura.");
+			msgbox("Se ha acabado el talonario de notas de crédito. No se puede continuar con la anulación de factura.");
 			fcorel=0;return;
 		}
 		
-		if (fcorel==cf) mu.msgbox("Esto es la última nota de credito de talonario.");
+		if (fcorel==cf) mu.msgbox("Esta es la última nota de crédito.");
 				
 	}
 	
@@ -1003,7 +1003,7 @@ public class Anulacion extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle("ROAD");
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg  + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					

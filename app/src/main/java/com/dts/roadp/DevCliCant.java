@@ -69,7 +69,7 @@ public class DevCliCant extends PBase {
 		}
 		
 		if (razon.equalsIgnoreCase("0")){
-			mu.msgbox("Debe definir un razon de devolucion.");return;
+			mu.msgbox("Debe definir una razón de devolución.");return;
 		}
 		
 		((appGlobals) vApp).dval=cant;
@@ -175,7 +175,7 @@ public class DevCliCant extends PBase {
 		String icode,iname;
 			
 		spincode.add("0");
-		spinlist.add("Seleccione un razón ....");
+		spinlist.add("Seleccione una razón ....");
 		  
 		try {
 				

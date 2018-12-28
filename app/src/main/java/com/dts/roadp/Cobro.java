@@ -451,7 +451,7 @@ public class Cobro extends PBase {
 			if (epago<0) throw new Exception();
 			
 			if (epago>plim) {
-				mu.msgbox("Total de pago mayor que total de saldos.");return;
+				mu.msgbox("Total de pago mayor que total de saldo.");return;
 			}
 			
 			if (epago>tsel) {
@@ -599,7 +599,7 @@ public class Cobro extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle("Road");
-		dialog.setMessage("Impresion correcta ?");
+		dialog.setMessage("Impresión correcta ?");
 					
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {	
@@ -625,7 +625,7 @@ public class Cobro extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg  + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					
@@ -649,7 +649,7 @@ public class Cobro extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					

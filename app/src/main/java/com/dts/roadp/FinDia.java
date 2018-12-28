@@ -115,11 +115,11 @@ public class FinDia extends PBase {
         AlertDialog.Builder dialog1 = new  AlertDialog.Builder(this);
 
         dialog1.setTitle("Road");
-        dialog1.setMessage("No se ha realizado el deposito.");
+        dialog1.setMessage("No se ha realizado el depósito.");
 
         dialog1.setIcon(R.drawable.ic_quest);
 
-        dialog1.setPositiveButton("Realizar Deposito.", new DialogInterface.OnClickListener() {
+        dialog1.setPositiveButton("Realizar Depósito.", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 ActivityDeposito();
             }
@@ -134,7 +134,7 @@ public class FinDia extends PBase {
 		AlertDialog.Builder dialog1 = new  AlertDialog.Builder(this);
 
 		dialog1.setTitle("Road");
-		dialog1.setMessage("Debe imprimir el recibo de deposito");
+		dialog1.setMessage("Debe imprimir el recibo de depósito");
 
 		dialog1.setIcon(R.drawable.ic_quest);
 
@@ -182,7 +182,7 @@ public class FinDia extends PBase {
 			File f2 = new File(Environment.getExternalStorageDirectory() + "/print.txt");
 			FileUtils.copyFile(f1, f2);
 		} catch (Exception e) {
-			msgExit("No se pudo crear archivo de impresion.");
+			msgExit("No se pudo crear archivo de impresión.");
 			return;
 		}
 
@@ -611,7 +611,7 @@ public class FinDia extends PBase {
 		}		
 		
 		if (du.getActDate()==fechaUltimoCierre) {
-			msgExit("Fin de Dia ya fue efectuado el dia de hoy");return false;
+			msgExit("Fin de Día ya fue efectuado el día de hoy");return false;
 		}
 
 		//#HS_20181127_1033 Agregue validacion para verificar si ya se realizo el deposito.

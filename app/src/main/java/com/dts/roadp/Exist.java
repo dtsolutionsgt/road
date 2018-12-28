@@ -502,7 +502,7 @@ public class Exist extends PBase {
 		protected boolean buildFooter() {
 
 			try {
-				rep.add("Total lineas : "+lns);
+				rep.add("Total líneas : "+lns);
 				rep.add("");rep.add("");rep.add("");rep.add("");
 
 				return true;

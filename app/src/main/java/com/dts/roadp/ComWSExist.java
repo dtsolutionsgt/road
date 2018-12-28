@@ -100,8 +100,8 @@ public class ComWSExist extends PBase {
 
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		
-		dialog.setTitle("Recepcion");
-		dialog.setMessage("Recibir datos nuevos ?");
+		dialog.setTitle("Recepción");
+		dialog.setMessage("¿Recibir datos nuevos?");
 					
 		dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	
@@ -531,7 +531,7 @@ public class ComWSExist extends PBase {
 			
 			if (scon==1) {
 				fstr="Sync OK";
-				if (!getData()) fstr="Recepcion incompleta : "+sstr;
+				if (!getData()) fstr="Recepción incompleta : "+sstr;
 			} else {	
 				fstr="No se puede conectar al web service : "+sstr;
 			}
@@ -646,7 +646,7 @@ public class ComWSExist extends PBase {
 		
 		ss=txtWS.getText().toString().trim();
 		if (mu.emptystr(ss) || ss.equalsIgnoreCase("*")) {
-			mu.msgbox("La direccion de Web service no esta definida.");return false;
+			mu.msgbox("La dirección de Web service no esta definida.");return false;
 		}
 		URL=ss;
 		

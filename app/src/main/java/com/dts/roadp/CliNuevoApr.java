@@ -417,7 +417,7 @@ public class CliNuevoApr extends PBase {
 						// al total de la anterior operación se le saca el mod 11
 
 						int modulo=total%11;
-						cuimsg+="cui con modulo" + modulo;
+						cuimsg+="CUI con módulo" + modulo;
 
 						// Si el mod es igual al numero verificador el cui es valido , sino es invalido
 						if(modulo!=ver){
@@ -564,7 +564,7 @@ public class CliNuevoApr extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg  + "?");
 		dialog.setIcon(R.drawable.ic_quest);
 					
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
@@ -585,7 +585,7 @@ public class CliNuevoApr extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg  + "?");
 		dialog.setIcon(R.drawable.ic_quest);
 					
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {

@@ -335,7 +335,7 @@ public class CliNuevo extends PBase {
 			locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 
 			isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-			if (!isGPSEnabled) 	toastcent("GPS Deshabilitado !");
+			if (!isGPSEnabled) 	toastcent("¡GPS Deshabilitado!");
 
 			isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
@@ -423,12 +423,12 @@ public class CliNuevo extends PBase {
 		
 		s=txtNom.getText().toString();
 		if (mu.emptystr(s)) {
-			mu.msgbox("Falta el nombre de cliente");return false;
+			mu.msgbox("Falta nombre de cliente");return false;
 		}
 				
 		s=txtDir.getText().toString();
 		if (mu.emptystr(s)) {
-			mu.msgbox("Falta la direccion");return false;
+			mu.msgbox("Falta la dirección");return false;
 		}		
 		
 		s=txtNit.getText().toString();
@@ -475,7 +475,7 @@ public class CliNuevo extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg  + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					
@@ -499,7 +499,7 @@ public class CliNuevo extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					
@@ -528,7 +528,7 @@ public class CliNuevo extends PBase {
 	
 	@Override
 	public void onBackPressed() {
-		msgAskExit("Salir sin guardar datos");
+		msgAskExit("¿Salir sin guardar datos?");
 	}
 	
 	

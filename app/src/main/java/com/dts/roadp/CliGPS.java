@@ -114,7 +114,7 @@ public class CliGPS extends PBase {
 	private void showStaticMap() {
 
 		if (latitude==0 && longitude==0) {
-			toastcent("Posicion desconicida, no se puede mostrar mapa !");
+			toastcent("¡Posición desconicida, no se puede mostrar mapa!");
 			imgMap.setImageResource(R.drawable.blank48);return;
 		}
 		
@@ -231,7 +231,7 @@ public class CliGPS extends PBase {
 			if (isGPSEnabled) {
 				lblGPS.setText("GPS Activo");
 			} else {
-				toastcent("GPS Deshabilitado !"); 
+				toastcent("¡GPS Deshabilitado!");
 				lblGPS.setText("GPS Deshabilitado");
 			}
 
@@ -286,7 +286,7 @@ public class CliGPS extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("Borrar la posici?n ?");
+		dialog.setMessage("¿Borrar la posición?");
 
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {			      	

@@ -63,10 +63,10 @@ public class DevolBod extends PBase {
 	
 	public void finishDevol(View view){
 		if (!hasProducts()) {
-			mu.msgbox("No puede continuar, no ha agregado ninguno producto !");return;
+			mu.msgbox("¡No puede continuar, no ha agregado ninguno producto!");return;
 		}
 		
-		msgAskComplete("Aplicar devolucion");
+		msgAskComplete("Aplicar devolución");
 	}
 	
 	
@@ -343,7 +343,7 @@ public class DevolBod extends PBase {
 			db.setTransactionSuccessful();
 			db.endTransaction();
 			
-			Toast.makeText(this,"Devolucion aplicada", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this,"Devolución aplicada", Toast.LENGTH_SHORT).show();
 			super.finish();
 			
 		} catch (Exception e) {
@@ -416,7 +416,7 @@ public class DevolBod extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					
@@ -440,7 +440,7 @@ public class DevolBod extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					
@@ -465,7 +465,7 @@ public class DevolBod extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("Eliminar todos los productos de lista ?");
+		dialog.setMessage("¿Eliminar todos los productos de la lista?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					
@@ -519,7 +519,7 @@ public class DevolBod extends PBase {
 
 	@Override
 	public void onBackPressed() {
-		msgAskExit("Salir sin terminar devolucion");
+		msgAskExit("Salir sin terminar devolución");
 	}	
 	
 }

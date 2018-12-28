@@ -65,10 +65,10 @@ public class DevolCli extends PBase {
 	
 	public void finishDevol(View view){
 		if (!hasProducts()) {
-			mu.msgbox("No puede continuar, no ha agregado ninguno producto !");return;
+			mu.msgbox("¡No puede continuar, no ha agregado ninguno producto!");return;
 		}
 		
-		msgAskComplete("Aplicar la devolucion");
+		msgAskComplete("Aplicar la devolución");
 	}
 	
 	// Main
@@ -330,7 +330,7 @@ public class DevolCli extends PBase {
 				
 			db.endTransaction();
 			
-			Toast.makeText(this,"Devolucion guardada", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();
 			
 			super.finish();
 		} catch (Exception e) {
@@ -354,7 +354,7 @@ public class DevolCli extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					
@@ -378,7 +378,7 @@ public class DevolCli extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					
@@ -437,6 +437,6 @@ public class DevolCli extends PBase {
 
 	@Override
 	public void onBackPressed() {
-		msgAskExit("Salir sin terminar devolucion");
+		msgAskExit("Salir sin terminar devolución");
 	}
 }

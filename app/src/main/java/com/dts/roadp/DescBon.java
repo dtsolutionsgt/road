@@ -43,7 +43,7 @@ public class DescBon extends PBase {
 		
 		if (prommodo==0) ss=" %"; else ss=" (monto) ";
 		
-		lblDesc.setText("Maximo : "+mu.frmdecno(desc)+ss);
+		lblDesc.setText("Máximo : "+mu.frmdecno(desc)+ss);
 		txtDesc.setText(mu.frmdecno(desc));
 	}
 	
@@ -77,7 +77,7 @@ public class DescBon extends PBase {
 		}
 		
 		if (vd>desc) {
-			mu.msgbox("Valor de descuento es mayor que maximo");return;
+			mu.msgbox("Valor de descuento es mayor que máximo");return;
 		}
 
 		desc=vd;

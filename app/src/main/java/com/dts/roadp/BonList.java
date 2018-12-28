@@ -349,7 +349,7 @@ public class BonList extends PBase {
 			if (completo) {
 				nextItem();	
 			} else {
-				mu.msgbox("Bonificacion incompleta.");
+				mu.msgbox("Bonificación incompleta.");
 			}
 		}			
 	}

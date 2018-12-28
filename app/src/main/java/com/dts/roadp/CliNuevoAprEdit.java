@@ -115,7 +115,7 @@ public class CliNuevoAprEdit extends PBase {
 		}
 		
 		if (mu.emptystr(txtDir.getText().toString())) {		
-			msgScroll("Falta direccion");txtDir.requestFocus();return ;
+			msgScroll("Falta dirección");txtDir.requestFocus();return ;
 		}
 		
 		if (mu.emptystr(txtNit.getText().toString())) {		
@@ -462,7 +462,7 @@ public class CliNuevoAprEdit extends PBase {
 			//Verificamos que no se haya ingresado 0 en la posicion de depto o municipio
 			if((muni==0 || depto==0) || (muni==0 && depto==0)){
 				valido=false;
-				cuimsg+="CUI no v�lido";
+				cuimsg+="CUI no válido";
 			}
 
 			else{
@@ -470,7 +470,7 @@ public class CliNuevoAprEdit extends PBase {
 				cuimsg+="munixdepto: " + munisPorDepto.length;
 				if(depto > munisPorDepto.length ){
 					valido=false;
-					cuimsg+="CUI no v�lido Departamento fuera de rango";
+					cuimsg+="CUI no válido Departamento fuera de rango";
 				}
 				else{
 					//si depto es menor o igual a 22
@@ -479,7 +479,7 @@ public class CliNuevoAprEdit extends PBase {
 					//se valida que el municipio ingresado en la cadena este dentro del rango del depto
 					if(muni > munisPorDepto[depto -1]){
 						valido=false;
-						cuimsg+="CUI no v�lido municipio fuera de rango";
+						cuimsg+="CUI no válido municipio fuera de rango";
 					}
 
 					else{
@@ -495,7 +495,7 @@ public class CliNuevoAprEdit extends PBase {
 						// al total de la anterior operaci�n se le saca el mod 11
 
 						int modulo=total%11;
-						cuimsg+="cui con modulo" + modulo;
+						cuimsg+="CUI con modulo" + modulo;
 
 						// Si el mod es igual al numero verificador el cui es valido , sino es invalido
 						if(modulo!=ver){
@@ -674,7 +674,7 @@ public class CliNuevoAprEdit extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg  + "?");
 		dialog.setIcon(R.drawable.ic_quest);
 
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {

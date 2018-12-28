@@ -110,7 +110,7 @@ public class Deposito extends PBase {
 	}
 	
 	public void saveDepos(View view){
-		msgAskSave("Guardar deposito");
+		msgAskSave("Guardar depósito");
 	}
 	
 	// Main
@@ -511,7 +511,7 @@ public class Deposito extends PBase {
 			if (ddoc.buildPrint(corel,0)) prn.printask(printcallback);
 			claseFinDia.updateImpDeposito();
 		} else {
-			Toast.makeText(this,"Deposito guardado", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this,"Depósito guardado", Toast.LENGTH_SHORT).show();
 			super.finish();
 		}
 		claseFinDia.updateDeposito();
@@ -574,7 +574,7 @@ public class Deposito extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					
@@ -598,7 +598,7 @@ public class Deposito extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+		dialog.setMessage("¿" + msg + "?");
 				
 		dialog.setIcon(R.drawable.ic_quest);
 					
@@ -627,7 +627,7 @@ public class Deposito extends PBase {
 	
 	@Override
 	public void onBackPressed() {
-		msgAskExit("Salir sin guardar deposito");
+		msgAskExit("Salir sin guardar depósito");
 	}
 	
 	

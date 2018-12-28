@@ -154,12 +154,12 @@ public class ComWS extends PBase {
 	public void askRec(View view) {
 		
 		if (isbusy==1) {
-			toastcent("Por favor, espere que se termine tarea actual.");return;
+			toastcent("Por favor, espere que se termine la tarea actual.");return;
 		}
 			
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		
-		dialog.setTitle("Recepcion");
+		dialog.setTitle("Recepción");
 		dialog.setMessage("¿Recibir datos nuevos?");
 					
 		dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
@@ -177,12 +177,12 @@ public class ComWS extends PBase {
 	public void askSend(View view) {
 		
 		if (isbusy==1) {
-			toastcent("Por favor, espere que se termine tarea actual.");return;
+			toastcent("Por favor, espere que se termine la tarea actual.");return;
 		}
 			
 		if (gl.contlic) {		
 			if (!validaLicencia()) {
-				mu.msgbox("Licencia invalida!");return;
+				mu.msgbox("Licencia inválida!");return;
 			}
 		}
 		
@@ -207,7 +207,7 @@ public class ComWS extends PBase {
 	public void askExist(View view) {
 		
 		if (isbusy==1) {
-			toastcent("Por favor, espere que se termine tarea actual.");return;
+			toastcent("Por favor, espere que se termine la tarea actual.");return;
 		}
 			
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -784,7 +784,7 @@ public class ComWS extends PBase {
 //		    	}
 		    }
 
-			fprog = "Confirmando documento de invnetario recibido en BOF...";
+			fprog = "Confirmando documento de invetario recibido en BOF...";
 			wsRtask.onProgressUpdate();
 
 		    Actualiza_Documentos();
@@ -1411,7 +1411,7 @@ public class ComWS extends PBase {
 			
 		if (fstr.equalsIgnoreCase("Sync OK")) {
 			lblInfo.setText(" ");
-			s="Recepcion completa.";
+			s="Recepción completa.";
 			
 			if (!esvacio) {
 				if (stockflag==1) {
@@ -1525,7 +1525,7 @@ public class ComWS extends PBase {
 	
 	private boolean sendData(){
 
-		senv = "Envio terminado \n \n";
+		senv = "Envío terminado \n \n";
 
 		items.clear();
 		
@@ -1804,7 +1804,7 @@ public class ComWS extends PBase {
 				
 				try {
 					
-					i+=1;fprog="Nota credito "+i;wsStask.onProgressUpdate();
+					i+=1;fprog="Nota crédito "+i;wsStask.onProgressUpdate();
 					
 					if(gl.banderafindia == false) { dbld.clear(); }
 
@@ -1836,9 +1836,9 @@ public class ComWS extends PBase {
 		if(gl.banderafindia == false) {
 			if (pc != pcc) {
 				int pf = pcc - pc;
-				senv += "Notas credito : " + pc + " , NO ENVIADO : " + pf + "\n";
+				senv += "Notas crédito : " + pc + " , NO ENVIADO : " + pf + "\n";
 			} else {
-				senv += "Notas credito : " + pc + "\n";
+				senv += "Notas crédito : " + pc + "\n";
 			}
 		}
 	}	
@@ -1855,7 +1855,7 @@ public class ComWS extends PBase {
 			DT=Con.OpenDT(sql);
 
 			if (DT.getCount()==0) {
-				senv+="Depositos : "+pc+"\n";return;
+				senv+="Depósitos : "+pc+"\n";return;
 			}
 			
 			pcc=DT.getCount();pc=0;i=0;
@@ -1867,7 +1867,7 @@ public class ComWS extends PBase {
 				
 				try {
 					
-					i+=1;fprog="Deposito "+i;wsStask.onProgressUpdate();
+					i+=1;fprog="Depósito "+i;wsStask.onProgressUpdate();
 					
 					if(gl.banderafindia == false){ dbld.clear(); }
 
@@ -1898,9 +1898,9 @@ public class ComWS extends PBase {
 		if(gl.banderafindia == false) {
 			if (pc != pcc) {
 				int pf = pcc - pc;
-				senv += "Depositos : " + pc + " , NO ENVIADO : " + pf + " \n";
+				senv += "Depósitos : " + pc + " , NO ENVIADO : " + pf + " \n";
 			} else {
-				senv += "Depositos : " + pc + "\n";
+				senv += "Depósitos : " + pc + "\n";
 			}
 		}
 	}
@@ -2693,7 +2693,7 @@ public class ComWS extends PBase {
 		//ss=txtWS.getText().toString().trim();
 		ss="http://192.168.1.142/wsAndr/wsandr.asmx";
 		if (mu.emptystr(ss) || ss.equalsIgnoreCase("*")) {
-			mu.msgbox("La direccion de Web service no esta definida.");return false;
+			mu.msgbox("La dirección de Web service no esta definida.");return false;
 		}
 		URL=ss;
 		

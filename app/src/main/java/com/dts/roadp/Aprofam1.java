@@ -67,7 +67,7 @@ public class Aprofam1 extends PBase {
 		}
 		
 		if (ref2.equalsIgnoreCase("*")) {
-			msgbox("Debe seleccionar una organizacion");return;
+			msgbox("Debe seleccionar una organización");return;
 		}		
 		
 		gl.ref1=ref1;gl.ref2=ref2;

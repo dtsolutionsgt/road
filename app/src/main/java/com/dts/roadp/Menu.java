@@ -269,6 +269,7 @@ public class Menu extends PBase {
 				break;
 
 			case 2:  // Comunicacion
+				gl.findiaactivo=false;
 				gl.tipo = 0;
 				gl.autocom = 0;
 				gl.modoadmin = false;

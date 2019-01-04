@@ -220,13 +220,30 @@ public class printZebraCPCL extends printBase {
 	
 		if (!hasCallback) return;
 
-		final Handler cbhandler = new Handler();
-		cbhandler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				callback.run();
-			}
-		}, 500);
+        try {
+            final Handler cbhandler = new Handler();
+            cbhandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        callback.run();
+                    } catch (Exception ee) {}
+                }
+            }, 500);
+        } catch (Exception e) {}
+
+        try {
+            //#EJC201800: Llamar el close de la printer
+            final Handler cbhandler1 = new Handler();
+            cbhandler1.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        printclose.run();
+                    } catch (Exception ee) {}
+                }
+            }, 200);
+        } catch (Exception e) {}
 
 	}
 

@@ -164,7 +164,6 @@ public class FinDia extends PBase {
 			buildReports();
 		}
 
-
 		if (fail) rslt = false;
 		else rslt = completeProcess();
 
@@ -186,23 +185,36 @@ public class FinDia extends PBase {
 			return;
 		}
 
-		if (prn.isEnabled()) {
-			final Handler shandler = new Handler();
-			shandler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					Intent intent = new Intent(FinDia.this, PrintDialog.class);
-					startActivity(intent);
-				}
-			}, 500);
-		}
+        try {
+            db.execSQL("UPDATE FinDia SET val1="+du.getActDate());
+        } catch (Exception e) {
+            msgbox("No se pudo actualizar fecha de cierre.");
+        }
 
 		Toast.makeText(FinDia.this, "Cierre del día completo.", Toast.LENGTH_SHORT).show();
-		FinDia.super.finish();
 
-		((appGlobals) vApp).modoadmin = false;
-		((appGlobals) vApp).autocom = 1;
+		gl.findiaactivo=true;
+		gl.modoadmin = false;
+		gl.autocom = 1;
 		startActivity(new Intent(this, ComWS.class));
+
+        try {
+
+            if (prn.isEnabled()) {
+                final Handler shandler = new Handler();
+                shandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent = new Intent(FinDia.this, PrintDialog.class);
+                        startActivity(intent);
+                    }
+                }, 2000);
+            }
+        } catch (Exception e) {
+            msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+        }
+
+		FinDia.super.finish();
 	}
 
 	//#HS_20181127_1052 Agregue funcion de inicio de FinDia.
@@ -225,8 +237,6 @@ public class FinDia extends PBase {
 		((appGlobals) vApp).autocom = 1;
 		startActivity(new Intent(this, ComWS.class));
 	}
-
-
 
 	private boolean completeProcess() {
 		Cursor DT;
@@ -771,7 +781,8 @@ public class FinDia extends PBase {
 	private void requisitosFinDia(){
 
 	}
-	
+
+
 	// Reportes
 	
 	private void repProductos() {
@@ -1428,7 +1439,7 @@ public class FinDia extends PBase {
 				if(gl.banderafindia == false){
 					startFDD();
 				}else {
-					iniciarFD();
+					startFDD();//iniciarFD();
 				}
 			}
 		});

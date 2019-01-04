@@ -165,7 +165,7 @@
         android:layout_below="@+id/spinner"
         android:layout_marginTop="-3dp"
         android:gravity="center_horizontal"
-        android:text="¡No olvide que ela base de datos es Case sensitive !"
+        android:text="¡No olvide que la base de datos es Case sensitive !"
         android:textSize="10sp" />
 
 </RelativeLayout>

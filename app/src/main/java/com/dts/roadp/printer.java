@@ -18,66 +18,56 @@ public class printer {
 	private String sql;
 	
 	private Context cont;
-	
-	private Device epsdevice=null;
-	private Printer epsprinter=null;
-	
+
 	private Runnable printclose;
 	private appGlobals gl;
 	
 	private printBase prn;
 	private int prid;
 	private String prpar;
-	
 
-	public printer(Context context,Runnable printclosecall)
-    {
+
+	public printer(Context context, Runnable printclosecall) {
 
 		String prsid;
-		
-		cont=context;
-		
-		prid=0;prpar="";prw=32;
-		
-		printclose=printclosecall;
-		
-		gl=((appGlobals) (((Activity) cont).getApplication()));
-		
-		try {
 
-			epsdevice=gl.mDevice;
-			epsprinter=gl.mPrinter;
+		cont = context;
+
+		prid = 0;
+		prpar = "";
+		prw = 32;
+
+		printclose = printclosecall;
+
+		gl = ((appGlobals) (((Activity) cont).getApplication()));
+
+		try {
 
 			//if (gl.mPrinterSet) prsid="SET";else prsid="void";
 			//Toast.makeText(cont, "Printer : "+prsid, Toast.LENGTH_SHORT).show();
-		} catch (Exception e2)
-		{
-			Log.d("Printer_Init_Err",e2.getMessage());
+		} catch (Exception e2) {
+			Log.d("Printer_Init_Err", e2.getMessage());
 		}
-			
+
 		try {
 
 			Con = new BaseDatos(cont);
 			opendb();
-			
+
 			setPrinterType();
-			
-			try
-			{
-				Con.close();   
-			} catch (Exception e1)
-			{
+
+			try {
+				Con.close();
+			} catch (Exception e1) {
 			}
-			
+
 		} catch (Exception e) {
-			Toast.makeText(cont, "Printer : "+e.getMessage(), Toast.LENGTH_SHORT).show();
+			Toast.makeText(cont, "Printer : " + e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
-	
-		
+
 	}
 
-	public void printask(Runnable callBackHook)
-    {
+	public void printask(Runnable callBackHook)    {
 		if (emptyparam()) return;
 		if (prid>0) prn.printask(callBackHook);
 	}
@@ -115,15 +105,14 @@ public class printer {
 		if (ptipo.equalsIgnoreCase("EPSON")) prid=2;
 		if (ptipo.equalsIgnoreCase("ZEBRA CPCL")) prid=3;
 			
-		setPrinterClass(device,printer);
+		setPrinterClass();
 			
 	}
 	
 	
 	// Aux
 	
-	private void setPrinterType()
-	{
+	private void setPrinterType() 	{
 		Cursor DT;
 		String prtipo;
 		
@@ -150,7 +139,7 @@ public class printer {
 			if (prtipo.equalsIgnoreCase("EPSON")) prid=2;
 			if (prtipo.equalsIgnoreCase("ZEBRA CPCL")) prid=3;
 				
-			setPrinterClass(epsdevice,epsprinter);
+			setPrinterClass();
 				
 		} catch (Exception e) {
 			prid=0;prpar="";
@@ -160,15 +149,13 @@ public class printer {
 				
 	}
 	
-	private void setPrinterClass(Device device,Printer printer) {
+	private void setPrinterClass() {
 		switch (prid) {
 			case 1:  
 				prn=new printDMax(cont,prpar);
 				prn.printclose=printclose;
 				break;	
-			case 2:  
-				prn=new printEpson(cont,prpar,device,printer);
-				prn.printclose=printclose;
+			case 2:
 				break;		
 			case 3:  
 				prn=new printZebraCPCL(cont,prpar);

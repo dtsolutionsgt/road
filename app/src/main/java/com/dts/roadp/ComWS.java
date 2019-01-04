@@ -51,7 +51,7 @@ public class ComWS extends PBase {
 	
 	private int isbusy,fecha,lin,reccnt,ultcor,ultcor_ant;
 	private String err,ruta,rutatipo,sp,docstock,ultSerie,ultSerie_ant;
-	private boolean fFlag,showprogress,pendientes;
+	private boolean fFlag,showprogress,pendientes,envioparcial,findiaactivo;
 	
 	private SQLiteDatabase dbT;
 	private BaseDatos ConT;
@@ -84,8 +84,7 @@ public class ComWS extends PBase {
 	private String METHOD_NAME,URL;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-    {
+	protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_com_ws);
@@ -111,7 +110,6 @@ public class ComWS extends PBase {
 		relStock=(RelativeLayout) findViewById(R.id.relStock);
 
 		isbusy=0;
-//Its working
 
 		lblInfo.setText("");lblParam.setText("");
 		barInfo.setVisibility(View.INVISIBLE);
@@ -141,9 +139,11 @@ public class ComWS extends PBase {
 		//if (gl.autocom==1) runSend();
 		
 		//relExist.setVisibility(View.VISIBLE);
-		
-		txtRuta.setText("8001-1");
-		txtEmp.setText("03");
+
+        envioparcial=gl.peEnvioParcial;
+
+		//txtRuta.setText("8001-1");
+		//txtEmp.setText("03");
 		//txtWS.setText("http://192.168.1.69/wsAndr/wsandr.asmx");
 
 	}
@@ -250,7 +250,7 @@ public class ComWS extends PBase {
 	
 	private void runSend() {
 
-		if (isbusy==1) {return;}
+		if (isbusy==1) return;
 		
 		if (!setComParams()) return;
 		
@@ -817,8 +817,7 @@ public class ComWS extends PBase {
 	}
 
 	//#EJC20181120: Inserta los documentos que bajaron a la HH
-	private boolean Actualiza_Documentos()
-    {
+	private boolean Actualiza_Documentos() {
 
         DateUtils DU = new DateUtils();
         int Now=du.getFechaActual();
@@ -1323,11 +1322,12 @@ public class ComWS extends PBase {
 	private void estandartInventario() {
 		Cursor dt,df;
 		String cod,ub,us,lote,doc,stat;
-		double cant,fact;
+		double cant,cantm,fact;
 	
 		try {
 
-			sql="SELECT P_STOCK.CODIGO,P_STOCK.UNIDADMEDIDA, P_PRODUCTO.UNIDBAS, P_STOCK.CANT,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.STATUS  " +
+			sql="SELECT P_STOCK.CODIGO,P_STOCK.UNIDADMEDIDA, P_PRODUCTO.UNIDBAS, P_STOCK.CANT, " +
+					"P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.STATUS, P_STOCK.CANTM  " +
 					"FROM  P_STOCK INNER JOIN P_PRODUCTO ON P_STOCK.CODIGO=P_PRODUCTO.CODIGO";
 			dt=Con.OpenDT(sql);
 		
@@ -1343,6 +1343,7 @@ public class ComWS extends PBase {
 				lote = dt.getString(4);
 				doc = dt.getString(5);
 				stat = dt.getString(6);
+				cantm=dt.getDouble(7);
 
 				if (!ub.equalsIgnoreCase(us)) {
 					
@@ -1352,9 +1353,11 @@ public class ComWS extends PBase {
 					if (df.getCount()>0) {
 						
 						df.moveToFirst();
-						fact=df.getDouble(0);cant=cant*fact;
+						fact=df.getDouble(0);
+						cant=cant*fact;
+						cantm=cantm*fact;
 						
-						sql="UPDATE P_STOCK SET CANT="+cant+",UNIDADMEDIDA='"+ub+"'  " +
+						sql="UPDATE P_STOCK SET CANT="+cant+",CANTM="+cantm+",UNIDADMEDIDA='"+ub+"'  " +
 							"WHERE (CODIGO='"+cod+"') AND (UNIDADMEDIDA='"+us+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
 						db.execSQL(sql);
 					} else {
@@ -1488,37 +1491,36 @@ public class ComWS extends PBase {
 	
 	//#HS_20181123_1623 Agregue funcion FinDia para el commit y update de tablas.
 
-	private boolean FinDia(){
+    private boolean FinDia() {
 
-	try {
+        try {
 
-		if(commitSQL() == 1)
-		{
-			db.beginTransaction();
+            if (commitSQL() == 1) {
+                db.beginTransaction();
 
-			db.execSQL("UPDATE D_FACTURA SET STATCOM='S'");
-			db.execSQL("UPDATE D_PEDIDO SET STATCOM='S'");
-			db.execSQL("UPDATE D_NOTACRED SET STATCOM='S'");
-			db.execSQL("UPDATE D_COBRO SET STATCOM='S'");
-			db.execSQL("UPDATE D_DEPOS SET STATCOM='S'");
-			db.execSQL("UPDATE D_MOV SET STATCOM='S'");
-			db.execSQL("UPDATE D_CLINUEVO SET STATCOM='S'");
-			db.execSQL("UPDATE D_ATENCION SET STATCOM='S'");
-			db.execSQL("UPDATE D_CLICOORD SET STATCOM='S'");
-			db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
-			db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
-			db.execSQL("UPDATE FINDIA SET VAL5=0, VAL4=0,VAL3=0, VAL2=0");
+                db.execSQL("UPDATE D_FACTURA SET STATCOM='S'");
+                db.execSQL("UPDATE D_PEDIDO SET STATCOM='S'");
+                db.execSQL("UPDATE D_NOTACRED SET STATCOM='S'");
+                db.execSQL("UPDATE D_COBRO SET STATCOM='S'");
+                db.execSQL("UPDATE D_DEPOS SET STATCOM='S'");
+                db.execSQL("UPDATE D_MOV SET STATCOM='S'");
+                db.execSQL("UPDATE D_CLINUEVO SET STATCOM='S'");
+                db.execSQL("UPDATE D_ATENCION SET STATCOM='S'");
+                db.execSQL("UPDATE D_CLICOORD SET STATCOM='S'");
+                db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
+                db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
+                db.execSQL("UPDATE FINDIA SET VAL5=0, VAL4=0,VAL3=0, VAL2=0");
 
-			db.setTransactionSuccessful();
-			db.endTransaction();
-		}
+                db.setTransactionSuccessful();
+                db.endTransaction();
+            }
 
-	}catch (Exception e){
-		msgbox("FinDia(): "+e.getMessage());
-		return false;
-	}
-	return true;
-	}
+        } catch (Exception e) {
+            msgbox("FinDia(): " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
 
 
 	// WEB SERVICE - ENVIO
@@ -1528,7 +1530,7 @@ public class ComWS extends PBase {
 		senv = "Envío terminado \n \n";
 
 		items.clear();
-		
+
 		envioFacturas();
 		envioPedidos();
 		envioNotasCredito();
@@ -1550,16 +1552,20 @@ public class ComWS extends PBase {
 
 		envioFinDia();
 
-		if(gl.banderafindia == true){
+		if (envioparcial == false) {
 
-			claseFindia = new clsFinDia(this);
+            findiaactivo=gl.findiaactivo;
+            if (ultimoCierreFecha()==du.getActDate()) findiaactivo=true;
 
-			FinDia();
-			claseFindia.eliminarTablasD();
+            if (findiaactivo) {
+                claseFindia = new clsFinDia(this);
+                FinDia();
+                claseFindia.eliminarTablasD();
+            }
 
 		}
 
-		listaFachada();
+		//listaFachada();
 
 		return true;
 	}
@@ -1599,8 +1605,7 @@ public class ComWS extends PBase {
 
 					i+=1;fprog="Factura "+i;wsStask.onProgressUpdate();
 					
-					if (gl.banderafindia == false) dbld.clear();
-					//dbld.clear();
+					if (!envioparcial) dbld.clear();
 
 					dbld.insert("D_FACTURA" ,"WHERE COREL='"+cor+"'");
 					dbld.insert("D_FACTURAD","WHERE COREL='"+cor+"'");
@@ -1615,7 +1620,7 @@ public class ComWS extends PBase {
 					
 					dbld.add("UPDATE P_COREL SET CORELULT="+ccorel+"  WHERE RUTA='"+fruta+"'");	
 
-					if (gl.banderafindia == false) {
+					if (envioparcial) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_FACTURA SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -1639,14 +1644,14 @@ public class ComWS extends PBase {
 		}
 
 
-		//if (gl.banderafindia == false) {
+		if (envioparcial) {
 			if (pc != pcc) {
 				int pf = pcc - pc;
 				senv += "Facturas : " + pc + " , NO ENVIADO : " + pf + "\n";
 			} else {
 				senv += "Facturas : " + pc + "\n";
 			}
-		//}
+		}
 
 	}	
 		
@@ -1675,7 +1680,7 @@ public class ComWS extends PBase {
 					
 					i+=1;fprog="Pedido "+i;wsStask.onProgressUpdate();
 
-					if(gl.banderafindia == false){ dbld.clear(); }
+					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_PEDIDO" ,"WHERE COREL='"+cor+"'");
 					dbld.insert("D_PEDIDOD","WHERE COREL='"+cor+"'");
@@ -1685,7 +1690,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_REL_PROD_BON","WHERE COREL='"+cor+"'");
 					dbld.insert("D_BONIFFALT","WHERE COREL='"+cor+"'");
 
-					if(gl.banderafindia == false){
+					if (envioparcial){
 						if (commitSQL()==1) {
 							sql="UPDATE D_PEDIDO SET STATCOM='S' WHERE COREL='"+cor+"'";
 							db.execSQL(sql);
@@ -1706,7 +1711,7 @@ public class ComWS extends PBase {
 			fstr=e.getMessage();
 		}
 
-		if(gl.banderafindia == false) {
+		if (envioparcial) {
 			if (pc != pcc) {
 				int pf = pcc - pc;
 				senv += "Pedidos : " + pc + " , NO ENVIADO : " + pf + "\n";
@@ -1769,7 +1774,7 @@ public class ComWS extends PBase {
 			fstr=e.getMessage();
 		}
 
-		if(gl.banderafindia == false) {
+		if (envioparcial) {
 			if (pc != pcc) {
 				int pf = pcc - pc;
 				senv += "Cobros : " + pc + " , NO ENVIADO : " + pf + " \n";
@@ -1806,13 +1811,13 @@ public class ComWS extends PBase {
 					
 					i+=1;fprog="Nota crédito "+i;wsStask.onProgressUpdate();
 					
-					if(gl.banderafindia == false) { dbld.clear(); }
+					if(envioparcial) dbld.clear();
 
 					dbld.insert("D_NOTACRED" ,"WHERE COREL='"+cor+"'");
 										
 					dbld.add("UPDATE P_CORELNC SET CORELULT="+ccorel+"  WHERE RUTA='"+fruta+"'");	
 
-					if(gl.banderafindia == false) {
+					if (envioparcial) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_NOTACRED SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -1833,7 +1838,7 @@ public class ComWS extends PBase {
 			fstr=e.getMessage();
 		}
 
-		if(gl.banderafindia == false) {
+		if(envioparcial) {
 			if (pc != pcc) {
 				int pf = pcc - pc;
 				senv += "Notas crédito : " + pc + " , NO ENVIADO : " + pf + "\n";
@@ -1869,12 +1874,12 @@ public class ComWS extends PBase {
 					
 					i+=1;fprog="Depósito "+i;wsStask.onProgressUpdate();
 					
-					if(gl.banderafindia == false){ dbld.clear(); }
+					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_DEPOS" ,"WHERE COREL='"+cor+"'");
 					dbld.insert("D_DEPOSD","WHERE COREL='"+cor+"'");
 
-					if(gl.banderafindia == false) {
+					if(envioparcial) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_DEPOS SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -1895,7 +1900,7 @@ public class ComWS extends PBase {
 			fstr=e.getMessage();
 		}
 
-		if(gl.banderafindia == false) {
+		if(envioparcial) {
 			if (pc != pcc) {
 				int pf = pcc - pc;
 				senv += "Depósitos : " + pc + " , NO ENVIADO : " + pf + " \n";
@@ -1925,8 +1930,7 @@ public class ComWS extends PBase {
 		return cor;
 	}
 	
-	public void envio_D_MOV()
-	{
+	public void envio_D_MOV() 	{
 		Cursor DT;
 		String cor;
 		int i,pc=0,pcc=0;
@@ -1955,12 +1959,12 @@ public class ComWS extends PBase {
 					
 					i+=1;fprog="Inventario "+i;wsStask.onProgressUpdate();
 					
-					if(gl.banderafindia == false){ dbld.clear(); }
+					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_MOV" ,"WHERE COREL='"+cor+"'");
 					dbld.insert("D_MOVD","WHERE COREL='"+cor+"'");
 
-					if(gl.banderafindia == false) {
+					if (envioparcial) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_MOV SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -1986,7 +1990,7 @@ public class ComWS extends PBase {
 			fstr=e.getMessage();
 		}
 
-		if(gl.banderafindia == false) {
+		if (envioparcial) {
 			if (pc != pcc) {
 				int pf = pcc - pc;
 				senv += "Inventario : " + pc + " , NO ENVIADO : " + pf + " \n";
@@ -2021,14 +2025,14 @@ public class ComWS extends PBase {
 					
 					i+=1;fprog="Inventario "+i;wsStask.onProgressUpdate();
 					
-					if(gl.banderafindia == false){ dbld.clear(); }
+					if(envioparcial){ dbld.clear(); }
 
 					dbld.insert("D_CLINUEVO" ,"WHERE CODIGO='"+cor+"'");
 					if (gl.peModal.equalsIgnoreCase("APR")) {
 						dbld.insert("D_CLINUEVO_APR","WHERE CODIGO='"+cor+"'");
 					}
 
-					if(gl.banderafindia == false) {
+					if (envioparcial) {
 						if (commitSQL() == 1) {
 
 							sql = "UPDATE D_CLINUEVO SET STATCOM='S' WHERE CODIGO='" + cor + "'";
@@ -2055,7 +2059,7 @@ public class ComWS extends PBase {
 			fstr=e.getMessage();
 		}
 
-		if(gl.banderafindia == false) {
+		if (envioparcial) {
 			if (pc != pcc) {
 				int pf = pcc - pc;
 				senv += "Cli. nuevos : " + pc + " , NO ENVIADO : " + pf + " \n";
@@ -2087,11 +2091,11 @@ public class ComWS extends PBase {
 				
 				try {
 					
-					if(gl.banderafindia == false){ dbld.clear(); }
+					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_ATENCION" ,"WHERE (RUTA='"+cor+"') AND (FECHA="+fecha+") AND (HORALLEG='"+hora+"') ");
 
-					if(gl.banderafindia == false) {
+					if (envioparcial) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_ATENCION SET STATCOM='S' WHERE (RUTA='" + cor + "') AND (FECHA=" + fecha + ") AND (HORALLEG='" + hora + "') ";
 							db.execSQL(sql);
@@ -2137,13 +2141,13 @@ public class ComWS extends PBase {
 				
 				try {
 					
-					if(gl.banderafindia == false){ dbld.clear(); }
+					if (envioparcial) dbld.clear();
 					
 					ss="UPDATE P_CLIENTE SET COORX="+px+",COORY="+py+" WHERE (CODIGO='"+cod+"')";					
 					dbld.add(ss);
 					fterr=ss;
 
-					if(gl.banderafindia == false) {
+					if (envioparcial) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_CLICOORD SET STATCOM='S' WHERE (CODIGO='" + cod + "') AND (STAMP=" + stp + ") ";
 							db.execSQL(sql);
@@ -2193,12 +2197,12 @@ public class ComWS extends PBase {
 					
 					i+=1;fprog="Solicitud "+i;wsStask.onProgressUpdate();
 					
-					if(gl.banderafindia == false){ dbld.clear(); }
+					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_SOLICINV" ,"WHERE COREL='"+cor+"'");
 					dbld.insert("D_SOLICINVD","WHERE COREL='"+cor+"'");
 
-					if(gl.banderafindia == false) {
+					if (envioparcial) {
                         if (commitSQL() == 1) {
                             sql = "UPDATE D_SOLICINV SET STATCOM='S' WHERE COREL='" + cor + "'";
                             db.execSQL(sql);
@@ -2219,7 +2223,7 @@ public class ComWS extends PBase {
 			fstr=e.getMessage();
 		}
 
-		if(gl.banderafindia == false) {
+		if (envioparcial) {
 			if (pc != pcc) {
 				int pf = pcc - pc;
 				senv += "Solicitud : " + pc + " , NO ENVIADO : " + pf + "\n";
@@ -2235,12 +2239,12 @@ public class ComWS extends PBase {
 		
 		try {
 				
-			if(gl.banderafindia == false) dbld.clear();
+			if (envioparcial) dbld.clear();
 
 			dbld.add("DELETE FROM D_REPFINDIA WHERE RUTA='"+gl.ruta+"'");
 			dbld.insert("D_REPFINDIA" ,"WHERE (LINEA>=0)");
 
-			if(gl.banderafindia == false) commitSQL();
+			if (envioparcial) commitSQL();
 
 
 		} catch (Exception e) {
@@ -2259,7 +2263,7 @@ public class ComWS extends PBase {
 
 		try {
 
-			if(gl.banderafindia == false){ dbld.clear(); }
+			if (envioparcial) dbld.clear();
 
 			ss = " UPDATE P_STOCK SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
 					" WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + vFecha + "' AND ENVIADO = 0 " +
@@ -2276,7 +2280,7 @@ public class ComWS extends PBase {
 					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + vFecha + "')";
 			dbld.add(ss);
 
-			if(gl.banderafindia == false){
+			if (envioparcial) {
                 fterr=ss+"\n";
                 rslt=commitSQL();
                 fterr=fterr+rslt+"\n";
@@ -2298,12 +2302,12 @@ public class ComWS extends PBase {
 		
 		try {
 
-		    if(gl.banderafindia == false){ dbld.clear(); }
+		    if (envioparcial) dbld.clear();
 
 			ss="exec AcumuladoObjetivos '"+gl.ruta+"',"+oyear+","+omonth;					
 			dbld.add(ss);
 
-			if(gl.banderafindia == false) {
+			if (envioparcial) {
                 fterr = ss + "\n";
                 rslt = commitSQL();
                 fterr = fterr + rslt + "\n";
@@ -2452,17 +2456,16 @@ public class ComWS extends PBase {
 					
 		try {
 
-			if (getTest()==1) {scon=1;}
+			if (getTest()==1) scon=1;
 
 			if (scon==1) {
 				fstr="Sync OK";
 
 				if (!sendData()) {
 					fstr="Envio incompleto : "+sstr;
-				}else{
-
+				} else {
 				}
-			} else {	
+			} else {
 				fstr="No se puede conectar al web service : "+sstr;
 			}
 					
@@ -2486,8 +2489,8 @@ public class ComWS extends PBase {
 			lblInfo.setText(fstr);	
 			mu.msgbox(fstr+"\n"+fterr);
 		}
-		
-		mu.msgbox(senv);
+
+		if (envioparcial) mu.msgbox(senv);
 		if (!dbg.equalsIgnoreCase("::")) mu.msgbox(dbg);
 		
 		//updateLicencePush();
@@ -2498,8 +2501,7 @@ public class ComWS extends PBase {
 		isbusy=0;
 	}
 			
-	private class AsyncCallSend extends AsyncTask<String, Void, Void>
-	{
+	private class AsyncCallSend extends AsyncTask<String, Void, Void> {
 
 		@Override
 	    protected Void doInBackground(String... params) {
@@ -2690,8 +2692,8 @@ public class ComWS extends PBase {
 		}
 		gEmpresa=ss;
 		
-		//ss=txtWS.getText().toString().trim();
-		ss="http://192.168.1.142/wsAndr/wsandr.asmx";
+		ss=txtWS.getText().toString().trim();
+		//ss="http://192.168.1.142/wsAndr/wsandr.asmx";
 		if (mu.emptystr(ss) || ss.equalsIgnoreCase("*")) {
 			mu.msgbox("La dirección de Web service no esta definida.");return false;
 		}
@@ -2744,8 +2746,7 @@ public class ComWS extends PBase {
 	}
 
 	//#HS_20181121_1048 Se creo la funcion Get_Fecha_Inventario().
-	private int Get_Fecha_Inventario()
-	{
+	private int Get_Fecha_Inventario() 	{
 		Cursor DT;
 		int fecha = 0;
 
@@ -2769,6 +2770,22 @@ public class ComWS extends PBase {
 		}
 		return fecha;
 	}
+
+    private int ultimoCierreFecha() {
+        Cursor DT;
+        int rslt=0;
+
+        try {
+            sql="SELECT val1 FROM FinDia";
+            DT=Con.OpenDT(sql);
+            DT.moveToFirst();
+            rslt=DT.getInt(0);
+        } catch (Exception e) {
+            rslt=0;
+        }
+
+        return rslt;
+    }
 
 	private void visibilidadBotones() {
 		Cursor dt;

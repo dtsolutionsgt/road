@@ -47,15 +47,13 @@ public class printDMax extends printBase
 		msgAskPrint();				
 	}
 	
-	public boolean print()
-	{
+	public boolean print() 	{
 
 		hasCallback=false;
 		
 		fname="print.txt";errmsg="";
 
-		try
-		{
+		try	{
 			if (loadFile()){
 				doStartPrint();
 			}	else
@@ -67,27 +65,24 @@ public class printDMax extends printBase
 		return true;
 	}
 	
-	public void printask(String fileName)
-	{
+	public void printask(String fileName) {
 		hasCallback=false;
 		
 		fname=fileName;	errmsg="";
 		msgAskPrint();				
 	}
 		
-	public boolean print(String fileName)
-	{
+	public boolean print(String fileName) {
 		hasCallback=false;
 		
 		fname=fileName;errmsg="";
 		
-		try
-		{
-			if (loadFile())
-			{
+		try 		{
+			if (loadFile())	{
 				doStartPrint();
-			}else
+			} else {
 				return false;
+			}
 		} catch (Exception e) {
 			showmsg("Error: " + e.getMessage());return false;
 		}			
@@ -98,8 +93,7 @@ public class printDMax extends printBase
 
 	// Private
 	
-	private boolean loadFile()
-	{
+	private boolean loadFile() {
 
 		File ffile;
 		BufferedReader dfile;
@@ -147,8 +141,7 @@ public class printDMax extends printBase
 		}			
 	}
 	
-	private void doStartPrint()
-	{
+	private void doStartPrint() {
 		showmsg("Imprimiendo ..." );
 		//showmsg("MAC : "+printerAddress );
 		AsyncPrintCall wsRtask = new AsyncPrintCall();
@@ -158,10 +151,8 @@ public class printDMax extends printBase
 	private class AsyncPrintCall extends AsyncTask<String, Void, Void> {
 
 		@Override
-	    protected Void doInBackground(String... params)
-		{
-			try
-			{
+	    protected Void doInBackground(String... params) {
+			try {
 				processPrint();
 			} catch (Exception e) {
 				Log.d("Err_Impr",e.getMessage());
@@ -191,23 +182,31 @@ public class printDMax extends printBase
 		//showmsg("Imp : "+ss);
 		
 		if (!hasCallback) return;
-		
-		final Handler cbhandler = new Handler();
-		cbhandler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				callback.run();
-			}
-		}, 500);
 
-		//#EJC201800: Llamar el close de la printer
-		final Handler cbhandler1 = new Handler();
-		cbhandler1.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				printclose.run();
-			}
-		}, 200);
+        try {
+            final Handler cbhandler = new Handler();
+            cbhandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        callback.run();
+                    } catch (Exception ee) {}
+                }
+            }, 500);
+        } catch (Exception e) {}
+
+        try {
+            //#EJC201800: Llamar el close de la printer
+            final Handler cbhandler1 = new Handler();
+            cbhandler1.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        printclose.run();
+                    } catch (Exception ee) {}
+                }
+            }, 200);
+        } catch (Exception e) {}
 	}
 	
 	public void processPrint() {
@@ -217,19 +216,13 @@ public class printDMax extends printBase
 		try {
 
 			prconn = null;
-			
-			ss=ss+"p2..";
-			
+
 			//Looper.prepare();
 
 			prconn = Connection_Bluetooth.createClient(printerAddress);
-		
-			ss=ss+"p3..";
-			
+
 			if (!prconn.getIsOpen()) prconn.open();
-				
-			ss=ss+"p4..";
-			
+
 			prconn.write(printData);
 
 			prthread.sleep(1500);
@@ -238,12 +231,14 @@ public class printDMax extends printBase
 			printclose.run();
 			prconn.close();
 
-			ss=ss+"p6..";
-		
 		} catch (Exception e) {
-			ss=ss+"Error : " + e.getMessage();
+			ss = ss + "Error : " + e.getMessage();
 			Log.d("processPrint_ERR: ", ss);
-			if (prconn != null) prconn.close();
+
+			try {
+				if (prconn != null) prconn.close();
+			} catch (Exception ee) {
+			}
 		}	
 		
 	}
@@ -251,8 +246,7 @@ public class printDMax extends printBase
 	
 	// Aux
 	
-	private void msgAskPrint()
-	{
+	private void msgAskPrint() {
 
 		AlertDialog.Builder dialog = new AlertDialog.Builder(cont);
 
@@ -261,8 +255,7 @@ public class printDMax extends printBase
 
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {
-		    	try
-				{
+		    	try {
 					if (loadFile())
 						doStartPrint();
 				} catch (Exception e) {
@@ -293,13 +286,12 @@ public class printDMax extends printBase
 	
 	public void showmsg(String MsgStr) {
 		errmsg=MsgStr;
-		handler.post(new Runnable() {
+			handler.post(new Runnable() {
 			public void run() {
 				Toast.makeText(cont, errmsg, Toast.LENGTH_SHORT).show();
 			}
 		});
-			
-	}	
+	}
 	
 
 }

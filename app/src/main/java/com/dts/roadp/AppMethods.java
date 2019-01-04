@@ -200,6 +200,33 @@ public class AppMethods {
 			gl.peVehAyud=false;
 		}
 
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=14";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) throw new Exception();
+
+			gl.peEnvioParcial=val.equalsIgnoreCase("S");
+		} catch (Exception e) {
+			gl.peEnvioParcial=true;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=15";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) throw new Exception();
+
+			gl.peSoftScan=val.equalsIgnoreCase("S");
+		} catch (Exception e) {
+			gl.peSoftScan=false;
+		}
+
+
 	}
 
 	

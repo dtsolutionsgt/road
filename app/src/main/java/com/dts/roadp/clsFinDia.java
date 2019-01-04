@@ -209,7 +209,6 @@ public class clsFinDia extends PBase{
         }
     }
 
-
     public int getcomunicacion() {
         Cursor DT;
         int rslt=0;

@@ -1080,6 +1080,22 @@ public class BaseDatosScript {
 					"[PESO_PROMEDIO] REAL NOT NULL,"+
 					"[MODIF_PRECIO] INTEGER NOT NULL,"+
 					"[IMAGEN] TEXT NOT NULL,"+
+                    "[VIDEO] TEXT NOT NULL,"+
+                    "[VENTA_POR_PESO] INTEGER NOT NULL,"+
+                    "[ES_PROD_BARRA] INTEGER NOT NULL,"+
+                    "[UNID_INV] TEXT NOT NULL,"+
+                    "[VENTA_POR_PAQUETE] INTEGER NOT NULL,"+
+                    "[VENTA_POR_FACTOR_CONV] INTEGER NOT NULL,"+
+                    "[ES_SERIALIZADO] INTEGER NOT NULL,"+
+                    "[PARAM_CADUCIDAD] INTEGER NOT NULL,"+
+                    "[PRODUCTO_PADRE] TEXT NOT NULL,"+
+                    "[FACTOR_PADRE] REAL NOT NULL,"+
+                    "[TIENE_INV] [bit] INTEGER NOT NULL,"+
+                    "[TIENE_VINETA_O_TUBO] INTEGER NOT NULL,"+
+                    "[PRECIO_VINETA_O_TUBO] REAL NOT NULL,"+
+                    "[ES_VENDIBLE] INTEGER NOT NULL,"+
+                    "[UNIGRASAP] REAL NOT NULL,"+
+                    "[UM_SALIDA] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

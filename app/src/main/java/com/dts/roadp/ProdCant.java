@@ -23,15 +23,15 @@ import android.database.SQLException;
 public class ProdCant extends PBase {
 
 	private EditText txtCant;
-	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot,lblDispLbl;
+	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot,lblPeso,lblDispLbl,lblPesoLbl;
 	private ImageView imgProd,imgUpd,imgDel;	
 	
 	private Precio prc;
 	
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas;
 	private int nivel,browse=0,deccant;
-	private double cant,prec,icant,idisp,umfactor;
-	private boolean pexist,esdecimal;
+	private double cant,prec,icant,idisp,ipeso,umfactor;
+	private boolean pexist,esdecimal,porpeso,esbarra;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +62,9 @@ public class ProdCant extends PBase {
 
 		gl.dval=-1;
 		gl.gstr="";
-			
+
+        paramProd();
+
 		showData();
 		
 	}
@@ -186,7 +188,7 @@ public class ProdCant extends PBase {
 			deccant=0;
 		}
 
-			if (deccant==0) {
+		if (deccant==0) {
 			txtCant.setInputType(InputType.TYPE_CLASS_NUMBER );
 		} else {
 			txtCant.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
@@ -237,13 +239,14 @@ public class ProdCant extends PBase {
 		}
 		
 		if (rutatipo.equalsIgnoreCase("V")) {
-			idisp=getDisp();	
+			idisp=getDisp();
 		} else {
 			idisp=getDispInv();	
 		}
 		
 		lblPrec.setText(mu.frmcur(prec));
 		lblDisp.setText(mu.frmdec(idisp));
+        lblPeso.setText(mu.frmdec(ipeso));
 			
 		if (pexist) lblDisp.setText(""+((int) idisp)); else lblDisp.setText("");
 		lblDisp.setText(mu.frmdecimal(idisp, gl.peDecImp));
@@ -259,8 +262,7 @@ public class ProdCant extends PBase {
 		
 	}
 	
-	private double getDisp()
-	{
+	private double getDisp() {
 
 		Cursor dt;
 		double disp;
@@ -285,27 +287,14 @@ public class ProdCant extends PBase {
 			dt.moveToFirst();
 			
 			umstock=dt.getString(0);
-			
-			/*
-			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+um+"') AND (UNIDADMINIMA='"+umstock+"')";	
-			dt=Con.OpenDT(sql);
-			if (dt.getCount()>0) {
-				dt.moveToFirst();			
-				umfactor=dt.getDouble(0);
-			} else {	
-				umfactor=0;
-				msgFactor("No existe factor de conversi�n para "+um);return 0;
-			}			
-			*/
-			
+
 			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+um+"') AND (UNIDADMINIMA='"+ubas+"')";	
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()>0) {
 				dt.moveToFirst();			
 				umf1=dt.getDouble(0);
-			} else
-				{
+			} else 	{
 					umf1=1;
 					//#EJC20181127: No mostrar mensaje por versión de aprofam.
 				//msgFactor("No existe factor de conversión para "+um);return 0;
@@ -324,11 +313,13 @@ public class ProdCant extends PBase {
 			
 			umfactor=umf1/umf2;			
 			
-			sql="SELECT SUM(CANT) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
+			sql="SELECT SUM(CANT),SUM(PESO) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			
-			disp=dt.getDouble(0);disp=disp/umfactor;
+			disp=dt.getDouble(0);
+            if (!porpeso) disp=disp/umfactor;
+            ipeso=dt.getDouble(1);
 			
 			return disp;
 		} catch (Exception e) {
@@ -336,6 +327,7 @@ public class ProdCant extends PBase {
 		
 		return 0;
 	}
+
 	
 	private void delItem(){	
 		try {
@@ -367,7 +359,8 @@ public class ProdCant extends PBase {
 		hidekeyb();
 		super.finish();
 	}
-	
+
+
 	// Update Disp
 	
 	public void updDisp(){
@@ -393,7 +386,9 @@ public class ProdCant extends PBase {
 		lblBU=(TextView) findViewById(R.id.lblBU);
 		lblTot=(TextView) findViewById(R.id.textView1);lblTot.setText("");
 		lblDispLbl=(TextView) findViewById(R.id.textView8);
-					
+        lblPeso=(TextView) findViewById(R.id.textView25);lblPeso.setVisibility(View.INVISIBLE);
+        lblPesoLbl=(TextView) findViewById(R.id.textView24); lblPesoLbl.setVisibility(View.INVISIBLE);
+
 		imgProd=(ImageView) findViewById(R.id.imgPFoto);	
 		imgUpd=(ImageView) findViewById(R.id.imageView1);
 		imgDel=(ImageView) findViewById(R.id.imageView2);
@@ -477,7 +472,33 @@ public class ProdCant extends PBase {
 			return 0;
 	    }		
 	}
-		
+
+    private void paramProd() {
+        try {
+            AppMethods app = new AppMethods(this, gl, Con, db);
+
+            porpeso=app.ventaPeso(prodid);
+            esbarra=app.prodBarra(prodid);
+        } catch (Exception e) {
+            porpeso=false;esbarra=false;
+            msgbox(e.getMessage());
+        }
+
+        if (porpeso) {
+            lblPeso.setVisibility(View.VISIBLE);
+            lblPesoLbl.setVisibility(View.VISIBLE);
+        }
+
+
+    }
+
+    private void forceClose() {
+        super.finish();
+    }
+
+
+    // Msg
+
 	private void msgSinPrecio(String msg) {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
@@ -573,11 +594,7 @@ public class ProdCant extends PBase {
 		dialog.show();
 
 	}
-	
-	private void forceClose() {	
-		super.finish();
-	}
-	
+
 	
 	// Activity Events
 	

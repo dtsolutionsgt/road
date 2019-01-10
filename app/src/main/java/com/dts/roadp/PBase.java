@@ -38,6 +38,7 @@ public class PBase extends FragmentActivity {
 	public void InitBase(){
 		
 		Con = new BaseDatos(this);
+
 	    opendb();
 	    ins=Con.Ins;upd=Con.Upd;
 		

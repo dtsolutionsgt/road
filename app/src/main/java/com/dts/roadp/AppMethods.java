@@ -229,6 +229,39 @@ public class AppMethods {
 
 	}
 
+
+    // Productos
+
+    public boolean ventaPeso(String cod) {
+        Cursor DT;
+
+        try {
+            String sql = "SELECT VENTA_POR_PESO FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+            DT = Con.OpenDT(sql);
+            DT.moveToFirst();
+
+           return  DT.getInt(0)==1;
+        } catch (Exception e) {
+            toast(e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean prodBarra(String cod) {
+        Cursor DT;
+
+        try {
+            String sql = "SELECT ES_PROD_BARRA FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+            DT = Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            return  DT.getInt(0)==1;
+        } catch (Exception e) {
+            toast(e.getMessage());
+            return false;
+        }
+    }
+
 	
 	// Common
 	

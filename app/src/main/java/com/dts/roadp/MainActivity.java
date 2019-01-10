@@ -303,7 +303,6 @@ public class MainActivity extends PBase {
 	}
 
 	public void supervisorRuta(){
-
 		Cursor DT;
 
 		try{
@@ -360,7 +359,8 @@ public class MainActivity extends PBase {
 		}
 	
 	}
-	
+
+
 	
 	// Ventas Demo
 	
@@ -486,8 +486,7 @@ public class MainActivity extends PBase {
 	
 	// Aux
 	
-	private void entraComunicacion()
-	{
+	private void entraComunicacion() {
 
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 

@@ -177,7 +177,7 @@ public class Exist extends PBase {
 		Cursor dt, dp;
 		clsClasses.clsExist item,itemm,itemt;
 		String vF,pcod, cod, name, um, ump, sc, scm, sct="", sp, spm, spt="";
-		double val, valm, valt, peso, pesom, pesot;
+		double val, valm, valt, peso, pesot;
 		int icnt;
 
 		items.clear();lblReg.setText(" ( 0 ) ");
@@ -212,7 +212,7 @@ public class Exist extends PBase {
 				pcod=dp.getString(0);
                 valt=0;pesot=0;
 
-				sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT),SUM(P_STOCK.CANTM),P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
+				sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT),SUM(P_STOCK.CANTM),P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS,P_STOCK.PESO  " +
 						"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  ";
 				sql += "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
                         "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
@@ -241,16 +241,15 @@ public class Exist extends PBase {
 					val = dt.getDouble(2);
 					valm = dt.getDouble(3);
 					um = dt.getString(4);
-					peso = 0;
-					pesom = 0;
+					peso =  dt.getDouble(9);
 
 					valt += val + valm;
-					pesot += peso + pesom;
+					pesot += peso ;
 
-					ump = "";
+					ump = gl.umpeso;
 					sp = mu.frmdecimal(peso, gl.peDecImp) + " " + rep.ltrim(ump, 3);
 					if (!gl.usarpeso) sp = "";
-					spm = mu.frmdecimal(pesom, gl.peDecImp) + " " + rep.ltrim(ump, 3);
+					spm = mu.frmdecimal(peso, gl.peDecImp) + " " + rep.ltrim(ump, 3);
 					if (!gl.usarpeso) spm = "";
 					spt = mu.frmdecimal(pesot, gl.peDecImp) + " " + rep.ltrim(ump, 3);
 					if (!gl.usarpeso) spt = "";

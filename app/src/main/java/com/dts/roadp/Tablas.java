@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class Tablas extends PBase {
 
     private GridView grid,dgrid;
-    private Spinner spin;
+    private Spinner spin,spinf;
     private ProgressBar pbar;
     private EditText txt1;
 

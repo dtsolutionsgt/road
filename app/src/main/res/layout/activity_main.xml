@@ -231,7 +231,7 @@
         android:layout_alignLeft="@+id/textView3"
         android:layout_alignRight="@+id/relbotpan"
         android:gravity="center_horizontal"
-        android:text="ROAD Ver 8.1  -  14/09/18"
+        android:text="ROAD Ver 9.2  -  04/01/19"
         android:textColor="#000000"
         android:textSize="13sp" />
 

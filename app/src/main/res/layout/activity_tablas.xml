@@ -58,11 +58,18 @@
 
     <Spinner
         android:id="@+id/spinner"
-        android:layout_width="match_parent"
+        android:layout_width="207dp"
         android:layout_height="42dp"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/relRoad"
-        android:layout_margin="3dp"
+        android:layout_marginBottom="3dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_marginStart="174dp"
+        android:layout_marginTop="3dp"
         android:background="@layout/spinner_style" />
 
 

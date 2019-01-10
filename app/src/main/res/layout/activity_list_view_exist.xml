@@ -75,6 +75,7 @@
             android:layout_alignBaseline="@+id/lblETipo"
             android:layout_alignBottom="@+id/lblETipo"
             android:layout_centerHorizontal="true"
+            android:gravity="right"
             android:text="Medium Text"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="18sp" />
@@ -145,6 +146,7 @@
             android:layout_alignParentTop="false"
             android:layout_below="@+id/TextView01"
             android:layout_centerHorizontal="true"
+            android:gravity="right"
             android:text="Medium Text"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#C02020"
@@ -198,6 +200,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_centerHorizontal="true"
+            android:gravity="right"
             android:text="Medium Text"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#2020C0"

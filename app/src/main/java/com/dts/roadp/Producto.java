@@ -34,6 +34,7 @@ public class Producto extends PBase {
 	
 	private ArrayList<clsCD> items;
 	private ListAdaptProd adapter;
+	private AppMethods app;
 	
 	private String famid,itemid,pname,prname,um,ubas;
 	private int act,prodtipo;
@@ -55,8 +56,10 @@ public class Producto extends PBase {
 		gl.prodtipo=0;
 		this.setTitle("Producto");
 		if (prodtipo==1) this.setTitle("Producto con existencia");
-			
-		items = new ArrayList<clsCD>();
+
+        app = new AppMethods(this, gl, Con, db);
+
+        items = new ArrayList<clsCD>();
 		
 		act=0;
 		fillSpinner();
@@ -175,8 +178,7 @@ public class Producto extends PBase {
 		
 	}
 	
-	private void listItems()
-	{
+	private void listItems() {
 		Cursor DT;
 		clsCD vItem;
 		int cantidad;
@@ -300,7 +302,7 @@ public class Producto extends PBase {
 	
 	private void dispUmCliente() {
 		String sdisp;
-	 
+
 		for (int i = items.size()-1; i >=0; i--) {
 			if (getDisp(items.get(i).Cod)) {
 				sdisp=mu.frmdecimal(disp,gl.peDecImp)+" "+ltrim(um,6);
@@ -318,8 +320,10 @@ public class Producto extends PBase {
 		Cursor dt;
 		String umstock;
 		double umf1,umf2,umfactor;
-		
-		disp=0;
+        boolean porpeso=prodPorPeso(prodid);
+
+
+        disp=0;
 		
 		try {			
 			sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
@@ -374,11 +378,12 @@ public class Producto extends PBase {
 			
 			umfactor=umf1/umf2;			
 			
-			sql="SELECT SUM(CANT) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
+			sql="SELECT SUM(CANT),SUM(PESO) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			
-			disp=dt.getDouble(0);disp=disp/umfactor;
+			disp=dt.getDouble(0);
+			if (!porpeso) disp=disp/umfactor; else disp=dt.getDouble(1);
 
 			return true;
 		} catch (Exception e) {
@@ -457,7 +462,15 @@ public class Producto extends PBase {
 		
 		return ss;
 	}
-	
+
+    private boolean prodPorPeso(String prodid) {
+        try {
+            return app.ventaPeso(prodid);
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
 	
 	// Activity Events
 	

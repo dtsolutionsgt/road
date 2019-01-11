@@ -23,12 +23,13 @@ import android.database.SQLException;
 public class ProdCant extends PBase {
 
 	private EditText txtCant;
-	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot,lblPeso,lblDispLbl,lblPesoLbl;
+	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot;
+	private TextView lblPeso,lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso;
 	private ImageView imgProd,imgUpd,imgDel;	
 	
 	private Precio prc;
 	
-	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas;
+	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres;
 	private int nivel,browse=0,deccant;
 	private double cant,prec,icant,idisp,ipeso,umfactor;
 	private boolean pexist,esdecimal,porpeso,esbarra;
@@ -124,7 +125,7 @@ public class ProdCant extends PBase {
 		   	public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
 			 
 		   	public void onTextChanged(CharSequence s, int start,int before, int count) {
-		   		//setCant();
+		   		setCant();
 		   	}
 		});	
 		
@@ -154,7 +155,7 @@ public class ProdCant extends PBase {
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();			
 			um=dt.getString(0);ubas=um;
-			lblBU.setText(um);gl.ubas=ubas;
+			lblBU.setText(ubas);gl.ubas=ubas;upres=ubas;
 		} catch (Exception e) {
 			mu.msgbox("1-"+ e.getMessage());
 		}
@@ -243,18 +244,25 @@ public class ProdCant extends PBase {
 		} else {
 			idisp=getDispInv();	
 		}
-		
-		lblPrec.setText(mu.frmcur(prec));
-		lblDisp.setText(mu.frmdec(idisp));
-        lblPeso.setText(mu.frmdec(ipeso));
-			
+
+		if (porpeso) {
+			lblBU.setText(umstock);
+			upres = umstock;
+			lblPrec.setText(mu.frmcur(prec)+" x "+gl.umpeso);
+		} else {
+			lblPrec.setText(mu.frmcur(prec)+" x "+upres);
+		}
+
+
 		if (pexist) lblDisp.setText(""+((int) idisp)); else lblDisp.setText("");
-		lblDisp.setText(mu.frmdecimal(idisp, gl.peDecImp));
-		
+		lblDisp.setText(mu.frmdecimal(idisp, gl.peDecImp)+" "+upres);
+		lblPeso.setText(mu.frmdecimal(ipeso, gl.peDecImp)+" "+gl.umpeso);
+		lblFactor.setText("x "+mu.frmdecimal(umfactor, gl.peDecImp));
+
 		if (rutatipo.equalsIgnoreCase("P") && (idisp==0)) {
 			lblDisp.setText("");lblDispLbl.setText("");
 		}
-		
+
 		try {
 			txtCant.setSelection(txtCant.getText().length());
 		} catch (Exception e) {
@@ -263,7 +271,6 @@ public class ProdCant extends PBase {
 	}
 	
 	private double getDisp() {
-
 		Cursor dt;
 		double disp;
 		double umf1 =1;
@@ -328,7 +335,6 @@ public class ProdCant extends PBase {
 		return 0;
 	}
 
-	
 	private void delItem(){	
 		try {
 	    	db.execSQL("DELETE FROM T_VENTA WHERE PRODUCTO='"+prodid+"'");    	
@@ -388,7 +394,8 @@ public class ProdCant extends PBase {
 		lblDispLbl=(TextView) findViewById(R.id.textView8);
         lblPeso=(TextView) findViewById(R.id.textView25);lblPeso.setVisibility(View.INVISIBLE);
         lblPesoLbl=(TextView) findViewById(R.id.textView24); lblPesoLbl.setVisibility(View.INVISIBLE);
-
+		lblFactor=(TextView) findViewById(R.id.textView22);lblFactor.setVisibility(View.INVISIBLE);
+		lblCantPeso=(TextView) findViewById(R.id.textView21);lblCantPeso.setText("");lblCantPeso.setVisibility(View.INVISIBLE);
 		imgProd=(ImageView) findViewById(R.id.imgPFoto);	
 		imgUpd=(ImageView) findViewById(R.id.imageView1);
 		imgDel=(ImageView) findViewById(R.id.imageView2);
@@ -399,7 +406,7 @@ public class ProdCant extends PBase {
 		double cu,tv,corig,cround,fruni,frcant,adcant;
 		boolean ajust=false;
 		
-		lblTot.setText("");
+		lblTot.setText("***");
 
 		try {
 			cu=Double.parseDouble(txtCant.getText().toString());		
@@ -425,22 +432,25 @@ public class ProdCant extends PBase {
 			if (adcant!=cant) {
 				ajust=true;cant=adcant;
 			}
-
 		}
 
 		cant=mu.round(cant, gl.peDecImp);
 
 		try {
-			if (cant<0) {
-				lblCant.setText("");
-			} else {	
-				lblCant.setText(String.valueOf(cant));
-			}
-			
+			if (cant<0)	lblCant.setText(""); else lblCant.setText(String.valueOf(cant));
 			tv=prec*cant;
-			lblTot.setText(mu.frmcur(tv));
 		} catch (Exception e) {
-			 mu.msgbox(e.getMessage()); 
+			tv=0;mu.msgbox(e.getMessage());
+		}
+
+        lblTot.setText(mu.frmcur(tv));
+
+		try {
+			tv=umfactor*cant;
+			lblCantPeso.setText(mu.frmdecimal(tv,gl.peDecImp)+" "+gl.umpeso);
+		} catch (Exception e) {
+			lblCantPeso.setText("");
+			mu.msgbox(e.getMessage());
 		}
 
 		if (ajust) {
@@ -449,6 +459,7 @@ public class ProdCant extends PBase {
 		} else {
 			return 0;
 		}
+
 	}
 	
 	private void parseCant(double c) {
@@ -487,9 +498,9 @@ public class ProdCant extends PBase {
         if (porpeso) {
             lblPeso.setVisibility(View.VISIBLE);
             lblPesoLbl.setVisibility(View.VISIBLE);
+            lblFactor.setVisibility(View.VISIBLE);
+			lblCantPeso.setVisibility(View.VISIBLE);
         }
-
-
     }
 
     private void forceClose() {

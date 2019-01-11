@@ -629,7 +629,7 @@ public class FacturaRes extends PBase {
 	
 	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa) {
 		Cursor dt;
-		double acant,dcant,disp,cantapl,peso;
+		double acant,cantapl,dispcant,peso,pesoapl,disppeso;
 		String lote,doc,stat;
 
 		acant=cant*factor;
@@ -645,20 +645,24 @@ public class FacturaRes extends PBase {
 			dt.moveToFirst();
 			while (!dt.isAfterLast()) {
 
-				dcant=dt.getDouble(0);
+				cant=dt.getDouble(0);
 				peso=dt.getDouble(2);
 				lote=dt.getString(4);
 				doc=dt.getString(5);
 				stat=dt.getString(9);
 
-				if (acant>dcant) cantapl=dcant;else cantapl=acant;
-				disp=dcant-acant;if (disp<0) disp=0;
-				acant=acant-dcant;
+				if (acant>cant) cantapl=cant;else cantapl=acant;
+				pesoapl=cantapl*factor;
+
+				dispcant=cant-acant;if (dispcant<0) dispcant=0;
+				acant=acant-cant;
+
+				disppeso=peso-pesoapl;if (disppeso<0) disppeso=0;
 
 
 				// Stock
 
-				sql="UPDATE P_STOCK SET CANT="+disp+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"') AND (UNIDADMEDIDA='"+umstock+"')";
+				sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"') AND (UNIDADMEDIDA='"+umstock+"')";
 				db.execSQL(sql);
 
 				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0)";
@@ -673,7 +677,7 @@ public class FacturaRes extends PBase {
 				ins.add("CODIGO",prid );
 				ins.add("CANT",cantapl );
 				ins.add("CANTM",dt.getDouble(1));
-				ins.add("PESO",peso);
+				ins.add("PESO",pesoapl);
 				ins.add("plibra",dt.getDouble(3));
 				ins.add("LOTE",lote );
 
@@ -698,7 +702,7 @@ public class FacturaRes extends PBase {
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
 					ins.add("CANTIDAD",cantapl);
-					ins.add("PESO",peso);
+					ins.add("PESO",pesoapl);
 					ins.add("UMSTOCK",umstock);
 					ins.add("UMPESO",gl.umpeso);
 					ins.add("UMVENTA",umventa);

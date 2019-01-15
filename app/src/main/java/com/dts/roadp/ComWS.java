@@ -75,9 +75,9 @@ public class ComWS extends PBase {
 	public AsyncCallSend wsStask;
 	public AsyncCallConfirm wsCtask;
 	
-	private static String sstr,fstr,fprog,finf,ferr,fterr,idbg,dbg,ftmsg;
+	private static String sstr,fstr,fprog,finf,ferr,fterr,idbg,dbg,ftmsg,esql,ffpos;
 	private int scon,running,pflag,stockflag,conflag;
-	private String ftext,slsync,senv,gEmpresa,ActRuta,mac;
+	private String ftext,slsync,senv,gEmpresa,ActRuta,mac,fsql;
 	private boolean rutapos,ftflag,esvacio;
 	
 	private final String NAMESPACE ="http://tempuri.org/";
@@ -129,7 +129,8 @@ public class ComWS extends PBase {
 		getWSURL();
 		
 		mac=getMac();
-		
+		fsql=du.univfechasql(du.getActDate());
+
 		lic=new clsLicence(this);
 		
 		pendientes=validaPendientes();
@@ -145,6 +146,11 @@ public class ComWS extends PBase {
 		//txtRuta.setText("8001-1");
 		//txtEmp.setText("03");
 		//txtWS.setText("http://192.168.1.69/wsAndr/wsandr.asmx");
+
+
+		txtRuta.setText("0005-1");
+		txtWS.setText("http://192.168.1.112/wsAndr/wsandr.asmx");
+		txtEmp.setText("03");
 
 	}
 
@@ -580,6 +586,7 @@ public class ComWS extends PBase {
 		return 0;
 	}	
 
+
 	//#HS_20181219 Funcion para enviar JSON al Web Service.
 
 	public int envioFachada() {
@@ -620,6 +627,7 @@ public class ComWS extends PBase {
 
 	}
 
+
 	// WEB SERVICE - RECEPCION
 
 	private boolean getData(){
@@ -647,7 +655,7 @@ public class ComWS extends PBase {
 		idbg="";stockflag=0;
 		
 		ftmsg="";ftflag=false;
-		
+
 		try {
 				
 			// AdjustP_Cliente();
@@ -675,16 +683,12 @@ public class ComWS extends PBase {
 			if (!AddTable("P_COREL")) return false;
 			if (!AddTable("P_CORELNC")) return false;
 			if (!AddTable("P_CORRELREC")) return false;
-			if (!AddTable("P_CORREL_OTROS")) return false;	
-			
-			if (gl.peStockItf)
-			{
-				if (gl.peAceptarCarga)
-				{
+			if (!AddTable("P_CORREL_OTROS")) return false;
+
+			if (gl.peStockItf) {
+				if (gl.peAceptarCarga) 	{
 					if (!AddTable("P_STOCK_APR")) return false;
-
-				} else {	
-
+				} else {
 				    if (!AddTable("P_STOCK")) return false;
 				}
 			}
@@ -725,19 +729,17 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MERRESP")) return false;
 			if (!AddTable("P_MERMARCACOMP")) return false;
 			if (!AddTable("P_MERPRODCOMP")) return false;
-			
-			
-			// Configuracion
-			if (gl.contlic) {
-				if (!AddTable("LIC_CLIENTE")) return false;
-			}
+
+			//if (gl.contlic) {
+			//	if (!AddTable("LIC_CLIENTE")) return false;
+			//}
 
 			if (!AddTable("P_PARAMEXT")) return false;
 
 		} catch (Exception e) {
 			return false;
 		}
-		
+
 		ferr="";
 		
 		try {
@@ -750,15 +752,16 @@ public class ComWS extends PBase {
 			
 			ConT = new BaseDatos(this);
 			dbT = ConT.getWritableDatabase();
-			//dbT.beginTransaction();
 			ConT.vDatabase =dbT;
 		    insT=ConT.Ins;
 			
 		    prn=0;jj=0;
 
-		    for (int i = 0; i < rc; i++) {
+			dbT.beginTransaction();
 
-                sql = listItems.get(i);
+			for (int i = 0; i < rc; i++) {
+
+                sql = listItems.get(i);esql=sql;
                 dbT.execSQL(sql);
 
                 try {
@@ -770,19 +773,10 @@ public class ComWS extends PBase {
                 } catch (Exception e) {
                     Log.e("z", e.getMessage());
                 }
-
-				Log.d("DataIn",sql);
-
-//				jj++;
-//
-//		    	if (jj>=100) {
-//		    		//if (prn==0) fprog="Procesando ..."; else fprog="Procesando ... "+(prn*100)+" / "+rc;
-//		    		prn++;jj=0;
-//		    		fprog="Procesando ... "+(prn*100);
-//		    		wsRtask.onProgressUpdate();
-//		    		SystemClock.sleep(50);
-//		    	}
 		    }
+
+			dbT.setTransactionSuccessful();
+			dbT.endTransaction();
 
 			fprog = "Confirmando documento de invetario recibido en BOF...";
 			wsRtask.onProgressUpdate();
@@ -793,11 +787,9 @@ public class ComWS extends PBase {
 			wsRtask.onProgressUpdate();
 
 			scomp=1;
-			
+
 		} catch (Exception e) {
-
 			Log.e("Error",e.getMessage());
-
 			try {
 				ConT.close();  
 			} catch (Exception ee) {
@@ -805,7 +797,7 @@ public class ComWS extends PBase {
 			
 			sstr=e.getMessage();
 			ferr=sstr+"\n"+sql;
-			
+			esql=sql;
 			return false;
 		}
 		
@@ -897,20 +889,20 @@ public class ComWS extends PBase {
        if (TN.equalsIgnoreCase("P_STOCK")) { 
     	   //SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
     	   // "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND ((dbo.AndrDate(FECHA)>="+fi+") AND (dbo.AndrDate(FECHA)<="+ff+")) ";     	   
-    	 
-    	   if (gl.peModal.equalsIgnoreCase("TOL")) {
-    	 	   SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-                   "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (dbo.AndrDate(FECHA)>="+fi+") " +
-                   "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";   
-    	   } else if (gl.peModal.equalsIgnoreCase("APR"))  {
-    	 	   SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-            	   "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (dbo.AndrDate(FECHA)>="+fi+") ";
-     	   } else {	   
-    	 	   SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-                   "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (dbo.AndrDate(FECHA)>="+fi+") ";    	   
-    	   }
-         	   
-	       return SQL;		   
+
+		   if (gl.peModal.equalsIgnoreCase("TOL")) {
+			   SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+					   "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='"+fsql+"') " +
+					   "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
+		   } else if (gl.peModal.equalsIgnoreCase("APR"))  {
+			   SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+					   "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='"+fsql+"') ";
+		   } else {
+			   SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+					   "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='"+fsql+"') ";
+		   }
+			esql=SQL;
+		   return SQL;
        }
        
        if (TN.equalsIgnoreCase("P_CLIRUTA")) {
@@ -1011,23 +1003,21 @@ public class ComWS extends PBase {
          SQL = "SELECT * FROM P_STOCKINV";
          return SQL;  
        }
-       
-       if (TN.equalsIgnoreCase("P_CODATEN")) {
-         SQL = "SELECT * FROM P_CODATEN";
-         return SQL;  
-       }
 
-        if (TN.equalsIgnoreCase("P_CODNOLEC")) {
-            SQL = "SELECT * FROM P_CODNOLEC";
-            return SQL;
-        }
+		if (TN.equalsIgnoreCase("P_CODATEN")) {
+			SQL = "SELECT * FROM P_CODATEN";
+			return SQL;
+		}
 
+		if (TN.equalsIgnoreCase("P_CODNOLEC")) {
+			SQL = "SELECT * FROM P_CODNOLEC";
+			return SQL;
+		}
 
-
-       if (TN.equalsIgnoreCase("P_CODDEV")) {
-           SQL = "SELECT * FROM P_CODDEV";
-           return SQL;  
-       }
+		if (TN.equalsIgnoreCase("P_CODDEV")) {
+			SQL = "SELECT * FROM P_CODDEV";
+			return SQL;
+		}
 
        if (TN.equalsIgnoreCase("P_NIVELPRECIO")) {
          SQL = "SELECT * FROM P_NIVELPRECIO ";
@@ -1074,9 +1064,7 @@ public class ComWS extends PBase {
     	   SQL = "SELECT RUTA,SERIE,TIPO,INICIAL,FINAL,ACTUAL,ENVIADO FROM P_CORREL_OTROS WHERE RUTA='" + ActRuta + "'";
     	   return SQL;		   
        } 
-       
-       //
-    
+
        if (TN.equalsIgnoreCase("P_MEDIAPAGO")) {
     	   SQL = "SELECT CODIGO,NOMBRE,ACTIVO,NIVEL,PORCOBRO FROM P_MEDIAPAGO WHERE ACTIVO='S'";
     	   return SQL;		   
@@ -1091,8 +1079,7 @@ public class ComWS extends PBase {
     	   SQL = "SELECT CODIGO,TEXTO,SUCURSAL FROM P_ENCABEZADO_REPORTESHH";
     	   return SQL;		   
        }     
-          
-       
+
        if (TN.equalsIgnoreCase("P_BONIF")) {
     	   SQL = "SELECT  CLIENTE, CTIPO, PRODUCTO, PTIPO, TIPORUTA, TIPOBON, RANGOINI, RANGOFIN, TIPOLISTA, TIPOCANT, VALOR," +
     	   		 "LISTA, CANTEXACT, GLOBBON, PORCANT, dbo.AndrDate(FECHAINI), dbo.AndrDate(FECHAFIN), CODDESC, NOMBRE, EMP " +
@@ -1118,7 +1105,7 @@ public class ComWS extends PBase {
        //#HS_20181206 Agregue Ruta.
        if (TN.equalsIgnoreCase("P_VENDEDOR")) {
      		SQL="SELECT CODIGO,NOMBRE,CLAVE,RUTA,NIVEL,NIVELPRECIO,ISNULL(BODEGA,0) AS BODEGA,ISNULL(SUBBODEGA,0) AS SUBBODEGA,COD_VEHICULO,LIQUIDANDO,BLOQUEADO,DEVOLUCION_SAP  " +
-    			"FROM P_VENDEDOR  WHERE (RUTA='"+ActRuta+"') OR (NIVEL<3) ";
+    			"FROM P_VENDEDOR  WHERE (RUTA='"+ActRuta+"') OR (NIVEL=1) ";
            return SQL;  
        }
 
@@ -1387,11 +1374,8 @@ public class ComWS extends PBase {
 					
 		try {
 
-			if (getTest()==1) {
-				scon=1;
-			} else {
-			}
-				
+			if (getTest()==1) scon=1;
+
 			idbg=idbg + sstr;
 			
 			if (scon==1) {
@@ -1437,10 +1421,10 @@ public class ComWS extends PBase {
 			}		
 			
 		} else {	
-			lblInfo.setText(fstr);	
+			lblInfo.setText(fstr);
 			mu.msgbox("Ocurrio error : \n"+fstr+" ("+reccnt+") " + ferr);
 		}
-				
+
 		pendientes=validaPendientes();
 		visibilidadBotones();
 		
@@ -1448,7 +1432,7 @@ public class ComWS extends PBase {
 		comparaCorrel();
 		
 		paramsExtra();
-		//mu.msgbox("::"+sstr);
+		//mu.msgbox("::"+esql);
 		
 		if (ftflag) msgbox(ftmsg);
 		

@@ -126,6 +126,23 @@ public class DateUtils {
 		return s;
 	}
 
+	public String univfechasql(int f) {
+		int vy,vm,vd;
+		String sy,sm,sd;
+
+		//yyyy-MM-dd
+
+		vy=(int) f/100000000;f=f % 100000000;
+		vm=(int) f/1000000;f=f % 1000000;
+		vd=(int) f/10000;f=f % 10000;
+
+		if (vy>9) sy="20"+vy; else sy="200"+vy;
+		if (vm>9) sm="-"+vm; else sm="-0"+vm;
+		if (vd>9) sd="-"+vd; else sd="-0"+vd;
+
+		return sy+sm+sd;
+	}
+
 	public int ffecha00(int f) {
 		f=(int) f/10000;
 		f=f*10000;

@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -65,6 +66,7 @@ public class MainActivity extends PBase {
 		supervisorRuta();
 		
 		txtUser.setText("00100993");txtPass.setText("2613");
+		txtUser.setText("00107520");txtPass.setText("REBECA");
 		//txtUser.setText("Venta");txtPass.setText("Venta");
 		
 		gl.contlic=false;
@@ -122,6 +124,7 @@ public class MainActivity extends PBase {
 				if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
 					switch (arg1) {
 						case KeyEvent.KEYCODE_ENTER:
+							//toast("key ");
 							txtPass.requestFocus();
 							return true;
 					}

@@ -1090,7 +1090,7 @@ public class BaseDatosScript {
                     "[PARAM_CADUCIDAD] INTEGER NOT NULL,"+
                     "[PRODUCTO_PADRE] TEXT NOT NULL,"+
                     "[FACTOR_PADRE] REAL NOT NULL,"+
-                    "[TIENE_INV] [bit] INTEGER NOT NULL,"+
+                    "[TIENE_INV] INTEGER NOT NULL,"+
                     "[TIENE_VINETA_O_TUBO] INTEGER NOT NULL,"+
                     "[PRECIO_VINETA_O_TUBO] REAL NOT NULL,"+
                     "[ES_VENDIBLE] INTEGER NOT NULL,"+

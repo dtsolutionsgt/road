@@ -659,7 +659,6 @@ public class FacturaRes extends PBase {
 
 				disppeso=peso-pesoapl;if (disppeso<0) disppeso=0;
 
-
 				// Stock
 
 				sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"') AND (UNIDADMEDIDA='"+umstock+"')";

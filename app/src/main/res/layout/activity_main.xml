@@ -67,7 +67,7 @@
             android:layout_marginRight="20dp"
             android:layout_toRightOf="@+id/lblProd"
             android:ems="10"
-            android:textSize="18sp"
+            android:imeOptions="actionNext"
             android:textStyle="bold" />
 
         <TextView

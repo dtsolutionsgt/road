@@ -778,7 +778,7 @@ public class ComWS extends PBase {
 			dbT.setTransactionSuccessful();
 			dbT.endTransaction();
 
-			fprog = "Confirmando documento de invetario recibido en BOF...";
+			fprog = "Documento de invetario recibido en BOF...";
 			wsRtask.onProgressUpdate();
 
 		    Actualiza_Documentos();

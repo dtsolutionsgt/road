@@ -164,9 +164,9 @@
         android:layout_height="48dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/textView6"
+        android:layout_below="@+id/textView23"
         android:layout_margin="5dp"
-        android:background="@layout/frame_rect" >
+        android:background="@layout/frame_rect">
 
         <TextView
             android:id="@+id/lblEPend"
@@ -252,5 +252,37 @@
             android:textSize="14sp" />
 
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/textView23"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/textView26"
+        android:layout_marginRight="5dp"
+        android:background="@layout/frame_btn"
+        android:clickable="true"
+        android:onClick="checkNone"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:text="Desmarcar todo" />
+
+    <TextView
+        android:id="@+id/textView26"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView6"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@layout/frame_btn"
+        android:clickable="true"
+        android:onClick="checkAll"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:text="Marcar todo" />
 
 </RelativeLayout>

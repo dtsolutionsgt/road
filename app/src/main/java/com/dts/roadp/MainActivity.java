@@ -66,7 +66,7 @@ public class MainActivity extends PBase {
 		supervisorRuta();
 		
 		txtUser.setText("00100993");txtPass.setText("2613");
-		txtUser.setText("00107520");txtPass.setText("REBECA");
+		//txtUser.setText("00107520");txtPass.setText("REBECA");
 		//txtUser.setText("Venta");txtPass.setText("Venta");
 		
 		gl.contlic=false;

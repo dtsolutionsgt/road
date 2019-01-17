@@ -67,6 +67,7 @@ public class CliDet extends PBase {
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol;
 	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol,imgRoadTit;
+
 	private Exist Existencia = new Exist();
 	private String cod,tel, Nombre, NIT;
 	//#HS_20181220 Variables para fachada;
@@ -150,6 +151,36 @@ public class CliDet extends PBase {
 
 
 	// Events
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		if (requestCode == 1) {
+
+			try {
+
+				ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+				Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
+
+				bitmap1 = redimensionarImagen(bitmap1, 640, 360);
+
+				FileOutputStream out = new FileOutputStream(paht);
+				bitmap1.compress(Bitmap.CompressFormat.JPEG, 50, out);
+				out.flush();
+				out.close();
+
+				File archivo = new File(path);
+				imgRoadTit.setImageURI(Uri.fromFile(archivo));
+			}catch (Exception e){
+				//mu.msgbox("onActivityResult: " + e.getMessage());
+			}
+
+		}
+
+	}
+
+	//  Misc
 	
 	public void showVenta(View view) {
 		//Float cantidad;
@@ -670,8 +701,7 @@ public class CliDet extends PBase {
 		toast.show();
 	}
 
-	//#HS_20181213 Proceso para tomar foto de la fachada
-	// Camara
+	// Fachada
 
 	public void tomarFoto(View view){
 		int codResult = 1;
@@ -684,36 +714,13 @@ public class CliDet extends PBase {
 			startActivityForResult(intento1,codResult);
 
 		}catch (Exception e){
-			mu.msgbox("tomarFoto: "+ e.getMessage());
+			//mu.msgbox("tomarFoto: "+ e.getMessage());
+			mu.msgbox("No se puede activar la camara. ");
 		}
 
 	}
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-		if (requestCode == 1) {
-
-			try {
-
-				ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-				Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
-
-				bitmap1 = redimensionarImagen(bitmap1, 640, 360);
-
-				FileOutputStream out = new FileOutputStream(paht);
-				bitmap1.compress(Bitmap.CompressFormat.JPEG, 50, out);
-				out.flush();
-				out.close();
-
-			}catch (Exception e){
-				mu.msgbox("onActivityResult: " + e.getMessage());
-			}
-
-		}
-
-	}
 
 	public void mostrarFachada(View view){
 		Cursor DT;

@@ -148,9 +148,9 @@ public class ComWS extends PBase {
 		//txtWS.setText("http://192.168.1.69/wsAndr/wsandr.asmx");
 
 
-		txtRuta.setText("0005-1");
-		txtWS.setText("http://192.168.1.112/wsAndr/wsandr.asmx");
-		txtEmp.setText("03");
+		//txtRuta.setText("0005-1");
+		//txtWS.setText("http://192.168.1.112/wsAndr/wsandr.asmx");
+		//txtEmp.setText("03");
 
 	}
 
@@ -762,6 +762,9 @@ public class ComWS extends PBase {
 			for (int i = 0; i < rc; i++) {
 
                 sql = listItems.get(i);esql=sql;
+
+                sql=sql.replace("INTO VENDEDORES","INTO P_VENDEDOR");
+
                 dbT.execSQL(sql);
 
                 try {
@@ -788,7 +791,16 @@ public class ComWS extends PBase {
 
 			scomp=1;
 
+			try {
+				ConT.close();
+			} catch (Exception e) { }
+
+			return true;
+
 		} catch (Exception e) {
+			fprog = "Actualización incompleta";
+			wsRtask.onProgressUpdate();
+
 			Log.e("Error",e.getMessage());
 			try {
 				ConT.close();  
@@ -800,12 +812,7 @@ public class ComWS extends PBase {
 			esql=sql;
 			return false;
 		}
-		
-		try {
-			ConT.close();  
-		} catch (Exception e) { }
-		
-		return true;
+
 	}
 
 	//#EJC20181120: Inserta los documentos que bajaron a la HH
@@ -1103,11 +1110,18 @@ public class ComWS extends PBase {
        }      
 
        //#HS_20181206 Agregue Ruta.
-       if (TN.equalsIgnoreCase("P_VENDEDOR")) {
-     		SQL="SELECT CODIGO,NOMBRE,CLAVE,RUTA,NIVEL,NIVELPRECIO,ISNULL(BODEGA,0) AS BODEGA,ISNULL(SUBBODEGA,0) AS SUBBODEGA,COD_VEHICULO,LIQUIDANDO,BLOQUEADO,DEVOLUCION_SAP  " +
-    			"FROM P_VENDEDOR  WHERE (RUTA='"+ActRuta+"') OR (NIVEL=1) ";
-           return SQL;  
-       }
+		if (TN.equalsIgnoreCase("P_VENDEDOR")) {
+
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				SQL = "SELECT CODIGO,NOMBRE,CLAVE,RUTA,NIVEL,NIVELPRECIO,ISNULL(BODEGA,0) AS BODEGA,ISNULL(SUBBODEGA,0) AS SUBBODEGA,'' AS COD_VEHICULO,0 AS LIQUIDANDO,0 AS BLOQUEADO,0 AS DEVOLUCION_SAP  " +
+						"FROM VENDEDORES  WHERE (RUTA='" + ActRuta + "') ";
+			} else {
+				SQL = "SELECT CODIGO,NOMBRE,CLAVE,RUTA,NIVEL,NIVELPRECIO,ISNULL(BODEGA,0) AS BODEGA,ISNULL(SUBBODEGA,0) AS SUBBODEGA,COD_VEHICULO,LIQUIDANDO,BLOQUEADO,DEVOLUCION_SAP  " +
+						"FROM P_VENDEDOR  WHERE (RUTA='" + ActRuta + "') OR (NIVEL=1) ";
+			}
+
+			return SQL;
+		}
 
 		//#HS_20181207 Agregue campos de P_VEHICULO.
        if(TN.equalsIgnoreCase("P_VEHICULO")){

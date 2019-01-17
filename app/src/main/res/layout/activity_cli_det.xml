@@ -147,7 +147,7 @@
         android:layout_alignParentBottom="false"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
-        android:background="@layout/frame_rect" >
+        android:background="@layout/frame_rect">
 
         <TextView
             android:id="@+id/lblFecha"
@@ -155,10 +155,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:paddingLeft="10dp"
-            android:paddingTop="3dp"
-            android:paddingRight="5dp"
             android:paddingBottom="3dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="5dp"
+            android:paddingTop="3dp"
             android:text="Crédito"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="18sp" />
@@ -391,10 +391,10 @@
             android:id="@+id/relCamara"
             android:layout_width="match_parent"
             android:layout_height="62dp"
-            android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="0dp"
+            android:layout_alignParentStart="true"
             android:layout_marginBottom="5dp"
+            android:layout_marginStart="0dp"
             android:onClick="tomarFoto">
 
             <ImageView
@@ -403,20 +403,20 @@
                 android:layout_height="40dp"
                 android:layout_alignParentStart="true"
                 android:layout_marginStart="0dp"
-                android:paddingEnd="6dp"
                 android:paddingBottom="6dp"
+                android:paddingEnd="6dp"
                 android:src="@drawable/camara" />
 
             <TextView
                 android:id="@+id/textView20"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/imgCamara"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/imgCamara"
+                android:layout_marginBottom="5dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginTop="0dp"
-                android:layout_marginBottom="5dp"
                 android:gravity="center_horizontal"
                 android:paddingBottom="5dp"
                 android:text="CÁMARA"

@@ -669,7 +669,7 @@ public class Venta extends PBase {
 		lblPrec.setText(mu.frmcur(0));
 		lblTot.setText(mu.frmcur(0));
 
-		if (gl.peSoftScan) imgscan.setVisibility(View.VISIBLE);
+		imgscan.setVisibility(View.INVISIBLE);
 
 	}
 

@@ -1324,7 +1324,7 @@ public class FacturaRes extends PBase {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 		dialog.setTitle("Road");
-		dialog.setMessage("¿Esta seguro de cobrar despues?");
+		dialog.setMessage("Está factura quedará PENDIENTE DE PAGO, deberá realizar el pago posteriormente. ¿Está seguro?");
 
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {

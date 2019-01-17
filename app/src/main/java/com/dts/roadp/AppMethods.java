@@ -221,9 +221,9 @@ public class AppMethods {
 			val=dt.getString(0);
 			if (emptystr(val)) throw new Exception();
 
-			gl.peSoftScan=val.equalsIgnoreCase("S");
+			gl.peOrdPorNombre=val.equalsIgnoreCase("S");
 		} catch (Exception e) {
-			gl.peSoftScan=false;
+			gl.peOrdPorNombre=true;
 		}
 
 

@@ -108,7 +108,29 @@ public class Cobro extends PBase {
 		//db.execSQL("DELETE FROM D_COBROP");
 		super.finish();
 	}
-	
+
+	public void checkAll(View view) {
+        for (int i = 0; i <items.size(); i++) {
+            items.get(i).flag=1;
+        }
+
+        adapter.refreshItems();
+
+        calcSelected();
+        showTotals();
+	}
+
+	public void checkNone(View view) {
+
+		for (int i = 0; i <items.size(); i++) {
+			items.get(i).flag=0;
+		}
+
+		adapter.refreshItems();
+
+		calcSelected();
+		showTotals();
+	}
 	
 	// Main
 	

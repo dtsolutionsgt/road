@@ -73,110 +73,117 @@ public class Producto extends PBase {
 	}
 
 
-	// Main
-	
-	public void limpiaFiltro(View view) {
-		txtFilter.setText("");	
-	}
-	
-	private void setHandlers(){
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
-				
-				try {
+    // Events
 
-					Object lvObj = listView.getItemAtPosition(position);
-		           	clsCD vItem = (clsCD)lvObj;
-		           	
-					itemid=vItem.Cod;
-					prname=vItem.Desc;
-					gl.um=vItem.um;
-					gl.pprodname=prname;
-					
-					adapter.setSelectedIndex(position);
-		    		
-					appProd();
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-			};
-	    });
-	    
-	    listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-	    	@Override
-		    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-	    	  	  		    	  
-	    		try {
-					Object lvObj = listView.getItemAtPosition(position);
-		           	clsCD vItem = (clsCD)lvObj;
-		           	
-					itemid=vItem.Cod;
-					prname=vItem.Desc;
-					gl.um=vItem.um;
-					gl.pprodname=prname;
-					
-					adapter.setSelectedIndex(position);
-		    		
-					appProd();
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-		    	return true;
-		      }
-		});
-	
-	    txtFilter.addTextChangedListener(new TextWatcher() {
-		 
-	    	public void afterTextChanged(Editable s) {}
-		 
-	    	public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
-		 
-	    	public void onTextChanged(CharSequence s, int start,int before, int count) {
-	    		int tl;
-	    		
-	    		tl=txtFilter.getText().toString().length();
-	    		
-	    		if (tl==0 || tl>1) {listItems();}
-	    	}
-	    });	
-	    
-		spinFam.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	TextView spinlabel;
-		    	String scod,idposition;
-		    	
-		    	try {
-		    		spinlabel=(TextView)parentView.getChildAt(0);
-			    	spinlabel.setTextColor(Color.BLACK);spinlabel.setPadding(5,0,0,0);
-			    	spinlabel.setTextSize(18);spinlabel.setTypeface(spinlabel.getTypeface(), Typeface.BOLD);
-			    
-			    	scod=spincode.get(position);
-		    		famid=scod;
-		    		
-		    		listItems();
-		    		
-		    		spinFam.requestFocus();
-		    		//if (act>0) {hidekeyb();}
-		    		hidekeyb();
-		    		
-		    		act+=1;
-		         } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-		
-		    }
+    private void setHandlers() {
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) {
-		        return;
-		    }
+        listView.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-		});	
-		
-	}
+                try {
+
+                    Object lvObj = listView.getItemAtPosition(position);
+                    clsCD vItem = (clsCD) lvObj;
+
+                    itemid = vItem.Cod;
+                    prname = vItem.Desc;
+                    gl.um = vItem.um;
+                    gl.pprodname = prname;
+
+                    adapter.setSelectedIndex(position);
+
+                    appProd();
+                } catch (Exception e) {
+                    mu.msgbox(e.getMessage());
+                }
+            }
+
+            ;
+        });
+
+        listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                try {
+                    Object lvObj = listView.getItemAtPosition(position);
+                    clsCD vItem = (clsCD) lvObj;
+
+                    itemid = vItem.Cod;
+                    prname = vItem.Desc;
+                    gl.um = vItem.um;
+                    gl.pprodname = prname;
+
+                    adapter.setSelectedIndex(position);
+
+                    appProd();
+                } catch (Exception e) {
+                    mu.msgbox(e.getMessage());
+                }
+                return true;
+            }
+        });
+
+        txtFilter.addTextChangedListener(new TextWatcher() {
+
+            public void afterTextChanged(Editable s) {
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                int tl;
+
+                tl = txtFilter.getText().toString().length();
+
+                if (tl == 0 || tl > 1) {
+                    listItems();
+                }
+            }
+        });
+
+        spinFam.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                TextView spinlabel;
+                String scod, idposition;
+
+                try {
+                    spinlabel = (TextView) parentView.getChildAt(0);
+                    spinlabel.setTextColor(Color.BLACK);
+                    spinlabel.setPadding(5, 0, 0, 0);
+                    spinlabel.setTextSize(18);
+                    spinlabel.setTypeface(spinlabel.getTypeface(), Typeface.BOLD);
+
+                    scod = spincode.get(position);
+                    famid = scod;
+
+                    listItems();
+
+                    spinFam.requestFocus();
+                    //if (act>0) {hidekeyb();}
+                    hidekeyb();
+
+                    act += 1;
+                } catch (Exception e) {
+                    mu.msgbox(e.getMessage());
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                return;
+            }
+
+        });
+
+    }
+
+
+    // Main
 	
 	private void listItems() {
 		Cursor DT;
@@ -194,12 +201,14 @@ public class Producto extends PBase {
 
 		try {
 					
-			switch (prodtipo) {  
+			switch (prodtipo) {
+
 				case 0: // Preventa
 					sql="SELECT CODIGO,DESCCORTA,'' FROM P_PRODUCTO WHERE 1=1 ";
 					if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
 					if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
-					sql+="ORDER BY DESCCORTA";				
+
+					if (gl.peOrdPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
 					break;
 					
 				case 1:  // Venta   
@@ -216,7 +225,6 @@ public class Producto extends PBase {
 						    "FROM P_PRODUCTO INNER JOIN	P_STOCK ON P_STOCK.CODIGO=P_PRODUCTO.CODIGO INNER JOIN " +
 						    "P_PRODPRECIO ON (P_STOCK.CODIGO=P_PRODPRECIO.CODIGO)  " +
 						    "WHERE (P_STOCK.CANT > 0) AND (P_PRODPRECIO.NIVEL = " + gl.nivel +")";
-
 					
 					if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
 					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
@@ -229,7 +237,7 @@ public class Producto extends PBase {
 					if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
 					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
 			
-					sql+="ORDER BY P_PRODUCTO.DESCCORTA";		
+				    if (gl.peOrdPorNombre) sql+="ORDER BY P_PRODUCTO.DESCCORTA"; else sql+="ORDER BY P_PRODUCTO.CODIGO";
 					
 					break;	
 					
@@ -237,15 +245,17 @@ public class Producto extends PBase {
 					sql="SELECT CODIGO,DESCCORTA,'' FROM P_PRODUCTO WHERE 1=1 ";
 					if (!mu.emptystr(famid)) {sql=sql+"AND (LINEA='"+famid+"') ";}
 					if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
-					sql+="ORDER BY DESCCORTA";				
+
+					if (gl.peOrdPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
 					break;
 					
 				case 3:  // Mercadeo comp
 					sql="SELECT CODIGO,NOMBRE,'' FROM P_MERPRODCOMP WHERE 1=1 ";
 					if (!mu.emptystr(famid)) {sql=sql+"AND (MARCA='"+famid+"') ";}
 					if (vF.length()>0) {sql=sql+"AND ((NOMBRE LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
-					sql+="ORDER BY NOMBRE";				
-					break;	
+
+                    if (gl.peOrdPorNombre) sql+="ORDER BY NOMBRE"; else sql+="ORDER BY CODIGO";
+					break;
 			}
 				
 			DT=Con.OpenDT(sql);
@@ -469,14 +479,17 @@ public class Producto extends PBase {
         } catch (Exception e) {
             return false;
         }
-
     }
-	
+
+    public void limpiaFiltro(View view) {
+        txtFilter.setText("");
+    }
+
+
 	// Activity Events
 	
 	protected void onResume() {
 	    super.onResume();
 	}
-
 
 }

@@ -2,14 +2,20 @@ package com.dts.roadp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.text.InputType;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -42,8 +48,11 @@ public class FacturaRes extends PBase {
 	
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
 	private boolean acum,cleandprod,peexit,pago,saved,rutapos;
+
+	private static String uniqueID = null;
+	private static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
 	
-	
+	@SuppressLint("MissingPermission")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -135,6 +144,8 @@ public class FacturaRes extends PBase {
 		
 		prn=new printer(this,printclose);
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
+		fdoc.deviceid =androidid(this);
+
 		saved=false;
 		assignCorel();
 		
@@ -1403,7 +1414,21 @@ public class FacturaRes extends PBase {
 		}
 			
 	}
-	
+
+	public synchronized static String androidid(Context context) {
+		if (uniqueID == null) {
+			SharedPreferences sharedPrefs = context.getSharedPreferences(
+					PREF_UNIQUE_ID, Context.MODE_PRIVATE);
+			uniqueID = sharedPrefs.getString(PREF_UNIQUE_ID, null);
+			if (uniqueID == null) {
+				uniqueID = UUID.randomUUID().toString();
+				SharedPreferences.Editor editor = sharedPrefs.edit();
+				editor.putString(PREF_UNIQUE_ID, uniqueID);
+				editor.commit();
+			}
+		}
+		return uniqueID;
+	}
 	
 	// Aux
 	

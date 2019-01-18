@@ -10,7 +10,7 @@ public class clsDocument {
 
 	public String nombre,numero,serie,ruta,vendedor,cliente,nit;	
 	public String resol, resfecha,resvence,resrango,fsfecha,modofact;
-	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="";
+	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;
 	public boolean docfactura,docrecibo=false,docanul=false,docpedido=false;
 	public int ffecha,pendiente,residx;
@@ -298,7 +298,6 @@ public class clsDocument {
 		return true;
 	}
 
-
 	
 	// Aux
 	
@@ -355,6 +354,17 @@ public class clsDocument {
 		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);} 
 		
 		return s;
+	}
+
+	public String shora(int vValue) {
+		int h,m;
+		String sh,sm;
+
+		h=vValue % 10000;
+		m=h % 100;if (m>9) {sm=String.valueOf(m);} else {sm="0"+String.valueOf(m);}
+		h=(int) h/100;if (h>9) {sh=String.valueOf(h);} else {sh="0"+String.valueOf(h);}
+
+		return sh+":"+sm;
 	}
 	
 	public String frmdecimal(double val,int ndec) {

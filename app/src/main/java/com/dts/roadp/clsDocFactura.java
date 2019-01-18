@@ -15,7 +15,7 @@ public class clsDocFactura extends clsDocument {
 	private double tot,desc,imp,stot,percep;
 	private boolean sinimp;
 	private String 	contrib;
-	private int decimp,diacred;
+	private int decimp,diacred,totitems;
 			
 	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres) {
 		super(context, printwidth,cursymbol,decimpres);
@@ -47,43 +47,7 @@ public class clsDocFactura extends clsDocument {
 		
 		return true;
 	}
-	
-	protected boolean buildFooter() {
-		double totimp,totperc;
-		
-		if (sinimp) {
-			stot=stot-imp;
-			totperc=stot*(percep/100);totperc=round2(totperc);
-			totimp=imp-totperc;
-			
-			rep.addtotsp("Subtotal", stot);
-			rep.addtotsp("Impuesto", totimp);
-			if (contrib.equalsIgnoreCase("C")) rep.addtotsp("Percepcion", totperc);
-			rep.addtotsp("Descuento", -desc);
-			rep.addtotsp("TOTAL", tot);			
-		} else {
-			if (desc!=0) {
-				rep.addtotsp("Subtotal", stot);
-				rep.addtotsp("Descuento", -desc);	
-			}		
-			rep.addtotsp("TOTAL A PAGAR ", tot);
-		}
-		
-		rep.add("");
-		rep.add("Sujeto a Pagos Trimestrales");
-		rep.add("");
 
-		//#HS_20181212 Validación para factura pendiente de pago
-		if(pendiente == 4){
-			rep.add("");
-			rep.add("ESTE NO ES UN DOCUMENTO LEGAL");
-			rep.add("EXIJA SU FACTURA ORIGINAL");
-			rep.add("");
-		}
-
-		return super.buildFooter();
-	}	
-		
 	protected boolean loadHeadData(String corel) {
 		Cursor DT;
 		String cli,vend,val,empp;
@@ -235,7 +199,8 @@ public class clsDocFactura extends clsDocument {
 			
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-			
+			totitems=DT.getCount();
+
 			while (!DT.isAfterLast()) {
 		
 				item =new itemData();
@@ -277,34 +242,23 @@ public class clsDocFactura extends clsDocument {
 		if (modofact.equalsIgnoreCase("TOL")) headerToledano(reimpres);
 	}
 
-	protected void headerToledano(int reimpres) {
+	private void headerToledano(int reimpres) {
 		String s,sc;
 
 		rep.empty();rep.empty();
 
 		for (int i = 0; i <lines.size(); i++) 		{
-
 			s=lines.get(i);
 			s=encabezado(s);
-
-			/*
-			if (residx==1) {
-				if (docfactura) {
-					rep.add(resol);
-					rep.add(resfecha);
-					rep.add(resvence);
-					rep.add(resrango);
-					rep.add("Fecha de Emision : "+fsfecha);
-				}
-				residx=0;
-			}
-			*/
 			if (!s.equalsIgnoreCase("@@")) rep.add(s);
 		}
 
 		sc="CONDICIONES DE PAGO: ";
 		if (diacred==0) sc+="CONTADO"; else sc+="CREDITO "+diacred+" DIAS";
 		rep.add(sc);
+		rep.empty();
+		rep.add("Fecha: "+sfecha(ffecha)+" Hora: "+shora(ffecha));
+		rep.empty();
 
 		if (!emptystr(add1)) {
 			rep.add("");
@@ -323,6 +277,82 @@ public class clsDocFactura extends clsDocument {
 
 	}
 
+
+	// Pie por empresa
+
+	protected boolean buildFooter() {
+		if (modofact.equalsIgnoreCase("*")) return footerBase();
+		if (modofact.equalsIgnoreCase("TOL")) return footerToledano();
+
+		return false;
+	}
+
+	private boolean footerBase() {
+		double totimp,totperc;
+
+		if (sinimp) {
+			stot=stot-imp;
+			totperc=stot*(percep/100);totperc=round2(totperc);
+			totimp=imp-totperc;
+
+			rep.addtotsp("Subtotal", stot);
+			rep.addtotsp("Impuesto", totimp);
+			if (contrib.equalsIgnoreCase("C")) rep.addtotsp("Percepcion", totperc);
+			rep.addtotsp("Descuento", -desc);
+			rep.addtotsp("TOTAL", tot);
+		} else {
+			if (desc!=0) {
+				rep.addtotsp("Subtotal", stot);
+				rep.addtotsp("Descuento", -desc);
+			}
+			rep.addtotsp("TOTAL A PAGAR ", tot);
+		}
+
+		rep.add("");
+		rep.add("Sujeto a Pagos Trimestrales");
+		rep.add("");
+
+		//#HS_20181212 Validación para factura pendiente de pago
+		if(pendiente == 4){
+			rep.add("");
+			rep.add("ESTE NO ES UN DOCUMENTO LEGAL");
+			rep.add("EXIJA SU FACTURA ORIGINAL");
+			rep.add("");
+		}
+
+		return super.buildFooter();
+	}
+
+	private boolean footerToledano() {
+		double totimp, totperc;
+
+		stot = stot - imp;
+		totperc = stot * (percep / 100);
+		totperc = round2(totperc);
+		totimp = imp - totperc;
+
+		rep.addtotsp("Subtotal", stot);
+		rep.addtotsp("ITBM", totimp);
+		rep.addtotsp("Total", tot);
+		rep.add("");
+		rep.add("Total de items: "+totitems);
+		rep.add("");
+		rep.add("");
+		rep.line();
+		rep.addc("Firma Cliente");
+		rep.add("");
+		rep.addc("DE SER UNA VENTA AL CREDITO, SOLAMEN");
+		rep.addc("TE NUESTRO CORRESPONDIENTE RECIBO SE");
+		rep.addc("CONSIDERARA COMO EVIDENCIA  DE  PAGO");
+		rep.add("");
+
+		rep.add("Serial dispositivo : "+deviceid);
+		rep.add("No. Resolucion     : "+resol);
+		rep.add("Fecha Resolucion   : "+resfecha);
+		rep.add("");
+
+		return super.buildFooter();
+	}
 
 
 	// Aux

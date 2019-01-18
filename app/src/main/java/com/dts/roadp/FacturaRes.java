@@ -356,9 +356,9 @@ public class FacturaRes extends PBase {
 
 				//#HS_20181212 Condicion para imprimir facturas pendientes de pago
 				if (!gl.cobroPendiente) {
-					fdoc.buildPrint(corel, 0);
+					fdoc.buildPrint(corel, 0,gl.peFormatoFactura);
 				}else{
-					fdoc.buildPrint(corel,4);
+					fdoc.buildPrint(corel,4,gl.peFormatoFactura);
 				}
 			}
 

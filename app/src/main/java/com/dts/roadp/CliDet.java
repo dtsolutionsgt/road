@@ -20,6 +20,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.Lifecycle;
 import android.content.Context;
 import android.content.res.Resources;
@@ -81,12 +82,7 @@ public class CliDet extends PBase {
 	private byte[] imagenBit;
 	
 	private double gpx,gpy;
-	
-	// Waze
-	// 14.6017278,-90.5236343,15
-	// center map to Ayalon and set zoom to 10     waze://?ll=37.44469,-122.15971&z=10
-	// search for address:                         waze://?q=San%20Jose%20California
-	
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +148,54 @@ public class CliDet extends PBase {
 
 	// Events
 
+	public void tomarFoto(View view){
+		int codResult = 1;
+		try {
+
+			Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+			File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+			intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
+			startActivityForResult(intento1,codResult);
+
+		}catch (Exception e){
+			//mu.msgbox("tomarFoto: "+ e.getMessage());
+			mu.msgbox("No se puede activar la camara. ");
+		}
+
+	}
+
+	public void mostrarFachada(View view){
+		Cursor DT;
+		imgDB = false; imgPath=false;
+		try {
+
+			path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+			File archivo = new File(path);
+
+			sql = "SELECT IMAGEN FROM P_CLIENTE_FACHADA WHERE CODIGO ='"+ cod +"'";
+			DT=Con.OpenDT(sql);
+
+			if(DT.getCount() > 0){
+				DT.moveToFirst();
+				imagenbase64 = DT.getString(0);
+				imgDB = true;
+			}
+
+			if(archivo.exists()){
+				imgPath = true;
+				inputFachada();
+			}else if(imgDB == true){
+				inputFachada();
+			}else{
+				Toast.makeText(this,"Fachada no disponible",Toast.LENGTH_LONG).show();
+			}
+
+		}catch (Exception e){
+			mu.msgbox("inputFachada: " + e.getMessage());
+		}
+
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -180,239 +224,7 @@ public class CliDet extends PBase {
 
 	}
 
-	//  Misc
-	
-	public void showVenta(View view) {
-		//Float cantidad;
-		//gl.rutatipo="V";
 
-		if (!validaVenta()) return;
-
-		if(porcentaje == false) {
-			VerificaCantidad();
-		}
-
-		//#HS_20181129_1033 lo agregue en funcion VerificaCantidad.
-		//Asigna conexión actual a la forma de Existencias.
-		/*Existencia.Con = Con;
-		cantidad = Float.valueOf(Existencia.CantExistencias());
-		if(cantidad == 0){
-			mu.msgbox("No hay existencias disponibles.");
-		}else{
-			runVenta();
-		}*/
-
-	}	
-
-	public void VerificaCantidad(){
-		Float cantidad;
-		gl.rutatipo="V";
-		//Asigna conexión actual a la forma de Existencias.
-		Existencia.Con = Con;
-		cantidad = Float.valueOf(Existencia.CantExistencias());
-		if(cantidad == 0){
-			mu.msgbox("No hay existencias disponibles.");
-		}else{
-			runVenta();
-		}
-	}
-
-	public void showPreventa(View view) {
-		gl.rutatipo="P";
-		runVenta();
-	}	
-	
-	public void showDespacho(View view) {
-		mu.msgbox("La funcionalidad no esta implementada.");
-		//gl.rutatipo="D";
-		//runVenta();
-	}	
-	
-	private void runVenta() {
-		
-		if (merc==1) {
-			browse=1;
-			Intent intent = new Intent(this,MercLista.class);
-			startActivity(intent);	
-		} else {	
-			initVenta();
-		}	
-	}
-	
-	public void showDir(View view) {
-		//mu.msgbox(lblDir.getText().toString() + "\n" + lblRep.getText().toString());
-		msgAskEditCliente();
-	}
-
-	private void msgAskEditCliente() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-		dialog.setTitle("Road");
-		dialog.setMessage("¿Quiere editar datos del cliente?");
-
-		dialog.setIcon(R.drawable.ic_quest);
-
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				inputCliente();
-			}
-		});
-
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				closekeyb();
-			}
-		});
-
-		dialog.show();
-
-	}
-
-	//#HS_20181207 Cuadro de dialogo para editar datos del cliente
-	private void inputCliente() {
-
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-		alert.setTitle("Editar Cliente");
-
-		final LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-
-		final TextView lblNombre = new TextView(this);
-		lblNombre.setTextSize(10);
-		lblNombre.setText("Nombre:");
-
-		final TextView lblNit = new TextView(this);
-		lblNit.setTextSize(10);
-		lblNit.setText("NIT:");
-
-		final EditText editNombre = new EditText(this);
-		editNombre.setInputType(InputType.TYPE_CLASS_TEXT);
-		editNombre.setText(lblDir.getText().toString());
-
-		final EditText editNit = new EditText(this);
-		editNit.setInputType(InputType.TYPE_CLASS_TEXT);
-		editNit.setText(lblRep.getText().toString());
-
-		layout.addView(lblNombre);
-		layout.addView(editNombre);
-		layout.addView(lblNit);
-		layout.addView(editNit);
-
-		alert.setView(layout);
-
-		alert.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				String corel=mu.getCorelBase();
-				gl.fnombre = editNombre.getText().toString();
-				gl.fnit = editNit.getText().toString();
-				ActualizarCliente(corel,gl.fnombre, gl.fnit);
-			}
-		});
-
-		alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-
-			}
-		});
-
-		alert.show();
-	}
-
-	//#HS_20181211 agregue funcion para actualizar los campos de Nombre y NIT del cliente
-
-	private void ActualizarCliente(String corel, String NombreEdit, String NitEdit){
-		Cursor DT;
-		try {
-			db.execSQL("INSERT INTO D_FACTURAF(COREL, NOMBRE, NIT, DIRECCION) VALUES('"+corel+"','"+NombreEdit+"','"+NitEdit+"','')");
-			mu.msgbox("Registro actualizado");
-		}catch (Exception e){
-			mu.msgbox("ActualizarCliente: "+e.getMessage());
-		}
-	}
-
-	/////
-
-	public void setGPS(View view) {
-		browse=2;
-		startActivity(new Intent(this,CliGPS.class));	
-	}
-	
-	public void showCredit(View viev){
-		Intent intent = new Intent(this,Cobro.class);
-		startActivity(intent);	
-	}
-	
-	public void showDevol(View view){
-		msgAskTipoDev("Devolucion de producto en estado ... ");
-	}
-	
-	public void sendSMS(View view){
-		String to=tel;
-		
-		//to="42161467";
-		
-		if (to.length()==0) {
-			msgbox("Número incorrecto ");return;
-		}
-		
-		try {
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("sms:"+to)));
-		} catch (Exception e) {
-			msgbox("No pudo enviar mensaje : "+e.getMessage());
-		} 
-		
-		//try {
-		//    Intent i = new Intent(android.content.Intent.ACTION_VIEW);
-	   //     i.setType("vnd.android-dir/mms-sms");
-       //     startActivity(i);
-		//} catch (Exception e) {
-       //     mu.msgbox("E","No se puede enviar mensaje");
-		//}
-	}
-	
-	public void callPhone(View view){
-		String to=tel;
-		
-		//to="42161467";
-		
-		if (to.length()==0) {
-			msgbox("Número incorrecto ");return;
-		}
-		
-		try {
-			Intent callIntent = new Intent(Intent.ACTION_CALL);
-			callIntent.setData(Uri.parse("tel:"+to));
-			startActivity(callIntent);
-		} catch (Exception e) {
-			msgbox("No pudo llamar : "+e.getMessage());
-		} 
-			  
-	}
-	
-	public void callWaze(View view) {
-		
-		/*
-		try {
-			Intent intent = this.getPackageManager().getLaunchIntentForPackage("com.example.wazetest");
-			this.startActivity(intent);
-		} catch ( Exception ex  )	{
-		}
-		*/
-		
-		try {
-			String url = "waze://?ll=14.6017278,-90.5236343";
-			Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( url ) );
-			startActivity( intent );
-		} catch ( ActivityNotFoundException ex  )	{
-			Intent intent =
-			new Intent( Intent.ACTION_VIEW, Uri.parse( "market://details?id=com.waze" ) );
-			startActivity(intent);
-		}
-		
-	}
-	
-	
 	// Main
 	
 	private void showData() {
@@ -614,32 +426,313 @@ public class CliDet extends PBase {
 			mu.msgbox("inputFachada: " + e.getMessage());
 		}
 	}
+
+
+	// Fachada
+
+	public Bitmap redimensionarImagen(Bitmap mBitmap, float newWidth, float newHeigth){
+
+			int width = mBitmap.getWidth();
+			int height = mBitmap.getHeight();
+			float scaleWidth = ((float) newWidth) / width;
+			float scaleHeight = ((float) newHeigth) / height;
+			Matrix matrix = new Matrix();
+			matrix.postScale(scaleWidth, scaleHeight);
+			return Bitmap.createBitmap(mBitmap, 0, 0, width, height, matrix, false);
+
+	}
+
+	public void inputFachada(){
+
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+		final ImageView imgFachada = new ImageView(this);
+		imgFachada.setScaleType(CENTER_CROP);
+
+
+        if(imgPath == true) {
+			Bitmap bitmap1 = BitmapFactory.decodeFile(path);
+			imgFachada.setImageBitmap(redimensionarImagen(bitmap1, 640, 360));
+		}else if(imgDB == true) {
+			byte[] btImagen = Base64.decode(imagenbase64, Base64.DEFAULT);
+			Bitmap bitm = BitmapFactory.decodeByteArray(btImagen,0,btImagen.length);
+			imgFachada.setImageBitmap(redimensionarImagen(bitm,640,360));
+		}
+
+		alert.setView(imgFachada);
+
+		alert.show();
+
+		imgFachada.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				zoomFoto = new PhotoViewAttacher(imgFachada);
+			}
+		});
+
+	}
+
+
+	// GPS
 	
-	// Aux
-	
+	private void defineGeoPos(){
+		
+	}
+
+
+	//  Misc
+
+	public void showVenta(View view) {
+		//Float cantidad;
+		//gl.rutatipo="V";
+
+		if (!validaVenta()) return;
+
+		if(porcentaje == false) {
+			VerificaCantidad();
+		}
+
+		//#HS_20181129_1033 lo agregue en funcion VerificaCantidad.
+		//Asigna conexión actual a la forma de Existencias.
+		/*Existencia.Con = Con;
+		cantidad = Float.valueOf(Existencia.CantExistencias());
+		if(cantidad == 0){
+			mu.msgbox("No hay existencias disponibles.");
+		}else{
+			runVenta();
+		}*/
+
+	}
+
+	public void VerificaCantidad(){
+		Float cantidad;
+		gl.rutatipo="V";
+		//Asigna conexión actual a la forma de Existencias.
+		Existencia.Con = Con;
+		cantidad = Float.valueOf(Existencia.CantExistencias());
+		if(cantidad == 0){
+			mu.msgbox("No hay existencias disponibles.");
+		}else{
+			runVenta();
+		}
+	}
+
+	public void showPreventa(View view) {
+		gl.rutatipo="P";
+		runVenta();
+	}
+
+	public void showDespacho(View view) {
+		mu.msgbox("La funcionalidad no esta implementada.");
+		//gl.rutatipo="D";
+		//runVenta();
+	}
+
+	private void runVenta() {
+
+		if (merc==1) {
+			browse=1;
+			Intent intent = new Intent(this,MercLista.class);
+			startActivity(intent);
+		} else {
+			initVenta();
+		}
+	}
+
+	public void showDir(View view) {
+		//mu.msgbox(lblDir.getText().toString() + "\n" + lblRep.getText().toString());
+		msgAskEditCliente();
+	}
+
+	private void msgAskEditCliente() {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle("Road");
+		dialog.setMessage("¿Quiere editar datos del cliente?");
+
+		dialog.setIcon(R.drawable.ic_quest);
+
+		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				inputCliente();
+			}
+		});
+
+		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				closekeyb();
+			}
+		});
+
+		dialog.show();
+
+	}
+
+	//#HS_20181207 Cuadro de dialogo para editar datos del cliente
+	private void inputCliente() {
+
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+		alert.setTitle("Editar Cliente");
+
+		final LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+
+		final TextView lblNombre = new TextView(this);
+		lblNombre.setTextSize(10);
+		lblNombre.setText("Nombre:");
+
+		final TextView lblNit = new TextView(this);
+		lblNit.setTextSize(10);
+		lblNit.setText("NIT:");
+
+		final EditText editNombre = new EditText(this);
+		editNombre.setInputType(InputType.TYPE_CLASS_TEXT);
+		editNombre.setText(lblDir.getText().toString());
+
+		final EditText editNit = new EditText(this);
+		editNit.setInputType(InputType.TYPE_CLASS_TEXT);
+		editNit.setText(lblRep.getText().toString());
+
+		layout.addView(lblNombre);
+		layout.addView(editNombre);
+		layout.addView(lblNit);
+		layout.addView(editNit);
+
+		alert.setView(layout);
+
+		alert.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String corel=mu.getCorelBase();
+				gl.fnombre = editNombre.getText().toString();
+				gl.fnit = editNit.getText().toString();
+				ActualizarCliente(corel,gl.fnombre, gl.fnit);
+			}
+		});
+
+		alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+
+			}
+		});
+
+		alert.show();
+	}
+
+	//#HS_20181211 agregue funcion para actualizar los campos de Nombre y NIT del cliente
+	private void ActualizarCliente(String corel, String NombreEdit, String NitEdit){
+		Cursor DT;
+		try {
+			db.execSQL("INSERT INTO D_FACTURAF(COREL, NOMBRE, NIT, DIRECCION) VALUES('"+corel+"','"+NombreEdit+"','"+NitEdit+"','')");
+			mu.msgbox("Registro actualizado");
+		}catch (Exception e){
+			mu.msgbox("ActualizarCliente: "+e.getMessage());
+		}
+	}
+
+	public void setGPS(View view) {
+		browse=2;
+		startActivity(new Intent(this,CliGPS.class));
+	}
+
+	public void showCredit(View viev){
+		Intent intent = new Intent(this,Cobro.class);
+		startActivity(intent);
+	}
+
+	public void showDevol(View view){
+		msgAskTipoDev("Devolucion de producto en estado ... ");
+	}
+
+	public void sendSMS(View view){
+		String to=tel;
+
+		//to="42161467";
+
+		if (to.length()==0) {
+			msgbox("Número incorrecto ");return;
+		}
+
+		try {
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("sms:"+to)));
+		} catch (Exception e) {
+			msgbox("No pudo enviar mensaje : "+e.getMessage());
+		}
+
+		//try {
+		//    Intent i = new Intent(android.content.Intent.ACTION_VIEW);
+		//     i.setType("vnd.android-dir/mms-sms");
+		//     startActivity(i);
+		//} catch (Exception e) {
+		//     mu.msgbox("E","No se puede enviar mensaje");
+		//}
+	}
+
+	@SuppressLint("MissingPermission")
+	public void callPhone(View view){
+		String to=tel;
+
+
+		//to="42161467";
+
+		if (to.length()==0) {
+			msgbox("Número incorrecto ");return;
+		}
+
+		try {
+			Intent callIntent = new Intent(Intent.ACTION_CALL);
+			callIntent.setData(Uri.parse("tel:"+to));
+			startActivity(callIntent);
+
+		} catch (Exception e) {
+			msgbox("No pudo llamar : "+e.getMessage());
+		}
+
+	}
+
+	public void callWaze(View view) {
+
+		/*
+		try {
+			Intent intent = this.getPackageManager().getLaunchIntentForPackage("com.example.wazetest");
+			this.startActivity(intent);
+		} catch ( Exception ex  )	{
+		}
+		*/
+
+		try {
+			String url = "waze://?ll=14.6017278,-90.5236343";
+			Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( url ) );
+			startActivity( intent );
+		} catch ( ActivityNotFoundException ex  )	{
+			Intent intent =
+					new Intent( Intent.ACTION_VIEW, Uri.parse( "market://details?id=com.waze" ) );
+			startActivity(intent);
+		}
+
+	}
 
 	private void msgAskTipoDev(String msg) {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
+
 		dialog.setTitle(R.string.app_name);
 		dialog.setMessage(msg);
-				
+
 		dialog.setIcon(R.drawable.ic_quest);
-					
+
 		dialog.setPositiveButton("Bueno", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	setDevType("B");
-		    }
+			public void onClick(DialogInterface dialog, int which) {
+				setDevType("B");
+			}
 		});
-		
+
 		dialog.setNegativeButton("Malo", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	setDevType("M");
-		    }
+			public void onClick(DialogInterface dialog, int which) {
+				setDevType("M");
+			}
 		});
-		
+
 		dialog.show();
-			
+
 	}
 
 	private void msgAskVenta() {
@@ -667,9 +760,8 @@ public class CliDet extends PBase {
 		Intent intent = new Intent(this,DevolCli.class);
 		startActivity(intent);
 	}
-	
-	private void habilitaOpciones()
-	{
+
+	private void habilitaOpciones() {
 		try
 		{
 			String rt;
@@ -694,113 +786,14 @@ public class CliDet extends PBase {
 			Log.d("habilitaOpciones_err", ex.getMessage());
 		}
 	}
-	
+
 	protected void toastcent(String msg) {
 		Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_LONG);
 		toast.setGravity(Gravity.CENTER, 0, 0);
 		toast.show();
 	}
 
-	// Fachada
 
-	public void tomarFoto(View view){
-		int codResult = 1;
-		try {
-
-			Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-			intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
-			//startActivity(intento1);
-			startActivityForResult(intento1,codResult);
-
-		}catch (Exception e){
-			//mu.msgbox("tomarFoto: "+ e.getMessage());
-			mu.msgbox("No se puede activar la camara. ");
-		}
-
-	}
-
-
-
-	public void mostrarFachada(View view){
-		Cursor DT;
-		imgDB = false; imgPath=false;
-		try {
-
-            path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-            File archivo = new File(path);
-
-            sql = "SELECT IMAGEN FROM P_CLIENTE_FACHADA WHERE CODIGO ='"+ cod +"'";
-			DT=Con.OpenDT(sql);
-
-			if(DT.getCount() > 0){
-				DT.moveToFirst();
-				imagenbase64 = DT.getString(0);
-				imgDB = true;
-			}
-
-            if(archivo.exists()){
-            	imgPath = true;
-                inputFachada();
-            }else if(imgDB == true){
-				inputFachada();
-			}else{
-                Toast.makeText(this,"Fachada no disponible",Toast.LENGTH_LONG).show();
-            }
-
-		}catch (Exception e){
-				mu.msgbox("inputFachada: " + e.getMessage());
-		}
-
-	}
-
-	public Bitmap redimensionarImagen(Bitmap mBitmap, float newWidth, float newHeigth){
-
-			int width = mBitmap.getWidth();
-			int height = mBitmap.getHeight();
-			float scaleWidth = ((float) newWidth) / width;
-			float scaleHeight = ((float) newHeigth) / height;
-			Matrix matrix = new Matrix();
-			matrix.postScale(scaleWidth, scaleHeight);
-			return Bitmap.createBitmap(mBitmap, 0, 0, width, height, matrix, false);
-
-	}
-
-	public void inputFachada(){
-
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-		final ImageView imgFachada = new ImageView(this);
-		imgFachada.setScaleType(CENTER_CROP);
-
-        if(imgPath == true) {
-			Bitmap bitmap1 = BitmapFactory.decodeFile(path);
-			imgFachada.setImageBitmap(redimensionarImagen(bitmap1, 1000, 600));
-		}else if(imgDB == true) {
-			byte[] btImagen = Base64.decode(imagenbase64, Base64.DEFAULT);
-			Bitmap bitm = BitmapFactory.decodeByteArray(btImagen,0,btImagen.length);
-			imgFachada.setImageBitmap(redimensionarImagen(bitm,1000,600));
-		}
-
-		alert.setView(imgFachada);
-
-		alert.show();
-
-		imgFachada.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				zoomFoto = new PhotoViewAttacher(imgFachada);
-			}
-		});
-
-	}
-
-	// GPS
-	
-	private void defineGeoPos(){
-		
-	}
-
-	
 	// Activity Events
 	
 	@Override

@@ -15,7 +15,7 @@ public class clsDocFactura extends clsDocument {
 	private double tot,desc,imp,stot,percep;
 	private boolean sinimp;
 	private String 	contrib;
-	private int decimp;
+	private int decimp,diacred;
 			
 	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres) {
 		super(context, printwidth,cursymbol,decimpres);
@@ -161,7 +161,7 @@ public class clsDocFactura extends clsDocument {
 		vendedor=val;
 		
 		try {
-			sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION,NIT FROM P_CLIENTE WHERE CODIGO='"+cli+"'";
+			sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION,NIT,DIACREDITO FROM P_CLIENTE WHERE CODIGO='"+cli+"'";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
 			
@@ -175,6 +175,7 @@ public class clsDocFactura extends clsDocument {
 			clicod=cli;
 			clidir=DT.getString(3);
 			nit=DT.getString(4);
+			diacred=DT.getInt(5);
 			
 		} catch (Exception e) {
 			val=cli;
@@ -267,7 +268,63 @@ public class clsDocFactura extends clsDocument {
 		return true;
 	}
 
-	
+
+	// Encabezado por empresa
+
+	@Override
+	protected void saveHeadLines(int reimpres) {
+		if (modofact.equalsIgnoreCase("*")) super.saveHeadLines(reimpres);
+		if (modofact.equalsIgnoreCase("TOL")) headerToledano(reimpres);
+	}
+
+	protected void headerToledano(int reimpres) {
+		String s,sc;
+
+		rep.empty();rep.empty();
+
+		for (int i = 0; i <lines.size(); i++) 		{
+
+			s=lines.get(i);
+			s=encabezado(s);
+
+			/*
+			if (residx==1) {
+				if (docfactura) {
+					rep.add(resol);
+					rep.add(resfecha);
+					rep.add(resvence);
+					rep.add(resrango);
+					rep.add("Fecha de Emision : "+fsfecha);
+				}
+				residx=0;
+			}
+			*/
+			if (!s.equalsIgnoreCase("@@")) rep.add(s);
+		}
+
+		sc="CONDICIONES DE PAGO: ";
+		if (diacred==0) sc+="CONTADO"; else sc+="CREDITO "+diacred+" DIAS";
+		rep.add(sc);
+
+		if (!emptystr(add1)) {
+			rep.add("");
+			rep.add(add1);
+			if (!emptystr(add2)) rep.add(add2);
+			rep.add("");
+		}
+
+		if (docfactura && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
+		if (docfactura && (reimpres==2)) rep.add("------  C O P I A  ------");
+		if (docfactura && (reimpres==3)) rep.add("------       A N U L A D O      ------");
+		if(docfactura && (reimpres==4)) {
+			rep.add("- FACTURA PENDIENTE  DE  PAGO -");
+			pendiente = reimpres;
+		}
+
+	}
+
+
+
 	// Aux
 	
 	public double round2(double val){

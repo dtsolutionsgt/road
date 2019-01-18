@@ -22,7 +22,7 @@ public class appGlobals extends Application {
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo;
 
 	// Parametros Extra
-	public String peModal,peMon;
+	public String peModal,peMon,peFormatoFactura;
 	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec;
 	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre;
 	public int peDec,peDecCant,peDecImp;

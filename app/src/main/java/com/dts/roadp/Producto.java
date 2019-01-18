@@ -39,6 +39,7 @@ public class Producto extends PBase {
 	private String famid,itemid,pname,prname,um,ubas;
 	private int act,prodtipo;
 	private double disp;
+	boolean ordPorNombre;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,8 @@ public class Producto extends PBase {
         items = new ArrayList<clsCD>();
 		
 		act=0;
+		ordPorNombre=gl.peOrdPorNombre;
+
 		fillSpinner();
 		
 		setHandlers();
@@ -74,6 +77,16 @@ public class Producto extends PBase {
 
 
     // Events
+
+	public void porCodigo(View view) {
+		ordPorNombre=false;
+		listItems();
+	}
+
+	public void porNombre(View view) {
+		ordPorNombre=true;
+		listItems();
+	}
 
     private void setHandlers() {
 
@@ -208,7 +221,7 @@ public class Producto extends PBase {
 					if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
 					if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
 
-					if (gl.peOrdPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
+					if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
 					break;
 					
 				case 1:  // Venta   
@@ -236,9 +249,10 @@ public class Producto extends PBase {
 							"WHERE (P_PRODUCTO.TIPO ='S') ";	
 					if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
 					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
-			
-				    if (gl.peOrdPorNombre) sql+="ORDER BY P_PRODUCTO.DESCCORTA"; else sql+="ORDER BY P_PRODUCTO.CODIGO";
-					
+
+					if (ordPorNombre) sql += "ORDER BY P_PRODUCTO.DESCCORTA";else sql += "ORDER BY P_PRODUCTO.CODIGO";
+
+
 					break;	
 					
 				case 2: // Mercadeo propio
@@ -246,7 +260,7 @@ public class Producto extends PBase {
 					if (!mu.emptystr(famid)) {sql=sql+"AND (LINEA='"+famid+"') ";}
 					if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
 
-					if (gl.peOrdPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
+					if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
 					break;
 					
 				case 3:  // Mercadeo comp
@@ -254,7 +268,7 @@ public class Producto extends PBase {
 					if (!mu.emptystr(famid)) {sql=sql+"AND (MARCA='"+famid+"') ";}
 					if (vF.length()>0) {sql=sql+"AND ((NOMBRE LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
 
-                    if (gl.peOrdPorNombre) sql+="ORDER BY NOMBRE"; else sql+="ORDER BY CODIGO";
+                    if (ordPorNombre) sql+="ORDER BY NOMBRE"; else sql+="ORDER BY CODIGO";
 					break;
 			}
 				

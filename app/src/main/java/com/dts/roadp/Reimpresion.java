@@ -181,12 +181,18 @@ public class Reimpresion extends PBase {
 					 "FROM D_DEPOS INNER JOIN P_BANCO ON D_DEPOS.BANCO=P_BANCO.CODIGO "+
 					 "WHERE (D_DEPOS.ANULADO='N') ORDER BY D_DEPOS.COREL DESC ";	
 			}
-			
-			if (tipo==3) {
-				sql="SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO,D_FACTURA.IMPRES "+
-					 "FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO "+
-					 "WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC LIMIT 1";	
-			}			
+
+			if (tipo == 3) {
+				if (gl.peModal.equalsIgnoreCase("TOL")) {
+					sql = "SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO,D_FACTURA.IMPRES " +
+							"FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO " +
+							"WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC";
+				} else {
+					sql = "SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO,D_FACTURA.IMPRES " +
+							"FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO " +
+							"WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC LIMIT 1";
+				}
+			}
 				
 			if (tipo==4 || tipo==5) {
 				tm="R";if (tipo==5) tm="D";
@@ -256,7 +262,7 @@ public class Reimpresion extends PBase {
 
 					vItem.Cod="";
 					vItem.Desc="";
-					vItem.Fecha="Ultimo Cierre de d�a";
+					vItem.Fecha="Ultimo Cierre de dia";
 					vItem.Valor="";	  
 
 					items.add(vItem);				
@@ -286,10 +292,14 @@ public class Reimpresion extends PBase {
 				imprRecibo();break;	
 			case 2:  
 				imprDeposito();break;	
-			case 3:  
-				//imprFactura();
-				imprUltFactura();break;	
-			case 4:  
+			case 3:
+				if (gl.peModal.equalsIgnoreCase("TOL")) {
+					imprFactura();
+				} else {
+					imprUltFactura();
+				}
+				break;
+			case 4:
 				imprRecarga();break;	
 			case 5:  
 				imprRecarga();break;	
@@ -323,7 +333,7 @@ public class Reimpresion extends PBase {
 	
 	private void imprFactura() {
 		try {
-			if (fdoc.buildPrint(itemid,1)) prn.printask();
+			if (fdoc.buildPrint(itemid,1,gl.peFormatoFactura)) prn.printask();
 		} catch (Exception e) {
 			mu.msgbox(e.getMessage());
 		}
@@ -372,7 +382,7 @@ public class Reimpresion extends PBase {
 				msgbox("¡La factura "+serie+" - "+corel+" no se puede imprimir porque ya fue reimpresa anteriormente!");return;
 			}
 			
-			if (fdoc.buildPrint(id,1)) prn.printask();
+			if (fdoc.buildPrint(id,1,gl.peFormatoFactura)) prn.printask();
 		
 			try {
 				sql="UPDATE D_FACTURA SET IMPRES=2 WHERE COREL='"+itemid+"'";		

@@ -9,11 +9,11 @@ import android.widget.Toast;
 public class clsDocument {
 
 	public String nombre,numero,serie,ruta,vendedor,cliente,nit;	
-	public String resol, resfecha,resvence,resrango,fsfecha;
+	public String resol, resfecha,resvence,resrango,fsfecha,modofact;
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="";
 	public clsRepBuilder rep;
 	public boolean docfactura,docrecibo=false,docanul=false,docpedido=false;
-	public int ffecha,pendiente;
+	public int ffecha,pendiente,residx;
 	
 	protected android.database.sqlite.SQLiteDatabase db;
 	protected BaseDatos Con;
@@ -27,7 +27,7 @@ public class clsDocument {
 	
 	protected String clicod,clidir,pemodo;
 	
-	private int prw,residx;
+	private int prw;
 	
 	public clsDocument(Context context,int printwidth,String cursym,int decimpres) {
 		cont=context;
@@ -40,7 +40,8 @@ public class clsDocument {
 	}
 	
 	public boolean buildPrint(String corel,int reimpres) {
-		
+
+	    modofact="*";
 		rep.clear();
 				
 		if (!buildHeader(corel,reimpres)) return false;
@@ -49,6 +50,20 @@ public class clsDocument {
 		
 		if (!rep.save()) return false;
 		
+		return true;
+	}
+
+	public boolean buildPrint(String corel,int reimpres,String modo) {
+
+        modofact=modo;
+		rep.clear();
+
+		if (!buildHeader(corel,reimpres)) return false;
+		if (!buildDetail()) return false;
+		if (!buildFooter()) return false;
+
+		if (!rep.save()) return false;
+
 		return true;
 	}
 	
@@ -116,9 +131,122 @@ public class clsDocument {
 		
 		return true;
 	}
-	
-	// Private
-	
+
+    protected void saveHeadLines(int reimpres) {
+
+        String s;
+
+        rep.empty();rep.empty();
+
+        for (int i = 0; i <lines.size(); i++) 		{
+
+            s=lines.get(i);
+            s=encabezado(s);
+
+            if (docpedido) {
+                s=s.replace("Factura serie","Pedido");
+                s=s.replace("numero : 0","");
+            }
+
+            if (docrecibo) {
+                s=s.replace("Factura","Recibo");
+            }
+
+            if (residx==1) {
+                if (docfactura) {
+                    rep.add(resol);
+                    rep.add(resfecha);
+                    rep.add(resvence);
+                    rep.add(resrango);
+                    rep.add("Fecha de Emision : "+fsfecha);
+                }
+                residx=0;
+            }
+            if (!s.equalsIgnoreCase("@@")) rep.add(s);
+        }
+
+        if (!emptystr(nit)) rep.add("NIT : "+nit);
+        if (!emptystr(clidir)) rep.add("Dir : "+clidir);
+        if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
+
+
+        if (!emptystr(add1)) {
+            rep.add("");
+            rep.add(add1);
+            if (!emptystr(add2)) rep.add(add2);
+            rep.add("");
+        }
+
+        if (docfactura && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
+        if (docfactura && (reimpres==2)) rep.add("------  C O P I A  ------");
+        if (docfactura && (reimpres==3)) rep.add("------       A N U L A D O      ------");
+        //#HS_20181212 condición para factura pendiente de pago
+        if(docfactura && (reimpres==4)) {
+            rep.add("- P E N D I E N T E  D E  P A G O -");
+            pendiente = reimpres;
+        }
+        if (docfactura && (reimpres==5)) rep.add("------  C O N T A B I L I T A D  ------");
+
+
+    }
+
+    protected String encabezado(String l) {
+        String s,lu;
+        int idx;
+
+        residx=0;
+
+        //lu=l.toUpperCase().trim();
+        lu=l.trim();
+
+        if (lu.length()==1 && lu.equalsIgnoreCase("N")) {
+            s=nombre;s=rep.ctrim(s);return s;
+        }
+
+        if (l.indexOf("dd-MM-yyyy")>=0) {
+            s=DU.sfecha(DU.getActDateTime());
+            l=l.replace("dd-MM-yyyy",s);return l;
+        }
+
+        if (l.indexOf("HH:mm:ss")>=0) {
+            s=DU.shora(DU.getActDateTime());
+            l=l.replace("HH:mm:ss",s);return l;
+        }
+
+        idx=lu.indexOf("SS");
+        if (idx>=0) {
+            if (emptystr(serie)) return "@@";
+            if (emptystr(numero)) return "@@";
+
+            s=lu.substring(0,idx);
+            s=s+serie+" numero : "+numero;
+            residx=1;
+            return s;
+        }
+
+        idx=lu.indexOf("VV");
+        if (idx>=0) {
+            if (emptystr(vendedor)) return "@@";
+            l=l.replace("VV",vendedor);return l;
+        }
+
+        idx=lu.indexOf("RR");
+        if (idx>=0) {
+            if (emptystr(ruta)) return "@@";
+            l=l.replace("RR",ruta);return l;
+        }
+
+        idx=lu.indexOf("CC");
+        if (idx>=0) {
+            if (emptystr(cliente)) return "@@";
+            l=l.replace("CC",cliente);return l;
+        }
+
+        return l;
+    }
+
+
+    // Private
 
 	private boolean buildHeader(String corel,int reimpres) {
 		
@@ -147,7 +275,6 @@ public class clsDocument {
 		return true;
 	}
 
-
 	private boolean buildHeader(String corel,int reimpres,BaseDatos pCon,android.database.sqlite.SQLiteDatabase pdb) {
 		
 		lines.clear();
@@ -170,122 +297,8 @@ public class clsDocument {
 		
 		return true;
 	}
-	
-	
-	private void saveHeadLines(int reimpres)
-	{
 
-		String s;
-		
-		rep.empty();rep.empty();
-		
-		for (int i = 0; i <lines.size(); i++)
-		{
-			
-			s=lines.get(i);
-			s=encabezado(s);
-			
-			if (docpedido) {
-				s=s.replace("Factura serie","Pedido");
-				s=s.replace("numero : 0","");
-			}
-			
-			if (docrecibo) {
-				s=s.replace("Factura","Recibo");
-			}
-			
-			if (residx==1) {
-				if (docfactura) {
-					rep.add(resol);
-					rep.add(resfecha);
-					rep.add(resvence);
-					rep.add(resrango);
-					rep.add("Fecha de Emision : "+fsfecha);	
-				}			
-				residx=0;
-			}
-			if (!s.equalsIgnoreCase("@@")) rep.add(s);
-		}
 
-		if (!emptystr(nit)) rep.add("NIT : "+nit);
-		if (!emptystr(clidir)) rep.add("Dir : "+clidir);
-		if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
-
-		
-		if (!emptystr(add1)) {
-			rep.add("");
-			rep.add(add1);
-			if (!emptystr(add2)) rep.add(add2);
-			rep.add("");
-		}
-		
-		if (docfactura && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
-		//if (docfactura && (reimpres==2)) rep.add("------  C O N T A B I L I T A D  ------");
-		if (docfactura && (reimpres==2)) rep.add("------  C O P I A  ------");
-		if (docfactura && (reimpres==3)) rep.add("------       A N U L A D O      ------");
-		//#HS_20181212 condición para factura pendiente de pago
-		if(docfactura && (reimpres==4)) {
-			rep.add("- P E N D I E N T E  D E  P A G O -");
-			pendiente = reimpres;
-		}
-		
-	}
-	
-	private String encabezado(String l) {
-		String s,lu;
-		int idx;
-		
-		residx=0;
-		
-		//lu=l.toUpperCase().trim();
-		lu=l.trim();
-			
-		if (lu.length()==1 && lu.equalsIgnoreCase("N")) {
-			s=nombre;s=rep.ctrim(s);return s;
-		}
-		
-		if (l.indexOf("dd-MM-yyyy")>=0) {
-			s=DU.sfecha(DU.getActDateTime());
-			l=l.replace("dd-MM-yyyy",s);return l;
-		}
-		
-		if (l.indexOf("HH:mm:ss")>=0) {
-			s=DU.shora(DU.getActDateTime());
-			l=l.replace("HH:mm:ss",s);return l;
-		}
-		
-		idx=lu.indexOf("SS");
-		if (idx>=0) {
-			if (emptystr(serie)) return "@@";
-			if (emptystr(numero)) return "@@";
-		
-			s=lu.substring(0,idx);
-			s=s+serie+" numero : "+numero;
-			residx=1;
-			return s;
-		}
-		
-		idx=lu.indexOf("VV");
-		if (idx>=0) {
-			if (emptystr(vendedor)) return "@@";
-			l=l.replace("VV",vendedor);return l;
-		}
-		
-		idx=lu.indexOf("RR");
-		if (idx>=0) {
-			if (emptystr(ruta)) return "@@";
-			l=l.replace("RR",ruta);return l;
-		}
-		
-		idx=lu.indexOf("CC");
-		if (idx>=0) {
-			if (emptystr(cliente)) return "@@";
-			l=l.replace("CC",cliente);return l;
-		}		
-		
-		return l;
-	}
-		
 	
 	// Aux
 	

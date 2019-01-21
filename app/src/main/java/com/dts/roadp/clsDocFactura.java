@@ -22,31 +22,7 @@ public class clsDocFactura extends clsDocument {
 		docfactura=true;
 		decimp=decimpres;
 	}
-	
-	protected boolean buildDetail() {
-		itemData item;
-		String cu,cp;
-		
-		rep.line();
-		rep.add3fact("Cantidad      Peso","  Precio","Total");
-		rep.line();
-		//rep.empty();
-		
-		for (int i = 0; i <items.size(); i++) {
-			item=items.get(i);
-			rep.add(item.nombre);
-			//rep.add3lrr(rep.rtrim(""+item.cant,5),item.prec,item.tot);
-			
-			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um,6);
-			cp=frmdecimal(0,decimp)+" "+rep.ltrim(item.ump,3);
-			
-			rep.add3fact(cu+" "+cp,item.prec,item.tot);
-		}
-		
-		rep.line();
-		
-		return true;
-	}
+
 
 	protected boolean loadHeadData(String corel) {
 		Cursor DT;
@@ -193,7 +169,7 @@ public class clsDocFactura extends clsDocument {
 		items.clear();
 		
 		try {
-			sql="SELECT D_FACTURAD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_FACTURAD.CANT,D_FACTURAD.PRECIODOC,D_FACTURAD.IMP, D_FACTURAD.DES,D_FACTURAD.DESMON, D_FACTURAD.TOTAL, D_FACTURAD.UMVENTA, D_FACTURAD.UMPESO " +
+			sql="SELECT D_FACTURAD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_FACTURAD.CANT,D_FACTURAD.PRECIODOC,D_FACTURAD.IMP, D_FACTURAD.DES,D_FACTURAD.DESMON, D_FACTURAD.TOTAL, D_FACTURAD.UMVENTA, D_FACTURAD.UMPESO, D_FACTURAD.PESO " +
 				"FROM D_FACTURAD INNER JOIN P_PRODUCTO ON D_FACTURAD.PRODUCTO = P_PRODUCTO.CODIGO " +
 				"WHERE (D_FACTURAD.COREL='"+corel+"')";	
 			
@@ -216,7 +192,8 @@ public class clsDocFactura extends clsDocument {
 				item.tot=DT.getDouble(7);				
 				item.um=DT.getString(8);
 				item.ump=DT.getString(9);
-				
+				item.peso=DT.getDouble(10);
+
 				if (sinimp) item.tot=item.tot-item.imp;
 				
 				//Toast.makeText(cont,item.cod+" "+item.imp+"   "+item.tot, Toast.LENGTH_SHORT).show();
@@ -230,6 +207,67 @@ public class clsDocFactura extends clsDocument {
 			
 	    }		
 		
+		return true;
+	}
+
+
+	// Detaille por empresa
+
+	protected boolean buildDetail() {
+		if (modofact.equalsIgnoreCase("*")) return detailBase();
+		if (modofact.equalsIgnoreCase("TOL")) return detailToledano();
+
+		return false;
+	}
+
+	protected boolean detailToledano() {
+		itemData item;
+		String ss;
+
+		rep.line();
+		rep.add("CODIGO   DESCRIPCION        UM  CANT");
+		rep.add("       KGS    PRECIO           VALOR");
+		rep.line();
+
+		for (int i = 0; i <items.size(); i++) {
+			item=items.get(i);
+			
+			ss=rep.ltrim(item.cod+" "+item.nombre,prw-10);
+			ss=ss+rep.rtrim(item.um,4)+" "+rep.rtrim(frmdecimal(item.cant,2),5);
+			rep.add(ss);
+			ss=rep.rtrim(frmdecimal(item.peso,2),10)+" "+rep.rtrim(frmdecimal(item.prec,2),8);
+			ss=rep.ltrim(ss,prw-10);
+			ss=ss+" "+rep.rtrim(frmdecimal(item.tot,2),9);
+			rep.add(ss);
+
+		}
+
+		rep.line();
+
+		return true;
+	}
+
+	protected boolean detailBase() {
+		itemData item;
+		String cu,cp;
+
+		rep.line();
+		rep.add3fact("Cantidad      Peso","  Precio","Total");
+		rep.line();
+
+		for (int i = 0; i <items.size(); i++) {
+			item=items.get(i);
+			rep.add(item.nombre);
+			//rep.add3lrr(rep.rtrim(""+item.cant,5),item.prec,item.tot);
+
+			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um,6);
+			cp=frmdecimal(0,decimp)+" "+rep.ltrim(item.ump,3);
+
+			rep.add3fact(cu+" "+cp,item.prec,item.tot);
+		}
+
+		rep.line();
+
 		return true;
 	}
 
@@ -267,9 +305,9 @@ public class clsDocFactura extends clsDocument {
 			rep.add("");
 		}
 
-		if (docfactura && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
-		if (docfactura && (reimpres==2)) rep.add("------  C O P I A  ------");
-		if (docfactura && (reimpres==3)) rep.add("------       A N U L A D O      ------");
+		if (docfactura && (reimpres==1)) rep.add("------  R E I M P R E S I O N  ------");
+		if (docfactura && (reimpres==2)) rep.add("------       C O P I A         ------");
+		if (docfactura && (reimpres==3)) rep.add("------      A N U L A D O      ------");
 		if(docfactura && (reimpres==4)) {
 			rep.add("- FACTURA PENDIENTE  DE  PAGO -");
 			pendiente = reimpres;
@@ -372,7 +410,7 @@ public class clsDocFactura extends clsDocument {
 	
 	private class itemData {
 		public String cod,nombre,um,ump;
-		public double cant,prec,imp,descper,desc,tot;
+		public double cant,peso,prec,imp,descper,desc,tot;
 	}
 	
 	

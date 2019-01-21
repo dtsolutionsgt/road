@@ -1,11 +1,18 @@
 package com.dts.roadp;
 
 import java.util.ArrayList;
+import java.util.UUID;
+
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -42,7 +49,7 @@ public class Reimpresion extends PBase {
 	private String presvence,presrango,pvendedor,pcliente,pclicod,pclidir;
 	private double ptot;
 	private int residx;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -332,6 +339,8 @@ public class Reimpresion extends PBase {
 	}
 	
 	private void imprFactura() {
+		fdoc.deviceid =androidid();
+
 		try {
 			if (fdoc.buildPrint(itemid,1,gl.peFormatoFactura)) prn.printask();
 		} catch (Exception e) {
@@ -676,6 +685,20 @@ public class Reimpresion extends PBase {
 		dialog.setNegativeButton("No", null);
 		dialog.show();
 			
-	}	
+	}
+
+	private String androidid() {
+	    String uniqueID="";
+        try {
+            uniqueID = Settings.Secure.getString(getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+            uniqueID="0000000000";
+        }
+
+		return uniqueID;
+	}
+
 
 }

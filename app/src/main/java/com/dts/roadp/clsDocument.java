@@ -26,8 +26,8 @@ public class clsDocument {
 	protected DecimalFormat decfrm;
 	
 	protected String clicod,clidir,pemodo;
-	
-	private int prw;
+
+	protected int prw;
 	
 	public clsDocument(Context context,int printwidth,String cursym,int decimpres) {
 		cont=context;

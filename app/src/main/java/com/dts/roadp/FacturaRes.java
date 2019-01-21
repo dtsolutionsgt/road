@@ -49,9 +49,7 @@ public class FacturaRes extends PBase {
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
 	private boolean acum,cleandprod,peexit,pago,saved,rutapos;
 
-	private static String uniqueID = null;
-	private static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
-	
+
 	@SuppressLint("MissingPermission")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -144,7 +142,7 @@ public class FacturaRes extends PBase {
 		
 		prn=new printer(this,printclose);
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
-		fdoc.deviceid =androidid(this);
+		fdoc.deviceid =androidid();
 
 		saved=false;
 		assignCorel();
@@ -1268,7 +1266,20 @@ public class FacturaRes extends PBase {
 		
 	}
 
-	
+	private String androidid() {
+		String uniqueID="";
+		try {
+			uniqueID = Settings.Secure.getString(getContentResolver(),
+					Settings.Secure.ANDROID_ID);
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			uniqueID="0000000000";
+		}
+
+		return uniqueID;
+	}
+
+
 	// Aux
 	
 	public void askSave(View view) {
@@ -1415,20 +1426,7 @@ public class FacturaRes extends PBase {
 			
 	}
 
-	public synchronized static String androidid(Context context) {
-		if (uniqueID == null) {
-			SharedPreferences sharedPrefs = context.getSharedPreferences(
-					PREF_UNIQUE_ID, Context.MODE_PRIVATE);
-			uniqueID = sharedPrefs.getString(PREF_UNIQUE_ID, null);
-			if (uniqueID == null) {
-				uniqueID = UUID.randomUUID().toString();
-				SharedPreferences.Editor editor = sharedPrefs.edit();
-				editor.putString(PREF_UNIQUE_ID, uniqueID);
-				editor.commit();
-			}
-		}
-		return uniqueID;
-	}
+
 	
 	// Aux
 	

@@ -8,7 +8,10 @@ import java.text.DecimalFormat;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -33,8 +36,9 @@ public class MainActivity extends PBase {
 	private clsLicence lic;
 	private BaseDatosVersion dbVers;
 	
-	private boolean rutapos;
+	private boolean rutapos,scanning=false;
 	private int fecha;
+	private String cs1,cs2,cs3;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +151,51 @@ public class MainActivity extends PBase {
 			}
 		});
 
+		/*
+		txtUser.addTextChangedListener(new TextWatcher() {
+
+			public void afterTextChanged(Editable s) {}
+
+			public void beforeTextChanged(CharSequence s, int start,int count, int after) {}
+
+			public void onTextChanged(CharSequence s, int start,int before, int count) {
+				//mu.msgbox("start "+start+" before "+before+" count "+count);
+
+				final CharSequence ss=s;
+
+				if (!scanning) {
+					scanning=true;
+					Handler handlerTimer = new Handler();
+					handlerTimer.postDelayed(new Runnable(){
+						public void run() {
+							compareSC(ss);
+						}}, 50);
+				}
+
+
+			}
+		});
+		*/
+	}
+
+	private void compareSC(CharSequence s) {
+		String os,bc;
+
+		bc=txtUser.getText().toString();
+		if (mu.emptystr(bc) || bc.length()<2) {
+			txtUser.setText("");
+			scanning=false;
+			return;
+		}
+		os=s.toString();
+
+		if (bc.equalsIgnoreCase(os)) {
+			//Toast.makeText(this,"Codigo barra : " +bc, Toast.LENGTH_SHORT).show();
+			msgbox("Barra: "+bc);
+		}
+
+		txtUser.setText("");
+		scanning=false;
 	}
 
 
@@ -206,6 +255,7 @@ public class MainActivity extends PBase {
 			gl.emp = "0";
 			lblRuta.setText("");
 			gl.devol = false;
+			msgbox(e.getMessage());
 		}
 
 		gl.vendnom = "Vendedor 1";

@@ -58,7 +58,8 @@ public class Cobro extends PBase {
 		showTotals();
 		
 		listItems();	
-		
+
+		gl.pagomodo=0;
 		
 		printcallback= new Runnable() {
 		    public void run() {
@@ -77,6 +78,7 @@ public class Cobro extends PBase {
 					
 	}
 
+
 	// Events
 	
 	public void paySelect(View view) {
@@ -84,7 +86,8 @@ public class Cobro extends PBase {
 		if (tsel==0) {
 			mu.msgbox("Total a pagar = 0");return;
 		}
-		
+
+		gl.pagomodo=0;
 		gl.pagoval=tsel;
 		gl.pagolim=plim;
 		gl.pagocobro=true;
@@ -131,7 +134,20 @@ public class Cobro extends PBase {
 		calcSelected();
 		showTotals();
 	}
-	
+
+	public void sinRef(View view) {
+		gl.pagomodo=1;
+		gl.pagoval=0;
+		gl.pagolim=0;
+		gl.pagocobro=true;
+		browse=1;
+
+		Intent intent = new Intent(this,Pago.class);
+		startActivity(intent);
+
+	}
+
+
 	// Main
 	
 	private void setHandlers(){

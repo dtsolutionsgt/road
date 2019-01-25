@@ -37,7 +37,7 @@ public class Pago extends PBase {
 	private ArrayList<String> bname = new ArrayList<String>();
 	
 	private String cliid,tpago,desc1,desc2,desc3,bc,bn;
-	private int nivel,cpago;
+	private int nivel,cpago,pagomodo;
 	private double pago,ttot,saldo,monto,pagolim;
 	private boolean cobro;
 	
@@ -55,12 +55,12 @@ public class Pago extends PBase {
 		
 		setHandlers();
 		
-		saldo=((appGlobals) vApp).pagoval;
-		pagolim=((appGlobals) vApp).pagolim;
-		cobro=((appGlobals) vApp).pagocobro;
-			
-		
-		cliid=((appGlobals) vApp).cliente;
+		saldo=gl.pagoval;
+		pagolim=gl.pagolim;
+		cobro=gl.pagocobro;
+		cliid=gl.cliente;
+		pagomodo=gl.pagomodo;
+
 		setNivel();
 		
 		initSession();
@@ -85,17 +85,19 @@ public class Pago extends PBase {
 			pago=0;
 			mu.msgbox("Monto incorrecto");return;
 	    }
-		
-		if (totalPago()+pago>pagolim) {
-			mu.msgbox("Total de pagos mayor que total de saldos.");return;
+
+	    if (pagomodo==0) {
+			if (totalPago()+pago>pagolim) {
+				mu.msgbox("Total de pagos mayor que total de saldos.");return;
+			}
+
+			if (totalPago()+pago>saldo) {
+				msgAskOverPayd("Total de pagos mayor que saldo\nContinuar");
+			} else {
+				showPagoDialog();
+			}
 		}
-		
-		if (totalPago()+pago>saldo) {
-			msgAskOverPayd("Total de pagos mayor que saldo\nContinuar");
-		} else {	
-			showPagoDialog();
-		}
-		
+
 	}
 	
 	public void deletePayment(View view){
@@ -512,8 +514,11 @@ public class Pago extends PBase {
 		
 		txtMonto.setText(""+monto);
 		lblTotal.setText(mu.frmdec(tp));
-		
-		if (monto==0) finalCheck();
+
+		if (pagomodo==0) {
+			if (monto==0) finalCheck();
+		}
+
 	}
 	
 	private void doExit(){

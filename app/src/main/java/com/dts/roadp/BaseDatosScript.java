@@ -341,24 +341,41 @@ public class BaseDatosScript {
 			database.execSQL(vSQL);
 			
 
-			vSQL="CREATE TABLE [D_COBROP] ("+
+			vSQL="CREATE TABLE [D_COBROD_SR] ("+
 					"[COREL] TEXT NOT NULL,"+
-					"[ITEM] INTEGER NOT NULL,"+
+					"[DOCUMENTO] TEXT NOT NULL,"+
 					"[ANULADO] TEXT NOT NULL,"+
 					"[EMPRESA] TEXT NOT NULL,"+
-					"[CODPAGO] INTEGER NOT NULL,"+
-					"[TIPO] TEXT NOT NULL,"+
-					"[VALOR] REAL NOT NULL,"+
-					"[DESC1] TEXT NOT NULL,"+
-					"[DESC2] TEXT NOT NULL,"+
-					"[DESC3] TEXT NOT NULL,"+
-					"[DEPOS] TEXT NOT NULL,"+
-					"PRIMARY KEY ([COREL],[ITEM])"+
+					"[TIPODOC] TEXT NOT NULL,"+
+					"[MONTO] REAL NOT NULL,"+
+					"[PAGO] REAL NOT NULL,"+
+					"[CONTRASENA] TEXT NOT NULL,"+
+                    "PRIMARY KEY ([COREL],[DOCUMENTO])"+
 					");";
 			database.execSQL(vSQL);
 
-			vSQL="CREATE INDEX D_COBROP_idx1 ON D_COBROP(ANULADO)";
-			database.execSQL(vSQL);
+
+            vSQL="CREATE TABLE [D_COBROP] ("+
+                    "[COREL] TEXT NOT NULL,"+
+                    "[ITEM] INTEGER NOT NULL,"+
+                    "[ANULADO] TEXT NOT NULL,"+
+                    "[EMPRESA] TEXT NOT NULL,"+
+                    "[CODPAGO] INTEGER NOT NULL,"+
+                    "[TIPO] TEXT NOT NULL,"+
+                    "[VALOR] REAL NOT NULL,"+
+                    "[DESC1] TEXT NOT NULL,"+
+                    "[DESC2] TEXT NOT NULL,"+
+                    "[DESC3] TEXT NOT NULL,"+
+                    "[DEPOS] TEXT NOT NULL,"+
+                    "PRIMARY KEY ([COREL],[ITEM])"+
+                    ");";
+            database.execSQL(vSQL);
+
+            vSQL="CREATE INDEX D_COBROP_idx1 ON D_COBROP(ANULADO)";
+            database.execSQL(vSQL);
+
+
+
 
 			
 			vSQL="CREATE TABLE [D_CLINUEVO] ("+
@@ -692,6 +709,10 @@ public class BaseDatosScript {
 					"[COSTO] REAL NOT NULL,"+
 					"[TOTAL] REAL NOT NULL,"+
 					"[STATCOM] TEXT NOT NULL,"+
+					"[UMVENTA] TEXT NOT NULL,"+
+					"[UMSTOCK] TEXT NOT NULL,"+
+					"[UMPESO] TEXT NOT NULL,"+
+					"[FACTOR] REAL NOT NULL,"+
 					"PRIMARY KEY ([COREL],[ITEM])"+
 					");";
 			database.execSQL(vSQL);
@@ -703,6 +724,10 @@ public class BaseDatosScript {
 					"[LOTE] TEXT NOT NULL,"+
 					"[CANT] REAL NOT NULL,"+
 					"[PESO] REAL NOT NULL,"+
+					"[UMVENTA] TEXT NOT NULL,"+
+					"[UMSTOCK] TEXT NOT NULL,"+
+					"[UMPESO] TEXT NOT NULL,"+
+					"[FACTOR] REAL NOT NULL,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO],[LOTE])"+
 					");";
 			database.execSQL(vSQL);
@@ -1516,14 +1541,14 @@ public class BaseDatosScript {
 			
 			vSQL="CREATE TABLE [P_ARCHIVOCONF] ("+
 					"[RUTA] TEXT NOT NULL,"+
-					"[TIPO_HH] TEXT NULL,"+
-					"[IDIOMA] TEXT  NULL,"+
-					"[TIPO_IMPRESORA] TEXT  NULL,"+
-					"[SERIAL_HH] TEXT  NULL,"+
-					"[MODIF_PESO] TEXT NULL,"+
-					"[PUERTO_IMPRESION] TEXT NULL,"+
-					"[LBS_O_KGS] TEXT NULL,"+
-					"[NOTA_CREDITO] INTEGER  NULL,"+
+					"[TIPO_HH] TEXT NOT NULL,"+
+					"[IDIOMA] TEXT  NOT NULL,"+
+					"[TIPO_IMPRESORA] TEXT  NOT NULL,"+
+					"[SERIAL_HH] TEXT  NOT NULL,"+
+					"[MODIF_PESO] TEXT NOT NULL,"+
+					"[PUERTO_IMPRESION] TEXT NOT NULL,"+
+					"[LBS_O_KGS] TEXT NOT NULL,"+
+					"[NOTA_CREDITO] INTEGER  NOT NULL,"+
 					"PRIMARY KEY ([RUTA])"+
 					");";
 			database.execSQL(vSQL);

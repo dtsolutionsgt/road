@@ -1525,7 +1525,7 @@ public class ComWS extends PBase {
 
 	// WEB SERVICE - ENVIO
 	
-	private boolean sendData(){
+	private boolean sendData() {
 
 		senv = "Envío terminado \n \n";
 
@@ -1570,10 +1570,10 @@ public class ComWS extends PBase {
 		return true;
 	}
 
-	public void envioFacturas()     {
+	public void envioFacturas() {
 
 		Cursor DT;
-		String cor,fruta;
+		String cor,fruta,tt;
 		int i,pc=0,pcc=0,ccorel;
 		
 		fterr="";

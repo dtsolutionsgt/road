@@ -23,6 +23,7 @@ import java.util.List;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.Lifecycle;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,6 +34,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Base64;
@@ -150,6 +152,14 @@ public class CliDet extends PBase {
 
 	public void tomarFoto(View view){
 		int codResult = 1;
+
+		if (!this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+		    msgbox("El dispositivo no soporta toma de foto");return;
+        }
+
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+
 		try {
 
 			Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -299,6 +309,11 @@ public class CliDet extends PBase {
 		if (cused==0) {
 			lblCobro.setVisibility(View.INVISIBLE);
 			imgCobro.setVisibility(View.INVISIBLE);			
+		}
+
+		if (gl.peModal.equalsIgnoreCase("TOL")) {
+			lblCobro.setVisibility(View.VISIBLE);
+			imgCobro.setVisibility(View.VISIBLE);
 		}
 				
 	}

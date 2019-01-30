@@ -38,7 +38,7 @@ import android.widget.Toast;
 public class Clientes extends PBase {
 
 	private ListView listView;
-	private Spinner spinList;
+	private Spinner spinList,spinFilt;
 	private EditText txtFiltro;
 	private TextView lblCant;
 	
@@ -65,6 +65,7 @@ public class Clientes extends PBase {
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		spinList = (Spinner) findViewById(R.id.spinner1);
+		spinFilt = (Spinner) findViewById(R.id.spinner8);
 		txtFiltro = (EditText) findViewById(R.id.txtMonto);
 		lblCant= (TextView) findViewById(R.id.lblCant);
 				
@@ -101,82 +102,7 @@ public class Clientes extends PBase {
 		Intent intent = new Intent(this,CliNuevo.class);
 		startActivity(intent);
 	}
-	
-	//#HS_20181211 Agregue funcion que lista las opciones de incidencia de no lectura
-	private void listNoLectura(){
-		Cursor DT;
-		String code,name;
 
-		listcode.clear();listname.clear();
-
-		try {
-
-			sql="SELECT Codigo,Nombre FROM P_CODNOLEC ORDER BY Nombre";
-
-			DT=Con.OpenDT(sql);
-			if (DT.getCount()==0) {return;}
-
-			DT.moveToFirst();
-			while (!DT.isAfterLast()) {
-
-				try {
-					code=String.valueOf(DT.getInt(0));
-					name=DT.getString(1);
-
-					listcode.add(code);
-					listname.add(name);
-				} catch (Exception e) {
-					mu.msgbox(e.getMessage());
-				}
-				DT.moveToNext();
-			}
-		} catch (Exception e) {
-			mu.msgbox( e.getMessage());return;
-		}
-
-		showIncNoLectura();
-
-	}
-	//#HS_20181211 Funcion que abre el dialogo, opciones de incidencia de no lectura
-	public void showIncNoLectura() {
-		final AlertDialog Dialog;
-
-		final String[] selitems = new String[listname.size()];
-
-		for (int i = 0; i < listname.size(); i++) {
-			selitems[i] = listname.get(i);
-		}
-
-		mMenuDlg = new AlertDialog.Builder(this);
-		mMenuDlg.setTitle("Incidencia de no lectura");
-
-		mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				try {
-					//String opcion=listcode.get(item);
-					showCliente();
-
-				} catch (Exception e) {
-				}
-			}
-		});
-
-		mMenuDlg.setNegativeButton("Regresar", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-			}
-		});
-
-		Dialog = mMenuDlg.create();
-		Dialog.show();
-
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-		nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-		nbutton.setTextColor(Color.WHITE);
-	}
-
-	// Main
-	
 	private void setHandlers(){
 		
 		listView.setOnItemClickListener(new OnItemClickListener() {
@@ -254,7 +180,20 @@ public class Clientes extends PBase {
 		        return;
 		    }
 
-		});	
+		});
+
+		spinFilt.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+				listItems();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parentView) {
+				return;
+			}
+
+		});
 				
 	    txtFiltro.addTextChangedListener(new TextWatcher() {
 			 
@@ -272,8 +211,11 @@ public class Clientes extends PBase {
 	    	}
 	    });
 
-	}	
-	
+	}
+
+
+	// Main
+
 	public void listItems() {
 		Cursor DT;
 		clsCDB vItem;	
@@ -288,7 +230,7 @@ public class Clientes extends PBase {
 		try {
 
 			cobros.clear();
-			sql="SELECT DISTINCT  CLIENTE FROM D_COBRO WHERE (ANULADO='N') ";
+			sql="SELECT DISTINCT CLIENTE FROM P_COBRO ";
 			DT=Con.OpenDT(sql);
 
 			if (DT.getCount()>0) {
@@ -307,6 +249,13 @@ public class Clientes extends PBase {
 					"FROM D_FACTURA INNER JOIN  D_FACTURAP ON  D_FACTURA.COREL = D_FACTURAP.COREL " +
 					"GROUP BY  D_FACTURA.CLIENTE, D_FACTURA.COREL, D_FACTURA.ANULADO " +
 					"HAVING  (D_FACTURA.ANULADO='N') AND (SUM(D_FACTURAP.VALOR=0))";
+
+			sql="SELECT DISTINCT CLIENTE FROM D_FACTURA WHERE (COREL NOT IN " +
+					"  (SELECT DISTINCT D_FACTURA_1.COREL " +
+					"   FROM D_FACTURA AS D_FACTURA_1 INNER JOIN " +
+					"   D_FACTURAP ON D_FACTURA_1.COREL=D_FACTURAP.COREL))";
+
+
 			DT=Con.OpenDT(sql);
 
 			if (DT.getCount()>0) {
@@ -314,9 +263,7 @@ public class Clientes extends PBase {
 				for (int i = 0; i <DT.getCount(); i++) {
 					try {
 						ss=DT.getString(0);
-						if (!ppago.contains(ss)) {
-							ppago.add(ss);toast(ss);
-						}
+						if (!ppago.contains(ss)) ppago.add(ss);
 						DT.moveToNext();
 					} catch (Exception e) {
 					}
@@ -339,7 +286,8 @@ public class Clientes extends PBase {
 			DT=Con.OpenDT(sql);
 			
 			lblCant.setText(""+DT.getCount()+"");
-			
+
+
 			if (DT.getCount()>0) {
 			
 				DT.moveToFirst();
@@ -356,9 +304,16 @@ public class Clientes extends PBase {
 					if (cobros.contains(ss)) vItem.Cobro=1;else vItem.Cobro=0;
 					if (ppago.contains(ss)) vItem.ppend=1;else vItem.ppend=0;
 
-					items.add(vItem);	
-			 
-					if (id.equalsIgnoreCase(selid)) {selidx=vP;}
+					switch (spinFilt.getSelectedItemPosition()) {
+						case 0:
+							items.add(vItem);break;
+						case 1:
+							if (vItem.Cobro==1) items.add(vItem);break;
+						case 2:
+							if (vItem.ppend==1) items.add(vItem);break;
+					}
+
+					if (id.equalsIgnoreCase(selid)) selidx=vP;
 					vP+=1;
 			  
 					DT.moveToNext();
@@ -447,7 +402,19 @@ public class Clientes extends PBase {
 		
 		spinList.setAdapter(dataAdapter);
 		spinList.setSelection(dweek);
-	
+
+
+		List<String> flist = new ArrayList<String>();
+		flist.add("Todos");
+		flist.add("Con cobros");
+		flist.add("Pago pendiente");
+
+		ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, flist);
+		dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+		spinFilt.setAdapter(dataAdapter2);
+		spinFilt.setSelection(0);
+
 	}
 
 	private boolean puedeborrarse() {
@@ -540,8 +507,80 @@ public class Clientes extends PBase {
 			mu.msgbox(e.getMessage());
 		}
 	}
-	
-	
+	//#HS_20181211 Agregue funcion que lista las opciones de incidencia de no lectura
+	private void listNoLectura(){
+		Cursor DT;
+		String code,name;
+
+		listcode.clear();listname.clear();
+
+		try {
+
+			sql="SELECT Codigo,Nombre FROM P_CODNOLEC ORDER BY Nombre";
+
+			DT=Con.OpenDT(sql);
+			if (DT.getCount()==0) {return;}
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				try {
+					code=String.valueOf(DT.getInt(0));
+					name=DT.getString(1);
+
+					listcode.add(code);
+					listname.add(name);
+				} catch (Exception e) {
+					mu.msgbox(e.getMessage());
+				}
+				DT.moveToNext();
+			}
+		} catch (Exception e) {
+			mu.msgbox( e.getMessage());return;
+		}
+
+		showIncNoLectura();
+
+	}
+	//#HS_20181211 Funcion que abre el dialogo, opciones de incidencia de no lectura
+	public void showIncNoLectura() {
+		final AlertDialog Dialog;
+
+		final String[] selitems = new String[listname.size()];
+
+		for (int i = 0; i < listname.size(); i++) {
+			selitems[i] = listname.get(i);
+		}
+
+		mMenuDlg = new AlertDialog.Builder(this);
+		mMenuDlg.setTitle("Incidencia de no lectura");
+
+		mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+				try {
+					//String opcion=listcode.get(item);
+					showCliente();
+
+				} catch (Exception e) {
+				}
+			}
+		});
+
+		mMenuDlg.setNegativeButton("Regresar", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+			}
+		});
+
+		Dialog = mMenuDlg.create();
+		Dialog.show();
+
+		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+		nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+		nbutton.setTextColor(Color.WHITE);
+	}
+
+
 	// Activity Events
 	
 	protected void onResume() {

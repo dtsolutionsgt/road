@@ -275,7 +275,7 @@ public class Exist extends PBase {
 					item.PesoM = spm;itemm.PesoM = spm;
 					item.PesoT = spt;item.PesoT = spt;
 
-					item.Lote = dt.getString(5);if (mu.emptystr(item.Lote)) item.Lote =cod;
+					item.Lote = dt.getString(5);//if (mu.emptystr(item.Lote)) item.Lote =cod;
                     itemm.Lote = item.Lote;
 					item.Doc = dt.getString(6);itemm.Doc = dt.getString(6);
 					item.Centro = dt.getString(7);itemm.Centro = dt.getString(7);

@@ -105,7 +105,8 @@ public class ListAdaptExist extends BaseAdapter {
 		switch (items.get(position).flag) {
 			case 0:
 				holder.reltitle.setVisibility(View.VISIBLE);
-
+				holder.lblCod.setVisibility(View.VISIBLE);
+				/*
 				if (ic<2) {
 					if (lote==null || lote.isEmpty()) {
 						holder.lblCod.setVisibility(View.GONE);
@@ -116,6 +117,7 @@ public class ListAdaptExist extends BaseAdapter {
 				} else {
 					holder.lblCod.setVisibility(View.VISIBLE);
 				}
+				*/
 				break;
 			case 1:
 				holder.relbueno.setVisibility(View.VISIBLE);break;

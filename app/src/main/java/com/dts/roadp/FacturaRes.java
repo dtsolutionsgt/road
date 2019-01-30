@@ -624,7 +624,8 @@ public class FacturaRes extends PBase {
 		try {
 			upd.init("P_CLIRUTA");
 			upd.add("BANDERA",0);
-			upd.Where("CLIENTE='"+cliid+"' AND DIA="+dweek);
+			//upd.Where("CLIENTE='"+cliid+"' AND DIA="+dweek);
+			upd.Where("CLIENTE='"+cliid+"'");
 	
 			db.execSQL(upd.SQL());
 		} catch (SQLException e) {
@@ -1425,7 +1426,6 @@ public class FacturaRes extends PBase {
 		}
 			
 	}
-
 
 	
 	// Aux

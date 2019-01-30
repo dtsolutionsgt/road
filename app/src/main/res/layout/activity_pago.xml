@@ -185,11 +185,12 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:gravity="center_vertical"
-            android:paddingLeft="5dp"
+            android:paddingLeft="10dp"
             android:paddingRight="5dp"
             android:text="Total :"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp" />
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/lblPTotal"

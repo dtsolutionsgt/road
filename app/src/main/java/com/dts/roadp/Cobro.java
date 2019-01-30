@@ -58,7 +58,8 @@ public class Cobro extends PBase {
 		showTotals();
 		
 		listItems();	
-		
+
+		gl.pagomodo=0;
 		
 		printcallback= new Runnable() {
 		    public void run() {
@@ -77,6 +78,7 @@ public class Cobro extends PBase {
 					
 	}
 
+
 	// Events
 	
 	public void paySelect(View view) {
@@ -84,7 +86,8 @@ public class Cobro extends PBase {
 		if (tsel==0) {
 			mu.msgbox("Total a pagar = 0");return;
 		}
-		
+
+		gl.pagomodo=0;
 		gl.pagoval=tsel;
 		gl.pagolim=plim;
 		gl.pagocobro=true;
@@ -102,11 +105,8 @@ public class Cobro extends PBase {
 		inputEfectivo();  
 	}
 	
-	public void clearCobros(View view){
-		//db.execSQL("DELETE FROM D_COBRO");
-		//db.execSQL("DELETE FROM D_COBROD");
-		//db.execSQL("DELETE FROM D_COBROP");
-		super.finish();
+	public void doExit(View view){
+		exit();
 	}
 
 	public void checkAll(View view) {
@@ -131,7 +131,20 @@ public class Cobro extends PBase {
 		calcSelected();
 		showTotals();
 	}
-	
+
+	public void sinRef(View view) {
+		gl.pagomodo=1;
+		gl.pagoval=0;
+		gl.pagolim=0;
+		gl.pagocobro=true;
+		browse=1;
+
+		Intent intent = new Intent(this,Pago.class);
+		startActivity(intent);
+
+	}
+
+
 	// Main
 	
 	private void setHandlers(){
@@ -220,12 +233,15 @@ public class Cobro extends PBase {
 	}	
 	
 	private void createDoc(){
-		docList();
-		if (!applyPay()) return;
-		
+
+		if (gl.pagomodo==0) {
+			docList();
+			if (!applyPay()) return;
+		}
+
 		if (saveCobro()) {
-			listItems();				
-			
+			listItems();
+
 			if (prn.isEnabled()) {
 				fdoc.buildPrint(corel,0);
 				prn.printask(printclose);
@@ -272,30 +288,50 @@ public class Cobro extends PBase {
 			ins.add("CORELATIVO",fcorel);
 		
 			db.execSQL(ins.sql());
-			
-			// Documentos
-		
-			sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD";
-			DT=Con.OpenDT(sql);
-	
-			DT.moveToFirst();
-			while (!DT.isAfterLast()) {
-				
-				ins.init("D_COBROD");
+
+			if (gl.pagomodo==0) {
+
+				// Cobro regular - Documentos
+
+				sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD";
+				DT=Con.OpenDT(sql);
+
+				DT.moveToFirst();
+				while (!DT.isAfterLast()) {
+
+					ins.init("D_COBROD");
+
+					ins.add("COREL",corel);
+					ins.add("ANULADO","N");
+					ins.add("EMPRESA",gl.emp);
+					ins.add("DOCUMENTO",DT.getString(0));
+					ins.add("TIPODOC",DT.getString(1));
+					ins.add("MONTO",DT.getDouble(2));
+					ins.add("PAGO",DT.getDouble(3));
+					ins.add("CONTRASENA","");
+
+					db.execSQL(ins.sql());
+
+					DT.moveToNext();
+				}
+
+			} else {
+
+				ins.init("D_COBROD_SR");
+
 				ins.add("COREL",corel);
+				ins.add("DOCUMENTO",gl.cliente);
 				ins.add("ANULADO","N");
 				ins.add("EMPRESA",gl.emp);
-				ins.add("DOCUMENTO",DT.getString(0));
-				ins.add("TIPODOC",DT.getString(1));
-				ins.add("MONTO",DT.getDouble(2));	
-				ins.add("PAGO",DT.getDouble(3));
-				ins.add("CONTRASENA","");
-			
-				db.execSQL(ins.sql());				
-				
-			    DT.moveToNext();				
+				ins.add("TIPODOC","SR");
+				ins.add("MONTO",tpago);
+				ins.add("PAGO",tpago);
+				ins.add("CONTRASENA","1");
+
+				db.execSQL(ins.sql());
+
 			}
-			
+
 			// Pagos
 				
 			sql="SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
@@ -527,8 +563,7 @@ public class Cobro extends PBase {
 		} else {	
 			lblPend.setText(mu.frmcur(0));
 		}
-		
-		
+
 	}
 	
 	private void calcSelected() {
@@ -638,8 +673,17 @@ public class Cobro extends PBase {
 		
 		dialog.show();
 			
-	}	
-	
+	}
+
+	private void exit() {
+		showTotals();
+		if(tpend>0) {
+			msgAskExit("Tiene documentos pendientes de pago. Salir");
+		} else {
+			finish();
+		}
+	}
+
 	
 	// MsgDialogs
 	
@@ -689,9 +733,33 @@ public class Cobro extends PBase {
 		
 		dialog.show();
 			
-	}	
-	
-	
+	}
+
+	private void msgAskExit(String msg) {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle(R.string.app_name);
+		dialog.setMessage("¿" + msg + "?");
+
+		dialog.setIcon(R.drawable.ic_quest);
+
+		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				finish();
+			}
+		});
+
+		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				closekeyb();
+			}
+		});
+
+		dialog.show();
+
+	}
+
+
 	// Activity Events
 	
 	@Override
@@ -705,6 +773,11 @@ public class Cobro extends PBase {
 	    	if (gl.pagado) createDoc();
 	    }
 	    
+	}
+
+	@Override
+	public void onBackPressed() {
+		exit();
 	}
 	
 }

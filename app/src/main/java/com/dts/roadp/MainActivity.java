@@ -4,16 +4,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.text.DecimalFormat;
-
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,55 +34,106 @@ public class MainActivity extends PBase {
 	private clsLicence lic;
 	private BaseDatosVersion dbVers;
 	
-	private boolean rutapos;
+	private boolean rutapos,scanning=false;
 	private int fecha;
-	
+	private String cs1,cs2,cs3;
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		
-		super.InitBase();
-		
-		this.setTitle("ROAD");
-		
-		txtUser= (EditText) findViewById(R.id.txtUser);
-		txtPass= (EditText) findViewById(R.id.txtMonto);
-		lblRuta= (TextView) findViewById(R.id.lblCDisp);
-		lblRTit= (TextView) findViewById(R.id.lblCUsed);
-		imgLogo= (ImageView) findViewById(R.id.imgNext);
-			
-		// DB VERSION
-		dbVers=new BaseDatosVersion(this,db,Con);
-		dbVers.checkVersion(1);
-		
-		setHandlers();
-		
-		txtUser.requestFocus();
-		
-		initSession();
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
+            grantPermissions();
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+	}
 
-		//#HS_20181206 Obtiene el supervisor de la ruta
-		supervisorRuta();
-		
-		txtUser.setText("00100993");txtPass.setText("2613");
-		//txtUser.setText("00107520");txtPass.setText("REBECA");
-		//txtUser.setText("Venta");txtPass.setText("Venta");
-		
-		gl.contlic=false;
-				
+	// Grant permissions
+
+	private void startApplication() {
+
+        try {
+            super.InitBase();
+
+            this.setTitle("ROAD");
+
+            txtUser= (EditText) findViewById(R.id.txtUser);
+            txtPass= (EditText) findViewById(R.id.txtMonto);
+            lblRuta= (TextView) findViewById(R.id.lblCDisp);
+            lblRTit= (TextView) findViewById(R.id.lblCUsed);
+            imgLogo= (ImageView) findViewById(R.id.imgNext);
+
+            // DB VERSION
+            dbVers=new BaseDatosVersion(this,db,Con);
+            dbVers.checkVersion(1);
+
+            setHandlers();
+
+            txtUser.requestFocus();
+
+            initSession();
+
+            //#HS_20181206 Obtiene el supervisor de la ruta
+            supervisorRuta();
+
+            txtUser.setText("00100993");txtPass.setText("2613");
+
+            gl.contlic=false;
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
+	}
+
+	private void grantPermissions() {
 		try {
-			//DecimalFormat decim = new DecimalFormat("#,###.00");
-			//msgbox(decim.format(25326.58974));
-			
-			//msgbox(mu.frmdecimal(25326.589,6));
-		} catch (Exception e) {
-			msgbox(e.getMessage());
+			if (Build.VERSION.SDK_INT >= 23) {
+
+				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
+			        && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
+					&& checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
+					&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED)
+				{
+					startApplication();
+				} else {
+					ActivityCompat.requestPermissions(this,
+							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+									     Manifest.permission.ACCESS_FINE_LOCATION,
+									     Manifest.permission.CALL_PHONE,
+									     Manifest.permission.CAMERA}, 1);
+				}
+			}
+
+	    } catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 	}
 
-	
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+		Toast.makeText(this,"req : "+requestCode, Toast.LENGTH_SHORT).show();
+
+		//switch (requestCode) {
+
+			//case 0:
+				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
+						&& checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
+						&& checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
+						&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED) {
+					Toast.makeText(this, "GRANTED : " + requestCode, Toast.LENGTH_SHORT).show();
+					startApplication();
+				} else {
+					Toast.makeText(this, "failed " + requestCode, Toast.LENGTH_SHORT).show();
+					super.finish();
+				}
+				//break;
+		//}
+	}
+
+
 	// Events
 	
 	public void showMenu(View view) {
@@ -147,6 +199,51 @@ public class MainActivity extends PBase {
 			}
 		});
 
+		/*
+		txtUser.addTextChangedListener(new TextWatcher() {
+
+			public void afterTextChanged(Editable s) {}
+
+			public void beforeTextChanged(CharSequence s, int start,int count, int after) {}
+
+			public void onTextChanged(CharSequence s, int start,int before, int count) {
+				//mu.msgbox("start "+start+" before "+before+" count "+count);
+
+				final CharSequence ss=s;
+
+				if (!scanning) {
+					scanning=true;
+					Handler handlerTimer = new Handler();
+					handlerTimer.postDelayed(new Runnable(){
+						public void run() {
+							compareSC(ss);
+						}}, 50);
+				}
+
+
+			}
+		});
+		*/
+	}
+
+	private void compareSC(CharSequence s) {
+		String os,bc;
+
+		bc=txtUser.getText().toString();
+		if (mu.emptystr(bc) || bc.length()<2) {
+			txtUser.setText("");
+			scanning=false;
+			return;
+		}
+		os=s.toString();
+
+		if (bc.equalsIgnoreCase(os)) {
+			//Toast.makeText(this,"Codigo barra : " +bc, Toast.LENGTH_SHORT).show();
+			msgbox("Barra: "+bc);
+		}
+
+		txtUser.setText("");
+		scanning=false;
 	}
 
 

@@ -231,7 +231,7 @@ public class clsDocFactura extends clsDocument {
 
 		for (int i = 0; i <items.size(); i++) {
 			item=items.get(i);
-			
+
 			ss=rep.ltrim(item.cod+" "+item.nombre,prw-10);
 			ss=ss+rep.rtrim(item.um,4)+" "+rep.rtrim(frmdecimal(item.cant,2),5);
 			rep.add(ss);

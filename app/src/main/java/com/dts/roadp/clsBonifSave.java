@@ -111,6 +111,10 @@ public class clsBonifSave {
 					ins.add("COSTO",cost);
 					ins.add("TOTAL",tot);
 					ins.add("STATCOM","N");
+					ins.add("UMVENTA","");
+					ins.add("UMSTOCK","");
+					ins.add("UMPESO","");
+					ins.add("FACTOR",1);
 
 					db.execSQL(ins.sql());
 
@@ -255,6 +259,10 @@ public class clsBonifSave {
 				ins.add("LOTE",lote );
 				ins.add("CANT",cantapl);
 				ins.add("PESO",0);
+				ins.add("UMVENTA","");
+				ins.add("UMSTOCK","");
+				ins.add("UMPESO","");
+				ins.add("FACTOR",1);
 				
 				db.execSQL(ins.sql());
 				

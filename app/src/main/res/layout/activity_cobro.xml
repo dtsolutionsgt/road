@@ -5,6 +5,22 @@
     android:background="@layout/back"
     tools:context=".Cobro" >
 
+    <TextView
+        android:id="@+id/textView30"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/textView23"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-5dp"
+        android:background="@layout/frame_btn"
+        android:clickable="true"
+        android:onClick="sinRef"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:text="Sin Ref" />
+
     <ImageView
         android:id="@+id/imgImg"
         android:layout_width="wrap_content"
@@ -12,7 +28,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:clickable="true"
-        android:onClick="clearCobros"
+        android:onClick="doExit"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"

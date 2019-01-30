@@ -206,7 +206,7 @@ public class Producto extends PBase {
 
 		ArrayList<clsCD> vitems = new ArrayList<clsCD>();;
 
-		items.clear();itemid="*";famid="0";
+		items.clear();itemid="*";//famid="0";
 
 		vF=txtFilter.getText().toString().replace("'","");
 

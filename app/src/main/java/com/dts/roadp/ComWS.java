@@ -1751,6 +1751,7 @@ public class ComWS extends PBase {
 					dbld.clear();
 					dbld.insert("D_COBRO" ,"WHERE COREL='"+cor+"'");
 					dbld.insert("D_COBROD","WHERE COREL='"+cor+"'");
+					dbld.insert("D_COBROD_SR","WHERE COREL='"+cor+"'");
 					dbld.insert("D_COBROP","WHERE COREL='"+cor+"'");
 					
 					dbld.add("UPDATE P_CORRELREC SET Actual="+corult+"  WHERE RUTA='"+fruta+"'");	

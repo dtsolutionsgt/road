@@ -284,6 +284,7 @@ public class Cobro extends PBase {
 			ins.add("STATCOM","N");
 			ins.add("CALCOBJ","N");
 			ins.add("IMPRES",0);
+			ins.add("CODIGOLIQUIDACION",0);
 			ins.add("SERIE",fserie);
 			ins.add("CORELATIVO",fcorel);
 		
@@ -309,6 +310,9 @@ public class Cobro extends PBase {
 					ins.add("MONTO",DT.getDouble(2));
 					ins.add("PAGO",DT.getDouble(3));
 					ins.add("CONTRASENA","");
+					ins.add("ID_TRANSACCION",0);
+					ins.add("REFERENCIA","");
+					ins.add("ASIGNACION","");
 
 					db.execSQL(ins.sql());
 

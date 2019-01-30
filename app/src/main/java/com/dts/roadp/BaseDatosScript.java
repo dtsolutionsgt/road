@@ -308,6 +308,7 @@ public class BaseDatosScript {
 					"[DEPOS] TEXT NOT NULL,"+
 					"[TOTAL] REAL NOT NULL,"+
 					"[CALCOBJ] TEXT NOT NULL,"+
+					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
 					"[SERIE] TEXT NOT NULL,"+
 					"[CORELATIVO] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
@@ -333,6 +334,9 @@ public class BaseDatosScript {
 					"[MONTO] REAL NOT NULL,"+
 					"[PAGO] REAL NOT NULL,"+
 					"[CONTRASENA] TEXT NOT NULL,"+
+					"[ID_TRANSACCION] INTEGER NOT NULL,"+
+					"[REFERENCIA] TEXT NOT NULL,"+
+					"[ASIGNACION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL],[DOCUMENTO])"+
 					");";
 			database.execSQL(vSQL);
@@ -374,10 +378,6 @@ public class BaseDatosScript {
             vSQL="CREATE INDEX D_COBROP_idx1 ON D_COBROP(ANULADO)";
             database.execSQL(vSQL);
 
-
-
-
-			
 			vSQL="CREATE TABLE [D_CLINUEVO] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+

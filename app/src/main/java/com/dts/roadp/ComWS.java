@@ -51,7 +51,7 @@ public class ComWS extends PBase {
 	
 	private int isbusy,fecha,lin,reccnt,ultcor,ultcor_ant;
 	private String err,ruta,rutatipo,sp,docstock,ultSerie,ultSerie_ant;
-	private boolean fFlag,showprogress,pendientes,envioparcial,findiaactivo;
+	private boolean fFlag,showprogress,pendientes,envioparcial,findiaactivo,errflag;
 	
 	private SQLiteDatabase dbT;
 	private BaseDatos ConT;
@@ -1527,6 +1527,8 @@ public class ComWS extends PBase {
 	
 	private boolean sendData() {
 
+		errflag=false;
+
 		senv = "Envío terminado \n \n";
 
 		items.clear();
@@ -1604,8 +1606,8 @@ public class ComWS extends PBase {
 				try {
 
 					i+=1;fprog="Factura "+i;wsStask.onProgressUpdate();
-					
-					if (!envioparcial) dbld.clear();
+
+					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_FACTURA" ,"WHERE COREL='"+cor+"'");
 					dbld.insert("D_FACTURAD","WHERE COREL='"+cor+"'");
@@ -1617,7 +1619,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_BONIF_LOTES","WHERE COREL='"+cor+"'");
 					dbld.insert("D_REL_PROD_BON","WHERE COREL='"+cor+"'");
 					dbld.insert("D_BONIFFALT","WHERE COREL='"+cor+"'");
-					
+
 					dbld.add("UPDATE P_COREL SET CORELULT="+ccorel+"  WHERE RUTA='"+fruta+"'");	
 
 					if (envioparcial) {
@@ -1626,6 +1628,7 @@ public class ComWS extends PBase {
 							db.execSQL(sql);
 							pc += 1;
 						} else {
+							errflag=true;
 							fterr += "\n" + sstr;
 							dbg = sstr;
 						}
@@ -1697,6 +1700,7 @@ public class ComWS extends PBase {
 							Toast.makeText(this, "Envio correcto", Toast.LENGTH_SHORT).show();
 							pc+=1;
 						} else {
+							errflag=true;
 							fterr+="\n"+sstr;
 						}
 					}
@@ -1747,8 +1751,9 @@ public class ComWS extends PBase {
 				try {
 					
 					i+=1;fprog="Cobro "+i;wsStask.onProgressUpdate();
-					
-					dbld.clear();
+
+					if (envioparcial) dbld.clear();
+
 					dbld.insert("D_COBRO" ,"WHERE COREL='"+cor+"'");
 					dbld.insert("D_COBROD","WHERE COREL='"+cor+"'");
 					dbld.insert("D_COBROD_SR","WHERE COREL='"+cor+"'");
@@ -1761,6 +1766,7 @@ public class ComWS extends PBase {
 					    db.execSQL(sql); 
 						pc+=1;
 					} else {
+						errflag=true;
 						fterr+="\n"+sstr;
 					}
 							
@@ -1943,8 +1949,7 @@ public class ComWS extends PBase {
 			sql="SELECT COREL FROM D_MOV WHERE STATCOM='N'";
 			DT=Con.OpenDT(sql);
 
-			if (DT.getCount()==0)
-			{
+			if (DT.getCount()==0) {
 				senv+="Inventario : "+pc+"\n";return;
 			}
 			
@@ -2484,7 +2489,7 @@ public class ComWS extends PBase {
 		
 		//senv="Envio completo\n";
 		
-		if (fstr.equalsIgnoreCase("Sync OK")) {
+		if (!errflag) {
 			lblInfo.setText(" ");
 		} else {	
 			lblInfo.setText(fstr);	
@@ -2492,7 +2497,7 @@ public class ComWS extends PBase {
 		}
 
 		if (envioparcial) mu.msgbox(senv);
-		if (!dbg.equalsIgnoreCase("::")) mu.msgbox(dbg);
+		//if (!dbg.equalsIgnoreCase("::")) mu.msgbox(dbg);
 		
 		//updateLicencePush();
 

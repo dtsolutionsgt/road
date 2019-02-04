@@ -276,18 +276,26 @@ public class clsDocFactura extends clsDocument {
 
 	@Override
 	protected void saveHeadLines(int reimpres) {
+
+
 		if (modofact.equalsIgnoreCase("*")) super.saveHeadLines(reimpres);
 		if (modofact.equalsIgnoreCase("TOL")) headerToledano(reimpres);
 	}
 
 	private void headerToledano(int reimpres) {
-		String s,sc;
+		String s,sc,ss;
 
 		rep.empty();rep.empty();
 
 		for (int i = 0; i <lines.size(); i++) 		{
 			s=lines.get(i);
 			s=encabezado(s);
+
+			ss=s.replace(" ","");
+			if (ss.equalsIgnoreCase("FACTURA")) {
+				if (reimpres==4) s="- FACTURA PENDIENTE  DE  PAGO -";
+			}
+
 			if (!s.equalsIgnoreCase("@@")) rep.add(s);
 		}
 
@@ -384,9 +392,9 @@ public class clsDocFactura extends clsDocument {
 		rep.addc("CONSIDERARA COMO EVIDENCIA  DE  PAGO");
 		rep.add("");
 
-		rep.add("Serial dispositivo : "+deviceid);
-		rep.add("No. Resolucion     : "+resol);
-		rep.add("Fecha Resolucion   : "+resfecha);
+		rep.add("Serial : "+deviceid);
+		rep.add(resol);
+		rep.add(resfecha);
 		rep.add("");
 
 		return super.buildFooter();

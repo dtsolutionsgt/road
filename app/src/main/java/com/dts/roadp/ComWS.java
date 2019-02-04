@@ -1,8 +1,10 @@
 package com.dts.roadp;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 import org.apache.commons.io.IOUtils;
@@ -1629,7 +1631,7 @@ public class ComWS extends PBase {
 							pc += 1;
 						} else {
 							errflag=true;
-							fterr += "\n" + sstr;
+							fterr += "\nFactura : " + sstr;
 							dbg = sstr;
 						}
 					}
@@ -1663,8 +1665,6 @@ public class ComWS extends PBase {
 		String cor;
 		int i,pc=0,pcc=0;
 		
-		fterr="";
-					
 		try {
 			sql="SELECT COREL FROM D_PEDIDO WHERE STATCOM='N'";
 			DT=Con.OpenDT(sql);
@@ -1729,9 +1729,7 @@ public class ComWS extends PBase {
 		Cursor DT;
 		String cor,fruta;
 		int i,pc=0,pcc=0,corult;
-		
-		fterr="";
-					
+
 		try {
 			sql="SELECT COREL,CORELATIVO,RUTA FROM D_COBRO WHERE STATCOM='N' ORDER BY COREL";
 			DT=Con.OpenDT(sql);
@@ -1767,7 +1765,7 @@ public class ComWS extends PBase {
 						pc+=1;
 					} else {
 						errflag=true;
-						fterr+="\n"+sstr;
+						fterr+="\nCobro: "+sstr;
 					}
 							
 				} catch (Exception e) {
@@ -1795,9 +1793,7 @@ public class ComWS extends PBase {
 		Cursor DT;
 		String cor,fruta;
 		int i,pc=0,pcc=0,ccorel;
-		
-		fterr="";
-					
+
 		try {
 			sql="SELECT COREL,RUTA,CORELATIVO FROM D_NOTACRED WHERE STATCOM='N' ORDER BY CORELATIVO";
 			DT=Con.OpenDT(sql);
@@ -1859,8 +1855,6 @@ public class ComWS extends PBase {
 		Cursor DT;
 		String cor;
 		int i,pc=0,pcc=0;
-
-		fterr="";
 
 		try {
 			sql="SELECT COREL FROM D_DEPOS WHERE STATCOM='N'";
@@ -1941,9 +1935,7 @@ public class ComWS extends PBase {
 		Cursor DT;
 		String cor;
 		int i,pc=0,pcc=0;
-		
-		fterr="";
-					
+
 		try {
 
 			sql="SELECT COREL FROM D_MOV WHERE STATCOM='N'";
@@ -2010,9 +2002,7 @@ public class ComWS extends PBase {
 		Cursor DT;
 		String cor;
 		int i,pc=0,pcc=0;
-		
-		fterr="";
-					
+
 		try {
 			sql="SELECT CODIGO FROM D_CLINUEVO WHERE STATCOM='N'";
 			DT=Con.OpenDT(sql);
@@ -2080,7 +2070,6 @@ public class ComWS extends PBase {
 		String cor,hora;
 		int fecha;
 		
-		fterr="";
 		fprog=" ";wsStask.onProgressUpdate();
 				
 		try {
@@ -2128,8 +2117,6 @@ public class ComWS extends PBase {
 		String cod,ss;
 		int stp;
 		double px,py;
-		
-		fterr="";
 		fprog=" ";wsStask.onProgressUpdate();
 				
 		try {
@@ -2151,7 +2138,6 @@ public class ComWS extends PBase {
 					
 					ss="UPDATE P_CLIENTE SET COORX="+px+",COORY="+py+" WHERE (CODIGO='"+cod+"')";					
 					dbld.add(ss);
-					fterr=ss;
 
 					if (envioparcial) {
 						if (commitSQL() == 1) {
@@ -2179,9 +2165,7 @@ public class ComWS extends PBase {
 		Cursor DT;
 		String cor;
 		int i,pc=0,pcc=0;
-		
-		fterr="";
-					
+
 		try {
 			
 			sql="SELECT * FROM D_SOLICINVD";	
@@ -2240,8 +2224,8 @@ public class ComWS extends PBase {
 	}	
 	
 	public void envioFinDia() {		
-		fterr="";
-		fprog=" ";wsStask.onProgressUpdate();
+
+			fprog=" ";wsStask.onProgressUpdate();
 		
 		try {
 				
@@ -2287,14 +2271,14 @@ public class ComWS extends PBase {
 			dbld.add(ss);
 
 			if (envioparcial) {
-                fterr=ss+"\n";
+                //fterr=ss+"\n";
                 rslt=commitSQL();
-                fterr=fterr+rslt+"\n";
+                //fterr=fterr+rslt+"\n";
             }
 
 		} catch (Exception e) {
 			fstr=e.getMessage();
-			fterr=fterr+fstr;
+			//fterr=fterr+fstr;
 		}
 
 	}
@@ -2314,7 +2298,6 @@ public class ComWS extends PBase {
 			dbld.add(ss);
 
 			if (envioparcial) {
-                fterr = ss + "\n";
                 rslt = commitSQL();
                 fterr = fterr + rslt + "\n";
             }
@@ -2492,8 +2475,9 @@ public class ComWS extends PBase {
 		if (!errflag) {
 			lblInfo.setText(" ");
 		} else {	
-			lblInfo.setText(fstr);	
-			mu.msgbox(fstr+"\n"+fterr);
+			lblInfo.setText(fstr);
+			writeErrLog(fterr);
+			mu.msgbox(fterr);
 		}
 
 		if (envioparcial) mu.msgbox(senv);
@@ -2890,7 +2874,26 @@ public class ComWS extends PBase {
 			msgbox(e.getMessage());
 		}
 	}
-	
+
+	private void writeErrLog(String errstr) {
+		BufferedWriter writer = null;
+		FileWriter wfile;
+
+		try {
+			String fname = Environment.getExternalStorageDirectory()+"/roaderror.txt";
+
+			wfile=new FileWriter(fname,false);
+			writer = new BufferedWriter(wfile);
+			writer.write(errstr);writer.write("\r\n");
+			writer.close();
+
+		} catch (Exception e) {
+				msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+	}
+
+
 	// Activity Events
 	
 	@Override

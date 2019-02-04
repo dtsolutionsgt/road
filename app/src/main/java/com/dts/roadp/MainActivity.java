@@ -253,6 +253,14 @@ public class MainActivity extends PBase {
 		Cursor DT;
 		String s, rn = "";
 
+		if (dbVacia()) {
+			gl.modoadmin=true;
+			gl.autocom=0;
+			toastcent("¡La base de datos está vacia!");
+			startActivity( new Intent(MainActivity.this,ComWS.class));
+		}
+
+
 		try {
 			//#HS_20181122_1505 Se agrego el campo Impresion.
 			sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL FROM P_RUTA";
@@ -421,6 +429,7 @@ public class MainActivity extends PBase {
 
 	}
 
+
 	// Licencia
 
 	private boolean validaLicencia() {
@@ -461,7 +470,6 @@ public class MainActivity extends PBase {
 	}
 
 
-	
 	// Ventas Demo
 	
 	public void showDemoMenu() {
@@ -626,6 +634,19 @@ public class MainActivity extends PBase {
 		});
 
 		alert.show();
+	}
+
+	private boolean dbVacia() {
+		Cursor dt;
+
+		try {
+			sql = "SELECT CODIGO FROM P_RUTA";
+			dt = Con.OpenDT(sql);
+
+			return dt.getCount()==0;
+		} catch (Exception e) {
+			return true;
+		}
 	}
 
 	// Activity Events

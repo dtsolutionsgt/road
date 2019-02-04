@@ -39,7 +39,7 @@ public class clsDocCobro extends clsDocument {
 	}
 	
 	protected boolean buildFooter() {
-		rep.addtot("TOTAL EFECTIVO", tot);			
+		rep.addtot("TOTAL PAGO", tot);
 		
 		return super.buildFooter();
 	}	
@@ -50,7 +50,7 @@ public class clsDocCobro extends clsDocument {
 				
 		super.loadHeadData(corel);
 		
-		nombre="FACTURA";
+		nombre="RECIBO";
 		
 		try {
 			sql="SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,FECHA FROM D_COBRO WHERE COREL='"+corel+"'";
@@ -122,6 +122,16 @@ public class clsDocCobro extends clsDocument {
 		try {
 			sql="SELECT DOCUMENTO FROM D_COBROD WHERE COREL='"+corel+"'";	
 			DT=Con.OpenDT(sql);
+
+			if (DT.getCount()==0) {
+
+				item =new itemData();
+				item.cod="SIN REFERENCIA";
+				items.add(item);
+
+				return true;
+			}
+
 			DT.moveToFirst();
 			
 			while (!DT.isAfterLast()) {

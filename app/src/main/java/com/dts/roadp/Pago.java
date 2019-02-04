@@ -117,6 +117,7 @@ public class Pago extends PBase {
 			finalCheck();
 		} else {
 			gl.pagado=totalPago()>0;
+			finish();
 		}
 	}
 	

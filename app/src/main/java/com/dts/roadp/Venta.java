@@ -479,7 +479,7 @@ public class Venta extends PBase {
 
 	private void addItem(){
 		Cursor dt;
-		double precdoc,fact,cantbas;
+		double precdoc,fact,cantbas,peso;
 		String umb;
 
 		try {
@@ -502,6 +502,7 @@ public class Venta extends PBase {
 		}
 
 		cantbas=cant*fact;
+		peso=mu.round(cant*fact,gl.peDec);
 
 		try {
 
@@ -522,7 +523,7 @@ public class Venta extends PBase {
 			ins.add("DESMON",descmon);
 			ins.add("TOTAL",tot);
 			ins.add("PRECIODOC",precdoc);
-			ins.add("PESO",0);
+			ins.add("PESO",peso);
 			ins.add("VAL1",0);
 			ins.add("VAL2","");
 			ins.add("VAL3",0);
@@ -963,8 +964,7 @@ public class Venta extends PBase {
 		return location;
 	}
 
-	
-	
+
 	// Aux
 	
 	private void msgAskExit(String msg) {

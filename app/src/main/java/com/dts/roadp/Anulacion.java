@@ -384,7 +384,7 @@ public class Anulacion extends PBase {
 	private void revertStock(String corel,String pcod,String um) {
 		Cursor dt;
 		String doc,stat,lot;
-		double cant;
+		double cant,ppeso;
 		
 		doc="";stat="";lot="";
 
@@ -398,6 +398,7 @@ public class Anulacion extends PBase {
         while (!dt.isAfterLast()) {
 
             cant = dt.getInt(0);
+			ppeso = dt.getDouble(2);
             lot = dt.getString(4);
             doc = dt.getString(5);
             stat = dt.getString(9);
@@ -409,7 +410,7 @@ public class Anulacion extends PBase {
                 ins.add("CODIGO", pcod);
                 ins.add("CANT", 0);
                 ins.add("CANTM", dt.getDouble(1));
-                ins.add("PESO", dt.getDouble(2));
+                ins.add("PESO", 0);
                 ins.add("plibra", dt.getDouble(3));
                 ins.add("LOTE", lot);
                 ins.add("DOCUMENTO", doc);
@@ -429,7 +430,7 @@ public class Anulacion extends PBase {
                 //mu.msgbox(e.getMessage());
             }
 
-            sql = "UPDATE P_STOCK SET CANT=CANT+" + cant + " WHERE (CODIGO='" + pcod + "') AND (UNIDADMEDIDA='" + um + "') AND (LOTE='" + lot + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
+            sql = "UPDATE P_STOCK SET CANT=CANT+"+cant+",PESO=PESO+"+ppeso+"  WHERE (CODIGO='" + pcod + "') AND (UNIDADMEDIDA='" + um + "') AND (LOTE='" + lot + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
             db.execSQL(sql);
 
             dt.moveToNext();

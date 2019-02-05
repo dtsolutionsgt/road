@@ -41,13 +41,14 @@ public class FacturaRes extends PBase {
 	private clsDescGlob clsDesc;
 	private printer prn;
 	private clsDocFactura fdoc;
+	private AppMethods app;
 	
 	private int fecha,fechae,fcorel,clidia,media;
 	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt;
 	private int cyear, cmonth, cday, dweek,stp=0;
 	
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
-	private boolean acum,cleandprod,peexit,pago,saved,rutapos;
+	private boolean acum,cleandprod,peexit,pago,saved,rutapos,porpeso;
 
 
 	@SuppressLint("MissingPermission")
@@ -74,6 +75,8 @@ public class FacturaRes extends PBase {
 		media=gl.media;
 		credito=gl.credito;
 		gl.cobroPendiente = false;
+
+		app = new AppMethods(this, gl, Con, db);
 			
 		if (rutapos) {
 			lblMPago.setVisibility(View.INVISIBLE);
@@ -497,6 +500,8 @@ public class FacturaRes extends PBase {
 	
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
+
+				porpeso=prodPorPeso(DT.getString(0));
 					
 			  	ins.init("D_FACTURAD");
 				ins.add("COREL",corel);
@@ -554,7 +559,7 @@ public class FacturaRes extends PBase {
 					DT.moveToNext();
 				}
 
-			}else{
+			} else {
 
 				try {
 
@@ -639,9 +644,10 @@ public class FacturaRes extends PBase {
 	
 	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa) {
 		Cursor dt;
-		double acant,cantapl,dispcant,peso,pesoapl,disppeso;
+		double acant,cantapl,dispcant,peso,pesoapl,disppeso,factpeso;
 		String lote,doc,stat;
 
+		if(porpeso) factor=1;
 		acant=cant*factor;
 
 		try {
@@ -661,8 +667,10 @@ public class FacturaRes extends PBase {
 				doc=dt.getString(5);
 				stat=dt.getString(9);
 
+				if (cant!=0) factpeso=peso/cant; else factpeso=0;
+
 				if (acant>cant) cantapl=cant;else cantapl=acant;
-				pesoapl=cantapl*factor;
+				pesoapl=cantapl*factpeso;
 
 				dispcant=cant-acant;if (dispcant<0) dispcant=0;
 				acant=acant-cant;
@@ -1427,9 +1435,14 @@ public class FacturaRes extends PBase {
 			
 	}
 
-	
-	// Aux
-	
+	private boolean prodPorPeso(String prodid) {
+		try {
+			return app.ventaPeso(prodid);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 	private void hidekeyboard() {
 		View sview = this.getCurrentFocus();
 		

@@ -288,13 +288,12 @@ public class clsDocument {
 				loadHeadData(corel);
 			}
 			loadHeadLines();
-						
+
+			saveHeadLines(reimpres);
 		} catch (Exception e) {
 			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 		}		
-		
-		saveHeadLines(reimpres);
-		
+
 		return true;
 	}
 

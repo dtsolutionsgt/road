@@ -649,6 +649,7 @@ public class MainActivity extends PBase {
 		}
 	}
 
+
 	// Activity Events
 	
 	protected void onResume() {

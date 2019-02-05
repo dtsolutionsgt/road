@@ -19,12 +19,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
-
 public class ProdCant extends PBase {
 
-	private EditText txtCant;
+	private EditText txtCant,txtPeso;
 	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot;
-	private TextView lblPeso,lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso;
+	private TextView lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso,lblPesoUni;
 	private ImageView imgProd,imgUpd,imgDel;	
 	
 	private Precio prc;
@@ -74,7 +73,7 @@ public class ProdCant extends PBase {
 	// Events
 	
 	public void sendCant(View view) {
-		if (setCant()<1) applyCant();
+		if (setCant(false)<1) applyCant();
 	}
 	
 	public void showPromo(View view){
@@ -125,7 +124,7 @@ public class ProdCant extends PBase {
 		   	public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
 			 
 		   	public void onTextChanged(CharSequence s, int start,int before, int count) {
-		   		setCant();
+		   		setCant(true);
 		   	}
 		});	
 		
@@ -256,8 +255,8 @@ public class ProdCant extends PBase {
 
 		if (pexist) lblDisp.setText(""+((int) idisp)); else lblDisp.setText("");
 		lblDisp.setText(mu.frmdecimal(idisp, gl.peDecImp)+" "+upres);
-		lblPeso.setText(mu.frmdecimal(ipeso, gl.peDecImp)+" "+gl.umpeso);
 		lblFactor.setText("x "+mu.frmdecimal(umfactor, gl.peDecImp));
+		lblPesoUni.setText(gl.umpeso);
 
 		if (rutatipo.equalsIgnoreCase("P") && (idisp==0)) {
 			lblDisp.setText("");lblDispLbl.setText("");
@@ -346,6 +345,7 @@ public class ProdCant extends PBase {
 	}
 
 	private void applyCant() {
+		double ppeso;
 
 		if (cant<0){
 			mu.msgbox("Cantidad incorrecta");txtCant.requestFocus();return;
@@ -357,7 +357,22 @@ public class ProdCant extends PBase {
 			}
 		}
 
+		if (porpeso) {
+
+			String spp=txtPeso.getText().toString();
+
+			try {
+				ppeso=Double.parseDouble(spp);
+				if (ppeso<=0) throw new Exception();
+			} catch (Exception e) {
+				mu.msgbox("Peso incorrect");txtPeso.requestFocus();return;
+			}
+		} else {
+			ppeso=0;
+		}
+
 		gl.dval=cant;
+		gl.dpeso=ppeso;
 		gl.um=um;
 		gl.umstock=umstock;
 		gl.umfactor=umfactor;
@@ -384,7 +399,7 @@ public class ProdCant extends PBase {
 	private void setControls() {
 		
 		txtCant= (EditText) findViewById(R.id.txtMonto);
-		
+		txtPeso= (EditText) findViewById(R.id.txtPeso);txtPeso.setVisibility(View.INVISIBLE);
 		lblDesc=(TextView) findViewById(R.id.lblFecha);
 		lblCant=(TextView) findViewById(R.id.lblCant);
 		lblPrec=(TextView) findViewById(R.id.lblPNum);
@@ -392,7 +407,7 @@ public class ProdCant extends PBase {
 		lblBU=(TextView) findViewById(R.id.lblBU);
 		lblTot=(TextView) findViewById(R.id.textView1);lblTot.setText("");
 		lblDispLbl=(TextView) findViewById(R.id.textView8);
-        lblPeso=(TextView) findViewById(R.id.textView25);lblPeso.setVisibility(View.INVISIBLE);
+		lblPesoUni=(TextView) findViewById(R.id.textView25);
         lblPesoLbl=(TextView) findViewById(R.id.textView24); lblPesoLbl.setVisibility(View.INVISIBLE);
 		lblFactor=(TextView) findViewById(R.id.textView22);lblFactor.setVisibility(View.INVISIBLE);
 		lblCantPeso=(TextView) findViewById(R.id.textView21);lblCantPeso.setText("");lblCantPeso.setVisibility(View.INVISIBLE);
@@ -402,11 +417,12 @@ public class ProdCant extends PBase {
 		
 	}
 	
-	private int setCant(){
+	private int setCant(boolean mode){
 		double cu,tv,corig,cround,fruni,frcant,adcant;
 		boolean ajust=false;
 		
 		lblTot.setText("***");
+		if (mode) txtPeso.setText("0");
 
 		try {
 			cu=Double.parseDouble(txtCant.getText().toString());		
@@ -453,13 +469,14 @@ public class ProdCant extends PBase {
 			mu.msgbox(e.getMessage());
 		}
 
+		if (mode) txtPeso.setText(mu.frmdecimal(cant*umfactor, gl.peDecImp));
+
 		if (ajust) {
 			msgAskAjust("Cantidad ajustada a : "+mu.frmdecimal(cant, gl.peDecImp)+". ¿Aplicar?");
 			return 1;
 		} else {
 			return 0;
 		}
-
 	}
 	
 	private void parseCant(double c) {
@@ -496,7 +513,7 @@ public class ProdCant extends PBase {
         }
 
         if (porpeso) {
-            lblPeso.setVisibility(View.VISIBLE);
+            txtPeso.setVisibility(View.VISIBLE);
             lblPesoLbl.setVisibility(View.VISIBLE);
             lblFactor.setVisibility(View.VISIBLE);
 			lblCantPeso.setVisibility(View.VISIBLE);

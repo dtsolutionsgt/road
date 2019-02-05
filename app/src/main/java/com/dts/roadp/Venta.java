@@ -502,7 +502,9 @@ public class Venta extends PBase {
 		}
 
 		cantbas=cant*fact;
-		peso=mu.round(cant*fact,gl.peDec);
+		//peso=mu.round(cant*fact,gl.peDec);
+		peso=mu.round(gl.dpeso,gl.peDec);
+
 
 		try {
 

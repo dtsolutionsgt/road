@@ -993,14 +993,12 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX P_CLIENTE_idx1 ON P_CLIENTE(NOMBRE)";
 			database.execSQL(vSQL);
 
-			//#HS_20181220 Tabla para las imagenes de fachada//
 			vSQL="CREATE TABLE [P_CLIENTE_FACHADA] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[IMAGEN]  TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);
-			///////////////////////////////////////////////////
 
 			vSQL="CREATE TABLE [P_CLIDIR] ("+
 					"[CODIGO_CLIENTE] TEXT NOT NULL,"+
@@ -1029,7 +1027,36 @@ public class BaseDatosScript {
 			database.execSQL(vSQL);
 			vSQL="CREATE INDEX P_CLIRUTA_idx3 ON P_CLIRUTA(SECUENCIA)";
 			database.execSQL(vSQL);
-			
+
+
+			vSQL="CREATE TABLE [P_COBRO] ("+
+					"[DOCUMENTO] TEXT NOT NULL,"+
+					"[EMPRESA] TEXT NOT NULL,"+
+					"[RUTA] TEXT NOT NULL,"+
+					"[CLIENTE] TEXT NOT NULL,"+
+					"[TIPODOC] TEXT NOT NULL,"+
+					"[VALORORIG] REAL NOT NULL,"+
+					"[SALDO] REAL NOT NULL,"+
+					"[CANCELADO] REAL NOT NULL,"+
+					"[FECHAEMIT] INTEGER NOT NULL,"+
+					"[FECHAV] INTEGER NOT NULL,"+
+					"[CONTRASENA] TEXT NOT NULL,"+
+					"[ID_TRANSACCION] INTEGER NOT NULL,"+
+					"[REFERENCIA] TEXT NOT NULL,"+
+					"[ASIGNACION] TEXT NOT NULL,"+
+					"PRIMARY KEY ([DOCUMENTO],[EMPRESA])"+
+					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE INDEX P_COBRO_idx1 ON P_COBRO(CLIENTE)";
+			database.execSQL(vSQL);
+			vSQL="CREATE INDEX P_COBRO_idx2 ON P_COBRO(SALDO)";
+			database.execSQL(vSQL);
+			vSQL="CREATE INDEX P_COBRO_idx3 ON P_COBRO(FECHAEMIT)";
+			database.execSQL(vSQL);
+			vSQL="CREATE INDEX P_COBRO_idx4 ON P_COBRO(FECHAV)";
+			database.execSQL(vSQL);
+
 
 			vSQL="CREATE TABLE [P_IMPUESTO] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
@@ -1351,35 +1378,6 @@ public class BaseDatosScript {
 
 			vSQL="CREATE INDEX P_MERESTADO_idx1 ON P_MERESTADO(NOMBRE)";
 			database.execSQL(vSQL);
-			
-			//#HS_20181212 Agregue campos ID_TRANSACCION, REFERENCIA, ASIGNACION.
-			vSQL="CREATE TABLE [P_COBRO] ("+
-					"[DOCUMENTO] TEXT NOT NULL,"+
-					"[EMPRESA] TEXT NOT NULL,"+
-					"[RUTA] TEXT NOT NULL,"+
-					"[CLIENTE] TEXT NOT NULL,"+
-					"[TIPODOC] TEXT NOT NULL,"+
-					"[VALORORIG] REAL NOT NULL,"+
-					"[SALDO] REAL NOT NULL,"+
-					"[CANCELADO] REAL NOT NULL,"+
-					"[FECHAEMIT] INTEGER NOT NULL,"+
-					"[FECHAV] INTEGER NOT NULL,"+
-					"[CONTRASENA] TEXT NOT NULL,"+
-					"[ID_TRANSACCION] INTEGER NOT NULL,"+
-					"[REFERENCIA] TEXT NOT NULL,"+
-					"[ASIGNACION] TEXT NOT NULL,"+
-					"PRIMARY KEY ([DOCUMENTO],[EMPRESA])"+
-					");";
-			database.execSQL(vSQL);
-
-			vSQL="CREATE INDEX P_COBRO_idx1 ON P_COBRO(CLIENTE)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_COBRO_idx2 ON P_COBRO(SALDO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_COBRO_idx3 ON P_COBRO(FECHAEMIT)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_COBRO_idx4 ON P_COBRO(FECHAV)";
-			database.execSQL(vSQL);
 
 			
 			vSQL="CREATE TABLE [P_NIVELMEDIAPAGO] ("+
@@ -1670,8 +1668,21 @@ public class BaseDatosScript {
 					"PRIMARY KEY ([PRODUCTO],[UNIDADSUPERIOR])"+
 					");";
 			database.execSQL(vSQL);
-			
-	
+
+			vSQL="CREATE TABLE [P_PORCMERMA] ("+
+					"[EMPRESA] TEXT NOT NULL,"+
+					"[SUCURSAL] TEXT NOT NULL,"+
+					"[RUTA] TEXT NOT NULL,"+
+					"[PRODUCTO] TEXT NOT NULL,"+
+					"[PORCENTAJEMERMA] REAL NOT NULL,"+
+					"[PORCMINIMO] REAL NOT NULL,"+
+					"[PORCMAXIMO] REAL NOT NULL,"+
+					"PRIMARY KEY ([EMPRESA],[SUCURSAL],[RUTA],[PRODUCTO])"+
+					");";
+			database.execSQL(vSQL);
+
+
+
 			return 1;
 			 
 		} catch (SQLiteException e) {

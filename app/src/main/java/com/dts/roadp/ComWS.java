@@ -714,6 +714,8 @@ public class ComWS extends PBase {
 
 			if (!AddTable("P_ARCHIVOCONF")) return false;
 			if (!AddTable("P_ENCABEZADO_REPORTESHH")) return false;
+			if (!AddTable("P_PORCMERMA")) return false;
+
 
 			// Objetivos
 			
@@ -887,62 +889,63 @@ public class ComWS extends PBase {
 			return false;
 		}
 	}
-	
+
 	private String getTableSQL(String TN) {
-       String SQL="";
-       int fi,ff;
-       
-       fi=du.ffecha00(du.getActDate());ff=du.ffecha24(du.getActDate());
-       int ObjAno=du.getyear(du.getActDate());
-       int ObjMes=du.getmonth(du.getActDate());
+		String SQL = "";
+		int fi, ff;
 
-       if (TN.equalsIgnoreCase("P_STOCK")) { 
-    	   //SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-    	   // "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND ((dbo.AndrDate(FECHA)>="+fi+") AND (dbo.AndrDate(FECHA)<="+ff+")) ";     	   
+		fi = du.ffecha00(du.getActDate());
+		ff = du.ffecha24(du.getActDate());
+		int ObjAno = du.getyear(du.getActDate());
+		int ObjMes = du.getmonth(du.getActDate());
 
-		   if (gl.peModal.equalsIgnoreCase("TOL")) {
-			   SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-					   "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='"+fsql+"') " +
-					   "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
-		   } else if (gl.peModal.equalsIgnoreCase("APR"))  {
-			   SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-					   "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='"+fsql+"') ";
-		   } else {
-			   SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-					   "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='"+fsql+"') ";
-		   }
-			esql=SQL;
-		   return SQL;
-       }
-       
-       if (TN.equalsIgnoreCase("P_CLIRUTA")) {
-    	   SQL = "SELECT RUTA,CLIENTE,SEMANA,DIA,SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'";
-    	   return SQL;		   
-       }
-       
-       if (TN.equalsIgnoreCase("P_CLIENTE")) {
-             SQL = " SELECT CODIGO,NOMBRE,BLOQUEADO,TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL, ";
-             SQL += "NIVELPRECIO,MEDIAPAGO,LIMITECREDITO,DIACREDITO,DESCUENTO,BONIFICACION, ";
-             SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
-             SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, " ;
-             SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
-             SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
-             SQL += "FROM P_CLIENTE ";
-             SQL += "WHERE (CODIGO IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') )) ";
-             return SQL;  
-       }
+		if (TN.equalsIgnoreCase("P_STOCK")) {
+			//SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+			// "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND ((dbo.AndrDate(FECHA)>="+fi+") AND (dbo.AndrDate(FECHA)<="+ff+")) ";
 
-       //#HS_20181220 Tabla de Fachadas cliente.
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') " +
+						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
+			} else if (gl.peModal.equalsIgnoreCase("APR")) {
+				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') ";
+			} else {
+				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') ";
+			}
+			esql = SQL;
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CLIRUTA")) {
+			SQL = "SELECT RUTA,CLIENTE,SEMANA,DIA,SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CLIENTE")) {
+			SQL = " SELECT CODIGO,NOMBRE,BLOQUEADO,TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL, ";
+			SQL += "NIVELPRECIO,MEDIAPAGO,LIMITECREDITO,DIACREDITO,DESCUENTO,BONIFICACION, ";
+			SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
+			SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
+			SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
+			SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
+			SQL += "FROM P_CLIENTE ";
+			SQL += "WHERE (CODIGO IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') )) ";
+			return SQL;
+		}
+
+		//#HS_20181220 Tabla de Fachadas cliente.
 		if (TN.equalsIgnoreCase("P_CLIENTE_FACHADA")) {
 			SQL = " SELECT * FROM P_CLIENTE_FACHADA ";
 			return SQL;
 		}
 
 		if (TN.equalsIgnoreCase("P_CLIDIR")) {
-            SQL = " SELECT * FROM P_CLIDIR ";
-            SQL += " WHERE (P_CLIDIR.CODIGO_CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') ))";
-            return SQL;  
-       }  
+			SQL = " SELECT * FROM P_CLIDIR ";
+			SQL += " WHERE (P_CLIDIR.CODIGO_CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') ))";
+			return SQL;
+		}
        /*       if (TN.equalsIgnoreCase("P_PRODUCTO")) {
            SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
            SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, DESCUENTO,BONIFICACION, ";
@@ -951,68 +954,68 @@ public class ComWS extends PBase {
            return SQL;  
        } 
 	   */
-       
-       if (TN.equalsIgnoreCase("P_PRODUCTO")) {
-           SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
-           SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, ISNULL(DESCUENTO,'N') AS DESCUENTO, ISNULL(BONIFICACION,'N') AS BONIFICACION, ";
-           SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN, ";
-           SQL += "VIDEO,VENTA_POR_PESO,ES_PROD_BARRA,UNID_INV,VENTA_POR_PAQUETE,VENTA_POR_FACTOR_CONV,ES_SERIALIZADO,PARAM_CADUCIDAD, ";
-           SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
-           SQL += "FROM P_PRODUCTO WHERE (CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "')) ";
-           SQL += "OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) ";
-           return SQL;  
-       }
 
-       if (TN.equalsIgnoreCase("P_FACTORCONV")) {
-           //#EJC20181112
-           //SQL = "SELECT PRODUCTO,UNIDADSUPERIOR,FACTORCONVERSION,UNIDADMINIMA FROM P_FACTORCONV ";
-           SQL = " SELECT * FROM P_FACTORCONV WHERE " +
-           " ((PRODUCTO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
-           " OR PRODUCTO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "')))";
+		if (TN.equalsIgnoreCase("P_PRODUCTO")) {
+			SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
+			SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, ISNULL(DESCUENTO,'N') AS DESCUENTO, ISNULL(BONIFICACION,'N') AS BONIFICACION, ";
+			SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN, ";
+			SQL += "VIDEO,VENTA_POR_PESO,ES_PROD_BARRA,UNID_INV,VENTA_POR_PAQUETE,VENTA_POR_FACTOR_CONV,ES_SERIALIZADO,PARAM_CADUCIDAD, ";
+			SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
+			SQL += "FROM P_PRODUCTO WHERE (CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "')) ";
+			SQL += "OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) ";
+			return SQL;
+		}
 
-           return SQL;  
-        }
-              
-       if (TN.equalsIgnoreCase("P_LINEA")) {
-          SQL = "SELECT CODIGO,MARCA,NOMBRE FROM P_LINEA ";
-          SQL += "WHERE (CODIGO IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')))";
-          return SQL;  
-       }
-     
-       if (TN.equalsIgnoreCase("P_PRODPRECIO")) {
+		if (TN.equalsIgnoreCase("P_FACTORCONV")) {
+			//#EJC20181112
+			//SQL = "SELECT PRODUCTO,UNIDADSUPERIOR,FACTORCONVERSION,UNIDADMINIMA FROM P_FACTORCONV ";
+			SQL = " SELECT * FROM P_FACTORCONV WHERE " +
+					" ((PRODUCTO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
+					" OR PRODUCTO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "')))";
 
-    	   SQL = "SELECT CODIGO,NIVEL,PRECIO,UNIDADMEDIDA FROM P_PRODPRECIO ";
-    	   SQL += " WHERE ( (CODIGO IN ( SELECT CODIGO FROM P_PRODUCTO WHERE (LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE RUTA='" + ActRuta + "')) ) ) ";
-    	   SQL += " OR  (CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "')) ) ";
-    	   SQL += " AND (NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'))) ";
-    	   return SQL;  
-       }
-                              
-       if (TN.equalsIgnoreCase("P_DESCUENTO")) {
-          SQL = "SELECT  CLIENTE,CTIPO,PRODUCTO,PTIPO,TIPORUTA,RANGOINI,RANGOFIN,DESCTIPO,VALOR,GLOBDESC,PORCANT,dbo.AndrDateIni(FECHAINI),dbo.AndrDateFin(FECHAFIN),CODDESC,NOMBRE ";
-          SQL += "FROM P_DESCUENTO WHERE DATEDIFF(D, FECHAINI,GETDATE()) >=0 AND DATEDIFF(D,GETDATE(), FECHAFIN) >=0";
-          return SQL;  
-       }
+			return SQL;
+		}
 
-       if (TN.equalsIgnoreCase("P_EMPRESA")) {
-         SQL = "SELECT * FROM P_EMPRESA WHERE EMPRESA = '" + gEmpresa + "'";
-         return SQL;  
-       }
-       
-       if (TN.equalsIgnoreCase("P_RUTA")) {
-           SQL = "SELECT * FROM P_RUTA WHERE CODIGO = '" + ActRuta + "'";
-           return SQL;  
-         }
+		if (TN.equalsIgnoreCase("P_LINEA")) {
+			SQL = "SELECT CODIGO,MARCA,NOMBRE FROM P_LINEA ";
+			SQL += "WHERE (CODIGO IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')))";
+			return SQL;
+		}
 
-       if (TN.equalsIgnoreCase("P_BANCO")) {
-         SQL = "SELECT * FROM P_BANCO WHERE EMPRESA = '" + gEmpresa + "'";
-         return SQL;  
-       }
-     
-       if (TN.equalsIgnoreCase("P_STOCKINV")) {
-         SQL = "SELECT * FROM P_STOCKINV";
-         return SQL;  
-       }
+		if (TN.equalsIgnoreCase("P_PRODPRECIO")) {
+
+			SQL = "SELECT CODIGO,NIVEL,PRECIO,UNIDADMEDIDA FROM P_PRODPRECIO ";
+			SQL += " WHERE ( (CODIGO IN ( SELECT CODIGO FROM P_PRODUCTO WHERE (LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE RUTA='" + ActRuta + "')) ) ) ";
+			SQL += " OR  (CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "')) ) ";
+			SQL += " AND (NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'))) ";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_DESCUENTO")) {
+			SQL = "SELECT  CLIENTE,CTIPO,PRODUCTO,PTIPO,TIPORUTA,RANGOINI,RANGOFIN,DESCTIPO,VALOR,GLOBDESC,PORCANT,dbo.AndrDateIni(FECHAINI),dbo.AndrDateFin(FECHAFIN),CODDESC,NOMBRE ";
+			SQL += "FROM P_DESCUENTO WHERE DATEDIFF(D, FECHAINI,GETDATE()) >=0 AND DATEDIFF(D,GETDATE(), FECHAFIN) >=0";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_EMPRESA")) {
+			SQL = "SELECT * FROM P_EMPRESA WHERE EMPRESA = '" + gEmpresa + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_RUTA")) {
+			SQL = "SELECT * FROM P_RUTA WHERE CODIGO = '" + ActRuta + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_BANCO")) {
+			SQL = "SELECT * FROM P_BANCO WHERE EMPRESA = '" + gEmpresa + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_STOCKINV")) {
+			SQL = "SELECT * FROM P_STOCKINV";
+			return SQL;
+		}
 
 		if (TN.equalsIgnoreCase("P_CODATEN")) {
 			SQL = "SELECT * FROM P_CODATEN";
@@ -1029,90 +1032,90 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
-       if (TN.equalsIgnoreCase("P_NIVELPRECIO")) {
-         SQL = "SELECT * FROM P_NIVELPRECIO ";
-         return SQL;  
-       }
+		if (TN.equalsIgnoreCase("P_NIVELPRECIO")) {
+			SQL = "SELECT * FROM P_NIVELPRECIO ";
+			return SQL;
+		}
 
-       if (TN.equalsIgnoreCase("P_CLIGRUPO")) {
-           SQL = "SELECT CODIGO,CLIENTE FROM P_CLIGRUPO WHERE (CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'))";
-           return SQL;  
-       }
-       
-       if (TN.equalsIgnoreCase("P_STOCK_APR")) { 
-    	   SQL="SELECT CODIGO, CANT, PESO " +
-    	   	   "FROM P_STOCK_APR WHERE RUTA='" + ActRuta + "' ";
-    	   //SQL = "SELECT CODIGO,CANT,0 AS CANTM,PESO FROM P_STOCK WHERE RUTA='" + ActRuta + "'";
-    	   //idbg=SQL;
-      	   return SQL;		   
-       }
+		if (TN.equalsIgnoreCase("P_CLIGRUPO")) {
+			SQL = "SELECT CODIGO,CLIENTE FROM P_CLIGRUPO WHERE (CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'))";
+			return SQL;
+		}
 
-       //#HS_20181212 Agregue campos ID_TRANSACCION, REFERENCIA, ASIGNACION.
-       if (TN.equalsIgnoreCase("P_COBRO")) {
-    	   SQL = "SELECT  DOCUMENTO, EMPRESA, RUTA, CLIENTE, TIPODOC, VALORORIG, SALDO, CANCELADO, dbo.AndrDate(FECHAEMIT),dbo.AndrDate(FECHAV),'' AS CONTRASENA, ID_TRANSACCION, REFERENCIA, ASIGNACION ";
-    	   SQL += "FROM P_COBRO WHERE (RUTA='" + ActRuta + "') AND CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "')) ";
-    	   //idbg=SQL;
-    	   return SQL;
-       }
-       
-       if (TN.equalsIgnoreCase("P_COREL")) {
-    	   SQL = "SELECT RESOL,SERIE,CORELINI,CORELFIN,CORELULT,dbo.AndrDate(FECHARES),RUTA,dbo.AndrDate(FECHAVIG),RESGUARDO,VALOR1 FROM P_COREL WHERE RUTA='" + ActRuta + "'";
-    	   return SQL;		   
-       }       
-       
-       if (TN.equalsIgnoreCase("P_CORELNC")) {
-    	   SQL = "SELECT RESOL,SERIE,CORELINI,CORELFIN,CORELULT,dbo.AndrDate(FECHARES),RUTA,dbo.AndrDate(FECHAVIG),RESGUARDO,VALOR1 FROM P_CORELNC WHERE RUTA='" + ActRuta + "'";
-    	   return SQL;		   
-       }  
-       
-       if (TN.equalsIgnoreCase("P_CORRELREC")) {
-    	   SQL = "SELECT RUTA,SERIE,INICIAL,FINAL,ACTUAL,ENVIADO FROM P_CORRELREC WHERE RUTA='" + ActRuta + "'";
-    	   return SQL;		   
-       } 
-       
-       if (TN.equalsIgnoreCase("P_CORREL_OTROS")) {
-    	   SQL = "SELECT RUTA,SERIE,TIPO,INICIAL,FINAL,ACTUAL,ENVIADO FROM P_CORREL_OTROS WHERE RUTA='" + ActRuta + "'";
-    	   return SQL;		   
-       } 
+		if (TN.equalsIgnoreCase("P_STOCK_APR")) {
+			SQL = "SELECT CODIGO, CANT, PESO " +
+					"FROM P_STOCK_APR WHERE RUTA='" + ActRuta + "' ";
+			//SQL = "SELECT CODIGO,CANT,0 AS CANTM,PESO FROM P_STOCK WHERE RUTA='" + ActRuta + "'";
+			//idbg=SQL;
+			return SQL;
+		}
 
-       if (TN.equalsIgnoreCase("P_MEDIAPAGO")) {
-    	   SQL = "SELECT CODIGO,NOMBRE,ACTIVO,NIVEL,PORCOBRO FROM P_MEDIAPAGO WHERE ACTIVO='S'";
-    	   return SQL;		   
-       } 
-        
-       if (TN.equalsIgnoreCase("P_ARCHIVOCONF")) {
-    	   SQL = "SELECT RUTA,TIPO_HH,IDIOMA,TIPO_IMPRESORA,SERIAL_HH,MODIF_PESO,PUERTO_IMPRESION,LBS_O_KGS,NOTA_CREDITO FROM P_ARCHIVOCONF WHERE (RUTA='" + ActRuta + "')";
-    	   return SQL;		   
-       }        
-       
-       if (TN.equalsIgnoreCase("P_ENCABEZADO_REPORTESHH")) {
-    	   SQL = "SELECT CODIGO,TEXTO,SUCURSAL FROM P_ENCABEZADO_REPORTESHH";
-    	   return SQL;		   
-       }     
+		//#HS_20181212 Agregue campos ID_TRANSACCION, REFERENCIA, ASIGNACION.
+		if (TN.equalsIgnoreCase("P_COBRO")) {
+			SQL = "SELECT  DOCUMENTO, EMPRESA, RUTA, CLIENTE, TIPODOC, VALORORIG, SALDO, CANCELADO, dbo.AndrDate(FECHAEMIT),dbo.AndrDate(FECHAV),'' AS CONTRASENA, ID_TRANSACCION, REFERENCIA, ASIGNACION ";
+			SQL += "FROM P_COBRO WHERE (RUTA='" + ActRuta + "') AND CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "')) ";
+			//idbg=SQL;
+			return SQL;
+		}
 
-       if (TN.equalsIgnoreCase("P_BONIF")) {
-    	   SQL = "SELECT  CLIENTE, CTIPO, PRODUCTO, PTIPO, TIPORUTA, TIPOBON, RANGOINI, RANGOFIN, TIPOLISTA, TIPOCANT, VALOR," +
-    	   		 "LISTA, CANTEXACT, GLOBBON, PORCANT, dbo.AndrDate(FECHAINI), dbo.AndrDate(FECHAFIN), CODDESC, NOMBRE, EMP " +
-    	   		 "FROM P_BONIF WHERE ((dbo.AndrDate(FECHAINI)<="+ff+") AND (dbo.AndrDate(FECHAFIN)>="+fi+"))";
-    	   return SQL;		   
-       }          
-       
-       if (TN.equalsIgnoreCase("P_BONLIST")) {
-    	   SQL = "SELECT CODIGO,PRODUCTO,CANT,CANTMIN,NOMBRE FROM P_BONLIST";
-    	   return SQL;		   
-       }      
-         
-       if (TN.equalsIgnoreCase("P_PRODGRUP")) {
-           SQL = "SELECT CODIGO,PRODUCTO,NOMBRE FROM P_PRODGRUP";
-           return SQL;  
-       }
-        
-       if (TN.equalsIgnoreCase("P_IMPUESTO")) {
-           SQL = "SELECT CODIGO,VALOR FROM P_IMPUESTO";
-           return SQL;  
-       }      
+		if (TN.equalsIgnoreCase("P_COREL")) {
+			SQL = "SELECT RESOL,SERIE,CORELINI,CORELFIN,CORELULT,dbo.AndrDate(FECHARES),RUTA,dbo.AndrDate(FECHAVIG),RESGUARDO,VALOR1 FROM P_COREL WHERE RUTA='" + ActRuta + "'";
+			return SQL;
+		}
 
-       //#HS_20181206 Agregue Ruta.
+		if (TN.equalsIgnoreCase("P_CORELNC")) {
+			SQL = "SELECT RESOL,SERIE,CORELINI,CORELFIN,CORELULT,dbo.AndrDate(FECHARES),RUTA,dbo.AndrDate(FECHAVIG),RESGUARDO,VALOR1 FROM P_CORELNC WHERE RUTA='" + ActRuta + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CORRELREC")) {
+			SQL = "SELECT RUTA,SERIE,INICIAL,FINAL,ACTUAL,ENVIADO FROM P_CORRELREC WHERE RUTA='" + ActRuta + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CORREL_OTROS")) {
+			SQL = "SELECT RUTA,SERIE,TIPO,INICIAL,FINAL,ACTUAL,ENVIADO FROM P_CORREL_OTROS WHERE RUTA='" + ActRuta + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_MEDIAPAGO")) {
+			SQL = "SELECT CODIGO,NOMBRE,ACTIVO,NIVEL,PORCOBRO FROM P_MEDIAPAGO WHERE ACTIVO='S'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_ARCHIVOCONF")) {
+			SQL = "SELECT RUTA,TIPO_HH,IDIOMA,TIPO_IMPRESORA,SERIAL_HH,MODIF_PESO,PUERTO_IMPRESION,LBS_O_KGS,NOTA_CREDITO FROM P_ARCHIVOCONF WHERE (RUTA='" + ActRuta + "')";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_ENCABEZADO_REPORTESHH")) {
+			SQL = "SELECT CODIGO,TEXTO,SUCURSAL FROM P_ENCABEZADO_REPORTESHH";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_BONIF")) {
+			SQL = "SELECT  CLIENTE, CTIPO, PRODUCTO, PTIPO, TIPORUTA, TIPOBON, RANGOINI, RANGOFIN, TIPOLISTA, TIPOCANT, VALOR," +
+					"LISTA, CANTEXACT, GLOBBON, PORCANT, dbo.AndrDate(FECHAINI), dbo.AndrDate(FECHAFIN), CODDESC, NOMBRE, EMP " +
+					"FROM P_BONIF WHERE ((dbo.AndrDate(FECHAINI)<=" + ff + ") AND (dbo.AndrDate(FECHAFIN)>=" + fi + "))";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_BONLIST")) {
+			SQL = "SELECT CODIGO,PRODUCTO,CANT,CANTMIN,NOMBRE FROM P_BONLIST";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_PRODGRUP")) {
+			SQL = "SELECT CODIGO,PRODUCTO,NOMBRE FROM P_PRODGRUP";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_IMPUESTO")) {
+			SQL = "SELECT CODIGO,VALOR FROM P_IMPUESTO";
+			return SQL;
+		}
+
+		//#HS_20181206 Agregue Ruta.
 		if (TN.equalsIgnoreCase("P_VENDEDOR")) {
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
@@ -1127,104 +1130,109 @@ public class ComWS extends PBase {
 		}
 
 		//#HS_20181207 Agregue campos de P_VEHICULO.
-       if(TN.equalsIgnoreCase("P_VEHICULO")){
-		   SQL="SELECT CODIGO,MARCA,PLACA,PESO,KM_MILLAS,TIPO FROM P_VEHICULO";
-		   return SQL;
-	   }
+		if (TN.equalsIgnoreCase("P_VEHICULO")) {
+			SQL = "SELECT CODIGO,MARCA,PLACA,PESO,KM_MILLAS,TIPO FROM P_VEHICULO";
+			return SQL;
+		}
 
-       if (TN.equalsIgnoreCase("P_MUNI")) {
-           SQL = "SELECT * FROM P_MUNI";
-           return SQL;  
-       }      
-       
-       if (TN.equalsIgnoreCase("P_REF1")) {
-           SQL = "SELECT * FROM P_REF1";
-           return SQL;  
-       }      
-       
-       if (TN.equalsIgnoreCase("P_REF2")) {
-           SQL = "SELECT * FROM P_REF2";
-           return SQL;  
-       }   
-       
-       if (TN.equalsIgnoreCase("P_REF3")) {
-           SQL = "SELECT * FROM P_REF3";
-           return SQL;  
-       }   
-       
-       
-       // Objetivos
-     
-       if (TN.equalsIgnoreCase("O_PROD")) {
-         SQL = "SELECT RUTA, CODIGO, METAV, METAU, ACUMV, ACUMU FROM O_PROD WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
-         return SQL;  
-       }
-               
-       if (TN.equalsIgnoreCase("O_LINEA")) {
-          SQL = "SELECT RUTA, CODIGO, METAV, METAU, ACUMV, ACUMU FROM O_LINEA WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
-          return SQL;  
-       }
+		if (TN.equalsIgnoreCase("P_MUNI")) {
+			SQL = "SELECT * FROM P_MUNI";
+			return SQL;
+		}
 
-       if (TN.equalsIgnoreCase("O_RUTA")) {
-          SQL = "SELECT * FROM O_RUTA WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno+ ") AND (OBJMES=" +ObjMes + ")";
-          return SQL;  
-       }
+		if (TN.equalsIgnoreCase("P_REF1")) {
+			SQL = "SELECT * FROM P_REF1";
+			return SQL;
+		}
 
-       if (TN.equalsIgnoreCase("O_COBRO")) {
-          SQL = "SELECT * FROM O_COBRO WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" +ObjAno + ") AND (OBJMES=" + ObjMes + ")";
-          return SQL;  
-       }
-       
-       
-       // Mercadeo
-       
-       if (TN.equalsIgnoreCase("P_MEREQTIPO")) {
-    	   SQL = "SELECT * FROM P_MEREQTIPO";
-    	   return SQL;  
-       }
+		if (TN.equalsIgnoreCase("P_REF2")) {
+			SQL = "SELECT * FROM P_REF2";
+			return SQL;
+		}
 
-       if (TN.equalsIgnoreCase("P_MEREQUIPO")) {
-    	   SQL = "SELECT * FROM P_MEREQUIPO ";
-    	   SQL = SQL + "WHERE (CLIENTE IN  (SELECT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "' ) )";
-    	   return SQL;  
-       }
-       
-       if (TN.equalsIgnoreCase("P_MERESTADO")) {
-    	   SQL = "SELECT * FROM P_MERESTADO" ;  
-    	   return SQL; 
-       }
+		if (TN.equalsIgnoreCase("P_REF3")) {
+			SQL = "SELECT * FROM P_REF3";
+			return SQL;
+		}
 
-       if (TN.equalsIgnoreCase("P_MERPREGUNTA")) {
-    	   SQL = "SELECT * FROM P_MERPREGUNTA";
-    	   return SQL;    
-       }
-       
-       if (TN.equalsIgnoreCase("P_MERRESP")) {
-    	   SQL = "SELECT * FROM P_MERRESP";
-    	   return SQL;      	   
-       }
 
-       if (TN.equalsIgnoreCase("P_MERMARCACOMP")) {
-    	   SQL = "SELECT * FROM P_MERMARCACOMP";
-    	   return SQL;    
-       }
+		// Objetivos
 
-       if (TN.equalsIgnoreCase("P_MERPRODCOMP")) {
-    	   SQL = "SELECT * FROM P_MERPRODCOMP";
-    	   return SQL;   
-       }
-       
-       if (TN.equalsIgnoreCase("LIC_CLIENTE")) {
-    	   SQL="SELECT * FROM LIC_CLIENTE WHERE ID='"+mac+"'";
-    	   return SQL;   
-       } 
+		if (TN.equalsIgnoreCase("O_PROD")) {
+			SQL = "SELECT RUTA, CODIGO, METAV, METAU, ACUMV, ACUMU FROM O_PROD WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
+			return SQL;
+		}
 
-       if (TN.equalsIgnoreCase("P_PARAMEXT")) {
-    	   SQL="SELECT ID,Nombre,Valor FROM P_PARAMEXT WHERE ((idRuta='"+ActRuta+"') OR (ISNULL(idRuta,'')=''))";
-    	   return SQL;   
-       }       
+		if (TN.equalsIgnoreCase("O_LINEA")) {
+			SQL = "SELECT RUTA, CODIGO, METAV, METAU, ACUMV, ACUMU FROM O_LINEA WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
+			return SQL;
+		}
 
-       return SQL;
+		if (TN.equalsIgnoreCase("O_RUTA")) {
+			SQL = "SELECT * FROM O_RUTA WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("O_COBRO")) {
+			SQL = "SELECT * FROM O_COBRO WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
+			return SQL;
+		}
+
+
+		// Mercadeo
+
+		if (TN.equalsIgnoreCase("P_MEREQTIPO")) {
+			SQL = "SELECT * FROM P_MEREQTIPO";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_MEREQUIPO")) {
+			SQL = "SELECT * FROM P_MEREQUIPO ";
+			SQL = SQL + "WHERE (CLIENTE IN  (SELECT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "' ) )";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_MERESTADO")) {
+			SQL = "SELECT * FROM P_MERESTADO";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_MERPREGUNTA")) {
+			SQL = "SELECT * FROM P_MERPREGUNTA";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_MERRESP")) {
+			SQL = "SELECT * FROM P_MERRESP";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_MERMARCACOMP")) {
+			SQL = "SELECT * FROM P_MERMARCACOMP";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_MERPRODCOMP")) {
+			SQL = "SELECT * FROM P_MERPRODCOMP";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_PORCMERMA")) {
+			SQL = "SELECT EMPRESA,SUCURSAL,RUTA,PRODUCTO,PORCENTAJEMERMA,PORCMINIMO,PORCMAXIMO FROM P_PORCMERMA WHERE (RUTA='" + ActRuta + "')";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("LIC_CLIENTE")) {
+			SQL = "SELECT * FROM LIC_CLIENTE WHERE ID='" + mac + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_PARAMEXT")) {
+			SQL = "SELECT ID,Nombre,Valor FROM P_PARAMEXT WHERE ((idRuta='" + ActRuta + "') OR (ISNULL(idRuta,'')=''))";
+			return SQL;
+		}
+
+		return SQL;
 	}   
 	 
 	private void comparaCorrel() {
@@ -1491,7 +1499,8 @@ public class ComWS extends PBase {
         }
  
     }	
-	
+
+
 	//#HS_20181123_1623 Agregue funcion FinDia para el commit y update de tablas.
 
     private boolean FinDia() {

@@ -30,7 +30,7 @@ public class clsClasses {
 	
 	public class clsVenta {
 		public String Cod,Nombre,um,val,valp,sdesc;
-		public double Cant,Prec,Desc,Total,imp,percep;
+		public double Cant,Peso,Prec,Desc,Total,imp,percep;
 		
 	}
 	
@@ -87,6 +87,12 @@ public class clsClasses {
 	//#HS_20181121_1546 Se agregó clsFinDia y los campos de la tabla FinDia.
 	public class clsFinDiaItems {
 		public int id, corel, val1, val2, val3, val4, val5, val6, val7, val8;
+	}
+
+	public class clsRepes {
+		public int id,bol;
+		public double peso,can;
+		public String sid,speso,sbol,scan,stot;
 	}
 	
 }

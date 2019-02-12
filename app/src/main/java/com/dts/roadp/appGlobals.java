@@ -12,7 +12,7 @@ import android.app.Application;
 public class appGlobals extends Application {
 
 	//#HS_20181122_1507 Se agregaron la variables impresora, tipoImpresora, supervisor, ayudante, ayudanteID, vehiculo, vehiculoID.
-	public String ruta,sucur,rutatipo,rutatipog,vend,vendnom,gstr,gstr2,prod,um,umstock,cliente,ubas,emp,imgpath,umpeso,impresora, tipoImpresora, codSupervisor, ayudante, ayudanteID, vehiculo, vehiculoID;
+	public String ruta,sucur,rutatipo,rutatipog,vend,vendnom,gstr,gstr2,prod,um,umpres,umstock,cliente,ubas,emp,imgpath,umpeso,impresora, tipoImpresora, codSupervisor, ayudante, ayudanteID, vehiculo, vehiculoID;
 	public String devtipo,devrazon,wsURL,bonprodid,pprodname,contrib,ateninistr,tcorel;
 	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,atentini,vnivel,vnivprec,media;
 	public int autocom,nuevaFecha,pagomodo;

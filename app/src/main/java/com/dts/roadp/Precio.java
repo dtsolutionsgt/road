@@ -18,9 +18,10 @@ public class Precio {
 	private DecimalFormat ffrmprec;
 	private MiscUtils mu;
 	
-	private String prodid,um;
+	private String prodid,um,umpeso;
 	private double cant,desc,prec;
 	private int nivel,ndec;
+	private boolean porpeso;
 	
 	public Precio(Context context,MiscUtils mutil,int numdec) {
 		
@@ -41,9 +42,10 @@ public class Precio {
 		
 	}
 	 
-	public double precio(String prod,double pcant,int nivelprec,String unimedida) {
+	public double precio(String prod,double pcant,int nivelprec,String unimedida,String unimedidapeso,boolean prodporpeso) {
 
 		prodid=prod;cant=pcant;nivel=nivelprec;um=unimedida;
+		umpeso=unimedidapeso;porpeso=prodporpeso;
 		costo=0;descmon=0;imp=0;tot=0;
 
 		clsDescuento clsDesc=new clsDescuento(cont,prodid,cant);
@@ -63,8 +65,12 @@ public class Precio {
 		String sprec="";
 	
 		try {
-			sql="SELECT PRECIO FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+nivel+") AND (UNIDADMEDIDA='"+um+"') ";
-				
+			if (porpeso) {
+				sql="SELECT PRECIO FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+nivel+") AND (UNIDADMEDIDA='"+umpeso+"') ";
+			} else {
+				sql="SELECT PRECIO FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+nivel+") AND (UNIDADMEDIDA='"+um+"') ";
+			}
+
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 							  

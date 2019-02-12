@@ -38,7 +38,7 @@ public class Venta extends PBase {
 	private TextView lblProd,lblPres,lblCant,lblPrec,lblTot,lblTit;
 	private ImageView imgroad,imgscan;
 
-	private ArrayList<clsVenta> items;
+	private ArrayList<clsVenta> items= new ArrayList<clsVenta>();
 	private ListAdaptVenta adapter;
 	private clsVenta selitem;
 	private Precio prc;
@@ -51,7 +51,7 @@ public class Venta extends PBase {
 	private String prodid,um;
 
 	private double cant,desc,mdesc,prec,precsin,imp,impval;
-	private double descmon,tot,totsin,percep,ttimp,ttperc,ttsin;
+	private double descmon,tot,totsin,percep,ttimp,ttperc,ttsin,prodtot;
 	private double px,py,cpx,cpy,cdist;
 
 	private String emp,cliid,rutatipo;
@@ -59,6 +59,7 @@ public class Venta extends PBase {
 	private boolean sinimp,rutapos;
 
 	private DecimalFormat ffrmprec;
+	private AppMethods app;
 
 	// Location
 	private LocationManager locationManager;
@@ -92,6 +93,7 @@ public class Venta extends PBase {
 		gl.atentini=du.getActDateTime();
 		gl.ateninistr=du.geActTimeStr();
 
+		app = new AppMethods(this, gl, Con, db);
 
 		if (rutatipo.equalsIgnoreCase("V")) {
 			lblTit.setText("Venta");
@@ -106,8 +108,6 @@ public class Venta extends PBase {
 		ffrmprec = new DecimalFormat("#0.0000");
 
 		setHandlers();
-
-		items = new ArrayList<clsVenta>();
 
 		initValues();
 
@@ -218,9 +218,6 @@ public class Venta extends PBase {
 		startActivity(intent);
 	}
 
-
-	// Main
-
 	private void setHandlers(){
 
 		listView.setOnItemClickListener(new OnItemClickListener() {
@@ -253,16 +250,23 @@ public class Venta extends PBase {
 					prodid=vItem.Cod;
 					adapter.setSelectedIndex(position);
 
-					msgAskDel("Borrar producto");
-		        } catch (Exception e) {
+					if (prodPorPeso(prodid)) {
+                        gl.gstr=prodid;
+                        gl.gstr2=vItem.Nombre;
+						showItemMenu();
+					} else {
+						msgAskDel("Borrar producto");
+					}
+	    		} catch (Exception e) {
 			   	   mu.msgbox( e.getMessage());
 		        }
 		    	return true;
 		      }
 		});
-
-
 	}
+
+
+	// Main
 
 	public void listItems() {
 		Cursor DT;
@@ -272,7 +276,7 @@ public class Venta extends PBase {
 		items.clear();tot=0;ttimp=0;ttperc=0;
 
 		try {
-			sql="SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, T_VENTA.TOTAL, T_VENTA.CANT, T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM " +
+			sql="SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, T_VENTA.TOTAL, T_VENTA.CANT, T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, T_VENTA.PESO " +
 				 "FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO "+
 				 "ORDER BY P_PRODUCTO.DESCCORTA ";
 
@@ -296,8 +300,14 @@ public class Venta extends PBase {
 					item.imp=DT.getDouble(6);
 					item.percep=DT.getDouble(7);
 					item.um=DT.getString(8);
+					item.Peso=DT.getDouble(9);
 
 					item.val=mu.frmdecimal(item.Cant,gl.peDecImp)+" "+ltrim(item.um,6);
+					if (gl.usarpeso) {
+						item.valp=mu.frmdecimal(item.Peso,gl.peDecImp)+" "+ltrim(gl.umpeso,6);
+					} else {
+						item.valp=".";
+					}
 
 					if (sinimp) {
 						ttsin=tt-item.imp-item.percep;
@@ -377,7 +387,7 @@ public class Venta extends PBase {
 	    }
 
 		cant=cnt;
-		um=gl.um;
+		um=gl.umpres;
 
 		lblCant.setText(mu.frmdecimal(cant,gl.peDecImp)+" "+ltrim(um,6));
 		lblPres.setText("");
@@ -448,13 +458,13 @@ public class Venta extends PBase {
 
 		//prodPrecio();
 
-		prec=prc.precio(prodid,cant,nivel,um);
+		prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,prodPorPeso(prodid));
 
 		precsin=prc.precsin;
 		imp=prc.imp;
 		impval=prc.impval;
 		descmon=prc.descmon;
-		tot=prc.tot;
+		tot=prc.tot;prodtot=tot;
 		totsin=prc.totsin;
 		percep=0;
 
@@ -473,7 +483,7 @@ public class Venta extends PBase {
 	}
 
 	private void prodPrecio() {
-		prec=prc.precio(prodid,cant,nivel,um);
+		prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,prodPorPeso(prodid));
 		prec=mu.round(prec,gl.peDec);
 	}
 
@@ -514,7 +524,7 @@ public class Venta extends PBase {
 
 			ins.add("PRODUCTO",prodid);
 			ins.add("EMPRESA",emp);
-			ins.add("UM",gl.um);
+			ins.add("UM",gl.umpres);
 			ins.add("CANT",cant);
 			if (rutatipo.equalsIgnoreCase("V")) ins.add("UMSTOCK",gl.umstock);else ins.add("UMSTOCK",gl.um);
 			if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
@@ -523,7 +533,7 @@ public class Venta extends PBase {
 			ins.add("IMP",impval);
 			ins.add("DES",desc);
 			ins.add("DESMON",descmon);
-			ins.add("TOTAL",tot);
+			ins.add("TOTAL",prodtot);
 			ins.add("PRECIODOC",precdoc);
 			ins.add("PESO",peso);
 			ins.add("VAL1",0);
@@ -580,112 +590,6 @@ public class Venta extends PBase {
 	    	listItems();
 		} catch (SQLException e) {
 			mu.msgbox("Error : " + e.getMessage());
-		}
-	}
-
-
-	// Aux
-
-	private void setControls(){
-
-		listView = (ListView) findViewById(R.id.listView1);
-
-		lblProd= (TextView) findViewById(R.id.lblProd);
-		lblPres= (TextView) findViewById(R.id.lblPres);
-		lblCant= (TextView) findViewById(R.id.lblCant);
-		lblPrec= (TextView) findViewById(R.id.lblPNum);
-		lblTot= (TextView) findViewById(R.id.lblTot);
-		lblTit= (TextView) findViewById(R.id.txtRoadTit);
-
-		imgroad= (ImageView) findViewById(R.id.imgRoadTit);
-		imgscan= (ImageView) findViewById(R.id.imageView13);imgscan.setVisibility(View.INVISIBLE);
-
-	}
-
-	private void initValues(){
-		Cursor DT;
-		String contrib;
-
-		try {
-			sql="SELECT INITPATH FROM P_EMPRESA WHERE EMPRESA='"+emp+"'";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-
-			String sim=DT.getString(0);
-			sinimp=sim.equalsIgnoreCase("S");
-
-		} catch (Exception e) {
-			sinimp=false;
-	    }
-
-		contrib=gl.contrib;
-		if (contrib.equalsIgnoreCase("C")) sinimp=true;
-		if (contrib.equalsIgnoreCase("F")) sinimp=false;
-
-		gl.sinimp=sinimp;
-
-		//mu.msgbox(contrib+" // SINIMP "+sinimp);
-
-		lblProd.setText("");
-		lblPres.setText("");
-
-		try {
-			sql="DELETE FROM T_VENTA";
-			db.execSQL(sql);
-		} catch (SQLException e) {
-			mu.msgbox("Error : " + e.getMessage());
-		}
-
-		try {
-			sql="DELETE FROM T_PAGO";
-			db.execSQL(sql);
-		} catch (SQLException e) {
-			mu.msgbox("Error : " + e.getMessage());
-		}
-
-		try {
-			sql="DELETE FROM T_BONIFFALT";
-			db.execSQL(sql);
-		} catch (SQLException e) {
-			mu.msgbox("Error : " + e.getMessage());
-		}
-
-		try {
-			sql="DELETE FROM T_BONITEM";
-			db.execSQL(sql);
-		} catch (SQLException e) {
-			mu.msgbox("Error : " + e.getMessage());
-		}
-
-		gl.ref1="";
-		gl.ref2="";
-		gl.ref3="";
-
-		clsDescFiltro clsDFilt=new clsDescFiltro(this,gl.ruta,gl.cliente);
-
-		clsBonFiltro  clsBFilt=new clsBonFiltro(this,gl.ruta,gl.cliente);
-
-		//mu.msgbox("Filtro desc "+clsDFilt.estr);
-
-		dweek=mu.dayofweek();
-
-		lblPrec.setText(mu.frmcur(0));
-		lblTot.setText(mu.frmcur(0));
-
-		imgscan.setVisibility(View.INVISIBLE);
-
-	}
-
-	private boolean hasProducts(){
-		Cursor DT;
-
-		try {
-			sql="SELECT PRODUCTO FROM T_VENTA";
-			DT=Con.OpenDT(sql);
-
-			return DT.getCount()>0;
-		} catch (Exception e) {
-			return false;
 		}
 	}
 
@@ -967,8 +871,142 @@ public class Venta extends PBase {
 	}
 
 
-	// Aux
-	
+    // Aux
+
+	private void showItemMenu() {
+		final AlertDialog Dialog;
+		final String[] selitems = {"Repesaje","Borrar"};
+
+		AlertDialog.Builder menudlg = new AlertDialog.Builder(this);
+		menudlg.setTitle("Producto venta");
+
+		menudlg.setItems(selitems , new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+				switch (item) {
+                    case 0:
+                        startActivity(new Intent(Venta.this,RepesajeLista.class));break;
+					case 1:
+						msgAskDel("Borrar producto");break;
+				}
+
+				dialog.cancel();
+			}
+		});
+
+		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+
+		Dialog = menudlg.create();
+		Dialog.show();
+	}
+
+	private void setControls(){
+
+		listView = (ListView) findViewById(R.id.listView1);
+
+		lblProd= (TextView) findViewById(R.id.lblProd);
+		lblPres= (TextView) findViewById(R.id.lblPres);
+		lblCant= (TextView) findViewById(R.id.lblCant);
+		lblPrec= (TextView) findViewById(R.id.lblPNum);
+		lblTot= (TextView) findViewById(R.id.lblTot);
+		lblTit= (TextView) findViewById(R.id.txtRoadTit);
+
+		imgroad= (ImageView) findViewById(R.id.imgRoadTit);
+		imgscan= (ImageView) findViewById(R.id.imageView13);imgscan.setVisibility(View.INVISIBLE);
+
+	}
+
+	private void initValues(){
+		Cursor DT;
+		String contrib;
+
+		try {
+			sql="SELECT INITPATH FROM P_EMPRESA WHERE EMPRESA='"+emp+"'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			String sim=DT.getString(0);
+			sinimp=sim.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			sinimp=false;
+		}
+
+		contrib=gl.contrib;
+		if (contrib.equalsIgnoreCase("C")) sinimp=true;
+		if (contrib.equalsIgnoreCase("F")) sinimp=false;
+
+		gl.sinimp=sinimp;
+
+		//mu.msgbox(contrib+" // SINIMP "+sinimp);
+
+		lblProd.setText("");
+		lblPres.setText("");
+
+		try {
+			sql="DELETE FROM T_VENTA";
+			db.execSQL(sql);
+		} catch (SQLException e) {
+			mu.msgbox("Error : " + e.getMessage());
+		}
+
+		try {
+			sql="DELETE FROM T_PAGO";
+			db.execSQL(sql);
+		} catch (SQLException e) {
+			mu.msgbox("Error : " + e.getMessage());
+		}
+
+		try {
+			sql="DELETE FROM T_BONIFFALT";
+			db.execSQL(sql);
+		} catch (SQLException e) {
+			mu.msgbox("Error : " + e.getMessage());
+		}
+
+		try {
+			sql="DELETE FROM T_BONITEM";
+			db.execSQL(sql);
+		} catch (SQLException e) {
+			mu.msgbox("Error : " + e.getMessage());
+		}
+
+		gl.ref1="";
+		gl.ref2="";
+		gl.ref3="";
+
+		clsDescFiltro clsDFilt=new clsDescFiltro(this,gl.ruta,gl.cliente);
+
+		clsBonFiltro  clsBFilt=new clsBonFiltro(this,gl.ruta,gl.cliente);
+
+		//mu.msgbox("Filtro desc "+clsDFilt.estr);
+
+		dweek=mu.dayofweek();
+
+		lblPrec.setText(mu.frmcur(0));
+		lblTot.setText(mu.frmcur(0));
+
+		imgscan.setVisibility(View.INVISIBLE);
+
+	}
+
+	private boolean hasProducts(){
+		Cursor DT;
+
+		try {
+			sql="SELECT PRODUCTO FROM T_VENTA";
+			DT=Con.OpenDT(sql);
+
+			return DT.getCount()>0;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 	private void msgAskExit(String msg) {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
@@ -1080,8 +1118,24 @@ public class Venta extends PBase {
 		
 		return ss;
 	}
-	
-	
+
+	private boolean prodPorPeso(String prodid) {
+		try {
+			return app.ventaPeso(prodid);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	private boolean prodBarra(String prodid) {
+		try {
+			return app.prodBarra(prodid);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+
 	// Activity Events
 	
 	@Override

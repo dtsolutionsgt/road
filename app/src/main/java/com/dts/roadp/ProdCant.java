@@ -28,7 +28,7 @@ public class ProdCant extends PBase {
 	
 	private Precio prc;
 	
-	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres;
+	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant;
 	private double cant,prec,icant,idisp,ipeso,umfactor;
 	private boolean pexist,esdecimal,porpeso,esbarra;
@@ -147,13 +147,14 @@ public class ProdCant extends PBase {
  	
 	private void showData() {
 		Cursor dt;
+		double ippeso=0;
 		
 		try {
 			
 			sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();			
-			um=dt.getString(0);ubas=um;
+			um=dt.getString(0);ubas=um;umfact=um;
 			lblBU.setText(ubas);gl.ubas=ubas;upres=ubas;
 		} catch (Exception e) {
 			mu.msgbox("1-"+ e.getMessage());
@@ -210,7 +211,7 @@ public class ProdCant extends PBase {
 			mu.msgbox("3-"+ e.getMessage());
 		}
 
-		prec=prc.precio(prodid,0,nivel,um);
+		prec=prc.precio(prodid,0,nivel,um,gl.umpeso,porpeso);
 		
 		lblPrec.setText("Precio: "+mu.frmcur(0));
 
@@ -222,13 +223,14 @@ public class ProdCant extends PBase {
 		if (gl.sinimp) prec=prc.precsin;
 		
 		try {
-			sql="SELECT CANT FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
+			sql="SELECT CANT,PESO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
            	dt=Con.OpenDT(sql);
            	
        		dt.moveToFirst();
   			icant=dt.getDouble(0);
+  			ippeso=dt.getDouble(1);
 		} catch (Exception e) {
-			icant=0;
+			icant=0;ippeso=0;
 	    }	
 
 		if (icant>0) {
@@ -265,8 +267,9 @@ public class ProdCant extends PBase {
 		try {
 			txtCant.setSelection(txtCant.getText().length());
 		} catch (Exception e) {
-		}	
-		
+		}
+
+        txtPeso.setText(mu.frmdecimal(ippeso, gl.peDecImp));
 	}
 	
 	private double getDisp() {
@@ -373,7 +376,8 @@ public class ProdCant extends PBase {
 
 		gl.dval=cant;
 		gl.dpeso=ppeso;
-		gl.um=um;
+		gl.um=upres;
+		gl.umpres=upres;
 		gl.umstock=umstock;
 		gl.umfactor=umfactor;
 
@@ -407,7 +411,7 @@ public class ProdCant extends PBase {
 		lblBU=(TextView) findViewById(R.id.lblBU);
 		lblTot=(TextView) findViewById(R.id.textView1);lblTot.setText("");
 		lblDispLbl=(TextView) findViewById(R.id.textView8);
-		lblPesoUni=(TextView) findViewById(R.id.textView25);
+		lblPesoUni=(TextView) findViewById(R.id.textView25);lblPesoUni.setVisibility(View.INVISIBLE);
         lblPesoLbl=(TextView) findViewById(R.id.textView24); lblPesoLbl.setVisibility(View.INVISIBLE);
 		lblFactor=(TextView) findViewById(R.id.textView22);lblFactor.setVisibility(View.INVISIBLE);
 		lblCantPeso=(TextView) findViewById(R.id.textView21);lblCantPeso.setText("");lblCantPeso.setVisibility(View.INVISIBLE);

@@ -3,11 +3,9 @@ package com.dts.roadp;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
-
-import org.apache.commons.io.IOUtils;
+import android.support.v4.content.IntentCompat;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.ksoap2.SoapEnvelope;
@@ -17,9 +15,11 @@ import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -33,6 +33,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.support.v4.content.IntentCompat;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -2893,12 +2894,28 @@ public class ComWS extends PBase {
 
 	}
 
+	private void restarApp(){
+		PackageManager packageManager = this.getPackageManager();
+		Intent intent = packageManager.getLaunchIntentForPackage(this.getPackageName());
+		ComponentName componentName = intent.getComponent();
+		Intent mainIntent =Intent.makeRestartActivityTask(componentName);
+		//Intent mainIntent = IntentCompat..makeRestartActivityTask(componentName);
+		this.startActivity(mainIntent);
+		System.exit(0);
+	}
+
 
 	// Activity Events
 	
 	@Override
 	public void onBackPressed() {
 	   if (isbusy==0) {
+		   if (gl.modoadmin) {
+		   	toast("restart");
+		   	restarApp();
+
+		   };
+
 		   super.onBackPressed();
 	   }
 	}	

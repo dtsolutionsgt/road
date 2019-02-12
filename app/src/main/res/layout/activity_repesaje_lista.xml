@@ -159,6 +159,8 @@
                 android:layout_alignParentEnd="true"
                 android:layout_below="@+id/textView31"
                 android:layout_marginRight="5dp"
+                android:clickable="true"
+                android:onClick="exit"
                 android:src="@drawable/next48" />
 
             <TextView

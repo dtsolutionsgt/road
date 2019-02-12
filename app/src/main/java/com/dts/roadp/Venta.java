@@ -458,7 +458,11 @@ public class Venta extends PBase {
 
 		//prodPrecio();
 
-		prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,prodPorPeso(prodid));
+		if (prodPorPeso(prodid)) {
+			prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,gl.dpeso);
+		} else {
+			prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,0);
+		}
 
 		precsin=prc.precsin;
 		imp=prc.imp;
@@ -483,7 +487,7 @@ public class Venta extends PBase {
 	}
 
 	private void prodPrecio() {
-		prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,prodPorPeso(prodid));
+		prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,gl.dpeso);
 		prec=mu.round(prec,gl.peDec);
 	}
 
@@ -884,6 +888,7 @@ public class Venta extends PBase {
 			public void onClick(DialogInterface dialog, int item) {
 				switch (item) {
                     case 0:
+                    	browse=4;
                         startActivity(new Intent(Venta.this,RepesajeLista.class));break;
 					case 1:
 						msgAskDel("Borrar producto");break;
@@ -1156,9 +1161,13 @@ public class Venta extends PBase {
 	    
 	    if (browse==3) {
 	    	browse=0;
-	    	if (gl.promapl) updDesc();
-	    	return;
+	    	if (gl.promapl) updDesc();return;
 	    }
+
+		if (browse==4) {
+			browse=0;
+			listItems();return;
+		}
 	
 	}
 	

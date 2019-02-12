@@ -56,7 +56,12 @@ public class RepesajeLista extends PBase {
     // Events
 
     public void repesaje(View view) {
+        browse=1;
         startActivity(new Intent(this,Repesaje.class));
+    }
+
+    public void exit(View view) {
+        finish();
     }
 
     private void setHandlers() {
@@ -125,5 +130,16 @@ public class RepesajeLista extends PBase {
     // Aux
 
 
+// Activity Events
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (browse==1) {
+            browse=0;
+            listItems();return;
+        }
+
+    }
 }

@@ -1,0 +1,39 @@
+package com.dts.roadp;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+
+public class PicView extends PBase {
+
+	private ImageView imgImg;
+	
+	private String imgpath;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_pic_view);
+		
+		super.InitBase();
+		
+		imgImg=(ImageView) findViewById(R.id.imgImg);
+		
+		this.setTitle(((appGlobals) vApp).gstr);
+		imgpath=((appGlobals) vApp).imgpath;
+		
+		try {
+			Bitmap bmImg = BitmapFactory.decodeFile(imgpath);
+			imgImg.setImageBitmap(bmImg);
+	    } catch (Exception e) {
+	    	mu.msgbox(e.getMessage());
+	    	imgImg.setVisibility(View.INVISIBLE);
+		}
+	
+		closekeyb();
+		
+	}
+
+}

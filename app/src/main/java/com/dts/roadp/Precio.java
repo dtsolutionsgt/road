@@ -6,7 +6,7 @@ import android.database.Cursor;
 
 public class Precio {
 
-	public double costo,descmon,imp,impval,tot,precsin,totsin;
+	public double costo,descmon,imp,impval,tot,precsin,totsin,precdoc;
 	
 	private int active;
 	private android.database.sqlite.SQLiteDatabase db;
@@ -41,17 +41,17 @@ public class Precio {
 		ffrmprec = new DecimalFormat("#0.00");
 		
 	}
-	 
-	public double precio(String prod,double pcant,int nivelprec,String unimedida,String unimedidapeso,boolean prodporpeso) {
+
+	public double precio(String prod,double pcant,int nivelprec,String unimedida,String unimedidapeso,double ppeso) {
 
 		prodid=prod;cant=pcant;nivel=nivelprec;um=unimedida;
-		umpeso=unimedidapeso;porpeso=prodporpeso;
+		umpeso=unimedidapeso;
 		costo=0;descmon=0;imp=0;tot=0;
 
 		clsDescuento clsDesc=new clsDescuento(cont,prodid,cant);
 		desc=clsDesc.getDesc();
 
-		if (cant>0) prodPrecio();else prodPrecioBase();
+		if (cant>0) prodPrecio(ppeso);else prodPrecioBase();
 
 		return prec;
 	}
@@ -59,13 +59,13 @@ public class Precio {
 	
 	// Private
 	
-	private void prodPrecio() {
+	private void prodPrecio(double ppeso) {
 		Cursor DT;
 		double pr,stot,pprec,tsimp;
 		String sprec="";
 	
 		try {
-			if (porpeso) {
+			if (ppeso>0) {
 				sql="SELECT PRECIO FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+nivel+") AND (UNIDADMEDIDA='"+umpeso+"') ";
 			} else {
 				sql="SELECT PRECIO FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+nivel+") AND (UNIDADMEDIDA='"+um+"') ";
@@ -86,25 +86,24 @@ public class Precio {
 		
 		imp=getImp();
 		pr=pr*(1+imp/100);
-		
+
+		// total
 		stot=pr*cant;stot=mu.round(stot,ndec);
-		
-		if (imp>0) {
-			impval=stot-tsimp;
-		} else {
-			impval=0;
-		}
-		
-		descmon=(double) (stot*desc/100);
-		descmon=mu.round(descmon,ndec);
-		
+		if (imp>0) impval=stot-tsimp; else impval=0;
+		descmon=(double) (stot*desc/100);descmon=mu.round(descmon,ndec);
 		tot=stot-descmon;
-		
-		if (cant>0) {
-			prec=(double) (tot/cant);
-		} else {
-			prec=pr;
+
+		if (cant>0) prec=(double) (tot/cant); else prec=pr;
+
+		try {
+			sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
+			pprec=Double.parseDouble(sprec);
+			precdoc=mu.round(pprec,ndec);
+		} catch (Exception e) {
+			precdoc=prec;
 		}
+
+		if (ppeso>0) prec=prec*ppeso/cant;
 			
 		try {
 			sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
@@ -114,7 +113,13 @@ public class Precio {
 			pprec=prec;
 		}
 		prec=pprec;
-		
+
+		// total
+		stot=prec*cant;stot=mu.round(stot,ndec);
+		if (imp>0) impval=stot-tsimp; else impval=0;
+		descmon=(double) (stot*desc/100);descmon=mu.round(descmon,ndec);
+		tot=stot-descmon;
+
 		if (imp==0) precsin=prec; else precsin=prec/(1+imp/100);
 		//Toast.makeText(cont,sprec+" - "+pprec+" / "+prec+" prec sin : "+precsin, Toast.LENGTH_SHORT).show();
 		

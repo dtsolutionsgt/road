@@ -139,7 +139,18 @@ public class ProdCant extends PBase {
 		        return false;
 		    }
 		});
-	
+
+        txtPeso.addTextChangedListener(new TextWatcher() {
+
+            public void afterTextChanged(Editable s) {}
+
+            public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+
+            public void onTextChanged(CharSequence s, int start,int before, int count) {
+                setPrecio();
+            }
+        });
+
 	}
 		
 	
@@ -211,7 +222,8 @@ public class ProdCant extends PBase {
 			mu.msgbox("3-"+ e.getMessage());
 		}
 
-		prec=prc.precio(prodid,0,nivel,um,gl.umpeso,porpeso);
+
+		prec=prc.precio(prodid,0,nivel,um,gl.umpeso,0);
 		
 		lblPrec.setText("Precio: "+mu.frmcur(0));
 
@@ -375,7 +387,7 @@ public class ProdCant extends PBase {
 		}
 
 		gl.dval=cant;
-		gl.dpeso=ppeso;
+		if (porpeso) gl.dpeso=ppeso;else gl.dpeso=0;
 		gl.um=upres;
 		gl.umpres=upres;
 		gl.umstock=umstock;
@@ -455,10 +467,20 @@ public class ProdCant extends PBase {
 		}
 
 		cant=mu.round(cant, gl.peDecImp);
+		if (porpeso) {
+			prec=prc.precio(prodid,0,nivel,um,gl.umpeso,umfactor*cant);
+		} else {
+			prec=prc.precio(prodid,0,nivel,um,gl.umpeso,0);
+		}
 
 		try {
 			if (cant<0)	lblCant.setText(""); else lblCant.setText(String.valueOf(cant));
-			tv=prec*cant;
+			if (porpeso) {
+                tv=prec*cant*umfactor;
+            } else {
+                tv=prec*cant;
+            }
+
 		} catch (Exception e) {
 			tv=0;mu.msgbox(e.getMessage());
 		}
@@ -482,6 +504,34 @@ public class ProdCant extends PBase {
 			return 0;
 		}
 	}
+
+	private void setPrecio() {
+	    double cu,tv,corig,cround,fruni,frcant,adcant,ppeso;
+
+        try {
+            ppeso=Double.parseDouble(txtPeso.getText().toString());
+        } catch (Exception e) {
+            lblTot.setText("***");mu.msgbox("Peso incorrecto");return;
+        }
+
+        prec=prc.precio(prodid,0,nivel,um,gl.umpeso,ppeso);
+
+        try {
+            tv=prec*ppeso;
+        } catch (Exception e) {
+            tv=0;mu.msgbox(e.getMessage());
+        }
+
+        lblTot.setText(mu.frmcur(tv));
+
+        try {
+            tv=umfactor*cant;
+            lblCantPeso.setText(mu.frmdecimal(tv,gl.peDecImp)+" "+gl.umpeso);
+        } catch (Exception e) {
+            lblCantPeso.setText("");
+            mu.msgbox(e.getMessage());
+        }
+    }
 	
 	private void parseCant(double c) {
 		DecimalFormat frmdec = new DecimalFormat("#.####"); 

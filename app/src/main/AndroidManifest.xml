@@ -380,7 +380,7 @@
             android:screenOrientation="portrait"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateAlwaysVisible" />
      </application>
 
 </manifest>

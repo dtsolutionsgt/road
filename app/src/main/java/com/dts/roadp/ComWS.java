@@ -786,7 +786,7 @@ public class ComWS extends PBase {
 			dbT.setTransactionSuccessful();
 			dbT.endTransaction();
 
-			fprog = "Documento de invetario recibido en BOF...";
+			fprog = "Documento de inventario recibido en BOF...";
 			wsRtask.onProgressUpdate();
 
 		    Actualiza_Documentos();
@@ -906,7 +906,7 @@ public class ComWS extends PBase {
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
 						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') " +
-						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
+						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";
 			} else if (gl.peModal.equalsIgnoreCase("APR")) {
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
 						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') ";
@@ -1432,22 +1432,35 @@ public class ComWS extends PBase {
 					s=s+"\nSe actualizó inventario.";
 					estandartInventario();
 				}
-				mu.msgbox(s);	
+
 				validaDatos(true);
 					
 				if (stockflag==1) sendConfirm();
 
-			} else {
+                if (gl.modoadmin) {
+
+                    mu.msgbox(s);
+                    toast("restart");
+                    restarApp();
+                }
+                else {
+
+                    msgAskExit(s);
+                };
+
+            } else {
 				isbusy=0;
 				esvacio=false;
 				SystemClock.sleep(100);
 				if (validaDatos(false)) runRecep();
 				return;
-			}		
-			
+			}
+
 		} else {	
 			lblInfo.setText(fstr);
-			mu.msgbox("Ocurrio error : \n"+fstr+" ("+reccnt+") " + ferr);
+			mu.msgbox("Ocurrió error : \n"+fstr+" ("+reccnt+") " + ferr);
+			isbusy=0;
+			return;
 		}
 
 		pendientes=validaPendientes();
@@ -1460,7 +1473,7 @@ public class ComWS extends PBase {
 		//mu.msgbox("::"+esql);
 		
 		if (ftflag) msgbox(ftmsg);
-		
+
 	}
 	
 	private class AsyncCallRec extends AsyncTask<String, Void, Void> {
@@ -2920,13 +2933,30 @@ public class ComWS extends PBase {
 	public void onBackPressed() {
 	   if (isbusy==0) {
 		   if (gl.modoadmin) {
-		   	toast("restart");
-		   	restarApp();
+
+		       toast("restart");
+		       restarApp();
 
 		   };
 
 		   super.onBackPressed();
 	   }
-	}	
-	
+	}
+
+    private void msgAskExit(String msg) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+        dialog.setTitle(R.string.app_name);
+        dialog.setMessage(msg  + " ?");
+        dialog.setIcon(R.drawable.ic_quest);
+
+        dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+               finish();
+            }
+        });
+
+        dialog.show();
+
+    }
 }

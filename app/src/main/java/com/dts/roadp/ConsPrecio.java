@@ -2,7 +2,6 @@ package com.dts.roadp;
 
 import java.util.ArrayList;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;

@@ -1436,7 +1436,7 @@ public class ComWS extends PBase {
 				validaDatos(true);
 					
 				if (stockflag==1) sendConfirm();
-
+//Test of my commit by ejc.
                 if (gl.modoadmin) {
 
                     mu.msgbox(s);

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -36,7 +37,7 @@ public class MainActivity extends PBase {
 	
 	private boolean rutapos,scanning=false;
 	private int fecha;
-	private String cs1,cs2,cs3;
+	private String cs1,cs2,cs3,barcode;
 
 
 	@Override
@@ -136,17 +137,27 @@ public class MainActivity extends PBase {
 
 	// Events
 	
-	public void showMenu(View view) {
-		
-		/*
-		gl.vendnom="DTS Test";
-		gl.vend="1";
-		gl.vnivel=1;
-		gl.vnivprec=1;
-		
-		gotoMenu();
-		*/
+	public void doScan(View view) {
+		if (!detectBarcodeScanner()) return;
+
+		browse=4;
+		barcode="";
+
+		Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+		intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE", "QR_CODE_MODE");
+		startActivityForResult(intent, 0);
 	}
+
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		//if (requestCode == 0) {
+			if (resultCode == RESULT_OK) {
+				String contents = intent.getStringExtra("SCAN_RESULT");
+				barcode=contents;
+				toast("BC:"+barcode);
+			}
+		//}
+	}
+
 	
 	public void comMan(View view) {
 		entraComunicacion();			
@@ -199,31 +210,6 @@ public class MainActivity extends PBase {
 			}
 		});
 
-		/*
-		txtUser.addTextChangedListener(new TextWatcher() {
-
-			public void afterTextChanged(Editable s) {}
-
-			public void beforeTextChanged(CharSequence s, int start,int count, int after) {}
-
-			public void onTextChanged(CharSequence s, int start,int before, int count) {
-				//mu.msgbox("start "+start+" before "+before+" count "+count);
-
-				final CharSequence ss=s;
-
-				if (!scanning) {
-					scanning=true;
-					Handler handlerTimer = new Handler();
-					handlerTimer.postDelayed(new Runnable(){
-						public void run() {
-							compareSC(ss);
-						}}, 50);
-				}
-
-
-			}
-		});
-		*/
 	}
 
 	private void compareSC(CharSequence s) {
@@ -649,6 +635,19 @@ public class MainActivity extends PBase {
 		}
 	}
 
+	private boolean detectBarcodeScanner() {
+
+		String packagename="com.google.zxing.client.android";
+		PackageManager pm = this.getPackageManager();
+
+		try {
+			pm.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
+			return true;
+		} catch (PackageManager.NameNotFoundException e) {
+			toast("Aplicacion ZXing Barcode Scanner no esta instalada");return false;
+		}
+
+	}
 
 	// Activity Events
 	
@@ -656,6 +655,13 @@ public class MainActivity extends PBase {
 	    super.onResume();
 	    initSession();
 		txtUser.requestFocus();
+
+		if (browse==4) {
+			browse=0;
+			txtUser.setText("Sc:"+barcode);
+			//if (!mu.emptystr(barcode)) toast("Scanned :"+barcode);
+			return;
+		}
 	}
 
 }

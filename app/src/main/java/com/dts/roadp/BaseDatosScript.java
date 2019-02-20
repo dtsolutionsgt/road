@@ -622,6 +622,32 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX D_FACTURA_STOCK_idx1 ON D_FACTURA_STOCK(COREL)";
 			database.execSQL(vSQL);
 
+
+			vSQL="CREATE TABLE [D_FACTURA_BARRA] ("+
+					"[RUTA] TEXT NOT NULL,"+
+					"[BARRA] TEXT NOT NULL,"+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[CANT] REAL NOT NULL,"+
+					"[COREL] TEXT NOT NULL,"+
+					"[PRECIO] REAL NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[DOCUMENTO] TEXT NOT NULL,"+
+					"[FECHA] INTEGER NOT NULL,"+
+					"[ANULADO] INTEGER NOT NULL,"+
+					"[CENTRO] TEXT NOT NULL,"+
+					"[STATUS] TEXT NOT NULL,"+
+					"[ENVIADO] INTEGER NOT NULL,"+
+					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
+					"[COREL_D_MOV] TEXT NOT NULL,"+
+					"[UNIDADMEDIDA] TEXT NOT NULL,"+
+					"PRIMARY KEY ([RUTA],[BARRA],[DOCUMENTO],[STATUS])"+
+					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE INDEX D_FACTURA_BARRA_idx1 ON D_FACTURA_BARRA(COREL)";
+			database.execSQL(vSQL);
+
+
 			vSQL="CREATE TABLE [D_MOV] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
@@ -824,6 +850,20 @@ public class BaseDatosScript {
 					"[CORELFACT] INTEGER NOT NULL,"+
 					"[IMPRES] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
+					");";
+			database.execSQL(vSQL);
+
+
+			vSQL="CREATE TABLE [D_STOCKB_DEV] ("+
+					"[BARRA] TEXT NOT NULL,"+
+					"[RUTA] TEXT NOT NULL,"+
+					"[VENDEDOR] TEXT NOT NULL,"+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[COREL] TEXT NOT NULL,"+
+					"[FECHA] INTEGER NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
+					"PRIMARY KEY ([BARRA],[RUTA],[VENDEDOR],[CODIGO],[COREL])"+
 					");";
 			database.execSQL(vSQL);
 			
@@ -1245,7 +1285,29 @@ public class BaseDatosScript {
 					"PRIMARY KEY ([CODIGO],[LOTE],[DOCUMENTO],[STATUS],[UNIDADMEDIDA])"+
 					");";
 			database.execSQL(vSQL);
-			
+
+			vSQL="CREATE TABLE [P_STOCKB] ("+
+					"[RUTA] TEXT NOT NULL,"+
+					"[BARRA] TEXT NOT NULL,"+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[CANT] REAL NOT NULL,"+
+					"[COREL] TEXT NOT NULL,"+
+					"[PRECIO] REAL NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[DOCUMENTO] TEXT NOT NULL,"+
+					"[FECHA] INTEGER NOT NULL,"+
+					"[ANULADO] INTEGER NOT NULL,"+
+					"[CENTRO] TEXT NOT NULL,"+
+					"[STATUS] TEXT NOT NULL,"+
+					"[ENVIADO] INTEGER NOT NULL,"+
+					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
+					"[COREL_D_MOV] TEXT NOT NULL,"+
+					"[UNIDADMEDIDA] TEXT NOT NULL,"+
+					"[DOC_ENTREGA] TEXT NOT NULL,"+
+					"PRIMARY KEY ([RUTA],[BARRA],[DOCUMENTO],[STATUS])"+
+					");";
+			database.execSQL(vSQL);
+
 			
 			vSQL="CREATE TABLE [P_STOCK_APR] ("+
 					"[CODIGO] TEXT NOT NULL,"+
@@ -1851,6 +1913,16 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+
+			vSQL="CREATE TABLE [T_BARRA] ("+
+					"[BARRA] TEXT NOT NULL,"+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[PRECIO] REAL NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[PESOORIG] REAL NOT NULL,"+
+					"PRIMARY KEY ([BARRA],[CODIGO])"+
+					");";
+			database.execSQL(vSQL);
 			
 			return 1;
 

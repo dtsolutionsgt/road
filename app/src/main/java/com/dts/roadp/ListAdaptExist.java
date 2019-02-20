@@ -85,14 +85,14 @@ public class ListAdaptExist extends BaseAdapter {
 
 		holder.lblLote.setText(items.get(position).Lote);
         holder.lblLotem.setText(items.get(position).Lote);
-		holder.lblPeso.setText(items.get(position).Peso);
-		holder.lblValor.setText(items.get(position).Valor);
+		holder.lblPeso.setText(items.get(position).Valor);
+		holder.lblValor.setText(items.get(position).Peso);
 
-		holder.lblPesoM.setText(items.get(position).PesoM);
-		holder.lblValorM.setText(items.get(position).ValorM);
+		holder.lblPesoM.setText(items.get(position).ValorM);
+		holder.lblValorM.setText(items.get(position).PesoM);
 
-        holder.lblPesoT.setText(items.get(position).PesoT);
-		holder.lblValorT.setText(items.get(position).ValorT);
+        holder.lblPesoT.setText(items.get(position).ValorT);
+		holder.lblValorT.setText(items.get(position).PesoT);
 
 		holder.reltitle.setVisibility(View.GONE);
 		holder.relbueno.setVisibility(View.GONE);
@@ -105,20 +105,7 @@ public class ListAdaptExist extends BaseAdapter {
 		switch (items.get(position).flag) {
 			case 0:
 				holder.reltitle.setVisibility(View.VISIBLE);
-				holder.lblCod.setVisibility(View.VISIBLE);
-				/*
-				if (ic<2) {
-					if (lote==null || lote.isEmpty()) {
-						holder.lblCod.setVisibility(View.GONE);
-						//holder.lblCod.setVisibility(View.VISIBLE);
-					} else {
-						holder.lblCod.setVisibility(View.VISIBLE);
-					}
-				} else {
-					holder.lblCod.setVisibility(View.VISIBLE);
-				}
-				*/
-				break;
+				holder.lblCod.setVisibility(View.VISIBLE);break;
 			case 1:
 				holder.relbueno.setVisibility(View.VISIBLE);break;
             case 2:

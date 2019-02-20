@@ -80,7 +80,7 @@ public class ComWS extends PBase {
 	
 	private static String sstr,fstr,fprog,finf,ferr,fterr,idbg,dbg,ftmsg,esql,ffpos;
 	private int scon,running,pflag,stockflag,conflag;
-	private String ftext,slsync,senv,gEmpresa,ActRuta,mac,fsql;
+	private String ftext,slsync,senv,gEmpresa,ActRuta,mac,fsql,fsqli,fsqlf;
 	private boolean rutapos,ftflag,esvacio;
 	
 	private final String NAMESPACE ="http://tempuri.org/";
@@ -133,6 +133,8 @@ public class ComWS extends PBase {
 		
 		mac=getMac();
 		fsql=du.univfechasql(du.getActDate());
+		fsqli=du.univfechasql(du.ffecha00(du.getActDate()));
+		fsqlf=du.univfechasql(du.ffecha24(du.getActDate()));
 
 		lic=new clsLicence(this);
 		
@@ -236,9 +238,9 @@ public class ComWS extends PBase {
 			
 	}
 
+
 	// Main
 
-	
 	private void runRecep() {
 
 		if (isbusy==1) return;
@@ -693,6 +695,7 @@ public class ComWS extends PBase {
 					if (!AddTable("P_STOCK_APR")) return false;
 				} else {
 				    if (!AddTable("P_STOCK")) return false;
+					if (!AddTable("P_STOCKB")) return false;
 				}
 			}
 			
@@ -900,8 +903,6 @@ public class ComWS extends PBase {
 		int ObjMes = du.getmonth(du.getActDate());
 
 		if (TN.equalsIgnoreCase("P_STOCK")) {
-			//SQL="SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-			// "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND ((dbo.AndrDate(FECHA)>="+fi+") AND (dbo.AndrDate(FECHA)<="+ff+")) ";
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
@@ -915,6 +916,13 @@ public class ComWS extends PBase {
 						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') ";
 			}
 			esql = SQL;
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_STOCKB")) {
+			SQL = "RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
+				  "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+				  "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
 			return SQL;
 		}
 

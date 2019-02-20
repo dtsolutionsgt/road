@@ -82,7 +82,6 @@ public class FinDia extends PBase {
 
 	}
 
-	
 	public void  iniciaCierre(View view) {
 		//#HS_20181128_0906 Agregue validacion para FinDia.
 	    if(gl.banderafindia == true) {

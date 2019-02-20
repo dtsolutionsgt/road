@@ -635,18 +635,18 @@ public class ComWSExist extends PBase {
 		
 		ss=txtRuta.getText().toString().trim();
 		if (mu.emptystr(ss)) {
-			mu.msgbox("La ruta no esta definida.");return false;
+			mu.msgbox("La ruta no está definida.");return false;
 		}	
 		
 		ss=txtEmp.getText().toString().trim();
 		if (mu.emptystr(ss)) {
-			mu.msgbox("La empresa no esta definida.");return false;
+			mu.msgbox("La empresa no está definida.");return false;
 		}
 		gEmpresa=ss;
 		
 		ss=txtWS.getText().toString().trim();
 		if (mu.emptystr(ss) || ss.equalsIgnoreCase("*")) {
-			mu.msgbox("La dirección de Web service no esta definida.");return false;
+			mu.msgbox("La dirección de Web service no está definida.");return false;
 		}
 		URL=ss;
 		

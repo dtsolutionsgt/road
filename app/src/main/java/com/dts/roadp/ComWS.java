@@ -133,8 +133,8 @@ public class ComWS extends PBase {
 		
 		mac=getMac();
 		fsql=du.univfechasql(du.getActDate());
-		fsqli=du.univfechasql(du.ffecha00(du.getActDate()));
-		fsqlf=du.univfechasql(du.ffecha24(du.getActDate()));
+		fsqli=du.univfechasql(du.ffecha00(du.getActDate()))+" 00:00:00";
+		fsqlf=du.univfechasql(du.ffecha24(du.getActDate()))+" 23:59:59";
 
 		lic=new clsLicence(this);
 		

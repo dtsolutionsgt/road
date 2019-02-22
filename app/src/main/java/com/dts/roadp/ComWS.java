@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
-import android.support.v4.content.IntentCompat;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.ksoap2.SoapEnvelope;
@@ -24,7 +24,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -33,7 +32,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.support.v4.content.IntentCompat;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -85,6 +83,8 @@ public class ComWS extends PBase {
 	
 	private final String NAMESPACE ="http://tempuri.org/";
 	private String METHOD_NAME,URL;
+
+	private AppMethods clsAppM;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -163,15 +163,24 @@ public class ComWS extends PBase {
 	// Events
 	
 	public void askRec(View view) {
-		
+
+		String Mensaje;
+
 		if (isbusy==1) {
 			toastcent("Por favor, espere que se termine la tarea actual.");return;
 		}
-			
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		
+
+		if (TieneDatos()){
+			Mensaje = "¿Tiene facturas, pedidos, cobros, devoluciones o inventario, está seguro de borrar los datos?";
+		}
+		else {
+			Mensaje = "¿Recibir datos nuevos?";
+		}
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
 		dialog.setTitle("Recepción");
-		dialog.setMessage("¿Recibir datos nuevos?");
+		dialog.setMessage(Mensaje);
 					
 		dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	
@@ -695,7 +704,7 @@ public class ComWS extends PBase {
 					if (!AddTable("P_STOCK_APR")) return false;
 				} else {
 				    if (!AddTable("P_STOCK")) return false;
-					if (!AddTable("P_STOCKB")) return false;
+				    if (!AddTable("P_STOCKB")) return false;
 				}
 			}
 			
@@ -920,7 +929,8 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_STOCKB")) {
-			SQL = "RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
+			SQL = "RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, " +
+                  " CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
 				  "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 				  "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
 			return SQL;
@@ -1398,7 +1408,6 @@ public class ComWS extends PBase {
 
 	}
 
-	
 	// Web Service handling Methods
 	
 	public void wsExecute(){
@@ -1444,18 +1453,9 @@ public class ComWS extends PBase {
 				validaDatos(true);
 					
 				if (stockflag==1) sendConfirm();
-//Test of my commit by ejc.
-				//Otro comment.
-                if (gl.modoadmin) {
 
-                    mu.msgbox(s);
-                    toast("restart");
-                    restarApp();
-                }
-                else {
-
-                    msgAskExit(s);
-                };
+				//Esta función es la que muestra mensaje después de la carga de datos
+                msgAskExit(s);
 
             } else {
 				isbusy=0;
@@ -1522,9 +1522,7 @@ public class ComWS extends PBase {
  
     }	
 
-
-	//#HS_20181123_1623 Agregue funcion FinDia para el commit y update de tablas.
-
+	//#HS_20181123_1623 Agregué función FinDia para el commit y update de tablas.
     private boolean FinDia() {
 
         try {
@@ -2952,20 +2950,50 @@ public class ComWS extends PBase {
 	   }
 	}
 
+	//CKFK 20190220 Creé esta función para mostrar mensaje cuando se reinicie o se cierre la pantalla de comunicación
     private void msgAskExit(String msg) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
         dialog.setTitle(R.string.app_name);
-        dialog.setMessage(msg  + " ?");
+        dialog.setMessage(msg);
         dialog.setIcon(R.drawable.ic_quest);
 
         dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-               finish();
+
+            	if (gl.modoadmin) {
+
+					restarApp();
+            	}
+				else {
+
+					finish();
+				};
             }
         });
 
         dialog.show();
 
     }
+
+    //CKFK 20190221 Creé esta función para validar si existen registros en las tablas antes de volver a cargar datos
+	private boolean TieneDatos(){
+
+		int CantFact = 0;
+		int CantPedidos = 0;
+        int CantCobros = 0;
+        int CantDev = 0;
+        int CantInv = 0;
+
+        clsAppM=new AppMethods(this, gl, Con, db);
+
+		CantFact=clsAppM.getDocCountTipo("Facturas");
+		CantPedidos=clsAppM.getDocCountTipo("Pedidos");
+		CantCobros=clsAppM.getDocCountTipo("Cobros");
+		CantDev=clsAppM.getDocCountTipo("Devoluciones");
+		CantInv=clsAppM.getDocCountTipo("Inventario");
+
+		return ((CantCobros>0) || (CantFact>0) || (CantPedidos>0) || (CantDev>0) || (CantInv>0));
+
+	}
 }

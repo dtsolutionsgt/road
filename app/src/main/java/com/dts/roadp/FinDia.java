@@ -42,6 +42,7 @@ public class FinDia extends PBase {
 	private boolean idle=true,fullfd,fail;
 	private clsFinDia claseFinDia;
 	private DateUtils claseDateUtils;
+	private AppMethods claseAppMethods;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -660,7 +661,7 @@ public class FinDia extends PBase {
 		
 		pend=getFactCount("SELECT SERIE,CORELATIVO FROM D_FACTURA","Facturas :");
 		if (pend==0) {
-			msgExit("No se puede realizar Cierre del día. No Está registrada ninguna factura.");return false;	
+			msgExit("No se puede realizar Cierre del día. No está registrada ninguna factura.");return false;
 		}
 		
 		try {
@@ -669,10 +670,10 @@ public class FinDia extends PBase {
 			pend=0;sp="";
 			
 			pend=pend+getFactCount("SELECT SERIE,CORELATIVO FROM D_FACTURA WHERE STATCOM<>'S'","Facturas :");
-			pend=pend+getDocCount("SELECT COREL FROM D_PEDIDO WHERE STATCOM<>'S'","Pedidos :");
-			pend=pend+getDocCount("SELECT COREL FROM D_COBRO WHERE STATCOM<>'S'","Recibos :");
+			pend=pend+claseAppMethods.getDocCount("SELECT COREL FROM D_PEDIDO WHERE STATCOM<>'S'","Pedidos :");
+			pend=pend+claseAppMethods.getDocCount("SELECT COREL FROM D_COBRO WHERE STATCOM<>'S'","Recibos :");
 			pend=pend+getDeposCount("SELECT TOTAL FROM D_DEPOS WHERE STATCOM<>'S'","Depositos :");
-			pend=pend+getDocCount("SELECT COREL FROM D_MOV WHERE STATCOM<>'S'","Inventario :");
+			pend=pend+claseAppMethods.getDocCount("SELECT COREL FROM D_MOV WHERE STATCOM<>'S'","Inventario :");
 			//pend=pend+getDocCount("SELECT RUTA  FROM D_ATENCION WHERE STATCOM<>'N'","A:");
 			
 			if (pend>0) {
@@ -742,37 +743,6 @@ public class FinDia extends PBase {
 			return cnt;
 		} catch (Exception e) {
 			mu.msgbox(sql+"\n"+e.getMessage());
-			return 0;
-		}		
-	}
-		
-	private int getDocCount(String ss,String pps) {
-		Cursor DT;
-		int cnt;
-		String st;
-		
-		try {
-			sql=ss;
-			DT=Con.OpenDT(sql);
-			cnt=DT.getCount();
-			st=pps+" "+cnt;
-			
-			if (cnt>0) {
-				
-				/*
-				DT.moveToFirst();
-				while (!DT.isAfterLast()) {
-					st=st+DT.getString(0)+", ";
-					DT.moveToNext();
-				}				
-				sp=sp+st+"\n";
-				*/
-			}
-			sp=sp+st+"\n";
-			
-			return cnt;
-		} catch (Exception e) {
-			//mu.msgbox(sql+"\n"+e.getMessage());
 			return 0;
 		}		
 	}

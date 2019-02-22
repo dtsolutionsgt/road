@@ -23,7 +23,9 @@ public class AppMethods {
 	private BaseDatos.Insert ins;
 	private BaseDatos.Update upd;
 	private BaseDatos Con;
-	
+	private String sql;
+	private String sp;
+
 	public AppMethods(Context context,appGlobals global,BaseDatos dbconnection, SQLiteDatabase database) {
 		cont=context; 
 		gl=global;
@@ -41,8 +43,80 @@ public class AppMethods {
 		ins=Con.Ins;
 		upd=Con.Upd;
 	}
-	
-	
+
+	//Función para saber la cantidad de registros en una tabla
+	public int getDocCount(String ss,String pps) {
+		Cursor DT;
+		int cnt;
+		String st;
+
+		try {
+			sql=ss;
+			DT=Con.OpenDT(sql);
+			cnt=DT.getCount();
+			st=pps+" "+cnt;
+
+			sp=sp+st+"\n";
+
+			return cnt;
+		} catch (Exception e) {
+			//mu.msgbox(sql+"\n"+e.getMessage());
+			return 0;
+		}
+	}
+
+	//Función para saber la cantidad de registros en una tabla específica
+	public int getDocCountTipo(String tipo) {
+		Cursor DT;
+		int cnt;
+		String st, ss;
+		String pps = "";
+
+		try {
+
+			switch(tipo) {
+				case "Facturas":
+
+					sql="SELECT COREL FROM D_FACTURA";
+					break;
+
+				case "Pedidos":
+
+					sql="SELECT COREL FROM D_PEDIDO";
+					break;
+
+				case "Cobros":
+
+					sql="SELECT DOCUMENTO FROM P_COBRO";
+					break;
+
+				case "Devolucion":
+
+					sql="SELECT COREL FROM D_NOTACRED";
+					break;
+
+				case "Inventario":
+
+					sql=" SELECT COREL FROM P_STOCK " +
+					    " UNION SELECT COREL FROM P_STOCKB " +
+					    " UNION SELECT COREL FROM P_STOCK_PALLET";
+					break;
+			}
+
+			DT=Con.OpenDT(sql);
+			cnt=DT.getCount();
+			st=pps+" "+cnt;
+
+			sp=sp+st+"\n";
+
+			return cnt;
+		} catch (Exception e) {
+			//mu.msgbox(sql+"\n"+e.getMessage());
+			return 0;
+		}
+	}
+
+
 	// Public
 	
 	public void parametrosExtra() {

@@ -211,7 +211,7 @@ public class clsDocFactura extends clsDocument {
 	}
 
 
-	// Detaille por empresa
+	// Detalle por empresa
 
 	protected boolean buildDetail() {
 		if (modofact.equalsIgnoreCase("*")) return detailBase();

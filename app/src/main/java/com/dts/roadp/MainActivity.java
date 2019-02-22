@@ -136,29 +136,7 @@ public class MainActivity extends PBase {
 
 
 	// Events
-	
-	public void doScan(View view) {
-		if (!detectBarcodeScanner()) return;
 
-		browse=4;
-		barcode="";
-
-		Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-		intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE", "QR_CODE_MODE");
-		startActivityForResult(intent, 0);
-	}
-
-	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		//if (requestCode == 0) {
-			if (resultCode == RESULT_OK) {
-				String contents = intent.getStringExtra("SCAN_RESULT");
-				barcode=contents;
-				toast("BC:"+barcode);
-			}
-		//}
-	}
-
-	
 	public void comMan(View view) {
 		entraComunicacion();			
 	}
@@ -635,19 +613,6 @@ public class MainActivity extends PBase {
 		}
 	}
 
-	private boolean detectBarcodeScanner() {
-
-		String packagename="com.google.zxing.client.android";
-		PackageManager pm = this.getPackageManager();
-
-		try {
-			pm.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
-			return true;
-		} catch (PackageManager.NameNotFoundException e) {
-			toast("Aplicacion ZXing Barcode Scanner no esta instalada");return false;
-		}
-
-	}
 
 	// Activity Events
 	
@@ -656,12 +621,6 @@ public class MainActivity extends PBase {
 	    initSession();
 		txtUser.requestFocus();
 
-		if (browse==4) {
-			browse=0;
-			txtUser.setText("Sc:"+barcode);
-			//if (!mu.emptystr(barcode)) toast("Scanned :"+barcode);
-			return;
-		}
 	}
 
 }

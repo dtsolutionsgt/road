@@ -133,8 +133,8 @@ public class ComWS extends PBase {
 		
 		mac=getMac();
 		fsql=du.univfechasql(du.getActDate());
-		fsqli=du.univfechasql(du.ffecha00(du.getActDate()));
-		fsqlf=du.univfechasql(du.ffecha24(du.getActDate()));
+		fsqli=du.univfechasql(du.ffecha00(du.getActDate()))+" 00:00:00";
+		fsqlf=du.univfechasql(du.ffecha24(du.getActDate()))+" 23:59:59";
 
 		lic=new clsLicence(this);
 		
@@ -794,7 +794,7 @@ public class ComWS extends PBase {
 
 		    Actualiza_Documentos();
 
-			fprog = "Fin de la actualización";
+			fprog = "Fin de actualización";
 			wsRtask.onProgressUpdate();
 
 			scomp=1;
@@ -920,9 +920,10 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_STOCKB")) {
-			SQL = "RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
-				  "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+			SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
+				  "FROM P_STOCKB WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 				  "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
+			err=SQL;
 			return SQL;
 		}
 
@@ -1444,7 +1445,7 @@ public class ComWS extends PBase {
 				validaDatos(true);
 					
 				if (stockflag==1) sendConfirm();
-//Test of my commit by ejc.
+
                 if (gl.modoadmin) {
 
                     mu.msgbox(s);
@@ -1452,7 +1453,6 @@ public class ComWS extends PBase {
                     restarApp();
                 }
                 else {
-
                     msgAskExit(s);
                 };
 
@@ -1478,7 +1478,7 @@ public class ComWS extends PBase {
 		comparaCorrel();
 		
 		paramsExtra();
-		//mu.msgbox("::"+esql);
+		//mu.msgbox("::"+err);
 		
 		if (ftflag) msgbox(ftmsg);
 
@@ -2955,7 +2955,7 @@ public class ComWS extends PBase {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
         dialog.setTitle(R.string.app_name);
-        dialog.setMessage(msg  + " ?");
+        dialog.setMessage(msg  );
         dialog.setIcon(R.drawable.ic_quest);
 
         dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {

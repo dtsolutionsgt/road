@@ -7,6 +7,7 @@ import com.dts.roadp.clsClasses.clsCD;
 import com.dts.roadp.clsClasses.clsVenta;
 
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -48,15 +49,14 @@ public class Venta extends PBase {
 	private ArrayList<String> lname = new ArrayList<String>();
 
 	private int browse;
-	private String prodid,um;
 
 	private double cant,desc,mdesc,prec,precsin,imp,impval;
 	private double descmon,tot,totsin,percep,ttimp,ttperc,ttsin,prodtot;
 	private double px,py,cpx,cpy,cdist;
 
-	private String emp,cliid,rutatipo;
+	private String emp,cliid,rutatipo,prodid,um,tiposcan;
 	private int nivel,dweek,clidia;
-	private boolean sinimp,rutapos;
+	private boolean sinimp,rutapos,softscanexist;
 
 	private DecimalFormat ffrmprec;
 	private AppMethods app;
@@ -69,7 +69,7 @@ public class Venta extends PBase {
 
 	private boolean isGPSEnabled,isNetworkEnabled,canGetLocation;
 	private double  latitude,longitude;
-	private String  cod;
+	private String  cod,barcode;
 
 	private static final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
 	private static final long  MIN_TIME_BW_UPDATES = 1000; // in Milliseconds
@@ -124,6 +124,17 @@ public class Venta extends PBase {
 
 
 	// Events
+
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		//if (requestCode == 0) {
+		if (resultCode == RESULT_OK) {
+			String contents = intent.getStringExtra("SCAN_RESULT");
+			barcode=contents;
+			toast("BC:"+barcode);
+		}
+		//}
+	}
+
 
 	public void showProd(View view) {
 		gl.gstr="";
@@ -216,6 +227,14 @@ public class Venta extends PBase {
 
 		Intent intent = new Intent(this,ListaPromo.class);
 		startActivity(intent);
+	}
+
+	public void doSoftScan(View view) {
+		browse=5;barcode="";
+
+		Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+		intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE", "QR_CODE_MODE");
+		startActivityForResult(intent, 0);
 	}
 
 	private void setHandlers(){
@@ -355,6 +374,45 @@ public class Venta extends PBase {
 		um=gl.um;
 
 		setCant();
+	}
+
+	private void processBarcode() {
+		Cursor dt;
+
+		try {
+
+			sql="SELECT P_STOCK.CODIGO " +
+				"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_STOCK.CODIGO=P_PRODUCTO.CODIGO	" +
+				"WHERE (P_PRODUCTO.CODBARRA='"+barcode+"') ";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0) {
+				dt.moveToFirst();
+
+				gl.gstr=dt.getString(0);gl.um="UN";
+				processItem();
+				return;
+			}
+
+			sql="SELECT CODIGO, CANT, COREL, PRECIO, PESO, UNIDADMEDIDA " +
+				"FROM P_STOCKB WHERE (BARRA='"+barcode+"') ";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0) {
+				dt.moveToFirst();
+
+				msgbox("Barra encontrada");
+				return;
+			}
+
+			msgbox("Producto no encontrado");
+			//gl.gstr="0427";gl.um="UN";
+			//processItem();
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
 	}
 
 	private void setCant(){
@@ -921,13 +979,34 @@ public class Venta extends PBase {
 		lblTit= (TextView) findViewById(R.id.txtRoadTit);
 
 		imgroad= (ImageView) findViewById(R.id.imgRoadTit);
-		imgscan= (ImageView) findViewById(R.id.imageView13);imgscan.setVisibility(View.INVISIBLE);
+		imgscan= (ImageView) findViewById(R.id.imageView13);
+
+		imgscan.setVisibility(View.INVISIBLE);
 
 	}
 
 	private void initValues(){
 		Cursor DT;
 		String contrib;
+
+		tiposcan="*";
+
+		try {
+			sql="SELECT TIPO_HH FROM P_ARCHIVOCONF WHERE RUTA='"+gl.ruta+"'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			tiposcan=DT.getString(0);
+		} catch (Exception e) {
+			tiposcan="*";msgbox(e.getMessage());
+		}
+
+		if (tiposcan.equalsIgnoreCase("SOFTWARE")) {
+			softscanexist=detectBarcodeScanner();
+		} else {
+			softscanexist=false;
+		}
+		if (softscanexist) imgscan.setVisibility(View.VISIBLE);else imgscan.setVisibility(View.INVISIBLE);
 
 		try {
 			sql="SELECT INITPATH FROM P_EMPRESA WHERE EMPRESA='"+emp+"'";
@@ -946,8 +1025,6 @@ public class Venta extends PBase {
 		if (contrib.equalsIgnoreCase("F")) sinimp=false;
 
 		gl.sinimp=sinimp;
-
-		//mu.msgbox(contrib+" // SINIMP "+sinimp);
 
 		lblProd.setText("");
 		lblPres.setText("");
@@ -988,14 +1065,11 @@ public class Venta extends PBase {
 
 		clsBonFiltro  clsBFilt=new clsBonFiltro(this,gl.ruta,gl.cliente);
 
-		//mu.msgbox("Filtro desc "+clsDFilt.estr);
-
 		dweek=mu.dayofweek();
 
 		lblPrec.setText(mu.frmcur(0));
 		lblTot.setText(mu.frmcur(0));
 
-		imgscan.setVisibility(View.INVISIBLE);
 
 	}
 
@@ -1140,6 +1214,20 @@ public class Venta extends PBase {
 		}
 	}
 
+	private boolean detectBarcodeScanner() {
+
+		String packagename="com.google.zxing.client.android";
+		PackageManager pm = this.getPackageManager();
+
+		try {
+			pm.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
+			return true;
+		} catch (PackageManager.NameNotFoundException e) {
+			toast("Aplicacion ZXing Barcode Scanner no esta instalada");return false;
+		}
+
+	}
+
 
 	// Activity Events
 	
@@ -1167,6 +1255,11 @@ public class Venta extends PBase {
 		if (browse==4) {
 			browse=0;
 			listItems();return;
+		}
+
+		if (browse==5) {
+			browse=0;
+			processBarcode();return;
 		}
 	
 	}

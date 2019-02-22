@@ -9,6 +9,7 @@ android {
         targetSdkVersion 28
         renderscriptTargetApi 28
         renderscriptSupportModeEnabled true
+
     }
 
     packagingOptions {

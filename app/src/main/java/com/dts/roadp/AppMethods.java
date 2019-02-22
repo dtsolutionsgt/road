@@ -312,6 +312,20 @@ public class AppMethods {
 		} catch (Exception e) {
 			gl.peFormatoFactura="";
 		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=17";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) throw new Exception();
+
+			gl.peImprFactCorrecta=val.equalsIgnoreCase("S");
+		} catch (Exception e) {
+			gl.peImprFactCorrecta=false;
+		}
+
 	}
 
 

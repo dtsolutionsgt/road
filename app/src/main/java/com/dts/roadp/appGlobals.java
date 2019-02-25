@@ -15,9 +15,9 @@ public class appGlobals extends Application {
 	public String ruta,sucur,rutatipo,rutatipog,vend,vendnom,gstr,gstr2,prod,um,umpres,umstock,cliente,ubas,emp,imgpath,umpeso,impresora, tipoImpresora, codSupervisor, ayudante, ayudanteID, vehiculo, vehiculoID;
 	public String devtipo,devrazon,wsURL,bonprodid,pprodname,contrib,ateninistr,tcorel;
 	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,atentini,vnivel,vnivprec,media;
-	public int autocom,nuevaFecha,pagomodo;
+	public int autocom,nuevaFecha,pagomodo,filtrocli;
 	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor;
-	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo;
+	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov;
 	
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,contlic,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo;

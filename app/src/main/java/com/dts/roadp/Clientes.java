@@ -76,7 +76,7 @@ public class Clientes extends PBase {
 		dweek=mu.dayofweek();
 		
 		fillSpinners();
-		
+
 		listItems();
 				
 		closekeyb();
@@ -250,7 +250,7 @@ public class Clientes extends PBase {
 					"GROUP BY  D_FACTURA.CLIENTE, D_FACTURA.COREL, D_FACTURA.ANULADO " +
 					"HAVING  (D_FACTURA.ANULADO='N') AND (SUM(D_FACTURAP.VALOR=0))";
 
-			sql="SELECT DISTINCT CLIENTE FROM D_FACTURA WHERE (COREL NOT IN " +
+			sql="SELECT DISTINCT CLIENTE FROM D_FACTURA WHERE (ANULADO='N') AND (COREL NOT IN " +
 					"  (SELECT DISTINCT D_FACTURA_1.COREL " +
 					"   FROM D_FACTURA AS D_FACTURA_1 INNER JOIN " +
 					"   D_FACTURAP ON D_FACTURA_1.COREL=D_FACTURAP.COREL))";
@@ -413,7 +413,12 @@ public class Clientes extends PBase {
 		dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 		spinFilt.setAdapter(dataAdapter2);
-		spinFilt.setSelection(0);
+
+		if (gl.filtrocli==-1) {
+			spinFilt.setSelection(0);
+		} else {
+			spinFilt.setSelection(gl.filtrocli);
+		}
 
 	}
 

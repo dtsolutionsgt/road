@@ -110,44 +110,6 @@ public class FinDia extends PBase {
 		startActivity(menu);
 	}
 
-	private void msgAskDeposito() {
-
-        AlertDialog.Builder dialog1 = new  AlertDialog.Builder(this);
-
-        dialog1.setTitle("Road");
-        dialog1.setMessage("No se ha realizado el depósito.");
-
-        dialog1.setIcon(R.drawable.ic_quest);
-
-        dialog1.setPositiveButton("Realizar Depósito.", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                ActivityDeposito();
-            }
-        });
-
-        dialog1.show();
-
-    }
-
-	private void msgAskImpresionDeposito() {
-
-		AlertDialog.Builder dialog1 = new  AlertDialog.Builder(this);
-
-		dialog1.setTitle("Road");
-		dialog1.setMessage("Debe imprimir el recibo de depósito");
-
-		dialog1.setIcon(R.drawable.ic_quest);
-
-		dialog1.setPositiveButton("Imprimir Documento", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				ActivityImpresionDeposito(1);
-			}
-		});
-
-		dialog1.show();
-
-	}
-
 	public void startFDD() {
 		boolean rslt;
 
@@ -514,6 +476,7 @@ public class FinDia extends PBase {
 
 
 		corel=((appGlobals) vApp).ruta+"_"+mu.getCorelBase();devcorel=corel;
+		gl.corel_d_mov=corel;
 
 		try {
 
@@ -532,7 +495,6 @@ public class FinDia extends PBase {
 			ins.add("CODIGOLIQUIDACION",0);
 
 			db.execSQL(ins.sql());
-
 
 			sql="SELECT CODIGO,LOTE,SUM(CANT),SUM(CANTM),SUM(PESO),UNIDADMEDIDA FROM P_STOCK GROUP BY CODIGO,LOTE,UNIDADMEDIDA " +
 				"HAVING SUM(CANT)>0 OR SUM(CANTM) >0";
@@ -562,7 +524,7 @@ public class FinDia extends PBase {
 					ins.add("PESO",ppeso);
 					ins.add("PESOM",ppeso);
 					ins.add("LOTE",plote);
-					ins.add("CODIGOLIQUIDACION",-1);
+					ins.add("CODIGOLIQUIDACION",0);
 					ins.add("UNIDADMEDIDA",um);
 
 					db.execSQL(ins.sql());
@@ -571,8 +533,10 @@ public class FinDia extends PBase {
 				}
 			}
 
-			//vSQL="DELETE FROM P_STOCK";
-			//db.execSQL(vSQL);
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				sql="DELETE FROM P_STOCK";
+				db.execSQL(sql);
+			}
 
 			db.setTransactionSuccessful();
 			db.endTransaction();
@@ -608,9 +572,11 @@ public class FinDia extends PBase {
 
 		if (fullfd) {
 
-			if (!validaPagosPend()) return false;
-			if (fullfd) return true;
-			
+			if (!validaPagosPend()) {
+				msgPendPago("Existen facturas pendientes de pago. No se puede realizar fin del día");
+				return false;
+			}
+
 			setFactCor();
 			if (fcorel==0) {
 				msgExit("No Están definidos los correlativos de factura.");return false;
@@ -754,7 +720,7 @@ public class FinDia extends PBase {
 		Cursor dt;
 
 		try {
-			sql="SELECT DISTINCT CLIENTE FROM D_FACTURA WHERE (COREL NOT IN " +
+			sql="SELECT DISTINCT CLIENTE FROM D_FACTURA WHERE (ANULADO='N') AND (COREL NOT IN " +
 				"(SELECT DISTINCT D_FACTURA_1.COREL " +
 				"FROM D_FACTURA AS D_FACTURA_1 INNER JOIN " +
 				"D_FACTURAP ON D_FACTURA_1.COREL=D_FACTURAP.COREL))";
@@ -1348,7 +1314,48 @@ public class FinDia extends PBase {
 		} catch (Exception e) {}
 	}
 
-    private void msgAsk() {
+
+	// Mensajes
+
+	private void msgAskDeposito() {
+
+		AlertDialog.Builder dialog1 = new  AlertDialog.Builder(this);
+
+		dialog1.setTitle("Road");
+		dialog1.setMessage("No se ha realizado el depósito.");
+
+		dialog1.setIcon(R.drawable.ic_quest);
+
+		dialog1.setPositiveButton("Realizar Depósito.", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				ActivityDeposito();
+			}
+		});
+
+		dialog1.show();
+
+	}
+
+	private void msgAskImpresionDeposito() {
+
+		AlertDialog.Builder dialog1 = new  AlertDialog.Builder(this);
+
+		dialog1.setTitle("Road");
+		dialog1.setMessage("Debe imprimir el recibo de depósito");
+
+		dialog1.setIcon(R.drawable.ic_quest);
+
+		dialog1.setPositiveButton("Imprimir Documento", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				ActivityImpresionDeposito(1);
+			}
+		});
+
+		dialog1.show();
+
+	}
+
+	private void msgAsk() {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
         dialog.setTitle("Road");
@@ -1457,7 +1464,23 @@ public class FinDia extends PBase {
 		});
 		
 		dialog.show();
-	}	
+	}
+
+	private void msgPendPago(String msg) {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle(R.string.app_name);
+		dialog.setMessage(msg);
+
+		dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				gl.filtrocli=2;
+				startActivity(new Intent(FinDia.this,Clientes.class));
+			}
+		});
+
+		dialog.show();
+	}
 
 	private void msgExitCom(String msg) {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);

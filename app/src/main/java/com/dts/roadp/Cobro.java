@@ -32,7 +32,7 @@ public class Cobro extends PBase {
 	private printer prn;
 	private clsDocCobro fdoc;
 	
-	private String cliid,itemid,prodid,sefect,corel,fserie;
+	private String cliid,itemid,prodid,sefect,corel,fserie,tipo;
 	private double ttot,tsel,tpag,tpend,vefect,plim;
 	private boolean peexit;
 	private int fflag=1,fcorel;
@@ -54,10 +54,11 @@ public class Cobro extends PBase {
 		setHandlers();
 		
 		initSession();
-			
+
+		listItems();
+		clearAll();
+
 		showTotals();
-		
-		listItems();	
 
 		gl.pagomodo=0;
 		
@@ -144,37 +145,42 @@ public class Cobro extends PBase {
 
 	}
 
-
-	// Main
-	
 	private void setHandlers(){
-			
+
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
-				int flag;	
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				int flag;
 				try {
 					Object lvObj = listView.getItemAtPosition(position);
-					clsClasses.clsCobro vItem = (clsClasses.clsCobro)lvObj;
-			           	
+					clsClasses.clsCobro vItem = (clsClasses.clsCobro) lvObj;
+
 					adapter.setSelectedIndex(position);
-			    		
-					flag=vItem.flag;
-					if (flag==0) flag=1; else flag=0;
-					vItem.flag=flag;
-					
+
+					tipo=vItem.Tipo;
+					if (tipo.equalsIgnoreCase("R")) clearAll();
+
+					flag = vItem.flag;
+					if (flag == 0) flag = 1;
+					else flag = 0;
+					vItem.flag = flag;
+
 					adapter.refreshItems();
-					
+
 					calcSelected();
 					showTotals();
-						
-		        } catch (Exception e) {
-			   	   mu.msgbox(e.getMessage());
-		        }
-			};
-	    });
-		    
+
+				} catch (Exception e) {
+					mu.msgbox(e.getMessage());
+				}
+			}
+
+			;
+		});
 	}
+
+
+	// Main
 
 	private void listItems(){
 		Cursor DT;
@@ -182,9 +188,7 @@ public class Cobro extends PBase {
 		double pg,sal,ssal;
 				
 		items.clear();ttot=0;tpag=0;
-		
-		//hidekeyb();
-				
+
 		try {
 			sql="SELECT DOCUMENTO,TIPODOC,VALORORIG,SALDO,FECHAEMIT,FECHAV " +
 				 "FROM P_COBRO WHERE CLIENTE='"+cliid+"' ORDER BY FECHAV";
@@ -205,8 +209,7 @@ public class Cobro extends PBase {
 				pg=getDocPago(DT.getString(0),DT.getString(1));
 				ssal=sal-pg;if (ssal<0) ssal=0;
 				if (ssal>0) fflag=1; else fflag=0;
-				
-				
+
 				vItem.Saldo=ssal;
 				vItem.Pago=pg;
 				vItem.flag=fflag;
@@ -252,6 +255,7 @@ public class Cobro extends PBase {
 	private boolean saveCobro(){
 		Cursor DT;
 		double tpago;
+		String doc="";
 		
 		if (!assignCorel()) return false;
 		
@@ -305,7 +309,7 @@ public class Cobro extends PBase {
 					ins.add("COREL",corel);
 					ins.add("ANULADO","N");
 					ins.add("EMPRESA",gl.emp);
-					ins.add("DOCUMENTO",DT.getString(0));
+					ins.add("DOCUMENTO",DT.getString(0));doc=DT.getString(0);
 					ins.add("TIPODOC",DT.getString(1));
 					ins.add("MONTO",DT.getDouble(2));
 					ins.add("PAGO",DT.getDouble(3));
@@ -343,9 +347,15 @@ public class Cobro extends PBase {
 		
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
-								
-				ins.init("D_COBROP");
-				ins.add("COREL",corel);
+
+				if (tipo.equalsIgnoreCase("R")) {
+					ins.init("D_FACTURAP");
+					ins.add("COREL",doc);
+				} else {
+					ins.init("D_COBROP");
+					ins.add("COREL",corel);
+				}
+
 				ins.add("ITEM",DT.getInt(0));
 				ins.add("ANULADO","N");
 				ins.add("EMPRESA",gl.emp);
@@ -596,7 +606,13 @@ public class Cobro extends PBase {
 		}		
 		
 	}
-	
+
+	private void clearAll() {
+		for (int i = 0; i < items.size(); i++ ) {
+			items.get(i).flag=0;
+		}
+	}
+
 	private double getDocPago(String doc,String tipo){
 		Cursor DT;
 		double tp;

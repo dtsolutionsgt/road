@@ -245,6 +245,7 @@ public class Menu extends PBase {
 					Intent intentp = new Intent(this, CliPos.class);
 					startActivity(intentp);
 				} else {
+					gl.filtrocli=-1;
 					Intent intent = new Intent(this, Clientes.class);
 					//Asigna conexión actual al siguiente activity.
 

@@ -2573,7 +2573,6 @@ public class ComWS extends PBase {
 		sql="UPDATE P_RUTA SET EMAIL='"+du.getActDate()+"'";
 		db.execSQL(sql);
 
-
 		Handler mtimer = new Handler();	
 		Runnable mrunner=new Runnable() {
 			@Override

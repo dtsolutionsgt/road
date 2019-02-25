@@ -65,7 +65,7 @@ public class Pago extends PBase {
 		setHandlers();
 		
 		saldo=gl.pagoval;
-		pagolim=gl.pagolim;
+		pagolim=mu.round2(gl.pagolim);
 		cobro=gl.pagocobro;
 		cliid=gl.cliente;
 		pagomodo=gl.pagomodo;

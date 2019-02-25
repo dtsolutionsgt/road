@@ -411,6 +411,5 @@ public class clsFinDia extends PBase{
         return true;
     }
 
-    ////////
 
 }

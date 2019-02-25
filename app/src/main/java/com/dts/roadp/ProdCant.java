@@ -2,7 +2,6 @@ package com.dts.roadp;
 
 import java.io.File;
 import java.text.DecimalFormat;
-
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
@@ -19,10 +18,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
+
 public class ProdCant extends PBase {
 
 	private EditText txtCant,txtPeso;
-	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot;
+	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot,lblCodProd;
 	private TextView lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso,lblPesoUni;
 	private ImageView imgProd,imgUpd,imgDel;	
 	
@@ -42,7 +42,7 @@ public class ProdCant extends PBase {
 		
 		setControls();
 				
-		prodid=gl.prod;
+		prodid=gl.prod;lblCodProd.setText(prodid);
 		um=gl.um;
 		nivel=gl.nivel;
 		rutatipo=gl.rutatipo;
@@ -133,7 +133,12 @@ public class ProdCant extends PBase {
 		    public boolean onKey(View v, int keyCode, KeyEvent event) {
 		        if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
 		            (keyCode == KeyEvent.KEYCODE_ENTER)) {
-			        	sendCant(v);
+			        	if (porpeso) {
+			        		txtPeso.requestFocus();
+							txtPeso.setSelection(0,txtPeso.length());
+						} else {
+			        		sendCant(v);
+						}
 		          return true;
 		        }
 		        return false;
@@ -151,6 +156,18 @@ public class ProdCant extends PBase {
             }
         });
 
+
+        txtPeso.setOnKeyListener(new OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                   (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    sendCant(v);
+                    return true;
+                }
+                return false;
+            }
+        });
 	}
 		
 	
@@ -427,14 +444,15 @@ public class ProdCant extends PBase {
         lblPesoLbl=(TextView) findViewById(R.id.textView24); lblPesoLbl.setVisibility(View.INVISIBLE);
 		lblFactor=(TextView) findViewById(R.id.textView22);lblFactor.setVisibility(View.INVISIBLE);
 		lblCantPeso=(TextView) findViewById(R.id.textView21);lblCantPeso.setText("");lblCantPeso.setVisibility(View.INVISIBLE);
-		imgProd=(ImageView) findViewById(R.id.imgPFoto);	
+		lblCodProd=(TextView) findViewById(R.id.txtRoadTit);
+		imgProd=(ImageView) findViewById(R.id.imgPFoto);
 		imgUpd=(ImageView) findViewById(R.id.imageView1);
 		imgDel=(ImageView) findViewById(R.id.imageView2);
 		
 	}
 	
 	private int setCant(boolean mode){
-		double cu,tv,corig,cround,fruni,frcant,adcant;
+		double cu,tv,corig,cround,fruni,frcant,adcant,vpeso,opeso;
 		boolean ajust=false;
 		
 		lblTot.setText("***");
@@ -487,6 +505,7 @@ public class ProdCant extends PBase {
 
         lblTot.setText(mu.frmcur(tv));
 
+		opeso=umfactor*cant;
 		try {
 			tv=umfactor*cant;
 			lblCantPeso.setText(mu.frmdecimal(tv,gl.peDecImp)+" "+gl.umpeso);
@@ -497,6 +516,17 @@ public class ProdCant extends PBase {
 
 		if (mode) txtPeso.setText(mu.frmdecimal(cant*umfactor, gl.peDecImp));
 
+		try {
+			if (mu.emptystr(txtPeso.getText().toString())) return 2;
+			vpeso=Double.parseDouble(txtPeso.getText().toString());
+		} catch (Exception e) {
+			mu.msgbox("Peso incorrecto");return 2;
+		}
+
+		if (porpeso) {
+			if (!checkLimits(vpeso,opeso)) return 2;
+		}
+
 		if (ajust) {
 			msgAskAjust("Cantidad ajustada a : "+mu.frmdecimal(cant, gl.peDecImp)+". ¿Aplicar?");
 			return 1;
@@ -505,13 +535,51 @@ public class ProdCant extends PBase {
 		}
 	}
 
+	private boolean checkLimits(double vpeso,double opeso) {
+		Cursor dt;
+		double pmin,pmax;
+		String ss;
+
+		try {
+			sql="SELECT PORCMINIMO,PORCMAXIMO FROM P_PORCMERMA WHERE PRODUCTO='"+prodid+"'";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount() == 0) {
+				msgbox("El repesaje no se puede aplicar,\n no esta definido rango de repesaje para el producto.");return false;
+			}
+			dt.moveToFirst();
+
+			pmin = opeso - dt.getDouble(0) * opeso / 100;
+			pmax = opeso + dt.getDouble(1) * opeso / 100;
+
+			if (vpeso<pmin) {
+				ss="El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por debajo de los percentajes permitidos," +
+						" minimo : "+mu.frmdecimal(pmin, gl.peDecImp)+", no se puede aplicar.";
+				msgbox(ss);return false;
+			}
+
+			if (vpeso>pmax) {
+				ss="El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por debajo de los percentajes permitidos," +
+						" máximo : "+mu.frmdecimal(pmax, gl.peDecImp)+", no se puede aplicar.";
+				msgbox(ss);return false;
+			}
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return true;
+	}
+
 	private void setPrecio() {
 	    double cu,tv,corig,cround,fruni,frcant,adcant,ppeso;
 
         try {
             ppeso=Double.parseDouble(txtPeso.getText().toString());
         } catch (Exception e) {
-            lblTot.setText("***");mu.msgbox("Peso incorrecto");return;
+            lblTot.setText("***");
+            if (!mu.emptystr(txtPeso.getText().toString())) mu.msgbox("Peso incorrecto");
+            return;
         }
 
         prec=prc.precio(prodid,0,nivel,um,gl.umpeso,ppeso);

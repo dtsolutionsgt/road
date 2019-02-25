@@ -607,6 +607,9 @@ public class FinDia extends PBase {
 		}
 
 		if (fullfd) {
+
+			if (!validaPagosPend()) return false;
+			if (fullfd) return true;
 			
 			setFactCor();
 			if (fcorel==0) {
@@ -745,6 +748,24 @@ public class FinDia extends PBase {
 			mu.msgbox(sql+"\n"+e.getMessage());
 			return 0;
 		}		
+	}
+
+	private boolean validaPagosPend() {
+		Cursor dt;
+
+		try {
+			sql="SELECT DISTINCT CLIENTE FROM D_FACTURA WHERE (COREL NOT IN " +
+				"(SELECT DISTINCT D_FACTURA_1.COREL " +
+				"FROM D_FACTURA AS D_FACTURA_1 INNER JOIN " +
+				"D_FACTURAP ON D_FACTURA_1.COREL=D_FACTURAP.COREL))";
+			dt=Con.OpenDT(sql);
+
+			return (dt.getCount()==0);
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			return false;
+		}
+
 	}
 
 	private void requisitosFinDia(){

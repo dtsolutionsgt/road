@@ -1,10 +1,12 @@
 package com.dts.roadp;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import com.dts.roadp.clsClasses.clsCobro;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -15,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -40,7 +43,13 @@ public class Pago extends PBase {
 	private int nivel,cpago,pagomodo;
 	private double pago,ttot,saldo,monto,pagolim;
 	private boolean cobro;
-	
+	private int cyear, cmonth, cday,dweek;
+
+	public final Calendar c = Calendar.getInstance();
+	final int mes = c.get(Calendar.MONTH);
+	final int dia = c.get(Calendar.DAY_OF_MONTH);
+	final int anio = c.get(Calendar.YEAR);
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,7 +71,7 @@ public class Pago extends PBase {
 		pagomodo=gl.pagomodo;
 
 		setNivel();
-		
+		setActDate();
 		initSession();
 		
 		listPagos();
@@ -120,10 +129,7 @@ public class Pago extends PBase {
 			finish();
 		}
 	}
-	
-	
-	// Main
-	
+
 	private void setHandlers(){
 		
 		listView.setOnItemClickListener(new OnItemClickListener() {
@@ -145,6 +151,9 @@ public class Pago extends PBase {
 	    });
 		    
 	}
+
+
+	//region Main
 
 	private void listItems(){
 		Cursor DT;
@@ -257,8 +266,9 @@ public class Pago extends PBase {
 			msgAskSave("Aplicar pagos y continuar?");
 		}
 	}
-	
-	
+
+	//endregion
+
 	// Tipo pago
 	
 	private void selPago(int pidx) {
@@ -440,8 +450,10 @@ public class Pago extends PBase {
 
 		if (cpago==2) {
 			alert.setTitle("Numero de Cheque");
+		} else if(cpago==3) {
+			alert.setTitle("Numero de Cheque");
 		} else {
-			alert.setTitle("Numero de tarjeta");
+			alert.setTitle("Pendiente especificación");
 		}
 		
 		final EditText input = new EditText(this);
@@ -452,8 +464,12 @@ public class Pago extends PBase {
 		
 		alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-			   	//closekeyb();
-		    	checkNum(input.getText().toString());
+				if (cpago==2) {
+					checkNum(input.getText().toString(),false);
+				} else if (cpago==3) {
+					checkNum(input.getText().toString(),true);
+				}
+
 		  	}
 		});
 
@@ -466,7 +482,7 @@ public class Pago extends PBase {
 		alert.show();
 	}
 	
-	private void checkNum(String s) {
+	private void checkNum(String s, boolean modo) {
 		
 		if (mu.emptystr(s)) {
 			showkeyb();
@@ -475,11 +491,49 @@ public class Pago extends PBase {
 			return;
 		}
 		
-		desc1=s;desc2=bn;desc3=bc;
-		
+		//desc1=s;desc2=bn;desc3=bc;
+		desc1=s;desc2=bc;desc3="";
+
+		if (cpago==2) {
+			addPago();
+		} else {
+			obtenerFecha();
+		}
+
+	}
+
+	private void aplicarFecha(String fs) {
+		desc3=fs;
 		addPago();
 	}
-	
+
+
+	// Date
+
+	private void obtenerFecha(){
+		DatePickerDialog recogerFecha = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+			@Override
+			public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+				final int mesActual = month + 1;
+				String diaFormateado = (dayOfMonth < 10)? "0" + String.valueOf(dayOfMonth):String.valueOf(dayOfMonth);
+				String mesFormateado = (mesActual < 10)? "0" + String.valueOf(mesActual):String.valueOf(mesActual);
+
+				aplicarFecha(diaFormateado + "/" + mesFormateado + "/" + year);
+			}
+		},anio, mes, dia);
+
+		recogerFecha.show();
+	}
+
+	private void setActDate(){
+		final Calendar c = Calendar.getInstance();
+		cyear = c.get(Calendar.YEAR);
+		cmonth = c.get(Calendar.MONTH)+1;
+		cday = c.get(Calendar.DAY_OF_MONTH);
+		fecha=du.cfecha(cyear,cmonth,cday);
+	}
+
+
 	// Aux
 	
 	private void setNivel(){

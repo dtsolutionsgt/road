@@ -483,30 +483,6 @@ public class PedidoRes extends PBase {
 		recogerFecha.show();
 	}
 
-	//#HS_20181212 Se agregó nuevo dialog para la fecha
-	/*@SuppressLint("ValidFragment")
-	public  class DatePickerFragment extends DialogFragment
-    implements DatePickerDialog.OnDateSetListener {
-
-		@Override
-			public Dialog onCreateDialog(Bundle savedInstanceState) {
-				
-				final Calendar c = Calendar.getInstance();
-				int year = cyear;
-				int month = cmonth-1;
-				int day = cday;
-
-				return new DatePickerDialog(getActivity(), this, year, month, day);
-			}
-
-			public void onDateSet(DatePicker view, int year, int month, int day) {
-				cyear=year;cmonth=month+1;cday=day;
-				fechae=du.cfecha(cyear,cmonth,cday);
-				lblFecha.setText(du.sfecha(fechae));
-			}
-			
-	}*/
-	
 	private void setActDate(){
 		final Calendar c = Calendar.getInstance();
 		cyear = c.get(Calendar.YEAR);

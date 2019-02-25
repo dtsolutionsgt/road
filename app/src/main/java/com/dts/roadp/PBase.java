@@ -88,7 +88,9 @@ public class PBase extends FragmentActivity {
 	}
 	
 	protected void toastlong(String msg) {
-		Toast.makeText(this,msg, Toast.LENGTH_LONG).show();
+		Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_LONG);
+		toast.setGravity(Gravity.CENTER, 0, 0);
+		toast.show();
 	}
 
 	protected void toastcent(String msg) {

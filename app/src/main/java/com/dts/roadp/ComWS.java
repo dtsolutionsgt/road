@@ -921,7 +921,7 @@ public class ComWS extends PBase {
 
 		if (TN.equalsIgnoreCase("P_STOCKB")) {
 			SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
-				  "FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+				  "FROM P_STOCKB WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 				  "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
 			return SQL;
 		}
@@ -2506,10 +2506,11 @@ public class ComWS extends PBase {
 		
 		if (!errflag) {
 			lblInfo.setText(" ");
+			if (scon==0) {
+				lblInfo.setText(fstr);writeErrLog(fstr);mu.msgbox(fstr);
+			}
 		} else {	
-			lblInfo.setText(fstr);
-			writeErrLog(fterr);
-			mu.msgbox(fterr);
+			lblInfo.setText(fstr);writeErrLog(fterr);mu.msgbox(fterr);
 		}
 
 		if (envioparcial) mu.msgbox(senv);

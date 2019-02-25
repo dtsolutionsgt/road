@@ -59,7 +59,8 @@ public class ComWS extends PBase {
 	private SQLiteDatabase dbT;
 	private BaseDatos ConT;
 	private BaseDatos.Insert insT;
-	
+	private  AppMethods clsAppM;
+
 	private ArrayList<String> listItems=new ArrayList<String>();
 	private ArrayList<String> results=new ArrayList<String>();
 	
@@ -163,26 +164,23 @@ public class ComWS extends PBase {
 	// Events
 	
 	public void askRec(View view) {
-		
+
 		if (isbusy==1) {
 			toastcent("Por favor, espere que se termine la tarea actual.");return;
 		}
-			
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		
-		dialog.setTitle("Recepción");
-		dialog.setMessage("¿Recibir datos nuevos?");
-					
-		dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	runRecep();
-		    }
-		});
-		
-		dialog.setNegativeButton("Cancelar", null);
-		
-		dialog.show();
-			
+
+		//CKFK 20190222 Se agregó esta validación para no sobreescribir los datos si ya se importaron
+        if (!gl.modoadmin){
+
+            if (ExistenDatos()) {
+                BorraDatosAnteriores("¿Tiene facturas, pedidos, cobros, devoluciones o inventario, está seguro de borrar los datos?");
+            }
+
+        }
+        else{
+            msgAskConfirmaRecibido();
+        }
+
 	}	
 	
 	public void askSend(View view) {
@@ -695,7 +693,7 @@ public class ComWS extends PBase {
 					if (!AddTable("P_STOCK_APR")) return false;
 				} else {
 				    if (!AddTable("P_STOCK")) return false;
-					if (!AddTable("P_STOCKB")) return false;
+					//if (!AddTable("P_STOCKB")) return false;
 				}
 			}
 			
@@ -919,6 +917,7 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
+		//CKFK 20190222 Agregué a la consulta el AND (ENVIADO = 0)
 		if (TN.equalsIgnoreCase("P_STOCKB")) {
 			SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
 				  "FROM P_STOCKB WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
@@ -1444,18 +1443,8 @@ public class ComWS extends PBase {
 				validaDatos(true);
 					
 				if (stockflag==1) sendConfirm();
-//Test of my commit by ejc.
-				//Otro comment.
-                if (gl.modoadmin) {
 
-                    mu.msgbox(s);
-                    toast("restart");
-                    restarApp();
-                }
-                else {
-
-                    msgAskExit(s);
-                };
+				msgAskExit(s);
 
             } else {
 				isbusy=0;
@@ -2509,7 +2498,7 @@ public class ComWS extends PBase {
 			if (scon==0) {
 				lblInfo.setText(fstr);writeErrLog(fstr);mu.msgbox(fstr);
 			}
-		} else {	
+		} else {
 			lblInfo.setText(fstr);writeErrLog(fterr);mu.msgbox(fterr);
 		}
 
@@ -2936,6 +2925,30 @@ public class ComWS extends PBase {
 		System.exit(0);
 	}
 
+	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
+    public boolean ExistenDatos(){
+
+        try {
+
+            int cantFact,CantPedidos,CantCobros,CantDevol,CantInventario;
+
+            clsAppM = new AppMethods(this, gl, Con, db);
+
+            cantFact = clsAppM.getDocCountTipo("Facturas");
+            CantPedidos = clsAppM.getDocCountTipo("Pedidos");
+            CantCobros = clsAppM.getDocCountTipo("Cobros");
+            CantDevol = clsAppM.getDocCountTipo("Devoluciones");
+            CantInventario = clsAppM.getDocCountTipo("Inventario");
+
+           return  ((cantFact>0) || (CantCobros>0) || (CantDevol>0) || (CantPedidos>0) || (CantInventario>0));
+
+        } catch (Exception e) {
+            msgbox(e.getMessage());
+            return false;
+        }
+
+    };
+
 
 	// Activity Events
 	
@@ -2943,13 +2956,11 @@ public class ComWS extends PBase {
 	public void onBackPressed() {
 	   if (isbusy==0) {
 		   if (gl.modoadmin) {
-
-		       toast("restart");
-		       restarApp();
-
-		   };
-
-		   super.onBackPressed();
+               msgAskExitComplete();
+		   }
+           else{
+               super.onBackPressed();
+           }
 	   }
 	}
 
@@ -2957,14 +2968,86 @@ public class ComWS extends PBase {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
         dialog.setTitle(R.string.app_name);
-        dialog.setMessage(msg  + " ?");
+        dialog.setMessage(msg);
         dialog.setIcon(R.drawable.ic_quest);
 
         dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-               finish();
+
+                if (gl.modoadmin) {
+                    restarApp();
+                }
+                else {
+                    finish();
+                };
             }
         });
+
+        dialog.show();
+
+    }
+
+    private void BorraDatosAnteriores(String msg) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+        dialog.setTitle(R.string.app_name);
+        dialog.setMessage(msg);
+        dialog.setIcon(R.drawable.ic_quest);
+
+        dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+               claseFindia.eliminarTablasD();
+            }
+        });
+
+        dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                msgAskConfirmaRecibido();
+            }
+        });
+
+        dialog.show();
+
+    }
+
+    private void msgAskExitComplete() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+        dialog.setTitle(R.string.app_name);
+        dialog.setMessage("Está seguro de salir de la aplicación?");
+        dialog.setIcon(R.drawable.ic_quest);
+
+        dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                System.exit(0);
+            }
+        });
+
+        dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                ;
+            }
+        });
+
+        dialog.show();
+
+    }
+
+    private void msgAskConfirmaRecibido(){
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+        dialog.setTitle("Recepción");
+        dialog.setMessage("¿Recibir datos nuevos?");
+
+        dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                runRecep();
+            }
+        });
+
+        dialog.setNegativeButton("Cancelar", null);
 
         dialog.show();
 

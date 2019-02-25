@@ -171,7 +171,7 @@ public class FinDia extends PBase {
 		idle = true;
 
 		if (!rslt) {
-			msgExit("Proceso cierre del día fallo. Intente de nuevo, por favor.");
+			msgExit("Proceso cierre del día falló. Intente de nuevo, por favor.");
 			delPrintFiles();
 			return;
 		}
@@ -217,7 +217,7 @@ public class FinDia extends PBase {
 		FinDia.super.finish();
 	}
 
-	//#HS_20181127_1052 Agregue funcion de inicio de FinDia.
+	//#HS_20181127_1052 Agregué funcion de inicio de FinDia.
 	public void iniciarFD() {
 
 		File fd=new File(Environment.getExternalStorageDirectory()+"/SyncFold/findia.txt");
@@ -238,162 +238,162 @@ public class FinDia extends PBase {
 		startActivity(new Intent(this, ComWS.class));
 	}
 
-	private boolean completeProcess() {
+	public boolean completeProcess() {
 		Cursor DT;
 		String corel;
-		
+
 		try {
-			
+
 			db.beginTransaction();
-			
+
 			sql="SELECT COREL FROM D_FACTURA WHERE STATCOM='S'";
-			DT=Con.OpenDT(sql);		
+			DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) {
-				
+
 				DT.moveToFirst();
 				while (!DT.isAfterLast()) {
-					
+
 					corel=DT.getString(0);
-					
+
 					sql="DELETE FROM D_FACTURA WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_FACTURAD WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_FACTURAP WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_FACTURAD_LOTES WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_FACTURAF WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_FACTURA_STOCK WHERE COREL='"+corel+"'";db.execSQL(sql);
-					
+
 					sql="DELETE FROM D_BONIF";db.execSQL(sql);
 					sql="DELETE FROM D_BONIF_LOTES";db.execSQL(sql);
 					sql="DELETE FROM D_REL_PROD_BON";db.execSQL(sql);
 					sql="DELETE FROM D_BONIFFALT";db.execSQL(sql);
-					
+
 					DT.moveToNext();
-				}			
+				}
 			}
-			
-			
+
+
 			sql="SELECT COREL FROM D_PEDIDO WHERE STATCOM='S'";
-			DT=Con.OpenDT(sql);		
+			DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) {
-				
+
 				DT.moveToFirst();
 				while (!DT.isAfterLast()) {
-					
+
 					corel=DT.getString(0);
-					
+
 					sql="DELETE FROM D_PEDIDO WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_PEDIDOD WHERE COREL='"+corel+"'";db.execSQL(sql);
-					
+
 					sql="DELETE FROM D_BONIF";db.execSQL(sql);
 					sql="DELETE FROM D_REL_PROD_BON";db.execSQL(sql);
 					sql="DELETE FROM D_BONIFFALT";db.execSQL(sql);
-					
+
 					DT.moveToNext();
-				}			
+				}
 			}
 
 			sql="SELECT COREL FROM D_COBRO WHERE STATCOM='S'";
-			DT=Con.OpenDT(sql);		
+			DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) {
-				
+
 				DT.moveToFirst();
 				while (!DT.isAfterLast()) {
-					
+
 					corel=DT.getString(0);
-					
+
 					sql="DELETE FROM D_COBRO WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_COBROD WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_COBROP WHERE COREL='"+corel+"'";db.execSQL(sql);
-					
+
 					DT.moveToNext();
-				}			
+				}
 			}
-			
-					
+
+
 			sql="SELECT COREL FROM D_DEPOS WHERE STATCOM='S'";
-			DT=Con.OpenDT(sql);		
+			DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) {
-				
+
 				DT.moveToFirst();
 				while (!DT.isAfterLast()) {
 					corel=DT.getString(0);
 					sql="DELETE FROM D_DEPOS WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_DEPOSD WHERE COREL='"+corel+"'";db.execSQL(sql);
-					
+
 					DT.moveToNext();
-				}			
+				}
 			}
 
-			
+
 			sql="SELECT COREL FROM D_MOV WHERE STATCOM='S'";
-			DT=Con.OpenDT(sql);		
+			DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) {
-				
+
 				DT.moveToFirst();
 				while (!DT.isAfterLast()) {
 					corel=DT.getString(0);
 					sql="DELETE FROM D_MOV WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_MOVD WHERE COREL='"+corel+"'";db.execSQL(sql);
-					
+
 					DT.moveToNext();
-				}			
+				}
 			}
 			//sql="DELETE FROM D_MOVD WHERE CODIGOLIQUIDACION=0";db.execSQL(sql);
 
-			
+
 			sql="SELECT CODIGO FROM D_CLINUEVO WHERE STATCOM='S'";
-			DT=Con.OpenDT(sql);		
+			DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) {
-				
+
 				DT.moveToFirst();
 				while (!DT.isAfterLast()) {
 					corel=DT.getString(0);
 					sql="DELETE FROM D_CLINUEVO WHERE CODIGO='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_CLINUEVO_APR WHERE CODIGO='"+corel+"'";db.execSQL(sql);
-					
+
 					DT.moveToNext();
-				}			
-			}		
-			
-			
+				}
+			}
+
+
 			sql="SELECT COREL FROM D_SOLICINV WHERE STATCOM='S'";
-			DT=Con.OpenDT(sql);		
+			DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) {
-				
+
 				DT.moveToFirst();
 				while (!DT.isAfterLast()) {
 					corel=DT.getString(0);
 					sql="DELETE FROM D_SOLICINV WHERE COREL='"+corel+"'";db.execSQL(sql);
 					sql="DELETE FROM D_SOLICINVD WHERE COREL='"+corel+"'";db.execSQL(sql);
-					
+
 					DT.moveToNext();
-				}			
+				}
 			}
-			
-				
+
+
 			sql="DELETE FROM D_ATENCION";db.execSQL(sql);
 			sql="DELETE FROM D_CLICOORD WHERE STATCOM='S'";db.execSQL(sql);
-					
-			
+
+
 			corelz++;
 			sql="UPDATE FinDia SET Corel="+corelz;
 			db.execSQL(sql);
-			
+
 			/*sql="UPDATE P_RUTA SET Email='0'";
 			db.execSQL(sql);*/
-			
-			db.setTransactionSuccessful();			
+
+			db.setTransactionSuccessful();
 			db.endTransaction();
-					
+
 		} catch (SQLException e) {
 			db.endTransaction();
 			//mu.msgbox("Error : " + e.getMessage());
 			return false;
-		}				
-		
+		}
+
 		return true;
 	}
-	
+
 	private void buildReports() {
 		
 		rep.empty();

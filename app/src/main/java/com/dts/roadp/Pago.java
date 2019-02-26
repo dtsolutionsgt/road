@@ -309,7 +309,7 @@ public class Pago extends PBase {
 		try {
 			
 			if (cobro) {
-				sql="SELECT Codigo,Nombre FROM P_MEDIAPAGO WHERE (NIVEL<="+nivel+") AND (ACTIVO='S') AND (PORCOBRO='S') ORDER BY Codigo";
+				sql="SELECT Codigo,Nombre,Nivel FROM P_MEDIAPAGO WHERE (NIVEL<="+nivel+") AND (ACTIVO='S') AND (PORCOBRO='S') ORDER BY Codigo";
 			} else {	
 				sql="SELECT Codigo,Nombre,Nivel FROM P_MEDIAPAGO WHERE (NIVEL<="+nivel+") AND (ACTIVO='S') ORDER BY Codigo";
 			}

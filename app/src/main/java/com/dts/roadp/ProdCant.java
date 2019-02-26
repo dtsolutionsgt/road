@@ -404,7 +404,8 @@ public class ProdCant extends PBase {
 		}
 
 		gl.dval=cant;
-		if (porpeso) gl.dpeso=ppeso;else gl.dpeso=0;
+		//if (porpeso) gl.dpeso=ppeso;else gl.dpeso=0;
+		gl.dpeso=ppeso;
 		gl.um=upres;
 		gl.umpres=upres;
 		gl.umstock=umstock;

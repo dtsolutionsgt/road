@@ -2298,7 +2298,7 @@ public class ComWS extends PBase {
 		int rslt;
 		int vfecha = Get_Fecha_Inventario();
 		//#HS_20181203_1000 Agregue DU.univfechaext(vfecha) para convertir la fecha a formato de yymmdd hhmm
-        vFecha = DU.univfechaext(vfecha);
+        vFecha = DU.univfechasql(vfecha)+" 00:00:00";
 		String corel_d_mov = Get_Corel_D_Mov();
 
 		try {
@@ -3014,7 +3014,7 @@ public class ComWS extends PBase {
         dialog.show();
 
     }
-
+    // #JP corregido 20190226
     private void BorraDatosAnteriores(String msg) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 

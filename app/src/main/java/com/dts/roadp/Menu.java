@@ -184,7 +184,6 @@ public class Menu extends PBase {
 			item = clsCls.new clsMenu();
 			item.ID=10;item.Name="Cambio usuario";item.Icon=10;
 			items.add(item);
-				
 		} catch (Exception e) {
 		}
 		

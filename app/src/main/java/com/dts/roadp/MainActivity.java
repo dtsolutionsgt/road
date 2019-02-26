@@ -54,6 +54,31 @@ public class MainActivity extends PBase {
 
 	// Grant permissions
 
+	private void grantPermissions() {
+		try {
+			if (Build.VERSION.SDK_INT >= 23) {
+
+				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
+						&& checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
+						&& checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
+						&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED)
+				{
+					startApplication();
+				} else {
+					ActivityCompat.requestPermissions(this,
+							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+									Manifest.permission.ACCESS_FINE_LOCATION,
+									Manifest.permission.CALL_PHONE,
+									Manifest.permission.CAMERA}, 1);
+				}
+			}
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+	}
+
+
 	private void startApplication() {
 
         try {
@@ -89,29 +114,7 @@ public class MainActivity extends PBase {
 
 	}
 
-	private void grantPermissions() {
-		try {
-			if (Build.VERSION.SDK_INT >= 23) {
 
-				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
-			        && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
-					&& checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
-					&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED)
-				{
-					startApplication();
-				} else {
-					ActivityCompat.requestPermissions(this,
-							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-									     Manifest.permission.ACCESS_FINE_LOCATION,
-									     Manifest.permission.CALL_PHONE,
-									     Manifest.permission.CAMERA}, 1);
-				}
-			}
-
-	    } catch (Exception e) {
-			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-		}
-	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {

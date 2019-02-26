@@ -64,7 +64,7 @@ public class Pago extends PBase {
 		
 		setHandlers();
 		
-		saldo=gl.pagoval;
+		saldo=gl.pagoval;saldo=mu.round2(saldo);
 		pagolim=mu.round2(gl.pagolim);
 		cobro=gl.pagocobro;
 		cliid=gl.cliente;
@@ -687,8 +687,11 @@ public class Pago extends PBase {
 					
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	gl.pagado=totalPago()>0;
-		    	doExit();
+		    	if (totalPago()>0){
+					gl.pagado = true;
+					toast("doexit");
+					doExit();
+				}
 		    }
 		});
 		

@@ -236,20 +236,20 @@ public class Cobro extends PBase {
 	}	
 	
 	private void createDoc(){
-
 		if (gl.pagomodo==0) {
 			docList();
 			if (!applyPay()) return;
 		}
 
-		if (saveCobro()) {
-			listItems();
 
+	if (saveCobro()) {
+			listItems();
 			if (prn.isEnabled()) {
 				fdoc.buildPrint(corel,0);
 				prn.printask(printclose);
 			}
 		}
+
 	}
 	
 	private boolean saveCobro(){
@@ -348,13 +348,21 @@ public class Cobro extends PBase {
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 
-				if (tipo.equalsIgnoreCase("R")) {
-					ins.init("D_FACTURAP");
-					ins.add("COREL",doc);
-				} else {
+				if (mu.emptystr(tipo)) {
 					ins.init("D_COBROP");
 					ins.add("COREL",corel);
+				} else {
+					if (tipo.equalsIgnoreCase("R")) {
+						ins.init("D_FACTURAP");
+						ins.add("COREL",doc);
+					} else {
+						ins.init("D_COBROP");
+						ins.add("COREL",corel);
+					}
+
 				}
+
+
 
 				ins.add("ITEM",DT.getInt(0));
 				ins.add("ANULADO","N");

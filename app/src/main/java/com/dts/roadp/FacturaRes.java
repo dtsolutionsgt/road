@@ -673,7 +673,7 @@ public class FacturaRes extends PBase {
 	
 	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa) {
 		Cursor dt;
-		double acant,cantapl,dispcant,peso,pesoapl,disppeso,factpeso;
+		double ccant,acant,cantapl,dispcant,peso,pesoapl,disppeso,factpeso;
 		String lote,doc,stat;
 
 		if(porpeso) factor=1;
@@ -690,7 +690,7 @@ public class FacturaRes extends PBase {
 			dt.moveToFirst();
 			while (!dt.isAfterLast()) {
 
-				cant=dt.getDouble(0);
+				cant=dt.getDouble(0);ccant=cant;
 				peso=dt.getDouble(2);
 				lote=dt.getString(4);
 				doc=dt.getString(5);
@@ -747,7 +747,7 @@ public class FacturaRes extends PBase {
 					ins.add("COREL",corel);
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
-					ins.add("CANTIDAD",cantapl);
+					ins.add("CANTIDAD",ccant);
 					ins.add("PESO",pesoapl);
 					ins.add("UMSTOCK",umstock);
 					ins.add("UMPESO",gl.umpeso);

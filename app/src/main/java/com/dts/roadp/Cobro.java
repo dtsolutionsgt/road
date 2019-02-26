@@ -83,9 +83,11 @@ public class Cobro extends PBase {
 	// Events
 	
 	public void paySelect(View view) {
-		
+
+		calcSelected();
+
 		if (tsel==0) {
-			mu.msgbox("Total a pagar = 0");return;
+			mu.msgbox("Total a pagar = 0, debe seleccionar un documento");return;
 		}
 
 		gl.pagomodo=0;
@@ -99,8 +101,11 @@ public class Cobro extends PBase {
 	}
 	
 	public void payCash(View view) {
+
+		calcSelected();
+
 		if (tsel==0) {
-			mu.msgbox("Total a pagar = 0");return;
+			mu.msgbox("Total a pagar = 0, debe seleccionar un documento");return;
 		}
 		
 		inputEfectivo();  

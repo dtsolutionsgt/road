@@ -1375,14 +1375,14 @@ public class FinDia extends PBase {
 
     }
 
-	private void msgAskFinDiaTrue() {
+	private void msgAskFinDiaTrue()
+	{
+
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle("Road");
 		dialog.setMessage("Este proceso prepara el sistema para el siguiente día de venta. Continuar ?");
-				
 		dialog.setIcon(R.drawable.ic_quest);
-					
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {
 				//#HS_20181121_1453 Se habilito el mensaje de confirmación.
@@ -1398,12 +1398,13 @@ public class FinDia extends PBase {
 			
 	}	
 	
-	private void msgAsk2() {
+	private void msgAsk2()
+	{
+
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		    	
 		dialog.setTitle(R.string.app_name);
 		dialog.setMessage("¿Está seguro de continuar?");
-				
 		dialog.setIcon(R.drawable.ic_quest);
 					
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
@@ -1421,7 +1422,9 @@ public class FinDia extends PBase {
 	}
 
 	//#HS_20181121_1506 Se creo la pregunta para la devolución de inventario.
-	private void msgAskDevInventario() {
+	private void msgAskDevInventario()
+	{
+
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 		dialog.setTitle("Road");

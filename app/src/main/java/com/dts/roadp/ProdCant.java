@@ -537,17 +537,23 @@ public class ProdCant extends PBase {
 	}
 
 	private boolean checkLimits(double vpeso,double opeso) {
+
 		Cursor dt;
 		double pmin,pmax;
 		String ss;
 
 		try {
+
 			sql="SELECT PORCMINIMO,PORCMAXIMO FROM P_PORCMERMA WHERE PRODUCTO='"+prodid+"'";
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount() == 0) {
-				msgbox("El repesaje no se puede aplicar,\n no esta definido rango de repesaje para el producto.");return false;
+				msgbox("No está definido rango de repesaje para el producto, no se podrá modificar el peso");
+				//#EJC20190226: Si no está definido repesaje no se puede modificar el peso según observación de Carolina se debe dejar vender.
+				txtPeso.setEnabled(false);
+				return true;
 			}
+
 			dt.moveToFirst();
 
 			pmin = opeso - dt.getDouble(0) * opeso / 100;

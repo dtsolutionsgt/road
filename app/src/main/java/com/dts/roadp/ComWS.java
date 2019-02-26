@@ -1477,6 +1477,8 @@ public class ComWS extends PBase {
 				SystemClock.sleep(100);
 				//#EJC20190226:Evita cargar datos dos veces.
 				//if (validaDatos(false)) runRecep();
+                //#EJC20190226_1308: Reiniciar la App
+                msgAskExit(s);
 				return;
 			}
 

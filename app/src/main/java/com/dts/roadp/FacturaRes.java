@@ -453,7 +453,13 @@ public class FacturaRes extends PBase {
 		int mitem;		
 		
 		corel=gl.ruta+"_"+mu.getCorelBase();
-		fecha=du.getActDateTime();
+
+		if (gl.peModal.equalsIgnoreCase("TOL")) {
+			fecha=du.getActDate();
+		} else {
+			fecha=du.getActDateTime();
+		}
+
 		
 		try {
 			sql="SELECT MAX(ITEM) FROM D_FACT_LOG";

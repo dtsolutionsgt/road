@@ -275,7 +275,7 @@ public class Cobro extends PBase {
 			ins.init("D_COBRO");
 			ins.add("COREL",corel);
 			ins.add("ANULADO","N");
-			ins.add("FECHA",fecha);
+			ins.add("FECHA",du.getActDate());
 			ins.add("EMPRESA",gl.emp);
 			ins.add("RUTA",gl.ruta);
 			ins.add("VENDEDOR",gl.vend);

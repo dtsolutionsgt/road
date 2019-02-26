@@ -400,7 +400,7 @@ public class Deposito extends PBase {
 			ins.init("D_DEPOS");
 			ins.add("COREL",corel);
 			ins.add("EMPRESA",((appGlobals) vApp).emp);
-			ins.add("FECHA",fecha);
+			ins.add("FECHA",du.getActDate());
 			ins.add("RUTA",((appGlobals) vApp).ruta);
 			ins.add("BANCO",bancoid);
 			ins.add("CUENTA",cuenta);

@@ -107,6 +107,24 @@ public class DateUtils {
 		
 		return s;
 	}
+
+	public String univfechasinhora(int f) {
+		int vy,vm,vd;
+		String s;
+
+		//yyyyMMdd hh:mm:ss
+
+		vy=(int) f/10000;f=f % 10000;
+		vm=(int) f/100;f=f % 100;
+		vd=(int) f;
+
+		s=""+vy;
+		if (vm>9) s=s+vm; else s=s+"0"+vm;
+		if (vd>9) s=s+vd; else s=s+"0"+vd;
+		s=vy+" "+vm+":"+vd+":00"; //#HS_20181128_1102 Agregue " "+vm+":"+vd+":00" para que devolviera la hora.
+
+		return s;
+	}
 	
 	public String univfechaext(int f) {
 		int vy,vm,vd;

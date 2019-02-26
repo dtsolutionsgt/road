@@ -179,7 +179,7 @@
         android:layout_above="@+id/rellaydn"
         android:layout_below="@+id/relativeLayout1"
         android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp" >
+        android:layout_marginRight="5dp">
 
     </ListView>
 

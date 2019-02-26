@@ -337,7 +337,7 @@ public class Clientes extends PBase {
 	public void showCliente() {
 		
 		gl.cliente=selid;
-		
+
 		gl.closeCliDet=false;
 		gl.closeVenta=false;
 		

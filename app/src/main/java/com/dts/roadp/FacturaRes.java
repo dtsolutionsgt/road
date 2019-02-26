@@ -29,9 +29,9 @@ import android.widget.Toast;
 public class FacturaRes extends PBase {
 
 	private ListView listView;
-	private TextView lblPago,lblFact,lblTalon,lblMPago,lblCred;
-	private ImageView imgBon,imgMPago,imgCred;
-	
+	private TextView lblPago,lblFact,lblTalon,lblMPago,lblCred,lblPend,lblCash;
+	private ImageView imgBon,imgMPago,imgCred,imgPend, imgCash;
+
 	private List<String> spname = new ArrayList<String>();
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
 	private ListAdaptTotals adapter;
@@ -65,11 +65,15 @@ public class FacturaRes extends PBase {
 		lblTalon = (TextView) findViewById(R.id.lblTalon);
 		lblMPago = (TextView) findViewById(R.id.lblCVence);
 		lblCred = (TextView) findViewById(R.id.TextView02);
-		
+		lblPend = (TextView) findViewById(R.id.lblCVence2);
+		lblCash = (TextView) findViewById(R.id.textView4);
+
 		imgBon = (ImageView) findViewById(R.id.imageView6);
 		imgMPago = (ImageView) findViewById(R.id.imageView1);
 		imgCred = (ImageView) findViewById(R.id.imageView3);
-		
+		imgPend = (ImageView) findViewById(R.id.imageView12);
+		imgCash = (ImageView) findViewById(R.id.imageView2);
+
 		cliid=gl.cliente;	
 		rutapos=gl.rutapos;
 		media=gl.media;
@@ -93,25 +97,44 @@ public class FacturaRes extends PBase {
 		if (media==1) {
 			imgCred.setVisibility(View.INVISIBLE);
 			lblCred.setVisibility(View.INVISIBLE);
-			imgMPago.setVisibility(View.INVISIBLE);
-			lblMPago.setVisibility(View.INVISIBLE);
+			lblCash.setVisibility(View.VISIBLE);
+			imgCash.setVisibility(View.VISIBLE);
+			lblPend.setVisibility(View.INVISIBLE);
+			imgPend.setVisibility(View.INVISIBLE);
+			imgMPago.setVisibility(View.VISIBLE);
+			lblMPago.setVisibility(View.VISIBLE);
 		}
 
 		if (media <= 3){
 			imgMPago.setVisibility(View.VISIBLE);
 			lblMPago.setVisibility(View.VISIBLE);
+			imgCred.setVisibility(View.INVISIBLE);
+			lblCred.setVisibility(View.INVISIBLE);
+			lblCash.setVisibility(View.VISIBLE);
+			imgCash.setVisibility(View.VISIBLE);
+			lblPend.setVisibility(View.VISIBLE);
+			imgPend.setVisibility(View.VISIBLE);
 		}
 
 		if (media==4) {
+			lblCash.setVisibility(View.INVISIBLE);
+			imgCash.setVisibility(View.INVISIBLE);
+			lblPend.setVisibility(View.INVISIBLE);
+			imgPend.setVisibility(View.INVISIBLE);
 			imgCred.setVisibility(View.VISIBLE);
 			lblCred.setVisibility(View.VISIBLE);
-			imgMPago.setVisibility(View.VISIBLE);
-			lblMPago.setVisibility(View.VISIBLE);
-			
-			if (credito<=0) {
-				imgCred.setVisibility(View.INVISIBLE);
-				lblCred.setVisibility(View.INVISIBLE);	
-			}			
+			imgMPago.setVisibility(View.INVISIBLE);
+			lblMPago.setVisibility(View.INVISIBLE);
+
+			if (gl.vcredito) {
+
+                if (credito<=0) {
+                    imgCred.setVisibility(View.INVISIBLE);
+                    lblCred.setVisibility(View.INVISIBLE);
+                }
+
+            }
+
 		}
 		
 		fechae=fecha;

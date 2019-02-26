@@ -302,6 +302,7 @@ public class Pago extends PBase {
 	private void listPagos(){
 		Cursor DT;
 		String code,name;
+		int nvl;
 			
 		lcode.clear();lname.clear();
 		
@@ -310,7 +311,7 @@ public class Pago extends PBase {
 			if (cobro) {
 				sql="SELECT Codigo,Nombre FROM P_MEDIAPAGO WHERE (NIVEL<="+nivel+") AND (ACTIVO='S') AND (PORCOBRO='S') ORDER BY Codigo";
 			} else {	
-				sql="SELECT Codigo,Nombre FROM P_MEDIAPAGO WHERE (NIVEL<="+nivel+") AND (ACTIVO='S') ORDER BY Codigo";
+				sql="SELECT Codigo,Nombre,Nivel FROM P_MEDIAPAGO WHERE (NIVEL<="+nivel+") AND (ACTIVO='S') ORDER BY Codigo";
 			}
 		
 			DT=Con.OpenDT(sql);
@@ -321,11 +322,26 @@ public class Pago extends PBase {
 			while (!DT.isAfterLast()) {
 				  
 			  try {
+
 				  code=String.valueOf(DT.getInt(0));
 				  name=DT.getString(1);
-				  
-				  lcode.add(code);
-				  lname.add(name);
+				  nvl=DT.getInt(2);
+
+				  if (nvl==2 & gl.vcheque) {
+					  lcode.add(code);
+					  lname.add(name);
+				  }else{
+				  	if (nvl==3 & gl.vchequepost){
+						lcode.add(code);
+						lname.add(name);
+					}else{
+				  		if (nvl==1){
+							lcode.add(code);
+							lname.add(name);
+						}
+					}
+				  }
+
 			  } catch (Exception e) {
 				  mu.msgbox(e.getMessage()); 
 			  }

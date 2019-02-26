@@ -247,7 +247,8 @@ public class CliDet extends PBase {
 		tel="";
 		
 		try {
-			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE,COORX,COORY,MEDIAPAGO,NIT "+
+			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
+				"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST "+
 				 "FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
            	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
@@ -283,7 +284,10 @@ public class CliDet extends PBase {
 			gl.fnombre=DT.getString(0);
 			gl.fnit=DT.getString(12);
 			gl.fdir=DT.getString(2);
-			
+			gl.vcredito = DT.getString(13).equalsIgnoreCase("S");
+			gl.vcheque = DT.getString(14).equalsIgnoreCase("S");
+			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
+
 		} catch (Exception e) {
 		   	mu.msgbox(e.getMessage());
 	    }

@@ -17,11 +17,15 @@ public class appGlobals extends Application {
 	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,atentini,vnivel,vnivprec,media;
 	public int autocom,nuevaFecha,pagomodo,filtrocli;
 	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor;
-	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov;
-	
+    public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov;
+
+	//CM_20190225: Variable para validar crédito.
+    public  boolean vcredito;
+	public boolean vcheque,vchequepost;
+
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,contlic,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo;
-
+	public int mpago;
 	// Parametros Extra
 	public String peModal,peMon,peFormatoFactura;
 	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec;

@@ -397,7 +397,11 @@ public class FacturaRes extends PBase {
 				}
 			}
 
-			prn.printask(printclose);
+			if (gl.peImprFactCorrecta) {
+				singlePrint();
+			} else {
+				prn.printask(printclose);
+			}
 
 			/*
 			final Handler shandler = new Handler();
@@ -422,11 +426,7 @@ public class FacturaRes extends PBase {
 		
 		/*
 		if (prn.isEnabled()) {
-
-
 			fdoc.buildPrint(corel);
-
-
 			singlePrint();
 		} else {
 			gl.closeCliDet=true;

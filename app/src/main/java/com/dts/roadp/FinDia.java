@@ -466,16 +466,14 @@ public class FinDia extends PBase {
 	}
 
 	private boolean devProductos() {
-
 		Cursor DT;
 		String corel,pcod,plote,um;
 		Double pcant,pcantm,ppeso;
 		claseFinDia = new clsFinDia(this);
-
 		int i;
 
 
-		corel=((appGlobals) vApp).ruta+"_"+mu.getCorelBase();devcorel=corel;
+		corel=gl.ruta+"_"+mu.getCorelBase();devcorel=corel;
 		gl.corel_d_mov=corel;
 
 		try {

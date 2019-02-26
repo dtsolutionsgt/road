@@ -1938,11 +1938,11 @@ public class ComWS extends PBase {
 
 		try {
 
-			sql = "SELECT COREL FROM D_MOV WHERE STATCOM='N'";
+			sql = "SELECT COREL FROM D_MOV WHERE (TIPO='D') ORDER BY COREL DESC ";
 			DT = Con.OpenDT(sql);
-			DT.moveToFirst();
 
 			if (DT.getCount() > 0) {
+				DT.moveToFirst();
 				cor = DT.getString(0);
 			}
 
@@ -2277,7 +2277,7 @@ public class ComWS extends PBase {
 			if (envioparcial) dbld.clear();
 
 			ss = " UPDATE P_STOCK SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
-					" WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + vFecha + "' AND ENVIADO = 0 " +
+					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA>='" + fsql + "') AND ENVIADO = 0 " +
 					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + vFecha + "' )";
 			dbld.add(ss);
 

@@ -849,15 +849,12 @@ public class CliDet extends PBase {
 	    	browse=0;
 	    	showData();return;
 	    }
-  
-	    
+
 	}
 
 	@Override
 	protected void onPause() {
 	    super.onPause();
 	}	
-	
-	
 
 }

@@ -11,14 +11,15 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:background="#F0F0F0">
+        android:layout_marginRight="1dp"
+        android:background="#BDE2F3">
 
         <TextView
             android:id="@+id/lblPNum"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
             android:layout_marginRight="0dp"
             android:layout_weight="1"
             android:width="0dip"
@@ -188,7 +189,7 @@
             android:paddingRight="5dp"
             android:text="Código"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="#2020C0"
+            android:textColor="#2020d0"
             android:textSize="18sp" />
 
         <TextView
@@ -200,7 +201,7 @@
             android:gravity="right"
             android:text="Medium Text"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#2020C0"
+            android:textColor="#2020d0"
             android:textStyle="bold" />
 
         <TextView
@@ -215,7 +216,7 @@
             android:paddingLeft="5dp"
             android:text="Total"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="#2020C0"
+            android:textColor="#2020d0"
             android:textSize="18sp"
             android:textStyle="normal" />
     </RelativeLayout>

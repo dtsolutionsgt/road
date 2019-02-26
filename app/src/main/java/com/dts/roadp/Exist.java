@@ -80,7 +80,7 @@ public class Exist extends PBase {
 }
 
 	
-	// Events
+	//region Events
 	
 	public void printDoc(View view) {
 		if (doc.buildPrint("0",0)) prn.printask();
@@ -90,8 +90,9 @@ public class Exist extends PBase {
 		txtFilter.setText("");
 	}
 	
-	
-	// Main
+	//endregion
+
+	//region Main
 	
  	private void setHandlers(){
 		
@@ -212,7 +213,7 @@ public class Exist extends PBase {
 				pcod=dp.getString(0);
                 valt=0;pesot=0;
 
-				sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT),SUM(P_STOCK.CANTM),P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS,P_STOCK.PESO  " +
+				sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT),SUM(P_STOCK.CANTM),P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS,SUM(P_STOCK.PESO)  " +
 						"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  ";
 				sql += "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
                         "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
@@ -433,8 +434,8 @@ public class Exist extends PBase {
 		dialog.show();
 
 	}
-	
-	// Print
+
+	//endregion
 
 	private class clsDocExist extends clsDocument {
 
@@ -513,6 +514,9 @@ public class Exist extends PBase {
 
 	}
 
+
+	//region Activity Events
+
 	@Override
 	protected  void onResume(){
 		super.onResume();
@@ -524,5 +528,5 @@ public class Exist extends PBase {
 		super.onPause();
 	}
 
-
+	//endregion
 }

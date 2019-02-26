@@ -123,7 +123,7 @@ public class Menu extends PBase {
 	}
 	
 	
-	// Menu principal
+	//region  Main
 	
 	public void showClients(View view) {
 		Intent intent;
@@ -391,339 +391,9 @@ public class Menu extends PBase {
 
 	}
 
+	//endregion
 
-	// Validacion de inicio.
-
-	//#HS_20181122_1527 Se agrego la funcion GetTipoImpresora().
-	public String GetTipoImpresora() {
-		Cursor DT;
-		String Tipo = "";
-
-		try{
-
-			sql="SELECT TIPO_IMPRESORA FROM P_ARCHIVOCONF";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-
-			if(DT.getCount()> 0)
-			{
-				Tipo = DT.getString(0);
-				gl.tipoImpresora = Tipo;
-			}
-
-		}catch (Exception e){
-			msgbox("GetTipoImpresora: " + e.getMessage());
-		}
-
-		return Tipo;
-	}
-
-	//#HS_20181122_1513 Se agrego la funcion ConfImpresora()
-	public void ConfImpresora(){
-
-		if(GetTipoImpresora().equalsIgnoreCase("SIN IMPRESORA") || GetTipoImpresora().equalsIgnoreCase("BLUETOOTH")){
-			msgAskImpresora();
-		}
-
-	}
-
-	//#HS_20181122_1517 Se agrego el mensaje de configuracion de impresora.
-	private void msgAskImpresora() 	{
-
-			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-			dialog.setTitle("Road");
-			dialog.setMessage("Debe configurar la impresora");
-
-			dialog.setIcon(R.drawable.ic_quest);
-
-			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					menuConfImpres();
-				}
-			});
-
-			dialog.show();
-
-	}
-
-	//Mensajes si ingresa con usuario de supervisor
-
-	private void msgAskSupervisor1() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-		dialog.setTitle("Road");
-		dialog.setMessage("Este usuario es ADMINISTRADOR. ¿Está seguro de realizar la venta con este usuario?");
-
-		dialog.setIcon(R.drawable.ic_quest);
-
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				msgAskSupervisor2();
-			}
-		});
-
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {}
-		});
-
-		dialog.show();
-
-	}
-
-	private void msgAskSupervisor2() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-		dialog.setTitle("Road");
-		dialog.setMessage("Usted no debería realizar ventas con el Rol de ADMINISTRADOR. ¿Esta 100% seguro de realizar la venta con este usuario?");
-
-		dialog.setIcon(R.drawable.ic_quest);
-
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				startActivity(new Intent(Menu.this, Clientes.class));
-			}
-		});
-
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {}
-		});
-
-		dialog.show();
-
-	}
-
-	//#HS_20181207 Mensaje que muestra los ayudantes y vehiculos disponibles.
-
-	private void AyudanteVehiculo() {
-		inputAyudanteVehiculo();
-
-		getlistAyudante();
-		getlistVehiculo();
-		getAyudante();
-		getVehiculo();
-	}
-
-	private void inputAyudanteVehiculo() {
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-		alert.setTitle("AYUDANTE Y VEHÍCULO");
-
-		final LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-
-		//layout.addView(new TextView(this));
-		layout.addView(lblAyudante);
-		layout.addView(Ayudante);
-		//layout.addView(new TextView(this));
-		layout.addView(lblVehiculo);
-		layout.addView(Vehiculo);
-
-		alert.setView(layout);
-
-		alert.setPositiveButton("Asignar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				getAyudanteVehiculo();
-			}
-		});
-
-		alert.setNegativeButton("Omitir", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				gl.ayudante = "";gl.ayudanteID = "";
-				gl.vehiculo = "";gl.vehiculoID= "";
-				closekeyb();
-			}
-		});
-
-		alert.show();
-	}
-
-	private void getAyudante(){
-
-		Ayudante.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-				TextView spinlabel;
-
-				try {
-					spinlabel=(TextView)parentView.getChildAt(0);
-					spinlabel.setTextColor(Color.BLACK);
-					spinlabel.setPadding(5, 0, 0, 0);
-					spinlabel.setTextSize(18);
-
-					gl.ayudanteID=listIDAyudante.get(position);
-					gl.ayudante=listAyudante.get(position);
-
-				} catch (Exception e) {
-					mu.msgbox( e.getMessage());
-				}
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parentView) {
-				return;
-			}
-
-		});
-
-	}
-
-	private void getVehiculo(){
-
-		Vehiculo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-				TextView spinlabel;
-
-				try {
-					spinlabel=(TextView)parentView.getChildAt(0);
-					spinlabel.setTextColor(Color.BLACK);
-					spinlabel.setPadding(5, 0, 0, 0);
-					spinlabel.setTextSize(18);
-
-					gl.vehiculoID=listIDVehiculo.get(position);
-					gl.vehiculo=listVehiculo.get(position);
-
-				} catch (Exception e) {
-					mu.msgbox( e.getMessage());
-				}
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parentView) {
-				return;
-			}
-
-		});
-
-	}
-
-	//#HS_20181207 Obtiene el ayudante y vehiculo asignado a la ruta.
-	private void getAyudanteVehiculo(){
-
-		try
-		{
-			if(gl.ayudante==""){
-			    msgAskAyudante();
-            }else if(gl.vehiculo == ""){
-			    msgAskVehiculo();
-            }else{
-			    mu.msgbox("Ayudante y Vehículo asignado a la ruta");
-            }
-
-		}catch (Exception e){
-			Log.d("getAyudanteVehiculo error: ", e.getMessage());
-		}
-	}
-
-	//#HS_20181207 Lista los ayudantes de la ruta.
-	private void getlistAyudante(){
-		Cursor DT;
-
-		try {
-			sql="SELECT CODIGO,NOMBRE FROM P_VENDEDOR WHERE RUTA = '" + gl.ruta + "' AND NIVEL = 5";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-
-			while (!DT.isAfterLast())
-			{
-				listIDAyudante.add(DT.getString(0));
-				listAyudante.add(DT.getString(1));
-				DT.moveToNext();
-			}
-
-			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listAyudante);
-			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-			Ayudante.setAdapter(dataAdapter);
-
-		} catch (Exception e) {
-			mu.msgbox(e.getMessage());
-		}
-
-	}
-
-	private void getlistVehiculo(){
-		Cursor DT;
-
-		try {
-			sql="SELECT CODIGO, MARCA, PLACA FROM P_VEHICULO";
-			DT=Con.OpenDT(sql);
-
-			if(DT.getCount()>0) {
-				DT.moveToFirst();
-
-				while (!DT.isAfterLast()) {
-					listIDVehiculo.add(DT.getString(0));
-					listVehiculo.add(DT.getString(1) + "-" + DT.getString(2));
-					DT.moveToNext();
-				}
-			}else if(DT.getCount() == 0){
-				listIDVehiculo.add("");
-				listVehiculo.add("No hay vehiculos disponibles");
-			}
-
-			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listVehiculo);
-			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-			Vehiculo.setAdapter(dataAdapter);
-
-		} catch (Exception e) {
-			mu.msgbox(e.getMessage());
-		}
-
-	}
-
-	private void msgAskAyudante() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-		dialog.setTitle("Road");
-		dialog.setMessage("¿Esta seguro de continuar sin asignar un ayudante?");
-
-		dialog.setIcon(R.drawable.ic_quest);
-
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-
-			}
-		});
-
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				inputAyudanteVehiculo();
-			}
-		});
-
-		dialog.show();
-
-	}
-
-	private void msgAskVehiculo() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-		dialog.setTitle("Road");
-		dialog.setMessage("¿Esta seguro de continuar sin asignar un vehículo?");
-
-		dialog.setIcon(R.drawable.ic_quest);
-
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-
-			}
-		});
-
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-
-			}
-		});
-
-		dialog.show();
-
-	}
-
-
-	// Reimpresion
+	//region Reimpresion
 	
 	public void showPrintMenuTodo() {
 		final AlertDialog Dialog;
@@ -910,8 +580,9 @@ public class Menu extends PBase {
 		startActivity(intent);
 	}
 
+	//endregion
 	
-	// Anulacion
+	//region Anulacion
 	
 	public void showVoidMenuTodo() {
 		final AlertDialog Dialog;
@@ -1047,9 +718,10 @@ public class Menu extends PBase {
 		Intent intent = new Intent(this,Anulacion.class);
 		startActivity(intent);
 	}
+
+	//endregion
 	
-	
-	// Consultas
+	//region Consultas
 	
 	public void showConsMenu() {
 		final AlertDialog Dialog;
@@ -1128,9 +800,10 @@ public class Menu extends PBase {
 		Intent intent = new Intent(this,ConsPrecio.class);
 		startActivity(intent);
 	}
-	
-	
-	// Inventario
+
+	//endregion
+
+	//region Inventario
 	
 	public void showInvMenuVenta() 	{
 		final AlertDialog Dialog;
@@ -1141,7 +814,7 @@ public class Menu extends PBase {
 		} else {
 			if (gl.peStockItf) {
 				if (gl.peModal.equalsIgnoreCase("TOL")) {	
-					//itemcnt+=1; 
+					itemcnt+=1;
 				} else {
 					itemcnt+=1;
 				}			 
@@ -1160,7 +833,8 @@ public class Menu extends PBase {
 		} else {	
 			if (gl.peStockItf) {
 				if (gl.peModal.equalsIgnoreCase("TOL")) {	
-					//selitems[itempos]="Recarga manual";itempos++; 
+					//selitems[itempos]="Recarga manual";itempos++;
+					selitems[itempos]="Devolucion a bodega";itempos++;
 				} else {	
 					selitems[itempos]="Devolucion a bodega";itempos++;
 				}				
@@ -1302,8 +976,11 @@ public class Menu extends PBase {
 	}
 	
 	private void menuDevBod() {
-		Intent intent = new Intent(this,DevolBod.class);
-		startActivity(intent);
+		if (gl.peModal.equalsIgnoreCase("TOL")) {
+			startActivity(new Intent(this,DevolBodTol.class));
+		} else {
+			startActivity(new Intent(this,DevolBod.class));
+		}
 	}
 	
 	private void menuSolicInv() {
@@ -1364,9 +1041,10 @@ public class Menu extends PBase {
 		Intent intent = new Intent(this,SolicInv.class);
 		startActivity(intent);
 	}
-	
-	
-	// Utilerias
+
+	//endregion
+
+	//region Utilerias
 	
 	public void showInvMenuUtils() {
 		final AlertDialog Dialog;
@@ -1509,8 +1187,286 @@ public class Menu extends PBase {
 		dialog.show();
 	}
 
+	//endregion
 
-	// Aux
+	//region Supervisor ayudante
+
+	private void msgAskSupervisor1() {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle("Road");
+		dialog.setMessage("Este usuario es ADMINISTRADOR. ¿Está seguro de realizar la venta con este usuario?");
+
+		dialog.setIcon(R.drawable.ic_quest);
+
+		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				msgAskSupervisor2();
+			}
+		});
+
+		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {}
+		});
+
+		dialog.show();
+
+	}
+
+	private void msgAskSupervisor2() {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle("Road");
+		dialog.setMessage("Usted no debería realizar ventas con el Rol de ADMINISTRADOR. ¿Esta 100% seguro de realizar la venta con este usuario?");
+
+		dialog.setIcon(R.drawable.ic_quest);
+
+		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				startActivity(new Intent(Menu.this, Clientes.class));
+			}
+		});
+
+		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {}
+		});
+
+		dialog.show();
+
+	}
+
+	//#HS_20181207 Mensaje que muestra los ayudantes y vehiculos disponibles.
+
+	private void AyudanteVehiculo() {
+		inputAyudanteVehiculo();
+
+		getlistAyudante();
+		getlistVehiculo();
+		getAyudante();
+		getVehiculo();
+	}
+
+	private void inputAyudanteVehiculo() {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+		alert.setTitle("AYUDANTE Y VEHÍCULO");
+
+		final LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+
+		//layout.addView(new TextView(this));
+		layout.addView(lblAyudante);
+		layout.addView(Ayudante);
+		//layout.addView(new TextView(this));
+		layout.addView(lblVehiculo);
+		layout.addView(Vehiculo);
+
+		alert.setView(layout);
+
+		alert.setPositiveButton("Asignar", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				getAyudanteVehiculo();
+			}
+		});
+
+		alert.setNegativeButton("Omitir", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				gl.ayudante = "";gl.ayudanteID = "";
+				gl.vehiculo = "";gl.vehiculoID= "";
+				closekeyb();
+			}
+		});
+
+		alert.show();
+	}
+
+	private void getAyudante(){
+
+		Ayudante.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+				TextView spinlabel;
+
+				try {
+					spinlabel=(TextView)parentView.getChildAt(0);
+					spinlabel.setTextColor(Color.BLACK);
+					spinlabel.setPadding(5, 0, 0, 0);
+					spinlabel.setTextSize(18);
+
+					gl.ayudanteID=listIDAyudante.get(position);
+					gl.ayudante=listAyudante.get(position);
+
+				} catch (Exception e) {
+					mu.msgbox( e.getMessage());
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parentView) {
+				return;
+			}
+
+		});
+
+	}
+
+	private void getVehiculo(){
+
+		Vehiculo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+				TextView spinlabel;
+
+				try {
+					spinlabel=(TextView)parentView.getChildAt(0);
+					spinlabel.setTextColor(Color.BLACK);
+					spinlabel.setPadding(5, 0, 0, 0);
+					spinlabel.setTextSize(18);
+
+					gl.vehiculoID=listIDVehiculo.get(position);
+					gl.vehiculo=listVehiculo.get(position);
+
+				} catch (Exception e) {
+					mu.msgbox( e.getMessage());
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parentView) {
+				return;
+			}
+
+		});
+
+	}
+
+	//#HS_20181207 Obtiene el ayudante y vehiculo asignado a la ruta.
+	private void getAyudanteVehiculo(){
+
+		try
+		{
+			if(gl.ayudante==""){
+				msgAskAyudante();
+			}else if(gl.vehiculo == ""){
+				msgAskVehiculo();
+			}else{
+				mu.msgbox("Ayudante y Vehículo asignado a la ruta");
+			}
+
+		}catch (Exception e){
+			//Log.d("getAyudanteVehiculo error: ", e.getMessage());
+		}
+	}
+
+	//#HS_20181207 Lista los ayudantes de la ruta.
+	private void getlistAyudante(){
+		Cursor DT;
+
+		try {
+			sql="SELECT CODIGO,NOMBRE FROM P_VENDEDOR WHERE RUTA = '" + gl.ruta + "' AND NIVEL = 5";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			while (!DT.isAfterLast())
+			{
+				listIDAyudante.add(DT.getString(0));
+				listAyudante.add(DT.getString(1));
+				DT.moveToNext();
+			}
+
+			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listAyudante);
+			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+			Ayudante.setAdapter(dataAdapter);
+
+		} catch (Exception e) {
+			mu.msgbox(e.getMessage());
+		}
+
+	}
+
+	private void getlistVehiculo(){
+		Cursor DT;
+
+		try {
+			sql="SELECT CODIGO, MARCA, PLACA FROM P_VEHICULO";
+			DT=Con.OpenDT(sql);
+
+			if(DT.getCount()>0) {
+				DT.moveToFirst();
+
+				while (!DT.isAfterLast()) {
+					listIDVehiculo.add(DT.getString(0));
+					listVehiculo.add(DT.getString(1) + "-" + DT.getString(2));
+					DT.moveToNext();
+				}
+			}else if(DT.getCount() == 0){
+				listIDVehiculo.add("");
+				listVehiculo.add("No hay vehiculos disponibles");
+			}
+
+			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listVehiculo);
+			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+			Vehiculo.setAdapter(dataAdapter);
+
+		} catch (Exception e) {
+			mu.msgbox(e.getMessage());
+		}
+
+	}
+
+	private void msgAskAyudante() {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle("Road");
+		dialog.setMessage("¿Esta seguro de continuar sin asignar un ayudante?");
+
+		dialog.setIcon(R.drawable.ic_quest);
+
+		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+
+			}
+		});
+
+		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				inputAyudanteVehiculo();
+			}
+		});
+
+		dialog.show();
+
+	}
+
+	private void msgAskVehiculo() {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle("Road");
+		dialog.setMessage("¿Esta seguro de continuar sin asignar un vehículo?");
+
+		dialog.setIcon(R.drawable.ic_quest);
+
+		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+
+			}
+		});
+
+		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+
+			}
+		});
+
+		dialog.show();
+
+	}
+
+	//endregion
+
+	//region Aux
 	
 	private void setPrintWidth() {
 		Cursor DT;
@@ -1569,14 +1525,69 @@ public class Menu extends PBase {
 		return prid;
 				
 	}
-	
-	
-	// Activity Events
+
+	//#HS_20181122_1527 Se agrego la funcion GetTipoImpresora().
+	public String GetTipoImpresora() {
+		Cursor DT;
+		String Tipo = "";
+
+		try{
+
+			sql="SELECT TIPO_IMPRESORA FROM P_ARCHIVOCONF";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			if(DT.getCount()> 0)
+			{
+				Tipo = DT.getString(0);
+				gl.tipoImpresora = Tipo;
+			}
+
+		}catch (Exception e){
+			msgbox("GetTipoImpresora: " + e.getMessage());
+		}
+
+		return Tipo;
+	}
+
+	//#HS_20181122_1513 Se agrego la funcion ConfImpresora()
+	public void ConfImpresora(){
+
+		if(GetTipoImpresora().equalsIgnoreCase("SIN IMPRESORA") || GetTipoImpresora().equalsIgnoreCase("BLUETOOTH")){
+			msgAskImpresora();
+		}
+
+	}
+
+	//#HS_20181122_1517 Se agrego el mensaje de configuracion de impresora.
+	private void msgAskImpresora() 	{
+
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle("Road");
+		dialog.setMessage("Debe configurar la impresora");
+
+		dialog.setIcon(R.drawable.ic_quest);
+
+		dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				menuConfImpres();
+			}
+		});
+
+		dialog.show();
+
+	}
+
+	//endregion
+
+	//region Activity Events
 	
 	@Override
  	protected void onResume() {
 	    super.onResume();
 	    setPrintWidth();
 	}
-	
+
+	//endregion
 }

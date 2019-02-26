@@ -250,11 +250,11 @@ public class ComWS extends PBase {
 		ultSerie_ant=ultSerie();
 
 		barInfo.setVisibility(View.VISIBLE);barInfo.invalidate();
-		lblInfo.setText("Conectando ...");
+        lblInfo.setText("Iniciando proceso de carga..");
 
-		wsRtask = new AsyncCallRec();
-		wsRtask.execute();
-
+        lblInfo.setText("Conectando ...");
+        wsRtask = new AsyncCallRec();
+        wsRtask.execute();
 	}
 	
 	private void runSend() {
@@ -282,15 +282,15 @@ public class ComWS extends PBase {
 	public void writeData(View view){
 		
 		dbld.clear();
-
 		dbld.insert("D_PEDIDO","WHERE 1=1");
 		dbld.insert("D_PEDIDOD","WHERE 1=1");
-		
 		dbld.save();
 		
 	}
 	
-	private boolean validaPendientes() {
+	private boolean validaPendientes()
+    {
+
 		int pend=0;
 			
 		sp="";
@@ -371,10 +371,12 @@ public class ComWS extends PBase {
 	// Web Service Methods
 	
 	public int fillTable(String value,String delcmd) {
-		int rc;
+
+	    int rc;
 		String s,ss;
 	
 		METHOD_NAME = "getIns";
+
 		sstr="OK";
 		
 		try {
@@ -448,7 +450,9 @@ public class ComWS extends PBase {
 	        
 	        return 1;
 	    } catch (Exception e) {
-	    	
+
+		    //#EJC20190226: Evitar que se muestre OK después del nombre de la tabla cuando da error de timeOut.
+            sstr=e.getMessage();
 	    	idbg=idbg+" ERR "+e.getMessage();
 	    	return 0;
 	    }
@@ -688,15 +692,21 @@ public class ComWS extends PBase {
 			if (!AddTable("P_CORRELREC")) return false;
 			if (!AddTable("P_CORREL_OTROS")) return false;
 
-			if (gl.peStockItf) {
+			/*
+			if (gl.peStockItf)
+			{
 				if (gl.peAceptarCarga) 	{
 					if (!AddTable("P_STOCK_APR")) return false;
 				} else {
 				    if (!AddTable("P_STOCK")) return false;
 					//if (!AddTable("P_STOCKB")) return false;
 				}
-			}
-			
+			}*/
+
+			//#EJC20190226: Cargar siempre todas las tablas para evitar cargar datos dos veces.
+            if (!AddTable("P_STOCK_APR")) return false;
+            if (!AddTable("P_STOCK")) return false;
+
 			if (!AddTable("P_COBRO")) return false;
 			if (!AddTable("P_CLIGRUPO")) return false;
 			if (!AddTable("P_MEDIAPAGO")) return false;
@@ -1279,7 +1289,9 @@ public class ComWS extends PBase {
 		}
 	}
 		
-	private boolean validaDatos(boolean completo) {
+	private boolean validaDatos(boolean completo)
+    {
+
 		Cursor dt;
 
 		try {
@@ -1288,53 +1300,62 @@ public class ComWS extends PBase {
 				sql="SELECT RESOL FROM P_COREL";	
 				dt=Con.OpenDT(sql);	
 				if (dt.getCount()==0) {
-					msgbox("No está definido correlativo de facturas");return false;
+					msgbox("No está definido correlativo de facturas");
+					return false;
 				}
 			}
 
 			sql="SELECT Codigo FROM P_CLIENTE";	
 			dt=Con.OpenDT(sql);	
 			if (dt.getCount()==0) {
-				msgbox("Lista de clientes está vacia");return false;
+				msgbox("Lista de clientes está vacia");
+				return false;
 			}
 
 			sql="SELECT Ruta FROM P_CLIRUTA";	
 			dt=Con.OpenDT(sql);	
 			if (dt.getCount()==0) {
-				msgbox("Lista de clientes por ruta está vacia");return false;
+				msgbox("Lista de clientes por ruta está vacia");
+				return false;
 			}
 
 			sql="SELECT Codigo FROM P_PRODUCTO";	
 			dt=Con.OpenDT(sql);	
 			if (dt.getCount()==0) {
-				msgbox("Lista de productos está vacia");return false;
+				msgbox("Lista de productos está vacia");
+				return false;
 			}
 
 			if (completo) {
 
-				sql="SELECT Nivel FROM P_PRODPRECIO";	
+				sql="SELECT Nivel FROM P_PRODPRECIO ";
 				dt=Con.OpenDT(sql);	
 				if (dt.getCount()==0) {
-					msgbox("Lista de precios está vacia");return false;
+					msgbox("Lista de precios está vacia");
+					return false;
 				}
 
-				sql="SELECT Producto FROM P_FACTORCONV";	
+				sql="SELECT Producto FROM P_FACTORCONV ";
 				dt=Con.OpenDT(sql);	
 				if (dt.getCount()==0) {
-					msgbox("Lista de conversiones está vacia");return false;
+					msgbox("Lista de conversiones está vacia");
+					return false;
 				}
 
 				if (gl.peStockItf) {
-					sql="SELECT Codigo FROM P_STOCK";	
+					sql="SELECT Codigo FROM P_STOCK ";
 					dt=Con.OpenDT(sql);	
 					if (dt.getCount()==0) {
-						msgbox("La carga de productos está vacia");return false;
+						msgbox("La carga de productos está vacia");
+						return false;
 					}		
 				}
 
 			}
 
-		} catch (Exception e) {
+		} catch (Exception e)
+        {
+            Log.d("ValidaDatos",e.getMessage());
 		}		
 
 		return true;
@@ -1431,10 +1452,14 @@ public class ComWS extends PBase {
 		running=0;
 			
 		if (fstr.equalsIgnoreCase("Sync OK")) {
-			lblInfo.setText(" ");
-			s="Recepción completa.";
+
+		    lblInfo.setText(" ");
+
+		    s="Recepción completa.";
 			
-			if (!esvacio) {
+			if (!esvacio)
+			{
+
 				if (stockflag==1) {
 					s=s+"\nSe actualizó inventario.";
 					estandartInventario();
@@ -1450,7 +1475,8 @@ public class ComWS extends PBase {
 				isbusy=0;
 				esvacio=false;
 				SystemClock.sleep(100);
-				if (validaDatos(false)) runRecep();
+				//#EJC20190226:Evita cargar datos dos veces.
+				//if (validaDatos(false)) runRecep();
 				return;
 			}
 
@@ -1458,6 +1484,7 @@ public class ComWS extends PBase {
 			lblInfo.setText(fstr);
 			mu.msgbox("Ocurrió error : \n"+fstr+" ("+reccnt+") " + ferr);
 			isbusy=0;
+            barInfo.setVisibility(View.INVISIBLE);
 			return;
 		}
 

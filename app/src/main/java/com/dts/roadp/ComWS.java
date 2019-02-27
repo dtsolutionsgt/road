@@ -2237,7 +2237,7 @@ public class ComWS extends PBase {
 			if (envioparcial) dbld.clear();
 
 			ss = " UPDATE P_STOCK SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
-					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA>='" + fsql + "') AND ENVIADO = 0 " +
+					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA>='" + fsqli + "') AND ENVIADO = 0 " +
 					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + vFecha + "' )";
 			dbld.add(ss);
 
@@ -2417,7 +2417,7 @@ public class ComWS extends PBase {
 
 	//endregion
 
-	//region WS EnvioHandling Methods
+	//region WS Envio Handling Methods
 	
 	public void wsSendExecute(){
 

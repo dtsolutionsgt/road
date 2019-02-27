@@ -75,7 +75,6 @@ public class Menu extends PBase {
 			lblAyudante.setText("Ayudante:");
 			lblVehiculo = new TextView(this);
 			lblVehiculo.setText("Vehículo:");
-			///
 
 			vApp=this.getApplication();
 			rutatipo=gl.rutatipog;
@@ -124,13 +123,12 @@ public class Menu extends PBase {
 
 			ConfImpresora();
 
-		}catch (Exception e)
-		{
+		} catch (Exception e) {
 			Log.e("Mnu", e.getMessage());
 		}
 
 	}
-	
+
 	//region  Main
 	
 	public void showClients(View view) {
@@ -1060,24 +1058,23 @@ public class Menu extends PBase {
 		menudlg = new AlertDialog.Builder(this);
 		menudlg.setIcon(R.drawable.utils48);
 		menudlg.setTitle("Utilerias");
-					
-		menudlg.setItems(selitems ,	new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int item) {
-					
-					switch (item) {
-						case 0:  
-							menuConfImpres();break;
-						case 1:
-							startActivity(new Intent(Menu.this,Tablas.class));
-							break;
-						case 2:
-							menuCorelZ();break;
-						case 3:
-							;break;
-						}
-					
-					dialog.cancel();	
+
+		menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+
+				switch (item) {
+					case 0:
+						menuConfImpres();break;
+					case 1:
+						startActivity(new Intent(Menu.this, Tablas.class));break;
+					case 2:
+						menuCorelZ();break;
+					case 3:
+						startActivity(new Intent(Menu.this, Soporte.class));break;
 				}
+
+				dialog.cancel();
+			}
 		});
 				
 		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {

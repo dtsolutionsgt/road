@@ -65,6 +65,7 @@ public class CliNuevoApr extends PBase {
 		setContentView(R.layout.activity_cli_nuevo_apr);
 		
 		super.InitBase();
+		addlog("CliNuevoApr",""+du.getActDateTime(),gl.vend);
 		
 		//spmun= (Spinner) findViewById(R.id.spinner1);
 		sprel= (Spinner) findViewById(R.id.spinner2);
@@ -92,143 +93,165 @@ public class CliNuevoApr extends PBase {
     // Events 
 	
 	public void doSave(View view) {
-		
-		cui=txtcui.getText().toString().trim();
-		if (mu.emptystr(cui)) {		
-			msgScroll("Falta definir CUI / DPI");return ;
+
+		try{
+			cui=txtcui.getText().toString().trim();
+			if (mu.emptystr(cui)) {
+				msgScroll("Falta definir CUI / DPI");return ;
+			}
+
+			if (cui.length()!=13) {
+				msgScroll("CUI / DPI incorrecto");return ;
+			}
+
+			if (validaCUI(cui)) {
+				if (parseSpinValues()) save();
+			} else {
+				msgAskCUI("CUI / DPI incorrecto. Continuar");
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		if (cui.length()!=13) {
-			msgScroll("CUI / DPI incorrecto");return ;
-		}
-			
-		if (validaCUI(cui)) {
-			if (parseSpinValues()) save();
-		} else {	
-			msgAskCUI("CUI / DPI incorrecto. Continuar");
-		}
+
 		
 	}
 	
 	public void doFecha(View view) {
-		fechaNac();	
+
+		try{
+			fechaNac();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
    
 	public void doMuni(View view) {
-		browse=1;
-		Intent intent = new Intent(this,Municipio.class);
-		startActivity(intent);
+		try{
+			browse=1;
+			Intent intent = new Intent(this,Municipio.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void setHandlers(){
-		
-		sprel.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
-		    	try {
-		    		TextView spinlabel=(TextView) parentView.getChildAt(0);
-		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
-		        } catch (Exception e) {
-		        }	 
-		    }
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) { return;}
-		});	
-		
-		spgru.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
-		    	try {
-		    		TextView spinlabel=(TextView) parentView.getChildAt(0);
-		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
-		        } catch (Exception e) {
-		        }	 
-		    }
+		try{
+			sprel.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) { return;}
-		});	
-				
-		spesc.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
-		    	try {
-		    		TextView spinlabel=(TextView) parentView.getChildAt(0);
-		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
-		        } catch (Exception e) {
-		        }	 
-		    }
+					try {
+						TextView spinlabel=(TextView) parentView.getChildAt(0);
+						spinlabel.setTypeface(lblFecha.getTypeface());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) { return;}
-		});	
-				
-		spest.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
-		    	try {
-		    		TextView spinlabel=(TextView) parentView.getChildAt(0);
-		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
-		        } catch (Exception e) {
-		        }	 
-		    }
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) { return;}
+			});
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) { return;}
-		});	
-				
-		spgen.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
-		    	try {
-		    		TextView spinlabel=(TextView) parentView.getChildAt(0);
-		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
-		        } catch (Exception e) {
-		        }	 
-		    }
+			spgru.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) { return;}
-		});	
-				
-		sphij.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
-		    	try {
-		    		TextView spinlabel=(TextView) parentView.getChildAt(0);
-		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
-		        } catch (Exception e) {
-		        }	 
-		    }
+					try {
+						TextView spinlabel=(TextView) parentView.getChildAt(0);
+						spinlabel.setTypeface(lblFecha.getTypeface());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) { return;}
-		});	
-			
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) { return;}
+			});
+
+			spesc.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+
+					try {
+						TextView spinlabel=(TextView) parentView.getChildAt(0);
+						spinlabel.setTypeface(lblFecha.getTypeface());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) { return;}
+			});
+
+			spest.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+
+					try {
+						TextView spinlabel=(TextView) parentView.getChildAt(0);
+						spinlabel.setTypeface(lblFecha.getTypeface());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) { return;}
+			});
+
+			spgen.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+
+					try {
+						TextView spinlabel=(TextView) parentView.getChildAt(0);
+						spinlabel.setTypeface(lblFecha.getTypeface());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) { return;}
+			});
+
+			sphij.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+
+					try {
+						TextView spinlabel=(TextView) parentView.getChildAt(0);
+						spinlabel.setTypeface(lblFecha.getTypeface());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) { return;}
+			});
+
 		/*
 		spmun.setOnItemSelectedListener(new OnItemSelectedListener() {
 		    @Override
 		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
+
 		    	try {
 		    		TextView spinlabel=(TextView)parentView.getChildAt(0);
 		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
 		        } catch (Exception e) {
 		        }
-		    	
+
 		    	try {
 		    		idmun=spincode.get(position);
 		        } catch (Exception e) {
 		        	idmun="";
 		        }
-			
+
 		    }
 
 		    @Override
@@ -236,9 +259,11 @@ public class CliNuevoApr extends PBase {
 		        return;
 		    }
 
-		});	
+		});
 		*/
-		
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}	  
    
 
@@ -254,6 +279,7 @@ public class CliNuevoApr extends PBase {
 			dt.moveToFirst();
 			iddep=dt.getString(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());return;
 		}
 
@@ -283,6 +309,7 @@ public class CliNuevoApr extends PBase {
 			super.finish();
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 			mu.msgbox(e.getMessage());
 		}			
@@ -321,12 +348,14 @@ public class CliNuevoApr extends PBase {
 	
 			return true;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage()+":"+dbgv);return false;
 		}
 		
 	}
    
 	private boolean validaCUI(String Cui) {
+
 		boolean valido=true;
 		cuimsg="";
 
@@ -342,7 +371,7 @@ public class CliNuevoApr extends PBase {
 		//Si la cadena cumple con la expresion regular debemos de verificar que sea un CUI válido
 		if(validCui ==true){
 
-			// Extraemos el numero del DPI  
+			// Extraemos el numero del DPI
 			String no = Cui.substring(0, 8);
 			// Extraemos el numero de Departamento
 			int depto = Integer.parseInt(Cui.substring(9, 11));
@@ -466,6 +495,7 @@ public class CliNuevoApr extends PBase {
 				
 				applyDate();
 			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				msgbox(e.getMessage());
 			}
 		}
@@ -474,15 +504,20 @@ public class CliNuevoApr extends PBase {
 
 	private void applyDate() {
 		String s;
-		
-		if (cyear==0) return;
-					
-		s="";
-		if (cday>9)   s=s+String.valueOf(cday)+"/"; else s=s+"0"+String.valueOf(cday)+"/";  
-		if (cmonth>9) s=s+String.valueOf(cmonth)+"/"; else s=s+"0"+String.valueOf(cmonth)+"/"; 	
-		s=s+cyear;
-			
-		lblFecha.setText(s);
+
+		try{
+			if (cyear==0) return;
+
+			s="";
+			if (cday>9)   s=s+String.valueOf(cday)+"/"; else s=s+"0"+String.valueOf(cday)+"/";
+			if (cmonth>9) s=s+String.valueOf(cmonth)+"/"; else s=s+"0"+String.valueOf(cmonth)+"/";
+			s=s+cyear;
+
+			lblFecha.setText(s);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
    
@@ -510,6 +545,7 @@ public class CliNuevoApr extends PBase {
 			//spmun.setSelection(0);			
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}
 	}
@@ -521,6 +557,7 @@ public class CliNuevoApr extends PBase {
 		   darel.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		   sprel.setAdapter(darel);sprel.setSelection(0);
 	   } catch (Exception e) {
+		   addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 	   }
 	   
 	   try {
@@ -528,6 +565,7 @@ public class CliNuevoApr extends PBase {
 		   dagru.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		   spgru.setAdapter(dagru);spgru.setSelection(0);
 	   } catch (Exception e) {
+		   addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 	   }
 	   
 	   try { // CA=CT
@@ -535,6 +573,7 @@ public class CliNuevoApr extends PBase {
 		   daesc.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		   spesc.setAdapter(daesc);spesc.setSelection(0);
 	   } catch (Exception e) {
+		   addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 	   }
 	   
 	   try { 
@@ -542,6 +581,7 @@ public class CliNuevoApr extends PBase {
 		   daest.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		   spest.setAdapter(daest);spest.setSelection(0);
 	   } catch (Exception e) {
+		   addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 	   }
 	   
 	   try { //MA = M, FE=F, TE=3
@@ -549,6 +589,7 @@ public class CliNuevoApr extends PBase {
 		   dagen.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		   spgen.setAdapter(dagen);spgen.setSelection(0);
 	   } catch (Exception e) {
+		   addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 	   }
 	   
 	   try { 
@@ -556,52 +597,63 @@ public class CliNuevoApr extends PBase {
 		   dahij.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		   sphij.setAdapter(dahij);sphij.setSelection(0);
 	   } catch (Exception e) {
+		   addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 	   }
 	  
    }
    
 	private void msgAskExit(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("¿" + msg  + "?");
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	doExitNoSave();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) { }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg  + "?");
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					doExitNoSave();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { }
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 	
 	private void msgAskCUI(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("¿" + msg  + "?");
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	if (parseSpinValues()) save();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {
-		    	txtcui.requestFocus();
-		    	scrView.scrollTo(0,0);
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg  + "?");
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if (parseSpinValues()) save();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					txtcui.requestFocus();
+					scrView.scrollTo(0,0);
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 	
@@ -625,6 +677,7 @@ public class CliNuevoApr extends PBase {
 			
 			super.finish();
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
@@ -632,59 +685,79 @@ public class CliNuevoApr extends PBase {
 
 	private void msgScroll(String msg) {
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
 
-		dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				txtcui.requestFocus();
-				scrView.scrollTo(0,0);
-			}
-		});
+			dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					txtcui.requestFocus();
+					scrView.scrollTo(0,0);
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 	
 	private void msgMuni(String msg) {
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
 
-		dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				doMuni(null);
-			}
-		});
+			dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					doMuni(null);
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 	
 	private void msgFecha(String msg) {
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
 
-		dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				fechaNac();
-			}
-		});
+			dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					fechaNac();
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 	
 	private void fechaNac() {
-		DialogFragment newFragment = new DatePickerFragment();
-		newFragment.show(getSupportFragmentManager(), "datePicker");		
+		try{
+			DialogFragment newFragment = new DatePickerFragment();
+			newFragment.show(getSupportFragmentManager(), "datePicker");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void aplicaMuni() {	
@@ -694,6 +767,7 @@ public class CliNuevoApr extends PBase {
     		idmun=((appGlobals) vApp).gstr;  		
     		lblMuni.setText(((appGlobals) vApp).pprodname);
         } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         	idmun="*";lblMuni.setText("");
         	toast(e.getMessage());
         }
@@ -704,17 +778,28 @@ public class CliNuevoApr extends PBase {
 		
 	@Override
 	protected void onResume() {
-		super.onResume();
+		try{
+			super.onResume();
 
-		if (browse==1) {
-			browse=0;
-			aplicaMuni();return;
+			if (browse==1) {
+				browse=0;
+				aplicaMuni();return;
+			}
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}	
 	
 	@Override
 	public void onBackPressed() {
-		msgAskExit("Salir sin crear cliente");
+		try{
+			msgAskExit("Salir sin crear cliente");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	

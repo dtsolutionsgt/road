@@ -62,6 +62,7 @@ public class Clientes extends PBase {
 		setContentView(R.layout.activity_clientes);
 		
 		super.InitBase();
+		addlog("Clientes",""+du.getActDateTime(),gl.vend);
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		spinList = (Spinner) findViewById(R.id.spinner1);
@@ -89,127 +90,143 @@ public class Clientes extends PBase {
 	// Events
 	
 	public void applyFilter(View view){
-		//listItems();
-		//hidekeyb();
-		txtFiltro.setText("");
+		try{
+			//listItems();
+			//hidekeyb();
+			txtFiltro.setText("");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void showVenta(View view) {
-		
-		gl.tcorel=mu.getCorelBase();//gl.ruta/
-				
-		//Intent intent = new Intent(this,CliNuevoApr.class);
-		Intent intent = new Intent(this,CliNuevo.class);
-		startActivity(intent);
+
+		try{
+			gl.tcorel=mu.getCorelBase();//gl.ruta/
+
+			//Intent intent = new Intent(this,CliNuevoApr.class);
+			Intent intent = new Intent(this,CliNuevo.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void setHandlers(){
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
-							
-				Object lvObj = listView.getItemAtPosition(position);
-	           	clsCDB sitem = (clsCDB)lvObj;
-	           	selitem=sitem;
-	           
-				selid=sitem.Cod;selidx=position;
-				adapter.setSelectedIndex(position);
 
-				//#HS_20181211 Carga la lista de incidencias por no lectura y muestra el dialogo
-				if(gl.incNoLectura == true) {
-					listNoLectura();
-				}else {
-					showCliente();
-				}
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
 
-			};
-	    });
-	
-		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-				boolean pedit,pbor;
-				try {
 					Object lvObj = listView.getItemAtPosition(position);
-					clsClasses.clsCDB item = (clsClasses.clsCDB) lvObj;
+					clsCDB sitem = (clsCDB)lvObj;
+					selitem=sitem;
 
-					selid=item.Cod;selidx=position;
+					selid=sitem.Cod;selidx=position;
 					adapter.setSelectedIndex(position);
-					
-					pedit=puedeeditarse();
-					pbor=puedeborrarse();
-					
-					if (pbor && pedit) {
-						showItemMenu();							
-					} else {	
-						if (pbor)  msgAskBor("Eliminar cliente nuevo");	
-						if (pedit) msgAskEdit("Cambiar datos de cliente nuevo");
-					}						
-					
-				} catch (Exception e) {
+
+					//#HS_20181211 Carga la lista de incidencias por no lectura y muestra el dialogo
+					if(gl.incNoLectura == true) {
+						listNoLectura();
+					}else {
+						showCliente();
+					}
+
+				};
+			});
+
+			listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+					boolean pedit,pbor;
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsClasses.clsCDB item = (clsClasses.clsCDB) lvObj;
+
+						selid=item.Cod;selidx=position;
+						adapter.setSelectedIndex(position);
+
+						pedit=puedeeditarse();
+						pbor=puedeborrarse();
+
+						if (pbor && pedit) {
+							showItemMenu();
+						} else {
+							if (pbor)  msgAskBor("Eliminar cliente nuevo");
+							if (pedit) msgAskEdit("Cambiar datos de cliente nuevo");
+						}
+
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+					return true;
 				}
-				return true;
-			}
-		});
+			});
 
-		spinList.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	TextView spinlabel;
-		    	String scod;
-		    	
-		    	try {
-		    		spinlabel=(TextView)parentView.getChildAt(0);
-			    	spinlabel.setTextColor(Color.BLACK);
-			    	spinlabel.setPadding(5, 0, 0, 0);
-			    	spinlabel.setTextSize(18);
-			    
-			    	dweek=position;
-			    	
-			    	listItems();
+			spinList.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+					TextView spinlabel;
+					String scod;
 
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-		
-		    }
+					try {
+						spinlabel=(TextView)parentView.getChildAt(0);
+						spinlabel.setTextColor(Color.BLACK);
+						spinlabel.setPadding(5, 0, 0, 0);
+						spinlabel.setTextSize(18);
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) {
-		        return;
-		    }
+						dweek=position;
 
-		});
+						listItems();
 
-		spinFilt.setOnItemSelectedListener(new OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-				listItems();
-			}
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
 
-			@Override
-			public void onNothingSelected(AdapterView<?> parentView) {
-				return;
-			}
+				}
 
-		});
-				
-	    txtFiltro.addTextChangedListener(new TextWatcher() {
-			 
-	    	public void afterTextChanged(Editable s) {}
-		 
-	    	public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
-		 
-	    	public void onTextChanged(CharSequence s, int start,int before, int count) {
-	    		int tl;
-	    		
-	    		tl=txtFiltro.getText().toString().length();
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) {
+					return;
+				}
 
-	    		if (tl>1) gl.escaneo="S";
-	    		if (tl==0 || tl>1) listItems();
-	    	}
-	    });
+			});
+
+			spinFilt.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+					listItems();
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) {
+					return;
+				}
+
+			});
+
+			txtFiltro.addTextChangedListener(new TextWatcher() {
+
+				public void afterTextChanged(Editable s) {}
+
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+
+				public void onTextChanged(CharSequence s, int start,int before, int count) {
+					int tl;
+
+					tl=txtFiltro.getText().toString().length();
+
+					if (tl>1) gl.escaneo="S";
+					if (tl==0 || tl>1) listItems();
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 
 	}
 
@@ -240,6 +257,7 @@ public class Clientes extends PBase {
 						cobros.add(DT.getString(0));
 						DT.moveToNext();
 					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 					}
 				}
 			}
@@ -321,6 +339,7 @@ public class Clientes extends PBase {
 			}
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox(e.getMessage());
 	    }
 			 
@@ -335,96 +354,116 @@ public class Clientes extends PBase {
 	}
 	
 	public void showCliente() {
-		
-		gl.cliente=selid;
 
-		gl.closeCliDet=false;
-		gl.closeVenta=false;
-		
-		Intent intent;
-		intent = new Intent(this,CliDet.class);
-		startActivity(intent);
+		try{
+			gl.cliente=selid;
+
+			gl.closeCliDet=false;
+			gl.closeVenta=false;
+
+			Intent intent;
+			intent = new Intent(this,CliDet.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void editCliente() {
-		gl.tcorel=selid;
-		startActivity(new Intent(this,CliNuevoAprEdit.class));
+		try{
+			gl.tcorel=selid;
+			startActivity(new Intent(this,CliNuevoAprEdit.class));
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	
 	// Aux
 
     private void showItemMenu() {
-        final AlertDialog Dialog;
-        final String[] selitems = {"Eliminar cliente","Cambiar datos"};
-     
-        AlertDialog.Builder menudlg = new AlertDialog.Builder(this);
-        menudlg.setTitle("Cliente nuevo");
+		try{
+			final AlertDialog Dialog;
+			final String[] selitems = {"Eliminar cliente","Cambiar datos"};
 
-        menudlg.setItems(selitems , new DialogInterface.OnClickListener() {
-	            public void onClick(DialogInterface dialog, int item) {
-		            switch (item) {
-		                case 0:
-		                	msgAskBor("Eliminar cliente");break;
-		                case 1:
-		                	editCliente();break;
-		            }
+			AlertDialog.Builder menudlg = new AlertDialog.Builder(this);
+			menudlg.setTitle("Cliente nuevo");
 
-		            dialog.cancel();
-	            }
-        });
+			menudlg.setItems(selitems , new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+					switch (item) {
+						case 0:
+							msgAskBor("Eliminar cliente");break;
+						case 1:
+							editCliente();break;
+					}
 
-        menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-        @Override
-	            public void onClick(DialogInterface dialog, int which) {
-		            dialog.cancel();
-	            }
-        });
+					dialog.cancel();
+				}
+			});
 
-        Dialog = menudlg.create();
-        Dialog.show();
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
     }
 
 	private void fillSpinners(){
-		List<String> dlist = new ArrayList<String>();
-			
-		dlist.add("Todos");
-		dlist.add("Lunes");
-		dlist.add("Martes");
-		dlist.add("Miercoles");
-		dlist.add("Jueves");
-		dlist.add("Viernes");
-		dlist.add("Sabado");
-		dlist.add("Domingo");		
-				
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, dlist);
-		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		
-		spinList.setAdapter(dataAdapter);
-		spinList.setSelection(dweek);
+		try{
+			List<String> dlist = new ArrayList<String>();
+
+			dlist.add("Todos");
+			dlist.add("Lunes");
+			dlist.add("Martes");
+			dlist.add("Miercoles");
+			dlist.add("Jueves");
+			dlist.add("Viernes");
+			dlist.add("Sabado");
+			dlist.add("Domingo");
+
+			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, dlist);
+			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+			spinList.setAdapter(dataAdapter);
+			spinList.setSelection(dweek);
 
 
-		List<String> flist = new ArrayList<String>();
-		flist.add("Todos");
-		flist.add("Con cobros");
-		flist.add("Pago pendiente");
+			List<String> flist = new ArrayList<String>();
+			flist.add("Todos");
+			flist.add("Con cobros");
+			flist.add("Pago pendiente");
 
-		ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, flist);
-		dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, flist);
+			dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-		spinFilt.setAdapter(dataAdapter2);
+			spinFilt.setAdapter(dataAdapter2);
 
-		if (gl.filtrocli==-1) {
-			spinFilt.setSelection(0);
-		} else {
-			spinFilt.setSelection(gl.filtrocli);
+			if (gl.filtrocli==-1) {
+				spinFilt.setSelection(0);
+			} else {
+				spinFilt.setSelection(gl.filtrocli);
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 
 	}
 
 	private boolean puedeborrarse() {
 		Cursor dt;
-		String sql;
+		String sql = "";
 
 		try {
 			sql="SELECT * FROM D_CLINUEVO WHERE CODIGO='"+selid+"'";
@@ -436,6 +475,7 @@ public class Clientes extends PBase {
 			if (dt.getCount()>0) return false;
 		
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 
@@ -444,7 +484,7 @@ public class Clientes extends PBase {
 	
 	private boolean puedeeditarse() {
 		Cursor dt;
-		String sql;
+		String sql = "";
 
 		try {
 			sql="SELECT * FROM D_CLINUEVO WHERE CODIGO='"+selid+"' AND STATCOM='N'";
@@ -452,6 +492,7 @@ public class Clientes extends PBase {
 			if (dt.getCount()==0) return false;
 		
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 
@@ -459,40 +500,51 @@ public class Clientes extends PBase {
 	}
 	
 	private void msgAskBor(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setMessage("¿" + msg + "?");
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setNegativeButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {	
-				borraCliNuevo();
-			}
-		});
+			dialog.setMessage("¿" + msg + "?");
 
-		dialog.setPositiveButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {}
-		});
+			dialog.setNegativeButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					borraCliNuevo();
+				}
+			});
 
-		dialog.show();
+			dialog.setPositiveButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	private void msgAskEdit(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setMessage("¿" + msg + "?");
+			dialog.setMessage("¿" + msg + "?");
 
-		dialog.setNegativeButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {	
-				editCliente();			
-			}
-		});
+			dialog.setNegativeButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					editCliente();
+				}
+			});
 
-		dialog.setPositiveButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {}
-		});
+			dialog.setPositiveButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 	
@@ -508,6 +560,7 @@ public class Clientes extends PBase {
 			
 			listItems();
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 			mu.msgbox(e.getMessage());
 		}
@@ -536,11 +589,13 @@ public class Clientes extends PBase {
 					listcode.add(code);
 					listname.add(name);
 				} catch (Exception e) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 					mu.msgbox(e.getMessage());
 				}
 				DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox( e.getMessage());return;
 		}
 
@@ -549,49 +604,60 @@ public class Clientes extends PBase {
 	}
 	//#HS_20181211 Funcion que abre el dialogo, opciones de incidencia de no lectura
 	public void showIncNoLectura() {
-		final AlertDialog Dialog;
+		try{
+			final AlertDialog Dialog;
 
-		final String[] selitems = new String[listname.size()];
+			final String[] selitems = new String[listname.size()];
 
-		for (int i = 0; i < listname.size(); i++) {
-			selitems[i] = listname.get(i);
+			for (int i = 0; i < listname.size(); i++) {
+				selitems[i] = listname.get(i);
+			}
+
+			mMenuDlg = new AlertDialog.Builder(this);
+			mMenuDlg.setTitle("Incidencia de no lectura");
+
+			mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+					try {
+						//String opcion=listcode.get(item);
+						showCliente();
+
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
+			});
+
+			mMenuDlg.setNegativeButton("Regresar", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+
+			Dialog = mMenuDlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		mMenuDlg = new AlertDialog.Builder(this);
-		mMenuDlg.setTitle("Incidencia de no lectura");
-
-		mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				try {
-					//String opcion=listcode.get(item);
-					showCliente();
-
-				} catch (Exception e) {
-				}
-			}
-		});
-
-		mMenuDlg.setNegativeButton("Regresar", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-			}
-		});
-
-		Dialog = mMenuDlg.create();
-		Dialog.show();
-
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-		nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-		nbutton.setTextColor(Color.WHITE);
 	}
 
 
 	// Activity Events
 	
 	protected void onResume() {
-	   super.onResume();
-	    
-	   listItems();
+		try{
+			super.onResume();
+
+			listItems();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	

@@ -263,8 +263,8 @@ public class Cobro extends PBase {
 		String doc="";
 		
 		if (!assignCorel()) return false;
-		
-		corel=gl.ruta+"_"+mu.getCorelBase();
+
+		corel=correlativo_factura();
 		
 		try {
 			
@@ -392,7 +392,29 @@ public class Cobro extends PBase {
 			db.setTransactionSuccessful();
 			
 			db.endTransaction();
-			
+
+			if (tipo.equalsIgnoreCase("R")){
+
+				db.beginTransaction();
+
+				sql="DELETE FROM D_COBRO WHERE COREL='"+corel+"'";
+				db.execSQL(sql);
+
+				sql="DELETE FROM D_COBROD WHERE COREL='"+corel+"'";
+				db.execSQL(sql);
+
+				sql="DELETE FROM D_COBROP WHERE COREL='"+corel+"'";
+				db.execSQL(sql);
+
+				sql="DELETE FROM P_COBRO WHERE DOCUMENTO='"+doc+"'";
+				db.execSQL(sql);
+
+				db.setTransactionSuccessful();
+
+				db.endTransaction();
+
+			}
+
 		} catch (Exception e) {
 			db.endTransaction();
 		   	mu.msgbox(e.getMessage());return false;
@@ -400,7 +422,24 @@ public class Cobro extends PBase {
 		
 		return true;
 	}
-	
+
+	private String correlativo_factura(){
+
+		Cursor DT;
+
+		try{
+
+			sql="SELECT SERIE,ACTUAL FROM P_CORRELREC WHERE RUTA='"+gl.ruta+"'" ;
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+			int cor=DT.getInt(1)+1;
+			return DT.getString(0)+cor;
+
+		} catch (Exception e) {
+			return gl.ruta+"_"+mu.getCorelBase();
+		}
+	}
+
 	private void docList(){
 		clsClasses.clsCobro vItem;
 		int j=0;

@@ -747,7 +747,7 @@ public class FacturaRes extends PBase {
 					ins.add("COREL",corel);
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
-					ins.add("CANTIDAD",ccant);
+					ins.add("CANTIDAD",cantapl);
 					ins.add("PESO",pesoapl);
 					ins.add("UMSTOCK",umstock);
 					ins.add("UMPESO",gl.umpeso);

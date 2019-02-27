@@ -219,6 +219,7 @@ public class MainActivity extends PBase {
 	private void initSession() {
 		Cursor DT;
 		String s, rn = "";
+		String vCellCom = "";
 
 		if (dbVacia()) {
 			gl.modoadmin=true;
@@ -230,7 +231,7 @@ public class MainActivity extends PBase {
 
 		try {
 			//#HS_20181122_1505 Se agrego el campo Impresion.
-			sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL FROM P_RUTA";
+			sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR FROM P_RUTA";
 			DT = Con.OpenDT(sql);
 			DT.moveToFirst();
 
@@ -241,6 +242,11 @@ public class MainActivity extends PBase {
 			gl.wsURL = DT.getString(4);
 			gl.impresora = DT.getString(5);
 			gl.sucur = DT.getString(6);
+
+			if (!mu.emptystr(DT.getString(7))){
+				vCellCom = DT.getString(7);
+			}
+			gl.CellCom = (vCellCom.equalsIgnoreCase("S"));
 
 			rutapos = s.equalsIgnoreCase("R");
 
@@ -261,7 +267,8 @@ public class MainActivity extends PBase {
 
 		try {
 			//#HS_20181120_1616 Se agrego el campo UNIDAD_MEDIDA_PESO.//campo INCIDENCIA_NO_LECTURA
-			sql = "SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO,INCIDENCIA_NO_LECTURA FROM P_EMPRESA";
+			sql = " SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO," +
+				  " INCIDENCIA_NO_LECTURA FROM P_EMPRESA";
 			DT = Con.OpenDT(sql);
 			DT.moveToFirst();
 

@@ -6,8 +6,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,32 +20,33 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-@SuppressWarnings( "deprecation" )
+@SuppressWarnings("deprecation")
 public class CliGPS extends PBase {
 
-	private TextView lblPos,lblGPS;
+	private TextView lblPos, lblGPS;
 	private ProgressBar pbar;
 	private ImageView imgMap;
-	
-	private boolean idle=true;
-	
+
+	private boolean idle = true;
+
 	// Location
 	private LocationManager locationManager;
 	private Location location;
 
 	private LocationListener locationListener;
 
-	private boolean isGPSEnabled,isNetworkEnabled,canGetLocation;
-	private double  latitude,longitude;
-	private String  cod;
+	private boolean isGPSEnabled, isNetworkEnabled, canGetLocation;
+	private double latitude, longitude;
+	private String cod;
 
 	private static final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
-	private static final long  MIN_TIME_BW_UPDATES = 1000; // in Milliseconds
+	private static final long MIN_TIME_BW_UPDATES = 1000; // in Milliseconds
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +54,12 @@ public class CliGPS extends PBase {
 		setContentView(R.layout.activity_cli_gps);
 
 		super.InitBase();
+		addlog("CliGPS", "" + du.getActDateTime(), gl.vend);
 
 		lblPos = (TextView) findViewById(R.id.textView3);
 		lblGPS = (TextView) findViewById(R.id.textView1);
 
-		imgMap  = (ImageView) findViewById(R.id.imageView2);
+		imgMap = (ImageView) findViewById(R.id.imageView2);
 		pbar = (ProgressBar) findViewById(R.id.progressBar1);
 
 		initSession();
@@ -65,69 +70,91 @@ public class CliGPS extends PBase {
 	// Events
 
 	public void lastScreen(View view) {
-		super.finish();
+		try {
+			super.finish();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
 	}
 
 	public void applyGPS(View view) {
-		if (latitude==0 && longitude==0) {
-			askApply();
-		} else {
-			updateItem(latitude,longitude);
-		}	
+		try {
+			if (latitude == 0 && longitude == 0) {
+				askApply();
+			} else {
+				updateItem(latitude, longitude);
+			}
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
 	}
 
-	
+
 	// Main
 
 	private void initSession() {
 
-		cod=gl.cliente;
-	
-		lblPos.setText("0.00000000 , 0.00000000");
-		lblGPS.setText("Conectando ...");
+		try {
+			cod = gl.cliente;
 
-		locationListener = new LocationListener() {
+			lblPos.setText("0.00000000 , 0.00000000");
+			lblGPS.setText("Conectando ...");
 
-			@Override
-			public void onLocationChanged(Location arg0) {}
+			locationListener = new LocationListener() {
 
-			@Override
-			public void onProviderDisabled(String arg0) {}
+				@Override
+				public void onLocationChanged(Location arg0) {
+				}
 
-			@Override
-			public void onProviderEnabled(String arg0)  {}
+				@Override
+				public void onProviderDisabled(String arg0) {
+				}
 
-			@Override
-			public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
+				@Override
+				public void onProviderEnabled(String arg0) {
+				}
 
-		};
+				@Override
+				public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+				}
 
-		final Handler handler = new Handler();
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				lastKnowPos();
-			}
-		}, 500);		
+			};
+
+			final Handler handler = new Handler();
+			handler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					lastKnowPos();
+				}
+			}, 500);
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
 	}
 
 	private void showStaticMap() {
 
-		if (latitude==0 && longitude==0) {
+		if (latitude == 0 && longitude == 0) {
 			toastcent("¡Posición desconicida, no se puede mostrar mapa!");
-			imgMap.setImageResource(R.drawable.blank48);return;
+			imgMap.setImageResource(R.drawable.blank48);
+			return;
 		}
-		
-		
+
+
 		try {
 
 			final String URL = "https://maps.googleapis.com/maps/api/staticmap?" +
-					"center="+latitude+","+longitude+"&" +
+					"center=" + latitude + "," + longitude + "&" +
 					"zoom=16&size=400x400&" +
-					"markers=color:red%7Clabel:C%7C"+latitude+","+longitude+"&" +
+					"markers=color:red%7Clabel:C%7C" + latitude + "," + longitude + "&" +
 					"key=AIzaSyAeDWYjkjRi9vQVk7ITRgvAzV3ktpWyhP0";
 
-			AsyncTask<Void, Void, Bitmap> setImageFromUrl = new AsyncTask<Void, Void, Bitmap>(){
+			AsyncTask<Void, Void, Bitmap> setImageFromUrl = new AsyncTask<Void, Void, Bitmap>() {
 
 				@Override
 				protected Bitmap doInBackground(Void... params) {
@@ -148,9 +175,9 @@ public class CliGPS extends PBase {
 				}
 
 				protected void onPostExecute(Bitmap bmp) {
-					if (bmp!=null) {
+					if (bmp != null) {
 						imgMap.setImageBitmap(bmp);
-					} else {	
+					} else {
 						imgMap.setImageResource(R.drawable.blank48);
 					}
 
@@ -163,32 +190,38 @@ public class CliGPS extends PBase {
 			setImageFromUrl.execute();
 
 		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
 	}
 
-	private void updateItem(double px,double py) {
+	private void updateItem(double px, double py) {
 		try {
-			sql="UPDATE P_CLIENTE SET coorx="+px+",coory="+py+" WHERE CODIGO='"+cod+"'";
+			sql = "UPDATE P_CLIENTE SET coorx=" + px + ",coory=" + py + " WHERE CODIGO='" + cod + "'";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			msgbox(e.getMessage());
 		}
 
 		try {
 			ins.init("D_CLICOORD");
-			
-			ins.add("CODIGO",cod);
-			ins.add("STAMP",du.getCorelBase());
-			ins.add("COORX",px);
-			ins.add("COORY",py);
-			ins.add("STATCOM","N");
-			
+
+			ins.add("CODIGO", cod);
+			ins.add("STAMP", du.getCorelBase());
+			ins.add("COORX", px);
+			ins.add("COORY", py);
+			ins.add("STATCOM", "N");
+
 			db.execSQL(ins.sql());
 		} catch (SQLException e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			msgbox(e.getMessage());
-		}	
-		
+		}
+
 		super.finish();
 	}
 
@@ -197,29 +230,42 @@ public class CliGPS extends PBase {
 
 	private void lastKnowPos() {
 
-		idle=false;pbar.setVisibility(View.VISIBLE);
+		idle = false;
+		pbar.setVisibility(View.VISIBLE);
 
-		latitude=0;longitude=0;
+		latitude = 0;
+		longitude = 0;
 
 		try {
 			getLocation();
 		} catch (Exception e) {
-			latitude=0;longitude=0;
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			latitude = 0;
+			longitude = 0;
 		}
 
-		idle=true;pbar.setVisibility(View.INVISIBLE);
 
-		lblPos.setText(latitude+" , "+longitude);
+		try {
+			idle = true;
+			pbar.setVisibility(View.INVISIBLE);
 
-		if (latitude+longitude!=0) {		
-			final Handler handler = new Handler();
-			handler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					showStaticMap();
-				}
-			}, 500);		
-		}	
+			lblPos.setText(latitude + " , " + longitude);
+
+			if (latitude + longitude != 0) {
+				final Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						showStaticMap();
+					}
+				}, 500);
+			}
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
 	}
 
 	public Location getLocation() {
@@ -242,7 +288,17 @@ public class CliGPS extends PBase {
 			} else {
 				this.canGetLocation = true;
 				if (isNetworkEnabled) {
-					locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,MIN_TIME_BW_UPDATES,
+					if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+						// TODO: Consider calling
+						//    ActivityCompat#requestPermissions
+						// here to request the missing permissions, and then overriding
+						//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+						//                                          int[] grantResults)
+						// to handle the case where the user grants the permission. See the documentation
+						// for ActivityCompat#requestPermissions for more details.
+						//return TODO;
+					}
+					locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
 							MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
 					if (locationManager != null) {
 						location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -272,6 +328,7 @@ public class CliGPS extends PBase {
 			}
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return null;
 		}
 
@@ -283,22 +340,27 @@ public class CliGPS extends PBase {
 
 	private void askApply() {
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("¿Borrar la posición?");
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿Borrar la posición?");
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {			      	
-				updateItem(0,0);	
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					updateItem(0,0);
+				}
+			});
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {}			      	
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {}
+			});
 
-		dialog.show();	
-	}	
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
 
 }

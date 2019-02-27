@@ -706,7 +706,7 @@ public class ComWS extends PBase {
 			//#EJC20190226: Cargar siempre todas las tablas para evitar cargar datos dos veces.
             if (!AddTable("P_STOCK_APR")) return false;
             if (!AddTable("P_STOCK")) return false;
-
+            if (!AddTable("P_STOCKB")) return false;
 			if (!AddTable("P_COBRO")) return false;
 			if (!AddTable("P_CLIGRUPO")) return false;
 			if (!AddTable("P_MEDIAPAGO")) return false;
@@ -1547,9 +1547,10 @@ public class ComWS extends PBase {
 
         try {
 
-            if (commitSQL() == 1) {
-                db.beginTransaction();
+            if (commitSQL() == 1)
+            {
 
+                db.beginTransaction();
                 db.execSQL("UPDATE D_FACTURA SET STATCOM='S'");
                 db.execSQL("UPDATE D_PEDIDO SET STATCOM='S'");
                 db.execSQL("UPDATE D_NOTACRED SET STATCOM='S'");
@@ -1562,7 +1563,6 @@ public class ComWS extends PBase {
                 db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
                 db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
                 db.execSQL("UPDATE FINDIA SET VAL5=0, VAL4=0,VAL3=0, VAL2=0");
-
                 db.setTransactionSuccessful();
                 db.endTransaction();
             }

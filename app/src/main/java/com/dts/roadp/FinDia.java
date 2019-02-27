@@ -14,7 +14,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
+import android.widget.CalendarView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -110,7 +112,9 @@ public class FinDia extends PBase {
 		startActivity(menu);
 	}
 
-	public void startFDD() {
+	public void startFDD()
+    {
+
 		boolean rslt;
 
 		File fd=new File(Environment.getExternalStorageDirectory()+"/SyncFold/findia.txt");
@@ -119,7 +123,8 @@ public class FinDia extends PBase {
 		idle=false;fail=false;
 
 		if (gl.peModal.equalsIgnoreCase("TOL")) {
-			devProductos();
+			//#EJC20190226: En comentario porque agregué el insert de d_mov encabezado, se debe hacer en otra pantalla el insert del detalle de lo que hay que devoler.
+		    //devProductos();
 			buildReportsTOL();
 		} else {
 			//devProductos();
@@ -138,7 +143,8 @@ public class FinDia extends PBase {
 			return;
 		}
 
-		try {
+		try
+        {
 			File f1 = new File(Environment.getExternalStorageDirectory() + "/SyncFold/findia.txt");
 			File f2 = new File(Environment.getExternalStorageDirectory() + "/print.txt");
 			FileUtils.copyFile(f1, f2);
@@ -147,7 +153,8 @@ public class FinDia extends PBase {
 			return;
 		}
 
-        try {
+        try
+        {
             db.execSQL("UPDATE FinDia SET val1="+du.getActDate());
         } catch (Exception e) {
             msgbox("No se pudo actualizar fecha de cierre.");
@@ -158,21 +165,26 @@ public class FinDia extends PBase {
 		gl.findiaactivo=true;
 		gl.modoadmin = false;
 		gl.autocom = 1;
-		startActivity(new Intent(this, ComWS.class));
 
-        try {
+        startActivity(new Intent(this, ComWS.class));
 
-            if (prn.isEnabled()) {
+        try
+        {
+
+            if (prn.isEnabled())
+            {
                 final Handler shandler = new Handler();
                 shandler.postDelayed(new Runnable() {
                     @Override
-                    public void run() {
+                    public void run()
+                    {
                         Intent intent = new Intent(FinDia.this, PrintDialog.class);
                         startActivity(intent);
                     }
                 }, 2000);
             }
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
@@ -180,7 +192,8 @@ public class FinDia extends PBase {
 	}
 
 	//#HS_20181127_1052 Agregué funcion de inicio de FinDia.
-	public void iniciarFD() {
+	public void iniciarFD()
+    {
 
 		File fd=new File(Environment.getExternalStorageDirectory()+"/SyncFold/findia.txt");
 		FileUtils.deleteQuietly(fd);
@@ -465,6 +478,44 @@ public class FinDia extends PBase {
 	
 	}
 
+	//#EJC20190226: Insertar solo cabecera de d_mov.
+    private boolean Inserta_Enc_D_Mov() {
+
+        String corel;
+        claseFinDia = new clsFinDia(this);
+        int i;
+
+        corel=gl.ruta+"_"+mu.getCorelBase();devcorel=corel;
+        gl.corel_d_mov=corel;
+
+        try {
+
+            db.beginTransaction();
+            ins.init("D_MOV");
+            ins.add("COREL",corel);
+            ins.add("RUTA",((appGlobals) vApp).ruta);
+            ins.add("ANULADO","N");
+            ins.add("FECHA",fecha);
+            ins.add("TIPO","D");
+            ins.add("USUARIO",((appGlobals) vApp).vend);
+            ins.add("REFERENCIA","Cierre de dia");
+            ins.add("STATCOM","N");
+            ins.add("IMPRES",0);
+            ins.add("CODIGOLIQUIDACION",0);
+            db.execSQL(ins.sql());
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
+            return true;
+
+        } catch (Exception e) {
+            db.endTransaction();
+            //mu.msgbox( e.getMessage());
+            return false;
+        }
+
+    }
+
 	private boolean devProductos() {
 		Cursor DT;
 		String corel,pcod,plote,um;
@@ -514,7 +565,6 @@ public class FinDia extends PBase {
 					um=DT.getString(5);
 
 					ins.init("D_MOVD");
-
 					ins.add("COREL",corel);
 					ins.add("PRODUCTO",pcod);
 					ins.add("CANT",pcant);
@@ -1408,7 +1458,8 @@ public class FinDia extends PBase {
 		dialog.setIcon(R.drawable.ic_quest);
 					
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {
+		    public void onClick(DialogInterface dialog, int which)
+            {
 				msgAskDevInventario();
 		    }
 		});
@@ -1425,30 +1476,39 @@ public class FinDia extends PBase {
 	private void msgAskDevInventario()
 	{
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        if (!Ya_Realizo_Devolucion())
+        {
 
-		dialog.setTitle("Road");
-		dialog.setMessage("No ha efectuado la devolución a bodega, ¿Quiere proceder a realizarla?");
+            browse=1;
+            startActivity(new Intent(this,DevolBodCan.class));
 
-		dialog.setIcon(R.drawable.ic_quest);
+            /*AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setTitle("Road");
+            dialog.setMessage("No ha efectuado la devolución a bodega, ¿Quiere proceder a realizarla?");
+            dialog.setIcon(R.drawable.ic_quest);
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if(gl.banderafindia == false)
+                    {
+                        startFDD();
+                    }else {
+                        startFDD();//iniciarFD();
+                    }
+                }
+            });
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				if(gl.banderafindia == false){
-					startFDD();
-				}else {
-					startFDD();//iniciarFD();
-				}
-			}
-		});
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityMenu();
+                }
+            });
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				ActivityMenu();
-			}
-		});
+            dialog.show();*/
 
-		dialog.show();
+        }else
+        {
+            startFDD();
+        }
 
 	}
 	
@@ -1543,8 +1603,126 @@ public class FinDia extends PBase {
 		
 		dialog.show();
 			
-	}	
-	
+	}
+
+
+    private boolean Tiene_Inventario_Devolucion()
+    {
+
+        boolean TieneInvDevol = false;
+
+        Cursor DT;
+
+        try
+        {
+
+            double vTotalLbsB = 0;
+            double vTotalUB = 0;
+
+            //Producto con lote
+            sql= " SELECT SUM(ifnull(S.PESO,0)) AS PESOTOT, SUM(ifnull(S.CANT,0))AS CANTUNI " +
+            " FROM P_STOCK S, P_PRODUCTO P " +
+            " WHERE P.ES_PROD_BARRA = 0 AND S.CODIGO= P.CODIGO " ;
+
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()!=0)
+            {
+                DT.moveToFirst();
+
+                vTotalLbsB =   DT.getDouble(0);
+                vTotalUB = DT.getDouble(1);
+            }
+
+            //Producto con HU
+            sql = " SELECT SUM(ifnull(S.CANT,0)) AS PESOTOT, COUNT(S.CODIGO)AS CANTUNI " +
+            " FROM P_STOCKB S, P_PRODUCTO P " +
+            " WHERE P.ES_PROD_BARRA = 1 AND S.CODIGO= P.CODIGO AND (S.COREL = '' OR S.COREL IS NULL)";
+
+                    /*+
+            " AND S.BARRA NOT IN (SELECT BARRA FROM D_BONIF_BARRA WHERE COREL NOT IN (" +
+            " SELECT COREL FROM D_FACTURA WHERE ANULADO = 'S')) "; */
+
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()!=0)
+            {
+                DT.moveToFirst();
+
+                vTotalLbsB +=   DT.getDouble(0);
+                vTotalUB += DT.getDouble(1);
+            }
+
+            //Devolución de dañado.
+            sql = " SELECT SUM(S.PESO) AS PESOTOT, SUM(S.CANT)AS CANTUNI " +
+            " FROM D_CXC E, D_CxCD S, P_PRODUCTO P WHERE E.COREL = S.COREL AND S.CODIGO= P.CODIGO AND E.ANULADO = 'N' ";
+
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()!=0)
+            {
+                DT.moveToFirst();
+
+                vTotalLbsB +=   DT.getDouble(0);
+                vTotalUB += DT.getDouble(1);
+            }
+
+            TieneInvDevol = (vTotalUB > 0);
+
+        }catch (Exception e) {
+            Log.e("TieneInvDevol",e.getMessage());
+        }
+
+        return  TieneInvDevol;
+
+    }
+
+
+    private boolean Ya_Realizo_Devolucion()
+    {
+
+        boolean Ya_Realizo_Devol = false;
+
+        Cursor DT;
+
+        try
+        {
+
+            double vTotalLbsB = 0;
+            double vTotalUB = 0;
+            boolean vTieneInvDevol = false;
+
+            sql = "SELECT STATCOM FROM D_MOV WHERE TIPO = 'D' AND ANULADO = 'N'";
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()==0)
+            {
+
+                vTieneInvDevol = Tiene_Inventario_Devolucion();
+
+                if (vTieneInvDevol)
+                {
+                    Ya_Realizo_Devol = false;
+
+                }else
+                {
+                    Ya_Realizo_Devol = Inserta_Enc_D_Mov();
+                }
+
+            }else
+            {
+                Ya_Realizo_Devol = true;
+            }
+
+        }catch (Exception e) {
+            Log.e("TieneInvDevol",e.getMessage());
+        }
+
+        return  Ya_Realizo_Devol;
+
+    }
+
+
 	// Activity Events
 	
 	@Override

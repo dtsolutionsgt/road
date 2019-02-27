@@ -52,74 +52,85 @@ public class Menu extends PBase {
 	private Exist Existencia = new Exist();
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_menu);
-		
-		super.InitBase();
-		
-		gridView = (GridView) findViewById(R.id.gridView1);
-		relbotpan = (RelativeLayout) findViewById(R.id.relbotpan);
+	protected void onCreate(Bundle savedInstanceState)
+	{
 
-		//#HS_20181206_0945 Agregue lblVendedor que se muestra en el menú.
-		lblVendedor = (TextView) findViewById(R.id.lblVendedor);
-		lblRuta = (TextView) findViewById(R.id.textView9);
+		try
+		{
 
-		Ayudante = new Spinner(this);
-		Vehiculo = new Spinner(this);
-		lblAyudante = new TextView(this);
-		lblAyudante.setText("Ayudante:");
-		lblVehiculo = new TextView(this);
-		lblVehiculo.setText("Vehículo:");
-		///
+			super.onCreate(savedInstanceState);
+			setContentView(R.layout.activity_menu);
 
-		vApp=this.getApplication();
-		rutatipo=gl.rutatipog;
-		
-		rutapos=false;gl.rutapos=false;
-			
-		iicon=1;
+			super.InitBase();
 
-		if (rutatipo.equalsIgnoreCase("T")) {
-			sdoc="Factura + Pedido";	
-		} else {	
-			if (rutatipo.equalsIgnoreCase("V")) {
-				sdoc="Venta";iicon=102;
+			gridView = (GridView) findViewById(R.id.gridView1);
+			relbotpan = (RelativeLayout) findViewById(R.id.relbotpan);
+
+			//#HS_20181206_0945 Agregue lblVendedor que se muestra en el menú.
+			lblVendedor = (TextView) findViewById(R.id.lblVendedor);
+			lblRuta = (TextView) findViewById(R.id.textView9);
+
+			Ayudante = new Spinner(this);
+			Vehiculo = new Spinner(this);
+			lblAyudante = new TextView(this);
+			lblAyudante.setText("Ayudante:");
+			lblVehiculo = new TextView(this);
+			lblVehiculo.setText("Vehículo:");
+			///
+
+			vApp=this.getApplication();
+			rutatipo=gl.rutatipog;
+
+			rutapos=false;gl.rutapos=false;
+
+			iicon=1;
+
+			if (rutatipo.equalsIgnoreCase("T")) {
+				sdoc="Factura + Pedido";
 			} else {
-				sdoc="Preventa";iicon=101;
+				if (rutatipo.equalsIgnoreCase("V")) {
+					sdoc="Venta";iicon=102;
+				} else {
+					sdoc="Preventa";iicon=101;
+				}
 			}
-		}
-		
-		if (rutatipo.equalsIgnoreCase("R")) {
-			sdoc="Venta";	
-			rutapos=true;
-			gl.rutapos=true;
-		}
-		
-		selId=-1;selIdx=-1;
-		
-		setHandlers();
-		
-		int ori=this.getResources().getConfiguration().orientation; // 1 - portrait , 2 - landscape
-		horizpos=ori==2;
-		
-		if (horizpos) {
-			gridView.setNumColumns(3);relbotpan.setVisibility(View.GONE);
-		} else {
-			gridView.setNumColumns(3);relbotpan.setVisibility(View.VISIBLE);
-		}
-		
-		this.setTitle("ROAD");
-		listItems();
 
-		if (gl.peVehAyud) {
-			AyudanteVehiculo();
-		} else {
-			gl.ayudanteID="";gl.vehiculoID="";
+			if (rutatipo.equalsIgnoreCase("R")) {
+				sdoc="Venta";
+				rutapos=true;
+				gl.rutapos=true;
+			}
+
+			selId=-1;selIdx=-1;
+
+			setHandlers();
+
+			int ori=this.getResources().getConfiguration().orientation; // 1 - portrait , 2 - landscape
+			horizpos=ori==2;
+
+			if (horizpos) {
+				gridView.setNumColumns(3);relbotpan.setVisibility(View.GONE);
+			} else {
+				gridView.setNumColumns(3);relbotpan.setVisibility(View.VISIBLE);
+			}
+
+			this.setTitle("ROAD");
+			listItems();
+
+			if (gl.peVehAyud) {
+				AyudanteVehiculo();
+			} else {
+				gl.ayudanteID="";gl.vehiculoID="";
+			}
+
+			ConfImpresora();
+
+		}catch (Exception e)
+		{
+			Log.e("Mnu", e.getMessage());
 		}
 
-		ConfImpresora();
+
 	}
 	
 	

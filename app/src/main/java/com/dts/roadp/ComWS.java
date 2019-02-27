@@ -237,7 +237,7 @@ public class ComWS extends PBase {
 	}
 
 
-	// Main
+	//region Main
 
 	private void runRecep() {
 
@@ -288,8 +288,7 @@ public class ComWS extends PBase {
 		
 	}
 	
-	private boolean validaPendientes()
-    {
+	private boolean validaPendientes() {
 
 		int pend=0;
 			
@@ -305,70 +304,9 @@ public class ComWS extends PBase {
 		
 	}
 		
-	private int getDocCount(String ss,String pps) {
-		Cursor DT;
-		int cnt;
-		String st;
-		
-		try {
-			sql=ss;
-			DT=Con.OpenDT(sql);
-			cnt=DT.getCount();
-			
-			if (cnt>0) {
-				st=pps+" "+cnt;			
-				sp=sp+st+", ";	
-			}
-				
-			return cnt;
-		} catch (Exception e) {
-			mu.msgbox(sql+"\n"+e.getMessage());
-			return 0;
-		}		
-	}
-	
-	
-	// Licencia
+	//endregion
 
-	private boolean validaLicencia() {
-		Cursor dt;
-		String mac,lickey,idkey,binkey;
-		int fval,ff,lkey;
-
-		try {
-			mac=lic.getMac();
-			lkey=lic.getLicKey(mac);
-			lickey=lic.encodeLicence(lkey);
-
-			sql="SELECT IDKEY,BINKEY FROM LIC_CLIENTE WHERE ID='"+mac+"'";
-			dt=Con.OpenDT(sql);
-			if (dt.getCount()==0) return false;
-
-			dt.moveToFirst();		
-			idkey=dt.getString(0);
-			binkey=dt.getString(1);
-
-			if (!idkey.equalsIgnoreCase(lickey)) return false;
-
-			ff=du.getActDate();
-			fval=lic.decodeValue(binkey);
-			fval=fval-lkey;
-
-			//Toast.makeText(this,""+fval, Toast.LENGTH_SHORT).show();
-
-			if (fval==999999) return true;				
-			fval=fval*10000;
-
-			if (fval>=ff) return true; else return false;
-
-		} catch (Exception e) {
-			mu.msgbox(e.getMessage());return false;
-		}
-
-	}
-	
-	
-	// Web Service Methods
+	//region Web Service Methods
 	
 	public int fillTable(String value,String delcmd) {
 
@@ -428,7 +366,7 @@ public class ComWS extends PBase {
 
 	        	if (i==0) {
 	        		
-	        		 idbg=idbg+" ret " +str +"  ";
+	        		idbg=idbg+" ret " +str +"  ";
 	        		
 	        		if (str.equalsIgnoreCase("#")) {
 	        			listItems.add(delcmd);
@@ -593,9 +531,7 @@ public class ComWS extends PBase {
 		return 0;
 	}	
 
-
 	//#HS_20181219 Funcion para enviar JSON al Web Service.
-
 	public int envioFachada() {
 		String METHOD_NAME="GuardaFachada";
 		s="";
@@ -634,8 +570,9 @@ public class ComWS extends PBase {
 
 	}
 
+	//endregion
 
-	// WEB SERVICE - RECEPCION
+	//region WS Recepcion Methods
 
 	private boolean getData(){
 
@@ -667,7 +604,6 @@ public class ComWS extends PBase {
 				
 			// AdjustP_Cliente();
 		    // AdjustP_Cobro()
-			
 			if (!AddTable("P_NIVELPRECIO")) return false;
 
 			if (!AddTable("P_RUTA")) return false;
@@ -751,7 +687,6 @@ public class ComWS extends PBase {
 			//}
 
 			if (!AddTable("P_PARAMEXT")) return false;
-
 		} catch (Exception e) {
 			return false;
 		}
@@ -1289,8 +1224,7 @@ public class ComWS extends PBase {
 		}
 	}
 		
-	private boolean validaDatos(boolean completo)
-    {
+	private boolean validaDatos(boolean completo) {
 
 		Cursor dt;
 
@@ -1353,8 +1287,7 @@ public class ComWS extends PBase {
 
 			}
 
-		} catch (Exception e)
-        {
+		} catch (Exception e) {
             Log.d("ValidaDatos",e.getMessage());
 		}		
 
@@ -1418,8 +1351,41 @@ public class ComWS extends PBase {
 
 	}
 
+	//#HS_20181123_1623 Agregue funcion FinDia para el commit y update de tablas.
+	private boolean FinDia() {
+
+		try {
+
+			if (commitSQL() == 1)
+			{
+
+				db.beginTransaction();
+				db.execSQL("UPDATE D_FACTURA SET STATCOM='S'");
+				db.execSQL("UPDATE D_PEDIDO SET STATCOM='S'");
+				db.execSQL("UPDATE D_NOTACRED SET STATCOM='S'");
+				db.execSQL("UPDATE D_COBRO SET STATCOM='S'");
+				db.execSQL("UPDATE D_DEPOS SET STATCOM='S'");
+				db.execSQL("UPDATE D_MOV SET STATCOM='S'");
+				db.execSQL("UPDATE D_CLINUEVO SET STATCOM='S'");
+				db.execSQL("UPDATE D_ATENCION SET STATCOM='S'");
+				db.execSQL("UPDATE D_CLICOORD SET STATCOM='S'");
+				db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
+				db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
+				db.execSQL("UPDATE FINDIA SET VAL5=0, VAL4=0,VAL3=0, VAL2=0");
+				db.setTransactionSuccessful();
+				db.endTransaction();
+			}
+
+		} catch (Exception e) {
+			msgbox("FinDia(): " + e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	//endregion
 	
-	// Web Service handling Methods
+	//region WS Recepcion Handling Methods
 	
 	public void wsExecute(){
 				
@@ -1457,8 +1423,7 @@ public class ComWS extends PBase {
 
 		    s="Recepción completa.";
 			
-			if (!esvacio)
-			{
+			if (!esvacio) {
 
 				if (stockflag==1) {
 					s=s+"\nSe actualizó inventario.";
@@ -1481,7 +1446,6 @@ public class ComWS extends PBase {
                 msgAskExit(s);
 				return;
 			}
-
 		} else {	
 			lblInfo.setText(fstr);
 			mu.msgbox("Ocurrió error : \n"+fstr+" ("+reccnt+") " + ferr);
@@ -1540,42 +1504,9 @@ public class ComWS extends PBase {
  
     }	
 
+    //endregion
 
-	//#HS_20181123_1623 Agregue funcion FinDia para el commit y update de tablas.
-
-    private boolean FinDia() {
-
-        try {
-
-            if (commitSQL() == 1)
-            {
-
-                db.beginTransaction();
-                db.execSQL("UPDATE D_FACTURA SET STATCOM='S'");
-                db.execSQL("UPDATE D_PEDIDO SET STATCOM='S'");
-                db.execSQL("UPDATE D_NOTACRED SET STATCOM='S'");
-                db.execSQL("UPDATE D_COBRO SET STATCOM='S'");
-                db.execSQL("UPDATE D_DEPOS SET STATCOM='S'");
-                db.execSQL("UPDATE D_MOV SET STATCOM='S'");
-                db.execSQL("UPDATE D_CLINUEVO SET STATCOM='S'");
-                db.execSQL("UPDATE D_ATENCION SET STATCOM='S'");
-                db.execSQL("UPDATE D_CLICOORD SET STATCOM='S'");
-                db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
-                db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
-                db.execSQL("UPDATE FINDIA SET VAL5=0, VAL4=0,VAL3=0, VAL2=0");
-                db.setTransactionSuccessful();
-                db.endTransaction();
-            }
-
-        } catch (Exception e) {
-            msgbox("FinDia(): " + e.getMessage());
-            return false;
-        }
-        return true;
-    }
-
-
-	// WEB SERVICE - ENVIO
+	//region WS Envio Methods
 	
 	private boolean sendData() {
 
@@ -2410,7 +2341,6 @@ public class ComWS extends PBase {
 	}
 
 	//#HS_20181219 funcion para crear JSON de fotos fachada.
-
 	public void listaFachada(){
 
 		Cursor DT;
@@ -2475,7 +2405,6 @@ public class ComWS extends PBase {
 	}
 
 	//#HS_20181221 Elimina las fotos de ROADFOTOS
-
 	public void EliminarArchivos(File ArchivoDirectorio) {
 		if (ArchivoDirectorio.isDirectory())
 		{
@@ -2486,8 +2415,9 @@ public class ComWS extends PBase {
 			ArchivoDirectorio.delete();
 	}
 
+	//endregion
 
-	// Web Service handling Methods
+	//region WS EnvioHandling Methods
 	
 	public void wsSendExecute(){
 
@@ -2578,8 +2508,9 @@ public class ComWS extends PBase {
 	 
     }
 	
-	
-	// WEB SERVICE - CONFIRM
+	//endregion
+
+	//region WS Confirm Methods
 
 	private void sendConfirm() {
 		Cursor dt;
@@ -2615,8 +2546,9 @@ public class ComWS extends PBase {
 
 	}
 
+	//endregion
 	
-	// Web Service handling Methods
+	//region WS Confirm Handling Methods
 
 	public void wsConfirmExecute(){
 		String univdate=du.univfecha(du.getActDate());
@@ -2673,8 +2605,9 @@ public class ComWS extends PBase {
 
 	}	
 
+	//endregion
 	
-	// Aux
+	//region Aux
 	
 	public void comManual(View view) {
 		Intent intent = new Intent(this,ComDrop.class);
@@ -2741,7 +2674,66 @@ public class ComWS extends PBase {
 		
 		return true;
 	}
-	
+
+	private int getDocCount(String ss,String pps) {
+		Cursor DT;
+		int cnt;
+		String st;
+
+		try {
+			sql=ss;
+			DT=Con.OpenDT(sql);
+			cnt=DT.getCount();
+
+			if (cnt>0) {
+				st=pps+" "+cnt;
+				sp=sp+st+", ";
+			}
+
+			return cnt;
+		} catch (Exception e) {
+			mu.msgbox(sql+"\n"+e.getMessage());
+			return 0;
+		}
+	}
+
+	private boolean validaLicencia() {
+		Cursor dt;
+		String mac,lickey,idkey,binkey;
+		int fval,ff,lkey;
+
+		try {
+			mac=lic.getMac();
+			lkey=lic.getLicKey(mac);
+			lickey=lic.encodeLicence(lkey);
+
+			sql="SELECT IDKEY,BINKEY FROM LIC_CLIENTE WHERE ID='"+mac+"'";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return false;
+
+			dt.moveToFirst();
+			idkey=dt.getString(0);
+			binkey=dt.getString(1);
+
+			if (!idkey.equalsIgnoreCase(lickey)) return false;
+
+			ff=du.getActDate();
+			fval=lic.decodeValue(binkey);
+			fval=fval-lkey;
+
+			//Toast.makeText(this,""+fval, Toast.LENGTH_SHORT).show();
+
+			if (fval==999999) return true;
+			fval=fval*10000;
+
+			if (fval>=ff) return true; else return false;
+
+		} catch (Exception e) {
+			mu.msgbox(e.getMessage());return false;
+		}
+
+	}
+
 	private String getMac() {		
 		WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 		WifiInfo info = manager.getConnectionInfo();
@@ -2977,8 +2969,99 @@ public class ComWS extends PBase {
 
     };
 
+	private void msgAskExit(String msg) {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-	// Activity Events
+		dialog.setTitle(R.string.app_name);
+		dialog.setMessage(msg);
+		dialog.setIcon(R.drawable.ic_quest);
+
+		dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+
+				if (gl.modoadmin) {
+					restarApp();
+				}
+				else {
+					finish();
+				};
+			}
+		});
+
+		dialog.show();
+
+	}
+	// #JP corregido 20190226
+	private void BorraDatosAnteriores(String msg) {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle(R.string.app_name);
+		dialog.setMessage(msg);
+		dialog.setIcon(R.drawable.ic_quest);
+
+		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				claseFindia = new clsFinDia(ComWS.this);
+				claseFindia.eliminarTablasD();
+				msgAskConfirmaRecibido();
+			}
+		});
+
+		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				msgAskConfirmaRecibido();
+			}
+		});
+
+		dialog.show();
+
+	}
+
+	private void msgAskExitComplete() {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle(R.string.app_name);
+		dialog.setMessage("Está seguro de salir de la aplicación?");
+		dialog.setIcon(R.drawable.ic_quest);
+
+		dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				System.exit(0);
+			}
+		});
+
+		dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				;
+			}
+		});
+
+		dialog.show();
+
+	}
+
+	private void msgAskConfirmaRecibido(){
+
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle("Recepción");
+		dialog.setMessage("¿Recibir datos nuevos?");
+
+		dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				runRecep();
+			}
+		});
+
+		dialog.setNegativeButton("Cancelar", null);
+
+		dialog.show();
+
+	}
+
+	//endregion
+
+	//region Activity Events
 	
 	@Override
 	public void onBackPressed() {
@@ -2992,93 +3075,6 @@ public class ComWS extends PBase {
 	   }
 	}
 
-    private void msgAskExit(String msg) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+	//endregion
 
-        dialog.setTitle(R.string.app_name);
-        dialog.setMessage(msg);
-        dialog.setIcon(R.drawable.ic_quest);
-
-        dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-
-                if (gl.modoadmin) {
-                    restarApp();
-                }
-                else {
-                    finish();
-                };
-            }
-        });
-
-        dialog.show();
-
-    }
-    // #JP corregido 20190226
-    private void BorraDatosAnteriores(String msg) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-        dialog.setTitle(R.string.app_name);
-        dialog.setMessage(msg);
-        dialog.setIcon(R.drawable.ic_quest);
-
-        dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-            	claseFindia = new clsFinDia(ComWS.this);
-                claseFindia.eliminarTablasD();
-                msgAskConfirmaRecibido();
-            }
-        });
-
-        dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                msgAskConfirmaRecibido();
-            }
-        });
-
-        dialog.show();
-
-    }
-
-    private void msgAskExitComplete() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-        dialog.setTitle(R.string.app_name);
-        dialog.setMessage("Está seguro de salir de la aplicación?");
-        dialog.setIcon(R.drawable.ic_quest);
-
-        dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                System.exit(0);
-            }
-        });
-
-        dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                ;
-            }
-        });
-
-        dialog.show();
-
-    }
-
-    private void msgAskConfirmaRecibido(){
-
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-        dialog.setTitle("Recepción");
-        dialog.setMessage("¿Recibir datos nuevos?");
-
-        dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                runRecep();
-            }
-        });
-
-        dialog.setNegativeButton("Cancelar", null);
-
-        dialog.show();
-
-    }
 }

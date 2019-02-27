@@ -52,16 +52,15 @@ public class Menu extends PBase {
 	private Exist Existencia = new Exist();
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) 	{
 
-		try
-		{
+		try {
 
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.activity_menu);
 
 			super.InitBase();
+			addlog("Menu",""+du.getActDateTime(),gl.vend);
 
 			gridView = (GridView) findViewById(R.id.gridView1);
 			relbotpan = (RelativeLayout) findViewById(R.id.relbotpan);
@@ -130,9 +129,7 @@ public class Menu extends PBase {
 			Log.e("Mnu", e.getMessage());
 		}
 
-
 	}
-	
 	
 	//region  Main
 	
@@ -1058,7 +1055,7 @@ public class Menu extends PBase {
 	
 	public void showInvMenuUtils() {
 		final AlertDialog Dialog;
-		final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ"};
+		final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ","Soporte"};
 	 		    
 		menudlg = new AlertDialog.Builder(this);
 		menudlg.setIcon(R.drawable.utils48);
@@ -1075,6 +1072,8 @@ public class Menu extends PBase {
 							break;
 						case 2:
 							menuCorelZ();break;
+						case 3:
+							;break;
 						}
 					
 					dialog.cancel();	

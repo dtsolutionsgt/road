@@ -102,7 +102,11 @@ public class PBase extends FragmentActivity {
 		toast.show();
 	}	
 	
-	
+	protected void addlog(String methodname,String msg,String info) {
+
+	}
+
+
 	// Activity Events
 	
 	@Override

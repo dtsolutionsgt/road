@@ -17,7 +17,8 @@ public class appGlobals extends Application {
 	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,atentini,vnivel,vnivprec,media;
 	public int autocom,nuevaFecha,pagomodo,filtrocli;
 	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor;
-    public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov;
+	public boolean CellCom;
+	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov;
 
 	//CM_20190225: Variable para validar crédito.
     public  boolean vcredito;

@@ -59,7 +59,7 @@ public class ComWS extends PBase {
 	private SQLiteDatabase dbT;
 	private BaseDatos ConT;
 	private BaseDatos.Insert insT;
-	private  AppMethods clsAppM;
+	private AppMethods clsAppM;
 
 	private ArrayList<String> listItems=new ArrayList<String>();
 	private ArrayList<String> results=new ArrayList<String>();
@@ -575,12 +575,18 @@ public class ComWS extends PBase {
 	//region WS Recepcion Methods
 
 	private boolean getData(){
-
 	    Cursor DT;
+		BufferedWriter writer = null;
+		FileWriter wfile;
 		int rc,scomp,prn,jj;
 		String s,val="";
-	
+
+
 		try {
+			String fname = Environment.getExternalStorageDirectory()+"/roadcarga.txt";
+			wfile=new FileWriter(fname,false);
+			writer = new BufferedWriter(wfile);
+
 
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=2";	
 			DT=Con.OpenDT(sql);
@@ -713,8 +719,11 @@ public class ComWS extends PBase {
 			for (int i = 0; i < rc; i++) {
 
                 sql = listItems.get(i);esql=sql;
-
                 sql=sql.replace("INTO VENDEDORES","INTO P_VENDEDOR");
+
+				try {
+					writer.write(sql);writer.write("\r\n");
+				} catch (Exception e) {}
 
                 dbT.execSQL(sql);
 
@@ -746,6 +755,14 @@ public class ComWS extends PBase {
 				ConT.close();
 			} catch (Exception e) { }
 
+
+			try {
+				writer.close();
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			}
+
 			return true;
 
 		} catch (Exception e) {
@@ -755,8 +772,7 @@ public class ComWS extends PBase {
 			Log.e("Error",e.getMessage());
 			try {
 				ConT.close();  
-			} catch (Exception ee) {
-			}
+			} catch (Exception ee) {}
 			
 			sstr=e.getMessage();
 			ferr=sstr+"\n"+sql;

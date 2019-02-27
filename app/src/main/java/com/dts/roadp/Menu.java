@@ -1053,7 +1053,7 @@ public class Menu extends PBase {
 	
 	public void showInvMenuUtils() {
 		final AlertDialog Dialog;
-		final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ","Soporte"};
+		final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ","Envío a soporte"};
 	 		    
 		menudlg = new AlertDialog.Builder(this);
 		menudlg.setIcon(R.drawable.utils48);

@@ -48,6 +48,7 @@ public class Producto extends PBase {
 		setContentView(R.layout.activity_producto);
 		
 		super.InitBase();
+		addlog("Producto",""+du.getActDateTime(),gl.vend);
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		txtFilter = (EditText) findViewById(R.id.editText1);
@@ -79,119 +80,135 @@ public class Producto extends PBase {
     // Events
 
 	public void porCodigo(View view) {
-		ordPorNombre=false;
-		listItems();
+		try{
+			ordPorNombre=false;
+			listItems();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	public void porNombre(View view) {
-		ordPorNombre=true;
-		listItems();
+		try{
+			ordPorNombre=true;
+			listItems();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
     private void setHandlers() {
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        listView.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					try {
 
-                try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsCD vItem = (clsCD) lvObj;
 
-                    Object lvObj = listView.getItemAtPosition(position);
-                    clsCD vItem = (clsCD) lvObj;
+						itemid = vItem.Cod;
+						prname = vItem.Desc;
+						gl.um = vItem.um;
+						gl.pprodname = prname;
 
-                    itemid = vItem.Cod;
-                    prname = vItem.Desc;
-                    gl.um = vItem.um;
-                    gl.pprodname = prname;
+						adapter.setSelectedIndex(position);
 
-                    adapter.setSelectedIndex(position);
+						appProd();
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox(e.getMessage());
+					}
+				}
 
-                    appProd();
-                } catch (Exception e) {
-                    mu.msgbox(e.getMessage());
-                }
-            }
+				;
+			});
 
-            ;
-        });
+			listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-        listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsCD vItem = (clsCD) lvObj;
 
-                try {
-                    Object lvObj = listView.getItemAtPosition(position);
-                    clsCD vItem = (clsCD) lvObj;
+						itemid = vItem.Cod;
+						prname = vItem.Desc;
+						gl.um = vItem.um;
+						gl.pprodname = prname;
 
-                    itemid = vItem.Cod;
-                    prname = vItem.Desc;
-                    gl.um = vItem.um;
-                    gl.pprodname = prname;
+						adapter.setSelectedIndex(position);
 
-                    adapter.setSelectedIndex(position);
+						appProd();
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox(e.getMessage());
+					}
+					return true;
+				}
+			});
 
-                    appProd();
-                } catch (Exception e) {
-                    mu.msgbox(e.getMessage());
-                }
-                return true;
-            }
-        });
+			txtFilter.addTextChangedListener(new TextWatcher() {
 
-        txtFilter.addTextChangedListener(new TextWatcher() {
+				public void afterTextChanged(Editable s) {
+				}
 
-            public void afterTextChanged(Editable s) {
-            }
+				public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				}
 
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
+					int tl;
 
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                int tl;
+					tl = txtFilter.getText().toString().length();
 
-                tl = txtFilter.getText().toString().length();
+					if (tl == 0 || tl > 1) {
+						listItems();
+					}
+				}
+			});
 
-                if (tl == 0 || tl > 1) {
-                    listItems();
-                }
-            }
-        });
+			spinFam.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+					TextView spinlabel;
+					String scod, idposition;
 
-        spinFam.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                TextView spinlabel;
-                String scod, idposition;
+					try {
+						spinlabel = (TextView) parentView.getChildAt(0);
+						spinlabel.setTextColor(Color.BLACK);
+						spinlabel.setPadding(5, 0, 0, 0);
+						spinlabel.setTextSize(18);
+						spinlabel.setTypeface(spinlabel.getTypeface(), Typeface.BOLD);
 
-                try {
-                    spinlabel = (TextView) parentView.getChildAt(0);
-                    spinlabel.setTextColor(Color.BLACK);
-                    spinlabel.setPadding(5, 0, 0, 0);
-                    spinlabel.setTextSize(18);
-                    spinlabel.setTypeface(spinlabel.getTypeface(), Typeface.BOLD);
+						scod = spincode.get(position);
+						famid = scod;
 
-                    scod = spincode.get(position);
-                    famid = scod;
+						listItems();
 
-                    listItems();
+						spinFam.requestFocus();
+						//if (act>0) {hidekeyb();}
+						hidekeyb();
 
-                    spinFam.requestFocus();
-                    //if (act>0) {hidekeyb();}
-                    hidekeyb();
+						act += 1;
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox(e.getMessage());
+					}
 
-                    act += 1;
-                } catch (Exception e) {
-                    mu.msgbox(e.getMessage());
-                }
+				}
 
-            }
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) {
+					return;
+				}
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                return;
-            }
-
-        });
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 
     }
 
@@ -307,6 +324,7 @@ public class Producto extends PBase {
 		} catch (Exception e)
 		{
 		   //	mu.msgbox( e.getMessage());
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			Log.d("prods",e.getMessage());
 	    }
 
@@ -319,24 +337,33 @@ public class Producto extends PBase {
 		
 	}
 	
-	private void appProd(){	
-		gl.gstr=itemid;
-		super.finish();
+	private void appProd(){
+		try{
+			gl.gstr=itemid;
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void dispUmCliente() {
 		String sdisp;
-
-		for (int i = items.size()-1; i >=0; i--) {
-			if (getDisp(items.get(i).Cod)) {
-				sdisp=mu.frmdecimal(disp,gl.peDecImp)+" "+ltrim(um,6);
-				items.get(i).Text=sdisp;
-			} else {	
-				items.remove(i);
+		try{
+			for (int i = items.size()-1; i >=0; i--) {
+				if (getDisp(items.get(i).Cod)) {
+					sdisp=mu.frmdecimal(disp,gl.peDecImp)+" "+ltrim(um,6);
+					items.get(i).Text=sdisp;
+				} else {
+					items.remove(i);
+				}
 			}
+
+			adapter.notifyDataSetChanged();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		adapter.notifyDataSetChanged();
+
 		
 	}
 	
@@ -361,6 +388,7 @@ public class Producto extends PBase {
 
 			ubas=dt.getString(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
 		}
 		
@@ -373,6 +401,7 @@ public class Producto extends PBase {
   			disp=dt.getDouble(0);
 			if (disp>0)	return true;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    }
 		
 		try {
@@ -411,6 +440,7 @@ public class Producto extends PBase {
 
 			return true;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
 	    }	
 		
@@ -457,8 +487,10 @@ public class Producto extends PBase {
 			}
 					
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		   	mu.msgbox( e.getMessage());
 	    }
 					
@@ -470,20 +502,26 @@ public class Producto extends PBase {
 		try {
 			spinFam.setSelection(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			spinFam.setSelection(0);
 	    }
 		
 	}	
 
 	public String ltrim(String ss,int sw) {
-		int l=ss.length();
-		if (l>sw) {
-			ss=ss.substring(0,sw);	
-		} else {
-			String frmstr="%-"+sw+"s";	
-			ss=String.format(frmstr,ss);
+		try{
+			int l=ss.length();
+			if (l>sw) {
+				ss=ss.substring(0,sw);
+			} else {
+				String frmstr="%-"+sw+"s";
+				ss=String.format(frmstr,ss);
+			}
+
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
 		return ss;
 	}
 
@@ -491,19 +529,30 @@ public class Producto extends PBase {
         try {
             return app.ventaPeso(prodid);
         } catch (Exception e) {
-            return false;
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        	return false;
         }
     }
 
     public void limpiaFiltro(View view) {
-        txtFilter.setText("");
+		try{
+			txtFilter.setText("");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
     }
 
 
 	// Activity Events
 	
 	protected void onResume() {
-	    super.onResume();
+		try{
+			super.onResume();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 }

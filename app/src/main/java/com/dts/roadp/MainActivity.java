@@ -46,6 +46,7 @@ public class MainActivity extends PBase {
         try {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
+
             grantPermissions();
         } catch (Exception e) {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -74,10 +75,10 @@ public class MainActivity extends PBase {
 			}
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 	}
-
 
 	private void startApplication() {
 
@@ -114,8 +115,6 @@ public class MainActivity extends PBase {
 
 	}
 
-
-
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 		Toast.makeText(this,"req : "+requestCode, Toast.LENGTH_SHORT).show();
@@ -138,7 +137,7 @@ public class MainActivity extends PBase {
 	}
 
 
-	// Events
+	//region Events
 
 	public void comMan(View view) {
 		entraComunicacion();			
@@ -213,8 +212,9 @@ public class MainActivity extends PBase {
 		scanning=false;
 	}
 
+	//endregion
 
-	// Main
+	//region Main
 
 	private void initSession() {
 		Cursor DT;
@@ -403,48 +403,9 @@ public class MainActivity extends PBase {
 
 	}
 
+	//endregion
 
-	// Licencia
-
-	private boolean validaLicencia() {
-		Cursor dt;
-		String mac, lickey, idkey, binkey;
-		int fval, ff, lkey;
-
-		try {
-			mac = lic.getMac();
-			lkey = lic.getLicKey(mac);
-			lickey = lic.encodeLicence(lkey);
-
-			sql = "SELECT IDKEY,BINKEY FROM LIC_CLIENTE WHERE ID='" + mac + "'";
-			dt=Con.OpenDT(sql);
-			if (dt.getCount()==0) return false;
-			
-			dt.moveToFirst();		
-			idkey=dt.getString(0);
-			binkey=dt.getString(1);
-			
-			if (!idkey.equalsIgnoreCase(lickey)) return false;
-			
-			ff=du.getActDate();
-			fval=lic.decodeValue(binkey);
-			fval=fval-lkey;
-			
-			//Toast.makeText(this,""+fval, Toast.LENGTH_SHORT).show();
-			
-			if (fval==999999) return true;				
-			fval=fval*10000;
-			
-			if (fval>=ff) return true; else return false;
-			
-		} catch (Exception e) {
-			mu.msgbox(e.getMessage());return false;
-		}
-	
-	}
-
-
-	// Ventas Demo
+	//region Ventas Demo
 	
 	public void showDemoMenu() {
 		final AlertDialog Dialog;
@@ -564,9 +525,10 @@ public class MainActivity extends PBase {
 		}		
 		
 	}
-		
+
+	//endregion
 	
-	// Aux
+	//region Aux
 	
 	private void entraComunicacion() {
 
@@ -623,8 +585,46 @@ public class MainActivity extends PBase {
 		}
 	}
 
+	private boolean validaLicencia() {
+		Cursor dt;
+		String mac, lickey, idkey, binkey;
+		int fval, ff, lkey;
 
-	// Activity Events
+		try {
+			mac = lic.getMac();
+			lkey = lic.getLicKey(mac);
+			lickey = lic.encodeLicence(lkey);
+
+			sql = "SELECT IDKEY,BINKEY FROM LIC_CLIENTE WHERE ID='" + mac + "'";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return false;
+
+			dt.moveToFirst();
+			idkey=dt.getString(0);
+			binkey=dt.getString(1);
+
+			if (!idkey.equalsIgnoreCase(lickey)) return false;
+
+			ff=du.getActDate();
+			fval=lic.decodeValue(binkey);
+			fval=fval-lkey;
+
+			//Toast.makeText(this,""+fval, Toast.LENGTH_SHORT).show();
+
+			if (fval==999999) return true;
+			fval=fval*10000;
+
+			if (fval>=ff) return true; else return false;
+
+		} catch (Exception e) {
+			mu.msgbox(e.getMessage());return false;
+		}
+
+	}
+
+	//endregion
+
+	//region Activity Events
 	
 	protected void onResume() {
 	    super.onResume();
@@ -632,6 +632,8 @@ public class MainActivity extends PBase {
 		txtUser.requestFocus();
 
 	}
+
+	//endregion
 
 }
 

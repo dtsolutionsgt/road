@@ -118,8 +118,7 @@ public class FinDia extends PBase {
         startActivity(menu);
     }
 
-	public void startFDD()
-    {
+	public void startFDD()  {
 
 		boolean rslt;
 
@@ -150,8 +149,7 @@ public class FinDia extends PBase {
             return;
         }
 
-		try
-        {
+		try {
 			File f1 = new File(Environment.getExternalStorageDirectory() + "/SyncFold/findia.txt");
 			File f2 = new File(Environment.getExternalStorageDirectory() + "/print.txt");
 			FileUtils.copyFile(f1, f2);
@@ -160,8 +158,7 @@ public class FinDia extends PBase {
 			return;
 		}
 
-        try
-        {
+        try  {
             db.execSQL("UPDATE FinDia SET val1="+du.getActDate());
         } catch (Exception e) {
             msgbox("No se pudo actualizar fecha de cierre.");
@@ -175,23 +172,19 @@ public class FinDia extends PBase {
 
         startActivity(new Intent(this, ComWS.class));
 
-        try
-        {
+        try  {
 
-            if (prn.isEnabled())
-            {
+            if (prn.isEnabled())  {
                 final Handler shandler = new Handler();
                 shandler.postDelayed(new Runnable() {
                     @Override
-                    public void run()
-                    {
+                    public void run()  {
                         Intent intent = new Intent(FinDia.this, PrintDialog.class);
                         startActivity(intent);
                     }
                 }, 2000);
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
@@ -199,8 +192,7 @@ public class FinDia extends PBase {
     }
 
 	//#HS_20181127_1052 Agregué funcion de inicio de FinDia.
-	public void iniciarFD()
-    {
+	public void iniciarFD()  {
 
         File fd = new File(Environment.getExternalStorageDirectory() + "/SyncFold/findia.txt");
         FileUtils.deleteQuietly(fd);
@@ -1597,8 +1589,7 @@ public class FinDia extends PBase {
 		dialog.setIcon(R.drawable.ic_quest);
 
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which)
-            {
+		    public void onClick(DialogInterface dialog, int which) {
 				msgAskDevInventario();
 		    }
 		});
@@ -1612,14 +1603,14 @@ public class FinDia extends PBase {
 	}
 
 	//#HS_20181121_1506 Se creo la pregunta para la devolución de inventario.
-	private void msgAskDevInventario()
-	{
+	private void msgAskDevInventario() {
 
-        if (!Ya_Realizo_Devolucion())
-        {
+        if (!Ya_Realizo_Devolucion()) {
 
             browse=1;
-            startActivity(new Intent(this,DevolBodCan.class));
+            startActivity(new Intent(this,DevolBodTol.class));
+
+            toastlong("No ha efectuado la devolución a bodega,debe proceder a realizarla antes de fin del dia");
 
             /*AlertDialog.Builder dialog = new AlertDialog.Builder(this);
             dialog.setTitle("Road");
@@ -1644,8 +1635,7 @@ public class FinDia extends PBase {
 
             dialog.show();*/
 
-        }else
-        {
+        } else  {
             startFDD();
         }
 

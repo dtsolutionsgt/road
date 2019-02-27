@@ -89,7 +89,7 @@ public class DevolBodCan extends PBase {
             ins.add("COREL",corel);
             ins.add("RUTA",gl.ruta);
             ins.add("ANULADO","N");
-            ins.add("FECHA",fecha);
+            ins.add("FECHA",du.getActDate());
             ins.add("TIPO","D");
             ins.add("USUARIO",gl.vend);
             ins.add("REFERENCIA","Devolucion");

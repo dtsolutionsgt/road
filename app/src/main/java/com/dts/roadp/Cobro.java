@@ -19,6 +19,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 
+import org.apache.commons.lang.StringUtils;
+
 public class Cobro extends PBase {
 
 	private ListView listView;
@@ -445,7 +447,7 @@ public class Cobro extends PBase {
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			int cor=DT.getInt(1)+1;
-			return DT.getString(0)+cor;
+			return DT.getString(0) + StringUtils.right("000000" + Integer.toString(cor), 6);
 
 		} catch (Exception e) {
 			return gl.ruta+"_"+mu.getCorelBase();

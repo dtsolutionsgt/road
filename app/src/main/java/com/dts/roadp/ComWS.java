@@ -1310,7 +1310,9 @@ public class ComWS extends PBase {
 		return true;
 	}
 	
-	private void estandartInventario() {
+	private void estandartInventario()
+
+    {
 		Cursor dt,df;
 		String cod,ub,us,lote,doc,stat;
 		double cant,cantm,fact;
@@ -1439,19 +1441,21 @@ public class ComWS extends PBase {
 
 		    s="Recepción completa.";
 			
-			if (!esvacio) {
-
+			//if (!esvacio) {
 				if (stockflag==1) {
 					s=s+"\nSe actualizó inventario.";
-					estandartInventario();
 				}
 
-				validaDatos(true);
+            estandartInventario();
+
+
+            validaDatos(true);
 					
 				if (stockflag==1) sendConfirm();
 
 				msgAskExit(s);
 
+				/*
             } else {
 				isbusy=0;
 				esvacio=false;
@@ -1461,7 +1465,9 @@ public class ComWS extends PBase {
                 //#EJC20190226_1308: Reiniciar la App
                 msgAskExit(s);
 				return;
+
 			}
+			*/
 		} else {	
 			lblInfo.setText(fstr);
 			mu.msgbox("Ocurrió error : \n"+fstr+" ("+reccnt+") " + ferr);

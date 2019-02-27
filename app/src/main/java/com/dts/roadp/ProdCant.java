@@ -30,7 +30,7 @@ public class ProdCant extends PBase {
 	
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant;
-	private double cant,prec,icant,idisp,ipeso,umfactor;
+	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom;
 	private boolean pexist,esdecimal,porpeso,esbarra;
 	
 	@Override
@@ -190,7 +190,7 @@ public class ProdCant extends PBase {
 	
 		try {
 							
-			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO "+
+			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO,PESO_PROMEDIO "+
 				 "FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	dt=Con.OpenDT(sql);
 			dt.moveToFirst();
@@ -201,7 +201,8 @@ public class ProdCant extends PBase {
 			//prodimg=DT.getString(6);
 			prodimg=prodid;
 			proddesc=dt.getString(7);
-			
+			pesoprom = dt.getDouble(9);
+
 			if (dt.getString(7).equalsIgnoreCase("P")) pexist=true; else pexist=false;
 			
 		} catch (Exception e) {
@@ -400,11 +401,10 @@ public class ProdCant extends PBase {
 				mu.msgbox("Peso incorrect");txtPeso.requestFocus();return;
 			}
 		} else {
-			ppeso=0;
+			ppeso=pesoprom*cant;
 		}
 
 		gl.dval=cant;
-		//if (porpeso) gl.dpeso=ppeso;else gl.dpeso=0;
 		gl.dpeso=ppeso;
 		gl.um=upres;
 		gl.umpres=upres;

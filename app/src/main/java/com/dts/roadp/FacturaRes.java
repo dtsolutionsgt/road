@@ -449,7 +449,8 @@ public class FacturaRes extends PBase {
 
 	private boolean saveOrder(){
 		Cursor DT;
-		double peso;
+		String vprod,vumstock,vumventa;
+		double vcant,vpeso,vfactor,peso;
 		int mitem;		
 		
 		corel=gl.ruta+"_"+mu.getCorelBase();
@@ -555,7 +556,18 @@ public class FacturaRes extends PBase {
 			    db.execSQL(ins.sql());
 
 				//#HS_20181120_1625 Se agrego parametro porque cambio la funcion
-			    if (esProductoConStock(DT.getString(0))) rebajaStockUM(DT.getString(0),DT.getString(13),DT.getDouble(1),DT.getDouble(12),DT.getString(11));
+
+
+				vprod=DT.getString(0);
+				vumstock=DT.getString(13);
+				vcant=DT.getDouble(1);
+				vpeso=DT.getDouble(8);
+				vfactor=vpeso/vcant;
+				vumventa=DT.getString(11);
+
+				if (esProductoConStock(DT.getString(0))) {
+					rebajaStockUM(vprod, vumstock, vcant, vfactor, vumventa);
+				}
 
 			    DT.moveToNext();
 			}
@@ -673,11 +685,12 @@ public class FacturaRes extends PBase {
 	
 	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa) {
 		Cursor dt;
-		double ccant,acant,cantapl,dispcant,peso,pesoapl,disppeso,factpeso;
+		double ccant,acant,cantapl,dispcant,peso,pesoapl,disppeso,factpeso,tcant,lcant,actcant;
 		String lote,doc,stat;
 
-		if(porpeso) factor=1;
+		//if (porpeso) factor=1;
 		acant=cant*factor;
+		lcant=cant;tcant=0;actcant=cant;
 
 		try {
 
@@ -690,21 +703,25 @@ public class FacturaRes extends PBase {
 			dt.moveToFirst();
 			while (!dt.isAfterLast()) {
 
-				cant=dt.getDouble(0);ccant=cant;
+				cant=dt.getDouble(0);
 				peso=dt.getDouble(2);
 				lote=dt.getString(4);
 				doc=dt.getString(5);
 				stat=dt.getString(9);
 
-				if (cant!=0) factpeso=peso/cant; else factpeso=0;
+				if (actcant>cant) cantapl=cant;else cantapl=actcant;
+				dispcant=cant-cantapl;if (dispcant<0) dispcant=0;
+				pesoapl=cantapl*factor;
+				disppeso=peso-pesoapl;if (disppeso<0) disppeso=0;
 
+				/*
+				if (cant!=0) factpeso=peso/cant; else factpeso=0;
 				if (acant>cant) cantapl=cant;else cantapl=acant;
 				pesoapl=cantapl*factpeso;
-
 				dispcant=cant-acant;if (dispcant<0) dispcant=0;
 				acant=acant-cant;
-
 				disppeso=peso-pesoapl;if (disppeso<0) disppeso=0;
+				*/
 
 				// Stock
 

@@ -792,7 +792,6 @@ public class BonList extends PBase {
 		}
 	}
 
-
 	// Activity Events
 
 	@Override

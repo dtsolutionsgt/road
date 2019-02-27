@@ -24,6 +24,7 @@ public class BonVenta extends PBase {
 		setContentView(R.layout.activity_bon_venta);
 		
 		super.InitBase();
+		addlog("BonVenta",""+du.getActDateTime(),gl.vend);
 		
 		listView =  (ListView) findViewById(R.id.listView1);
 		lblTipo =  (TextView) findViewById(R.id.textView2);
@@ -36,23 +37,33 @@ public class BonVenta extends PBase {
 	// Events
 	
 	public void nextScreen(View view) {
-		super.finish();
+		try{
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void sethandlers() {
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		    	  	  		    	  
-		    	try {
-		       		adapter.setSelectedIndex(position);
-			    } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-			    }
-			  	
-		   }
-		});				
+
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+					try {
+						adapter.setSelectedIndex(position);
+					} catch (Exception e) {
+						mu.msgbox( e.getMessage());
+					}
+
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}
 	
@@ -98,6 +109,7 @@ public class BonVenta extends PBase {
 			}
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage()+"\n"+sql);
 		}	
 		
@@ -146,6 +158,7 @@ public class BonVenta extends PBase {
 			}
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage()+"\n"+sql);
 		}			
 		

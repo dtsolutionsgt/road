@@ -33,6 +33,7 @@ public class Aprofam1 extends PBase {
 		setContentView(R.layout.activity_aprofam1);
 		
 		super.InitBase();
+		addlog("Aprofam1",""+du.getActDateTime(),gl.vend);
 		
 		spin1= (Spinner) findViewById(R.id.spinner1);
 		spin2= (Spinner) findViewById(R.id.Spinner01);
@@ -53,42 +54,53 @@ public class Aprofam1 extends PBase {
     // Events 
 
 	public void doVenta(View view) {
-		
-		if (mu.emptystr(txtNit.getText().toString())) {
-			msgbox("NIT incorrecto");return;		
-		}	
-		
-		if (mu.emptystr(txtNom.getText().toString())) {
-			msgbox("Nombre incorrecto");return;		
+
+		try{
+			if (mu.emptystr(txtNit.getText().toString())) {
+				msgbox("NIT incorrecto");return;
+			}
+
+			if (mu.emptystr(txtNom.getText().toString())) {
+				msgbox("Nombre incorrecto");return;
+			}
+
+			if (ref1.equalsIgnoreCase("*")) {
+				msgbox("Debe seleccionar una aseguradora");return;
+			}
+
+			if (ref2.equalsIgnoreCase("*")) {
+				msgbox("Debe seleccionar una organización");return;
+			}
+
+			gl.ref1=ref1;gl.ref2=ref2;
+			gl.fnit=txtNit.getText().toString();
+			gl.fnombre=txtNom.getText().toString();
+			gl.fdir=txtDir.getText().toString();
+
+			startActivity(new Intent(this,Venta.class));
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		if (ref1.equalsIgnoreCase("*")) {
-			msgbox("Debe seleccionar una aseguradora");return;
-		}
-		
-		if (ref2.equalsIgnoreCase("*")) {
-			msgbox("Debe seleccionar una organización");return;
-		}		
-		
-		gl.ref1=ref1;gl.ref2=ref2;
-		gl.fnit=txtNit.getText().toString();
-		gl.fnombre=txtNom.getText().toString();
-		gl.fdir=txtDir.getText().toString();
-			
-		startActivity(new Intent(this,Venta.class));
-		super.finish();
+
 	}
 
 	public void doExit(View view) {
-		super.finish();
+
+		try{
+			super.finish();
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
    
 	private void setHandlers() {
-		
+
 		spin1.setOnItemSelectedListener(new OnItemSelectedListener() {
 		    @Override
 		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
+
 		    	try {
 		    		TextView spinlabel=(TextView)parentView.getChildAt(0);
 		    		spinlabel.setTypeface(lblFecha.getTypeface());
@@ -96,14 +108,16 @@ public class Aprofam1 extends PBase {
 			    	spinlabel.setPadding(5, 0, 0, 0);
 			    	spinlabel.setTextSize(22);
 		        } catch (Exception e) {
+		    		addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		        }
-		    	
+
 		    	try {
 		    		ref1=code1.get(position);
 		        } catch (Exception e) {
+		    		addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		        	ref1="*";
 		        }
-			
+
 		    }
 
 		    @Override
@@ -111,12 +125,12 @@ public class Aprofam1 extends PBase {
 		        return;
 		    }
 
-		});	
-		
+		});
+
 		spin2.setOnItemSelectedListener(new OnItemSelectedListener() {
 		    @Override
 		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
+
 		    	try {
 		    		TextView spinlabel=(TextView)parentView.getChildAt(0);
 		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
@@ -124,14 +138,16 @@ public class Aprofam1 extends PBase {
 			    	spinlabel.setPadding(5, 0, 0, 0);
 			    	spinlabel.setTextSize(22);
 		        } catch (Exception e) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		        }
-		    	
+
 		    	try {
 		    		ref2=code2.get(position);
 		        } catch (Exception e) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		        	ref2="*";
 		        }
-			
+
 		    }
 
 		    @Override
@@ -139,7 +155,7 @@ public class Aprofam1 extends PBase {
 		        return;
 		    }
 
-		});	
+		});
 			
 	}	  
    
@@ -173,6 +189,7 @@ public class Aprofam1 extends PBase {
 			spin1.setAdapter(dataAdapter);
 			spin1.setSelection(-1);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}
 	}
@@ -200,6 +217,7 @@ public class Aprofam1 extends PBase {
 
 			spin2.setAdapter(dataAdapter);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}
 	}

@@ -35,6 +35,7 @@ public class DevCliCant extends PBase {
 		setContentView(R.layout.activity_dev_cli_cant);
 		
 		super.InitBase();
+		addlog("DevCliCant",""+du.getActDateTime(),gl.vend);
 		
 		setControls();
 		
@@ -61,22 +62,27 @@ public class DevCliCant extends PBase {
 	// Events
 	
 	public void sendCant(View view) {
-			
-		setCant();
-			
-		if (cant<0){
-			mu.msgbox("Cantidad incorrecta");return;
+
+		try{
+			setCant();
+
+			if (cant<0){
+				mu.msgbox("Cantidad incorrecta");return;
+			}
+
+			if (razon.equalsIgnoreCase("0")){
+				mu.msgbox("Debe definir una razón de devolución.");return;
+			}
+
+			((appGlobals) vApp).dval=cant;
+			((appGlobals) vApp).devrazon=razon;
+
+			//hidekeyb();
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		if (razon.equalsIgnoreCase("0")){
-			mu.msgbox("Debe definir una razón de devolución.");return;
-		}
-		
-		((appGlobals) vApp).dval=cant;
-		((appGlobals) vApp).devrazon=razon;
-			
-		//hidekeyb();
-		super.finish();
+
 			
 	}
 	
@@ -96,9 +102,10 @@ public class DevCliCant extends PBase {
 			    	spinlabel.setTextSize(18);
 			    
 			    	razon=spincode.get(position);
-		    		
-		         } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
+
+		    	} catch (Exception e) {
+		    		addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			   	    mu.msgbox( e.getMessage());
 		        }
 		
 		    }
@@ -129,6 +136,7 @@ public class DevCliCant extends PBase {
 			lblDesc.setText(DT.getString(7));
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   mu.msgbox("1-"+ e.getMessage());
 	    }	
 		
@@ -145,6 +153,7 @@ public class DevCliCant extends PBase {
   			setSpinVal(razon);
   			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			icant=0;
 	    }	
 
@@ -156,16 +165,22 @@ public class DevCliCant extends PBase {
 		try {
 			cant=Double.parseDouble(txtCant.getText().toString());
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			cant=-1; 
 		}
 	}
 	
 	private void parseCant(double c) {
-		DecimalFormat frmdec = new DecimalFormat("#.####"); 
-		double ub;
-		
-		ub=c;
-		if (ub>0) txtCant.setText(frmdec.format(ub));
+		try{
+			DecimalFormat frmdec = new DecimalFormat("#.####");
+			double ub;
+
+			ub=c;
+			if (ub>0) txtCant.setText(frmdec.format(ub));
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	// Aux
@@ -195,8 +210,12 @@ public class DevCliCant extends PBase {
 			}
 					
 		} catch (SQLException e) {
+
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		} catch (Exception e) {
+
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		   	mu.msgbox( e.getMessage());
 	    }
 					
@@ -208,6 +227,8 @@ public class DevCliCant extends PBase {
 		try {
 			spin.setSelection(0);
 		} catch (Exception e) {
+
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			spin.setSelection(0);
 	    }
 		
@@ -227,20 +248,26 @@ public class DevCliCant extends PBase {
 		try {
 			spin.setSelection(pos);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			spin.setSelection(0);
 	    }
 	}
 	
 	private void setControls() {
-		txtCant= (EditText) findViewById(R.id.txtMonto);
-		rlCant= (RelativeLayout) findViewById(R.id.rlCant);
-			
-		lblDesc=(TextView) findViewById(R.id.lblFecha);
-		lblPrec=(TextView) findViewById(R.id.lblPNum);
-			
-		lblBU=(TextView) findViewById(R.id.lblBU);
-		
-		spin = (Spinner) findViewById(R.id.spinner1);
+		try{
+			txtCant= (EditText) findViewById(R.id.txtMonto);
+			rlCant= (RelativeLayout) findViewById(R.id.rlCant);
+
+			lblDesc=(TextView) findViewById(R.id.lblFecha);
+			lblPrec=(TextView) findViewById(R.id.lblPNum);
+
+			lblBU=(TextView) findViewById(R.id.lblBU);
+
+			spin = (Spinner) findViewById(R.id.spinner1);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 }

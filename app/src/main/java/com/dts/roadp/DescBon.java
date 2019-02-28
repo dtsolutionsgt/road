@@ -22,6 +22,7 @@ public class DescBon extends PBase {
 		setContentView(R.layout.activity_desc_bon);
 		
 		super.InitBase();
+		addlog("DescBon",""+du.getActDateTime(),gl.vend);
 		
 		lblDesc= (TextView) findViewById(R.id.lblFecha);
 		txtDesc = (EditText) findViewById(R.id.txtDesc);
@@ -40,58 +41,74 @@ public class DescBon extends PBase {
 	
 	private void showProm(){
 		String ss;
-		
-		if (prommodo==0) ss=" %"; else ss=" (monto) ";
-		
-		lblDesc.setText("Máximo : "+mu.frmdecno(desc)+ss);
-		txtDesc.setText(mu.frmdecno(desc));
+
+		try{
+			if (prommodo==0) ss=" %"; else ss=" (monto) ";
+
+			lblDesc.setText("Máximo : "+mu.frmdecno(desc)+ss);
+			txtDesc.setText(mu.frmdecno(desc));
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void setHandlers(){
-		
-		txtDesc.setOnKeyListener(new OnKeyListener() {
-			@Override
-		    public boolean onKey(View v, int keyCode, KeyEvent event) {
-		        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-		        	aplProm(v);
-		        	return true;
-		        }
-		        return false;
-		    }
-		});
+
+		try{
+			txtDesc.setOnKeyListener(new OnKeyListener() {
+				@Override
+				public boolean onKey(View v, int keyCode, KeyEvent event) {
+					if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+						aplProm(v);
+						return true;
+					}
+					return false;
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}
 	
 	public void aplProm(View view){
 		String svd;
 		double vd;
-		
-		try {
-			svd=txtDesc.getText().toString();
-			svd=svd.replace(",",".");
-			vd=Double.parseDouble(svd);
-			
-			if (vd<0) throw new Exception() ;
-		} catch (Exception e) {
-			mu.msgbox("Valor de descuento incorrecto");return;
-		}
-		
-		if (vd>desc) {
-			mu.msgbox("Valor de descuento es mayor que máximo");return;
+
+		try{
+			try {
+				svd=txtDesc.getText().toString();
+				svd=svd.replace(",",".");
+				vd=Double.parseDouble(svd);
+
+				if (vd<0) throw new Exception() ;
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				mu.msgbox("Valor de descuento incorrecto");return;
+			}
+
+			if (vd>desc) {
+				mu.msgbox("Valor de descuento es mayor que máximo");return;
+			}
+
+			desc=vd;
+			((appGlobals) vApp).promprod=prodid;
+			if (prommodo==0) {
+				((appGlobals) vApp).promdesc=desc;
+				((appGlobals) vApp).prommdesc=0;
+			} else {
+				((appGlobals) vApp).promdesc=0;
+				((appGlobals) vApp).prommdesc=desc;
+			}
+			((appGlobals) vApp).promapl=true;
+
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		desc=vd;
-		((appGlobals) vApp).promprod=prodid;
-		if (prommodo==0) {
-			((appGlobals) vApp).promdesc=desc;
-			((appGlobals) vApp).prommdesc=0;
-		} else {
-			((appGlobals) vApp).promdesc=0;
-			((appGlobals) vApp).prommdesc=desc;
-		}
-		((appGlobals) vApp).promapl=true;
-		
-		super.finish();
 		
 	}
 	
@@ -100,6 +117,11 @@ public class DescBon extends PBase {
 
 	@Override
 	public void onBackPressed() {
+		try{
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 		//super.onBackPressed();
 	}	
 

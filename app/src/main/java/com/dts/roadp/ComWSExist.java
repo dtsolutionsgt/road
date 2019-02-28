@@ -61,7 +61,8 @@ public class ComWSExist extends PBase {
 		setContentView(R.layout.activity_com_wsexist);
 		
 		super.InitBase();
-		
+		addlog("ComWSExist",""+du.getActDateTime(),gl.vend);
+
 		System.setProperty("line.separator","\r\n");
 			
 		lblInfo= (TextView) findViewById(R.id.lblETipo);
@@ -98,20 +99,25 @@ public class ComWSExist extends PBase {
 	public void askRec(View view)
 	{
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		
-		dialog.setTitle("Recepción");
-		dialog.setMessage("¿Recibir datos nuevos?");
-					
-		dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	runRecep();
-		    }
-		});
-		
-		dialog.setNegativeButton("Cancelar", null);
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Recepción");
+			dialog.setMessage("¿Recibir datos nuevos?");
+
+			dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					runRecep();
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", null);
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
@@ -119,18 +125,23 @@ public class ComWSExist extends PBase {
 	// Main
 	
 	private void runRecep() {
-			
-		if (isbusy==1) return;
-		
-		if (!setComParams()) return;
-		
-		isbusy=1;
-			
-		barInfo.setVisibility(View.VISIBLE);barInfo.invalidate();
-		lblInfo.setText("Conectando ...");
-			
-		wsRtask = new AsyncCallRec();
-		wsRtask.execute();
+
+		try{
+			if (isbusy==1) return;
+
+			if (!setComParams()) return;
+
+			isbusy=1;
+
+			barInfo.setVisibility(View.VISIBLE);barInfo.invalidate();
+			lblInfo.setText("Conectando ...");
+
+			wsRtask = new AsyncCallRec();
+			wsRtask.execute();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 		
@@ -195,6 +206,7 @@ public class ComWSExist extends PBase {
 	    			    listItems.add(sql);
 	    			    sstr=str;
 		    		} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		    		   	sstr=e.getMessage();
 		    	    }	
 	        	}
@@ -202,7 +214,7 @@ public class ComWSExist extends PBase {
 	        
 	        return 1;
 	    } catch (Exception e) {
-	    	
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    	idbg=idbg+" ERR "+e.getMessage();
 	    	return 0;
 	    }
@@ -253,6 +265,7 @@ public class ComWSExist extends PBase {
 	 
 	        return 1;
 	    } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    	sstr=e.getMessage(); 
 	    }
 		
@@ -287,6 +300,7 @@ public class ComWSExist extends PBase {
 	        	        
 	        return 1;
 	    } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		    sstr=e.getMessage();          
 	    }
 		
@@ -311,6 +325,7 @@ public class ComWSExist extends PBase {
 			val=DT.getString(0);
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			val="N";
 		}	
 		
@@ -325,6 +340,7 @@ public class ComWSExist extends PBase {
 			if (!AddTable("P_STOCKINV")) return false;
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return false;
 		}
 		
@@ -368,10 +384,13 @@ public class ComWSExist extends PBase {
 			wsRtask.onProgressUpdate();
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			
 			try {
 				ConT.close();  
-			} catch (Exception ee) { }
+			} catch (Exception ee) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			}
 			
 			sstr=e.getMessage();
 			ferr=sstr+"\n"+sql;
@@ -381,7 +400,9 @@ public class ComWSExist extends PBase {
 		
 		try {
 			ConT.close();  
-		} catch (Exception e) { }
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
 		
 		return true;
 	}
@@ -427,6 +448,7 @@ public class ComWSExist extends PBase {
 
 		}catch (Exception e)
 		{
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			Log.e("Error",e.getMessage());
 			return  false;
 		}
@@ -474,6 +496,7 @@ public class ComWSExist extends PBase {
 			sstr = s;
 			return 0;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			sstr=e.getMessage();
 		}
 
@@ -497,6 +520,7 @@ public class ComWSExist extends PBase {
 				return false;	
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			fstr="Tab:"+TN+", "+ e.getMessage();idbg=idbg + e.getMessage();
 			return false;
 		}
@@ -504,12 +528,14 @@ public class ComWSExist extends PBase {
 	
 	private String getTableSQL(String TN) {
        String SQL="";
-      
-       if (TN.equalsIgnoreCase("P_STOCKINV")) {
-         SQL = "SELECT * FROM P_STOCKINV";
-         return SQL;  
-       }      
-         
+      try{
+		  if (TN.equalsIgnoreCase("P_STOCKINV")) {
+			  SQL = "SELECT * FROM P_STOCKINV";
+			  return SQL;
+		  }
+	  }catch (Exception e){
+		  addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+	  }
        return SQL;
 	}   
 			
@@ -537,6 +563,7 @@ public class ComWSExist extends PBase {
 			}
 				
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			scon=0;
 			fstr="No se puede conectar al web service. "+e.getMessage();
 		}
@@ -547,19 +574,23 @@ public class ComWSExist extends PBase {
 			
 		barInfo.setVisibility(View.INVISIBLE);
 		lblParam.setVisibility(View.INVISIBLE);
-			
-		if (fstr.equalsIgnoreCase("Sync OK")) {
-			lblInfo.setText(" ");
-			s="Actualización completa.";
-			toastcent(s);
-			super.finish();
-		} else {	
-			lblInfo.setText(fstr);	
-			mu.msgbox("Ocurrio error : \n"+fstr+" ("+reccnt+") " + ferr);
-		}
-		
-		isbusy=0;
-		//mu.msgbox("::"+dbg);
+		 try{
+			 if (fstr.equalsIgnoreCase("Sync OK")) {
+				 lblInfo.setText(" ");
+				 s="Actualización completa.";
+				 toastcent(s);
+				 super.finish();
+			 } else {
+				 lblInfo.setText(fstr);
+				 mu.msgbox("Ocurrio error : \n"+fstr+" ("+reccnt+") " + ferr);
+			 }
+
+			 isbusy=0;
+			 //mu.msgbox("::"+dbg);
+		 }catch (Exception e){
+			 addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		 }
+
 		
 	}
 	
@@ -570,6 +601,7 @@ public class ComWSExist extends PBase {
 			try {
 				wsExecute();
 			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			}
             
             return null;
@@ -577,13 +609,18 @@ public class ComWSExist extends PBase {
  
         @Override
         protected void onPostExecute(Void result) {
-        	wsFinished();
+        	try{
+				wsFinished();
+			}catch (Exception e){
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			}
         }
  
         @Override
         protected void onPreExecute() {
     		try {
     		} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
     		}
         }
  
@@ -592,6 +629,7 @@ public class ComWSExist extends PBase {
     		try {
     			lblInfo.setText(fprog);
     		} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
     		}
         }
  
@@ -601,8 +639,13 @@ public class ComWSExist extends PBase {
 	// Aux
 	
 	public void comManual(View view) {
-		Intent intent = new Intent(this,ComDrop.class);
-		startActivity(intent);	
+		try{
+			Intent intent = new Intent(this,ComDrop.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
 	}
 	
 	public void getWSURL() {
@@ -622,6 +665,7 @@ public class ComWSExist extends PBase {
 			URL=wsurl;
 			txtWS.setText(URL);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//MU.msgbox(e.getMessage());
 			URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
 			//txtWS.setText("");
@@ -634,21 +678,27 @@ public class ComWSExist extends PBase {
 		String ss;
 		
 		ss=txtRuta.getText().toString().trim();
-		if (mu.emptystr(ss)) {
-			mu.msgbox("La ruta no está definida.");return false;
-		}	
-		
-		ss=txtEmp.getText().toString().trim();
-		if (mu.emptystr(ss)) {
-			mu.msgbox("La empresa no está definida.");return false;
+
+		try{
+			if (mu.emptystr(ss)) {
+				mu.msgbox("La ruta no está definida.");return false;
+			}
+
+			ss=txtEmp.getText().toString().trim();
+			if (mu.emptystr(ss)) {
+				mu.msgbox("La empresa no está definida.");return false;
+			}
+			gEmpresa=ss;
+
+			ss=txtWS.getText().toString().trim();
+			if (mu.emptystr(ss) || ss.equalsIgnoreCase("*")) {
+				mu.msgbox("La dirección de Web service no está definida.");return false;
+			}
+			URL=ss;
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-		gEmpresa=ss;
-		
-		ss=txtWS.getText().toString().trim();
-		if (mu.emptystr(ss) || ss.equalsIgnoreCase("*")) {
-			mu.msgbox("La dirección de Web service no está definida.");return false;
-		}
-		URL=ss;
+
 		
 		return true;
 	}
@@ -658,9 +708,14 @@ public class ComWSExist extends PBase {
 	
 	@Override
 	public void onBackPressed() {
-	   if (isbusy==0) {
-		   super.onBackPressed();
-	   }
+		try {
+			if (isbusy==0) {
+				super.onBackPressed();
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
 	}	
 		
 }

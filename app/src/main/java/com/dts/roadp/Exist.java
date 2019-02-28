@@ -46,6 +46,7 @@ public class Exist extends PBase {
 		setContentView(R.layout.activity_exist);
 		
 		super.InitBase();
+		addlog("Exist",""+du.getActDateTime(),gl.vend);
 		
 		tipo=((appGlobals) vApp).tipo;
 		
@@ -59,6 +60,7 @@ public class Exist extends PBase {
 			sql="DELETE FROM P_STOCK WHERE CANT+CANTM=0";	
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 		
 		rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp);
@@ -83,11 +85,20 @@ public class Exist extends PBase {
 	//region Events
 	
 	public void printDoc(View view) {
-		if (doc.buildPrint("0",0)) prn.printask();
+		try{
+			if (doc.buildPrint("0",0)) prn.printask();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 		
 	public void limpiaFiltro(View view) {
-		txtFilter.setText("");
+		try{
+			txtFilter.setText("");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	//endregion
@@ -95,56 +106,63 @@ public class Exist extends PBase {
 	//region Main
 	
  	private void setHandlers(){
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-					clsClasses.clsExist item = (clsClasses.clsExist)lvObj;
-		           	
-					itemid=item.Cod;
-					
-					adapter.setSelectedIndex(position);
-					
-					//appProd();
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-			};
-	    });
+
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsClasses.clsExist item = (clsClasses.clsExist)lvObj;
+
+						itemid=item.Cod;
+
+						adapter.setSelectedIndex(position);
+
+						//appProd();
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+				};
+			});
 
 
-		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+			listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-					clsClasses.clsExist item = (clsClasses.clsExist) lvObj;
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsClasses.clsExist item = (clsClasses.clsExist) lvObj;
 
-					adapter.setSelectedIndex(position);
-					if (item.flag==1 | item.flag==2) itemDetail(item);
-				} catch (Exception e) {
+						adapter.setSelectedIndex(position);
+						if (item.flag==1 | item.flag==2) itemDetail(item);
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+					return true;
 				}
-				return true;
-			}
-		});
+			});
 
-		txtFilter.addTextChangedListener(new TextWatcher() {
-		 
-	    	public void afterTextChanged(Editable s) {}
-		 
-	    	public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
-		 
-	    	public void onTextChanged(CharSequence s, int start,int before, int count) {
-	    		int tl;
-	    		
-	    		tl=txtFilter.getText().toString().length();
-	    		
-	    		if (tl==0 || tl>1) listItems();
-	    	}
-	    });	
+			txtFilter.addTextChangedListener(new TextWatcher() {
+
+				public void afterTextChanged(Editable s) {}
+
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+
+				public void onTextChanged(CharSequence s, int start,int before, int count) {
+					int tl;
+
+					tl=txtFilter.getText().toString().length();
+
+					if (tl==0 || tl>1) listItems();
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	   
 	}
 
@@ -168,6 +186,7 @@ public class Exist extends PBase {
 
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return 0;
 		}
 
@@ -309,6 +328,7 @@ public class Exist extends PBase {
 				dp.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}
 
@@ -401,6 +421,7 @@ public class Exist extends PBase {
 				DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}
 
@@ -409,29 +430,38 @@ public class Exist extends PBase {
 	}
 
 	private void appProd(){
-		if (tipo==0) return;
-		
-		((appGlobals) vApp).gstr=itemid;
-		super.finish();
+		try{
+			if (tipo==0) return;
+
+			((appGlobals) vApp).gstr=itemid;
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void itemDetail(clsClasses.clsExist item) {
 		String ss;
-		
-		ss="Lote : "+item.Lote+"\n";
-		ss+="Documento : "+item.Doc+"\n";
-		ss+="Centro : "+item.Centro+"\n";
-		ss+="Estado : "+item.Stat+"\n";
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			ss="Lote : "+item.Lote+"\n";
+			ss+="Documento : "+item.Doc+"\n";
+			ss+="Centro : "+item.Centro+"\n";
+			ss+="Estado : "+item.Stat+"\n";
 
-		dialog.setTitle(item.Desc);
-		dialog.setMessage(ss);
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {}
-		});
-		dialog.show();
+			dialog.setTitle(item.Desc);
+			dialog.setMessage(ss);
+
+			dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {}
+			});
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 
 	}
 
@@ -493,6 +523,7 @@ public class Exist extends PBase {
   			rep.line();
 				return true;
 			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			    msgbox(e.getMessage());
 				return false;
 			}
@@ -507,6 +538,7 @@ public class Exist extends PBase {
 
 				return true;
 			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				return false;
 			}
 
@@ -519,13 +551,23 @@ public class Exist extends PBase {
 
 	@Override
 	protected  void onResume(){
-		super.onResume();
+		try{
+			super.onResume();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	@Override
 	protected void onPause() {
-		super.onPause();
+		try{
+			super.onPause();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	//endregion

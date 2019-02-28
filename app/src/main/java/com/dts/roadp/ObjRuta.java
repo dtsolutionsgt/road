@@ -17,6 +17,7 @@ public class ObjRuta extends PBase {
 		setContentView(R.layout.activity_obj_ruta);
 		
 		super.InitBase();
+		addlog("ObjRuta",""+du.getActDateTime(),gl.vend);
 		
 		lblMeta= (TextView) findViewById(R.id.lblMeta);
 		lblAcum= (TextView) findViewById(R.id.lblpSaldo);
@@ -88,6 +89,7 @@ public class ObjRuta extends PBase {
 				
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 		    meta=0;acum=0;falta=0;perc=0;
 	    }
@@ -145,6 +147,7 @@ public class ObjRuta extends PBase {
 				
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 		    meta=0;acum=0;falta=0;perc=0;
 	    }
@@ -190,6 +193,7 @@ public class ObjRuta extends PBase {
 				
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 		    meta=0;acum=0;falta=0;perc=0;
 	    }
@@ -215,6 +219,7 @@ public class ObjRuta extends PBase {
 			DT.moveToFirst();
 			tot=DT.getDouble(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox( e.getMessage());
 			tot=0;
 		}

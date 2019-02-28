@@ -75,6 +75,7 @@ public class CliNuevoAprEdit extends PBase {
 		setContentView(R.layout.activity_cli_nuevo_apr_edit);
 		
 		super.InitBase();
+		addlog("CliNuevoAprEdit",""+du.getActDateTime(),gl.vend);
 		
 		sprel= (Spinner) findViewById(R.id.spinner2);
 		spgru= (Spinner) findViewById(R.id.spinner3);
@@ -109,137 +110,164 @@ public class CliNuevoAprEdit extends PBase {
    
 	
 	public void doSave(View view) {
-			
-		if (mu.emptystr(txtNom.getText().toString())) {		
-			msgScroll("Falta nombre");txtNom.requestFocus();return ;
+
+		try{
+			if (mu.emptystr(txtNom.getText().toString())) {
+				msgScroll("Falta nombre");txtNom.requestFocus();return ;
+			}
+
+			if (mu.emptystr(txtDir.getText().toString())) {
+				msgScroll("Falta dirección");txtDir.requestFocus();return ;
+			}
+
+			if (mu.emptystr(txtNit.getText().toString())) {
+				msgScroll("Falta NIT");txtNit.requestFocus();return ;
+			}
+
+			cui=txtcui.getText().toString().trim();
+			if (mu.emptystr(cui)) {
+				msgScroll("Falta definir CUI / DPI");return ;
+			}
+
+			if (cui.length()!=13) {
+				msgScroll("CUI / DPI incorrecto");return ;
+			}
+
+			if (validaCUI(cui)) {
+				if (parseSpinValues()) save();
+			} else {
+				msgAskCUI("CUI / DPI incorrecto. Continuar");
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		if (mu.emptystr(txtDir.getText().toString())) {		
-			msgScroll("Falta dirección");txtDir.requestFocus();return ;
-		}
-		
-		if (mu.emptystr(txtNit.getText().toString())) {		
-			msgScroll("Falta NIT");txtNit.requestFocus();return ;
-		}
-		
-		cui=txtcui.getText().toString().trim();
-		if (mu.emptystr(cui)) {		
-			msgScroll("Falta definir CUI / DPI");return ;
-		}
-		
-		if (cui.length()!=13) {
-			msgScroll("CUI / DPI incorrecto");return ;
-		}
-			
-		if (validaCUI(cui)) {
-			if (parseSpinValues()) save();
-		} else {	
-			msgAskCUI("CUI / DPI incorrecto. Continuar");
-		}
+
+
 		
 	}
  
 	public void doFecha(View view) {
-		fechaNac();	
+
+		try{
+			fechaNac();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
    
 	public void doMuni(View view) {
-		browse=1;
-		Intent intent = new Intent(this,Municipio.class);
-		startActivity(intent);
+		try{
+			browse=1;
+			Intent intent = new Intent(this,Municipio.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void setHandlers(){
-		
-		sprel.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
-		    	try {
-		    		TextView spinlabel=(TextView) parentView.getChildAt(0);
-		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
-		        } catch (Exception e) {
-		        }	 
-		    }
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) { return;}
-		});	
-		
-		spgru.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
-		    	try {
-		    		TextView spinlabel=(TextView) parentView.getChildAt(0);
-		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
-		        } catch (Exception e) {
-		        }	 
-		    }
+		try{
+			sprel.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) { return;}
-		});	
-				
-		spesc.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
-		    	try {
-		    		TextView spinlabel=(TextView) parentView.getChildAt(0);
-		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
-		        } catch (Exception e) {
-		        }	 
-		    }
+					try {
+						TextView spinlabel=(TextView) parentView.getChildAt(0);
+						spinlabel.setTypeface(lblFecha.getTypeface());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) { return;}
-		});	
-				
-		spest.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
-		    	try {
-		    		TextView spinlabel=(TextView) parentView.getChildAt(0);
-		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
-		        } catch (Exception e) {
-		        }	 
-		    }
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) { return;}
+			});
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) { return;}
-		});	
-				
-		spgen.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
-		    	try {
-		    		TextView spinlabel=(TextView) parentView.getChildAt(0);
-		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
-		        } catch (Exception e) {
-		        }	 
-		    }
+			spgru.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) { return;}
-		});	
-				
-		sphij.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	
-		    	try {
-		    		TextView spinlabel=(TextView) parentView.getChildAt(0);
-		  	    	spinlabel.setTypeface(lblFecha.getTypeface());
-		        } catch (Exception e) {
-		        }	 
-		    }
+					try {
+						TextView spinlabel=(TextView) parentView.getChildAt(0);
+						spinlabel.setTypeface(lblFecha.getTypeface());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) { return;}
-		});	
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) { return;}
+			});
+
+			spesc.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+
+					try {
+						TextView spinlabel=(TextView) parentView.getChildAt(0);
+						spinlabel.setTypeface(lblFecha.getTypeface());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) { return;}
+			});
+
+			spest.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+
+					try {
+						TextView spinlabel=(TextView) parentView.getChildAt(0);
+						spinlabel.setTypeface(lblFecha.getTypeface());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) { return;}
+			});
+
+			spgen.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+
+					try {
+						TextView spinlabel=(TextView) parentView.getChildAt(0);
+						spinlabel.setTypeface(lblFecha.getTypeface());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) { return;}
+			});
+
+			sphij.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+
+					try {
+						TextView spinlabel=(TextView) parentView.getChildAt(0);
+						spinlabel.setTypeface(lblFecha.getTypeface());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) { return;}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}	  
    	
@@ -247,8 +275,13 @@ public class CliNuevoAprEdit extends PBase {
 	// Main 
 
 	private void loadItem() {
-		loadPart1();
-		loadPart2();
+		try{
+			loadPart1();
+			loadPart2();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void loadPart1() {
@@ -268,6 +301,7 @@ public class CliNuevoAprEdit extends PBase {
 			txtNit.setText(dt.getString(3));
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 
@@ -299,6 +333,7 @@ public class CliNuevoAprEdit extends PBase {
 			nombreMuni();
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 	}
@@ -314,6 +349,7 @@ public class CliNuevoAprEdit extends PBase {
 			dt.moveToFirst();
 			iddep=dt.getString(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());return;
 		}
 
@@ -360,6 +396,7 @@ public class CliNuevoAprEdit extends PBase {
 			super.finish();
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 			mu.msgbox(e.getMessage());
 		}		   
@@ -399,6 +436,7 @@ public class CliNuevoAprEdit extends PBase {
 
 			return true;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage()+":"+dbgv);return false;
 		}
 
@@ -417,98 +455,102 @@ public class CliNuevoAprEdit extends PBase {
 		// Se reemplazan los espacios en blanco en la cadena (si tiene)
 		Cui = Cui.replace(" ", "");
 
-		//Si la cadena cumple con la expresion regular debemos de verificar que sea un CUI v�lido
-		if(validCui ==true){
+		try{
+			//Si la cadena cumple con la expresion regular debemos de verificar que sea un CUI v�lido
+			if(validCui ==true){
 
-			// Extraemos el numero del DPI  
-			String no = Cui.substring(0, 8);
-			// Extraemos el numero de Departamento
-			int depto = Integer.parseInt(Cui.substring(9, 11));
-			// Extraemos el numero de Municipio
-			int muni = Integer.parseInt(Cui.substring(11,13));
+				// Extraemos el numero del DPI
+				String no = Cui.substring(0, 8);
+				// Extraemos el numero de Departamento
+				int depto = Integer.parseInt(Cui.substring(9, 11));
+				// Extraemos el numero de Municipio
+				int muni = Integer.parseInt(Cui.substring(11,13));
 
-			// Se extra el numero validador
-			int ver = Integer.parseInt(Cui.substring(8,9));
+				// Se extra el numero validador
+				int ver = Integer.parseInt(Cui.substring(8,9));
 
-			// Array con la cantidad de municipios que contiene cada departamento.
+				// Array con la cantidad de municipios que contiene cada departamento.
 
-			int munisPorDepto[] = {
-					/* 01 - Guatemala tiene:      */ 17 /* municipios. */,
-					/* 02 - El Progreso tiene:    */  8 /* municipios. */,
-					/* 03 - Sacatep�quez tiene:   */ 16 /* municipios. */,
-					/* 04 - Chimaltenango tiene:  */ 16 /* municipios. */,
-					/* 05 - Escuintla tiene:      */ 13 /* municipios. */,
-					/* 06 - Santa Rosa tiene:     */ 14 /* municipios. */,
-					/* 07 - Solol� tiene:         */ 19 /* municipios. */,
-					/* 08 - Totonicap�n tiene:    */  8 /* municipios. */,
-					/* 09 - Quetzaltenango tiene: */ 24 /* municipios. */,
-					/* 10 - Suchitep�quez tiene:  */ 21 /* municipios. */,
-					/* 11 - Retalhuleu tiene:     */  9 /* municipios. */,
-					/* 12 - San Marcos tiene:     */ 30 /* municipios. */,
-					/* 13 - Huehuetenango tiene:  */ 32 /* municipios. */,
-					/* 14 - Quich� tiene:         */ 21 /* municipios. */,
-					/* 15 - Baja Verapaz tiene:   */  8 /* municipios. */,
-					/* 16 - Alta Verapaz tiene:   */ 17 /* municipios. */,
-					/* 17 - Pet�n tiene:          */ 14 /* municipios. */,
-					/* 18 - Izabal tiene:         */  5 /* municipios. */,
-					/* 19 - Zacapa tiene:         */ 11 /* municipios. */,
-					/* 20 - Chiquimula tiene:     */ 11 /* municipios. */,
-					/* 21 - Jalapa tiene:         */  7 /* municipios. */,
-					/* 22 - Jutiapa tiene:        */ 17 /* municipios. */
-			};
+				int munisPorDepto[] = {
+						/* 01 - Guatemala tiene:      */ 17 /* municipios. */,
+						/* 02 - El Progreso tiene:    */  8 /* municipios. */,
+						/* 03 - Sacatep�quez tiene:   */ 16 /* municipios. */,
+						/* 04 - Chimaltenango tiene:  */ 16 /* municipios. */,
+						/* 05 - Escuintla tiene:      */ 13 /* municipios. */,
+						/* 06 - Santa Rosa tiene:     */ 14 /* municipios. */,
+						/* 07 - Solol� tiene:         */ 19 /* municipios. */,
+						/* 08 - Totonicap�n tiene:    */  8 /* municipios. */,
+						/* 09 - Quetzaltenango tiene: */ 24 /* municipios. */,
+						/* 10 - Suchitep�quez tiene:  */ 21 /* municipios. */,
+						/* 11 - Retalhuleu tiene:     */  9 /* municipios. */,
+						/* 12 - San Marcos tiene:     */ 30 /* municipios. */,
+						/* 13 - Huehuetenango tiene:  */ 32 /* municipios. */,
+						/* 14 - Quich� tiene:         */ 21 /* municipios. */,
+						/* 15 - Baja Verapaz tiene:   */  8 /* municipios. */,
+						/* 16 - Alta Verapaz tiene:   */ 17 /* municipios. */,
+						/* 17 - Pet�n tiene:          */ 14 /* municipios. */,
+						/* 18 - Izabal tiene:         */  5 /* municipios. */,
+						/* 19 - Zacapa tiene:         */ 11 /* municipios. */,
+						/* 20 - Chiquimula tiene:     */ 11 /* municipios. */,
+						/* 21 - Jalapa tiene:         */  7 /* municipios. */,
+						/* 22 - Jutiapa tiene:        */ 17 /* municipios. */
+				};
 
 
 
-			//Verificamos que no se haya ingresado 0 en la posicion de depto o municipio
-			if((muni==0 || depto==0) || (muni==0 && depto==0)){
-				valido=false;
-				cuimsg+="CUI no válido";
-			}
-
-			else{
-				//Si el numero de depto ingresado en la cadena es mayor 22 es cui invalido
-				cuimsg+="munixdepto: " + munisPorDepto.length;
-				if(depto > munisPorDepto.length ){
+				//Verificamos que no se haya ingresado 0 en la posicion de depto o municipio
+				if((muni==0 || depto==0) || (muni==0 && depto==0)){
 					valido=false;
-					cuimsg+="CUI no válido Departamento fuera de rango";
+					cuimsg+="CUI no válido";
 				}
+
 				else{
-					//si depto es menor o igual a 22
-
-					cuimsg+="Municipios maximos: " +  munisPorDepto[depto -1];
-					//se valida que el municipio ingresado en la cadena este dentro del rango del depto
-					if(muni > munisPorDepto[depto -1]){
+					//Si el numero de depto ingresado en la cadena es mayor 22 es cui invalido
+					cuimsg+="munixdepto: " + munisPorDepto.length;
+					if(depto > munisPorDepto.length ){
 						valido=false;
-						cuimsg+="CUI no válido municipio fuera de rango";
+						cuimsg+="CUI no válido Departamento fuera de rango";
 					}
-
 					else{
+						//si depto es menor o igual a 22
 
-						// si es valido
-						int total=0;
-						//Se realiza la siguiente Ooperaci�n 
-						for(int i=0; i<no.length(); i++){
-							cuimsg+="-" +no.substring(i,i+1);
-							total += (Integer.parseInt(no.substring(i,i+1)))*(i + 2);
+						cuimsg+="Municipios maximos: " +  munisPorDepto[depto -1];
+						//se valida que el municipio ingresado en la cadena este dentro del rango del depto
+						if(muni > munisPorDepto[depto -1]){
+							valido=false;
+							cuimsg+="CUI no válido municipio fuera de rango";
 						}
 
-						// al total de la anterior operaci�n se le saca el mod 11
+						else{
 
-						int modulo=total%11;
-						cuimsg+="CUI con modulo" + modulo;
+							// si es valido
+							int total=0;
+							//Se realiza la siguiente Ooperaci�n
+							for(int i=0; i<no.length(); i++){
+								cuimsg+="-" +no.substring(i,i+1);
+								total += (Integer.parseInt(no.substring(i,i+1)))*(i + 2);
+							}
 
-						// Si el mod es igual al numero verificador el cui es valido , sino es invalido
-						if(modulo!=ver){
-							valido=false;
+							// al total de la anterior operaci�n se le saca el mod 11
+
+							int modulo=total%11;
+							cuimsg+="CUI con modulo" + modulo;
+
+							// Si el mod es igual al numero verificador el cui es valido , sino es invalido
+							if(modulo!=ver){
+								valido=false;
+							}
 						}
 					}
 				}
+
+			} else{
+				valido=false;
 			}
 
-		} else{
-			valido=false;
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 		//se retorna el booleano que indica si el cui es v�lido o no
 		return valido;
 	}
@@ -544,6 +586,7 @@ public class CliNuevoAprEdit extends PBase {
 
 				applyDate();
 			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				msgbox(e.getMessage());
 			}
 		}
@@ -551,16 +594,21 @@ public class CliNuevoAprEdit extends PBase {
 	}
 
 	private void applyDate() {
-		String s;
+		try{
+			String s;
 
-		if (cyear==0) return;
+			if (cyear==0) return;
 
-		s="";
-		if (cday>9)   s=s+String.valueOf(cday)+"/"; else s=s+"0"+String.valueOf(cday)+"/";  
-		if (cmonth>9) s=s+String.valueOf(cmonth)+"/"; else s=s+"0"+String.valueOf(cmonth)+"/"; 	
-		s=s+cyear;
+			s="";
+			if (cday>9)   s=s+String.valueOf(cday)+"/"; else s=s+"0"+String.valueOf(cday)+"/";
+			if (cmonth>9) s=s+String.valueOf(cmonth)+"/"; else s=s+"0"+String.valueOf(cmonth)+"/";
+			s=s+cyear;
 
-		lblFecha.setText(s);
+			lblFecha.setText(s);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 
@@ -588,6 +636,7 @@ public class CliNuevoAprEdit extends PBase {
 			//spmun.setSelection(0);			
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}
 	}
@@ -605,6 +654,7 @@ public class CliNuevoAprEdit extends PBase {
 			}
 			sprel.setAdapter(darel);sprel.setSelection(sidx);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 		try {
@@ -616,6 +666,7 @@ public class CliNuevoAprEdit extends PBase {
 			}
 			spgru.setAdapter(dagru);spgru.setSelection(sidx);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 		try { // CA=CT
@@ -627,6 +678,7 @@ public class CliNuevoAprEdit extends PBase {
 			}
 			spesc.setAdapter(daesc);spesc.setSelection(sidx);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 		try { 
@@ -640,11 +692,13 @@ public class CliNuevoAprEdit extends PBase {
 					//if (cc.equalsIgnoreCase(cod)) sidx=i;
 				}
 			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				sidx=0;
 			}
 			
 			spest.setAdapter(daest);spest.setSelection(sidx);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 		try { //MA = M, FE=F, TE=3
@@ -659,6 +713,7 @@ public class CliNuevoAprEdit extends PBase {
 			}
 			spgen.setAdapter(dagen);spgen.setSelection(sidx);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 		try { 
@@ -666,31 +721,37 @@ public class CliNuevoAprEdit extends PBase {
 			dahij.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			sphij.setAdapter(dahij);sphij.setSelection(numhij);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 	}
 
 	private void msgAskCUI(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("¿" + msg  + "?");
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg  + "?");
+			dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {			      	
-				if (parseSpinValues()) save();
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if (parseSpinValues()) save();
+				}
+			});
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				txtcui.requestFocus();
-				scrView.scrollTo(0,0);
-			}
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					txtcui.requestFocus();
+					scrView.scrollTo(0,0);
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
@@ -714,6 +775,7 @@ public class CliNuevoAprEdit extends PBase {
 
 			super.finish();
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
@@ -721,59 +783,79 @@ public class CliNuevoAprEdit extends PBase {
 
 	private void msgScroll(String msg) {
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
 
-		dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				txtcui.requestFocus();
-				scrView.scrollTo(0,0);
-			}
-		});
+			dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					txtcui.requestFocus();
+					scrView.scrollTo(0,0);
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	private void msgMuni(String msg) {
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
 
-		dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				doMuni(null);
-			}
-		});
+			dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					doMuni(null);
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	private void msgFecha(String msg) {
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
 
-		dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				fechaNac();
-			}
-		});
+			dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					fechaNac();
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	private void fechaNac() {
-		DialogFragment newFragment = new DatePickerFragment();
-		newFragment.show(getSupportFragmentManager(), "datePicker");		
+		try{
+			DialogFragment newFragment = new DatePickerFragment();
+			newFragment.show(getSupportFragmentManager(), "datePicker");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void aplicaMuni() {	
@@ -783,6 +865,7 @@ public class CliNuevoAprEdit extends PBase {
 			idmun=((appGlobals) vApp).gstr;  		
 			lblMuni.setText(((appGlobals) vApp).pprodname);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			idmun="*";lblMuni.setText("");
 			toast(e.getMessage());
 		}
@@ -790,11 +873,16 @@ public class CliNuevoAprEdit extends PBase {
 
 	private void parseDateValue() {
 
-		cyear=(int) fechanac/10000;fechanac=fechanac % 10000;
-		cmonth=(int) fechanac/100;
-		cday=(int) fechanac % 100;
+		try{
+			cyear=(int) fechanac/10000;fechanac=fechanac % 10000;
+			cmonth=(int) fechanac/100;
+			cday=(int) fechanac % 100;
 
-		applyDate();
+			applyDate();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void nombreMuni() {
@@ -807,6 +895,7 @@ public class CliNuevoAprEdit extends PBase {
 			dt.moveToFirst();
 			lblMuni.setText(dt.getString(0));		
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 
@@ -817,12 +906,17 @@ public class CliNuevoAprEdit extends PBase {
 
 	@Override
 	protected void onResume() {
-		super.onResume();
+		try{
+			super.onResume();
 
-		if (browse==1) {
-			browse=0;
-			aplicaMuni();return;
+			if (browse==1) {
+				browse=0;
+				aplicaMuni();return;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}	
 
 

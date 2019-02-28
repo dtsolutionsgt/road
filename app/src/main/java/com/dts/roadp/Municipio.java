@@ -43,6 +43,7 @@ public class Municipio extends PBase {
 		setContentView(R.layout.activity_municipio);
 		
 		super.InitBase();
+		addlog("Municipio",""+du.getActDateTime(),gl.vend);
 
 		listView = (ListView) findViewById(R.id.listView1);
 		txtFilter = (EditText) findViewById(R.id.txtMonto);
@@ -60,61 +61,68 @@ public class Municipio extends PBase {
 
 	private void setHandlers(){
 
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
 
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-					clsCD vItem = (clsCD)lvObj;
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsCD vItem = (clsCD)lvObj;
 
-					itemid=vItem.Text;
-					prname=vItem.Desc;
-					gl.pprodname=prname;
-					adapter.setSelectedIndex(position);
+						itemid=vItem.Text;
+						prname=vItem.Desc;
+						gl.pprodname=prname;
+						adapter.setSelectedIndex(position);
 
-					appProd();
-				} catch (Exception e) {
-					mu.msgbox( e.getMessage());
+						appProd();
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+				};
+			});
+
+			listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsCD vItem = (clsCD)lvObj;
+
+						itemid=vItem.Text;
+						prname=vItem.Desc;
+						gl.pprodname=prname;
+						adapter.setSelectedIndex(position);
+
+						appProd();
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+					return true;
 				}
-			};
-		});
+			});
 
-		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+			txtFilter.addTextChangedListener(new TextWatcher() {
 
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-					clsCD vItem = (clsCD)lvObj;
+				public void afterTextChanged(Editable s) {}
 
-					itemid=vItem.Text;
-					prname=vItem.Desc;
-					gl.pprodname=prname;
-					adapter.setSelectedIndex(position);
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
 
-					appProd();
-				} catch (Exception e) {
-					mu.msgbox( e.getMessage());
+				public void onTextChanged(CharSequence s, int start,int before, int count) {
+					int tl;
+
+					tl=txtFilter.getText().toString().length();
+
+					if (tl==0 || tl>1) {listItems();}
 				}
-				return true;
-			}
-		});
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 
-		txtFilter.addTextChangedListener(new TextWatcher() {
-
-			public void afterTextChanged(Editable s) {}
-
-			public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
-
-			public void onTextChanged(CharSequence s, int start,int before, int count) {
-				int tl;
-
-				tl=txtFilter.getText().toString().length();
-
-				if (tl==0 || tl>1) {listItems();}
-			}
-		});	
 
 	}
 
@@ -153,6 +161,7 @@ public class Municipio extends PBase {
 				DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//	mu.msgbox( e.getMessage());
 		}
 
@@ -161,8 +170,13 @@ public class Municipio extends PBase {
 	}
 
 	private void appProd(){
-		gl.gstr=itemid;
-		super.finish();
+		try{
+			gl.gstr=itemid;
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	

@@ -29,6 +29,7 @@ public class DemoData extends PBase {
 		setContentView(R.layout.activity_demo_data);
 		
 		super.InitBase();
+		addlog("DemoData",""+du.getActDateTime(),gl.vend);
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		
@@ -68,6 +69,7 @@ public class DemoData extends PBase {
 					startActivity(intent);
 					
 		        } catch (Exception e) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			   	   mu.msgbox(e.getMessage());
 		        }
 			};
@@ -106,6 +108,7 @@ public class DemoData extends PBase {
 			items.add(item);	
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}		
 
@@ -138,6 +141,7 @@ public class DemoData extends PBase {
 			  DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }		
 		
@@ -170,6 +174,7 @@ public class DemoData extends PBase {
 			  DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }
 			 
@@ -181,6 +186,7 @@ public class DemoData extends PBase {
 			adapter.setSelectedIndex(idx);
 			listView.smoothScrollToPosition(idx);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 	
 	}
@@ -197,6 +203,7 @@ public class DemoData extends PBase {
 	
 			db.execSQL(upd.SQL());
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());return;
 		}	
 		
@@ -230,6 +237,7 @@ public class DemoData extends PBase {
 			db.endTransaction();
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 		   	mu.msgbox( e.getMessage());return;
 		}
@@ -244,21 +252,26 @@ public class DemoData extends PBase {
 	
 	@Override
  	protected void onResume() {
-	    super.onResume();
-	    
-	    if (browse==1) {
-	    	browse=0;
-	    	updateClient();
-	    	return;
-	    }
-	    
-	    if (browse==2) {
-	    	browse=0;
-	    	updateProd();
-	    	return;
-	    }
-	    
-	    listItems();
+		try{
+			super.onResume();
+
+			if (browse==1) {
+				browse=0;
+				updateClient();
+				return;
+			}
+
+			if (browse==2) {
+				browse=0;
+				updateProd();
+				return;
+			}
+
+			listItems();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	

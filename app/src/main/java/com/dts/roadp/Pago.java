@@ -56,6 +56,7 @@ public class Pago extends PBase {
 		setContentView(R.layout.activity_pago);
 		
 		super.InitBase();
+		addlog("Pago",""+du.getActDateTime(),gl.vend);
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		lblSaldo = (TextView) findViewById(R.id.lblpSaldo);
@@ -85,70 +86,92 @@ public class Pago extends PBase {
 	
 	public void addPayment(View view){
 		String s;
-		
-		try {
-			s=txtMonto.getText().toString();
-			pago=Double.parseDouble(s);
-			if (pago<=0) throw new Exception();
-		} catch (Exception e) {
-			pago=0;
-			mu.msgbox("Monto incorrecto");return;
-	    }
 
-	    if (pagomodo==0) {
-			if (totalPago() + pago > pagolim) {
-				mu.msgbox("Total de pagos mayor que total de saldos.");
-				return;
+		try{
+			try {
+				s=txtMonto.getText().toString();
+				pago=Double.parseDouble(s);
+				if (pago<=0) throw new Exception();
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				pago=0;
+				mu.msgbox("Monto incorrecto");return;
 			}
 
-			if (totalPago() + pago > saldo) {
-				msgAskOverPayd("Total de pagos mayor que saldo\nContinuar");
+			if (pagomodo==0) {
+				if (totalPago() + pago > pagolim) {
+					mu.msgbox("Total de pagos mayor que total de saldos.");
+					return;
+				}
+
+				if (totalPago() + pago > saldo) {
+					msgAskOverPayd("Total de pagos mayor que saldo\nContinuar");
+				} else {
+					showPagoDialog();
+				}
 			} else {
 				showPagoDialog();
 			}
-		} else {
-			showPagoDialog();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 
 	}
 	
 	public void deletePayment(View view){
-		
-		if (selid==0) {
-			mu.msgbox("Debe seleccionar un pago");return;
+
+		try{
+			if (selid==0) {
+				mu.msgbox("Debe seleccionar un pago");return;
+			}
+
+			msgAskDel("Eliminar pago");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		msgAskDel("Eliminar pago");
+
 	}
 	
 	public void savePago(View view){
-		if (pagomodo==0) {
-			finalCheck();
-		} else {
-			gl.pagado=totalPago()>0;
-			finish();
+		try{
+			if (pagomodo==0) {
+				finalCheck();
+			} else {
+				gl.pagado=totalPago()>0;
+				finish();
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}
 
 	private void setHandlers(){
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
-				
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-					selitem = (clsClasses.clsPago)lvObj;
-			           	
-					adapter.setSelectedIndex(position);
 
-					selid= selitem.id;
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
 
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-			};
-	    });
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						selitem = (clsClasses.clsPago)lvObj;
+
+						adapter.setSelectedIndex(position);
+
+						selid= selitem.id;
+
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+				};
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		    
 	}
 
@@ -183,6 +206,7 @@ public class Pago extends PBase {
 			}
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }
 			 
@@ -200,6 +224,7 @@ public class Pago extends PBase {
 			DT.moveToFirst();	
 			id=DT.getInt(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			id=0;
 		}	
 		
@@ -220,6 +245,7 @@ public class Pago extends PBase {
 	    	db.execSQL(ins.sql());
 	    	
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}	
 		
@@ -234,6 +260,7 @@ public class Pago extends PBase {
 			sql="DELETE FROM T_PAGO WHERE ITEM="+selid;
 	    	db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}	
 		
@@ -252,6 +279,7 @@ public class Pago extends PBase {
 			db.execSQL(sql);
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }	
 		
@@ -260,11 +288,16 @@ public class Pago extends PBase {
 	}
 	
 	private void finalCheck() {
-		if (totalPago()< saldo) {
-			msgAskSaveEmpty("El saldo es mayor que el monto . Salir");
-		} else {
-			msgAskSave("Aplicar pagos y continuar?");
+		try{
+			if (totalPago()< saldo) {
+				msgAskSaveEmpty("El saldo es mayor que el monto . Salir");
+			} else {
+				msgAskSave("Aplicar pagos y continuar?");
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}
 
 	//endregion
@@ -275,27 +308,32 @@ public class Pago extends PBase {
 		String s;
 		
 		s=lcode.get(pidx);cpago=0;
-		
-		// Efectivo
-		if (s.equalsIgnoreCase("1")) { 
-			cpago=1;tpago="E";desc1=" ";desc2=" ";desc3=" ";
-			addPago();
-			return;
+
+		try{
+			// Efectivo
+			if (s.equalsIgnoreCase("1")) {
+				cpago=1;tpago="E";desc1=" ";desc2=" ";desc3=" ";
+				addPago();
+				return;
+			}
+
+			// Cheque
+			if (s.equalsIgnoreCase("2")) {
+				cpago=2;tpago="C";
+				showBancoDialog();
+				return;
+			}
+
+			// Tarjeta
+			if (s.equalsIgnoreCase("3")) {
+				cpago=3;tpago="K";
+				showBancoDialog();
+				return;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		// Cheque
-		if (s.equalsIgnoreCase("2")) { 
-			cpago=2;tpago="C";
-			showBancoDialog();
-			return;
-		}		
-		
-		// Tarjeta
-		if (s.equalsIgnoreCase("3")) { 
-			cpago=3;tpago="K";
-			showBancoDialog();
-			return;
-		}			
+
 		
 	}
 	
@@ -343,11 +381,13 @@ public class Pago extends PBase {
 				  }
 
 			  } catch (Exception e) {
+				  addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 				  mu.msgbox(e.getMessage()); 
 			  }
 			  DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());return;
 	    }
 		
@@ -360,32 +400,37 @@ public class Pago extends PBase {
 	    for (int i = 0; i < lname.size(); i++) {
 	    	selitems[i] = lname.get(i);
 	    }
-		    
-	    mMenuDlg = new AlertDialog.Builder(this);
-	    mMenuDlg.setTitle("Tipo Pago");	    	
-					
-	    mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
+
+		try{
+			mMenuDlg = new AlertDialog.Builder(this);
+			mMenuDlg.setTitle("Tipo Pago");
+
+			mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
 					try {
 						selPago(item);
 						dialog.dismiss();
 					} catch (Exception e) {
-				    }
+					}
 				}
-		});
-				
-	    mMenuDlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-			@Override
+			});
+
+			mMenuDlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int which) {
 				}
-		});
-			
-	    Dialog = mMenuDlg.create();
-		Dialog.show();
-		
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);			
+			});
+
+			Dialog = mMenuDlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}
 
@@ -415,11 +460,13 @@ public class Pago extends PBase {
 				  bcode.add(code);
 				  bname.add(name);
 			  } catch (Exception e) {
+				  addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 				  mu.msgbox(e.getMessage()); 
 			  }
 			  DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());return;
 	    }
 		
@@ -432,121 +479,152 @@ public class Pago extends PBase {
 	    for (int i = 0; i < bname.size(); i++) {
 	    	selitems[i] = bname.get(i);
 	    }
-		    
-	    mMenuDlg = new AlertDialog.Builder(this);
-	    mMenuDlg.setTitle("Banco");	    	
-					
-	    mMenuDlg.setSingleChoiceItems(selitems , -1,
-			new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int item) {
-					try {
-						bc=bcode.get(item);
-						bn=bname.get(item);
-						inputNumero();
-						
-						dialog.dismiss();
-					} catch (Exception e) {
-						dialog.dismiss();
-				    }
-				}
-		});
-				
-	    mMenuDlg.setPositiveButton("Salir", new DialogInterface.OnClickListener() {
-			@Override
+
+		try{
+			mMenuDlg = new AlertDialog.Builder(this);
+			mMenuDlg.setTitle("Banco");
+
+			mMenuDlg.setSingleChoiceItems(selitems , -1,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int item) {
+							try {
+								bc=bcode.get(item);
+								bn=bname.get(item);
+								inputNumero();
+
+								dialog.dismiss();
+							} catch (Exception e) {
+								addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+								dialog.dismiss();
+							}
+						}
+					});
+
+			mMenuDlg.setPositiveButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int which) {
 				}
-		});
-			
-	    Dialog = mMenuDlg.create();
-		Dialog.show();
+			});
+
+			Dialog = mMenuDlg.create();
+			Dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void inputNumero() {
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		if (cpago==2) {
-			alert.setTitle("Numero de Cheque");
-		} else if(cpago==3) {
-			alert.setTitle("Numero de Cheque");
-		} else {
-			alert.setTitle("Pendiente especificación");
-		}
-		
-		final EditText input = new EditText(this);
-		alert.setView(input);
-		
-		input.setInputType(InputType.TYPE_CLASS_NUMBER);	
-		input.setText("");input.requestFocus();
-		
-		alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				if (cpago==2) {
-					checkNum(input.getText().toString(),false);
-				} else if (cpago==3) {
-					checkNum(input.getText().toString(),true);
-				}
-
-		  	}
-		});
-
-		alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				closekeyb();
+			if (cpago==2) {
+				alert.setTitle("Numero de Cheque");
+			} else if(cpago==3) {
+				alert.setTitle("Numero de Cheque");
+			} else {
+				alert.setTitle("Pendiente especificación");
 			}
-		});
 
-		alert.show();
+			final EditText input = new EditText(this);
+			alert.setView(input);
+
+			input.setInputType(InputType.TYPE_CLASS_NUMBER);
+			input.setText("");input.requestFocus();
+
+			alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					if (cpago==2) {
+						checkNum(input.getText().toString(),false);
+					} else if (cpago==3) {
+						checkNum(input.getText().toString(),true);
+					}
+
+				}
+			});
+
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					closekeyb();
+				}
+			});
+
+			alert.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void checkNum(String s, boolean modo) {
-		
-		if (mu.emptystr(s)) {
-			showkeyb();
-			inputNumero(); 
-			mu.msgbox("Numero incorrecto");showkeyb();
-			return;
-		}
-		
-		//desc1=s;desc2=bn;desc3=bc;
-		desc1=s;desc2=bc;desc3="";
 
-		if (cpago==2) {
-			addPago();
-		} else {
-			obtenerFecha();
+		try{
+			if (mu.emptystr(s)) {
+				showkeyb();
+				inputNumero();
+				mu.msgbox("Numero incorrecto");showkeyb();
+				return;
+			}
+
+			//desc1=s;desc2=bn;desc3=bc;
+			desc1=s;desc2=bc;desc3="";
+
+			if (cpago==2) {
+				addPago();
+			} else {
+				obtenerFecha();
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 
 	}
 
 	private void aplicarFecha(String fs) {
-		desc3=fs;
-		addPago();
+		try{
+			desc3=fs;
+			addPago();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 
 	// Date
 
 	private void obtenerFecha(){
-		DatePickerDialog recogerFecha = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-			@Override
-			public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-				final int mesActual = month + 1;
-				String diaFormateado = (dayOfMonth < 10)? "0" + String.valueOf(dayOfMonth):String.valueOf(dayOfMonth);
-				String mesFormateado = (mesActual < 10)? "0" + String.valueOf(mesActual):String.valueOf(mesActual);
+		try{
+			DatePickerDialog recogerFecha = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+				@Override
+				public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+					final int mesActual = month + 1;
+					String diaFormateado = (dayOfMonth < 10)? "0" + String.valueOf(dayOfMonth):String.valueOf(dayOfMonth);
+					String mesFormateado = (mesActual < 10)? "0" + String.valueOf(mesActual):String.valueOf(mesActual);
 
-				aplicarFecha(diaFormateado + "/" + mesFormateado + "/" + year);
-			}
-		},anio, mes, dia);
+					aplicarFecha(diaFormateado + "/" + mesFormateado + "/" + year);
+				}
+			},anio, mes, dia);
 
-		recogerFecha.show();
+			recogerFecha.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void setActDate(){
-		final Calendar c = Calendar.getInstance();
-		cyear = c.get(Calendar.YEAR);
-		cmonth = c.get(Calendar.MONTH)+1;
-		cday = c.get(Calendar.DAY_OF_MONTH);
-		fecha=du.cfecha(cyear,cmonth,cday);
+		try{
+			final Calendar c = Calendar.getInstance();
+			cyear = c.get(Calendar.YEAR);
+			cmonth = c.get(Calendar.MONTH)+1;
+			cday = c.get(Calendar.DAY_OF_MONTH);
+			fecha=du.cfecha(cyear,cmonth,cday);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 
@@ -564,7 +642,9 @@ public class Pago extends PBase {
 			s=DT.getString(0).trim();
 			nivel=Integer.parseInt(s);
 		} catch (Exception e) {
-			nivel=1;return;
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			nivel=1;
+			return;
 	    }	
 	}
 
@@ -577,180 +657,219 @@ public class Pago extends PBase {
 			DT.moveToFirst();	
 			return DT.getDouble(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return -1;
 		}		
 	}
 	
 	private void actMonto(){
 		double tp=totalPago();
-		
-		monto=saldo-tp;
-		if (monto<0) monto=0;
-		monto=mu.round2(monto);
-		
-		txtMonto.setText(""+monto);if (monto==0) txtMonto.setText("");
-		lblTotal.setText(mu.frmdec(tp));
 
-		if (pagomodo==0) {
-			if (monto==0) finalCheck();
+		try{
+			monto=saldo-tp;
+			if (monto<0) monto=0;
+			monto=mu.round2(monto);
+
+			txtMonto.setText(""+monto);if (monto==0) txtMonto.setText("");
+			lblTotal.setText(mu.frmdec(tp));
+
+			if (pagomodo==0) {
+				if (monto==0) finalCheck();
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 
 	}
 	
 	private void doExit(){
-		closekeyb();
-		super.finish();
+		try{
+			closekeyb();
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	// MsgDialogs
 	
 	private void msgAskOverPayd(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	showPagoDialog();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					showPagoDialog();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
 	private void msgAskExit(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	msgAskExit2("Está seguro");
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					msgAskExit2("Está seguro");
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
 	private void msgAskExit2(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {	
-		    	((appGlobals) vApp).pagado=false;
-		    	doExit();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					((appGlobals) vApp).pagado=false;
+					doExit();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
 	private void msgAskSave(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	if (totalPago()>0){
-					gl.pagado = true;
-					toast("doexit");
-					doExit();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if (totalPago()>0){
+						gl.pagado = true;
+						toast("doexit");
+						doExit();
+					}
 				}
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
-			
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	private void msgAskSaveEmpty(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		   		((appGlobals) vApp).pagado=false;
-		    	doExit();
-		     }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					((appGlobals) vApp).pagado=false;
+					doExit();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 			
 	}	
 	
 	private void msgAskDel(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	delPago();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					delPago();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
@@ -759,13 +878,18 @@ public class Pago extends PBase {
 	
 	@Override
 	public void onBackPressed() {
-		
-		if (totalPago()==0) {
-			((appGlobals) vApp).pagado=false;
-			super.onBackPressed();
-		} else {	
-			msgAskExit("Salir sin aplicar pago");
+
+		try{
+			if (totalPago()==0) {
+				((appGlobals) vApp).pagado=false;
+				super.onBackPressed();
+			} else {
+				msgAskExit("Salir sin aplicar pago");
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 		
 	}	
 	

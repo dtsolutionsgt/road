@@ -20,6 +20,7 @@ public class PrintDialog extends PBase {
 			setContentView(R.layout.activity_print_dialog);
 
 			super.InitBase();
+			addlog("PrintDialog",""+du.getActDateTime(),gl.vend);
 
 			printcallback= new Runnable() {
 				public void run() {
@@ -46,6 +47,7 @@ public class PrintDialog extends PBase {
 		}
 		catch (Exception e)
 		{
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			Log.e("print",e.getMessage());
 		}
 
@@ -86,6 +88,7 @@ public class PrintDialog extends PBase {
 
 		}catch (Exception ex)
 		{
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
 			Log.d("AskPrint",ex.getMessage());
 		}
 
@@ -97,7 +100,12 @@ public class PrintDialog extends PBase {
 	
 	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
+		try{
+			super.onBackPressed();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 }

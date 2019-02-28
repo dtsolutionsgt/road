@@ -239,12 +239,21 @@ public class MiscUtils {
 		v=val;
 		pw=Math.pow(10,ndec);
 		v=v*pw;
-		v=Math.round(v);
+		v=Math.floor(v);
 		v=v/pw;
 	
 		return v;
 	}
-	
+
+
+	public double trunc(double val) {
+		double v,pw;
+
+		v=val;
+		v=Math.floor(v);
+
+		return v;
+	}
 	
 }
 

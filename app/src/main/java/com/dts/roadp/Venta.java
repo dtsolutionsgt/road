@@ -56,7 +56,7 @@ public class Venta extends PBase {
 
 	private String emp,cliid,rutatipo,prodid,um,tiposcan;
 	private int nivel,dweek,clidia;
-	private boolean sinimp,rutapos,softscanexist;
+	private boolean sinimp,rutapos,softscanexist,porpeso;
 
 	private DecimalFormat ffrmprec;
 	private AppMethods app;
@@ -522,6 +522,7 @@ public class Venta extends PBase {
 			prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,0);
 		}
 
+
 		precsin=prc.precsin;
 		imp=prc.imp;
 		impval=prc.impval;
@@ -575,8 +576,16 @@ public class Venta extends PBase {
 
 		cantbas=cant*fact;
 		//peso=mu.round(cant*fact,gl.peDec);
-		peso=mu.round(gl.dpeso,gl.peDec);
 
+		porpeso=prodPorPeso(prodid);
+		if (porpeso) {
+			peso=mu.round(gl.dpeso,gl.peDec);
+		} else {
+			peso=mu.round(gl.dpeso*gl.umfactor,gl.peDec);
+		}
+
+
+		prodtot=mu.round(prec*cant,gl.peDec);
 
 		try {
 

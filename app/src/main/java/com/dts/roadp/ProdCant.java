@@ -30,7 +30,7 @@ public class ProdCant extends PBase {
 	
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant;
-	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom;
+	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom,pesostock;
 	private boolean pexist,esdecimal,porpeso,esbarra;
 	
 	@Override
@@ -51,7 +51,8 @@ public class ProdCant extends PBase {
 		imgUpd.setVisibility(View.INVISIBLE);
 		
 		prc=new Precio(this,mu,gl.peDec);
-		
+		getDisp();
+
 		setHandlers();
 
 		if (gl.peDecCant==0) {
@@ -242,7 +243,7 @@ public class ProdCant extends PBase {
 
 
 		prec=prc.precio(prodid,0,nivel,um,gl.umpeso,0);
-		
+
 		lblPrec.setText("Precio: "+mu.frmcur(0));
 
 		if (prec==0) {
@@ -276,9 +277,12 @@ public class ProdCant extends PBase {
 			idisp=getDispInv();	
 		}
 
+		idisp=mu.trunc(idisp);
+
 		if (porpeso) {
 			lblBU.setText(umstock);
 			upres = umstock;
+
 			lblPrec.setText(mu.frmcur(prec)+" x "+gl.umpeso);
 		} else {
 			lblPrec.setText(mu.frmcur(prec)+" x "+upres);
@@ -310,13 +314,14 @@ public class ProdCant extends PBase {
 			
 		try {
 
-			sql="SELECT SUM(CANT) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
+			sql="SELECT SUM(CANT),SUM(PESO) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			
 			umstock=um;umfactor=1;
 			disp=dt.getDouble(0);
-
+			ipeso=dt.getDouble(1);
+			pesostock=ipeso/disp;
 			if (disp>0) return disp;
 		} catch (Exception e){ }
 		
@@ -359,7 +364,7 @@ public class ProdCant extends PBase {
 			disp=dt.getDouble(0);
             if (!porpeso) disp=disp/umfactor;
             ipeso=dt.getDouble(1);
-			
+			pesostock = ipeso/disp;
 			return disp;
 		} catch (Exception e) {
 	    }	
@@ -401,7 +406,7 @@ public class ProdCant extends PBase {
 				mu.msgbox("Peso incorrect");txtPeso.requestFocus();return;
 			}
 		} else {
-			ppeso=pesoprom*cant;
+			if (pesoprom==0) ppeso = pesostock*cant;else ppeso=pesoprom*cant;
 		}
 
 		gl.dval=cant;
@@ -495,7 +500,7 @@ public class ProdCant extends PBase {
 		try {
 			if (cant<0)	lblCant.setText(""); else lblCant.setText(String.valueOf(cant));
 			if (porpeso) {
-                tv=prec*cant*umfactor;
+                tv=prec*cant;
             } else {
                 tv=prec*cant;
             }

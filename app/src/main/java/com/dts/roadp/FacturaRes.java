@@ -450,7 +450,7 @@ public class FacturaRes extends PBase {
 	private boolean saveOrder(){
 		Cursor DT;
 		String vprod,vumstock,vumventa;
-		double vcant,vpeso,vfactor,peso;
+		double vcant,vpeso,vfactor,peso,factpres;
 		int mitem;		
 		
 		corel=gl.ruta+"_"+mu.getCorelBase();
@@ -461,7 +461,6 @@ public class FacturaRes extends PBase {
 			fecha=du.getActDateTime();
 		}
 
-		
 		try {
 			sql="SELECT MAX(ITEM) FROM D_FACT_LOG";
 			DT=Con.OpenDT(sql);
@@ -532,7 +531,9 @@ public class FacturaRes extends PBase {
 			while (!DT.isAfterLast()) {
 
 				porpeso=prodPorPeso(DT.getString(0));
-					
+				factpres=DT.getDouble(12);
+				peso=DT.getDouble(8);
+
 			  	ins.init("D_FACTURAD");
 				ins.add("COREL",corel);
 				ins.add("PRODUCTO",DT.getString(0));
@@ -562,11 +563,11 @@ public class FacturaRes extends PBase {
 				vumstock=DT.getString(13);
 				vcant=DT.getDouble(1);
 				vpeso=DT.getDouble(8);
-				vfactor=vpeso/vcant;
+				vfactor=vpeso/(vcant*factpres);
 				vumventa=DT.getString(11);
 
 				if (esProductoConStock(DT.getString(0))) {
-					rebajaStockUM(vprod, vumstock, vcant, vfactor, vumventa);
+					rebajaStockUM(vprod, vumstock, vcant, vfactor, vumventa,factpres,peso);
 				}
 
 			    DT.moveToNext();
@@ -683,14 +684,18 @@ public class FacturaRes extends PBase {
 		return true;
 	}
 	
-	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa) {
+	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {
 		Cursor dt;
-		double ccant,acant,cantapl,dispcant,peso,pesoapl,disppeso,factpeso,tcant,lcant,actcant;
+		double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso;
 		String lote,doc,stat;
 
-		//if (porpeso) factor=1;
-		acant=cant*factor;
-		lcant=cant;tcant=0;actcant=cant;
+		if (porpeso) {
+			actcant=cant;
+			actpeso=ppeso;
+		} else {
+			actcant=cant*factpres;
+			actpeso=cant*factor;
+		}
 
 		try {
 
@@ -704,24 +709,22 @@ public class FacturaRes extends PBase {
 			while (!dt.isAfterLast()) {
 
 				cant=dt.getDouble(0);
-				peso=dt.getDouble(2);
+				speso=dt.getDouble(2);
 				lote=dt.getString(4);
 				doc=dt.getString(5);
 				stat=dt.getString(9);
 
 				if (actcant>cant) cantapl=cant;else cantapl=actcant;
 				dispcant=cant-cantapl;if (dispcant<0) dispcant=0;
-				pesoapl=cantapl*factor;
-				disppeso=peso-pesoapl;if (disppeso<0) disppeso=0;
+				actcant=actcant-cantapl;
 
-				/*
-				if (cant!=0) factpeso=peso/cant; else factpeso=0;
-				if (acant>cant) cantapl=cant;else cantapl=acant;
-				pesoapl=cantapl*factpeso;
-				dispcant=cant-acant;if (dispcant<0) dispcant=0;
-				acant=acant-cant;
-				disppeso=peso-pesoapl;if (disppeso<0) disppeso=0;
-				*/
+				if (porpeso) {
+					if (actpeso>speso) pesoapl=speso;else pesoapl=actpeso;
+					actpeso=actpeso-pesoapl;
+				} else {
+					pesoapl=cantapl*factor;
+				}
+				disppeso=speso-pesoapl;if (disppeso<0) disppeso=0;
 
 				// Stock
 
@@ -764,7 +767,7 @@ public class FacturaRes extends PBase {
 					ins.add("COREL",corel);
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
-					ins.add("CANTIDAD",cantapl);
+					ins.add("CANTIDAD",cantapl/factpres);
 					ins.add("PESO",pesoapl);
 					ins.add("UMSTOCK",umstock);
 					ins.add("UMPESO",gl.umpeso);
@@ -774,13 +777,13 @@ public class FacturaRes extends PBase {
 
 				} catch (SQLException e) {
 
-					sql="UPDATE D_FACTURAD_LOTES SET CANTIDAD=CANTIDAD+"+cantapl+",PESO=PESO+"+peso+"  " +
+					sql="UPDATE D_FACTURAD_LOTES SET CANTIDAD=CANTIDAD+"+cantapl+",PESO=PESO+"+pesoapl+"  " +
 						"WHERE (COREL='"+corel+"') AND (PRODUCTO='"+prid+"') AND (LOTE='"+lote+"')";
 					db.execSQL(sql);
 					//mu.msgbox(e.getMessage()+"\n"+ins.sql());
 				}
 
-				if (acant<=0) return;
+				//if (actcant<=0) return;
 
 				dt.moveToNext();
 			}

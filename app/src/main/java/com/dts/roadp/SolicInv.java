@@ -41,6 +41,7 @@ public class SolicInv extends PBase {
 		setContentView(R.layout.activity_solic_inv);
 		
 		super.InitBase();
+		addlog("SolicInv",""+du.getActDateTime(),gl.vend);
 
 		listView = (ListView) findViewById(R.id.listView1);
 		lblTot = (TextView) findViewById(R.id.textView1);
@@ -56,72 +57,95 @@ public class SolicInv extends PBase {
 	// Events
 	
 	public void showProd(View view) {
-		((appGlobals) vApp).gstr="";
-		browse=1;
-		itempos=-1;
-		Intent intent = new Intent(this,Producto.class);
-		startActivity(intent);
+		try{
+			((appGlobals) vApp).gstr="";
+			browse=1;
+			itempos=-1;
+			Intent intent = new Intent(this,Producto.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	public void finishDevol(View view){
-		if (!hasProducts()) {
-			mu.msgbox("No se puede continuar, no ha agregado ninguno producto !");return;
+		try{
+			if (!hasProducts()) {
+				mu.msgbox("No se puede continuar, no ha agregado ninguno producto !");return;
+			}
+
+			msgAskComplete("Completar la solicitud y preparar para envio");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		msgAskComplete("Completar la solicitud y preparar para envio");
+
 	}
 	
 	public void doExit(View view){
-		super.finish();
+		try{
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
-	public void doClear(View view){		
-		msgAskClear("Borrar la solicitud");
+	public void doClear(View view){
+		try{
+			msgAskClear("Borrar la solicitud");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	
 	// Main
 	
 	private void setHandlers(){
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
-				
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-					clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
-		           	
-					adapter.setSelectedIndex(position);
-		    		
-					updCant(vItem.Cod);
-					
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-			};
-		});
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
+
+						adapter.setSelectedIndex(position);
+
+						updCant(vItem.Cod);
+
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+				};
+			});
 
 
-		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+			listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-					clsClasses.clsCFDV item = (clsClasses.clsCFDV) lvObj;
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsClasses.clsCFDV item = (clsClasses.clsCFDV) lvObj;
 
-					adapter.setSelectedIndex(position);
-					prodid=item.Cod;
-					
-					msgAskDelete("Eliminar registro");
-				} catch (Exception e) {
+						adapter.setSelectedIndex(position);
+						prodid=item.Cod;
+
+						msgAskDelete("Eliminar registro");
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+					return true;
 				}
-				return true;
-			}
-		});
-
-
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	    
 	}
 	
@@ -159,6 +183,7 @@ public class SolicInv extends PBase {
 				DT.moveToNext();pp++;
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox( e.getMessage());
 		}
 			 
@@ -177,48 +202,68 @@ public class SolicInv extends PBase {
 	
 	private void processItem(){
 		String pid;
-		
-		pid=((appGlobals) vApp).gstr;
-		if (mu.emptystr(pid)) return;
-		
-		prodid=pid;
-		
-		setCant();
+
+		try{
+			pid=((appGlobals) vApp).gstr;
+			if (mu.emptystr(pid)) return;
+
+			prodid=pid;
+
+			setCant();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void setCant(){
-		browse=2;
-		
-		itempos=-1;
-		((appGlobals) vApp).prod=prodid;
-		((appGlobals) vApp).gstr="";
-		Intent intent = new Intent(this,RecargCant.class);
-		startActivity(intent);
+		try{
+			browse=2;
+
+			itempos=-1;
+			((appGlobals) vApp).prod=prodid;
+			((appGlobals) vApp).gstr="";
+			Intent intent = new Intent(this,RecargCant.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void updCant(String itemid){
-		browse=2;	
-		prodid=itemid;
-		((appGlobals) vApp).prod=itemid;		
-		startActivity(new Intent(this,RecargCant.class));
+		try{
+			browse=2;
+			prodid=itemid;
+			((appGlobals) vApp).prod=itemid;
+			startActivity(new Intent(this,RecargCant.class));
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void processCant(){
-		double cnt;
-		String raz;
-		
-		cnt=((appGlobals) vApp).dval;
-		if (cnt<0) return;
-		
-		//if (cnt==0) {
-		//	toastcent("No puede ser guardada ni enviada solicitud de inventario en cero");return;
-		//}
+		try{
+			double cnt;
+			String raz;
 
-		raz=((appGlobals) vApp).devrazon;
-		ubas=((appGlobals) vApp).ubas;
-		cant=cnt;
-		
-		addItem(raz);
+			cnt=((appGlobals) vApp).dval;
+			if (cnt<0) return;
+
+			//if (cnt==0) {
+			//	toastcent("No puede ser guardada ni enviada solicitud de inventario en cero");return;
+			//}
+
+			raz=((appGlobals) vApp).devrazon;
+			ubas=((appGlobals) vApp).ubas;
+			cant=cnt;
+
+			addItem(raz);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void addItem(String raz){
@@ -227,6 +272,7 @@ public class SolicInv extends PBase {
 			sql="DELETE FROM D_SOLICINVD WHERE PRODUCTO='"+prodid+"'";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 	
 		try {
@@ -243,6 +289,7 @@ public class SolicInv extends PBase {
 	    	db.execSQL(ins.sql());
 	    	
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}	
 		
@@ -250,6 +297,7 @@ public class SolicInv extends PBase {
 			sql="DELETE FROM D_SOLICINVD WHERE CANT=0";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 		
@@ -266,6 +314,7 @@ public class SolicInv extends PBase {
 			toastcent("Solicitud preparada para envio.");			
 			super.finish();
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 		}			
 	}
@@ -281,86 +330,104 @@ public class SolicInv extends PBase {
 			super.finish();
 			toastcent("Solicitud borrada.");
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}	
 	}
 	
 	private void msgAskClear(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	clearData();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					clearData();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
 	private void msgAskComplete(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	saveDevol();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					saveDevol();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
 	private void msgAskDelete(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	try {
-					sql="DELETE FROM D_SOLICINVD WHERE PRODUCTO='"+prodid+"'";
-					db.execSQL(sql);
-					
-					prodid="";
-					listItems();
-				} catch (SQLException e) {
-					msgbox(e.getMessage());
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					try {
+						sql="DELETE FROM D_SOLICINVD WHERE PRODUCTO='"+prodid+"'";
+						db.execSQL(sql);
+
+						prodid="";
+						listItems();
+					} catch (SQLException e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+						msgbox(e.getMessage());
+					}
 				}
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
 			
 	}	
 
@@ -373,6 +440,7 @@ public class SolicInv extends PBase {
 				
 			return DT.getCount()>0;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
 		}	
 	}
@@ -386,6 +454,7 @@ public class SolicInv extends PBase {
 			dt.moveToFirst();		
 			corel=dt.getString(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			corel="0";
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
@@ -396,19 +465,20 @@ public class SolicInv extends PBase {
 	
 	@Override
 	protected void onResume() {
-	    super.onResume();	
-	 
-	    if (browse==1) {
-	    	browse=0;
-	    	processItem();return;
-	    }
-	   
-	    if (browse==2) {
-	    	browse=0;
-	    	processCant();return;
-	    }
-	    
+		try{
+			super.onResume();
+
+			if (browse==1) {
+				browse=0;
+				processItem();return;
+			}
+
+			if (browse==2) {
+				browse=0;
+				processCant();return;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
-		
-	
 }

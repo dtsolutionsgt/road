@@ -584,8 +584,11 @@ public class Venta extends PBase {
 			peso=mu.round(gl.dpeso*gl.umfactor,gl.peDec);
 		}
 
-
-		prodtot=mu.round(prec*cant,gl.peDec);
+		if (porpeso) {
+			prodtot=mu.round(gl.prectemp*peso,gl.peDec);
+		} else {
+			prodtot=mu.round(prec*cant,gl.peDec);
+		}
 
 		try {
 
@@ -595,17 +598,17 @@ public class Venta extends PBase {
 
 			ins.add("PRODUCTO",prodid);
 			ins.add("EMPRESA",emp);
-			ins.add("UM",gl.umpres);
+			if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
 			ins.add("CANT",cant);
 			if (rutatipo.equalsIgnoreCase("V")) ins.add("UMSTOCK",gl.umstock);else ins.add("UMSTOCK",gl.um);
 			if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
 			ins.add("FACTOR",gl.umfactor);
-			ins.add("PRECIO",prec);
+			if (porpeso) ins.add("PRECIO",gl.prectemp); else ins.add("PRECIO",prec);
 			ins.add("IMP",impval);
 			ins.add("DES",desc);
 			ins.add("DESMON",descmon);
 			ins.add("TOTAL",prodtot);
-			ins.add("PRECIODOC",precdoc);
+			if (porpeso) ins.add("PRECIODOC",gl.prectemp); else ins.add("PRECIODOC",precdoc);
 			ins.add("PESO",peso);
 			ins.add("VAL1",0);
 			ins.add("VAL2","");

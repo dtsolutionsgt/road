@@ -415,6 +415,7 @@ public class ProdCant extends PBase {
 		gl.umpres=upres;
 		gl.umstock=umstock;
 		gl.umfactor=umfactor;
+        gl.prectemp=prec;
 
 		hidekeyb();
 		super.finish();

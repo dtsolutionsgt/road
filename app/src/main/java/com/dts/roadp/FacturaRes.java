@@ -512,7 +512,7 @@ public class FacturaRes extends PBase {
 			ins.add("ADD2",gl.ref2);
 			ins.add("ADD3",gl.ref3);
 			
-			ins.add("DEPOS","");
+			ins.add("DEPOS","N");
 			ins.add("PEDCOREL","");
 			ins.add("REFERENCIA","");
 			ins.add("ASIGNACION","");    
@@ -767,7 +767,13 @@ public class FacturaRes extends PBase {
 					ins.add("COREL",corel);
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
-					ins.add("CANTIDAD",cantapl/factpres);
+
+					if (porpeso) {
+						ins.add("CANTIDAD",cantapl);
+					} else {
+						ins.add("CANTIDAD",cantapl/factpres);
+					}
+
 					ins.add("PESO",pesoapl);
 					ins.add("UMSTOCK",umstock);
 					ins.add("UMPESO",gl.umpeso);

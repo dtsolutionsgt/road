@@ -81,8 +81,8 @@ public class ComWS extends PBase {
 	
 	private static String sstr,fstr,fprog,finf,ferr,fterr,idbg,dbg,ftmsg,esql,ffpos;
 	private int scon,running,pflag,stockflag,conflag;
-	private String ftext,slsync,senv,gEmpresa,ActRuta,mac,fsql,fsqli,fsqlf;
-	private boolean rutapos,ftflag,esvacio;
+	private String ftext,slsync,senv,gEmpresa,ActRuta,mac,fsql,fsqli,fsqlf,strliqid;
+	private boolean rutapos,ftflag,esvacio,liqid;
 	
 	private final String NAMESPACE ="http://tempuri.org/";
 	private String METHOD_NAME,URL;
@@ -587,6 +587,7 @@ public class ComWS extends PBase {
 			wfile=new FileWriter(fname,false);
 			writer = new BufferedWriter(wfile);
 
+            db.execSQL("DELETE FROM P_LIQUIDACION");
 
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=2";	
 			DT=Con.OpenDT(sql);
@@ -832,7 +833,7 @@ public class ComWS extends PBase {
 		try {
 			
 			fprog=TN;idbg=TN;
-			wsRtask.onProgressUpdate();
+			//wsRtask.onProgressUpdate();
 			SQL=getTableSQL(TN);
 
 			if (fillTable(SQL,"DELETE FROM "+TN)==1) {
@@ -1200,6 +1201,11 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
+		if (TN.equalsIgnoreCase("P_LIQUIDACION")) {
+            SQL = "SELECT RUTA,ESTADO FROM P_LIQUIDACION WHERE (RUTA='" + ActRuta + "') AND (FECHA>='" + fsql + "') ";
+            return SQL;
+        }
+
 		return SQL;
 	}   
 	 
@@ -1536,6 +1542,14 @@ public class ComWS extends PBase {
 
 		senv = "Envío terminado \n \n";
 
+        if (!validaLiquidacion()) {
+            liqid = false;
+            senv = "La liquidación no está cerrada, no se puede enviar datos";
+            return false;
+        } else {
+            liqid=true;
+        }
+
 		items.clear();
 
 		envioFacturas();
@@ -1576,6 +1590,42 @@ public class ComWS extends PBase {
 
 		return true;
 	}
+
+	private boolean validaLiquidacion() {
+        Cursor DT;
+        String ss;
+
+        try {
+
+            db.execSQL("DELETE FROM P_LIQUIDACION");
+
+            AddTable("P_LIQUIDACION") ;
+
+            sql = listItems.get(0);
+            db.execSQL(sql);
+
+            sql = listItems.get(1);
+            db.execSQL(sql);
+
+            sql = "SELECT ESTADO FROM P_LIQUIDACION";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                ss=DT.getString(0);
+                if (ss.equalsIgnoreCase("Cerrada")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                 return false;
+            }
+        } catch (Exception e) {
+            strliqid = e.getMessage();
+            return false;
+        }
+    }
 
 	public void envioFacturas() {
 
@@ -2490,7 +2540,7 @@ public class ComWS extends PBase {
 
 		pendientes=validaPendientes();
 		visibilidadBotones();
-		
+
 		isbusy=0;
 	}
 			

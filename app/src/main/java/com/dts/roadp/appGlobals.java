@@ -16,7 +16,7 @@ public class appGlobals extends Application {
 	public String devtipo,devrazon,wsURL,bonprodid,pprodname,contrib,ateninistr,tcorel;
 	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,atentini,vnivel,vnivprec,media;
 	public int autocom,nuevaFecha,pagomodo,filtrocli;
-	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor;
+	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor,prectemp;
 	public boolean CellCom;
 	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov;
 

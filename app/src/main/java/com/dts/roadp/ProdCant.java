@@ -39,7 +39,8 @@ public class ProdCant extends PBase {
 		setContentView(R.layout.activity_prod_cant);
 		
 		super.InitBase();
-		
+		addlog("ProdCant",""+du.getActDateTime(),gl.vend);
+
 		setControls();
 				
 		prodid=gl.prod;lblCodProd.setText(prodid);
@@ -74,101 +75,131 @@ public class ProdCant extends PBase {
 	// Events
 	
 	public void sendCant(View view) {
-		if (setCant(false)<1) applyCant();
+		try{
+			if (setCant(false)<1) applyCant();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 	
 	public void showPromo(View view){
-		gl.gstr=prodid;
-		
-		Intent intent = new Intent(this,ListaPromo.class);
-		startActivity(intent);
+		try{
+			gl.gstr=prodid;
+
+			Intent intent = new Intent(this,ListaPromo.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void showPic(View view){
-		gl.gstr=proddesc;
-		gl.imgpath=prodimg;
-		
-		Intent intent = new Intent(this,PicView.class);
-		startActivity(intent);
+		try{
+			gl.gstr=proddesc;
+			gl.imgpath=prodimg;
+
+			Intent intent = new Intent(this,PicView.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void doDelete(View view) {
-		msgAskDel("Borrar producto");
+		try{
+			msgAskDel("Borrar producto");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 		
 	public void askExist(View view) {
-				
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		
-		dialog.setTitle("Existencias bodega");
-		dialog.setMessage("Actualizar existencias ?");
-					
-		dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {
-		    	browse=1;
-		    	startActivity(new Intent(ProdCant.this,ComWSExist.class));
-		    }
-		});
-		
-		dialog.setNegativeButton("Cancelar", null);
-		
-		dialog.show();
+
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Existencias bodega");
+			dialog.setMessage("Actualizar existencias ?");
+
+			dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					browse=1;
+					startActivity(new Intent(ProdCant.this,ComWSExist.class));
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", null);
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 	
  	private void setHandlers(){
 
-		txtCant.addTextChangedListener(new TextWatcher() {
-			 
-		   	public void afterTextChanged(Editable s) {}
-			 
-		   	public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
-			 
-		   	public void onTextChanged(CharSequence s, int start,int before, int count) {
-		   		setCant(true);
-		   	}
-		});	
-		
-		txtCant.setOnKeyListener(new OnKeyListener() {
-			@Override 
-		    public boolean onKey(View v, int keyCode, KeyEvent event) {
-		        if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-		            (keyCode == KeyEvent.KEYCODE_ENTER)) {
-			        	if (porpeso) {
-			        		txtPeso.requestFocus();
+		try{
+			txtCant.addTextChangedListener(new TextWatcher() {
+
+				public void afterTextChanged(Editable s) {}
+
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+
+				public void onTextChanged(CharSequence s, int start,int before, int count) {
+					setCant(true);
+				}
+			});
+
+			txtCant.setOnKeyListener(new OnKeyListener() {
+				@Override
+				public boolean onKey(View v, int keyCode, KeyEvent event) {
+					if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+							(keyCode == KeyEvent.KEYCODE_ENTER)) {
+						if (porpeso) {
+							txtPeso.requestFocus();
 							txtPeso.setSelection(0,txtPeso.length());
 						} else {
-			        		sendCant(v);
+							sendCant(v);
 						}
-		          return true;
-		        }
-		        return false;
-		    }
-		});
+						return true;
+					}
+					return false;
+				}
+			});
 
-        txtPeso.addTextChangedListener(new TextWatcher() {
+			txtPeso.addTextChangedListener(new TextWatcher() {
 
-            public void afterTextChanged(Editable s) {}
+				public void afterTextChanged(Editable s) {}
 
-            public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
 
-            public void onTextChanged(CharSequence s, int start,int before, int count) {
-                setPrecio();
-            }
-        });
+				public void onTextChanged(CharSequence s, int start,int before, int count) {
+					setPrecio();
+				}
+			});
 
 
-        txtPeso.setOnKeyListener(new OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                   (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    sendCant(v);
-                    return true;
-                }
-                return false;
-            }
-        });
+			txtPeso.setOnKeyListener(new OnKeyListener() {
+				@Override
+				public boolean onKey(View v, int keyCode, KeyEvent event) {
+					if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+							(keyCode == KeyEvent.KEYCODE_ENTER)) {
+						sendCant(v);
+						return true;
+					}
+					return false;
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
 	}
 		
 	
@@ -186,6 +217,7 @@ public class ProdCant extends PBase {
 			um=dt.getString(0);ubas=um;umfact=um;
 			lblBU.setText(ubas);gl.ubas=ubas;upres=ubas;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("1-"+ e.getMessage());
 		}
 	
@@ -207,6 +239,7 @@ public class ProdCant extends PBase {
 			if (dt.getString(7).equalsIgnoreCase("P")) pexist=true; else pexist=false;
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		    mu.msgbox("1-"+ e.getMessage());
 	    }
 
@@ -216,6 +249,7 @@ public class ProdCant extends PBase {
 			dt.moveToFirst();
 			deccant=dt.getInt(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			deccant=0;
 		}
 
@@ -238,6 +272,7 @@ public class ProdCant extends PBase {
 				}
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("3-"+ e.getMessage());
 		}
 
@@ -261,6 +296,7 @@ public class ProdCant extends PBase {
   			icant=dt.getDouble(0);
   			ippeso=dt.getDouble(1);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			icant=0;ippeso=0;
 	    }	
 
@@ -301,6 +337,7 @@ public class ProdCant extends PBase {
 		try {
 			txtCant.setSelection(txtCant.getText().length());
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
         txtPeso.setText(mu.frmdecimal(ippeso, gl.peDecImp));
@@ -323,7 +360,9 @@ public class ProdCant extends PBase {
 			ipeso=dt.getDouble(1);
 			pesostock=ipeso/disp;
 			if (disp>0) return disp;
-		} catch (Exception e){ }
+		} catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
 		
 		try {
 			sql="SELECT UNIDADMEDIDA FROM P_STOCK WHERE (CODIGO='"+prodid+"')";	
@@ -367,7 +406,8 @@ public class ProdCant extends PBase {
 			pesostock = ipeso/disp;
 			return disp;
 		} catch (Exception e) {
-	    }	
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+	    }
 		
 		return 0;
 	}
@@ -378,6 +418,7 @@ public class ProdCant extends PBase {
 	    	gl.dval=0;
 	    	super.finish();
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}	
 	}
@@ -385,19 +426,20 @@ public class ProdCant extends PBase {
 	private void applyCant() {
 		double ppeso=0;
 
-		if (cant<0){
-			mu.msgbox("Cantidad incorrecta");txtCant.requestFocus();return;
-		}
-
-		if (rutatipo.equalsIgnoreCase("V")) {
-			if (cant>idisp) {
-				mu.msgbox("Cantidad mayor que disponible.");txtCant.requestFocus();return;
+		try{
+			if (cant<0){
+				mu.msgbox("Cantidad incorrecta");txtCant.requestFocus();return;
 			}
-		}
 
-		if (porpeso) {
+			if (rutatipo.equalsIgnoreCase("V")) {
+				if (cant>idisp) {
+					mu.msgbox("Cantidad mayor que disponible.");txtCant.requestFocus();return;
+				}
+			}
 
-			String spp=txtPeso.getText().toString();
+			if (porpeso) {
+
+				String spp=txtPeso.getText().toString();
 
 			try {
 				ppeso=Double.parseDouble(spp);
@@ -420,48 +462,62 @@ public class ProdCant extends PBase {
 		gl.umfactor=umfactor;
         gl.prectemp=prec;
 
-		hidekeyb();
-		super.finish();
+			hidekeyb();
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 
 	// Update Disp
 	
 	public void updDisp(){
-		
-		gl.gstr=prodid;
-		browse=1;
-		
-		Intent intent = new Intent(this,ActDisp.class);
-		startActivity(intent);
+
+		try{
+			gl.gstr=prodid;
+			browse=1;
+
+			Intent intent = new Intent(this,ActDisp.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	
 	// Aux
 	
 	private void setControls() {
-		
-		txtCant= (EditText) findViewById(R.id.txtMonto);
-		txtPeso= (EditText) findViewById(R.id.txtPeso);txtPeso.setVisibility(View.INVISIBLE);
-		lblDesc=(TextView) findViewById(R.id.lblFecha);
-		lblCant=(TextView) findViewById(R.id.lblCant);
-		lblPrec=(TextView) findViewById(R.id.lblPNum);
-		lblDisp=(TextView) findViewById(R.id.lblDisp);		
-		lblBU=(TextView) findViewById(R.id.lblBU);
-		lblTot=(TextView) findViewById(R.id.textView1);lblTot.setText("");
-		lblDispLbl=(TextView) findViewById(R.id.textView8);
-		lblPesoUni=(TextView) findViewById(R.id.textView25);lblPesoUni.setVisibility(View.INVISIBLE);
-        lblPesoLbl=(TextView) findViewById(R.id.textView24); lblPesoLbl.setVisibility(View.INVISIBLE);
-		lblFactor=(TextView) findViewById(R.id.textView22);lblFactor.setVisibility(View.INVISIBLE);
-		lblCantPeso=(TextView) findViewById(R.id.textView21);lblCantPeso.setText("");lblCantPeso.setVisibility(View.INVISIBLE);
-		lblCodProd=(TextView) findViewById(R.id.txtRoadTit);
-		imgProd=(ImageView) findViewById(R.id.imgPFoto);
-		imgUpd=(ImageView) findViewById(R.id.imageView1);
-		imgDel=(ImageView) findViewById(R.id.imageView2);
+
+		try{
+			txtCant= (EditText) findViewById(R.id.txtMonto);
+			txtPeso= (EditText) findViewById(R.id.txtPeso);txtPeso.setVisibility(View.INVISIBLE);
+			lblDesc=(TextView) findViewById(R.id.lblFecha);
+			lblCant=(TextView) findViewById(R.id.lblCant);
+			lblPrec=(TextView) findViewById(R.id.lblPNum);
+			lblDisp=(TextView) findViewById(R.id.lblDisp);
+			lblBU=(TextView) findViewById(R.id.lblBU);
+			lblTot=(TextView) findViewById(R.id.textView1);lblTot.setText("");
+			lblDispLbl=(TextView) findViewById(R.id.textView8);
+			lblPesoUni=(TextView) findViewById(R.id.textView25);lblPesoUni.setVisibility(View.INVISIBLE);
+			lblPesoLbl=(TextView) findViewById(R.id.textView24); lblPesoLbl.setVisibility(View.INVISIBLE);
+			lblFactor=(TextView) findViewById(R.id.textView22);lblFactor.setVisibility(View.INVISIBLE);
+			lblCantPeso=(TextView) findViewById(R.id.textView21);lblCantPeso.setText("");lblCantPeso.setVisibility(View.INVISIBLE);
+			lblCodProd=(TextView) findViewById(R.id.txtRoadTit);
+			imgProd=(ImageView) findViewById(R.id.imgPFoto);
+			imgUpd=(ImageView) findViewById(R.id.imageView1);
+			imgDel=(ImageView) findViewById(R.id.imageView2);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}
 
-	
+
 	private int setCant(boolean mode){
 		double cu,tv,corig,cround,fruni,frcant,adcant,vpeso=0,opeso;
 		boolean ajust=false;
@@ -469,12 +525,14 @@ public class ProdCant extends PBase {
 		lblTot.setText("***");
 		if (mode) txtPeso.setText("0");
 
+
 		try {
-			cu=Double.parseDouble(txtCant.getText().toString());		
+			cu=Double.parseDouble(txtCant.getText().toString());
 			cant=cu;corig=cant;cround=Math.floor(cant);
 			esdecimal=corig!=cround;
 			cant=mu.round(cant,deccant);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			cant=-1;return -1;
 		}
 
@@ -511,6 +569,7 @@ public class ProdCant extends PBase {
             }
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			tv=0;mu.msgbox(e.getMessage());
 		}
 
@@ -521,6 +580,7 @@ public class ProdCant extends PBase {
 			tv=umfactor*cant;
 			lblCantPeso.setText(mu.frmdecimal(tv,gl.peDecImp)+" "+gl.umpeso);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			lblCantPeso.setText("");
 			mu.msgbox(e.getMessage());
 		}
@@ -585,6 +645,7 @@ public class ProdCant extends PBase {
 			}
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 
@@ -597,7 +658,9 @@ public class ProdCant extends PBase {
         try {
             ppeso=Double.parseDouble(txtPeso.getText().toString());
         } catch (Exception e) {
-        	if (porpeso) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+
+            if (porpeso) {
 				lblTot.setText("***");
 				if (!mu.emptystr(txtPeso.getText().toString())) mu.msgbox("Peso incorrecto");
 				return;
@@ -609,6 +672,7 @@ public class ProdCant extends PBase {
         try {
             tv=prec*ppeso;
         } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             tv=0;mu.msgbox(e.getMessage());
         }
 
@@ -618,17 +682,23 @@ public class ProdCant extends PBase {
             tv=umfactor*cant;
             lblCantPeso.setText(mu.frmdecimal(tv,gl.peDecImp)+" "+gl.umpeso);
         } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             lblCantPeso.setText("");
             mu.msgbox(e.getMessage());
         }
     }
 	
 	private void parseCant(double c) {
-		DecimalFormat frmdec = new DecimalFormat("#.####"); 
-		double ub;
-			
-		ub=c;
-		if (ub>0) txtCant.setText(frmdec.format(ub));
+		try{
+			DecimalFormat frmdec = new DecimalFormat("#.####");
+			double ub;
+
+			ub=c;
+			if (ub>0) txtCant.setText(frmdec.format(ub));
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 	
@@ -641,6 +711,7 @@ public class ProdCant extends PBase {
 			DT.moveToFirst();
 			return DT.getDouble(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return 0;
 	    }		
 	}
@@ -652,6 +723,7 @@ public class ProdCant extends PBase {
             porpeso=app.ventaPeso(prodid);
             esbarra=app.prodBarra(prodid);
         } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             porpeso=false;esbarra=false;
             msgbox(e.getMessage());
         }
@@ -672,98 +744,121 @@ public class ProdCant extends PBase {
     // Msg
 
 	private void msgSinPrecio(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
-					
-		dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	forceClose();
-		    }
-		});
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
+
+			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					forceClose();
+				}
+			});
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
 	public void msgAskUpd(View view) {
-		
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("Actualizar disponible ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	updDisp();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) { }
-		});
-		
-		dialog.show();
+
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("Actualizar disponible ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					updDisp();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { }
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
 	private void msgAskDel(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	delItem();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) { }
-		});
-		
-		dialog.show();
-			
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					delItem();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { }
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 
 	private void msgAskAjust(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
+			dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				applyCant();
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					applyCant();
+				}
+			});
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) { }
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { }
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	private void msgFactor(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle("Advertencia");
-		dialog.setMessage("¡" + msg + "!");
+			dialog.setTitle("Advertencia");
+			dialog.setMessage("¡" + msg + "!");
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {	
-				forceClose();
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					forceClose();
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
@@ -771,13 +866,18 @@ public class ProdCant extends PBase {
 	// Activity Events
 	
 	protected void onResume() {
-		
-	    super.onResume();
-	    
-	    if (browse==1) {
-	    	browse=0;
-	    	lblDisp.setText(mu.frmdec(getDispInv()));
-	    }
+
+		try{
+			super.onResume();
+
+			if (browse==1) {
+				browse=0;
+				lblDisp.setText(mu.frmdec(getDispInv()));
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 }

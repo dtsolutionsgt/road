@@ -32,6 +32,7 @@ public class DevolBodTol extends PBase {
         setContentView(R.layout.activity_devol_bod_tol);
 
         super.InitBase();
+        addlog("DevolBodTol",""+du.getActDateTime(),gl.vend);
 
         listView = (ListView) findViewById(R.id.listView1);
         lblReg = (TextView) findViewById(R.id.textView61);lblReg.setText("");
@@ -43,6 +44,7 @@ public class DevolBodTol extends PBase {
             sql="DELETE FROM P_STOCK WHERE CANT+CANTM=0";
             db.execSQL(sql);
         } catch (SQLException e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
         }
 
         rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp);
@@ -56,26 +58,32 @@ public class DevolBodTol extends PBase {
 
     private void setHandlers() {
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                try {
-                    Object lvObj = listView.getItemAtPosition(position);
-                    clsClasses.clsExist item = (clsClasses.clsExist) lvObj;
+        try{
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    try {
+                        Object lvObj = listView.getItemAtPosition(position);
+                        clsClasses.clsExist item = (clsClasses.clsExist) lvObj;
 
-                    adapter.setSelectedIndex(position);
-                } catch (Exception e) {
+                        adapter.setSelectedIndex(position);
+                    } catch (Exception e) {
+                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                    }
                 }
-            };
-        });
+            });
 
-        imgNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                browse=1;
-                startActivity(new Intent(DevolBodTol.this,DevolBodCan.class));
-            }
-        });
+            imgNext.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    browse=1;
+                    startActivity(new Intent(DevolBodTol.this,DevolBodCan.class));
+                }
+            });
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
 
     }
 
@@ -206,6 +214,7 @@ public class DevolBodTol extends PBase {
                 dp.moveToNext();
             }
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());
         }
 
@@ -224,18 +233,23 @@ public class DevolBodTol extends PBase {
 
     @Override
     protected void onResume() {
-        super.onResume();
+        try{
+            super.onResume();
 
-        if (gl.closeVenta) super.finish();
+            if (gl.closeVenta) super.finish();
 
-        if (browse==1) {
-            browse=0;
-            if (gl.closeVenta) {
-                gl.closeVenta=false;
-                super.finish();
+            if (browse==1) {
+                browse=0;
+                if (gl.closeVenta) {
+                    gl.closeVenta=false;
+                    super.finish();
+                }
+                return;
             }
-            return;
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
+
     }
 
     //endregion

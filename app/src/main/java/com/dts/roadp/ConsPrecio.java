@@ -37,6 +37,7 @@ public class ConsPrecio extends PBase {
 		setContentView(R.layout.activity_cons_precio);
 		
 		super.InitBase();
+		addlog("ConsPrecio",""+du.getActDateTime(),gl.vend);
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		txtFilter = (EditText) findViewById(R.id.txtMonto);
@@ -53,63 +54,69 @@ public class ConsPrecio extends PBase {
 	// Main
 	
 	private void setHandlers(){
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
-				try {
-					adapter.setSelectedIndex(position);
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-			};
-	    });
-	    
-	    
-	    txtFilter.addTextChangedListener(new TextWatcher() {
-		 
-	    	public void afterTextChanged(Editable s) {}
-		 
-	    	public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
-		 
-	    	public void onTextChanged(CharSequence s, int start,int before, int count) {
-	    		int tl;
-	    		
-	    		tl=txtFilter.getText().toString().length();
-	    		
-	    		if (tl==0 || tl>1) listItems();
-	    	}
-	    });	
-	    
-		spinNivel.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	TextView spinlabel;
-		    	String scod;
-		    	
-		    	try {
-		    		spinlabel=(TextView)parentView.getChildAt(0);
-			    	spinlabel.setTextColor(Color.BLACK);
-			    	spinlabel.setPadding(5, 0, 0, 0);
-			    	spinlabel.setTextSize(16);
-			    
-			    	scod=spincode.get(position);
-		    		nivel=Integer.parseInt(scod);
-		    		
-		    		listItems();
-		    	
-		         } catch (Exception e) {
-			   	   mu.msgbox(e.getMessage());
-		        }
-		
-		    }
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) {
-		        return;
-		    }
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+					try {
+						adapter.setSelectedIndex(position);
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+				};
+			});
 
-		});			
+
+			txtFilter.addTextChangedListener(new TextWatcher() {
+
+				public void afterTextChanged(Editable s) {}
+
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+
+				public void onTextChanged(CharSequence s, int start,int before, int count) {
+					int tl;
+
+					tl=txtFilter.getText().toString().length();
+
+					if (tl==0 || tl>1) listItems();
+				}
+			});
+
+			spinNivel.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+					TextView spinlabel;
+					String scod;
+
+					try {
+						spinlabel=(TextView)parentView.getChildAt(0);
+						spinlabel.setTextColor(Color.BLACK);
+						spinlabel.setPadding(5, 0, 0, 0);
+						spinlabel.setTextSize(16);
+
+						scod=spincode.get(position);
+						nivel=Integer.parseInt(scod);
+
+						listItems();
+
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox(e.getMessage());
+					}
+
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) {
+					return;
+				}
+
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 		
 	}
 	
@@ -160,6 +167,7 @@ public class ConsPrecio extends PBase {
 			  DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox(e.getMessage());
 	    }
 			 
@@ -192,6 +200,7 @@ public class ConsPrecio extends PBase {
 			}
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}
 
@@ -203,6 +212,7 @@ public class ConsPrecio extends PBase {
 		try {
 			spinNivel.setSelection(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			nivel=0;
 		}
 

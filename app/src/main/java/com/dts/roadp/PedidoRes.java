@@ -67,6 +67,7 @@ public class PedidoRes extends PBase {
 		setContentView(R.layout.activity_pedido_res);
 		
 		super.InitBase();
+		addlog("PedidoRes",""+du.getActDateTime(),gl.vend);
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		txtDir = (EditText) findViewById(R.id.txtMonto);
@@ -130,13 +131,18 @@ public class PedidoRes extends PBase {
 		totalOrder();
 		
 		if (descg>0) {
-			final Handler handler = new Handler();
-			handler.postDelayed(new Runnable() {
-			  @Override
-			  	public void run() {
-				  showPromo();
-			  	}
-			}, 300);
+			try{
+				final Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						showPromo();
+					}
+				}, 300);
+
+			}catch (Exception e){
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			}
 		}
 	}
 	
@@ -150,44 +156,55 @@ public class PedidoRes extends PBase {
 			Intent intent = new Intent(this,DescBon.class);
 			startActivity(intent);	
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox( e.getMessage());
 		}
 		
 	}
 	
 	private void updDesc(){
-		descg=gl.promdesc;
-		descgmon=(double) (stot0*descg/100);		
-		totalOrder();	
+		try{
+			descg=gl.promdesc;
+			descgmon=(double) (stot0*descg/100);
+			totalOrder();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void totalOrder(){
 		double dmaxmon;
 		
 		cleandprod=false;
-		
-		if (acum) {
-			dfinmon=descpmon+descgmon;
-			cleandprod=false;	
-		} else {
-			if (descpmon>=descgmon) {
-				dfinmon=descpmon;
+
+		try{
+			if (acum) {
+				dfinmon=descpmon+descgmon;
 				cleandprod=false;
-			} else {	
-				dfinmon=descgmon;
-				cleandprod=true;
+			} else {
+				if (descpmon>=descgmon) {
+					dfinmon=descpmon;
+					cleandprod=false;
+				} else {
+					dfinmon=descgmon;
+					cleandprod=true;
+				}
 			}
+
+			dmaxmon=(double) (stot0*dmax/100);
+			if (dmax>0) {
+				if (dfinmon>dmaxmon) dfinmon=dmax;
+			}
+
+			descmon=mu.round2(dfinmon);
+			stot=mu.round2(stot0);
+
+			fillTotals();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		dmaxmon=(double) (stot0*dmax/100);
-		if (dmax>0) {
-			if (dfinmon>dmaxmon) dfinmon=dmax;	
-		}
-			
-		descmon=mu.round2(dfinmon);
-		stot=mu.round2(stot0);
-		
-		fillTotals();
+
 	}
 	
 	private void fillTotals() {
@@ -253,6 +270,7 @@ public class PedidoRes extends PBase {
 			}
 					
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 		
 		adapter=new ListAdaptTotals(this,items);
@@ -260,27 +278,32 @@ public class PedidoRes extends PBase {
 	}
 	
  	private void finishOrder(){
-		
-		if (!saveOrder()) return;
-		
-		clsBonifSave bonsave=new clsBonifSave(this,corel,"P");
-		
-		bonsave.ruta=gl.ruta;
- 		bonsave.cliente=gl.cliente;
- 		bonsave.fecha=fecha;
- 		bonsave.emp=gl.emp;
-		
-		bonsave.save();
-		
-		if (prn.isEnabled()) {
-			pdoc.buildPrint(corel,0);
-			prn.printask(printclose);
+
+		try{
+			if (!saveOrder()) return;
+
+			clsBonifSave bonsave=new clsBonifSave(this,corel,"P");
+
+			bonsave.ruta=gl.ruta;
+			bonsave.cliente=gl.cliente;
+			bonsave.fecha=fecha;
+			bonsave.emp=gl.emp;
+
+			bonsave.save();
+
+			if (prn.isEnabled()) {
+				pdoc.buildPrint(corel,0);
+				prn.printask(printclose);
+			}
+
+			gl.closeCliDet=true;
+			gl.closeVenta=true;
+
+			//super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		gl.closeCliDet=true;
-		gl.closeVenta=true;
-		
-		//super.finish();
+
 		
 	}
  	
@@ -375,8 +398,10 @@ public class PedidoRes extends PBase {
 			db.endTransaction();
 			 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
-		   	mu.msgbox( e.getMessage());return false;
+		   	mu.msgbox( e.getMessage());
+		   	return false;
 		}
 		
 		try {
@@ -386,6 +411,7 @@ public class PedidoRes extends PBase {
 	
 			db.execSQL(upd.SQL());
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}	
 		
@@ -410,6 +436,7 @@ public class PedidoRes extends PBase {
 			
 			return DT.getDouble(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			tot=0;
 			mu.msgbox( e.getMessage());return 0;
 		}	
@@ -455,6 +482,7 @@ public class PedidoRes extends PBase {
 	
 			db.execSQL(ins.sql());
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//MU.msgbox("Error : " + e.getMessage());
 		}	
 		
@@ -464,65 +492,86 @@ public class PedidoRes extends PBase {
 	// Date
 
 	public void showDateDialog(View view) {
-	    /*DialogFragment newFragment = new DatePickerFragment();
+		try{
+		/*DialogFragment newFragment = new DatePickerFragment();
 	    //newFragment.show(getSupportFragmentManager(), "datePicker");*/
-	    obtenerFecha();
+			obtenerFecha();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void obtenerFecha(){
-		DatePickerDialog recogerFecha = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-			@Override
-			public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-				final int mesActual = month + 1;
-				String diaFormateado = (dayOfMonth < 10)? CERO + String.valueOf(dayOfMonth):String.valueOf(dayOfMonth);
-				String mesFormateado = (mesActual < 10)? CERO + String.valueOf(mesActual):String.valueOf(mesActual);
-				lblFecha.setText(diaFormateado + BARRA + mesFormateado + BARRA + year);
-			}
-		},anio, mes, dia);
+		try{
+			DatePickerDialog recogerFecha = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+				@Override
+				public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+					final int mesActual = month + 1;
+					String diaFormateado = (dayOfMonth < 10)? CERO + String.valueOf(dayOfMonth):String.valueOf(dayOfMonth);
+					String mesFormateado = (mesActual < 10)? CERO + String.valueOf(mesActual):String.valueOf(mesActual);
+					lblFecha.setText(diaFormateado + BARRA + mesFormateado + BARRA + year);
+				}
+			},anio, mes, dia);
 
-		recogerFecha.show();
+			recogerFecha.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void setActDate(){
-		final Calendar c = Calendar.getInstance();
-		cyear = c.get(Calendar.YEAR);
-		cmonth = c.get(Calendar.MONTH)+1;
-		cday = c.get(Calendar.DAY_OF_MONTH);
-		fecha=du.cfecha(cyear,cmonth,cday);
+		try{
+			final Calendar c = Calendar.getInstance();
+			cyear = c.get(Calendar.YEAR);
+			cmonth = c.get(Calendar.MONTH)+1;
+			cday = c.get(Calendar.DAY_OF_MONTH);
+			fecha=du.cfecha(cyear,cmonth,cday);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	
 	// Aux
 	
 	private void adjustSpinner(){
-		
-		spinList.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	TextView spinlabel;
-		    	String scod;
-		    	
-		    	try {
-		    		spinlabel=(TextView)parentView.getChildAt(0);
-			    	spinlabel.setTextColor(Color.BLACK);
-			    	spinlabel.setPadding(5, 0, 0, 0);
-			    	spinlabel.setTextSize(18);
-			    
-			    	scod=spname.get(position);
-		    		txtDir.setText(scod);
-		   
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-		
-		    }
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) {
-		        return;
-		    }
+		try{
+			spinList.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+					TextView spinlabel;
+					String scod;
 
-		});	
+					try {
+						spinlabel=(TextView)parentView.getChildAt(0);
+						spinlabel.setTextColor(Color.BLACK);
+						spinlabel.setPadding(5, 0, 0, 0);
+						spinlabel.setTextSize(18);
+
+						scod=spname.get(position);
+						txtDir.setText(scod);
+
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) {
+					return;
+				}
+
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}	
 
@@ -538,6 +587,7 @@ public class PedidoRes extends PBase {
 			
 			spname.add(DT.getString(0));
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			spname.add("");txtDir.setText("");
 			mu.msgbox( e.getMessage());
 	    }		
@@ -554,6 +604,7 @@ public class PedidoRes extends PBase {
 			  DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }
 		
@@ -563,25 +614,32 @@ public class PedidoRes extends PBase {
 		try {
 			spinList.setAdapter(dataAdapter);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	
 	}
 	
 	public void askSave(View view) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle("Road");
-		dialog.setMessage("Guardar pedido ?");
-					
-		dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	finishOrder();
-		    }
-		});
-		
-		dialog.setNegativeButton("Salir", null);
-		
-		dialog.show();
+
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("Guardar pedido ?");
+
+			dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					finishOrder();
+				}
+			});
+
+			dialog.setNegativeButton("Salir", null);
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
@@ -599,32 +657,38 @@ public class PedidoRes extends PBase {
            	DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) imgBon.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    }			
 	}
 	
 	private void askPrint() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle("Road");
-		dialog.setMessage("Impresion correcta ?");
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {	
-		    	
-				gl.closeCliDet=true;
-				gl.closeVenta=true;
-				PedidoRes.super.finish();		
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	singlePrint();
-		    }
-		});
-		
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("Impresion correcta ?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+
+					gl.closeCliDet=true;
+					gl.closeVenta=true;
+					PedidoRes.super.finish();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					singlePrint();
+				}
+			});
+
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 
@@ -634,15 +698,20 @@ public class PedidoRes extends PBase {
 	
 	@Override
 	protected void onResume() {
-	    super.onResume();
-	    
-	    checkPromo();
-	    
-	    if (browse==1) {
-	    	browse=0;
-	    	if (gl.promapl) updDesc();
-	    	return;
-	    }
+		try{
+			super.onResume();
+
+			checkPromo();
+
+			if (browse==1) {
+				browse=0;
+				if (gl.promapl) updDesc();
+				return;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	
 	}	
 	

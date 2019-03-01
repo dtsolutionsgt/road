@@ -27,6 +27,7 @@ public class DevolBodCan extends PBase {
         setContentView(R.layout.activity_devol_bod_can);
 
         super.InitBase();
+        addlog("DevolBodCan",""+du.getActDateTime(),gl.vend);
 
         listView = (ListView) findViewById(R.id.listView1);
         lblReg = (TextView) findViewById(R.id.textView61);lblReg.setText("");
@@ -42,27 +43,38 @@ public class DevolBodCan extends PBase {
     //region Events
 
     public void doSave(View view) {
-        if (!validaDevolucion()) {
-            msgbox("La devolución está vacia, no se puede aplicar");
-        } else {
-            msgAskSave("Aplicar la devolución");
+        try{
+            if (!validaDevolucion()) {
+                msgbox("La devolución está vacia, no se puede aplicar");
+            } else {
+                msgAskSave("Aplicar la devolución");
+            }
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
+
     }
 
     private void setHandlers() {
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                try {
-                    Object lvObj = listView.getItemAtPosition(position);
-                    //clsClasses.clsExist item = (clsClasses.clsExist) lvObj;
+        try{
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    try {
+                        Object lvObj = listView.getItemAtPosition(position);
+                        //clsClasses.clsExist item = (clsClasses.clsExist) lvObj;
 
-                    //adapter.setSelectedIndex(position);
-                } catch (Exception e) {
+                        //adapter.setSelectedIndex(position);
+                    } catch (Exception e) {
+                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                    }
                 }
-            };
-        });
+            });
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
 
     }
 
@@ -143,6 +155,7 @@ public class DevolBodCan extends PBase {
             gl.closeVenta=true;
             finish();
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             db.endTransaction();
             mu.msgbox( e.getMessage());
         }
@@ -163,6 +176,7 @@ public class DevolBodCan extends PBase {
 
             cantstock=dt.getCount();
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
             return false;
         }
@@ -171,22 +185,27 @@ public class DevolBodCan extends PBase {
     }
 
     private void msgAskSave(String msg) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-        dialog.setTitle("Devolución a bodega");
-        dialog.setMessage("¿" + msg + "?");
+            dialog.setTitle("Devolución a bodega");
+            dialog.setMessage("¿" + msg + "?");
 
-        dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                save();
-            }
-        });
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    save();
+                }
+            });
 
-        dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {}
-        });
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {}
+            });
 
-        dialog.show();
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
 
     }
 

@@ -38,6 +38,7 @@ public class InvBodega extends PBase {
 		setContentView(R.layout.activity_inv_bodega);
 		
 		super.InitBase();
+		addlog("InvBodega",""+du.getActDateTime(),gl.vend);
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		txtFilter = (EditText) findViewById(R.id.txtMonto);
@@ -57,33 +58,39 @@ public class InvBodega extends PBase {
 	}
 
 	private void setHandlers(){
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
-				try {
-					adapter.setSelectedIndex(position);
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-			};
-	    });
-	    
-	    
-	    txtFilter.addTextChangedListener(new TextWatcher() {
-		 
-	    	public void afterTextChanged(Editable s) {}
-		 
-	    	public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
-		 
-	    	public void onTextChanged(CharSequence s, int start,int before, int count) {
-	    		int tl;
-	    		
-	    		tl=txtFilter.getText().toString().length();
-	    		
-	    		if (tl==0 || tl>1) listItems();
-	    	}
-	    });		
+
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+					try {
+						adapter.setSelectedIndex(position);
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+				};
+			});
+
+
+			txtFilter.addTextChangedListener(new TextWatcher() {
+
+				public void afterTextChanged(Editable s) {}
+
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+
+				public void onTextChanged(CharSequence s, int start,int before, int count) {
+					int tl;
+
+					tl=txtFilter.getText().toString().length();
+
+					if (tl==0 || tl>1) listItems();
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}
 	
@@ -128,6 +135,7 @@ public class InvBodega extends PBase {
 			  DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }
 			 
@@ -138,34 +146,44 @@ public class InvBodega extends PBase {
 	// Actualizacon
 	
 	public void updDisp(){
-		
-		((appGlobals) vApp).gstr="*";
-		browse=1;
-		
-		Intent intent = new Intent(this,ActDisp.class);
-		startActivity(intent);
+
+		try{
+			((appGlobals) vApp).gstr="*";
+			browse=1;
+
+			Intent intent = new Intent(this,ActDisp.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void msgAskUpd(View view) {
-		
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("Actualizar inventario ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	updDisp();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) { }
-		});
-		
-		dialog.show();
+
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("Actualizar inventario ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					updDisp();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { }
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
@@ -173,18 +191,23 @@ public class InvBodega extends PBase {
 	
 	protected void onResume() {
 		String rslt;
-		
-	    super.onResume();
-	    
-	    if (browse==1) {
-	    	browse=0;
-	    	rslt=((appGlobals) vApp).gstr;
-	    	
-	    	if (rslt.equalsIgnoreCase("&")) {
-	    		listItems();
-	    		Toast.makeText(this,"Inventario actualizado.", Toast.LENGTH_SHORT).show();
-	    	}
-	    }
+
+		try{
+			super.onResume();
+
+			if (browse==1) {
+				browse=0;
+				rslt=((appGlobals) vApp).gstr;
+
+				if (rslt.equalsIgnoreCase("&")) {
+					listItems();
+					Toast.makeText(this,"Inventario actualizado.", Toast.LENGTH_SHORT).show();
+				}
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 }

@@ -57,6 +57,7 @@ public class LicRegis extends PBase {
 		setContentView(R.layout.activity_lic_regis);
 				
 		super.InitBase();
+		addlog("LicRegis",""+du.getActDateTime(),gl.vend);
 		
 		System.setProperty("line.separator","\r\n");
 		
@@ -105,18 +106,23 @@ public class LicRegis extends PBase {
 	// Main
 	
 	public void runSend() {
-		
-		if (isbusy==1) {return;}
-		
-		if (!setComParams()) return;
-		
-		isbusy=1;
-			
-		barInfo.setVisibility(View.VISIBLE);barInfo.invalidate();
-		lblInfo.setText("Conectando ...");
-			
-		wsStask = new AsyncCallSend();
-		wsStask.execute();
+
+		try{
+			if (isbusy==1) {return;}
+
+			if (!setComParams()) return;
+
+			isbusy=1;
+
+			barInfo.setVisibility(View.VISIBLE);barInfo.invalidate();
+			lblInfo.setText("Conectando ...");
+
+			wsStask = new AsyncCallSend();
+			wsStask.execute();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 	
@@ -195,6 +201,7 @@ public class LicRegis extends PBase {
 	        
 	        return 1;
 	    } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    	
 	    	idbg=idbg+" ERR "+e.getMessage();
 	    	return 0;
@@ -244,6 +251,7 @@ public class LicRegis extends PBase {
 	        sstr = s;
 	        return 0;
 	    } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    	sstr=e.getMessage(); 
 	    }
 
@@ -295,6 +303,7 @@ public class LicRegis extends PBase {
 	 
 	        return 1;
 	    } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    	sstr=e.getMessage(); 
 	    }
 		
@@ -329,6 +338,7 @@ public class LicRegis extends PBase {
 	        	        
 	        return 1;
 	    } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		    sstr=e.getMessage();          
 	    }
 		
@@ -339,12 +349,17 @@ public class LicRegis extends PBase {
 	// +++ WEB SERVICE - ENVIO
 	
 	private boolean sendData(){
-		
-		senv="Registracion enviada \n \n";
-		
-		items.clear();
-		envioRegist();
-		
+
+		try{
+			senv="Registracion enviada \n \n";
+
+			items.clear();
+			envioRegist();
+
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 		return true;
 	}
 	
@@ -367,6 +382,7 @@ public class LicRegis extends PBase {
 				fstr=sstr;fterr+="\n"+sstr;					
 			}	
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			fstr=e.getMessage();
 			fterr+="\n"+e.getMessage();
 		}
@@ -386,6 +402,7 @@ public class LicRegis extends PBase {
 			items.add(item);
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	}
 	
@@ -408,27 +425,33 @@ public class LicRegis extends PBase {
 			}
 					
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			scon=0;
 			fstr="No se puede conectar al web service. "+e.getMessage();
 		}
 	}
 			
 	public void wsSendFinished(){
-				
-		barInfo.setVisibility(View.INVISIBLE);
-		lblParam.setVisibility(View.INVISIBLE);
-		running=0;
-		
-		if (fstr.equalsIgnoreCase("Sync OK")) {
-			lblInfo.setText(" ");
-		} else {	
-			lblInfo.setText(fstr);	
-			mu.msgbox(fstr+"\n"+fterr);
-		}
-		
-		mu.msgbox(senv);
 
-		isbusy=0;
+		try{
+			barInfo.setVisibility(View.INVISIBLE);
+			lblParam.setVisibility(View.INVISIBLE);
+			running=0;
+
+			if (fstr.equalsIgnoreCase("Sync OK")) {
+				lblInfo.setText(" ");
+			} else {
+				lblInfo.setText(fstr);
+				mu.msgbox(fstr+"\n"+fterr);
+			}
+
+			mu.msgbox(senv);
+
+			isbusy=0;
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 			
 	private class AsyncCallSend extends AsyncTask<String, Void, Void> {
@@ -439,6 +462,7 @@ public class LicRegis extends PBase {
 			try {
 				wsSendExecute();
 			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			}
 	            
 	        return null;
@@ -446,13 +470,19 @@ public class LicRegis extends PBase {
 	 
 	    @Override
 	    protected void onPostExecute(Void result) {
-	       	wsSendFinished();
+			try{
+				wsSendFinished();
+			}catch (Exception e){
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			}
+
 	    }
 	 
         @Override
         protected void onPreExecute() {
     		try {
-    		} catch (Exception e) {}
+    		} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");}
         }
 	 
         @Override
@@ -460,6 +490,7 @@ public class LicRegis extends PBase {
     		try {
     			lblInfo.setText(fprog);
     		} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
     		}
         }
 	 
@@ -469,20 +500,25 @@ public class LicRegis extends PBase {
 	// Aux
 		
 	public void askSend(View view) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle("Registro");
-		dialog.setMessage("Enviar registro ?");
-					
-		dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	runSend();
-		    }
-		});
-		
-		dialog.setNegativeButton("Cancelar", null);
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Registro");
+			dialog.setMessage("Enviar registro ?");
+
+			dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					runSend();
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", null);
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
@@ -509,6 +545,7 @@ public class LicRegis extends PBase {
 			URL=wsurl;
 			txtWS.setText(URL);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//MU.msgbox(e.getMessage());
 			URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
 			//txtWS.setText("");
@@ -519,30 +556,35 @@ public class LicRegis extends PBase {
 	
 	private boolean setComParams() {
 		String ss;
-		
-		ss=txtRuta.getText().toString().trim();
-		if (mu.emptystr(ss)) {
-			mu.msgbox("La ruta no esta definida.");return false;
-		}	
-		ActRuta=ss;
-		
-		ss=txtEmp.getText().toString().trim();
-		if (mu.emptystr(ss)) {
-			mu.msgbox("La empresa no esta definida.");return false;
+
+		try{
+			ss=txtRuta.getText().toString().trim();
+			if (mu.emptystr(ss)) {
+				mu.msgbox("La ruta no esta definida.");return false;
+			}
+			ActRuta=ss;
+
+			ss=txtEmp.getText().toString().trim();
+			if (mu.emptystr(ss)) {
+				mu.msgbox("La empresa no esta definida.");return false;
+			}
+			gEmpresa=ss;
+
+			ss=txtWS.getText().toString().trim();
+			if (mu.emptystr(ss) || ss.equalsIgnoreCase("*")) {
+				mu.msgbox("La direccion de Web service no esta definida.");return false;
+			}
+			URL=ss;
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		gEmpresa=ss;
-		
-		ss=txtWS.getText().toString().trim();
-		if (mu.emptystr(ss) || ss.equalsIgnoreCase("*")) {
-			mu.msgbox("La direccion de Web service no esta definida.");return false;
-		}
-		URL=ss;
+
 		
 		return true;
 	}
 	
-	private String getMac() {		
-		WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+	private String getMac() {
+		WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 		WifiInfo info = manager.getConnectionInfo();
 		return info.getMacAddress();
 	}
@@ -563,6 +605,7 @@ public class LicRegis extends PBase {
 			s2=sp[4];v2=Integer.parseInt(s2,16);
 			s3=sp[5];v3=Integer.parseInt(s3,16);		
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return 0;
 		}
 
@@ -579,6 +622,7 @@ public class LicRegis extends PBase {
 			val=lickey+appid+mval;
 			return Integer.toHexString(val).toUpperCase();
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return "*";
 		}
 	}
@@ -591,6 +635,7 @@ public class LicRegis extends PBase {
 			val=lickey+appid+mval;
 			return Integer.toHexString(val).toUpperCase();
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return "*";
 		}
 	}
@@ -602,6 +647,7 @@ public class LicRegis extends PBase {
 			val = val+lickey + maskid;
 			return Integer.toHexString(val).toUpperCase();
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return "*";
 		}  
 	}
@@ -611,9 +657,14 @@ public class LicRegis extends PBase {
 	
 	@Override
 	public void onBackPressed() {
-	   if (isbusy==0) {
-		   super.onBackPressed();
-	   }
+		try{
+			if (isbusy==0) {
+				super.onBackPressed();
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}		
 	
 	

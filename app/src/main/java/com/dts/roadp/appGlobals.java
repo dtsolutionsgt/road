@@ -58,7 +58,5 @@ public class appGlobals extends Application {
 	public Printer mPrinter=null;
 	public boolean mPrinterSet=false;
 	public String mPrinterIP;
-	
-	
-		
+
 }

@@ -30,6 +30,7 @@ public class RepesajeLista extends PBase {
         setContentView(R.layout.activity_repesaje_lista);
 
         super.InitBase();
+        addlog("RepesajeLista",""+du.getActDateTime(),gl.vend);
 
         listView = (ListView) findViewById(R.id.listView1);
 
@@ -56,8 +57,13 @@ public class RepesajeLista extends PBase {
     // Events
 
     public void repesaje(View view) {
-        browse=1;
-        startActivity(new Intent(this,Repesaje.class));
+        try{
+            browse=1;
+            startActivity(new Intent(this,Repesaje.class));
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
     public void exit(View view) {
@@ -66,21 +72,27 @@ public class RepesajeLista extends PBase {
 
     private void setHandlers() {
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                try {
-                    Object lvObj = listView.getItemAtPosition(position);
-                    clsClasses.clsCD vItem = (clsClasses.clsCD) lvObj;
+        try{
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    try {
+                        Object lvObj = listView.getItemAtPosition(position);
+                        clsClasses.clsCD vItem = (clsClasses.clsCD) lvObj;
 
-                    prodid = vItem.Cod;
-                    adapter.setSelectedIndex(position);
+                        prodid = vItem.Cod;
+                        adapter.setSelectedIndex(position);
 
-                } catch (Exception e) {
-                    mu.msgbox(e.getMessage());
+                    } catch (Exception e) {
+                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                        mu.msgbox(e.getMessage());
+                    }
                 }
-            }
-       });
+            });
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
 
     }
 
@@ -88,7 +100,11 @@ public class RepesajeLista extends PBase {
     // Main
 
     private void listItems() {
-        if (esbarra) listItemsBarra();else listItemsSingle();
+        try{
+            if (esbarra) listItemsBarra();else listItemsSingle();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
     }
 
     private void listItemsSingle() {
@@ -116,6 +132,7 @@ public class RepesajeLista extends PBase {
             lblTot.setText(mu.frmdecimal(DT.getDouble(1),2));
 
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());
         }
 
@@ -124,6 +141,11 @@ public class RepesajeLista extends PBase {
     }
 
     private void listItemsBarra() {
+        try{
+
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
 
     }
 
@@ -134,12 +156,17 @@ public class RepesajeLista extends PBase {
 
     @Override
     protected void onResume() {
-        super.onResume();
+        try{
+            super.onResume();
 
-        if (browse==1) {
-            browse=0;
-            listItems();return;
+            if (browse==1) {
+                browse=0;
+                listItems();return;
+            }
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
+
 
     }
 }

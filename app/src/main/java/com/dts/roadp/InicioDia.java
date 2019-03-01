@@ -56,6 +56,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
         imgIniciar.setOnClickListener(this);
 
         super.InitBase();
+        addlog("InicioDia",""+du.getActDateTime(),gl.vend);
 
         seleccionFecha = false;
         setActDate();
@@ -79,62 +80,83 @@ public class InicioDia extends PBase implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.imgCalendario:
-                obtenerFecha();
-                break;
-
-            case R.id.imgSiguiente:
-                try {
-                    askFinalizar();
+        try{
+            switch (v.getId()){
+                case R.id.imgCalendario:
+                    obtenerFecha();
                     break;
-                }catch (Exception e){
-                    mu.msgbox("InicioDia Imp: "+e.getMessage());
-                }
+
+                case R.id.imgSiguiente:
+                    try {
+                        askFinalizar();
+                        break;
+                    }catch (Exception e){
+                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                        mu.msgbox("InicioDia Imp: "+e.getMessage());
+                    }
+            }
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
+
     }
 
     private void obtenerFecha(){
 
-        DatePickerDialog recogerFecha = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                final int mesActual = month + 1;
-                String diaFormateado = (dayOfMonth < 10)? CERO + String.valueOf(dayOfMonth):String.valueOf(dayOfMonth);
-                String mesFormateado = (mesActual < 10)? CERO + String.valueOf(mesActual):String.valueOf(mesActual);
-                etFecha.setText(diaFormateado + BARRA + mesFormateado + BARRA + year);
-                yy = year;mm = mesFormateado; dd = diaFormateado;
-                seleccionFecha = true;
-            }
-        },anio, mes, dia);
+        try{
+            DatePickerDialog recogerFecha = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                    final int mesActual = month + 1;
+                    String diaFormateado = (dayOfMonth < 10)? CERO + String.valueOf(dayOfMonth):String.valueOf(dayOfMonth);
+                    String mesFormateado = (mesActual < 10)? CERO + String.valueOf(mesActual):String.valueOf(mesActual);
+                    etFecha.setText(diaFormateado + BARRA + mesFormateado + BARRA + year);
+                    yy = year;mm = mesFormateado; dd = diaFormateado;
+                    seleccionFecha = true;
+                }
+            },anio, mes, dia);
 
-        recogerFecha.show();
+            recogerFecha.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
     private void setActDate(){
-        final Calendar c = Calendar.getInstance();
-        cyear = c.get(Calendar.YEAR);
-        cmonth = c.get(Calendar.MONTH)+1;
-        cday = c.get(Calendar.DAY_OF_MONTH);
-        fecha=du.cfecha(cyear,cmonth,cday);
+        try{
+            final Calendar c = Calendar.getInstance();
+            cyear = c.get(Calendar.YEAR);
+            cmonth = c.get(Calendar.MONTH)+1;
+            cday = c.get(Calendar.DAY_OF_MONTH);
+            fecha=du.cfecha(cyear,cmonth,cday);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
     private void askFinalizar() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-        dialog.setTitle("Road");
-        dialog.setMessage("¿Esta seguro de cambiar la fecha de las factura e imprimir el invetario disponible?");
+            dialog.setTitle("Road");
+            dialog.setMessage("¿Esta seguro de cambiar la fecha de las factura e imprimir el invetario disponible?");
 
-        dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                printDoc();
-                fechaNueva();
-            }
-        });
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    printDoc();
+                    fechaNueva();
+                }
+            });
 
-        dialog.setNegativeButton("Cancelar", null);
+            dialog.setNegativeButton("Cancelar", null);
 
-        dialog.show();
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
 
     }
 
@@ -158,6 +180,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
             }
 
         }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             mu.msgbox("fechaNueva: " + e.getMessage());
         }
 
@@ -166,7 +189,11 @@ public class InicioDia extends PBase implements View.OnClickListener{
     ////////////////// Proceso para impresión //////////////////
 
     public void printDoc() {
-        if (doc.buildPrint("0",0)) prn.printask();
+        try{
+            if (doc.buildPrint("0",0)) prn.printask();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
     }
 
     private class clsDocExist extends clsDocument {
@@ -203,6 +230,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
 
                 return true;
             } catch (Exception e) {
+                addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
                 return false;
             }
 
@@ -220,6 +248,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
                 rep.add("");rep.add("");rep.add("");
                 return true;
             } catch (Exception e) {
+                addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
                 return false;
             }
 
@@ -244,6 +273,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
             }
 
         }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox("obtenerCorel: "+e.getMessage());
         }
     }
@@ -326,6 +356,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
                 DT.moveToNext();
             }
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());
         }
 
@@ -335,7 +366,12 @@ public class InicioDia extends PBase implements View.OnClickListener{
 
     @Override
     protected void onResume() {
-        super.onResume();
+        try{
+            super.onResume();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
 }

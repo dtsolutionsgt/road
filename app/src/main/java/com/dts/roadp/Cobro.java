@@ -45,7 +45,8 @@ public class Cobro extends PBase {
 		setContentView(R.layout.activity_cobro);
 		
 		super.InitBase();
-		
+		addlog("Cobro",""+du.getActDateTime(),gl.vend);
+
 		listView = (ListView) findViewById(R.id.listView1);
 		lblSel = (TextView) findViewById(R.id.textView7);
 		lblPag = (TextView) findViewById(R.id.lblCEmit);
@@ -86,38 +87,54 @@ public class Cobro extends PBase {
 	
 	public void paySelect(View view) {
 
-		calcSelected();
+		try{
+			calcSelected();
 
-		if (tsel==0) {
-			mu.msgbox("Total a pagar = 0, debe seleccionar un documento");return;
+			if (tsel==0) {
+				mu.msgbox("Total a pagar = 0, debe seleccionar un documento");return;
+			}
+
+			gl.pagomodo=0;
+			gl.pagoval=tsel;
+			gl.pagolim=plim;
+			gl.pagocobro=true;
+			browse=1;
+
+			Intent intent = new Intent(this,Pago.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		gl.pagomodo=0;
-		gl.pagoval=tsel;
-		gl.pagolim=plim;
-		gl.pagocobro=true;
-		browse=1;
-		
-		Intent intent = new Intent(this,Pago.class);
-		startActivity(intent);	
 	}
 	
 	public void payCash(View view) {
 
-		calcSelected();
+		try{
+			calcSelected();
 
-		if (tsel==0) {
-			mu.msgbox("Total a pagar = 0, debe seleccionar un documento");return;
+			if (tsel==0) {
+				mu.msgbox("Total a pagar = 0, debe seleccionar un documento");return;
+			}
+
+			inputEfectivo();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		inputEfectivo();  
+
 	}
 	
 	public void doExit(View view){
-		exit();
+
+		try{
+			exit();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 
 	public void checkAll(View view) {
+	    try{
         for (int i = 0; i <items.size(); i++) {
             items.get(i).flag=1;
             dtipo=items.get(i).Tipo;
@@ -131,68 +148,90 @@ public class Cobro extends PBase {
 
         }
 
-        adapter.refreshItems();
+			adapter.refreshItems();
 
-        calcSelected();
-        showTotals();
+			calcSelected();
+			showTotals();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	public void checkNone(View view) {
 
-		for (int i = 0; i <items.size(); i++) {
-			items.get(i).flag=0;
+		try{
+			for (int i = 0; i <items.size(); i++) {
+				items.get(i).flag=0;
+			}
+
+			adapter.refreshItems();
+
+			calcSelected();
+			showTotals();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		adapter.refreshItems();
-
-		calcSelected();
-		showTotals();
 	}
 
 	public void sinRef(View view) {
-		gl.pagomodo=1;
-		gl.pagoval=0;
-		gl.pagolim=0;
-		gl.pagocobro=true;
-		browse=1;
+		try{
+			gl.pagomodo=1;
+			gl.pagoval=0;
+			gl.pagolim=0;
+			gl.pagocobro=true;
+			browse=1;
 
-		Intent intent = new Intent(this,Pago.class);
-		startActivity(intent);
+			Intent intent = new Intent(this,Pago.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	private void setHandlers(){
 
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				int flag;
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-					clsClasses.clsCobro vItem = (clsClasses.clsCobro) lvObj;
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					int flag;
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsClasses.clsCobro vItem = (clsClasses.clsCobro) lvObj;
 
-					adapter.setSelectedIndex(position);
+						adapter.setSelectedIndex(position);
 
 					dtipo=vItem.Tipo;
 					if (dtipo.equalsIgnoreCase("R")) clearAll();
+						dtipo=vItem.Tipo;
+						if (dtipo.equalsIgnoreCase("R")) clearAll();
 
-					flag = vItem.flag;
-					if (flag == 0) flag = 1;
-					else flag = 0;
-					vItem.flag = flag;
+						flag = vItem.flag;
+						if (flag == 0) flag = 1;
+						else flag = 0;
+						vItem.flag = flag;
 
-					adapter.refreshItems();
+						adapter.refreshItems();
 
-					calcSelected();
-					showTotals();
+						calcSelected();
+						showTotals();
 
-				} catch (Exception e) {
-					mu.msgbox(e.getMessage());
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox(e.getMessage());
+					}
 				}
-			}
 
-			;
-		});
+				;
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 
@@ -241,6 +280,7 @@ public class Cobro extends PBase {
 			}
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox(e.getMessage());
 	    }
 			 
@@ -252,19 +292,24 @@ public class Cobro extends PBase {
 	}	
 	
 	private void createDoc(){
-		if (gl.pagomodo==0) {
-			docList();
-			if (!applyPay()) return;
-		}
-
-
-	if (saveCobro()) {
-			listItems();
-			if (prn.isEnabled()) {
-				fdoc.buildPrint(corel,0);
-				prn.printask(printclose);
+		try{
+			if (gl.pagomodo==0) {
+				docList();
+				if (!applyPay()) return;
 			}
+
+
+			if (saveCobro()) {
+				listItems();
+				if (prn.isEnabled()) {
+					fdoc.buildPrint(corel,0);
+					prn.printask(printclose);
+				}
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 
 	}
 	
@@ -378,6 +423,8 @@ public class Cobro extends PBase {
 
 				}
 
+
+
 				ins.add("ITEM",DT.getInt(0));
 				ins.add("ANULADO","N");
 				ins.add("EMPRESA",gl.emp);
@@ -430,6 +477,7 @@ public class Cobro extends PBase {
 
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 		   	mu.msgbox(e.getMessage());return false;
 		}
@@ -450,6 +498,7 @@ public class Cobro extends PBase {
 			return DT.getString(0) + StringUtils.right("000000" + Integer.toString(cor), 6);
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return gl.ruta+"_"+mu.getCorelBase();
 		}
 	}
@@ -487,6 +536,7 @@ public class Cobro extends PBase {
 			}		
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox(e.getMessage());
 	    }	
 		
@@ -537,6 +587,7 @@ public class Cobro extends PBase {
 			return true;
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox(e.getMessage());return false;
 	    }
 		
@@ -546,37 +597,42 @@ public class Cobro extends PBase {
 	// Pago Efectivo
 	
 	private void inputEfectivo() {
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		alert.setTitle("Pago Efectivo");
-		alert.setMessage("Valor a pagar");
-		
-		final EditText input = new EditText(this);
-		alert.setView(input);
-		
-		input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);	
-		input.setText(""+mu.round2(tsel));
-		input.requestFocus();
-		
-		showkeyb();
-		
-		alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				peexit=false;
-		    	sefect=input.getText().toString();
-		    	//closekeyb();
-		    	checkCash();
-		  	}
-		});
+			alert.setTitle("Pago Efectivo");
+			alert.setMessage("Valor a pagar");
 
-		alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				peexit=true;
-				closekeyb();
-			}
-		});
+			final EditText input = new EditText(this);
+			alert.setView(input);
 
-		alert.show();
+			input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			input.setText(""+mu.round2(tsel));
+			input.requestFocus();
+
+			showkeyb();
+
+			alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					peexit=false;
+					sefect=input.getText().toString();
+					//closekeyb();
+					checkCash();
+				}
+			});
+
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					peexit=true;
+					closekeyb();
+				}
+			});
+
+			alert.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void checkCash() {
@@ -614,7 +670,8 @@ public class Cobro extends PBase {
 			msgAskSave("Aplicar pago y crear un recibo");
 			
 		} catch (Exception e) {
-			inputEfectivo(); 
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			inputEfectivo();
 			mu.msgbox("Pago incorrecto"+e.getMessage());	   	
 	    }
 		
@@ -624,7 +681,11 @@ public class Cobro extends PBase {
 	// Impresion
 	
 	private void singlePrint() {
- 		prn.printask(printcallback);
+		try{
+			prn.printask(printcallback);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
  	}
 	
 	
@@ -632,51 +693,67 @@ public class Cobro extends PBase {
 	// Aux
 	
 	private void showTotals(){
-		lblSel.setText(mu.frmcur(tsel));
-		lblPag.setText(mu.frmcur(tpag));
-		
-		tpend=tsel-tpag;
-		plim=ttot-tpag;
-		
-		if (tpend>=0) {
-			lblPend.setText(mu.frmcur(tpend));
-		} else {	
-			lblPend.setText(mu.frmcur(0));
+		try{
+			lblSel.setText(mu.frmcur(tsel));
+			lblPag.setText(mu.frmcur(tpag));
+
+			tpend=tsel-tpag;
+			plim=ttot-tpag;
+
+			if (tpend>=0) {
+				lblPend.setText(mu.frmcur(tpend));
+			} else {
+				lblPend.setText(mu.frmcur(0));
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 
 	}
 	
 	private void calcSelected() {
-		clsClasses.clsCobro vItem;
-		Object lvObj;
-		int flag,dc;
-		double val;
-		
-		tsel=0;
-		
-		try {
-			dc=adapter.getCount();
-		} catch (Exception e) {
-		   return;
-		}
-			
-		for (int i = 0; i < dc; i++ ) {
-			lvObj = listView.getItemAtPosition(i);
-			vItem = (clsClasses.clsCobro)lvObj;
-				
-			flag=vItem.flag;
-			if (flag==1) {
-				val=vItem.Saldo;
-				tsel+=val;
+		try{
+			clsClasses.clsCobro vItem;
+			Object lvObj;
+			int flag,dc;
+			double val;
+
+			tsel=0;
+
+			try {
+				dc=adapter.getCount();
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				return;
 			}
-		}		
+
+			for (int i = 0; i < dc; i++ ) {
+				lvObj = listView.getItemAtPosition(i);
+				vItem = (clsClasses.clsCobro)lvObj;
+
+				flag=vItem.flag;
+				if (flag==1) {
+					val=vItem.Saldo;
+					tsel+=val;
+				}
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}
 
 	private void clearAll() {
-		for (int i = 0; i < items.size(); i++ ) {
-			items.get(i).flag=0;
+		try{
+			for (int i = 0; i < items.size(); i++ ) {
+				items.get(i).flag=0;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}
 
 	private double getDocPago(String doc,String ptipo){
@@ -691,6 +768,7 @@ public class Cobro extends PBase {
 			
 			tp=DT.getDouble(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	tp=0;
 	    }	
 		
@@ -706,6 +784,7 @@ public class Cobro extends PBase {
 			db.execSQL(sql);
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox(e.getMessage());
 	    }
 	}
@@ -728,6 +807,7 @@ public class Cobro extends PBase {
 			ca=DT.getInt(3);
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			fcorel=0;fserie="";
 			mu.msgbox("No esta definido correlativo de recibos.");return false;
 		}	
@@ -739,109 +819,133 @@ public class Cobro extends PBase {
 	}
 	
 	private void askPrint() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle("Road");
-		dialog.setMessage("Impresión correcta ?");
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {	
-					Cobro.super.finish();		
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	singlePrint();
-		    }
-		});
-		
-		
-		dialog.show();
-			
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("Impresión correcta ?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					Cobro.super.finish();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					singlePrint();
+				}
+			});
+
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void exit() {
-		showTotals();
-		if(tpend>0) {
-			msgAskExit("Tiene documentos pendientes de pago. Salir");
-		} else {
-			finish();
+		try{
+			showTotals();
+			if(tpend>0) {
+				msgAskExit("Tiene documentos pendientes de pago. Salir");
+			} else {
+				finish();
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}
 
 	
 	// MsgDialogs
 	
 	private void msgAskOverPayd(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("¿" + msg  + "?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	msgAskSave("Aplicar pago y crear un recibo");
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	closekeyb();
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg  + "?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					msgAskSave("Aplicar pago y crear un recibo");
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					closekeyb();
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
 	private void msgAskSave(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("¿" + msg + "?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	createDoc();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	closekeyb();
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg + "?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					createDoc();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					closekeyb();
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 
 	private void msgAskExit(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("¿" + msg + "?");
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg + "?");
 
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				finish();
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					finish();
+				}
+			});
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				closekeyb();
-			}
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					closekeyb();
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
@@ -850,20 +954,30 @@ public class Cobro extends PBase {
 	
 	@Override
  	protected void onResume() {
-	    super.onResume();
-	    
-	    if (browse==1) {
-	    	browse=0;
-	    	//closekeyb();
-	    	
-	    	if (gl.pagado) createDoc();
-	    }
+		try{
+			super.onResume();
+
+			if (browse==1) {
+				browse=0;
+				//closekeyb();
+
+				if (gl.pagado) createDoc();
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	    
 	}
 
 	@Override
 	public void onBackPressed() {
-		exit();
+		try{
+			exit();
+		}catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
 	}
 	
 }

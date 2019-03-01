@@ -92,6 +92,7 @@ public class CliDet extends PBase {
 		setContentView(R.layout.activity_cli_det);
 		
 		super.InitBase();
+		addlog("CliDet",""+du.getActDateTime(),gl.vend);
 		
 		lblNom= (TextView) findViewById(R.id.lblNom);
 		lblRep= (TextView) findViewById(R.id.lblPres);
@@ -152,25 +153,30 @@ public class CliDet extends PBase {
 
 	public void tomarFoto(View view){
 		int codResult = 1;
+		try{
+			if (!this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+				msgbox("El dispositivo no soporta toma de foto");return;
+			}
 
-		if (!this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-		    msgbox("El dispositivo no soporta toma de foto");return;
-        }
+			StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+			StrictMode.setVmPolicy(builder.build());
 
-        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-        StrictMode.setVmPolicy(builder.build());
+			try {
 
-		try {
+				Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+				File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+				intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
+				startActivityForResult(intento1,codResult);
 
-			Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-			intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
-			startActivityForResult(intento1,codResult);
-
+			}catch (Exception e){
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				//mu.msgbox("tomarFoto: "+ e.getMessage());
+				mu.msgbox("No se puede activar la camara. ");
+			}
 		}catch (Exception e){
-			//mu.msgbox("tomarFoto: "+ e.getMessage());
-			mu.msgbox("No se puede activar la camara. ");
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 
 	}
 
@@ -201,6 +207,7 @@ public class CliDet extends PBase {
 			}
 
 		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("inputFachada: " + e.getMessage());
 		}
 
@@ -227,6 +234,7 @@ public class CliDet extends PBase {
 				File archivo = new File(path);
 				imgRoadTit.setImageURI(Uri.fromFile(archivo));
 			}catch (Exception e){
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				//mu.msgbox("onActivityResult: " + e.getMessage());
 			}
 
@@ -289,36 +297,43 @@ public class CliDet extends PBase {
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox(e.getMessage());
 	    }
 		
 	}
 		
 	private void calcCredit() {
-			
-		NumberFormat format = NumberFormat.getInstance(); 
-		format.setGroupingUsed(true);
-		format.setMaximumFractionDigits(0);
-		
-		lblCLim.setText("-");lblCUsed.setText("-");lblCDisp.setText("-");
-		
-		cused=getUsedCred();
-		cdisp=clim-cused;if (cdisp<0) cdisp=0;
-		gl.credito=cdisp;
-		
-		lblCLim.setText(mu.frmcur(clim));
-		lblCUsed.setText(mu.frmcur(cused));
-		lblCDisp.setText(mu.frmcur(cdisp));
-		
-		if (cused==0) {
-			lblCobro.setVisibility(View.INVISIBLE);
-			imgCobro.setVisibility(View.INVISIBLE);			
+
+
+		try{
+			NumberFormat format = NumberFormat.getInstance();
+			format.setGroupingUsed(true);
+			format.setMaximumFractionDigits(0);
+
+			lblCLim.setText("-");lblCUsed.setText("-");lblCDisp.setText("-");
+
+			cused=getUsedCred();
+			cdisp=clim-cused;if (cdisp<0) cdisp=0;
+			gl.credito=cdisp;
+
+			lblCLim.setText(mu.frmcur(clim));
+			lblCUsed.setText(mu.frmcur(cused));
+			lblCDisp.setText(mu.frmcur(cdisp));
+
+			if (cused==0) {
+				lblCobro.setVisibility(View.INVISIBLE);
+				imgCobro.setVisibility(View.INVISIBLE);
+			}
+
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				lblCobro.setVisibility(View.VISIBLE);
+				imgCobro.setVisibility(View.VISIBLE);
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		if (gl.peModal.equalsIgnoreCase("TOL")) {
-			lblCobro.setVisibility(View.VISIBLE);
-			imgCobro.setVisibility(View.VISIBLE);
-		}
 				
 	}
 	
@@ -340,17 +355,23 @@ public class CliDet extends PBase {
 			
 			cu=tsal-tpg;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	cu=0;mu.msgbox(e.getMessage());
 	    }	
 		return cu;
 	}
 	
 	private void initVenta(){
-		if (gl.peModal.equalsIgnoreCase("APR")) {	
-			startActivity(new Intent(this,Aprofam1.class));	
-		} else {	
-			startActivity(new Intent(this,Venta.class));	
+		try{
+			if (gl.peModal.equalsIgnoreCase("APR")) {
+				startActivity(new Intent(this,Aprofam1.class));
+			} else {
+				startActivity(new Intent(this,Venta.class));
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}
 	
 	private boolean validaVenta() {
@@ -406,6 +427,7 @@ public class CliDet extends PBase {
 			}
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("No esta definido correlativo de factura. No se puede continuar con la venta.\n"); //+e.getMessage());
 			return false;
 		}	
@@ -442,6 +464,7 @@ public class CliDet extends PBase {
 			}
 
 		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("inputFachada: " + e.getMessage());
 		}
 	}
@@ -463,30 +486,35 @@ public class CliDet extends PBase {
 
 	public void inputFachada(){
 
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		final ImageView imgFachada = new ImageView(this);
-		imgFachada.setScaleType(CENTER_CROP);
+			final ImageView imgFachada = new ImageView(this);
+			imgFachada.setScaleType(CENTER_CROP);
 
 
-        if(imgPath == true) {
-			Bitmap bitmap1 = BitmapFactory.decodeFile(path);
-			imgFachada.setImageBitmap(redimensionarImagen(bitmap1, 640, 360));
-		}else if(imgDB == true) {
-			byte[] btImagen = Base64.decode(imagenbase64, Base64.DEFAULT);
-			Bitmap bitm = BitmapFactory.decodeByteArray(btImagen,0,btImagen.length);
-			imgFachada.setImageBitmap(redimensionarImagen(bitm,640,360));
+			if(imgPath == true) {
+				Bitmap bitmap1 = BitmapFactory.decodeFile(path);
+				imgFachada.setImageBitmap(redimensionarImagen(bitmap1, 640, 360));
+			}else if(imgDB == true) {
+				byte[] btImagen = Base64.decode(imagenbase64, Base64.DEFAULT);
+				Bitmap bitm = BitmapFactory.decodeByteArray(btImagen,0,btImagen.length);
+				imgFachada.setImageBitmap(redimensionarImagen(bitm,640,360));
+			}
+
+			alert.setView(imgFachada);
+
+			alert.show();
+
+			imgFachada.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					zoomFoto = new PhotoViewAttacher(imgFachada);
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		alert.setView(imgFachada);
-
-		alert.show();
-
-		imgFachada.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				zoomFoto = new PhotoViewAttacher(imgFachada);
-			}
-		});
 
 	}
 
@@ -504,11 +532,17 @@ public class CliDet extends PBase {
 		//Float cantidad;
 		//gl.rutatipo="V";
 
-		if (!validaVenta()) return;
+		try{
+			if (!validaVenta()) return;
 
-		if(porcentaje == false) {
-			VerificaCantidad();
+			if(porcentaje == false) {
+				VerificaCantidad();
+			}
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 
 		//#HS_20181129_1033 lo agregue en funcion VerificaCantidad.
 		//Asigna conexión actual a la forma de Existencias.
@@ -528,113 +562,148 @@ public class CliDet extends PBase {
 		//Asigna conexión actual a la forma de Existencias.
 		Existencia.Con = Con;
 		cantidad = Float.valueOf(Existencia.CantExistencias());
-		if(cantidad == 0){
-			mu.msgbox("No hay existencias disponibles.");
-		}else{
-			runVenta();
+
+		try{
+			if(cantidad == 0){
+				mu.msgbox("No hay existencias disponibles.");
+			}else{
+				runVenta();
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
+
 	}
 
 	public void showPreventa(View view) {
-		gl.rutatipo="P";
-		runVenta();
+		try{
+			gl.rutatipo="P";
+			runVenta();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	public void showDespacho(View view) {
-		mu.msgbox("La funcionalidad no esta implementada.");
+		try{
+			mu.msgbox("La funcionalidad no esta implementada.");
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 		//gl.rutatipo="D";
 		//runVenta();
 	}
 
 	private void runVenta() {
 
-		if (merc==1) {
-			browse=1;
-			Intent intent = new Intent(this,MercLista.class);
-			startActivity(intent);
-		} else {
-			initVenta();
+		try{
+			if (merc==1) {
+				browse=1;
+				Intent intent = new Intent(this,MercLista.class);
+				startActivity(intent);
+			} else {
+				initVenta();
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}
 
 	public void showDir(View view) {
-		//mu.msgbox(lblDir.getText().toString() + "\n" + lblRep.getText().toString());
-		msgAskEditCliente();
+		try{
+			//mu.msgbox(lblDir.getText().toString() + "\n" + lblRep.getText().toString());
+			msgAskEditCliente();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void msgAskEditCliente() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle("Road");
-		dialog.setMessage("¿Quiere editar datos del cliente?");
+			dialog.setTitle("Road");
+			dialog.setMessage("¿Quiere editar datos del cliente?");
 
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				inputCliente();
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					inputCliente();
+				}
+			});
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				closekeyb();
-			}
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					closekeyb();
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 
 	}
 
 	//#HS_20181207 Cuadro de dialogo para editar datos del cliente
 	private void inputCliente() {
 
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		alert.setTitle("Editar Cliente");
+			alert.setTitle("Editar Cliente");
 
-		final LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
+			final LinearLayout layout = new LinearLayout(this);
+			layout.setOrientation(LinearLayout.VERTICAL);
 
-		final TextView lblNombre = new TextView(this);
-		lblNombre.setTextSize(10);
-		lblNombre.setText("Nombre:");
+			final TextView lblNombre = new TextView(this);
+			lblNombre.setTextSize(10);
+			lblNombre.setText("Nombre:");
 
-		final TextView lblNit = new TextView(this);
-		lblNit.setTextSize(10);
-		lblNit.setText("NIT:");
+			final TextView lblNit = new TextView(this);
+			lblNit.setTextSize(10);
+			lblNit.setText("NIT:");
 
-		final EditText editNombre = new EditText(this);
-		editNombre.setInputType(InputType.TYPE_CLASS_TEXT);
-		editNombre.setText(lblDir.getText().toString());
+			final EditText editNombre = new EditText(this);
+			editNombre.setInputType(InputType.TYPE_CLASS_TEXT);
+			editNombre.setText(lblDir.getText().toString());
 
-		final EditText editNit = new EditText(this);
-		editNit.setInputType(InputType.TYPE_CLASS_TEXT);
-		editNit.setText(lblRep.getText().toString());
+			final EditText editNit = new EditText(this);
+			editNit.setInputType(InputType.TYPE_CLASS_TEXT);
+			editNit.setText(lblRep.getText().toString());
 
-		layout.addView(lblNombre);
-		layout.addView(editNombre);
-		layout.addView(lblNit);
-		layout.addView(editNit);
+			layout.addView(lblNombre);
+			layout.addView(editNombre);
+			layout.addView(lblNit);
+			layout.addView(editNit);
 
-		alert.setView(layout);
+			alert.setView(layout);
 
-		alert.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				String corel=mu.getCorelBase();
-				gl.fnombre = editNombre.getText().toString();
-				gl.fnit = editNit.getText().toString();
-				ActualizarCliente(corel,gl.fnombre, gl.fnit);
-			}
-		});
+			alert.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					String corel=mu.getCorelBase();
+					gl.fnombre = editNombre.getText().toString();
+					gl.fnit = editNit.getText().toString();
+					ActualizarCliente(corel,gl.fnombre, gl.fnit);
+				}
+			});
 
-		alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
 
-			}
-		});
+				}
+			});
 
-		alert.show();
+			alert.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	//#HS_20181211 agregue funcion para actualizar los campos de Nombre y NIT del cliente
@@ -644,22 +713,38 @@ public class CliDet extends PBase {
 			db.execSQL("INSERT INTO D_FACTURAF(COREL, NOMBRE, NIT, DIRECCION) VALUES('"+corel+"','"+NombreEdit+"','"+NitEdit+"','')");
 			mu.msgbox("Registro actualizado");
 		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("ActualizarCliente: "+e.getMessage());
 		}
 	}
 
 	public void setGPS(View view) {
-		browse=2;
-		startActivity(new Intent(this,CliGPS.class));
+		try{
+			browse=2;
+			startActivity(new Intent(this,CliGPS.class));
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	public void showCredit(View viev){
-		Intent intent = new Intent(this,Cobro.class);
-		startActivity(intent);
+		try{
+			Intent intent = new Intent(this,Cobro.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	public void showDevol(View view){
-		msgAskTipoDev("Devolucion de producto en estado ... ");
+		try{
+			msgAskTipoDev("Devolucion de producto en estado ... ");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	public void sendSMS(View view){
@@ -674,7 +759,8 @@ public class CliDet extends PBase {
 		try {
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("sms:"+to)));
 		} catch (Exception e) {
-			msgbox("No pudo enviar mensaje : "+e.getMessage());
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		msgbox("No pudo enviar mensaje : "+e.getMessage());
 		}
 
 		//try {
@@ -703,6 +789,7 @@ public class CliDet extends PBase {
 			startActivity(callIntent);
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			msgbox("No pudo llamar : "+e.getMessage());
 		}
 
@@ -722,7 +809,8 @@ public class CliDet extends PBase {
 			String url = "waze://?ll=14.6017278,-90.5236343";
 			Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( url ) );
 			startActivity( intent );
-		} catch ( ActivityNotFoundException ex  )	{
+		} catch ( ActivityNotFoundException ex )	{
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
 			Intent intent =
 					new Intent( Intent.ACTION_VIEW, Uri.parse( "market://details?id=com.waze" ) );
 			startActivity(intent);
@@ -731,53 +819,70 @@ public class CliDet extends PBase {
 	}
 
 	private void msgAskTipoDev(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
 
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setPositiveButton("Bueno", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				setDevType("B");
-			}
-		});
+			dialog.setPositiveButton("Bueno", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					setDevType("B");
+				}
+			});
 
-		dialog.setNegativeButton("Malo", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				setDevType("M");
-			}
-		});
+			dialog.setNegativeButton("Malo", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					setDevType("M");
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
 
 	}
 
 	private void msgAskVenta() {
 
-		AlertDialog.Builder dialog1 = new  AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog1 = new  AlertDialog.Builder(this);
 
-		dialog1.setTitle("Road");
-		dialog1.setMessage("Quedan menos del 25% de correlativos disponibles.");
+			dialog1.setTitle("Road");
+			dialog1.setMessage("Quedan menos del 25% de correlativos disponibles.");
 
-		dialog1.setIcon(R.drawable.ic_quest);
+			dialog1.setIcon(R.drawable.ic_quest);
 
-		dialog1.setPositiveButton("Enterado", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				porcentaje = false;
-				VerificaCantidad();
-			}
-		});
+			dialog1.setPositiveButton("Enterado", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					porcentaje = false;
+					VerificaCantidad();
+				}
+			});
 
-		dialog1.show();
+			dialog1.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
 
 	}
 
 	private void setDevType(String tdev) {
-		gl.devtipo=tdev;
-		Intent intent = new Intent(this,DevolCli.class);
-		startActivity(intent);
+		try{
+			gl.devtipo=tdev;
+			Intent intent = new Intent(this,DevolCli.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void habilitaOpciones() {
@@ -802,14 +907,21 @@ public class CliDet extends PBase {
 
 		}catch (Exception ex)
 		{
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
 			Log.d("habilitaOpciones_err", ex.getMessage());
 		}
 	}
 
 	protected void toastcent(String msg) {
-		Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_LONG);
-		toast.setGravity(Gravity.CENTER, 0, 0);
-		toast.show();
+
+		try{
+			Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_LONG);
+			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 
@@ -817,44 +929,67 @@ public class CliDet extends PBase {
 	
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
-		super.onSaveInstanceState(savedInstanceState);
-		
-		savedInstanceState.putString("CLIID", cod);
+
+		try{
+			super.onSaveInstanceState(savedInstanceState);
+
+			savedInstanceState.putString("CLIID", cod);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		
-		String cliid=savedInstanceState.getString("CLIID");
-		
-		//Toast.makeText(this, "Restored from a shitty crash : "+cliid, Toast.LENGTH_SHORT).show();
+
+		try{
+			super.onRestoreInstanceState(savedInstanceState);
+
+			String cliid=savedInstanceState.getString("CLIID");
+
+			//Toast.makeText(this, "Restored from a shitty crash : "+cliid, Toast.LENGTH_SHORT).show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}
 
 	@Override
 	protected void onResume() {
-	    super.onResume();
-	    
-	    if (gl.closeCliDet) super.finish();
-	    
-	    calcCredit();
-	    
-	    if (browse==1) {
-	    	browse=0;
-	    	initVenta();return;
-	    }
-	    
-	    if (browse==2) {
-	    	browse=0;
-	    	showData();return;
-	    }
+
+		try{
+			super.onResume();
+
+			if (gl.closeCliDet) super.finish();
+
+			calcCredit();
+
+			if (browse==1) {
+				browse=0;
+				initVenta();return;
+			}
+
+			if (browse==2) {
+				browse=0;
+				showData();return;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	@Override
 	protected void onPause() {
-	    super.onPause();
+		try{
+			super.onPause();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 
 }

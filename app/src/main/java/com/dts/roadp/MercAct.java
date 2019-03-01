@@ -38,6 +38,7 @@ public class MercAct extends PBase {
 		setContentView(R.layout.activity_merc);
 
 		super.InitBase();
+		addlog("MercAct",""+du.getActDateTime(),gl.vend);
 
 		listView = (ListView) findViewById(R.id.listView1);
 		
@@ -59,27 +60,33 @@ public class MercAct extends PBase {
 	// Main
 	
 	private void setHandlers(){
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
-				
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-					clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
-		           	
-					adapter.setSelectedIndex(position);
-		    		
-					tipoid=vItem.id;
-					pid=vItem.Sid;
-					
-					showRespDialog();
-					
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-			}
-	    });
+
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
+
+						adapter.setSelectedIndex(position);
+
+						tipoid=vItem.id;
+						pid=vItem.Sid;
+
+						showRespDialog();
+
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	    
 	}
 	
@@ -126,6 +133,7 @@ public class MercAct extends PBase {
 				  }
 			  
 			  } catch (Exception ex) {
+				  addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
 				  s=".....";
 		      }
 			  
@@ -140,6 +148,7 @@ public class MercAct extends PBase {
 			  DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }
 			 
@@ -152,7 +161,9 @@ public class MercAct extends PBase {
 		try {
 			sql="DELETE FROM D_MEREQUIPO WHERE CLIENTE='"+cliid+"' AND SERIAL='"+pid+"' AND FECHA="+fecha;
 			db.execSQL(sql);
-		} catch (SQLException e) {}
+		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
 		
 		try {
 			ins.init("D_MEREQUIPO");
@@ -168,6 +179,7 @@ public class MercAct extends PBase {
 	    	db.execSQL(ins.sql());
 	    	
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}	
 		
@@ -201,11 +213,13 @@ public class MercAct extends PBase {
 				  lcode.add(code);
 				  lname.add(name);
 			  } catch (Exception e) {
+				  addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 				  mu.msgbox(e.getMessage()); 
 			  }
 			  DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }
 		
@@ -218,32 +232,39 @@ public class MercAct extends PBase {
 	    for (int i = 0; i < lname.size(); i++) {
 	    	selitems[i] = lname.get(i);
 	    }
-		    
-	    mMenuDlg = new AlertDialog.Builder(this);
-	    mMenuDlg.setTitle("Estado");	    	
-					
-	    mMenuDlg.setSingleChoiceItems(selitems , -1,
-			new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int item) {
-					try {
-						String s=lcode.get(item);
-						int resp=Integer.parseInt(s);
-						
-						addItem(pid,resp,tipoid);
-						
-						dialog.dismiss();
-					} catch (Exception e) {}
-				}
-		});
-				
-	    mMenuDlg.setPositiveButton("Salir", new DialogInterface.OnClickListener() {
-			@Override
+
+		try{
+			mMenuDlg = new AlertDialog.Builder(this);
+			mMenuDlg.setTitle("Estado");
+
+			mMenuDlg.setSingleChoiceItems(selitems , -1,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int item) {
+							try {
+								String s=lcode.get(item);
+								int resp=Integer.parseInt(s);
+
+								addItem(pid,resp,tipoid);
+
+								dialog.dismiss();
+							} catch (Exception e) {
+								addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+							}
+						}
+					});
+
+			mMenuDlg.setPositiveButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int which) {
 				}
-		});
-			
-	    Dialog = mMenuDlg.create();
-		Dialog.show();
+			});
+
+			Dialog = mMenuDlg.create();
+			Dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 

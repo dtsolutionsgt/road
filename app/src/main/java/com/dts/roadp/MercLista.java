@@ -19,6 +19,7 @@ public class MercLista extends PBase {
 		setContentView(R.layout.activity_merc_lista);
 		
 		super.InitBase();
+		addlog("MercLista",""+du.getActDateTime(),gl.vend);
 		
 		cliid=((appGlobals) vApp).cliente;
 		
@@ -34,23 +35,43 @@ public class MercLista extends PBase {
 	// Events
 	
 	public void mercProp(View view){
-		Intent intent = new Intent(this,MercProp.class);
-		startActivity(intent);	
+		try{
+			Intent intent = new Intent(this,MercProp.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	public void mercComp(View view){
-		Intent intent = new Intent(this,MercComp.class);
-		startActivity(intent);	
+		try{
+			Intent intent = new Intent(this,MercComp.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	public void mercEnc(View view){
-		Intent intent = new Intent(this,MercPreg.class);
-		startActivity(intent);	
+		try{
+			Intent intent = new Intent(this,MercPreg.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	public void mercAct(View view){
-		Intent intent = new Intent(this,MercAct.class);
-		startActivity(intent);	
+		try{
+			Intent intent = new Intent(this,MercAct.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	// Main
@@ -78,7 +99,9 @@ public class MercLista extends PBase {
 			mact=s.equalsIgnoreCase("S");if (mact) vis+=1;
 			
 		} catch (Exception e) {
-		   	super.finish();return;
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		   	super.finish();
+		   	return;
 	    }	
 
 	    if (mprop) btnProp.setVisibility(View.VISIBLE); else btnProp.setVisibility(View.GONE);

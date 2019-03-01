@@ -25,6 +25,7 @@ public class ObjProd extends PBase {
 		setContentView(R.layout.activity_obj_prod);
 
 		super.InitBase();
+		addlog("ObjProd",""+du.getActDateTime(),gl.vend);
 
 		listView = (ListView) findViewById(R.id.listView1);
 		rbUni = (RadioButton) findViewById(R.id.radioButton1);
@@ -43,17 +44,27 @@ public class ObjProd extends PBase {
 	// Events
 
 	public void setUnits(View view){
-		rbUni.setChecked(true);
-		rbMonto.setChecked(false);
-		objtipo=0;
-		listItems();
+		try{
+			rbUni.setChecked(true);
+			rbMonto.setChecked(false);
+			objtipo=0;
+			listItems();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	public void setValue(View view){
-		rbUni.setChecked(false);
-		rbMonto.setChecked(true);
-		objtipo=1;
-		listItems();		
+		try{
+			rbUni.setChecked(false);
+			rbMonto.setChecked(true);
+			objtipo=1;
+			listItems();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	// Main
@@ -165,6 +176,7 @@ public class ObjProd extends PBase {
 					DTV.close();
 
 				} catch (Exception e) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 					mu.msgbox( e.getMessage());	  
 				}
 
@@ -199,6 +211,7 @@ public class ObjProd extends PBase {
 				DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox( e.getMessage());
 		}
 

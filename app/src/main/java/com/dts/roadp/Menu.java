@@ -75,6 +75,7 @@ public class Menu extends PBase {
 			lblAyudante.setText("Ayudante:");
 			lblVehiculo = new TextView(this);
 			lblVehiculo.setText("Vehículo:");
+			///
 
 			vApp=this.getApplication();
 			rutatipo=gl.rutatipog;
@@ -123,7 +124,8 @@ public class Menu extends PBase {
 
 			ConfImpresora();
 
-		} catch (Exception e) {
+		}catch (Exception e)
+		{
 			Log.e("Mnu", e.getMessage());
 		}
 
@@ -132,91 +134,106 @@ public class Menu extends PBase {
 	//region  Main
 	
 	public void showClients(View view) {
-		Intent intent;
-		intent = new Intent(this,Clientes.class);
-		startActivity(intent);
+		try{
+			Intent intent;
+			intent = new Intent(this,Clientes.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void listItems() {
-		clsMenu item;
-			
-		items.clear();selIdx=-1;
-			
-		try {
-			
-			item = clsCls.new clsMenu();
-			item.ID=1;item.Name=sdoc;item.Icon=iicon;
-			items.add(item);
+		try{
+			clsMenu item;
 
-			item = clsCls.new clsMenu();
-			item.ID=2;item.Name="Comunicación";item.Icon=2;
-			items.add(item);
-			    
-			item = clsCls.new clsMenu();
-			item.ID=3;item.Name="Reimpresión";item.Icon=3;
-			items.add(item);
-			    
-			item = clsCls.new clsMenu();
-			item.ID=4;item.Name="Anulación";item.Icon=4;
-			items.add(item);
-			    
-			if (!rutapos) {
+			items.clear();selIdx=-1;
+
+			try {
+
 				item = clsCls.new clsMenu();
-				item.ID=5;item.Name="Consultas";item.Icon=5;
+				item.ID=1;item.Name=sdoc;item.Icon=iicon;
 				items.add(item);
-			}
-				    
-			item = clsCls.new clsMenu();
-			item.ID=6;item.Name="Depósito";item.Icon=6;
-			items.add(item);
-			
-			item = clsCls.new clsMenu();
-			item.ID=7;item.Name="Inventario";item.Icon=7;
-			items.add(item);
+
+				item = clsCls.new clsMenu();
+				item.ID=2;item.Name="Comunicación";item.Icon=2;
+				items.add(item);
+
+				item = clsCls.new clsMenu();
+				item.ID=3;item.Name="Reimpresión";item.Icon=3;
+				items.add(item);
+
+				item = clsCls.new clsMenu();
+				item.ID=4;item.Name="Anulación";item.Icon=4;
+				items.add(item);
+
+				if (!rutapos) {
+					item = clsCls.new clsMenu();
+					item.ID=5;item.Name="Consultas";item.Icon=5;
+					items.add(item);
+				}
+
+				item = clsCls.new clsMenu();
+				item.ID=6;item.Name="Depósito";item.Icon=6;
+				items.add(item);
+
+				item = clsCls.new clsMenu();
+				item.ID=7;item.Name="Inventario";item.Icon=7;
+				items.add(item);
 
 			//#HS_20181211 Agregue nuevo boton en menu: Inicio de dia.
-			item = clsCls.new clsMenu();
-			item.ID=11;item.Name="Inicio de día";item.Icon=8;
-			items.add(item);
+			//item = clsCls.new clsMenu();
+			//item.ID=11;item.Name="Inicio de día";item.Icon=8;
+			//items.add(item);
 
-			item = clsCls.new clsMenu();
-			item.ID=8;item.Name="Cierre del día";item.Icon=8;
-			items.add(item);
-			
-			item = clsCls.new clsMenu();
-			item.ID=9;item.Name="Utilerias";item.Icon=9;
-			items.add(item);
+				item = clsCls.new clsMenu();
+				item.ID=8;item.Name="Cierre del día";item.Icon=8;
+				items.add(item);
 
-			item = clsCls.new clsMenu();
-			item.ID=10;item.Name="Cambio usuario";item.Icon=10;
-			items.add(item);
-		} catch (Exception e) {
+				item = clsCls.new clsMenu();
+				item.ID=9;item.Name="Utilerias";item.Icon=9;
+				items.add(item);
+
+				item = clsCls.new clsMenu();
+				item.ID=10;item.Name="Cambio usuario";item.Icon=10;
+				items.add(item);
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			}
+
+			adaptergrid=new ListAdaptMenuGrid(this, items);
+			gridView.setAdapter(adaptergrid);
+			adaptergrid.setSelectedIndex(selIdx);
+
+			//#HS_20181206 agrega el vendedor en lblVendedor y la ruta.
+			lblVendedor.setText(gl.vendnom);
+			lblRuta.setText(gl.ruta);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		adaptergrid=new ListAdaptMenuGrid(this, items);
-		gridView.setAdapter(adaptergrid);	
-		adaptergrid.setSelectedIndex(selIdx);
 
-        //#HS_20181206 agrega el vendedor en lblVendedor y la ruta.
-        lblVendedor.setText(gl.vendnom);
-        lblRuta.setText(gl.ruta);
 
 	}
 		
 	public void setHandlers(){
-	    
-		gridView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+	    try{
+			gridView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
 
-				clsMenu vItem = (clsMenu) adaptergrid.getItem(position);
-				menuid=vItem.ID;
+					clsMenu vItem = (clsMenu) adaptergrid.getItem(position);
+					menuid=vItem.ID;
 
-				adaptergrid.setSelectedIndex(position);		
+					adaptergrid.setSelectedIndex(position);
 
-				showMenuItem();		
-			};
-		});
+					showMenuItem();
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 
@@ -226,173 +243,179 @@ public class Menu extends PBase {
 		Float cantidad;
 		//toast("menu id : "+menuid);
 
-		prtype = getPrinterType();
-		if (prtype == 2) {
-			if (gl.mPrinterSet) epssetflag = false;
-			else epssetflag = true;
-		}
+		try{
+			prtype = getPrinterType();
+			if (prtype == 2) {
+				if (gl.mPrinterSet) epssetflag = false;
+				else epssetflag = true;
+			}
 
-		if (menuid == 2) epssetflag = false;
-		if (menuid == 9) epssetflag = false;
+			if (menuid == 2) epssetflag = false;
+			if (menuid == 9) epssetflag = false;
 
-		if (epssetflag) {
-			Intent intent = new Intent(this, UtilPrint.class);
-			startActivity(intent);
-			return;
-		}
+			if (epssetflag) {
+				Intent intent = new Intent(this, UtilPrint.class);
+				startActivity(intent);
+				return;
+			}
 
 
-		switch (menuid) {
+			switch (menuid) {
 
-			case 1:
+				case 1:
 
-				if (rutapos) {
-					Intent intentp = new Intent(this, CliPos.class);
-					startActivity(intentp);
-				} else {
-					gl.filtrocli=-1;
-					Intent intent = new Intent(this, Clientes.class);
-					//Asigna conexión actual al siguiente activity.
+					if (rutapos) {
+						Intent intentp = new Intent(this, CliPos.class);
+						startActivity(intentp);
+					} else {
+						gl.filtrocli=-1;
+						Intent intent = new Intent(this, Clientes.class);
+						//Asigna conexión actual al siguiente activity.
 
-					//#HS_201811 Verifica si hay existencias disponibles.
-					Existencia.Con = Con;
-					cantidad = Existencia.CantExistencias();
+						//#HS_201811 Verifica si hay existencias disponibles.
+						Existencia.Con = Con;
+						cantidad = Existencia.CantExistencias();
+
+						//#HS_20181206 Verifica el usuario si es DTS.
+						if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")){
+							mu.msgbox("No puede realizar esta acción");
+						}else {
+
+							if(gl.vnivel == 2){
+								msgAskSupervisor1();
+							}else {
+								startActivity(intent);
+							}
+						}
+
+					}
+
+					break;
+
+				case 2:  // Comunicacion
+					gl.findiaactivo=false;
+					gl.tipo = 0;
+					gl.autocom = 0;
+					gl.modoadmin = false;
+					Intent intent2 = new Intent(this, ComWS.class);
+					startActivity(intent2);
+					break;
+
+
+				case 3:  // Reimpresion
 
 					//#HS_20181206 Verifica el usuario si es DTS.
-					if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")){
+					if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
 						mu.msgbox("No puede realizar esta acción");
 					}else {
-
-						if(gl.vnivel == 2){
-							msgAskSupervisor1();
-						}else {
-								startActivity(intent);
-						}
-					}
-
-				}
-
-				break;
-
-			case 2:  // Comunicacion
-				gl.findiaactivo=false;
-				gl.tipo = 0;
-				gl.autocom = 0;
-				gl.modoadmin = false;
-				Intent intent2 = new Intent(this, ComWS.class);
-				startActivity(intent2);
-				break;
-
-
-			case 3:  // Reimpresion
-
-                //#HS_20181206 Verifica el usuario si es DTS.
-                if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
-                    mu.msgbox("No puede realizar esta acción");
-                }else {
-                    if (rutatipo.equalsIgnoreCase("T")) {
-                        showPrintMenuTodo();
-                    } else {
-                        if (rutatipo.equalsIgnoreCase("V")) {
-                            if (gl.peAceptarCarga) {
-                                showPrintMenuVentaApr();
-                            } else {
-                                showPrintMenuVenta();
-                            }
-                        } else {
-                            showPrintMenuPreventa();
-                        }
-                    }
-                }
-
-				break;
-
-			case 4:  // Anulacion
-
-				//#HS_20181206 Verifica el usuario si es DTS.
-				if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
-					mu.msgbox("No puede realizar esta acción");
-				}else {
-					if (rutapos) {
-						showVoidMenuVenta();
-					} else {
 						if (rutatipo.equalsIgnoreCase("T")) {
-							showVoidMenuTodo();
+							showPrintMenuTodo();
 						} else {
-							if (rutatipo.equalsIgnoreCase("V")) showVoidMenuVenta();
-							else showVoidMenuPreventa();
+							if (rutatipo.equalsIgnoreCase("V")) {
+								if (gl.peAceptarCarga) {
+									showPrintMenuVentaApr();
+								} else {
+									showPrintMenuVenta();
+								}
+							} else {
+								showPrintMenuPreventa();
+							}
 						}
 					}
-				}
 
-				break;
+					break;
 
-			case 5:  // Consultas
+				case 4:  // Anulacion
 
-				//#HS_20181206 Verifica el usuario si es DTS.
-				if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
-					mu.msgbox("No puede realizar esta acción");
-				}else {
-					showConsMenu();
-				}
-
-				break;
-
-			case 6:  // Deposito
-
-				getDepTipo();
-
-				//#HS_20181206 Verifica el usuario si es DTS.
-				if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
-					mu.msgbox("No puede realizar esta acción");
-				}else {
-					Intent intent6 = new Intent(this, Deposito.class);
-					startActivity(intent6);
-				}
-
-				break;
-
-			case 7:  // Inventario
-
-				//#HS_20181206 Verifica el usuario si es DTS.
-				if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
-					mu.msgbox("No puede realizar esta acción");
-				}else {
-					if (rutatipo.equalsIgnoreCase("P")) {
-						showInvMenuPreventa();
-					} else {
-						showInvMenuVenta();
+					//#HS_20181206 Verifica el usuario si es DTS.
+					if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
+						mu.msgbox("No puede realizar esta acción");
+					}else {
+						if (rutapos) {
+							showVoidMenuVenta();
+						} else {
+							if (rutatipo.equalsIgnoreCase("T")) {
+								showVoidMenuTodo();
+							} else {
+								if (rutatipo.equalsIgnoreCase("V")) showVoidMenuVenta();
+								else showVoidMenuPreventa();
+							}
+						}
 					}
-				}
 
-				break;
+					break;
 
-			case 8:  // Fin Dia
+				case 5:  // Consultas
 
-				//#HS_20181206 Verifica el usuario si es DTS.
-				if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
-					mu.msgbox("No puede realizar esta acción");
-				}else {
-					Intent intent8 = new Intent(this, FinDia.class);
-					startActivity(intent8);
-				}
+					//#HS_20181206 Verifica el usuario si es DTS.
+					if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
+						mu.msgbox("No puede realizar esta acción");
+					}else {
+						showConsMenu();
+					}
 
-				break;
+					break;
 
-			case 9:  // Utilerias
-				showInvMenuUtils();
-				break;
+				case 6:  // Deposito
 
-			case 10:  // Cambio usuario
-				askCambUsuario();
-				break;
+					getDepTipo();
 
-			case 11:	// Inicio día
-				Intent intent11 = new Intent(this, InicioDia.class);
-				startActivity(intent11);
-				break;
+					//#HS_20181206 Verifica el usuario si es DTS.
+					if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
+						mu.msgbox("No puede realizar esta acción");
+					}else {
+						Intent intent6 = new Intent(this, Deposito.class);
+						startActivity(intent6);
+					}
 
+					break;
+
+				case 7:  // Inventario
+
+					//#HS_20181206 Verifica el usuario si es DTS.
+					if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
+						mu.msgbox("No puede realizar esta acción");
+					}else {
+						if (rutatipo.equalsIgnoreCase("P")) {
+							showInvMenuPreventa();
+						} else {
+							showInvMenuVenta();
+						}
+					}
+
+					break;
+
+				case 8:  // Fin Dia
+
+					//#HS_20181206 Verifica el usuario si es DTS.
+					if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
+						mu.msgbox("No puede realizar esta acción");
+					}else {
+						Intent intent8 = new Intent(this, FinDia.class);
+						startActivity(intent8);
+					}
+
+					break;
+
+				case 9:  // Utilerias
+					showInvMenuUtils();
+					break;
+
+				case 10:  // Cambio usuario
+					askCambUsuario();
+					break;
+
+				case 11:	// Inicio día
+					Intent intent11 = new Intent(this, InicioDia.class);
+					startActivity(intent11);
+					break;
+
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
+
 
 	}
 
@@ -401,188 +424,217 @@ public class Menu extends PBase {
 	//region Reimpresion
 	
 	public void showPrintMenuTodo() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Factura","Pedido","Recibo","Deposito","Recarga","Devoluci�n a bodega","Cierre de dia"};
-	 		    
-		menudlg = new AlertDialog.Builder(this);
-		menudlg.setIcon(R.drawable.reimpresion48);
-		menudlg.setTitle("Reimpresión");
-					
-		menudlg.setItems(selitems , new DialogInterface.OnClickListener() {
+
+		try{
+			final AlertDialog Dialog;
+			final String[] selitems = {"Factura","Pedido","Recibo","Deposito","Recarga","Devoluci�n a bodega","Cierre de dia"};
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.reimpresion48);
+			menudlg.setTitle("Reimpresión");
+
+			menudlg.setItems(selitems , new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					
+
 					switch (item) {
-						case 0:  
+						case 0:
 							menuImprDoc(3);break;
-						case 1:  
-							menuImprDoc(0);break;							
-						case 2:  
+						case 1:
+							menuImprDoc(0);break;
+						case 2:
 							menuImprDoc(1);break;
-						case 3:  
+						case 3:
 							menuImprDoc(2);break;
-						case 4:  
+						case 4:
 							menuImprDoc(4);break;
-						case 5:  
-							menuImprDoc(5);break;	
-						case 6:  
-							menuImprDoc(99);break;	
+						case 5:
+							menuImprDoc(5);break;
+						case 6:
+							menuImprDoc(99);break;
 					}
-					
-					dialog.cancel();	
+
+					dialog.cancel();
 				}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-				
-		Dialog = menudlg.create();
-		Dialog.show();
-		
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);		
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void showPrintMenuVenta() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia"};
-	 		    
-		menudlg = new AlertDialog.Builder(this);
-		menudlg.setIcon(R.drawable.reimpresion48);
-		menudlg.setTitle("Reimpresión");
-					
-		menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
+
+		try{
+			final AlertDialog Dialog;
+			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia"};
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.reimpresion48);
+			menudlg.setTitle("Reimpresión");
+
+			menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					
+
 					switch (item) {
-						case 0:  
+						case 0:
 							menuImprDoc(3);break;
-						case 1:  
+						case 1:
 							menuImprDoc(1);break;
-						case 2:  
+						case 2:
 							menuImprDoc(2);break;
-						case 3:  
+						case 3:
 							menuImprDoc(4);break;
-						case 4:  
-							menuImprDoc(5);break;	
-						case 5:  
-							menuImprDoc(99);break;	
+						case 4:
+							menuImprDoc(5);break;
+						case 5:
+							menuImprDoc(99);break;
 					}
-					
-					dialog.cancel();	
+
+					dialog.cancel();
 				}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-			
-		Dialog = menudlg.create();
-		Dialog.show();
-		
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);		
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void showPrintMenuVentaApr() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia","Nota de credito"};
-	 		    
-		menudlg = new AlertDialog.Builder(this);
-		menudlg.setIcon(R.drawable.reimpresion48);
-		menudlg.setTitle("Reimpresión");
-					
-		menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
+
+		try{
+			final AlertDialog Dialog;
+			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia","Nota de credito"};
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.reimpresion48);
+			menudlg.setTitle("Reimpresión");
+
+			menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					
+
 					switch (item) {
-						case 0:  
+						case 0:
 							menuImprDoc(3);break;
-						case 1:  
+						case 1:
 							menuImprDoc(1);break;
-						case 2:  
+						case 2:
 							menuImprDoc(2);break;
-						case 3:  
+						case 3:
 							menuImprDoc(4);break;
-						case 4:  
-							menuImprDoc(5);break;	
-						case 5:  
-							menuImprDoc(99);break;	
-						case 6:  
-							menuImprDoc(6);break;	
+						case 4:
+							menuImprDoc(5);break;
+						case 5:
+							menuImprDoc(99);break;
+						case 6:
+							menuImprDoc(6);break;
 					}
-					
-					dialog.cancel();	
+
+					dialog.cancel();
 				}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-			
-		Dialog = menudlg.create();
-		Dialog.show();
-		
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);		
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void showPrintMenuPreventa() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Pedido","Recibo","Deposito"};
-	 		    
-		menudlg = new AlertDialog.Builder(this);
-		menudlg.setIcon(R.drawable.reimpresion48);
-		menudlg.setTitle("Reimpresi�n");
-					
-		menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
+
+		try{
+			final AlertDialog Dialog;
+			final String[] selitems = {"Pedido","Recibo","Deposito"};
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.reimpresion48);
+			menudlg.setTitle("Reimpresi�n");
+
+			menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					
+
 					switch (item) {
-						case 0:  
+						case 0:
 							menuImprDoc(0);break;
-						case 1:  
+						case 1:
 							menuImprDoc(1);break;
-						case 2:  
+						case 2:
 							menuImprDoc(2);break;
 					}
-					
-					dialog.cancel();	
+
+					dialog.cancel();
 				}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-			
-		Dialog = menudlg.create();
-		Dialog.show();
-		
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void menuImprDoc(int doctipo) {
-		gl.tipo=doctipo;
-		
-		Intent intent = new Intent(this,Reimpresion.class);
-		startActivity(intent);
+		try{
+			gl.tipo=doctipo;
+
+			Intent intent = new Intent(this,Reimpresion.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	//endregion
@@ -590,138 +642,161 @@ public class Menu extends PBase {
 	//region Anulacion
 	
 	public void showVoidMenuTodo() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Factura","Pedido","Recibo","Deposito","Recarga","Devolución a bodega"};
-	 		    
-		menudlg = new AlertDialog.Builder(this);
-		menudlg.setIcon(R.drawable.anulacion48);
-		menudlg.setTitle("Anulaci�n");
-					
-		menudlg.setItems(selitems ,	new DialogInterface.OnClickListener() {
+		try{
+			final AlertDialog Dialog;
+			final String[] selitems = {"Factura","Pedido","Recibo","Deposito","Recarga","Devolución a bodega"};
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.anulacion48);
+			menudlg.setTitle("Anulaci�n");
+
+			menudlg.setItems(selitems ,	new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					
+
 					switch (item) {
-						case 0:  
+						case 0:
 							gl.tipo=3;break;
-						case 1:  
-							gl.tipo=0;break;							
-						case 2:  
+						case 1:
+							gl.tipo=0;break;
+						case 2:
 							gl.tipo=1;break;
-						case 3:  
+						case 3:
 							gl.tipo=2;break;
-						case 4:  
+						case 4:
 							gl.tipo=4;break;
-						case 5:  
-							gl.tipo=5;break;							
+						case 5:
+							gl.tipo=5;break;
 					}
-					
+
 					menuAnulDoc();
-					dialog.cancel();	
+					dialog.cancel();
 				}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-			
-		Dialog = menudlg.create();
-		Dialog.show();
-		
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);		
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	public void showVoidMenuVenta() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega"};
-	 		    
-		menudlg = new AlertDialog.Builder(this);
-		menudlg.setIcon(R.drawable.anulacion48);		
-		menudlg.setTitle("Anulación");
-					
-		menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
+		try{
+
+			final AlertDialog Dialog;
+			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega"};
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.anulacion48);
+			menudlg.setTitle("Anulación");
+
+			menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					
+
 					switch (item) {
-						case 0:  
+						case 0:
 							gl.tipo=3;break;
-						case 1:  
+						case 1:
 							gl.tipo=1;break;
-						case 2:  
+						case 2:
 							gl.tipo=2;break;
-						case 3:  
+						case 3:
 							gl.tipo=4;break;
-						case 4:  
-							gl.tipo=5;break;							
+						case 4:
+							gl.tipo=5;break;
 					}
-					
+
 					menuAnulDoc();
-					dialog.cancel();	
+					dialog.cancel();
 				}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-			
-		Dialog = menudlg.create();
-		Dialog.show();
-		
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);		
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+
+		}catch(Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	public void showVoidMenuPreventa() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Pedido","Recibo","Deposito"};
-	 		    
-		menudlg = new AlertDialog.Builder(this);
-		menudlg.setIcon(R.drawable.anulacion48);		
-		menudlg.setTitle("Anulaci�n");
-					
-		menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
+
+		try{
+
+		}catch (Exception e){final AlertDialog Dialog;
+			final String[] selitems = {"Pedido","Recibo","Deposito"};
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.anulacion48);
+			menudlg.setTitle("Anulaci�n");
+
+			menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					
+
 					switch (item) {
-						case 0:  
+						case 0:
 							gl.tipo=0;break;
-						case 1:  
+						case 1:
 							gl.tipo=1;break;
-						case 2:  
+						case 2:
 							gl.tipo=2;break;
 					}
-					
+
 					menuAnulDoc();
-					dialog.cancel();	
+					dialog.cancel();
 				}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-			
-		Dialog = menudlg.create();
-		Dialog.show();
-		
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);		
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void menuAnulDoc() {
-		Intent intent = new Intent(this,Anulacion.class);
-		startActivity(intent);
+		try{
+			Intent intent = new Intent(this,Anulacion.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	//endregion
@@ -729,81 +804,118 @@ public class Menu extends PBase {
 	//region Consultas
 	
 	public void showConsMenu() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Objetivos por producto","Objetivos por familia","Objetivo por ruta","Objetivo por cobro","Inventario bodega","Consulta de precios"};
-	 		    
-		menudlg = new AlertDialog.Builder(this);
-		menudlg.setTitle("Consultas");
-					
-		menudlg.setItems(selitems , new DialogInterface.OnClickListener() {
+
+		try{
+			final AlertDialog Dialog;
+			final String[] selitems = {"Objetivos por producto","Objetivos por familia","Objetivo por ruta","Objetivo por cobro","Inventario bodega","Consulta de precios"};
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setTitle("Consultas");
+
+			menudlg.setItems(selitems , new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					
+
 					switch (item) {
-						case 0:  
+						case 0:
 							menuObjProd();break;
-						case 1:  
+						case 1:
 							menuObjFamilia();break;
-						case 2:  
+						case 2:
 							menuObjRuta();break;
-						case 3:  
+						case 3:
 							menuObjCobro();break;
-						case 4:  
+						case 4:
 							menuInvBod();dialog.cancel();break;
-						case 5:  
-							menuPrecios();dialog.cancel();break;							
+						case 5:
+							menuPrecios();dialog.cancel();break;
 					}
-					
-					//dialog.cancel();	
+
+					//dialog.cancel();
 				}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-			
-		Dialog = menudlg.create();
-		Dialog.show();
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void menuObjProd() {
-		gl.tipo=0;
-		
-		Intent intent = new Intent(this,ObjProd.class);
-		startActivity(intent);
+		try{
+			gl.tipo=0;
+
+			Intent intent = new Intent(this,ObjProd.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void menuObjFamilia() {
-		gl.tipo=1;
-		
-		Intent intent = new Intent(this,ObjProd.class);
-		startActivity(intent);
+		try{
+			gl.tipo=1;
+
+			Intent intent = new Intent(this,ObjProd.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void menuObjRuta() {
-		gl.tipo=0;
-		
-		Intent intent = new Intent(this,ObjRuta.class);
-		startActivity(intent);
+		try{
+			gl.tipo=0;
+
+			Intent intent = new Intent(this,ObjRuta.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void menuObjCobro() {
-		gl.tipo=1;
-		
-		Intent intent = new Intent(this,ObjRuta.class);
-		startActivity(intent);
+		try{
+			gl.tipo=1;
+
+			Intent intent = new Intent(this,ObjRuta.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void menuInvBod() {
-		Intent intent = new Intent(this,InvBodega.class);
-		startActivity(intent);
+		try{
+			Intent intent = new Intent(this,InvBodega.class);
+			startActivity(intent);
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	private void menuPrecios() {
-		Intent intent = new Intent(this,ConsPrecio.class);
-		startActivity(intent);
+		try{
+			Intent intent = new Intent(this,ConsPrecio.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	//endregion
@@ -811,240 +923,284 @@ public class Menu extends PBase {
 	//region Inventario
 	
 	public void showInvMenuVenta() 	{
-		final AlertDialog Dialog;
-		int itemcnt=1,itempos=0;		
-				
-		if (gl.peAceptarCarga) 	{
-			itemcnt+=1; 
-		} else {
-			if (gl.peStockItf) {
-				if (gl.peModal.equalsIgnoreCase("TOL")) {	
-					itemcnt+=1;
+
+		try{
+			final AlertDialog Dialog;
+			int itemcnt=1,itempos=0;
+
+			if (gl.peAceptarCarga) 	{
+				itemcnt+=1;
+			} else {
+				if (gl.peStockItf) {
+					if (gl.peModal.equalsIgnoreCase("TOL")) {
+						itemcnt+=1;
+					} else {
+						itemcnt+=1;
+					}
 				} else {
-					itemcnt+=1;
-				}			 
-			} else {	
-				itemcnt+=2;
-			}
-			 
-		}
-		if (gl.peSolicInv) itemcnt++;
-			
-		final String[] selitems = new String[itemcnt];
-		
-		selitems[itempos]="Existencias";itempos++;
-		if (gl.peAceptarCarga) {
-			selitems[itempos]="Aceptar Inventario";itempos++;
-		} else {	
-			if (gl.peStockItf) {
-				if (gl.peModal.equalsIgnoreCase("TOL")) {	
-					//selitems[itempos]="Recarga manual";itempos++;
-					selitems[itempos]="Devolucion a bodega";itempos++;
-				} else {	
-					selitems[itempos]="Devolucion a bodega";itempos++;
-				}				
-			} else {	
-				selitems[itempos]="Devolucion a bodega";itempos++;
-				selitems[itempos]="Recarga manual";itempos++;
-			}			
-		}
-		
-		if (gl.peSolicInv) {	
-			selitems[itempos]="Solicitud de inventario";itempos++;
-		}
-				
-		menudlg = new AlertDialog.Builder(this);
-		menudlg.setIcon(R.drawable.inventario48);		
-		menudlg.setTitle("Inventario");
-					
-		menudlg.setItems(selitems ,	new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				String mt=selitems[item];
+					itemcnt+=2;
+				}
 
-				if (mt.equalsIgnoreCase("Existencias")) menuExist();
-				if (mt.equalsIgnoreCase("Devolucion a bodega")) menuDevBod();
-				if (mt.equalsIgnoreCase("Recarga manual")) menuRecarga();
-				if (mt.equalsIgnoreCase("Aceptar Inventario")) menuRecargaAuto();
-				if (mt.equalsIgnoreCase("Solicitud de inventario")) menuSolicInv();
+			}
+			if (gl.peSolicInv) itemcnt++;
 
-				dialog.cancel();	
+			final String[] selitems = new String[itemcnt];
+
+			selitems[itempos]="Existencias";itempos++;
+			if (gl.peAceptarCarga) {
+				selitems[itempos]="Aceptar Inventario";itempos++;
+			} else {
+				if (gl.peStockItf) {
+					if (gl.peModal.equalsIgnoreCase("TOL")) {
+						//selitems[itempos]="Recarga manual";itempos++;
+						selitems[itempos]="Devolucion a bodega";itempos++;
+					} else {
+						selitems[itempos]="Devolucion a bodega";itempos++;
+					}
+				} else {
+					selitems[itempos]="Devolucion a bodega";itempos++;
+					selitems[itempos]="Recarga manual";itempos++;
+				}
 			}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
+
+			if (gl.peSolicInv) {
+				selitems[itempos]="Solicitud de inventario";itempos++;
 			}
-		});
-			
-		Dialog = menudlg.create();
-		Dialog.show();
-		
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);		
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.inventario48);
+			menudlg.setTitle("Inventario");
+
+			menudlg.setItems(selitems ,	new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+					String mt=selitems[item];
+
+					if (mt.equalsIgnoreCase("Existencias")) menuExist();
+					if (mt.equalsIgnoreCase("Devolucion a bodega")) menuDevBod();
+					if (mt.equalsIgnoreCase("Recarga manual")) menuRecarga();
+					if (mt.equalsIgnoreCase("Aceptar Inventario")) menuRecargaAuto();
+					if (mt.equalsIgnoreCase("Solicitud de inventario")) menuSolicInv();
+
+					dialog.cancel();
+				}
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	public void showInvMenuPreventa() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Existencias","Devolucion a bodega"};
-	 		    
-		menudlg = new AlertDialog.Builder(this);
-		menudlg.setIcon(R.drawable.inventario48);	
-		menudlg.setTitle("Inventario");
-					
-		menudlg.setItems(selitems,	new DialogInterface.OnClickListener() {
+		try{
+			final AlertDialog Dialog;
+			final String[] selitems = {"Existencias","Devolucion a bodega"};
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.inventario48);
+			menudlg.setTitle("Inventario");
+
+			menudlg.setItems(selitems,	new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					
+
 					switch (item) {
-						case 0:  
+						case 0:
 							menuExist();break;
-						case 1:  
-							menuDevBod();break;						
+						case 1:
+							menuDevBod();break;
 					}
-					
-					dialog.cancel();	
+
+					dialog.cancel();
 				}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-			
-		Dialog = menudlg.create();
-		Dialog.show();
-		
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);		
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch	(Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	public void showInvMenuPos() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Existencias","Devolucion","Recarga"};
-	 		    
-		menudlg = new AlertDialog.Builder(this);
-		menudlg.setIcon(R.drawable.inventario48);	
-		menudlg.setTitle("Inventario");
-					
-		menudlg.setItems(selitems ,	new DialogInterface.OnClickListener() {
+
+		try{
+			final AlertDialog Dialog;
+			final String[] selitems = {"Existencias","Devolucion","Recarga"};
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.inventario48);
+			menudlg.setTitle("Inventario");
+
+			menudlg.setItems(selitems ,	new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					
+
 					//mu.msgbox(item);
-					
+
 					switch (item) {
-						case 0:  
+						case 0:
 							menuExist();break;
-						case 1:  
+						case 1:
 							menuDevBod();break;
-						case 2:  
-							menuRecarga();break;							
+						case 2:
+							menuRecarga();break;
 					}
-					
-					dialog.cancel();	
+
+					dialog.cancel();
 				}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-			
-		Dialog = menudlg.create();
-		Dialog.show();
-		
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);		
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void menuExist() {
-		gl.tipo=0;
-		Intent intent = new Intent(this,Exist.class);
-		startActivity(intent);
+		try{
+			gl.tipo=0;
+			Intent intent = new Intent(this,Exist.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
-	private void menuRecarga() {	
-		Intent intent = new Intent(this,Recarga.class);
-		startActivity(intent);
+	private void menuRecarga() {
+
+		try{
+			Intent intent = new Intent(this,Recarga.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
-	private void menuRecargaAuto() {	
-		Intent intent = new Intent(this,RecargaAuto.class);
-		startActivity(intent);
+	private void menuRecargaAuto() {
+		try{
+			Intent intent = new Intent(this,RecargaAuto.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void menuDevBod() {
-		if (gl.peModal.equalsIgnoreCase("TOL")) {
-			startActivity(new Intent(this,DevolBodTol.class));
-		} else {
-			startActivity(new Intent(this,DevolBod.class));
+		try{
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				startActivity(new Intent(this,DevolBodTol.class));
+			} else {
+				startActivity(new Intent(this,DevolBod.class));
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}
 	
 	private void menuSolicInv() {
 		Cursor dt;
 		boolean newflag=false;
 		String flag,corel;
-
-		try {
-
-			sql="SELECT STATCOM FROM D_SOLICINV";
-			dt=Con.OpenDT(sql);
-
-			if (dt.getCount()>0) {
-				dt.moveToFirst();
-				
-				flag=dt.getString(0);
-				if (flag.equalsIgnoreCase("S")) {
-					msgbox("Falta enviar solicitud actual y realizar cierre del día antes de crear una nueva.");return;
-				}
-			} else {	
-				newflag=true;
-			}
-
-		} catch (Exception e) {
-			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-		}
-		
-		if (newflag) {
-
+		try{
 			try {
-				db.beginTransaction();
 
-				sql="DELETE FROM D_SOLICINVD";
-				db.execSQL(sql);
+				sql="SELECT STATCOM FROM D_SOLICINV";
+				dt=Con.OpenDT(sql);
 
-				corel=gl.ruta+"_"+mu.getCorelBase();
+				if (dt.getCount()>0) {
+					dt.moveToFirst();
 
-				ins.init("D_SOLICINV");
-				
-				ins.add("COREL",corel);
-				ins.add("ANULADO","N");
-				ins.add("RUTA",gl.ruta);
-				ins.add("FECHA",fecha);
-				ins.add("USUARIO",gl.vend);
-				ins.add("REFERENCIA","");
-				ins.add("STATCOM","P");
-							
-		    	db.execSQL(ins.sql());
+					flag=dt.getString(0);
+					if (flag.equalsIgnoreCase("S")) {
+						msgbox("Falta enviar solicitud actual y realizar cierre del día antes de crear una nueva.");return;
+					}
+				} else {
+					newflag=true;
+				}
 
-				db.setTransactionSuccessful();
-				db.endTransaction();
 			} catch (Exception e) {
-				db.endTransaction();msgbox("No se puede crear una nueva solicitud.\n"+e.getMessage());return;
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+				msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			}
 
+			if (newflag) {
+
+				try {
+					db.beginTransaction();
+
+					sql="DELETE FROM D_SOLICINVD";
+					db.execSQL(sql);
+
+					corel=gl.ruta+"_"+mu.getCorelBase();
+
+					ins.init("D_SOLICINV");
+
+					ins.add("COREL",corel);
+					ins.add("ANULADO","N");
+					ins.add("RUTA",gl.ruta);
+					ins.add("FECHA",fecha);
+					ins.add("USUARIO",gl.vend);
+					ins.add("REFERENCIA","");
+					ins.add("STATCOM","P");
+
+					db.execSQL(ins.sql());
+
+					db.setTransactionSuccessful();
+					db.endTransaction();
+				} catch (Exception e) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+					db.endTransaction();msgbox("No se puede crear una nueva solicitud.\n"+e.getMessage());return;
+				}
+
+			}
+
+			Intent intent = new Intent(this,SolicInv.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-		
-		Intent intent = new Intent(this,SolicInv.class);
-		startActivity(intent);
+
 	}
 
 	//endregion
@@ -1052,145 +1208,177 @@ public class Menu extends PBase {
 	//region Utilerias
 	
 	public void showInvMenuUtils() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ","Envío a soporte"};
-	 		    
-		menudlg = new AlertDialog.Builder(this);
-		menudlg.setIcon(R.drawable.utils48);
-		menudlg.setTitle("Utilerias");
+		try{
+			final AlertDialog Dialog;
+			final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ","Soporte"};
 
-		menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.utils48);
+			menudlg.setTitle("Utilerias");
 
-				switch (item) {
-					case 0:
-						menuConfImpres();break;
-					case 1:
-						startActivity(new Intent(Menu.this, Tablas.class));break;
-					case 2:
-						menuCorelZ();break;
-					case 3:
-						startActivity(new Intent(Menu.this, Soporte.class));break;
+			menudlg.setItems(selitems ,	new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+
+					switch (item) {
+						case 0:
+							menuConfImpres();break;
+						case 1:
+							startActivity(new Intent(Menu.this,Tablas.class));
+							break;
+						case 2:
+							menuCorelZ();break;
+						case 3:
+							;break;
+					}
+
+					dialog.cancel();
 				}
+			});
 
-				dialog.cancel();
-			}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-			
-		Dialog = menudlg.create();
-		Dialog.show();
-		
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);		
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}		
 	
 	private void menuConfImpres() {
-		Intent intent = new Intent(this,UtilPrint.class);
-		startActivity(intent);
+		try{
+			Intent intent = new Intent(this,UtilPrint.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void menuCorelZ() {
 		Cursor DT;
 		int coract;
 
-		try {
-			sql="SELECT Corel FROM FinDia";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			coract=DT.getInt(0);
-		} catch (Exception e) {
-			mu.msgbox(e.getMessage());
-			coract=0;
-		}			
-		
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-		alert.setTitle("Nuevo correlativo");
-		alert.setMessage("Actual : "+coract);
-		
-		final EditText input = new EditText(this);
-		alert.setView(input);
-		
-		input.setInputType(InputType.TYPE_CLASS_NUMBER );	
-		input.setText("");
-		input.requestFocus();
-		
-		alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				try {
-			    	String s=input.getText().toString();
-			    	int icor=Integer.parseInt(s);
-			    	
-			    	if (icor<0) throw new Exception();
-			    	askApplyCor(icor);
-				} catch (Exception e) {
-					mu.msgbox("Correlativo incorrecto");return;
-			    }
-		  	}
-		});
-
-		alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
+		try{
+			try {
+				sql="SELECT Corel FROM FinDia";
+				DT=Con.OpenDT(sql);
+				DT.moveToFirst();
+				coract=DT.getInt(0);
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+				mu.msgbox(e.getMessage());
+				coract=0;
 			}
-		});
 
-		alert.show();
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Nuevo correlativo");
+			alert.setMessage("Actual : "+coract);
+
+			final EditText input = new EditText(this);
+			alert.setView(input);
+
+			input.setInputType(InputType.TYPE_CLASS_NUMBER );
+			input.setText("");
+			input.requestFocus();
+
+			alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					try {
+						String s=input.getText().toString();
+						int icor=Integer.parseInt(s);
+
+						if (icor<0) throw new Exception();
+						askApplyCor(icor);
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox("Correlativo incorrecto");
+						return;
+					}
+				}
+			});
+
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+				}
+			});
+
+			alert.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
+
 		
 	}
 	
 	private void askApplyCor(int ncor) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("Aplicar nuevo correlativo ?");
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		final int fncor=ncor;
-		
-		dialog.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				try {
-					sql="UPDATE FinDia SET Corel="+fncor;
-					db.execSQL(sql);
-				} catch (SQLException e) {
-					mu.msgbox("Error : " + e.getMessage());
-				}		
-			}
-		});
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("Aplicar nuevo correlativo ?");
 
-		dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-			}
-		});
+			final int fncor=ncor;
 
-		dialog.show();	
+			dialog.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					try {
+						sql="UPDATE FinDia SET Corel="+fncor;
+						db.execSQL(sql);
+					} catch (SQLException e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+						mu.msgbox("Error : " + e.getMessage());
+					}
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
 	}
 
 	private void askCambUsuario() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("¿Cambiar usuario?");
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿Cambiar usuario?");
 
-		dialog.setPositiveButton("Cambiar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				Menu.super.finish();
-			}
-		});
+			dialog.setPositiveButton("Cambiar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					Menu.super.finish();
+				}
+			});
 
-		dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-			}
-		});
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
 	}
 
 	//endregion
@@ -1198,151 +1386,184 @@ public class Menu extends PBase {
 	//region Supervisor ayudante
 
 	private void msgAskSupervisor1() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle("Road");
-		dialog.setMessage("Este usuario es ADMINISTRADOR. ¿Está seguro de realizar la venta con este usuario?");
+			dialog.setTitle("Road");
+			dialog.setMessage("Este usuario es ADMINISTRADOR. ¿Está seguro de realizar la venta con este usuario?");
 
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				msgAskSupervisor2();
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					msgAskSupervisor2();
+				}
+			});
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {}
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	private void msgAskSupervisor2() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle("Road");
-		dialog.setMessage("Usted no debería realizar ventas con el Rol de ADMINISTRADOR. ¿Esta 100% seguro de realizar la venta con este usuario?");
+			dialog.setTitle("Road");
+			dialog.setMessage("Usted no debería realizar ventas con el Rol de ADMINISTRADOR. ¿Esta 100% seguro de realizar la venta con este usuario?");
 
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				startActivity(new Intent(Menu.this, Clientes.class));
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					startActivity(new Intent(Menu.this, Clientes.class));
+				}
+			});
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {}
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	//#HS_20181207 Mensaje que muestra los ayudantes y vehiculos disponibles.
 
 	private void AyudanteVehiculo() {
-		inputAyudanteVehiculo();
+		try{
+			inputAyudanteVehiculo();
 
-		getlistAyudante();
-		getlistVehiculo();
-		getAyudante();
-		getVehiculo();
+			getlistAyudante();
+			getlistVehiculo();
+			getAyudante();
+			getVehiculo();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void inputAyudanteVehiculo() {
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		alert.setTitle("AYUDANTE Y VEHÍCULO");
+		try{
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		final LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
+			alert.setTitle("AYUDANTE Y VEHÍCULO");
 
-		//layout.addView(new TextView(this));
-		layout.addView(lblAyudante);
-		layout.addView(Ayudante);
-		//layout.addView(new TextView(this));
-		layout.addView(lblVehiculo);
-		layout.addView(Vehiculo);
+			final LinearLayout layout = new LinearLayout(this);
+			layout.setOrientation(LinearLayout.VERTICAL);
 
-		alert.setView(layout);
+			//layout.addView(new TextView(this));
+			layout.addView(lblAyudante);
+			layout.addView(Ayudante);
+			//layout.addView(new TextView(this));
+			layout.addView(lblVehiculo);
+			layout.addView(Vehiculo);
 
-		alert.setPositiveButton("Asignar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				getAyudanteVehiculo();
-			}
-		});
+			alert.setView(layout);
 
-		alert.setNegativeButton("Omitir", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				gl.ayudante = "";gl.ayudanteID = "";
-				gl.vehiculo = "";gl.vehiculoID= "";
-				closekeyb();
-			}
-		});
+			alert.setPositiveButton("Asignar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					getAyudanteVehiculo();
+				}
+			});
 
-		alert.show();
+			alert.setNegativeButton("Omitir", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					gl.ayudante = "";gl.ayudanteID = "";
+					gl.vehiculo = "";gl.vehiculoID= "";
+					closekeyb();
+				}
+			});
+
+			alert.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void getAyudante(){
 
-		Ayudante.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-				TextView spinlabel;
+		try{
+			Ayudante.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+					TextView spinlabel;
 
-				try {
-					spinlabel=(TextView)parentView.getChildAt(0);
-					spinlabel.setTextColor(Color.BLACK);
-					spinlabel.setPadding(5, 0, 0, 0);
-					spinlabel.setTextSize(18);
+					try {
+						spinlabel=(TextView)parentView.getChildAt(0);
+						spinlabel.setTextColor(Color.BLACK);
+						spinlabel.setPadding(5, 0, 0, 0);
+						spinlabel.setTextSize(18);
 
-					gl.ayudanteID=listIDAyudante.get(position);
-					gl.ayudante=listAyudante.get(position);
+						gl.ayudanteID=listIDAyudante.get(position);
+						gl.ayudante=listAyudante.get(position);
 
-				} catch (Exception e) {
-					mu.msgbox( e.getMessage());
+					} catch (Exception e) {
+						mu.msgbox( e.getMessage());
+					}
 				}
-			}
 
-			@Override
-			public void onNothingSelected(AdapterView<?> parentView) {
-				return;
-			}
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) {
+					return;
+				}
 
-		});
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
 
 	}
 
 	private void getVehiculo(){
 
-		Vehiculo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-				TextView spinlabel;
+		try{
+			Vehiculo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+					TextView spinlabel;
 
-				try {
-					spinlabel=(TextView)parentView.getChildAt(0);
-					spinlabel.setTextColor(Color.BLACK);
-					spinlabel.setPadding(5, 0, 0, 0);
-					spinlabel.setTextSize(18);
+					try {
+						spinlabel=(TextView)parentView.getChildAt(0);
+						spinlabel.setTextColor(Color.BLACK);
+						spinlabel.setPadding(5, 0, 0, 0);
+						spinlabel.setTextSize(18);
 
-					gl.vehiculoID=listIDVehiculo.get(position);
-					gl.vehiculo=listVehiculo.get(position);
+						gl.vehiculoID=listIDVehiculo.get(position);
+						gl.vehiculo=listVehiculo.get(position);
 
-				} catch (Exception e) {
-					mu.msgbox( e.getMessage());
+					} catch (Exception e) {
+						mu.msgbox( e.getMessage());
+					}
 				}
-			}
 
-			@Override
-			public void onNothingSelected(AdapterView<?> parentView) {
-				return;
-			}
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) {
+					return;
+				}
 
-		});
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
 
 	}
 
@@ -1360,6 +1581,7 @@ public class Menu extends PBase {
 			}
 
 		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			//Log.d("getAyudanteVehiculo error: ", e.getMessage());
 		}
 	}
@@ -1386,6 +1608,7 @@ public class Menu extends PBase {
 			Ayudante.setAdapter(dataAdapter);
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}
 
@@ -1417,56 +1640,68 @@ public class Menu extends PBase {
 			Vehiculo.setAdapter(dataAdapter);
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}
 
 	}
 
 	private void msgAskAyudante() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle("Road");
-		dialog.setMessage("¿Esta seguro de continuar sin asignar un ayudante?");
+			dialog.setTitle("Road");
+			dialog.setMessage("¿Esta seguro de continuar sin asignar un ayudante?");
 
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
 
-			}
-		});
+				}
+			});
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				inputAyudanteVehiculo();
-			}
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					inputAyudanteVehiculo();
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	private void msgAskVehiculo() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle("Road");
-		dialog.setMessage("¿Esta seguro de continuar sin asignar un vehículo?");
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setTitle("Road");
+			dialog.setMessage("¿Esta seguro de continuar sin asignar un vehículo?");
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
+			dialog.setIcon(R.drawable.ic_quest);
 
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
+				}
+			});
 
-			}
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
 
-		dialog.show();
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
@@ -1484,6 +1719,7 @@ public class Menu extends PBase {
 			DT.moveToFirst();
 			prwd=DT.getInt(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			prwd=32;
 		}
 		
@@ -1502,6 +1738,7 @@ public class Menu extends PBase {
 			gl.boldep=DT.getInt(0);
 			gl.depparc=DT.getInt(1)==1;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			gl.boldep=0;
 			gl.depparc=false;
 		}
@@ -1525,6 +1762,7 @@ public class Menu extends PBase {
 			if (prtipo.equalsIgnoreCase("EPSON")) prid=2;
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			prid=0;
 	    }
 		
@@ -1550,6 +1788,7 @@ public class Menu extends PBase {
 			}
 
 		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox("GetTipoImpresora: " + e.getMessage());
 		}
 
@@ -1558,30 +1797,38 @@ public class Menu extends PBase {
 
 	//#HS_20181122_1513 Se agrego la funcion ConfImpresora()
 	public void ConfImpresora(){
-
-		if(GetTipoImpresora().equalsIgnoreCase("SIN IMPRESORA") || GetTipoImpresora().equalsIgnoreCase("BLUETOOTH")){
-			msgAskImpresora();
+		try{
+			if(GetTipoImpresora().equalsIgnoreCase("SIN IMPRESORA") || GetTipoImpresora().equalsIgnoreCase("BLUETOOTH")){
+				msgAskImpresora();
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 
 	}
 
 	//#HS_20181122_1517 Se agrego el mensaje de configuracion de impresora.
 	private void msgAskImpresora() 	{
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+			dialog.setTitle("Road");
+			dialog.setMessage("Debe configurar la impresora");
 
-		dialog.setTitle("Road");
-		dialog.setMessage("Debe configurar la impresora");
+			dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					menuConfImpres();
+				}
+			});
 
-		dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				menuConfImpres();
-			}
-		});
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 
-		dialog.show();
 
 	}
 
@@ -1591,8 +1838,13 @@ public class Menu extends PBase {
 	
 	@Override
  	protected void onResume() {
-	    super.onResume();
-	    setPrintWidth();
+		try{
+			super.onResume();
+			setPrintWidth();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	//endregion

@@ -24,6 +24,7 @@ public class RecargCant extends PBase {
 		setContentView(R.layout.activity_recarg_cant);
 		
 		super.InitBase();
+		addlog("RecargCant",""+du.getActDateTime(),gl.vend);
 		
 		setControls();
 		
@@ -46,30 +47,40 @@ public class RecargCant extends PBase {
 	// Events
 	
 	public void sendCant(View view) {
-			
-		setCant();
-			
-		if (cant<0){
-			mu.msgbox("Cantidad incorrecta");return;
+
+		try{
+			setCant();
+
+			if (cant<0){
+				mu.msgbox("Cantidad incorrecta");return;
+			}
+
+			((appGlobals) vApp).dval=cant;
+			((appGlobals) vApp).devrazon="0";
+
+			hidekeyb();
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		((appGlobals) vApp).dval=cant;
-		((appGlobals) vApp).devrazon="0";
-			
-		hidekeyb();
-		super.finish();
+
 			
 	}
 	
 	// Main
 	
 	private void setHandlers(){
-	
-		if (gl.peDecCant==0) {
- 			txtCant.setInputType(InputType.TYPE_CLASS_NUMBER );			
- 		} else {	
- 			txtCant.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);	
- 		}
+
+		try{
+			if (gl.peDecCant==0) {
+				txtCant.setInputType(InputType.TYPE_CLASS_NUMBER );
+			} else {
+				txtCant.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}
 	
@@ -90,6 +101,7 @@ public class RecargCant extends PBase {
 			lblDesc.setText(DT.getString(7));
 			costo=DT.getDouble(8);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   mu.msgbox("1-"+ e.getMessage());costo=0;
 	    }	
 		
@@ -103,6 +115,7 @@ public class RecargCant extends PBase {
   			icant=DT.getDouble(0);
   				
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			icant=0;
 	    }	
 
@@ -115,27 +128,38 @@ public class RecargCant extends PBase {
 			cant=Double.parseDouble(txtCant.getText().toString());			
 			cant=mu.round(cant,gl.peDecCant);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			cant=-1; 
 		}
 	}
 	
 	private void parseCant(double c) {
-		DecimalFormat frmdec = new DecimalFormat("#.####"); 
-		double ub;
-		
-		ub=c;
-		if (ub>0) txtCant.setText(frmdec.format(ub));
+		try{
+			DecimalFormat frmdec = new DecimalFormat("#.####");
+			double ub;
+
+			ub=c;
+			if (ub>0) txtCant.setText(frmdec.format(ub));
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	
 	// Aux
 
 	private void setControls() {
-		txtCant= (EditText) findViewById(R.id.txtMonto);
-		rlCant= (RelativeLayout) findViewById(R.id.rlCant);			
-		lblDesc=(TextView) findViewById(R.id.lblFecha);
-		lblPrec=(TextView) findViewById(R.id.lblPNum);			
-		lblBU=(TextView) findViewById(R.id.lblBU);	
+		try{
+			txtCant= (EditText) findViewById(R.id.txtMonto);
+			rlCant= (RelativeLayout) findViewById(R.id.rlCant);
+			lblDesc=(TextView) findViewById(R.id.lblFecha);
+			lblPrec=(TextView) findViewById(R.id.lblPNum);
+			lblBU=(TextView) findViewById(R.id.lblBU);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 }

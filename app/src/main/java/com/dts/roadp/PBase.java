@@ -1,15 +1,15 @@
 package com.dts.roadp;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v4.app.FragmentActivity;
 import android.view.Gravity;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-public class PBase extends FragmentActivity {
+public class PBase extends Activity {
 
 	protected int active;
 	protected SQLiteDatabase db;

@@ -1223,12 +1223,11 @@ public class Menu extends PBase {
 						case 0:
 							menuConfImpres();break;
 						case 1:
-							startActivity(new Intent(Menu.this,Tablas.class));
-							break;
+							startActivity(new Intent(Menu.this,Tablas.class));break;
 						case 2:
 							menuCorelZ();break;
 						case 3:
-							;break;
+							startActivity(new Intent(Menu.this,Soporte.class));break;
 					}
 
 					dialog.cancel();

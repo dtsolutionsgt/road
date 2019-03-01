@@ -46,6 +46,7 @@ public class Repesaje extends PBase {
         setContentView(R.layout.activity_repesaje);
 
         super.InitBase();
+        addlog("Repesaje",""+du.getActDateTime(),gl.vend);
 
         listView = (ListView) findViewById(R.id.listView1);
 
@@ -81,31 +82,51 @@ public class Repesaje extends PBase {
     // Events
 
     public void doSave(View view) {
-        if (checkItem()) saveItem();
+        try{
+            if (checkItem()) saveItem();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
     public void doDelete(View view) {
-        deleteItem();
+        try{
+            deleteItem();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
     public void doApply(View view) {
-        totales();
-        if (!checkLimits()) return;
+        try{
+            if (!checkLimits()) return;
 
-        if (opeso==tpeso) {
-            msgbox("No se puede aplicar repesaje.\nPeso total iqual al peso original.");return;
+            if (opeso==tpeso) {
+                msgbox("No se puede aplicar repesaje.\nPeso total iqual al peso original.");return;
+            }
+
+            if (tcant>0) msgAskApply("Seguro de cambiar peso de "+mu.frmdecimal(opeso, gl.peDecImp)+" a "+mu.frmdecimal(tpeso, gl.peDecImp));
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
+        totales();
 
-        if (tcant>0) msgAskApply("Seguro de cambiar peso de "+mu.frmdecimal(opeso, gl.peDecImp)+" a "+mu.frmdecimal(tpeso, gl.peDecImp));
     }
 
     public void doCalc(View view) {
-        openCalculator();
+        try{
+            openCalculator();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
     private void setHandlers() {
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        try{listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 try {
@@ -116,52 +137,58 @@ public class Repesaje extends PBase {
                     selidx = 0;
                     adapter.setSelectedIndex(position);
                 } catch (Exception e) {
+                    addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
                     mu.msgbox(e.getMessage());
                 }
             }
         });
 
-        txtPeso.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
-                if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (arg1) {
-                        case KeyEvent.KEYCODE_ENTER:
-                            txtBol.requestFocus();
-                            return true;
+            txtPeso.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
+                    if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
+                        switch (arg1) {
+                            case KeyEvent.KEYCODE_ENTER:
+                                txtBol.requestFocus();
+                                return true;
+                        }
                     }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
 
-        txtBol.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
-                if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (arg1) {
-                        case KeyEvent.KEYCODE_ENTER:
-                            txtBol.requestFocus();
-                            return true;
+            txtBol.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
+                    if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
+                        switch (arg1) {
+                            case KeyEvent.KEYCODE_ENTER:
+                                txtBol.requestFocus();
+                                return true;
+                        }
                     }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
 
-        txtCan.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
-                if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (arg1) {
-                        case KeyEvent.KEYCODE_ENTER:
-                            if (checkItem()) saveItem();
-                            return true;
+            txtCan.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
+                    if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
+                        switch (arg1) {
+                            case KeyEvent.KEYCODE_ENTER:
+                                if (checkItem()) saveItem();
+                                return true;
+                        }
                     }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
+
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
 
     }
 
@@ -169,19 +196,29 @@ public class Repesaje extends PBase {
     // Main
 
     private void listItems() {
+        try{
+            adapter=new ListAdaptRepes(this, ritems);
+            listView.setAdapter(adapter);
 
-        adapter=new ListAdaptRepes(this, ritems);
-        listView.setAdapter(adapter);
+            totales();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
 
-        totales();
+
     }
 
     private void loadItem() {
-        if (esbarra) {
+        try{
+            if (esbarra) {
 
-        } else {
-            loadItemSingle();
+            } else {
+                loadItemSingle();
+            }
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
+
     }
 
     private void loadItemSingle() {
@@ -200,36 +237,47 @@ public class Repesaje extends PBase {
             opeso=DT.getDouble(0);
             ocant=DT.getDouble(2);
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());
         }
 
      }
 
     private void saveItem() {
-        clsClasses.clsRepes item = clsCls.new clsRepes();
+        try{
+            clsClasses.clsRepes item = clsCls.new clsRepes();
 
-        item.id=ritems.size()+1;
-        item.peso=dpeso;
-        item.bol=ival;
-        item.can=dcan;
+            item.id=ritems.size()+1;
+            item.peso=dpeso;
+            item.bol=ival;
+            item.can=dcan;
 
-        item.sid="#"+item.id;
-        item.speso=mu.frmdecimal(dpeso,gl.peDecImp);
-        item.sbol=" "+ival;
-        item.scan=mu.frmdecimal(dcan,gl.peDecImp);
-        item.stot=mu.frmdecimal(dpeso-dcan,gl.peDecImp);
+            item.sid="#"+item.id;
+            item.speso=mu.frmdecimal(dpeso,gl.peDecImp);
+            item.sbol=" "+ival;
+            item.scan=mu.frmdecimal(dcan,gl.peDecImp);
+            item.stot=mu.frmdecimal(dpeso-dcan,gl.peDecImp);
 
-        ritems.add(item);
+            ritems.add(item);
 
-        clearItem();
-        listItems();
+            clearItem();
+            listItems();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
     private void clearItem() {
-        txtPeso.setText("");txtPeso.requestFocus();
-        if (esbarra) txtBol.setText("");else txtBol.setText("1");
-        txtCan.setText("");
-        selidx=-1;
+        try{
+            txtPeso.setText("");txtPeso.requestFocus();
+            if (esbarra) txtBol.setText("");else txtBol.setText("1");
+            txtCan.setText("");
+            selidx=-1;
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
     private void deleteItem() {
@@ -246,6 +294,7 @@ public class Repesaje extends PBase {
 
             listItems();
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
@@ -270,6 +319,7 @@ public class Repesaje extends PBase {
             finish();
             toastcent("Repesaje aplicado");
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
    }
@@ -282,26 +332,36 @@ public class Repesaje extends PBase {
     // Calculator
 
     private void prepareCalculator() {
-        items =new  ArrayList<HashMap<String,Object>>();
-        Handler mtimer = new Handler();
-        Runnable mrunner=new Runnable() {
-            @Override
-            public void run() {
-                listPackages();
-            }
-        };
-        mtimer.postDelayed(mrunner,500);
+        try{
+            items =new  ArrayList<HashMap<String,Object>>();
+            Handler mtimer = new Handler();
+            Runnable mrunner=new Runnable() {
+                @Override
+                public void run() {
+                    listPackages();
+                }
+            };
+            mtimer.postDelayed(mrunner,500);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
     private void listPackages() {
-        pm = getPackageManager();
-        packs = pm.getInstalledPackages(0);
-        for (PackageInfo pi : packs) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
-            map.put("appName", pi.applicationInfo.loadLabel(pm));
-            map.put("packageName", pi.packageName);
-            items.add(map);
+        try{
+            pm = getPackageManager();
+            packs = pm.getInstalledPackages(0);
+            for (PackageInfo pi : packs) {
+                HashMap<String, Object> map = new HashMap<String, Object>();
+                map.put("appName", pi.applicationInfo.loadLabel(pm));
+                map.put("packageName", pi.packageName);
+                items.add(map);
+            }
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
+
     }
 
     private void openCalculator() {
@@ -329,6 +389,7 @@ public class Repesaje extends PBase {
                 toast("No se puede abrir calculadora");
             }
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object() {
             }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
@@ -345,6 +406,7 @@ public class Repesaje extends PBase {
             dpeso=Double.parseDouble(ss);
             if (dpeso<=0) throw new Exception();
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox("Peso incorrecto.");txtPeso.requestFocus();return false;
         }
 
@@ -353,6 +415,7 @@ public class Repesaje extends PBase {
             ival=Integer.parseInt(ss);
             if (ival<=0) throw new Exception();
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox("Cantidad incorrecta.");txtBol.requestFocus();return false;
         }
 
@@ -362,6 +425,7 @@ public class Repesaje extends PBase {
             dcan=Double.parseDouble(ss);
             if (dcan<0) throw new Exception();
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox("Descuento canastas incorrecto.");txtCan.requestFocus();return false;
         }
 
@@ -369,35 +433,45 @@ public class Repesaje extends PBase {
     }
 
     private void msgAskExit(String msg) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-         dialog.setMessage(msg  + " ?");
-        dialog.setIcon(R.drawable.ic_quest);
+            dialog.setMessage(msg  + " ?");
+            dialog.setIcon(R.drawable.ic_quest);
 
-        dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        });
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
 
-        dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {}
-        });
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {}
+            });
 
-        dialog.show();
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
 
     }
 
     private void totales() {
-        tcant=ritems.size();
+        try{
+            tcant=ritems.size();
 
-        tpeso=0;
-        for (int i = 0; i <ritems.size(); i++) {
-            tpeso=tpeso+ritems.get(i).peso;
+            tpeso=0;
+            for (int i = 0; i <ritems.size(); i++) {
+                tpeso=tpeso+ritems.get(i).peso;
+            }
+
+            lblCant.setText("" + tcant);
+            lblPeso.setText(mu.frmdecimal(tpeso, gl.peDecImp));
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
-        lblCant.setText("" + tcant);
-        lblPeso.setText(mu.frmdecimal(tpeso, gl.peDecImp));
 
     }
 
@@ -431,6 +505,7 @@ public class Repesaje extends PBase {
             }
 
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
 
@@ -441,22 +516,27 @@ public class Repesaje extends PBase {
     // Messages
 
     private void msgAskApply(String msg) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-        dialog.setTitle("Title");
-        dialog.setMessage("¿" + msg + "?");
+            dialog.setTitle("Title");
+            dialog.setMessage("¿" + msg + "?");
 
-        dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                apply();
-            }
-        });
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    apply();
+                }
+            });
 
-        dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {}
-        });
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {}
+            });
 
-        dialog.show();
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
 
     }
 
@@ -465,7 +545,12 @@ public class Repesaje extends PBase {
 
     @Override
     public void onBackPressed() {
-        msgAskExit("Salir sin aplicar repesaje");
+        try{
+            msgAskExit("Salir sin aplicar repesaje");
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
 

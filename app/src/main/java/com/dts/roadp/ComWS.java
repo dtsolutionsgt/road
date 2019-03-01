@@ -59,7 +59,7 @@ public class ComWS extends PBase {
 	private SQLiteDatabase dbT;
 	private BaseDatos ConT;
 	private BaseDatos.Insert insT;
-	private  AppMethods clsAppM;
+	private AppMethods clsAppM;
 
 	private ArrayList<String> listItems=new ArrayList<String>();
 	private ArrayList<String> results=new ArrayList<String>();
@@ -81,8 +81,8 @@ public class ComWS extends PBase {
 	
 	private static String sstr,fstr,fprog,finf,ferr,fterr,idbg,dbg,ftmsg,esql,ffpos;
 	private int scon,running,pflag,stockflag,conflag;
-	private String ftext,slsync,senv,gEmpresa,ActRuta,mac,fsql,fsqli,fsqlf;
-	private boolean rutapos,ftflag,esvacio;
+	private String ftext,slsync,senv,gEmpresa,ActRuta,mac,fsql,fsqli,fsqlf,strliqid;
+	private boolean rutapos,ftflag,esvacio,liqid;
 	
 	private final String NAMESPACE ="http://tempuri.org/";
 	private String METHOD_NAME,URL;
@@ -95,7 +95,7 @@ public class ComWS extends PBase {
 		
 		super.InitBase();
 		addlog("ComWS",""+du.getActDateTime(),gl.vend);
-		
+
 		System.setProperty("line.separator","\r\n");
 		
 		dbld=new clsDataBuilder(this);
@@ -242,7 +242,7 @@ public class ComWS extends PBase {
 		if (isbusy==1) {
 			toastcent("Por favor, espere que se termine la tarea actual.");return;
 		}
-			
+
 
 			
 	}
@@ -477,7 +477,7 @@ public class ComWS extends PBase {
 	        return 0;
 	    } catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-	    	sstr=e.getMessage(); 
+	    	sstr=e.getMessage();
 	    }
 
     	return 0;
@@ -529,7 +529,7 @@ public class ComWS extends PBase {
 	        return 1;
 	    } catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-	    	sstr=e.getMessage(); 
+	    	sstr=e.getMessage();
 	    }
 		
 		return 0;
@@ -564,7 +564,7 @@ public class ComWS extends PBase {
 	        return 1;
 	    } catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		    sstr=e.getMessage();          
+		    sstr=e.getMessage();
 	    }
 		
 		return 0;
@@ -615,12 +615,19 @@ public class ComWS extends PBase {
 	//region WS Recepcion Methods
 
 	private boolean getData(){
-
 	    Cursor DT;
+		BufferedWriter writer = null;
+		FileWriter wfile;
 		int rc,scomp,prn,jj;
 		String s,val="";
-	
+
+
 		try {
+			String fname = Environment.getExternalStorageDirectory()+"/roadcarga.txt";
+			wfile=new FileWriter(fname,false);
+			writer = new BufferedWriter(wfile);
+
+            db.execSQL("DELETE FROM P_LIQUIDACION");
 
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=2";	
 			DT=Con.OpenDT(sql);
@@ -755,8 +762,11 @@ public class ComWS extends PBase {
 			for (int i = 0; i < rc; i++) {
 
                 sql = listItems.get(i);esql=sql;
-
                 sql=sql.replace("INTO VENDEDORES","INTO P_VENDEDOR");
+
+				try {
+					writer.write(sql);writer.write("\r\n");
+				} catch (Exception e) {}
 
                 dbT.execSQL(sql);
 
@@ -789,6 +799,14 @@ public class ComWS extends PBase {
 				ConT.close();
 			} catch (Exception e) {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			}
+
+
+			try {
+				writer.close();
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			}
 
 			return true;
@@ -864,7 +882,7 @@ public class ComWS extends PBase {
 		try {
 			
 			fprog=TN;idbg=TN;
-			wsRtask.onProgressUpdate();
+			//wsRtask.onProgressUpdate();
 			SQL=getTableSQL(TN);
 
 			if (fillTable(SQL,"DELETE FROM "+TN)==1) {
@@ -1237,6 +1255,11 @@ public class ComWS extends PBase {
 		}
 
 
+		if (TN.equalsIgnoreCase("P_LIQUIDACION")) {
+            SQL = "SELECT RUTA,ESTADO FROM P_LIQUIDACION WHERE (RUTA='" + ActRuta + "') AND (FECHA>='" + fsql + "') ";
+            return SQL;
+        }
+
 		return SQL;
 	}   
 	 
@@ -1353,7 +1376,9 @@ public class ComWS extends PBase {
 		return true;
 	}
 	
-	private void estandartInventario() {
+	private void estandartInventario()
+
+    {
 		Cursor dt,df;
 		String cod,ub,us,lote,doc,stat;
 		double cant,cantm,fact;
@@ -1483,38 +1508,42 @@ public class ComWS extends PBase {
 
 				lblInfo.setText(" ");
 
-				s="Recepción completa.";
-
-				if (!esvacio) {
-
-					if (stockflag==1) {
-						s=s+"\nSe actualizó inventario.";
-						estandartInventario();
-					}
-
-					validaDatos(true);
-
-					if (stockflag==1) sendConfirm();
-
-					msgAskExit(s);
-
-				} else {
-					isbusy=0;
-					esvacio=false;
-					SystemClock.sleep(100);
-					//#EJC20190226:Evita cargar datos dos veces.
-					//if (validaDatos(false)) runRecep();
-					//#EJC20190226_1308: Reiniciar la App
-					msgAskExit(s);
-					return;
+		    s="Recepción completa.";
+			
+			//if (!esvacio) {
+				if (stockflag==1) {
+					s=s+"\nSe actualizó inventario.";
 				}
-			} else {
-				lblInfo.setText(fstr);
-				mu.msgbox("Ocurrió error : \n"+fstr+" ("+reccnt+") " + ferr);
+
+            estandartInventario();
+
+
+            validaDatos(true);
+					
+				if (stockflag==1) sendConfirm();
+
+					msgAskExit(s);
+
+				/*
+            } else {
 				isbusy=0;
-				barInfo.setVisibility(View.INVISIBLE);
+				esvacio=false;
+				SystemClock.sleep(100);
+				//#EJC20190226:Evita cargar datos dos veces.
+				//if (validaDatos(false)) runRecep();
+                //#EJC20190226_1308: Reiniciar la App
+                msgAskExit(s);
 				return;
+
 			}
+			*/
+		} else {	
+			lblInfo.setText(fstr);
+			mu.msgbox("Ocurrió error : \n"+fstr+" ("+reccnt+") " + ferr);
+			isbusy=0;
+            barInfo.setVisibility(View.INVISIBLE);
+			return;
+		}
 
 			pendientes=validaPendientes();
 			visibilidadBotones();
@@ -1587,6 +1616,14 @@ public class ComWS extends PBase {
 
 		senv = "Envío terminado \n \n";
 
+        if (!validaLiquidacion()) {
+            liqid = false;
+            senv = "La liquidación no está cerrada, no se puede enviar datos";
+            return false;
+        } else {
+            liqid=true;
+        }
+
 		items.clear();
 
 		try{
@@ -1632,6 +1669,42 @@ public class ComWS extends PBase {
 
 		return true;
 	}
+
+	private boolean validaLiquidacion() {
+        Cursor DT;
+        String ss;
+
+        try {
+
+            db.execSQL("DELETE FROM P_LIQUIDACION");
+
+            AddTable("P_LIQUIDACION") ;
+
+            sql = listItems.get(0);
+            db.execSQL(sql);
+
+            sql = listItems.get(1);
+            db.execSQL(sql);
+
+            sql = "SELECT ESTADO FROM P_LIQUIDACION";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                ss=DT.getString(0);
+                if (ss.equalsIgnoreCase("Cerrada")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                 return false;
+            }
+        } catch (Exception e) {
+            strliqid = e.getMessage();
+            return false;
+        }
+    }
 
 	public void envioFacturas() {
 
@@ -2337,7 +2410,7 @@ public class ComWS extends PBase {
 			if (envioparcial) dbld.clear();
 
 			ss = " UPDATE P_STOCK SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
-					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA>='" + fsql + "') AND ENVIADO = 0 " +
+					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA>='" + fsqli + "') AND ENVIADO = 0 " +
 					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + vFecha + "' )";
 			dbld.add(ss);
 
@@ -2528,7 +2601,7 @@ public class ComWS extends PBase {
 
 	//endregion
 
-	//region WS EnvioHandling Methods
+	//region WS Envio Handling Methods
 	
 	public void wsSendExecute(){
 

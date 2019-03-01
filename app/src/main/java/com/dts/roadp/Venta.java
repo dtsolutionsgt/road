@@ -56,7 +56,7 @@ public class Venta extends PBase {
 
 	private String emp,cliid,rutatipo,prodid,um,tiposcan;
 	private int nivel,dweek,clidia;
-	private boolean sinimp,rutapos,softscanexist;
+	private boolean sinimp,rutapos,softscanexist,porpeso;
 
 	private DecimalFormat ffrmprec;
 	private AppMethods app;
@@ -569,13 +569,14 @@ public class Venta extends PBase {
 				prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,0);
 			}
 
-			precsin=prc.precsin;
-			imp=prc.imp;
-			impval=prc.impval;
-			descmon=prc.descmon;
-			tot=prc.tot;prodtot=tot;
-			totsin=prc.totsin;
-			percep=0;
+
+		precsin=prc.precsin;
+		imp=prc.imp;
+		impval=prc.impval;
+		descmon=prc.descmon;
+		tot=prc.tot;prodtot=tot;
+		totsin=prc.totsin;
+		percep=0;
 
 			//Toast.makeText(this,"Impval : "+impval+" , prec sin : "+precsin+" tot sin  "+totsin, Toast.LENGTH_LONG).show();
 
@@ -638,8 +639,19 @@ public class Venta extends PBase {
 
 		cantbas=cant*fact;
 		//peso=mu.round(cant*fact,gl.peDec);
-		peso=mu.round(gl.dpeso,gl.peDec);
 
+		porpeso=prodPorPeso(prodid);
+		if (porpeso) {
+			peso=mu.round(gl.dpeso,gl.peDec);
+		} else {
+			peso=mu.round(gl.dpeso*gl.umfactor,gl.peDec);
+		}
+
+		if (porpeso) {
+			prodtot=mu.round(gl.prectemp*peso,gl.peDec);
+		} else {
+			prodtot=mu.round(prec*cant,gl.peDec);
+		}
 
 		try {
 
@@ -649,17 +661,17 @@ public class Venta extends PBase {
 
 			ins.add("PRODUCTO",prodid);
 			ins.add("EMPRESA",emp);
-			ins.add("UM",gl.umpres);
+			if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
 			ins.add("CANT",cant);
 			if (rutatipo.equalsIgnoreCase("V")) ins.add("UMSTOCK",gl.umstock);else ins.add("UMSTOCK",gl.um);
 			if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
 			ins.add("FACTOR",gl.umfactor);
-			ins.add("PRECIO",prec);
+			if (porpeso) ins.add("PRECIO",gl.prectemp); else ins.add("PRECIO",prec);
 			ins.add("IMP",impval);
 			ins.add("DES",desc);
 			ins.add("DESMON",descmon);
 			ins.add("TOTAL",prodtot);
-			ins.add("PRECIODOC",precdoc);
+			if (porpeso) ins.add("PRECIODOC",gl.prectemp); else ins.add("PRECIODOC",precdoc);
 			ins.add("PESO",peso);
 			ins.add("VAL1",0);
 			ins.add("VAL2","");
@@ -1396,7 +1408,7 @@ public class Venta extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	
+
 	}
 	
 	@Override

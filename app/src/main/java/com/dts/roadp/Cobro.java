@@ -19,6 +19,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 
+import org.apache.commons.lang.StringUtils;
+
 public class Cobro extends PBase {
 
 	private ListView listView;
@@ -32,7 +34,7 @@ public class Cobro extends PBase {
 	private printer prn;
 	private clsDocCobro fdoc;
 	
-	private String cliid,itemid,prodid,sefect,corel,fserie,tipo;
+	private String cliid,itemid,prodid,sefect,corel,fserie,dtipo;
 	private double ttot,tsel,tpag,tpend,vefect,plim;
 	private boolean peexit;
 	private int fflag=1,fcorel;
@@ -44,7 +46,7 @@ public class Cobro extends PBase {
 		
 		super.InitBase();
 		addlog("Cobro",""+du.getActDateTime(),gl.vend);
-		
+
 		listView = (ListView) findViewById(R.id.listView1);
 		lblSel = (TextView) findViewById(R.id.textView7);
 		lblPag = (TextView) findViewById(R.id.lblCEmit);
@@ -132,10 +134,19 @@ public class Cobro extends PBase {
 	}
 
 	public void checkAll(View view) {
-		try{
-			for (int i = 0; i <items.size(); i++) {
-				items.get(i).flag=1;
+	    try{
+        for (int i = 0; i <items.size(); i++) {
+            items.get(i).flag=1;
+            dtipo=items.get(i).Tipo;
+
+            if (dtipo.equalsIgnoreCase("R")) {
+				for (int ii = 0; ii <i; ii++) {
+					items.get(i).flag=0;
+				}
+				break;
 			}
+
+        }
 
 			adapter.refreshItems();
 
@@ -194,8 +205,10 @@ public class Cobro extends PBase {
 
 						adapter.setSelectedIndex(position);
 
-						tipo=vItem.Tipo;
-						if (tipo.equalsIgnoreCase("R")) clearAll();
+					dtipo=vItem.Tipo;
+					if (dtipo.equalsIgnoreCase("R")) clearAll();
+						dtipo=vItem.Tipo;
+						if (dtipo.equalsIgnoreCase("R")) clearAll();
 
 						flag = vItem.flag;
 						if (flag == 0) flag = 1;
@@ -396,11 +409,11 @@ public class Cobro extends PBase {
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 
-				if (mu.emptystr(tipo)) {
+				if (mu.emptystr(dtipo)) {
 					ins.init("D_COBROP");
 					ins.add("COREL",corel);
 				} else {
-					if (tipo.equalsIgnoreCase("R")) {
+					if (dtipo.equalsIgnoreCase("R")) {
 						ins.init("D_FACTURAP");
 						ins.add("COREL",doc);
 					} else {
@@ -436,27 +449,32 @@ public class Cobro extends PBase {
 			
 			db.endTransaction();
 
-			if (tipo.equalsIgnoreCase("R")){
+			if (!mu.emptystr(dtipo)) {
 
-				db.beginTransaction();
+				if (dtipo.equalsIgnoreCase("R")) {
 
-				sql="DELETE FROM D_COBRO WHERE COREL='"+corel+"'";
-				db.execSQL(sql);
+					db.beginTransaction();
 
-				sql="DELETE FROM D_COBROD WHERE COREL='"+corel+"'";
-				db.execSQL(sql);
+					sql = "DELETE FROM D_COBRO WHERE COREL='" + corel + "'";
+					db.execSQL(sql);
 
-				sql="DELETE FROM D_COBROP WHERE COREL='"+corel+"'";
-				db.execSQL(sql);
+					sql = "DELETE FROM D_COBROD WHERE COREL='" + corel + "'";
+					db.execSQL(sql);
 
-				sql="DELETE FROM P_COBRO WHERE DOCUMENTO='"+doc+"'";
-				db.execSQL(sql);
+					sql = "DELETE FROM D_COBROP WHERE COREL='" + corel + "'";
+					db.execSQL(sql);
 
-				db.setTransactionSuccessful();
+					sql = "DELETE FROM P_COBRO WHERE DOCUMENTO='" + doc + "'";
+					db.execSQL(sql);
 
-				db.endTransaction();
+					db.setTransactionSuccessful();
+
+					db.endTransaction();
+
+				}
 
 			}
+
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -477,7 +495,7 @@ public class Cobro extends PBase {
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			int cor=DT.getInt(1)+1;
-			return DT.getString(0)+cor;
+			return DT.getString(0) + StringUtils.right("000000" + Integer.toString(cor), 6);
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -653,7 +671,7 @@ public class Cobro extends PBase {
 			
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			inputEfectivo(); 
+			inputEfectivo();
 			mu.msgbox("Pago incorrecto"+e.getMessage());	   	
 	    }
 		
@@ -738,13 +756,13 @@ public class Cobro extends PBase {
 
 	}
 
-	private double getDocPago(String doc,String tipo){
+	private double getDocPago(String doc,String ptipo){
 		Cursor DT;
 		double tp;
 				
 		try {
 			sql="SELECT SUM(PAGO) FROM D_COBROD "+
-		         "WHERE (ANULADO='N') AND (DOCUMENTO='"+doc+"') AND (TIPODOC='"+tipo+"') ";
+		         "WHERE (ANULADO='N') AND (DOCUMENTO='"+doc+"') AND (TIPODOC='"+ptipo+"') ";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			

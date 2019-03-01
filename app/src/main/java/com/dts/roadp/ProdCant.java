@@ -30,7 +30,7 @@ public class ProdCant extends PBase {
 	
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant;
-	private double cant,prec,icant,idisp,ipeso,umfactor;
+	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom,pesostock;
 	private boolean pexist,esdecimal,porpeso,esbarra;
 	
 	@Override
@@ -40,7 +40,7 @@ public class ProdCant extends PBase {
 		
 		super.InitBase();
 		addlog("ProdCant",""+du.getActDateTime(),gl.vend);
-		
+
 		setControls();
 				
 		prodid=gl.prod;lblCodProd.setText(prodid);
@@ -52,7 +52,8 @@ public class ProdCant extends PBase {
 		imgUpd.setVisibility(View.INVISIBLE);
 		
 		prc=new Precio(this,mu,gl.peDec);
-		
+		getDisp();
+
 		setHandlers();
 
 		if (gl.peDecCant==0) {
@@ -222,7 +223,7 @@ public class ProdCant extends PBase {
 	
 		try {
 							
-			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO "+
+			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO,PESO_PROMEDIO "+
 				 "FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	dt=Con.OpenDT(sql);
 			dt.moveToFirst();
@@ -233,7 +234,8 @@ public class ProdCant extends PBase {
 			//prodimg=DT.getString(6);
 			prodimg=prodid;
 			proddesc=dt.getString(7);
-			
+			pesoprom = dt.getDouble(9);
+
 			if (dt.getString(7).equalsIgnoreCase("P")) pexist=true; else pexist=false;
 			
 		} catch (Exception e) {
@@ -276,7 +278,7 @@ public class ProdCant extends PBase {
 
 
 		prec=prc.precio(prodid,0,nivel,um,gl.umpeso,0);
-		
+
 		lblPrec.setText("Precio: "+mu.frmcur(0));
 
 		if (prec==0) {
@@ -311,9 +313,12 @@ public class ProdCant extends PBase {
 			idisp=getDispInv();	
 		}
 
+		idisp=mu.trunc(idisp);
+
 		if (porpeso) {
 			lblBU.setText(umstock);
 			upres = umstock;
+
 			lblPrec.setText(mu.frmcur(prec)+" x "+gl.umpeso);
 		} else {
 			lblPrec.setText(mu.frmcur(prec)+" x "+upres);
@@ -346,13 +351,14 @@ public class ProdCant extends PBase {
 			
 		try {
 
-			sql="SELECT SUM(CANT) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
+			sql="SELECT SUM(CANT),SUM(PESO) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			
 			umstock=um;umfactor=1;
 			disp=dt.getDouble(0);
-
+			ipeso=dt.getDouble(1);
+			pesostock=ipeso/disp;
 			if (disp>0) return disp;
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -397,11 +403,11 @@ public class ProdCant extends PBase {
 			disp=dt.getDouble(0);
             if (!porpeso) disp=disp/umfactor;
             ipeso=dt.getDouble(1);
-			
+			pesostock = ipeso/disp;
 			return disp;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-	    }	
+	    }
 		
 		return 0;
 	}
@@ -435,23 +441,23 @@ public class ProdCant extends PBase {
 
 				String spp=txtPeso.getText().toString();
 
-				try {
-					ppeso=Double.parseDouble(spp);
-					if (ppeso<=0) throw new Exception();
-				} catch (Exception e) {
-					mu.msgbox("Peso incorrect");txtPeso.requestFocus();return;
-				}
-			} else {
-				ppeso=0;
+			try {
+				ppeso=Double.parseDouble(spp);
+				if (ppeso<=0) throw new Exception();
+			} catch (Exception e) {
+				mu.msgbox("Peso incorrect");txtPeso.requestFocus();return;
 			}
+		} else {
+			if (pesoprom==0) ppeso = pesostock*cant;else ppeso=pesoprom*cant;
+		}
 
-			gl.dval=cant;
-			//if (porpeso) gl.dpeso=ppeso;else gl.dpeso=0;
-			gl.dpeso=ppeso;
-			gl.um=upres;
-			gl.umpres=upres;
-			gl.umstock=umstock;
-			gl.umfactor=umfactor;
+		gl.dval=cant;
+		gl.dpeso=ppeso;
+		gl.um=upres;
+		gl.umpres=upres;
+		gl.umstock=umstock;
+		gl.umfactor=umfactor;
+        gl.prectemp=prec;
 
 			hidekeyb();
 			super.finish();
@@ -553,7 +559,7 @@ public class ProdCant extends PBase {
 		try {
 			if (cant<0)	lblCant.setText(""); else lblCant.setText(String.valueOf(cant));
 			if (porpeso) {
-                tv=prec*cant*umfactor;
+                tv=prec*cant;
             } else {
                 tv=prec*cant;
             }

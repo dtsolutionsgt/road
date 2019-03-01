@@ -58,7 +58,7 @@ public class FacturaRes extends PBase {
 		setContentView(R.layout.activity_factura_res);
 		
 		super.InitBase();
-		addlog("FacturaRes",""+du.getActDateTime(),gl.vend);
+        addlog("FacturaRes",""+du.getActDateTime(),gl.vend);
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		lblPago = (TextView) findViewById(R.id.TextView01);
@@ -252,6 +252,7 @@ public class FacturaRes extends PBase {
 	// Main
 	
 	private void processFinalPromo(){
+		
 		descg=gl.descglob;
 		descgtotal=gl.descgtotal;
 
@@ -441,7 +442,7 @@ public class FacturaRes extends PBase {
 				}
 
 				if (gl.peImprFactCorrecta) {
-					singlePrint();
+                    singlePrint();
 				} else {
 					prn.printask(printclose);
 				}
@@ -506,9 +507,10 @@ public class FacturaRes extends PBase {
 
 	private boolean saveOrder(){
 		Cursor DT;
-		double peso;
-		int mitem;
-
+		String vprod,vumstock,vumventa;
+		double vcant,vpeso,vfactor,peso,factpres;
+		int mitem;		
+		
 		corel=gl.ruta+"_"+mu.getCorelBase();
 
 		if (gl.peModal.equalsIgnoreCase("TOL")) {
@@ -570,7 +572,7 @@ public class FacturaRes extends PBase {
 			ins.add("ADD2",gl.ref2);
 			ins.add("ADD3",gl.ref3);
 			
-			ins.add("DEPOS","");
+			ins.add("DEPOS","N");
 			ins.add("PEDCOREL","");
 			ins.add("REFERENCIA","");
 			ins.add("ASIGNACION","");    
@@ -589,7 +591,9 @@ public class FacturaRes extends PBase {
 			while (!DT.isAfterLast()) {
 
 				porpeso=prodPorPeso(DT.getString(0));
-					
+				factpres=DT.getDouble(12);
+				peso=DT.getDouble(8);
+
 			  	ins.init("D_FACTURAD");
 				ins.add("COREL",corel);
 				ins.add("PRODUCTO",DT.getString(0));
@@ -613,7 +617,18 @@ public class FacturaRes extends PBase {
 			    db.execSQL(ins.sql());
 
 				//#HS_20181120_1625 Se agrego parametro porque cambio la funcion
-			    if (esProductoConStock(DT.getString(0))) rebajaStockUM(DT.getString(0),DT.getString(13),DT.getDouble(1),DT.getDouble(12),DT.getString(11));
+
+
+				vprod=DT.getString(0);
+				vumstock=DT.getString(13);
+				vcant=DT.getDouble(1);
+				vpeso=DT.getDouble(8);
+				vfactor=vpeso/(vcant*factpres);
+				vumventa=DT.getString(11);
+
+				if (esProductoConStock(DT.getString(0))) {
+					rebajaStockUM(vprod, vumstock, vcant, vfactor, vumventa,factpres,peso);
+				}
 
 			    DT.moveToNext();
 			}
@@ -732,13 +747,18 @@ public class FacturaRes extends PBase {
 		return true;
 	}
 	
-	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa) {
+	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {
 		Cursor dt;
-		double ccant,acant,cantapl,dispcant,peso,pesoapl,disppeso,factpeso;
+		double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso;
 		String lote,doc,stat;
 
-		if(porpeso) factor=1;
-		acant=cant*factor;
+		if (porpeso) {
+			actcant=cant;
+			actpeso=ppeso;
+		} else {
+			actcant=cant*factpres;
+			actpeso=cant*factor;
+		}
 
 		try {
 
@@ -751,21 +771,23 @@ public class FacturaRes extends PBase {
 			dt.moveToFirst();
 			while (!dt.isAfterLast()) {
 
-				cant=dt.getDouble(0);ccant=cant;
-				peso=dt.getDouble(2);
+				cant=dt.getDouble(0);
+				speso=dt.getDouble(2);
 				lote=dt.getString(4);
 				doc=dt.getString(5);
 				stat=dt.getString(9);
 
-				if (cant!=0) factpeso=peso/cant; else factpeso=0;
+				if (actcant>cant) cantapl=cant;else cantapl=actcant;
+				dispcant=cant-cantapl;if (dispcant<0) dispcant=0;
+				actcant=actcant-cantapl;
 
-				if (acant>cant) cantapl=cant;else cantapl=acant;
-				pesoapl=cantapl*factpeso;
-
-				dispcant=cant-acant;if (dispcant<0) dispcant=0;
-				acant=acant-cant;
-
-				disppeso=peso-pesoapl;if (disppeso<0) disppeso=0;
+				if (porpeso) {
+					if (actpeso>speso) pesoapl=speso;else pesoapl=actpeso;
+					actpeso=actpeso-pesoapl;
+				} else {
+					pesoapl=cantapl*factor;
+				}
+				disppeso=speso-pesoapl;if (disppeso<0) disppeso=0;
 
 				// Stock
 
@@ -808,7 +830,13 @@ public class FacturaRes extends PBase {
 					ins.add("COREL",corel);
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
-					ins.add("CANTIDAD",cantapl);
+
+					if (porpeso) {
+						ins.add("CANTIDAD",cantapl);
+					} else {
+						ins.add("CANTIDAD",cantapl/factpres);
+					}
+
 					ins.add("PESO",pesoapl);
 					ins.add("UMSTOCK",umstock);
 					ins.add("UMPESO",gl.umpeso);
@@ -819,13 +847,13 @@ public class FacturaRes extends PBase {
 				} catch (SQLException e) {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 
-					sql="UPDATE D_FACTURAD_LOTES SET CANTIDAD=CANTIDAD+"+cantapl+",PESO=PESO+"+peso+"  " +
+					sql="UPDATE D_FACTURAD_LOTES SET CANTIDAD=CANTIDAD+"+cantapl+",PESO=PESO+"+pesoapl+"  " +
 						"WHERE (COREL='"+corel+"') AND (PRODUCTO='"+prid+"') AND (LOTE='"+lote+"')";
 					db.execSQL(sql);
 					//mu.msgbox(e.getMessage()+"\n"+ins.sql());
 				}
 
-				if (acant<=0) return;
+				//if (actcant<=0) return;
 
 				dt.moveToNext();
 			}
@@ -896,7 +924,6 @@ public class FacturaRes extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-
 
 	}
 		
@@ -1214,7 +1241,7 @@ public class FacturaRes extends PBase {
 			
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			inputEfectivo(); 
+			inputEfectivo();
 			mu.msgbox("Pago incorrecto"+e.getMessage());	   	
 	    }
 		
@@ -1296,7 +1323,7 @@ public class FacturaRes extends PBase {
 			
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			inputEfectivo(); 
+			inputEfectivo();
 			mu.msgbox("Pago incorrecto"+e.getMessage());	   	
 	    }
 		
@@ -1566,12 +1593,12 @@ public class FacturaRes extends PBase {
 			db.execSQL("DELETE FROM T_PAGO");
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}	
+		}
 		try {
 			db.execSQL("DELETE FROM T_BONITEM WHERE PRODID='*'");
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}	
+		}
 	}
 	
 	private void checkPromo() {
@@ -1585,7 +1612,7 @@ public class FacturaRes extends PBase {
 			if (DT.getCount()>0) imgBon.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-	    }			
+	    }
 	}
 	
 	private void cliPorDia() {

@@ -1126,6 +1126,13 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX P_LINEA_idx1 ON P_LINEA(NOMBRE)";
 			database.execSQL(vSQL);
 
+			vSQL="CREATE TABLE [P_LIQUIDACION] ("+
+					"[RUTA] TEXT NOT NULL,"+
+					"[ESTADO] TEXT NOT NULL,"+
+					"PRIMARY KEY ([RUTA])"+
+					");";
+			database.execSQL(vSQL);
+
 
 			vSQL="CREATE TABLE [P_PRODPRECIO] ("+
 					"[CODIGO] TEXT NOT NULL,"+

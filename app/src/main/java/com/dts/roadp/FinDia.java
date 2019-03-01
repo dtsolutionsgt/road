@@ -725,25 +725,28 @@ public class FinDia extends PBase {
             // pendiente deposito
             pend = 0;
 
-            try {
-                sql = "SELECT COREL FROM D_FACTURA WHERE DEPOS<>'S' ";
-                DT = Con.OpenDT(sql);
-                pend = pend + DT.getCount();
-            } catch (Exception e) {
-                addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            }
+        try {
+            sql = "SELECT COREL FROM D_FACTURA WHERE ANULADO='N' AND DEPOS<>'S' ";
+            DT = Con.OpenDT(sql);
+            pend = pend + DT.getCount();
 
-            try {
-                sql = "SELECT COREL FROM D_COBRO WHERE DEPOS<>'S' ";
-                DT = Con.OpenDT(sql);
-                pend = pend + DT.getCount();
-            } catch (Exception e) {
-                addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            }
+            sql = "SELECT COREL FROM D_FACTURAP WHERE ANULADO='N' AND TIPO='K' ";
+            DT = Con.OpenDT(sql);
+            pend = pend - DT.getCount();
 
-		/*if (pend>0) {
+        } catch (Exception e) {
+        }
+
+        try {
+            sql = "SELECT COREL FROM D_COBRO WHERE ANULADO='N' AND DEPOS<>'S' ";
+            DT = Con.OpenDT(sql);
+            pend = pend + DT.getCount();
+        } catch (Exception e) {
+        }
+
+		if (pend>0) {
 			msgExitDepos("Existen documentos pendientes a depositar.");return false;
-		}*/
+		}
 
             pend = getFactCount("SELECT SERIE,CORELATIVO FROM D_FACTURA", "Facturas :");
             if (pend == 0) {

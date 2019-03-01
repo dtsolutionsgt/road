@@ -145,7 +145,6 @@ public class MainActivity extends PBase {
 
 	}
 
-
 	//region Events
 
 	public void comMan(View view) {

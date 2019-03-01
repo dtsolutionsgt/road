@@ -624,6 +624,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_PRODPRECIO")) return false;
 			if (!AddTable("P_DESCUENTO")) return false;
 			if (!AddTable("P_EMPRESA")) return false;
+			if (!AddTable("P_SUCURSAL")) return false;
 			if (!AddTable("P_BANCO")) return false;
 			if (!AddTable("P_STOCKINV")) return false;
 			if (!AddTable("P_CODATEN")) return false;
@@ -1212,6 +1213,12 @@ public class ComWS extends PBase {
             SQL = "SELECT RUTA,ESTADO FROM P_LIQUIDACION WHERE (RUTA='" + ActRuta + "') AND (FECHA>='" + fsql + "') ";
             return SQL;
         }
+
+		if (TN.equalsIgnoreCase("P_SUCURSAL")) {
+			SQL = " SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO " +
+				  " FROM P_SUCURSAL WHERE CODIGO IN (SELECT SUCURSAL FROM P_RUTA WHERE CODIGO = '" + ActRuta + "')";
+			return SQL;
+		}
 
 		return SQL;
 	}   

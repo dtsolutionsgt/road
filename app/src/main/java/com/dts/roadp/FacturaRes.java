@@ -2,24 +2,19 @@ package com.dts.roadp;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.text.InputType;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebHistoryItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -168,7 +163,7 @@ public class FacturaRes extends PBase {
 		
 		prn=new printer(this,printclose);
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
-		fdoc.deviceid =androidid();
+		fdoc.deviceid =gl.deviceId;
 
 		saved=false;
 		assignCorel();
@@ -1345,7 +1340,7 @@ public class FacturaRes extends PBase {
 	//endregion
 
 	//region Aux
-	
+
 	public void askSave(View view) {
 		checkPago();
 	}

@@ -6,10 +6,10 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.text.InputType;
 import android.util.Log;
@@ -297,6 +297,9 @@ public class MainActivity extends PBase {
 		} catch (Exception e) {
 		}
 
+
+		//Id de Dispositivo
+		gl.deviceId = androidid();
 
 		try {
 			AppMethods app = new AppMethods(this, gl, Con, db);
@@ -639,6 +642,18 @@ public class MainActivity extends PBase {
 
 	}
 
+	private String androidid() {
+		String uniqueID="";
+		try {
+			uniqueID = Settings.Secure.getString(getContentResolver(),
+					Settings.Secure.ANDROID_ID);
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			uniqueID="0000000000";
+		}
+
+		return uniqueID;
+	}
 	//endregion
 
 	//region Activity Events

@@ -1271,7 +1271,19 @@ public class BaseDatosScript {
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
 			database.execSQL(vSQL);
-			
+
+			vSQL="CREATE TABLE [P_SUCURSAL] ("+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[EMPRESA] TEXT NOT NULL,"+
+					"[DESCRIPCION] TEXT NOT NULL,"+
+					"[NOMBRE] TEXT NOT NULL,"+
+					"[DIRECCION] INTEGER NOT NULL,"+
+					"[TELEFONO] TEXT NOT NULL,"+
+					"[NIT] TEXT NOT NULL,"+
+					"[TEXTO] TEXT NOT NULL,"+
+					"PRIMARY KEY ([CODIGO])"+
+					");";
+			database.execSQL(vSQL);
 
 			vSQL="CREATE TABLE [P_STOCK] ("+
 					"[CODIGO] TEXT NOT NULL,"+

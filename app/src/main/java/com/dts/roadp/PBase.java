@@ -49,7 +49,7 @@ public class PBase extends FragmentActivity {
 		du=new DateUtils();fecha=du.getActDateTime();
 		
 		keyboard = (InputMethodManager)getSystemService(this.INPUT_METHOD_SERVICE);
-		
+
 	    browse=0;
 	}
 	

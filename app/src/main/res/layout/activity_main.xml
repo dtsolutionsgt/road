@@ -221,7 +221,7 @@
         android:layout_alignParentRight="true"
         android:gravity="center_horizontal"
         android:paddingBottom="10dp"
-        android:text="DTSolutions S.A., 2018"
+        android:text="DTSolutions S.A., 2019"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="13sp" />
 
@@ -233,7 +233,7 @@
         android:layout_alignLeft="@+id/textView3"
         android:layout_alignRight="@+id/relbotpan"
         android:gravity="center_horizontal"
-        android:text="ROAD Ver 9.3  -  01/03/2019"
+        android:text="ROAD 9.3.1  -  01/03/2019"
         android:textColor="#000000"
         android:textSize="13sp" />
 

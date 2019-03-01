@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.dts.roadp"
-        minSdkVersion 23
+        minSdkVersion 25
         targetSdkVersion 28
         renderscriptTargetApi 28
         renderscriptSupportModeEnabled true

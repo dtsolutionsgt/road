@@ -46,7 +46,8 @@ public class Soporte extends PBase {
 
     public void doEnvio(View view) {
         tipo=3;
-        msgAsk("Enviar archivo de envio");
+        //msgAsk("Enviar archivo de envio");
+        toastcent("Pendiente implementación");
     }
 
     public void doError(View view) {
@@ -56,7 +57,8 @@ public class Soporte extends PBase {
 
     public void doBitacora(View view) {
         tipo=5;
-        msgAsk("Enviar archivo de bitacora");
+        // msgAsk("Enviar archivo de bitacora");
+        toastcent("Pendiente implementación");
     }
 
     //endregion
@@ -87,8 +89,11 @@ public class Soporte extends PBase {
     }
 
     private void sendDBase() {
+        body="Base de datos \n"+body;
+        fname= Environment.getExternalStorageDirectory()+"/road.db";
+        file=new File(fname);
 
-        send("");
+        send("No se pudo enviar la base de datos datos");
     }
 
     private void sendCarga() {
@@ -105,8 +110,12 @@ public class Soporte extends PBase {
     }
 
     private void sendError() {
+        body="Error de envío \n"+body;
+        fname= Environment.getExternalStorageDirectory()+"/roaderr.txt";
+        file=new File(fname);
 
-        send("");
+        send("El archivo de detalle de error de envío no existe");
+
     }
 
     private void sendBitacora() {

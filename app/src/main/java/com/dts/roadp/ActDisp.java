@@ -25,7 +25,7 @@ public class ActDisp extends PBase {
 		
 		URL = ((appGlobals) vApp).wsURL;
 		prodid=((appGlobals) vApp).gstr;
-		
+
 		ws=new clsWebService(this);
 		ws.URL=URL;
 		ws.execute();

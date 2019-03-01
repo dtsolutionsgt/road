@@ -37,6 +37,7 @@ public class Recarga extends PBase {
 		setContentView(R.layout.activity_recarga);
 
 		super.InitBase();
+		addlog("Recarga",""+du.getActDateTime(),gl.vend);
 
 		listView = (ListView) findViewById(R.id.listView1);
 
@@ -66,44 +67,59 @@ public class Recarga extends PBase {
 	// Events
 	
 	public void showProd(View view) {
-		((appGlobals) vApp).gstr="";
-		browse=1;
-		itempos=-1;
-		Intent intent = new Intent(this,Producto.class);
-		startActivity(intent);
+		try{
+			((appGlobals) vApp).gstr="";
+			browse=1;
+			itempos=-1;
+			Intent intent = new Intent(this,Producto.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	public void finishDevol(View view){
-		if (!hasProducts()) {
-			mu.msgbox("No puede continuar, no ha agregado ninguno producto !");return;
+		try{
+			if (!hasProducts()) {
+				mu.msgbox("No puede continuar, no ha agregado ninguno producto !");return;
+			}
+
+			msgAskComplete("Aplicar la recarga");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		msgAskComplete("Aplicar la recarga");
+
 	}
 	
 	
 	// Main
 	
 	private void setHandlers(){
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
-				
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-					clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
-		           	
-					adapter.setSelectedIndex(position);
-		    		
-					//updCant(vItem.id);
-					updCantCod(vItem.Cod);
-					
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-			};
-	    });
+
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
+
+						adapter.setSelectedIndex(position);
+
+						//updCant(vItem.id);
+						updCantCod(vItem.Cod);
+
+					} catch (Exception e) {
+						mu.msgbox( e.getMessage());
+					}
+				};
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	    
 	}
 	
@@ -140,6 +156,7 @@ public class Recarga extends PBase {
 			  DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }
 			 
@@ -149,91 +166,117 @@ public class Recarga extends PBase {
 	
 	private void processItem(){
 		String pid;
-		
-		pid=((appGlobals) vApp).gstr;
-		if (mu.emptystr(pid)) return;
-		
-		prodid=pid;
-		
-		setCant();
+
+		try{
+			pid=((appGlobals) vApp).gstr;
+			if (mu.emptystr(pid)) return;
+
+			prodid=pid;
+
+			setCant();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void setCant(){
-		browse=2;
-		
-		itempos=-1;
-		((appGlobals) vApp).prod=prodid;
-		((appGlobals) vApp).gstr="";
-		((appGlobals) vApp).gstr2="";
-		Intent intent = new Intent(this,RecargCant.class);
-		startActivity(intent);
+		try{
+			browse=2;
+
+			itempos=-1;
+			((appGlobals) vApp).prod=prodid;
+			((appGlobals) vApp).gstr="";
+			((appGlobals) vApp).gstr2="";
+			Intent intent = new Intent(this,RecargCant.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void updCant(int item){
 		Cursor DT;
 		String prid,rz;
 		double pcant=0;
-		
-		try {
-			sql="SELECT CODIGO,CODDEV,CANT FROM T_CxCD WHERE Item="+item;	
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
-			
-			prid=DT.getString(0);
-			rz=DT.getString(1);
-					
-		} catch (Exception e) {
-			return;
-		}	
-		
-		browse=2;
-		
-		itempos=item;
-		
+
+		try{
+			try {
+				sql="SELECT CODIGO,CODDEV,CANT FROM T_CxCD WHERE Item="+item;
+				DT=Con.OpenDT(sql);
+				DT.moveToFirst();
+
+				prid=DT.getString(0);
+				rz=DT.getString(1);
+
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+				return;
+			}
+
+			browse=2;
+
+			itempos=item;
+
 		/*
 		((appGlobals) vApp).prod=prid;
 		((appGlobals) vApp).gstr=rz;
 		//((appGlobals) vApp).dval=pcant;
-		
+
 		Intent intent = new Intent(this,DevCliCant.class);
 		*/
-		
-		
-		((appGlobals) vApp).prod=prid;
-		((appGlobals) vApp).gstr="";
-		((appGlobals) vApp).gstr2=""+pcant;
-		Intent intent = new Intent(this,RecargCant.class);
-		
-		startActivity(intent);
+
+
+			((appGlobals) vApp).prod=prid;
+			((appGlobals) vApp).gstr="";
+			((appGlobals) vApp).gstr2=""+pcant;
+			Intent intent = new Intent(this,RecargCant.class);
+
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void updCantCod(String item){
 		Cursor DT;
 		String prid,rz;
 		double pcant=0;
-			
-		browse=2;
-		prodid=item;
-			
-		((appGlobals) vApp).prod=item;
-		((appGlobals) vApp).gstr="";
-		((appGlobals) vApp).gstr2=""+pcant;
-		Intent intent = new Intent(this,RecargCant.class);
-		
-		startActivity(intent);
+
+		try{
+			browse=2;
+			prodid=item;
+
+			((appGlobals) vApp).prod=item;
+			((appGlobals) vApp).gstr="";
+			((appGlobals) vApp).gstr2=""+pcant;
+			Intent intent = new Intent(this,RecargCant.class);
+
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void processCant(){
 		double cnt;
 		String raz;
-		
-		cnt=((appGlobals) vApp).dval;
-		if (cnt<0) return;
 
-		raz=((appGlobals) vApp).devrazon;
-		cant=cnt;
-		
-		addItem(raz);
+		try{
+			cnt=((appGlobals) vApp).dval;
+			if (cnt<0) return;
+
+			raz=((appGlobals) vApp).devrazon;
+			cant=cnt;
+
+			addItem(raz);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void addItem(String raz){
@@ -245,6 +288,7 @@ public class Recarga extends PBase {
 			vSQL="DELETE FROM T_CxCD WHERE item="+itempos;
 			db.execSQL(vSQL);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 		*/
 		
@@ -252,6 +296,7 @@ public class Recarga extends PBase {
 			sql="DELETE FROM T_CxCD WHERE CODIGO='"+prodid+"'";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 		
 		try {
@@ -260,6 +305,7 @@ public class Recarga extends PBase {
 			DT.moveToFirst();	
 			id=DT.getInt(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			id=0;
 		}	
 		
@@ -281,6 +327,7 @@ public class Recarga extends PBase {
 	    	db.execSQL(ins.sql());
 	    	
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}	
 		
@@ -288,6 +335,7 @@ public class Recarga extends PBase {
 			sql="DELETE FROM T_CxCD WHERE CANT=0";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 		
@@ -358,10 +406,12 @@ public class Recarga extends PBase {
 			try {
 				if (mdoc.buildPrint(corel,1)) prn.printask(printclose);
 			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 				mu.msgbox(e.getMessage());
 			}
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 		   	mu.msgbox( e.getMessage());
 		}	
@@ -400,6 +450,7 @@ public class Recarga extends PBase {
 			//msgbox(""+DT.getCount());
 	    	
 	    } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    	//mu.msgbox(e.getMessage());
 	    }
 	    
@@ -419,54 +470,65 @@ public class Recarga extends PBase {
 			sql="DELETE FROM T_CxCD";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}	
 	}
 	
 	private void msgAskExit(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	doExit();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					doExit();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
 	private void msgAskComplete(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	saveDevol();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					saveDevol();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
@@ -479,12 +541,18 @@ public class Recarga extends PBase {
 				
 			return DT.getCount()>0;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
 		}	
 	}
 		
 	private void doExit(){
-		super.finish();
+		try{
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	
@@ -492,25 +560,35 @@ public class Recarga extends PBase {
 	
 	@Override
 	protected void onResume() {
-	    super.onResume();
-	    
-	    //if (((appGlobals) vApp).closeVenta) super.finish();
-	    
-	    if (browse==1) {
-	    	browse=0;
-	    	processItem();return;
-	    }
-	    
-	    if (browse==2) {
-	    	browse=0;
-	    	processCant();return;
-	    }
+		try{
+			super.onResume();
+
+			//if (((appGlobals) vApp).closeVenta) super.finish();
+
+			if (browse==1) {
+				browse=0;
+				processItem();return;
+			}
+
+			if (browse==2) {
+				browse=0;
+				processCant();return;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	
 	}
 
 	@Override
 	public void onBackPressed() {
-		msgAskExit("Salir sin terminar recarga");
+		try{
+			msgAskExit("Salir sin terminar recarga");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 
 

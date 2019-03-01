@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -13,7 +12,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -66,7 +64,7 @@ public class CliNuevoApr extends PBase {
 		
 		super.InitBase();
 		addlog("CliNuevoApr",""+du.getActDateTime(),gl.vend);
-		
+
 		//spmun= (Spinner) findViewById(R.id.spinner1);
 		sprel= (Spinner) findViewById(R.id.spinner2);
 		spgru= (Spinner) findViewById(R.id.spinner3);
@@ -113,7 +111,7 @@ public class CliNuevoApr extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		
+
 	}
 	
 	public void doFecha(View view) {
@@ -467,6 +465,7 @@ public class CliNuevoApr extends PBase {
 	
 	// Date
 
+	/*
 	@SuppressLint("ValidFragment")
 	public class DatePickerFragment extends DialogFragment
 	implements DatePickerDialog.OnDateSetListener {
@@ -501,6 +500,7 @@ public class CliNuevoApr extends PBase {
 		}
 
 	}
+	*/
 
 	private void applyDate() {
 		String s;
@@ -752,8 +752,8 @@ public class CliNuevoApr extends PBase {
 	
 	private void fechaNac() {
 		try{
-			DialogFragment newFragment = new DatePickerFragment();
-			newFragment.show(getSupportFragmentManager(), "datePicker");
+			//DialogFragment newFragment = new DatePickerFragment();
+			//newFragment.show(getSupportFragmentManager(), "datePicker");
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -790,7 +790,7 @@ public class CliNuevoApr extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	}	
+	}
 	
 	@Override
 	public void onBackPressed() {

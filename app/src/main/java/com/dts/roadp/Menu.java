@@ -130,7 +130,7 @@ public class Menu extends PBase {
 		}
 
 	}
-	
+
 	//region  Main
 	
 	public void showClients(View view) {
@@ -182,10 +182,10 @@ public class Menu extends PBase {
 				item.ID=7;item.Name="Inventario";item.Icon=7;
 				items.add(item);
 
-				//#HS_20181211 Agregue nuevo boton en menu: Inicio de dia.
-				item = clsCls.new clsMenu();
-				item.ID=11;item.Name="Inicio de día";item.Icon=8;
-				items.add(item);
+			//#HS_20181211 Agregue nuevo boton en menu: Inicio de dia.
+			//item = clsCls.new clsMenu();
+			//item.ID=11;item.Name="Inicio de día";item.Icon=8;
+			//items.add(item);
 
 				item = clsCls.new clsMenu();
 				item.ID=8;item.Name="Cierre del día";item.Icon=8;

@@ -1,38 +1,20 @@
 package com.dts.roadp;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.dts.roadp.CliNuevoApr.DatePickerFragment;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
-import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 public class CliNuevoAprEdit extends PBase {
@@ -76,7 +58,7 @@ public class CliNuevoAprEdit extends PBase {
 		
 		super.InitBase();
 		addlog("CliNuevoAprEdit",""+du.getActDateTime(),gl.vend);
-		
+
 		sprel= (Spinner) findViewById(R.id.spinner2);
 		spgru= (Spinner) findViewById(R.id.spinner3);
 		spesc= (Spinner) findViewById(R.id.spinner4);
@@ -143,7 +125,7 @@ public class CliNuevoAprEdit extends PBase {
 		}
 
 
-		
+
 	}
  
 	public void doFecha(View view) {
@@ -558,6 +540,7 @@ public class CliNuevoAprEdit extends PBase {
 
 	// Date
 
+    /*
 	@SuppressLint("ValidFragment")
 	public class DatePickerFragment extends DialogFragment
 	implements DatePickerDialog.OnDateSetListener {
@@ -592,6 +575,7 @@ public class CliNuevoAprEdit extends PBase {
 		}
 
 	}
+	*/
 
 	private void applyDate() {
 		try{
@@ -850,8 +834,8 @@ public class CliNuevoAprEdit extends PBase {
 
 	private void fechaNac() {
 		try{
-			DialogFragment newFragment = new DatePickerFragment();
-			newFragment.show(getSupportFragmentManager(), "datePicker");
+			//DialogFragment newFragment = new DatePickerFragment();
+			//newFragment.show(getSupportFragmentManager(), "datePicker");
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -917,7 +901,7 @@ public class CliNuevoAprEdit extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	}	
+	}
 
 
 }

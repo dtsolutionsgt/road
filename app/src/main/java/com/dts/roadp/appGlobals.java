@@ -48,15 +48,12 @@ public class appGlobals extends Application {
 	
 	// GPS
 	public double gpspx,gpspy,gpscpx,gpscpy,gpscdist;
-	
-	
+
 	// Epson
 	
 	public Device mDevice=null;
 	public Printer mPrinter=null;
 	public boolean mPrinterSet=false;
 	public String mPrinterIP;
-	
-	
-		
+
 }

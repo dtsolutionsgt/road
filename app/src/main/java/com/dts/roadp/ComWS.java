@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
-import android.support.v4.content.IntentCompat;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.ksoap2.SoapEnvelope;
@@ -24,7 +23,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -33,7 +31,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.support.v4.content.IntentCompat;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -246,7 +243,6 @@ public class ComWS extends PBase {
 
 			
 	}
-
 
 	//region Main
 
@@ -649,9 +645,10 @@ public class ComWS extends PBase {
 		ftmsg="";ftflag=false;
 
 		try {
+
+			if (!AddTable("P_PARAMEXT")) return false;
+			procesaParamsExt();
 				
-			// AdjustP_Cliente();
-		    // AdjustP_Cobro()
 			if (!AddTable("P_NIVELPRECIO")) return false;
 
 			if (!AddTable("P_RUTA")) return false;
@@ -667,6 +664,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_EMPRESA")) return false;
 			if (!AddTable("P_BANCO")) return false;
 			if (!AddTable("P_STOCKINV")) return false;
+
 			if (!AddTable("P_CODATEN")) return false;
 			if (!AddTable("P_CODDEV")) return false;
             if (!AddTable("P_CODNOLEC")) return false;
@@ -675,19 +673,6 @@ public class ComWS extends PBase {
 			if (!AddTable("P_CORELNC")) return false;
 			if (!AddTable("P_CORRELREC")) return false;
 			if (!AddTable("P_CORREL_OTROS")) return false;
-
-			/*
-			if (gl.peStockItf)
-			{
-				if (gl.peAceptarCarga) 	{
-					if (!AddTable("P_STOCK_APR")) return false;
-				} else {
-				    if (!AddTable("P_STOCK")) return false;
-					//if (!AddTable("P_STOCKB")) return false;
-				}
-			}*/
-
-			//#EJC20190226: Cargar siempre todas las tablas para evitar cargar datos dos veces.
             if (!AddTable("P_STOCK_APR")) return false;
             if (!AddTable("P_STOCK")) return false;
             if (!AddTable("P_STOCKB")) return false;
@@ -700,7 +685,6 @@ public class ComWS extends PBase {
 			if (!AddTable("P_IMPUESTO")) return false;
 			if (!AddTable("P_VENDEDOR")) return false;
 			if (!AddTable("P_MUNI")) return false;
-			//#HS_20181207 Agregue tabla P_VEHICULO.
 			if (!AddTable("P_VEHICULO"))return false;
 			
 			if (!AddTable("P_REF1")) return false;
@@ -734,7 +718,6 @@ public class ComWS extends PBase {
 			//	if (!AddTable("LIC_CLIENTE")) return false;
 			//}
 
-			if (!AddTable("P_PARAMEXT")) return false;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
@@ -831,6 +814,72 @@ public class ComWS extends PBase {
 
 	}
 
+	private void procesaParamsExt() {
+		Cursor dt;
+		String sql,val="";
+		int ival,rc;
+
+		try {
+
+			rc=listItems.size();reccnt=rc;
+			if (rc==0) return ;
+
+			ConT = new BaseDatos(this);
+			dbT = ConT.getWritableDatabase();
+			ConT.vDatabase =dbT;
+			insT=ConT.Ins;
+
+			dbT.beginTransaction();
+
+			for (int i = 0; i < rc; i++) {
+
+				sql = listItems.get(i);esql=sql;
+				dbT.execSQL(sql);
+
+				try {
+					if (i % 10==0) {
+
+						SystemClock.sleep(20);
+					}
+				} catch (Exception e) {
+					Log.e("z", e.getMessage());
+				}
+			}
+
+			dbT.setTransactionSuccessful();
+			dbT.endTransaction();
+
+			try {
+				sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=2";
+				dt=Con.OpenDT(sql);
+				dt.moveToFirst();
+				val=dt.getString(0);
+			} catch (Exception e) {
+				val="N";
+			}
+			if (val.equalsIgnoreCase("S"))gl.peStockItf=true; else gl.peStockItf=false;
+
+			try {
+				sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=3";
+				dt=Con.OpenDT(sql);
+				dt.moveToFirst();
+				gl.peModal=dt.getString(0).toUpperCase();
+			} catch (Exception e) {
+				gl.peModal="-";
+			}
+
+			try {
+				ConT.close();
+			} catch (Exception e) { }
+
+		} catch (Exception e) {
+			try {
+				ConT.close();
+			} catch (Exception ee) {}
+		}
+
+	}
+
 	//#EJC20181120: Inserta los documentos que bajaron a la HH
 	private boolean Actualiza_Documentos() {
 
@@ -882,7 +931,7 @@ public class ComWS extends PBase {
 		try {
 			
 			fprog=TN;idbg=TN;
-			//wsRtask.onProgressUpdate();
+			wsRtask.onProgressUpdate();
 			SQL=getTableSQL(TN);
 
 			if (fillTable(SQL,"DELETE FROM "+TN)==1) {
@@ -903,6 +952,32 @@ public class ComWS extends PBase {
 		}
 	}
 
+	private boolean AddTableVL(String TN) {
+		String SQL;
+
+		try {
+
+			fprog=TN;idbg=TN;
+			//wsRtask.onProgressUpdate();
+			SQL=getTableSQL(TN);
+
+			if (fillTable(SQL,"DELETE FROM "+TN)==1) {
+				if (TN.equalsIgnoreCase("P_STOCK")) dbg=dbg+" ok ";
+				idbg=idbg +SQL+"#"+"PASS OK";
+				return true;
+			} else {
+				if (TN.equalsIgnoreCase("P_STOCK")) dbg=dbg+" fail "+sstr;
+				idbg=idbg +SQL+"#"+" PASS FAIL  ";
+				fstr="Tab:"+TN+" "+sstr;
+				return false;
+			}
+
+		} catch (Exception e) {
+			fstr="Tab:"+TN+", "+ e.getMessage();idbg=idbg + e.getMessage();
+			return false;
+		}
+	}
+
 	private String getTableSQL(String TN) {
 		String SQL = "";
 		int fi, ff;
@@ -913,7 +988,7 @@ public class ComWS extends PBase {
 		int ObjMes = du.getmonth(du.getActDate());
 
 		if (TN.equalsIgnoreCase("P_STOCK")) {
-/*
+
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
 						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') " +
@@ -925,12 +1000,6 @@ public class ComWS extends PBase {
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
 						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') ";
 			}
-*/
-
-			SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-					"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') " +
-					"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";
-
 
 			esql = SQL;
 			return SQL;
@@ -1257,10 +1326,6 @@ public class ComWS extends PBase {
 				SQL = "SELECT ID,Nombre,Valor FROM P_PARAMEXT WHERE ((idRuta='" + ActRuta + "') OR (ISNULL(idRuta,'')=''))";
 				return SQL;
 			}
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}
-
 
 		if (TN.equalsIgnoreCase("P_LIQUIDACION")) {
             SQL = "SELECT RUTA,ESTADO FROM P_LIQUIDACION WHERE (RUTA='" + ActRuta + "') AND (FECHA>='" + fsql + "') ";
@@ -1383,9 +1448,7 @@ public class ComWS extends PBase {
 		return true;
 	}
 	
-	private void estandartInventario()
-
-    {
+	private void estandartInventario()  {
 		Cursor dt,df;
 		String cod,ub,us,lote,doc,stat;
 		double cant,cantm,fact;
@@ -1623,13 +1686,17 @@ public class ComWS extends PBase {
 
 		senv = "Envío terminado \n \n";
 
-        if (!validaLiquidacion()) {
-            liqid = false;
-            senv = "La liquidación no está cerrada, no se puede enviar datos";
-            return false;
-        } else {
-            liqid=true;
-        }
+		if (gl.peModal.equalsIgnoreCase("TOL")) {
+			if (!validaLiquidacion()) {
+				liqid = false;
+				senv = "La liquidación no está cerrada, no se puede enviar datos";
+				return false;
+			} else {
+				liqid = true;
+			}
+		} else {
+			liqid = true;
+		}
 
 		items.clear();
 
@@ -1685,7 +1752,7 @@ public class ComWS extends PBase {
 
             db.execSQL("DELETE FROM P_LIQUIDACION");
 
-            AddTable("P_LIQUIDACION") ;
+            AddTableVL("P_LIQUIDACION") ;
 
             sql = listItems.get(0);
             db.execSQL(sql);

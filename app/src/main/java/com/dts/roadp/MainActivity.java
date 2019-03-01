@@ -6,11 +6,9 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
 import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -25,8 +23,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
-
-import uk.co.senab.photoview.gestures.EclairGestureDetector;
 
 public class MainActivity extends PBase {
 
@@ -67,11 +63,13 @@ public class MainActivity extends PBase {
 				{
 					startApplication();
 				} else {
+				    /*
 					ActivityCompat.requestPermissions(this,
 							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
 									Manifest.permission.ACCESS_FINE_LOCATION,
 									Manifest.permission.CALL_PHONE,
 									Manifest.permission.CAMERA}, 1);
+					*/
 				}
 			}
 
@@ -369,6 +367,8 @@ public class MainActivity extends PBase {
 	private boolean checkUser() {
 		Cursor DT;
 		String usr, pwd, dpwd;
+
+		try {
 
 		if (fecha>1903310000) {
 			msgAskLic("¡Su licencia expiró!");return false;

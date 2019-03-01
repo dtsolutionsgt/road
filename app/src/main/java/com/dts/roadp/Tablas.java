@@ -45,6 +45,8 @@ public class Tablas extends PBase {
 
         super.InitBase();
 
+        addlog("Tablas",""+du.getActDateTime(),gl.vend);
+
         grid = (GridView) findViewById(R.id.gridview1);
         dgrid = (GridView) findViewById(R.id.gridview2);
         spin = (Spinner) findViewById(R.id.spinner);
@@ -65,106 +67,118 @@ public class Tablas extends PBase {
     // Events
 
     public void doClear(View view) {
-         txt1.setText("");txt1.requestFocus();
+        try{
+            txt1.setText("");txt1.requestFocus();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
     }
 
     private void setHandlers(){
 
-        spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                TextView spinlabel;
+        try{
+            spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                    TextView spinlabel;
 
-                try {
-                    spinlabel = (TextView) parentView.getChildAt(0);
-                    spinlabel.setTextColor(Color.BLACK);
-                    spinlabel.setPadding(5, 0, 0, 0);
-                    spinlabel.setTextSize(18);
-                    spinlabel.setTypeface(spinlabel.getTypeface(), Typeface.BOLD);
+                    try {
+                        spinlabel = (TextView) parentView.getChildAt(0);
+                        spinlabel.setTextColor(Color.BLACK);
+                        spinlabel.setPadding(5, 0, 0, 0);
+                        spinlabel.setTextSize(18);
+                        spinlabel.setTypeface(spinlabel.getTypeface(), Typeface.BOLD);
 
-                    scod = spinlist.get(position);
-                    if (!scod.equalsIgnoreCase(" ")) {
-                        txt1.setText("");
-                        processTable();
-                    }
-                } catch (Exception e) {
-                    mu.msgbox(e.getMessage());
-                }
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                return;
-            }
-
-        });
-
-        grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                try {
-                    Object lvObj = grid.getItemAtPosition(position);
-                    String item = (String) lvObj;
-
-                    adapter.setSelectedIndex(position);
-                    toast(item);
-                } catch (Exception e) {
-                    mu.msgbox(e.getMessage());
-                }
-            }
-
-            ;
-        });
-
-        dgrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                try {
-                    Object lvObj = dgrid.getItemAtPosition(position);
-                    String item = (String) lvObj;
-
-                    dadapter.setSelectedIndex(position);
-                    toast(item);
-                } catch (Exception e) {
-                    mu.msgbox(e.getMessage());
-                }
-            }
-
-            ;
-        });
-
-        dgrid.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                try {
-                    Object lvObj = dgrid.getItemAtPosition(position);
-                    String item = (String) lvObj;
-
-                    adapter.setSelectedIndex(position);
-                    msgbox(item);
-                } catch (Exception e) {
-                }
-                return true;
-            }
-        });
-
-        txt1.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
-                if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (arg1) {
-                        case KeyEvent.KEYCODE_ENTER:
+                        scod = spinlist.get(position);
+                        if (!scod.equalsIgnoreCase(" ")) {
+                            txt1.setText("");
                             processTable();
-                            return true;
+                        }
+                    } catch (Exception e) {
+                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                        mu.msgbox(e.getMessage());
+                    }
+
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parentView) {
+                    return;
+                }
+
+            });
+
+            grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    try {
+                        Object lvObj = grid.getItemAtPosition(position);
+                        String item = (String) lvObj;
+
+                        adapter.setSelectedIndex(position);
+                        toast(item);
+                    } catch (Exception e) {
+                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                        mu.msgbox(e.getMessage());
                     }
                 }
-                return false;
-            }
-        });
+
+                ;
+            });
+
+            dgrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    try {
+                        Object lvObj = dgrid.getItemAtPosition(position);
+                        String item = (String) lvObj;
+
+                        dadapter.setSelectedIndex(position);
+                        toast(item);
+                    } catch (Exception e) {
+                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                        mu.msgbox(e.getMessage());
+                    }
+                }
+
+                ;
+            });
+
+            dgrid.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    try {
+                        Object lvObj = dgrid.getItemAtPosition(position);
+                        String item = (String) lvObj;
+
+                        adapter.setSelectedIndex(position);
+                        msgbox(item);
+                    } catch (Exception e) {
+                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                    }
+                    return true;
+                }
+            });
+
+            txt1.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
+                    if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
+                        switch (arg1) {
+                            case KeyEvent.KEYCODE_ENTER:
+                                processTable();
+                                return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
 
     }
 
@@ -172,34 +186,39 @@ public class Tablas extends PBase {
     // Main
 
     private void processTable() {
-        pbar.setVisibility(View.VISIBLE);
+        try{
+            pbar.setVisibility(View.VISIBLE);
 
-        Handler mmtimer = new Handler();
-        Runnable mmrunner = new Runnable() {
-            @Override
-            public void run() {
-                pbar.setVisibility(View.VISIBLE);
+            Handler mmtimer = new Handler();
+            Runnable mmrunner = new Runnable() {
+                @Override
+                public void run() {
+                    pbar.setVisibility(View.VISIBLE);
 
-                values.clear();
-                dvalues.clear();
+                    values.clear();
+                    dvalues.clear();
 
-                adapter = new ListAdaptTablas(Tablas.this, values);
-                grid.setAdapter(adapter);
+                    adapter = new ListAdaptTablas(Tablas.this, values);
+                    grid.setAdapter(adapter);
 
-                dadapter = new ListAdaptTablas2(Tablas.this, dvalues);
-                dgrid.setAdapter(dadapter);
-            }
-        };
-        mmtimer.postDelayed(mmrunner, 50);
+                    dadapter = new ListAdaptTablas2(Tablas.this, dvalues);
+                    dgrid.setAdapter(dadapter);
+                }
+            };
+            mmtimer.postDelayed(mmrunner, 50);
 
-        Handler mtimer = new Handler();
-        Runnable mrunner = new Runnable() {
-            @Override
-            public void run() {
-                showData(scod);
-            }
-        };
-        mtimer.postDelayed(mrunner, 1000);
+            Handler mtimer = new Handler();
+            Runnable mrunner = new Runnable() {
+                @Override
+                public void run() {
+                    showData(scod);
+                }
+            };
+            mtimer.postDelayed(mrunner, 1000);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
     private void showData(String tn) {
@@ -231,6 +250,7 @@ public class Tablas extends PBase {
             if (!mu.emptystr(flt)) ss=ss+" WHERE "+flt;
 
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
            // err=e.getMessage();
         }
 
@@ -274,6 +294,7 @@ public class Tablas extends PBase {
                 dt.moveToNext();
             }
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
         }
 
         dadapter=new ListAdaptTablas2(this,dvalues);
@@ -300,6 +321,7 @@ public class Tablas extends PBase {
                 DT.moveToNext();
             }
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());
         }
 

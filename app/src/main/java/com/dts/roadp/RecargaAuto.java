@@ -32,6 +32,7 @@ public class RecargaAuto extends PBase {
 		setContentView(R.layout.activity_recarga_auto);
 
 		super.InitBase();
+		addlog("RecargaAuto",""+du.getActDateTime(),gl.vend);
 
 		listView = (ListView) findViewById(R.id.listView1);
 
@@ -52,11 +53,16 @@ public class RecargaAuto extends PBase {
 	// Events
 
 	public void finishDevol(View view){
-		if (!hasProducts()) {
-			mu.msgbox("No puede continuar, la recarga esta vacia !");return;
+		try{
+			if (!hasProducts()) {
+				mu.msgbox("No puede continuar, la recarga esta vacia !");return;
+			}
+
+			msgAskComplete("Aplicar la recarga");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		msgAskComplete("Aplicar la recarga");
 	}
 
 
@@ -64,20 +70,25 @@ public class RecargaAuto extends PBase {
 
 	private void setHandlers(){
 
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
 
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-					clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
 
-					adapter.setSelectedIndex(position);
-				} catch (Exception e) {
-					mu.msgbox( e.getMessage());
-				}
-			};
-		});
+						adapter.setSelectedIndex(position);
+					} catch (Exception e) {
+						mu.msgbox( e.getMessage());
+					}
+				};
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
@@ -114,6 +125,7 @@ public class RecargaAuto extends PBase {
 				DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox( e.getMessage());
 		}
 
@@ -187,6 +199,7 @@ public class RecargaAuto extends PBase {
 			
 			msgExit("Recarga aplicada");
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 			mu.msgbox( e.getMessage());
 		}	
@@ -225,6 +238,7 @@ public class RecargaAuto extends PBase {
 			//msgbox(""+DT.getCount());
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//mu.msgbox(e.getMessage());
 		}
 
@@ -237,71 +251,86 @@ public class RecargaAuto extends PBase {
 	// Aux 
 
 	private void msgAskComplete(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
 
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {			      	
-				msgAskSave("¿Está seguro?");
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					msgAskSave("¿Está seguro?");
+				}
+			});
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {			      	
-				;
-			}
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}	
 	
 	private void msgAskSave(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
 
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {			      	
-				saveRecarga();
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					saveRecarga();
+				}
+			});
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {			      	
-				;
-			}
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}	
 	
 	private void msgExit(String msg) {
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
 
-		dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				doExit();
+			dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					doExit();
 
-				((appGlobals) vApp).tipo=0;
-				Intent intent = new Intent(RecargaAuto.this,Exist.class);
-				startActivity(intent);
-			}
-		});
+					((appGlobals) vApp).tipo=0;
+					Intent intent = new Intent(RecargaAuto.this,Exist.class);
+					startActivity(intent);
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}	
 
@@ -314,6 +343,7 @@ public class RecargaAuto extends PBase {
 
 			return DT.getCount()>0;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
 		}	
 	}

@@ -36,7 +36,6 @@ public class MainActivity extends PBase {
 	private BaseDatosVersion dbVers;
 	
 	private boolean rutapos,scanning=false;
-	private int fecha;
 	private String cs1,cs2,cs3,barcode;
 
 
@@ -87,11 +86,7 @@ public class MainActivity extends PBase {
 
             this.setTitle("ROAD");
 
-            if (fecha>1903310000) {
-            	toastlong("Su licencia expiro");
-			}
-
-            txtUser= (EditText) findViewById(R.id.txtUser);
+  			txtUser= (EditText) findViewById(R.id.txtUser);
             txtPass= (EditText) findViewById(R.id.txtMonto);
             lblRuta= (TextView) findViewById(R.id.lblCDisp);
             lblRTit= (TextView) findViewById(R.id.lblCUsed);
@@ -107,9 +102,7 @@ public class MainActivity extends PBase {
 
             initSession();
 
-            //#HS_20181206 Obtiene el supervisor de la ruta
             supervisorRuta();
-
             txtUser.setText("00100993");txtPass.setText("2613");
 
             gl.contlic=false;
@@ -328,6 +321,10 @@ public class MainActivity extends PBase {
 	private boolean checkUser() {
 		Cursor DT;
 		String usr, pwd, dpwd;
+
+		if (fecha>1903310000) {
+			msgAskLic("¡Su licencia expiró!");return false;
+		}
 
 		usr = txtUser.getText().toString().trim();
 		pwd = txtPass.getText().toString().trim();
@@ -622,6 +619,23 @@ public class MainActivity extends PBase {
 		} catch (Exception e) {
 			mu.msgbox(e.getMessage());return false;
 		}
+
+	}
+
+	private void msgAskLic(String msg) {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle(R.string.app_name);
+		dialog.setMessage(msg  );
+		dialog.setIcon(R.drawable.ic_quest);
+
+		dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				finish();
+			}
+		});
+
+		dialog.show();
 
 	}
 

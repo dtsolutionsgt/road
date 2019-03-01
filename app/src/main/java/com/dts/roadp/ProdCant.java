@@ -460,7 +460,7 @@ public class ProdCant extends PBase {
 		imgDel=(ImageView) findViewById(R.id.imageView2);
 		
 	}
-	
+
 	
 	private int setCant(boolean mode){
 		double cu,tv,corig,cround,fruni,frcant,adcant,vpeso=0,opeso;

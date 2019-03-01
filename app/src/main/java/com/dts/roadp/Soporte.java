@@ -12,7 +12,6 @@ public class Soporte extends PBase {
 
         super.InitBase();
 
-
         //subj : Empres Ruta
     }
 

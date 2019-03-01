@@ -383,7 +383,7 @@ public class ProdCant extends PBase {
 	}
 
 	private void applyCant() {
-		double ppeso;
+		double ppeso=0;
 
 		if (cant<0){
 			mu.msgbox("Cantidad incorrecta");txtCant.requestFocus();return;
@@ -403,7 +403,10 @@ public class ProdCant extends PBase {
 				ppeso=Double.parseDouble(spp);
 				if (ppeso<=0) throw new Exception();
 			} catch (Exception e) {
-				mu.msgbox("Peso incorrect");txtPeso.requestFocus();return;
+				if (porpeso) {
+					mu.msgbox("Peso incorrect");txtPeso.requestFocus();return;
+				}
+
 			}
 		} else {
 			if (pesoprom==0) ppeso = pesostock*cant;else ppeso=pesoprom*cant;
@@ -459,7 +462,7 @@ public class ProdCant extends PBase {
 	}
 	
 	private int setCant(boolean mode){
-		double cu,tv,corig,cround,fruni,frcant,adcant,vpeso,opeso;
+		double cu,tv,corig,cround,fruni,frcant,adcant,vpeso=0,opeso;
 		boolean ajust=false;
 		
 		lblTot.setText("***");
@@ -527,7 +530,10 @@ public class ProdCant extends PBase {
 			if (mu.emptystr(txtPeso.getText().toString())) return 2;
 			vpeso=Double.parseDouble(txtPeso.getText().toString());
 		} catch (Exception e) {
-			mu.msgbox("Peso incorrecto");return 2;
+			if (porpeso) {
+				mu.msgbox("Peso incorrecto");return 2;
+			}
+
 		}
 
 		if (porpeso) {
@@ -585,14 +591,16 @@ public class ProdCant extends PBase {
 	}
 
 	private void setPrecio() {
-	    double cu,tv,corig,cround,fruni,frcant,adcant,ppeso;
+	    double cu,tv,corig,cround,fruni,frcant,adcant,ppeso=0;
 
         try {
             ppeso=Double.parseDouble(txtPeso.getText().toString());
         } catch (Exception e) {
-            lblTot.setText("***");
-            if (!mu.emptystr(txtPeso.getText().toString())) mu.msgbox("Peso incorrecto");
-            return;
+        	if (porpeso) {
+				lblTot.setText("***");
+				if (!mu.emptystr(txtPeso.getText().toString())) mu.msgbox("Peso incorrecto");
+				return;
+			}
         }
 
         prec=prc.precio(prodid,0,nivel,um,gl.umpeso,ppeso);

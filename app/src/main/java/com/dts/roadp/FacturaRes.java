@@ -177,7 +177,7 @@ public class FacturaRes extends PBase {
 	}
 	
 	
-	// Events
+	//region Events
 	
 	public void prevScreen(View view) {
 		clearGlobals();
@@ -221,9 +221,10 @@ public class FacturaRes extends PBase {
 		Intent intent = new Intent(this,BonVenta.class);
 		startActivity(intent);	
 	}
+
+	//endregion
 	
-	
-	// Main
+	//region Main
 	
 	private void processFinalPromo(){
 		
@@ -556,10 +557,7 @@ public class FacturaRes extends PBase {
 				
 			    db.execSQL(ins.sql());
 
-				//#HS_20181120_1625 Se agrego parametro porque cambio la funcion
-
-
-				vprod=DT.getString(0);
+			    vprod=DT.getString(0);
 				vumstock=DT.getString(13);
 				vcant=DT.getDouble(1);
 				vpeso=DT.getDouble(8);
@@ -996,9 +994,10 @@ public class FacturaRes extends PBase {
 			return false;
 	    }		
 	}
+
+	//endregion
 	
-	
-	// Pago
+	//region Pago
 	
 	private void inputEfectivo() {
 		final AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -1343,8 +1342,9 @@ public class FacturaRes extends PBase {
 		return uniqueID;
 	}
 
+	//endregion
 
-	// Aux
+	//region Aux
 	
 	public void askSave(View view) {
 		checkPago();
@@ -1506,7 +1506,8 @@ public class FacturaRes extends PBase {
 		    imm.hideSoftInputFromWindow(sview.getWindowToken(), 0);
 		}
 	}
-	
+
+	//endregion
 	
 	// Activity Events
 	

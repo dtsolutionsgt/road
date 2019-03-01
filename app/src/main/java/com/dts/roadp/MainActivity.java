@@ -87,6 +87,10 @@ public class MainActivity extends PBase {
 
             this.setTitle("ROAD");
 
+            if (fecha>1903310000) {
+            	toastlong("Su licencia expiro");
+			}
+
             txtUser= (EditText) findViewById(R.id.txtUser);
             txtPass= (EditText) findViewById(R.id.txtMonto);
             lblRuta= (TextView) findViewById(R.id.lblCDisp);

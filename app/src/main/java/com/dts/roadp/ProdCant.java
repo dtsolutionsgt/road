@@ -461,6 +461,7 @@ public class ProdCant extends PBase {
 		
 	}
 	
+	
 	private int setCant(boolean mode){
 		double cu,tv,corig,cround,fruni,frcant,adcant,vpeso=0,opeso;
 		boolean ajust=false;

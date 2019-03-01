@@ -51,6 +51,7 @@ public class UtilPrint extends PBase {
 		setContentView(R.layout.activity_util_print);
 		
 		super.InitBase();
+		addlog("UtilPrint",""+du.getActDateTime(),gl.vend);
 		
 		spinPrint = (Spinner) findViewById(R.id.spinner1);
 		txtPar = (EditText) findViewById(R.id.txtMonto);
@@ -84,21 +85,31 @@ public class UtilPrint extends PBase {
 	// Events
 	
 	public void doApply(View view) {
-		updateItem();	
+		try{
+			updateItem();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void doAction(View view) {
 	}
 	
 	public void doTestPrint(View view) {
-			
-		if (prtipo.equalsIgnoreCase("SIN IMPRESORA")) return;
-		
-		prpar=txtPar.getText().toString().trim();
-		
-		if (mu.emptystr(prpar)) {
-			mu.msgbox("Parametro de impresion incorrecto");return;
+
+		try{
+			if (prtipo.equalsIgnoreCase("SIN IMPRESORA")) return;
+
+			prpar=txtPar.getText().toString().trim();
+
+			if (mu.emptystr(prpar)) {
+				mu.msgbox("Parametro de impresion incorrecto");return;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 
 	}
 		
@@ -124,6 +135,7 @@ public class UtilPrint extends PBase {
 			    	//}
 			    	
 		        } catch (Exception e) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				   	mu.msgbox( e.getMessage());
 		        }			    	
 		    }
@@ -157,6 +169,7 @@ public class UtilPrint extends PBase {
 			}
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			prtipo="";prpar="";
 		   	mu.msgbox( e.getMessage());
 	    }	
@@ -190,6 +203,7 @@ public class UtilPrint extends PBase {
 			}
 
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox( e.getMessage());
 		}
 		
@@ -216,6 +230,7 @@ public class UtilPrint extends PBase {
 			spinPrint.setSelection(sp);
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			Log.d("e",e.getMessage());
 		}
 	}	
@@ -244,6 +259,7 @@ public class UtilPrint extends PBase {
 		    writer.close();
 		    
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("No se puede crear archivo de impresion : "+e.getMessage());
 		}
 		

@@ -18,6 +18,7 @@ public class PicView extends PBase {
 		setContentView(R.layout.activity_pic_view);
 		
 		super.InitBase();
+		addlog("PicView",""+du.getActDateTime(),gl.vend);
 		
 		imgImg=(ImageView) findViewById(R.id.imgImg);
 		

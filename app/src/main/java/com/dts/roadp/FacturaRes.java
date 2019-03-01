@@ -29,9 +29,9 @@ import android.widget.Toast;
 public class FacturaRes extends PBase {
 
 	private ListView listView;
-	private TextView lblPago,lblFact,lblTalon,lblMPago,lblCred;
-	private ImageView imgBon,imgMPago,imgCred;
-	
+	private TextView lblPago,lblFact,lblTalon,lblMPago,lblCred,lblPend,lblCash;
+	private ImageView imgBon,imgMPago,imgCred,imgPend, imgCash;
+
 	private List<String> spname = new ArrayList<String>();
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
 	private ListAdaptTotals adapter;
@@ -58,6 +58,7 @@ public class FacturaRes extends PBase {
 		setContentView(R.layout.activity_factura_res);
 		
 		super.InitBase();
+        addlog("FacturaRes",""+du.getActDateTime(),gl.vend);
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		lblPago = (TextView) findViewById(R.id.TextView01);
@@ -65,11 +66,15 @@ public class FacturaRes extends PBase {
 		lblTalon = (TextView) findViewById(R.id.lblTalon);
 		lblMPago = (TextView) findViewById(R.id.lblCVence);
 		lblCred = (TextView) findViewById(R.id.TextView02);
-		
+		lblPend = (TextView) findViewById(R.id.lblCVence2);
+		lblCash = (TextView) findViewById(R.id.textView4);
+
 		imgBon = (ImageView) findViewById(R.id.imageView6);
 		imgMPago = (ImageView) findViewById(R.id.imageView1);
 		imgCred = (ImageView) findViewById(R.id.imageView3);
-		
+		imgPend = (ImageView) findViewById(R.id.imageView12);
+		imgCash = (ImageView) findViewById(R.id.imageView2);
+
 		cliid=gl.cliente;	
 		rutapos=gl.rutapos;
 		media=gl.media;
@@ -93,25 +98,44 @@ public class FacturaRes extends PBase {
 		if (media==1) {
 			imgCred.setVisibility(View.INVISIBLE);
 			lblCred.setVisibility(View.INVISIBLE);
-			imgMPago.setVisibility(View.INVISIBLE);
-			lblMPago.setVisibility(View.INVISIBLE);
+			lblCash.setVisibility(View.VISIBLE);
+			imgCash.setVisibility(View.VISIBLE);
+			lblPend.setVisibility(View.INVISIBLE);
+			imgPend.setVisibility(View.INVISIBLE);
+			imgMPago.setVisibility(View.VISIBLE);
+			lblMPago.setVisibility(View.VISIBLE);
 		}
 
 		if (media <= 3){
 			imgMPago.setVisibility(View.VISIBLE);
 			lblMPago.setVisibility(View.VISIBLE);
+			imgCred.setVisibility(View.INVISIBLE);
+			lblCred.setVisibility(View.INVISIBLE);
+			lblCash.setVisibility(View.VISIBLE);
+			imgCash.setVisibility(View.VISIBLE);
+			lblPend.setVisibility(View.VISIBLE);
+			imgPend.setVisibility(View.VISIBLE);
 		}
 
 		if (media==4) {
+			lblCash.setVisibility(View.INVISIBLE);
+			imgCash.setVisibility(View.INVISIBLE);
+			lblPend.setVisibility(View.INVISIBLE);
+			imgPend.setVisibility(View.INVISIBLE);
 			imgCred.setVisibility(View.VISIBLE);
 			lblCred.setVisibility(View.VISIBLE);
-			imgMPago.setVisibility(View.VISIBLE);
-			lblMPago.setVisibility(View.VISIBLE);
-			
-			if (credito<=0) {
-				imgCred.setVisibility(View.INVISIBLE);
-				lblCred.setVisibility(View.INVISIBLE);	
-			}			
+			imgMPago.setVisibility(View.INVISIBLE);
+			lblMPago.setVisibility(View.INVISIBLE);
+
+			if (gl.vcredito) {
+
+                if (credito<=0) {
+                    imgCred.setVisibility(View.INVISIBLE);
+                    lblCred.setVisibility(View.INVISIBLE);
+                }
+
+            }
+
 		}
 		
 		fechae=fecha;
@@ -154,72 +178,103 @@ public class FacturaRes extends PBase {
 	}
 	
 	
-	// Events
+	//region Events
 	
 	public void prevScreen(View view) {
-		clearGlobals();
-		super.finish();
+		try{
+			clearGlobals();
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void paySelect(View view) {
-		
-		if (fcorel==0) {
-			msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
+
+		try{
+			if (fcorel==0) {
+				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
+			}
+
+			gl.pagoval=tot;
+			gl.pagolim=tot;
+			gl.pagocobro=false;
+			browse=1;
+
+			Intent intent = new Intent(this,Pago.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-				
-		gl.pagoval=tot;
-		gl.pagolim=tot;
-		gl.pagocobro=false;
-		browse=1;
-		
-		Intent intent = new Intent(this,Pago.class);
-		startActivity(intent);	
+
 	}
 	
 	public void payCash(View view) {
-		
-		if (fcorel==0) {
-			msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
+
+		try{
+			if (fcorel==0) {
+				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
+			}
+
+			//inputEfectivo();
+			inputVuelto();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		//inputEfectivo();  
-		inputVuelto();
+
 	}
 	
 	public void payCred(View view) {
-		if (fcorel==0) {
-			msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
+		try{
+			if (fcorel==0) {
+				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
+			}
+
+			inputCredito();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		inputCredito();	
 	}
 	
 	public void showBon(View view) {
-		Intent intent = new Intent(this,BonVenta.class);
-		startActivity(intent);	
+		try{
+			Intent intent = new Intent(this,BonVenta.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
+
+	//endregion
 	
-	
-	// Main
+	//region Main
 	
 	private void processFinalPromo(){
 		
 		descg=gl.descglob;
 		descgtotal=gl.descgtotal;
 
-		//descgmon=(double) (stot0*descg/100);
-		descgmon=(double) (descg*descgtotal/100);
-		totalOrder();
+		try{
+			//descgmon=(double) (stot0*descg/100);
+			descgmon=(double) (descg*descgtotal/100);
+			totalOrder();
 
-		if (descg>0) {
-			final Handler handler = new Handler();
-			handler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					showPromo();
-				}
-			}, 300);
+			if (descg>0) {
+				final Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						showPromo();
+					}
+				}, 300);
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}
 	
 	public void showPromo(){
@@ -232,45 +287,56 @@ public class FacturaRes extends PBase {
 			Intent intent = new Intent(this,DescBon.class);
 			startActivity(intent);	
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox( e.getMessage());
 		}
 		
 	}
 	
 	private void updDesc(){
-		descg=gl.promdesc;
-		//descgmon=(double) (stot0*descg/100);
-		descgmon=(double) (descg*descgtotal/100);
-		totalOrder();	
+		try{
+			descg=gl.promdesc;
+			//descgmon=(double) (stot0*descg/100);
+			descgmon=(double) (descg*descgtotal/100);
+			totalOrder();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void totalOrder(){
 		double dmaxmon;
 		
 		cleandprod=false;
-		
-		if (acum) {
-			dfinmon=descpmon+descgmon;
-			cleandprod=false;	
-		} else {
-			if (descpmon>=descgmon) {
-				dfinmon=descpmon;
+
+		try{
+			if (acum) {
+				dfinmon=descpmon+descgmon;
 				cleandprod=false;
-			} else {	
-				dfinmon=descgmon;
-				cleandprod=true;
+			} else {
+				if (descpmon>=descgmon) {
+					dfinmon=descpmon;
+					cleandprod=false;
+				} else {
+					dfinmon=descgmon;
+					cleandprod=true;
+				}
 			}
+
+			dmaxmon=(double) (stot0*dmax/100);
+			if (dmax>0) {
+				if (dfinmon>dmaxmon) dfinmon=dmax;
+			}
+
+			descmon=mu.round2(dfinmon);
+			stot=mu.round2(stot0);
+
+			fillTotals();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		dmaxmon=(double) (stot0*dmax/100);
-		if (dmax>0) {
-			if (dfinmon>dmaxmon) dfinmon=dmax;	
-		}
-		
-		descmon=mu.round2(dfinmon);
-		stot=mu.round2(stot0);
-		
-		fillTotals();
+
 		
 	}
 	
@@ -337,6 +403,7 @@ public class FacturaRes extends PBase {
 			}
 					
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 		
 		adapter=new ListAdaptTotals(this,items);
@@ -345,36 +412,41 @@ public class FacturaRes extends PBase {
 	
  	private void finishOrder(){
 
- 		if (!saved) {
- 			if (!saveOrder()) return;
- 		}
- 		
- 		clsBonifSave bonsave=new clsBonifSave(this,corel,"V");
- 		
- 		bonsave.ruta=gl.ruta;
- 		bonsave.cliente=gl.cliente;
- 		bonsave.fecha=fecha;
- 		bonsave.emp=gl.emp;
- 		
-		bonsave.save();
-		
-		if (prn.isEnabled()) {
-					
-			if (gl.peModal.equalsIgnoreCase("APR")) {
-				fdoc.buildPrintExt(corel,2,"APR");
-			} else if (gl.peModal.equalsIgnoreCase("...")) {	
-				//
-			} else {
-
-				//#HS_20181212 Condicion para imprimir facturas pendientes de pago
-				if (!gl.cobroPendiente) {
-					fdoc.buildPrint(corel, 0,gl.peFormatoFactura);
-				}else{
-					fdoc.buildPrint(corel,4,gl.peFormatoFactura);
-				}
+		try{
+			if (!saved) {
+				if (!saveOrder()) return;
 			}
 
-			prn.printask(printclose);
+			clsBonifSave bonsave=new clsBonifSave(this,corel,"V");
+
+			bonsave.ruta=gl.ruta;
+			bonsave.cliente=gl.cliente;
+			bonsave.fecha=fecha;
+			bonsave.emp=gl.emp;
+
+			bonsave.save();
+
+			if (prn.isEnabled()) {
+
+				if (gl.peModal.equalsIgnoreCase("APR")) {
+					fdoc.buildPrintExt(corel,2,"APR");
+				} else if (gl.peModal.equalsIgnoreCase("...")) {
+					//
+				} else {
+
+					//#HS_20181212 Condicion para imprimir facturas pendientes de pago
+					if (!gl.cobroPendiente) {
+						fdoc.buildPrint(corel, 0,gl.peFormatoFactura);
+					}else{
+						fdoc.buildPrint(corel,4,gl.peFormatoFactura);
+					}
+				}
+
+				if (gl.peImprFactCorrecta) {
+                    singlePrint();
+				} else {
+					prn.printask(printclose);
+				}
 
 			/*
 			final Handler shandler = new Handler();
@@ -382,55 +454,72 @@ public class FacturaRes extends PBase {
 				@Override
 				public void run() {
 					//Intent intent = new Intent(FacturaRes.this,PrintDialog.class);
-					//startActivity(intent);				
+					//startActivity(intent);
 				}
 			}, 500);
-			*/	
-			
-		}
-		
-		gl.closeCliDet=true;
-		gl.closeVenta=true;
+			*/
 
-		if (!prn.isEnabled()){
-			super.finish();
-		}
+			}
 
-		
+			gl.closeCliDet=true;
+			gl.closeVenta=true;
+
+			if (!prn.isEnabled()){
+				super.finish();
+			}
+
+
 		/*
 		if (prn.isEnabled()) {
-
-
 			fdoc.buildPrint(corel);
-
-
 			singlePrint();
 		} else {
 			gl.closeCliDet=true;
 			gl.closeVenta=true;
-			
-			super.finish();			
+
+			super.finish();
 		}
-		*/		
+		*/
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}
  	
  	private void singlePrint() {
- 		prn.printask(printcallback);
+		try{
+			prn.printask(printcallback);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
  	}
 
  	//#HS_20181212 Funcion para proceso pendiente de pago.
 	public void pendientePago(View view){
-		askPendientePago();
+		try{
+			askPendientePago();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private boolean saveOrder(){
 		Cursor DT;
-		double peso;
+		String vprod,vumstock,vumventa;
+		double vcant,vpeso,vfactor,peso,factpres;
 		int mitem;		
 		
 		corel=gl.ruta+"_"+mu.getCorelBase();
-		fecha=du.getActDateTime();
+
+		if (gl.peModal.equalsIgnoreCase("TOL")) {
+			fecha=du.getActDate();
+		} else {
+			fecha=du.getActDateTime();
+		}
+
 		
 		try {
 			sql="SELECT MAX(ITEM) FROM D_FACT_LOG";
@@ -438,6 +527,7 @@ public class FacturaRes extends PBase {
 			DT.moveToFirst();
 			mitem=DT.getInt(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mitem=0;
 		}
 		mitem++;
@@ -483,7 +573,7 @@ public class FacturaRes extends PBase {
 			ins.add("ADD2",gl.ref2);
 			ins.add("ADD3",gl.ref3);
 			
-			ins.add("DEPOS","");
+			ins.add("DEPOS","N");
 			ins.add("PEDCOREL","");
 			ins.add("REFERENCIA","");
 			ins.add("ASIGNACION","");    
@@ -502,7 +592,9 @@ public class FacturaRes extends PBase {
 			while (!DT.isAfterLast()) {
 
 				porpeso=prodPorPeso(DT.getString(0));
-					
+				factpres=DT.getDouble(12);
+				peso=DT.getDouble(8);
+
 			  	ins.init("D_FACTURAD");
 				ins.add("COREL",corel);
 				ins.add("PRODUCTO",DT.getString(0));
@@ -525,8 +617,16 @@ public class FacturaRes extends PBase {
 				
 			    db.execSQL(ins.sql());
 
-				//#HS_20181120_1625 Se agrego parametro porque cambio la funcion
-			    if (esProductoConStock(DT.getString(0))) rebajaStockUM(DT.getString(0),DT.getString(13),DT.getDouble(1),DT.getDouble(12),DT.getString(11));
+			    vprod=DT.getString(0);
+				vumstock=DT.getString(13);
+				vcant=DT.getDouble(1);
+				vpeso=DT.getDouble(8);
+				vfactor=vpeso/(vcant*factpres);
+				vumventa=DT.getString(11);
+
+				if (esProductoConStock(DT.getString(0))) {
+					rebajaStockUM(vprod, vumstock, vcant, vfactor, vumventa,factpres,peso);
+				}
 
 			    DT.moveToNext();
 			}
@@ -585,6 +685,7 @@ public class FacturaRes extends PBase {
 					Toast.makeText(this, "Se guardo la factura pendiente de pago",Toast.LENGTH_LONG).show();
 
 				}catch (Exception e){
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 					mu.msgbox("PendientePago: "+e.getMessage());
 				}
 
@@ -622,6 +723,7 @@ public class FacturaRes extends PBase {
 			saved=true;
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 		   	mu.msgbox("Error (factura) " + e.getMessage());return false;
 		}
@@ -634,6 +736,7 @@ public class FacturaRes extends PBase {
 	
 			db.execSQL(upd.SQL());
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error  : " + e.getMessage());
 		}	
 		
@@ -642,13 +745,18 @@ public class FacturaRes extends PBase {
 		return true;
 	}
 	
-	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa) {
+	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {
 		Cursor dt;
-		double acant,cantapl,dispcant,peso,pesoapl,disppeso,factpeso;
+		double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso;
 		String lote,doc,stat;
 
-		if(porpeso) factor=1;
-		acant=cant*factor;
+		if (porpeso) {
+			actcant=cant;
+			actpeso=ppeso;
+		} else {
+			actcant=cant*factpres;
+			actpeso=cant*factor;
+		}
 
 		try {
 
@@ -662,20 +770,22 @@ public class FacturaRes extends PBase {
 			while (!dt.isAfterLast()) {
 
 				cant=dt.getDouble(0);
-				peso=dt.getDouble(2);
+				speso=dt.getDouble(2);
 				lote=dt.getString(4);
 				doc=dt.getString(5);
 				stat=dt.getString(9);
 
-				if (cant!=0) factpeso=peso/cant; else factpeso=0;
+				if (actcant>cant) cantapl=cant;else cantapl=actcant;
+				dispcant=cant-cantapl;if (dispcant<0) dispcant=0;
+				actcant=actcant-cantapl;
 
-				if (acant>cant) cantapl=cant;else cantapl=acant;
-				pesoapl=cantapl*factpeso;
-
-				dispcant=cant-acant;if (dispcant<0) dispcant=0;
-				acant=acant-cant;
-
-				disppeso=peso-pesoapl;if (disppeso<0) disppeso=0;
+				if (porpeso) {
+					if (actpeso>speso) pesoapl=speso;else pesoapl=actpeso;
+					actpeso=actpeso-pesoapl;
+				} else {
+					pesoapl=cantapl*factor;
+				}
+				disppeso=speso-pesoapl;if (disppeso<0) disppeso=0;
 
 				// Stock
 
@@ -718,7 +828,13 @@ public class FacturaRes extends PBase {
 					ins.add("COREL",corel);
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
-					ins.add("CANTIDAD",cantapl);
+
+					if (porpeso) {
+						ins.add("CANTIDAD",cantapl);
+					} else {
+						ins.add("CANTIDAD",cantapl/factpres);
+					}
+
 					ins.add("PESO",pesoapl);
 					ins.add("UMSTOCK",umstock);
 					ins.add("UMPESO",gl.umpeso);
@@ -727,19 +843,21 @@ public class FacturaRes extends PBase {
 					db.execSQL(ins.sql());
 
 				} catch (SQLException e) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 
-					sql="UPDATE D_FACTURAD_LOTES SET CANTIDAD=CANTIDAD+"+cantapl+",PESO=PESO+"+peso+"  " +
+					sql="UPDATE D_FACTURAD_LOTES SET CANTIDAD=CANTIDAD+"+cantapl+",PESO=PESO+"+pesoapl+"  " +
 						"WHERE (COREL='"+corel+"') AND (PRODUCTO='"+prid+"') AND (LOTE='"+lote+"')";
 					db.execSQL(sql);
 					//mu.msgbox(e.getMessage()+"\n"+ins.sql());
 				}
 
-				if (acant<=0) return;
+				//if (actcant<=0) return;
 
 				dt.moveToNext();
 			}
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 	}
@@ -750,54 +868,59 @@ public class FacturaRes extends PBase {
 		String lote,doc,stat;
 		
 		acant=cant;
-			
-		sql="SELECT CANT,LOTE,DOCUMENTO,STATUS FROM P_STOCK WHERE CODIGO='"+prid+"'";
-		DT=Con.OpenDT(sql);
 
-		DT.moveToFirst();
-		while (!DT.isAfterLast()) {
-				
-			val=DT.getDouble(0);
-			lote=DT.getString(1);
-			doc=DT.getString(2);
-			stat=DT.getString(3);
-			
-			if (val>acant) {
-				cantapl=acant;
-				disp=val-acant;
-			} else {
-				cantapl=val;
-				disp=0;
+		try{
+			sql="SELECT CANT,LOTE,DOCUMENTO,STATUS FROM P_STOCK WHERE CODIGO='"+prid+"'";
+			DT=Con.OpenDT(sql);
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				val=DT.getDouble(0);
+				lote=DT.getString(1);
+				doc=DT.getString(2);
+				stat=DT.getString(3);
+
+				if (val>acant) {
+					cantapl=acant;
+					disp=val-acant;
+				} else {
+					cantapl=val;
+					disp=0;
+				}
+				acant=acant-val;
+
+				// Stock
+
+				sql="UPDATE P_STOCK SET CANT="+disp+" WHERE CODIGO='"+prid+"' AND LOTE='"+lote+"' AND DOCUMENTO='"+doc+"' AND STATUS='"+stat+"'";
+				db.execSQL(sql);
+
+				// Factura lotes
+
+				try {
+					ins.init("D_FACTURAD_LOTES");
+
+					ins.add("COREL",corel);
+					ins.add("PRODUCTO",prid );
+					ins.add("LOTE",lote );
+					ins.add("CANTIDAD",cantapl);
+					ins.add("PESO",0);
+
+					db.execSQL(ins.sql());
+
+					//Toast.makeText(this,ins.SQL(),Toast.LENGTH_LONG).show();
+
+				} catch (SQLException e) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+					mu.msgbox(e.getMessage()+"\n"+ins.sql());
+				}
+
+				if (acant<=0) return;
+
+				DT.moveToNext();
 			}
-			acant=acant-val;
-			
-			// Stock
-			
-			sql="UPDATE P_STOCK SET CANT="+disp+" WHERE CODIGO='"+prid+"' AND LOTE='"+lote+"' AND DOCUMENTO='"+doc+"' AND STATUS='"+stat+"'";
-			db.execSQL(sql);
-			
-			// Factura lotes
-				
-			try {
-				ins.init("D_FACTURAD_LOTES");
-				
-				ins.add("COREL",corel);
-				ins.add("PRODUCTO",prid );
-				ins.add("LOTE",lote );
-				ins.add("CANTIDAD",cantapl);
-				ins.add("PESO",0);
-				
-				db.execSQL(ins.sql());
-				
-				//Toast.makeText(this,ins.SQL(),Toast.LENGTH_LONG).show();
-				
-			} catch (SQLException e) {
-				mu.msgbox(e.getMessage()+"\n"+ins.sql());
-			}
-			
-			if (acant<=0) return;
-				
-		    DT.moveToNext();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
 	}
@@ -847,7 +970,8 @@ public class FacturaRes extends PBase {
 			
 			db.execSQL(ins.sql());
 			
-		} catch (SQLException e) {			
+		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//String s=gl.ruta+" / "+ti+" / "+gl.ateninistr;
 			mu.msgbox("Error (att) : " + e.getMessage());
 		}	
@@ -870,6 +994,7 @@ public class FacturaRes extends PBase {
 			
 			return DT.getDouble(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			tot=0;
 			mu.msgbox( e.getMessage());return 0;
 		}	
@@ -894,6 +1019,7 @@ public class FacturaRes extends PBase {
 			cf=DT.getInt(3);
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			fcorel=0;fserie="";
 			mu.msgbox("No esta definido correlativo de factura. No se puede continuar con la venta.\n"+e.getMessage());
 			return;
@@ -906,6 +1032,7 @@ public class FacturaRes extends PBase {
 			
 			ca2=DT.getInt(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			ca2=0;
 		}
 		
@@ -938,124 +1065,142 @@ public class FacturaRes extends PBase {
 			
            	return DT.getString(0).equalsIgnoreCase("P");
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
 	    }		
 	}
+
+	//endregion
 	
-	
-	// Pago
+	//region Pago
 	
 	private void inputEfectivo() {
-		final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		try{
+			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		alert.setTitle("Pago Efectivo");
-		alert.setMessage("Monto a pagar");
-		
-		final EditText input = new EditText(this);
-		alert.setView(input);
-		
-		input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);	
-		input.setText(""+tot);
-		input.requestFocus();
-		
-		showkeyb();
-			
-		alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				peexit=false;
-		    	sefect=input.getText().toString();
-		    	closekeyb();
-		    	applyCash();
-		    	checkPago();
-		  	}
-		});
+			alert.setTitle("Pago Efectivo");
+			alert.setMessage("Monto a pagar");
 
-		alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				peexit=true;
-				closekeyb();
-			}
-		});
+			final EditText input = new EditText(this);
+			alert.setView(input);
 
-		alert.show();
+			input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			input.setText(""+tot);
+			input.requestFocus();
+
+			showkeyb();
+
+			alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					peexit=false;
+					sefect=input.getText().toString();
+					closekeyb();
+					applyCash();
+					checkPago();
+				}
+			});
+
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					peexit=true;
+					closekeyb();
+				}
+			});
+
+			alert.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void inputVuelto() {
-		final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		try{
+			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		alert.setTitle("A pagar : "+mu.frmcur(tot));
-		alert.setMessage("Pagado con billete : ");
-		
-		final EditText input = new EditText(this);
-		alert.setView(input);
-		
-		input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);	
-		input.setText("");
-		input.requestFocus();
-		
-		showkeyb();
-			
-		alert.setPositiveButton("Vuelto", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				double pg,vuel;
-					
-				peexit=false;
-				svuelt=input.getText().toString();
-				sefect=""+tot;
-				
-				try {
-					pg=Double.parseDouble(svuelt);
-					if (pg<tot) {
-						msgbox("Monto menor que total");return;
+			alert.setTitle("A pagar : "+mu.frmcur(tot));
+			alert.setMessage("Pagado con billete : ");
+
+			final EditText input = new EditText(this);
+			alert.setView(input);
+
+			input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			input.setText("");
+			input.requestFocus();
+
+			showkeyb();
+
+			alert.setPositiveButton("Vuelto", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					double pg,vuel;
+
+					peexit=false;
+					svuelt=input.getText().toString();
+					sefect=""+tot;
+
+					try {
+						pg=Double.parseDouble(svuelt);
+						if (pg<tot) {
+							msgbox("Monto menor que total");return;
+						}
+
+						vuel=pg-tot;
+					} catch (NumberFormatException e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						msgbox("Monto incorrecto");return;
 					}
-					
-					vuel=pg-tot;
-				} catch (NumberFormatException e) {
-					msgbox("Monto incorrecto");return;
+
+					applyCash();
+					if (vuel==0) {
+						checkPago();
+					} else {
+						vuelto("Vuelto : "+mu.frmcur(vuel));
+						//dialog.dismiss();
+					}
+
 				}
-						
-		    	applyCash();
-		    	if (vuel==0) {
-		    		checkPago();
-		    	} else {	
-		    		vuelto("Vuelto : "+mu.frmcur(vuel));
-		    		//dialog.dismiss();
-		    	}    	
-		    	
-		  	}
-		});
+			});
 
-		alert.setNegativeButton("Exacto", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				peexit=false;
-				svuelt=""+tot;
-		    	sefect=""+tot;
-		    	applyCash();
-		    	checkPago();
-			}
-		});
-		
-		alert.setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				peexit=true;
-			}
-		});
+			alert.setNegativeButton("Exacto", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					peexit=false;
+					svuelt=""+tot;
+					sefect=""+tot;
+					applyCash();
+					checkPago();
+				}
+			});
 
-		alert.show();
+			alert.setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					peexit=true;
+				}
+			});
+
+			alert.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void vuelto(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
-		
-		dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-    	    public void onClick(DialogInterface dialog, int which) {	
-    	    	checkPago();
-    	    }
-    	});
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
+
+			dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					checkPago();
+				}
+			});
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	
 	} 
 	
@@ -1094,45 +1239,51 @@ public class FacturaRes extends PBase {
 			//msgAskSave("Aplicar pago y crear un recibo");
 			
 		} catch (Exception e) {
-			inputEfectivo(); 
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			inputEfectivo();
 			mu.msgbox("Pago incorrecto"+e.getMessage());	   	
 	    }
 		
 	}
 	
 	private void inputCredito() {
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		alert.setTitle("Pago Crédito");
-		alert.setMessage("Valor a pagar");
-		
-		final EditText input = new EditText(this);
-		alert.setView(input);
-		
-		input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);	
-		input.setText(""+tot);
-		input.requestFocus();
-		
-		showkeyb();
-		
-		alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				peexit=false;
-		    	sefect=input.getText().toString();
-		    	closekeyb();
-		    	applyCredit();
-		    	checkPago();
-		  	}
-		});
+			alert.setTitle("Pago Crédito");
+			alert.setMessage("Valor a pagar");
 
-		alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				peexit=true;
-				closekeyb();
-			}
-		});
+			final EditText input = new EditText(this);
+			alert.setView(input);
 
-		alert.show();
+			input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			input.setText(""+tot);
+			input.requestFocus();
+
+			showkeyb();
+
+			alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					peexit=false;
+					sefect=input.getText().toString();
+					closekeyb();
+					applyCredit();
+					checkPago();
+				}
+			});
+
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					peexit=true;
+					closekeyb();
+				}
+			});
+
+			alert.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void applyCredit() {
@@ -1170,50 +1321,61 @@ public class FacturaRes extends PBase {
 			//msgAskSave("Aplicar pago y crear un recibo");
 			
 		} catch (Exception e) {
-			inputEfectivo(); 
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			inputEfectivo();
 			mu.msgbox("Pago incorrecto"+e.getMessage());	   	
 	    }
 		
 	}
 	
 	private void inputCard() {
-	
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-		alert.setTitle("Número de tarjeta");
-		
-		final EditText input = new EditText(this);
-		alert.setView(input);
-		
-		input.setInputType(InputType.TYPE_CLASS_NUMBER);	
-		input.setText("");input.requestFocus();
-		
-		showkeyb();
-		
-		alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-		    	if (checkNum(input.getText().toString())) addPagoTar();	
-		  	}
-		});
 
-		alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				closekeyb();
-			}
-		});
+		try{
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			alert.setTitle("Número de tarjeta");
 
-		alert.show();
+			final EditText input = new EditText(this);
+			alert.setView(input);
+
+			input.setInputType(InputType.TYPE_CLASS_NUMBER);
+			input.setText("");input.requestFocus();
+
+			showkeyb();
+
+			alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					if (checkNum(input.getText().toString())) addPagoTar();
+				}
+			});
+
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					closekeyb();
+				}
+			});
+
+			alert.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private boolean checkNum(String s) {
-		
-		if (mu.emptystr(s)) {
-			showkeyb();
-			inputCard(); 
-			mu.msgbox("Número incorrecto");showkeyb();
-			return false;
+
+		try{
+			if (mu.emptystr(s)) {
+				showkeyb();
+				inputCard();
+				mu.msgbox("Número incorrecto");showkeyb();
+				return false;
+			}
+
+			desc1=s;
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		desc1=s;
+
 		return true;
 		
 	}
@@ -1238,6 +1400,7 @@ public class FacturaRes extends PBase {
 	    	db.execSQL(ins.sql());
 	    	
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}	
 		
@@ -1257,6 +1420,7 @@ public class FacturaRes extends PBase {
 			
 			tpago=DT.getDouble(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			tpago=0;
 			mu.msgbox( e.getMessage());
 		}
@@ -1281,6 +1445,7 @@ public class FacturaRes extends PBase {
 			uniqueID = Settings.Secure.getString(getContentResolver(),
 					Settings.Secure.ANDROID_ID);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			uniqueID="0000000000";
 		}
@@ -1288,111 +1453,138 @@ public class FacturaRes extends PBase {
 		return uniqueID;
 	}
 
+	//endregion
 
-	// Aux
+	//region Aux
 	
 	public void askSave(View view) {
-		checkPago();
+		try{
+			checkPago();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void askSave() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle("Road");
-		dialog.setMessage("¿Guardar la factura?");
-					
-		dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	finishOrder();
-		    }
-		});
-		
-		dialog.setNegativeButton("Salir", null);
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("¿Guardar la factura?");
+
+			dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					finishOrder();
+				}
+			});
+
+			dialog.setNegativeButton("Salir", null);
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 	
 	private void askSavePos() {
 		double vuel;
 		String sv="";
-		
-		try {
-			vuel=Double.parseDouble(svuelt);
-			
-			if (vuel<tot) throw new Exception();
-						
-			if (vuel>tot) {
-				vuel=vuel-tot;
-				sv="Vuelto : "+mu.frmcur(vuel)+"\n\n";
-			} else {	
-				sv="SIN VUELTO";
+
+		try{
+			try {
+				vuel=Double.parseDouble(svuelt);
+
+				if (vuel<tot) throw new Exception();
+
+				if (vuel>tot) {
+					vuel=vuel-tot;
+					sv="Vuelto : "+mu.frmcur(vuel)+"\n\n";
+				} else {
+					sv="SIN VUELTO";
+				}
+
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				sv="";
 			}
-			
-		} catch (Exception e) {
-			sv="";
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage(sv+"¿Guardar la factura?");
+
+			dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					finishOrder();
+				}
+			});
+
+			dialog.setNegativeButton("Salir", null);
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle("Road");
-		dialog.setMessage(sv+"¿Guardar la factura?");
-					
-		dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	finishOrder();
-		    }
-		});
-		
-		dialog.setNegativeButton("Salir", null);
-		
-		dialog.show();
+
 			
 	}
 
 	//#HS_20181212 Dialogo para Pendiente de pago
 	private void askPendientePago() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle("Road");
-		dialog.setMessage("Está factura quedará PENDIENTE DE PAGO, deberá realizar el pago posteriormente. ¿Está seguro?");
+			dialog.setTitle("Road");
+			dialog.setMessage("Está factura quedará PENDIENTE DE PAGO, deberá realizar el pago posteriormente. ¿Está seguro?");
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				gl.cobroPendiente = true;
-				finishOrder();
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					gl.cobroPendiente = true;
+					finishOrder();
+				}
+			});
 
-		dialog.setNegativeButton("Cancelar", null);
+			dialog.setNegativeButton("Cancelar", null);
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	private void askPrint() {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle("Road");
-		dialog.setMessage("¿Impresión correcta?");
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {	
-		    	
-				gl.closeCliDet=true;
-				gl.closeVenta=true;
-				FacturaRes.super.finish();		
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	singlePrint();
-		    }
-		});
-		
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("¿Impresión correcta?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+
+					gl.closeCliDet=true;
+					gl.closeVenta=true;
+					FacturaRes.super.finish();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					singlePrint();
+				}
+			});
+
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
@@ -1400,11 +1592,13 @@ public class FacturaRes extends PBase {
 		try {
 			db.execSQL("DELETE FROM T_PAGO");
 		} catch (SQLException e) {
-		}	
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
 		try {
 			db.execSQL("DELETE FROM T_BONITEM WHERE PRODID='*'");
 		} catch (SQLException e) {
-		}	
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
 	}
 	
 	private void checkPromo() {
@@ -1417,7 +1611,8 @@ public class FacturaRes extends PBase {
            	DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) imgBon.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
-	    }			
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+	    }
 	}
 	
 	private void cliPorDia() {
@@ -1430,6 +1625,7 @@ public class FacturaRes extends PBase {
 			DT=Con.OpenDT(sql);
 			clidia=DT.getCount();
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			clidia=0;
 		}
 			
@@ -1439,41 +1635,56 @@ public class FacturaRes extends PBase {
 		try {
 			return app.ventaPeso(prodid);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return false;
 		}
 	}
 
 	private void hidekeyboard() {
-		View sview = this.getCurrentFocus();
-		
-		if (sview != null) {  
-		    InputMethodManager imm = (InputMethodManager)getSystemService(this.INPUT_METHOD_SERVICE);
-		    imm.hideSoftInputFromWindow(sview.getWindowToken(), 0);
+		try{
+			View sview = this.getCurrentFocus();
+
+			if (sview != null) {
+				InputMethodManager imm = (InputMethodManager)getSystemService(this.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(sview.getWindowToken(), 0);
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}
-	
+
+	//endregion
 	
 	// Activity Events
 	
 	@Override
 	protected void onResume() {
-	    super.onResume();
-	    
-	    checkPromo();
-	    
-	    checkPago();
-	    if (browse==1) {
-	    	browse=0;
-	    	if (gl.promapl) updDesc();
-	    	return;
-	    }
-	
+		try{
+			super.onResume();
+
+			checkPromo();
+
+			checkPago();
+			if (browse==1) {
+				browse=0;
+				if (gl.promapl) updDesc();
+				return;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}	
 
 	@Override
 	public void onBackPressed() {
-		clearGlobals();
-		super.onBackPressed();
+		try{
+			clearGlobals();
+			super.onBackPressed();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	

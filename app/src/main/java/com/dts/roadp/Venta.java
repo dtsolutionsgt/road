@@ -7,6 +7,7 @@ import com.dts.roadp.clsClasses.clsCD;
 import com.dts.roadp.clsClasses.clsVenta;
 
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -48,15 +49,14 @@ public class Venta extends PBase {
 	private ArrayList<String> lname = new ArrayList<String>();
 
 	private int browse;
-	private String prodid,um;
 
 	private double cant,desc,mdesc,prec,precsin,imp,impval;
 	private double descmon,tot,totsin,percep,ttimp,ttperc,ttsin,prodtot;
 	private double px,py,cpx,cpy,cdist;
 
-	private String emp,cliid,rutatipo;
+	private String emp,cliid,rutatipo,prodid,um,tiposcan;
 	private int nivel,dweek,clidia;
-	private boolean sinimp,rutapos;
+	private boolean sinimp,rutapos,softscanexist,porpeso;
 
 	private DecimalFormat ffrmprec;
 	private AppMethods app;
@@ -69,7 +69,7 @@ public class Venta extends PBase {
 
 	private boolean isGPSEnabled,isNetworkEnabled,canGetLocation;
 	private double  latitude,longitude;
-	private String  cod;
+	private String  cod,barcode;
 
 	private static final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
 	private static final long  MIN_TIME_BW_UPDATES = 1000; // in Milliseconds
@@ -81,6 +81,7 @@ public class Venta extends PBase {
 		setContentView(R.layout.activity_venta);
 
 		super.InitBase();
+		addlog("Venta",""+du.getActDateTime(),gl.vend);
 
 		setControls();
 
@@ -125,144 +126,195 @@ public class Venta extends PBase {
 
 	// Events
 
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		try{
+			//if (requestCode == 0) {
+			if (resultCode == RESULT_OK) {
+				String contents = intent.getStringExtra("SCAN_RESULT");
+				barcode=contents;
+				toast("BC:"+barcode);
+			}
+			//}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+
 	public void showProd(View view) {
-		gl.gstr="";
-		browse=1;
+		try{
+			gl.gstr="";
+			browse=1;
 
-		if (rutatipo.equalsIgnoreCase("P")) gl.prodtipo=0;else gl.prodtipo=1;
+			if (rutatipo.equalsIgnoreCase("P")) gl.prodtipo=0;else gl.prodtipo=1;
 
 
-		Intent intent = new Intent(this,Producto.class);
-		startActivity(intent);
+			Intent intent = new Intent(this,Producto.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	public void finishOrder(View view) {
-		clsBonifGlob clsBonG;
-		clsDeGlob clsDeG;
-		String s,ss;
+		try{
+			clsBonifGlob clsBonG;
+			clsDeGlob clsDeG;
+			String s,ss;
 
-		if (!hasProducts()) {
-			mu.msgbox("No puede continuar, no ha vendido ninguno producto !");return;
-		}
-
-		gl.gstr="";
-		browse=1;
-
-		// Descuentos
-
-		gl.bonprodid="*";
-		gl.bonus.clear();
-
-		clsDeG=new clsDeGlob(this,tot);ss="";
-
-		if (clsDeG.tieneDesc()) {
-
-			gl.descglob=clsDeG.valor;
-			gl.descgtotal=clsDeG.vmonto;
-
-			for (int i = 0; i <clsDeG.items.size(); i++) {
-				s=clsDeG.items.get(i).valor+" , "+clsDeG.items.get(i).lista;
-
-				ss=ss+s+"\n";
-				//Toast.makeText(this,"Desc    "+s, Toast.LENGTH_SHORT).show();
+			if (!hasProducts()) {
+				mu.msgbox("No puede continuar, no ha vendido ninguno producto !");return;
 			}
-		}
 
-		ss=ss+"acum : "+clsDeG.acum+" , limit "+clsDeG.maxlimit+"\n";
-		ss=ss+"Valor : "+clsDeG.valor+"\n";
-		ss=ss+"acum : "+clsDeG.valacum+"\n";
-		ss=ss+"max : "+clsDeG.valmax+"\n";
-		//mu.msgbox(ss);
+			gl.gstr="";
+			browse=1;
 
-		// Bonificacion
+			// Descuentos
 
-		gl.bonprodid="*";
-		gl.bonus.clear();
+			gl.bonprodid="*";
+			gl.bonus.clear();
 
-		clsBonG=new clsBonifGlob(this,tot);
-		if (clsBonG.tieneBonif()) {
-			for (int i = 0; i <clsBonG.items.size(); i++) {
-				//s=clsBonG.items.get(i).valor+"   "+clsBonG.items.get(i).tipolista+"  "+clsBonG.items.get(i).lista;
-				//Toast.makeText(this,s, Toast.LENGTH_SHORT).show();
-				gl.bonus.add(clsBonG.items.get(i));
+			clsDeG=new clsDeGlob(this,tot);ss="";
+
+			if (clsDeG.tieneDesc()) {
+
+				gl.descglob=clsDeG.valor;
+				gl.descgtotal=clsDeG.vmonto;
+
+				for (int i = 0; i <clsDeG.items.size(); i++) {
+					s=clsDeG.items.get(i).valor+" , "+clsDeG.items.get(i).lista;
+
+					ss=ss+s+"\n";
+					//Toast.makeText(this,"Desc    "+s, Toast.LENGTH_SHORT).show();
+				}
 			}
-		} else {
 
+			ss=ss+"acum : "+clsDeG.acum+" , limit "+clsDeG.maxlimit+"\n";
+			ss=ss+"Valor : "+clsDeG.valor+"\n";
+			ss=ss+"acum : "+clsDeG.valacum+"\n";
+			ss=ss+"max : "+clsDeG.valmax+"\n";
+			//mu.msgbox(ss);
+
+			// Bonificacion
+
+			gl.bonprodid="*";
+			gl.bonus.clear();
+
+			clsBonG=new clsBonifGlob(this,tot);
+			if (clsBonG.tieneBonif()) {
+				for (int i = 0; i <clsBonG.items.size(); i++) {
+					//s=clsBonG.items.get(i).valor+"   "+clsBonG.items.get(i).tipolista+"  "+clsBonG.items.get(i).lista;
+					//Toast.makeText(this,s, Toast.LENGTH_SHORT).show();
+					gl.bonus.add(clsBonG.items.get(i));
+				}
+			} else {
+
+			}
+
+
+			if (rutatipo.equalsIgnoreCase("V")) {
+				Intent intent = new Intent(this,FacturaRes.class);
+				startActivity(intent);
+			} else {
+				Intent intent = new Intent(this,PedidoRes.class);
+				startActivity(intent);
+			}
+
+
+			//Toast.makeText(this,"Bon global "+clsBonG.items.size(), Toast.LENGTH_SHORT).show();
+
+			if (gl.bonus.size()>0) {
+				//Intent intent = new Intent(this,BonList.class);
+				//startActivity(intent);
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-
-		if (rutatipo.equalsIgnoreCase("V")) {
-			Intent intent = new Intent(this,FacturaRes.class);
-			startActivity(intent);
-		} else {
-			Intent intent = new Intent(this,PedidoRes.class);
-			startActivity(intent);
-		}
-
-
-		//Toast.makeText(this,"Bon global "+clsBonG.items.size(), Toast.LENGTH_SHORT).show();
-
-		if (gl.bonus.size()>0) {
-			//Intent intent = new Intent(this,BonList.class);
-			//startActivity(intent);
-		}
 
 
 	}
 
 	public void showPromo(View view){
-		gl.gstr="*";
-		browse=3;
+		try{
+			gl.gstr="*";
+			browse=3;
 
-		Intent intent = new Intent(this,ListaPromo.class);
-		startActivity(intent);
+			Intent intent = new Intent(this,ListaPromo.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	public void doSoftScan(View view) {
+		try{
+			browse=5;barcode="";
+
+			Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+			intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE", "QR_CODE_MODE");
+			startActivityForResult(intent, 0);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void setHandlers(){
 
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
 
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-		           	clsVenta vItem = (clsVenta)lvObj;
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsVenta vItem = (clsVenta)lvObj;
 
-					prodid=vItem.Cod;
-					adapter.setSelectedIndex(position);
+						prodid=vItem.Cod;
+						adapter.setSelectedIndex(position);
 
-					setCant();
+						setCant();
 
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-			};
-	    });
-
-	    listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-	    	@Override
-		    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-	    		try {
-	    			Object lvObj = listView.getItemAtPosition(position);
-		           	clsVenta vItem = (clsVenta)lvObj;
-
-					prodid=vItem.Cod;
-					adapter.setSelectedIndex(position);
-
-					if (prodPorPeso(prodid)) {
-                        gl.gstr=prodid;
-                        gl.gstr2=vItem.Nombre;
-						showItemMenu();
-					} else {
-						msgAskDel("Borrar producto");
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
 					}
-	    		} catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-		    	return true;
-		      }
-		});
+				};
+			});
+
+			listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsVenta vItem = (clsVenta)lvObj;
+
+						prodid=vItem.Cod;
+						adapter.setSelectedIndex(position);
+
+						if (prodPorPeso(prodid)) {
+							gl.gstr=prodid;
+							gl.gstr2=vItem.Nombre;
+							showItemMenu();
+						} else {
+							msgAskDel("Borrar producto");
+						}
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+					return true;
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 
@@ -327,6 +379,7 @@ public class Venta extends PBase {
 			}
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }
 
@@ -345,24 +398,74 @@ public class Venta extends PBase {
 	}
 
 	private void processItem(){
-		Cursor DT;
-		String pid;
+		try{
+			Cursor DT;
+			String pid;
 
-		pid=gl.gstr;
-		if (mu.emptystr(pid)) {return;}
+			pid=gl.gstr;
+			if (mu.emptystr(pid)) {return;}
 
-		prodid=pid;
-		um=gl.um;
+			prodid=pid;
+			um=gl.um;
 
-		setCant();
+			setCant();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	private void processBarcode() {
+		Cursor dt;
+
+		try {
+
+			sql="SELECT P_STOCK.CODIGO " +
+				"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_STOCK.CODIGO=P_PRODUCTO.CODIGO	" +
+				"WHERE (P_PRODUCTO.CODBARRA='"+barcode+"') ";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0) {
+				dt.moveToFirst();
+
+				gl.gstr=dt.getString(0);gl.um="UN";
+				processItem();
+				return;
+			}
+
+			sql="SELECT CODIGO, CANT, COREL, PRECIO, PESO, UNIDADMEDIDA " +
+				"FROM P_STOCKB WHERE (BARRA='"+barcode+"') ";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0) {
+				dt.moveToFirst();
+
+				msgbox("Barra encontrada");
+				return;
+			}
+
+			msgbox("Producto no encontrado");
+			//gl.gstr="0427";gl.um="UN";
+			//processItem();
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
 	}
 
 	private void setCant(){
-		browse=2;
+		try{
+			browse=2;
 
-		gl.prod=prodid;
-		Intent intent = new Intent(this,ProdCant.class);
-		startActivity(intent);
+			gl.prod=prodid;
+			Intent intent = new Intent(this,ProdCant.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void processCant(){
@@ -376,93 +479,96 @@ public class Venta extends PBase {
 
 		if (cnt<0) return;
 
-		try {
-			sql="SELECT DESCCORTA FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
+		try{
+			try {
+				sql="SELECT DESCCORTA FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
+				DT=Con.OpenDT(sql);
+				DT.moveToFirst();
 
-			lblProd.setText(DT.getString(0));
-		} catch (Exception e) {
-		   	mu.msgbox( e.getMessage());
-	    }
-
-		cant=cnt;
-		um=gl.umpres;
-
-		lblCant.setText(mu.frmdecimal(cant,gl.peDecImp)+" "+ltrim(um,6));
-		lblPres.setText("");
-
-
-		// Bonificacion
-
-		desc=0;
-		prodPrecio();
-
-		prec=mu.round(prec,gl.peDec);
-
-		gl.bonprodid=prodid;
-		gl.bonprodcant=cant;
-
-		gl.bonus.clear();
-
-		vv=cant*prec;vv=mu.round(vv,gl.peDec);
-
-		clsBonif=new clsBonif(this,prodid,cant,vv);
-		if (clsBonif.tieneBonif()) {
-			//  lista de prod bonif
-			for (int i = 0; i <clsBonif.items.size(); i++) {
-
-				gl.bonus.add(clsBonif.items.get(i));
-
-				//Toast.makeText(this,"Val tipolista  : "+clsBonif.items.get(i).tipolista, Toast.LENGTH_SHORT).show();
-				//s=clsBonif.items.get(i).valor+"  "+clsBonif.items.get(i).lista;
-				//Toast.makeText(this,s, Toast.LENGTH_SHORT).show();
-			}
-		}
-
-
-		// Descuento por producto
-
-		clsDesc=new clsDescuento(this,prodid,cant);
-
-		desc=clsDesc.getDesc();
-		mdesc=clsDesc.monto;
-
-		//mu.msgbox(desc+"  ,  "+mdesc);
-
-		if (desc+mdesc>0) {
-
-			browse=3;
-			gl.promprod=prodid;
-			gl.promcant=cant;
-
-			if (desc>0) {
-				gl.prommodo=0;
-				gl.promdesc=desc;
-			} else {
-				gl.prommodo=1;
-				gl.promdesc=mdesc;
+				lblProd.setText(DT.getString(0));
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+				mu.msgbox( e.getMessage());
 			}
 
-			Intent intent = new Intent(this,DescBon.class);
-			startActivity(intent);
+			cant=cnt;
+			um=gl.umpres;
 
-		} else {
+			lblCant.setText(mu.frmdecimal(cant,gl.peDecImp)+" "+ltrim(um,6));
+			lblPres.setText("");
 
-			if (gl.bonus.size()>0) {
-				Intent intent = new Intent(this,BonList.class);
+
+			// Bonificacion
+
+			desc=0;
+			prodPrecio();
+
+			prec=mu.round(prec,gl.peDec);
+
+			gl.bonprodid=prodid;
+			gl.bonprodcant=cant;
+
+			gl.bonus.clear();
+
+			vv=cant*prec;vv=mu.round(vv,gl.peDec);
+
+			clsBonif=new clsBonif(this,prodid,cant,vv);
+			if (clsBonif.tieneBonif()) {
+				//  lista de prod bonif
+				for (int i = 0; i <clsBonif.items.size(); i++) {
+
+					gl.bonus.add(clsBonif.items.get(i));
+
+					//Toast.makeText(this,"Val tipolista  : "+clsBonif.items.get(i).tipolista, Toast.LENGTH_SHORT).show();
+					//s=clsBonif.items.get(i).valor+"  "+clsBonif.items.get(i).lista;
+					//Toast.makeText(this,s, Toast.LENGTH_SHORT).show();
+				}
+			}
+
+
+			// Descuento por producto
+
+			clsDesc=new clsDescuento(this,prodid,cant);
+
+			desc=clsDesc.getDesc();
+			mdesc=clsDesc.monto;
+
+			//mu.msgbox(desc+"  ,  "+mdesc);
+
+			if (desc+mdesc>0) {
+
+				browse=3;
+				gl.promprod=prodid;
+				gl.promcant=cant;
+
+				if (desc>0) {
+					gl.prommodo=0;
+					gl.promdesc=desc;
+				} else {
+					gl.prommodo=1;
+					gl.promdesc=mdesc;
+				}
+
+				Intent intent = new Intent(this,DescBon.class);
 				startActivity(intent);
+
+			} else {
+
+				if (gl.bonus.size()>0) {
+					Intent intent = new Intent(this,BonList.class);
+					startActivity(intent);
+				}
+
 			}
 
-		}
+			//prodPrecio();
 
-		//prodPrecio();
+			if (prodPorPeso(prodid)) {
+				prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,gl.dpeso);
+			} else {
+				prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,0);
+			}
 
-		if (prodPorPeso(prodid)) {
-			prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,gl.dpeso);
-		} else {
-			prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,0);
-		}
 
 		precsin=prc.precsin;
 		imp=prc.imp;
@@ -472,23 +578,37 @@ public class Venta extends PBase {
 		totsin=prc.totsin;
 		percep=0;
 
-		//Toast.makeText(this,"Impval : "+impval+" , prec sin : "+precsin+" tot sin  "+totsin, Toast.LENGTH_LONG).show();
+			//Toast.makeText(this,"Impval : "+impval+" , prec sin : "+precsin+" tot sin  "+totsin, Toast.LENGTH_LONG).show();
 
-		if (sinimp) lblPrec.setText(mu.frmcur(precsin));else lblPrec.setText(mu.frmcur(prec));
+			if (sinimp) lblPrec.setText(mu.frmcur(precsin));else lblPrec.setText(mu.frmcur(prec));
 
-		addItem();
+			addItem();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	private void updDesc(){
-		desc=gl.promdesc;
-		prodPrecio();
-		updItem();
+		try{
+			desc=gl.promdesc;
+			prodPrecio();
+			updItem();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void prodPrecio() {
-		prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,gl.dpeso);
-		prec=mu.round(prec,gl.peDec);
+		try{
+			prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,gl.dpeso);
+			prec=mu.round(prec,gl.peDec);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
 	}
 
 	private void addItem(){
@@ -501,6 +621,7 @@ public class Venta extends PBase {
 			sql="DELETE FROM T_VENTA WHERE (PRODUCTO='"+prodid+"')";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 
@@ -512,13 +633,25 @@ public class Venta extends PBase {
 			umb=dt.getString(0);
 			fact=dt.getDouble(1);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			umb=um;fact=1;
 		}
 
 		cantbas=cant*fact;
 		//peso=mu.round(cant*fact,gl.peDec);
-		peso=mu.round(gl.dpeso,gl.peDec);
 
+		porpeso=prodPorPeso(prodid);
+		if (porpeso) {
+			peso=mu.round(gl.dpeso,gl.peDec);
+		} else {
+			peso=mu.round(gl.dpeso*gl.umfactor,gl.peDec);
+		}
+
+		if (porpeso) {
+			prodtot=mu.round(gl.prectemp*peso,gl.peDec);
+		} else {
+			prodtot=mu.round(prec*cant,gl.peDec);
+		}
 
 		try {
 
@@ -528,17 +661,17 @@ public class Venta extends PBase {
 
 			ins.add("PRODUCTO",prodid);
 			ins.add("EMPRESA",emp);
-			ins.add("UM",gl.umpres);
+			if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
 			ins.add("CANT",cant);
 			if (rutatipo.equalsIgnoreCase("V")) ins.add("UMSTOCK",gl.umstock);else ins.add("UMSTOCK",gl.um);
 			if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
 			ins.add("FACTOR",gl.umfactor);
-			ins.add("PRECIO",prec);
+			if (porpeso) ins.add("PRECIO",gl.prectemp); else ins.add("PRECIO",prec);
 			ins.add("IMP",impval);
 			ins.add("DES",desc);
 			ins.add("DESMON",descmon);
 			ins.add("TOTAL",prodtot);
-			ins.add("PRECIODOC",precdoc);
+			if (porpeso) ins.add("PRECIODOC",gl.prectemp); else ins.add("PRECIODOC",precdoc);
 			ins.add("PESO",peso);
 			ins.add("VAL1",0);
 			ins.add("VAL2","");
@@ -549,6 +682,7 @@ public class Venta extends PBase {
 			db.execSQL(ins.sql());
 
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 
@@ -556,6 +690,7 @@ public class Venta extends PBase {
 			sql="DELETE FROM T_VENTA WHERE CANT=0";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 
@@ -581,6 +716,7 @@ public class Venta extends PBase {
 	    	db.execSQL(upd.SQL());
 
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 
@@ -593,6 +729,7 @@ public class Venta extends PBase {
 	    	db.execSQL("DELETE FROM T_VENTA WHERE PRODUCTO='"+prodid+"'");
 	    	listItems();
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 	}
@@ -628,6 +765,7 @@ public class Venta extends PBase {
 				DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());return;
 	    }
 
@@ -636,39 +774,44 @@ public class Venta extends PBase {
 	}
 
 	public void showAtenDialog() {
-		final AlertDialog Dialog;
+		try{
+			final AlertDialog Dialog;
 
-	    final String[] selitems = new String[lname.size()];
-	    for (int i = 0; i < lname.size(); i++) {
-	    	selitems[i] = lname.get(i);
-	    }
+			final String[] selitems = new String[lname.size()];
+			for (int i = 0; i < lname.size(); i++) {
+				selitems[i] = lname.get(i);
+			}
 
-	    mMenuDlg = new AlertDialog.Builder(this);
-	    mMenuDlg.setTitle("Razón de no atencion");
+			mMenuDlg = new AlertDialog.Builder(this);
+			mMenuDlg.setTitle("Razón de no atencion");
 
-	    mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
+			mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
 					try {
 						String s=lcode.get(item);
 						setNoAtt(s);
 						doExit();
 					} catch (Exception e) {
-				    }
+					}
 				}
-		});
+			});
 
-	    mMenuDlg.setNegativeButton("Regresar", new DialogInterface.OnClickListener() {
-			@Override
+			mMenuDlg.setNegativeButton("Regresar", new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int which) {
 				}
-		});
+			});
 
-	    Dialog = mMenuDlg.create();
-		Dialog.show();
+			Dialog = mMenuDlg.create();
+			Dialog.show();
 
-		Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-	    nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-	    nbutton.setTextColor(Color.WHITE);
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void setNoAtt(String scna){
@@ -677,6 +820,7 @@ public class Venta extends PBase {
 		try {
 			cna=Integer.parseInt(scna);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return;
 		}
 
@@ -690,6 +834,7 @@ public class Venta extends PBase {
 
 			db.execSQL(upd.SQL());
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 
@@ -740,6 +885,7 @@ public class Venta extends PBase {
 
 			db.execSQL(ins.sql());
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//mu.msgbox("Error : " + e.getMessage());
 		}
 
@@ -750,30 +896,35 @@ public class Venta extends PBase {
 
 	private void setGPS() {
 
-		locationListener = new LocationListener() {
+		try{
+			locationListener = new LocationListener() {
 
-			@Override
-			public void onLocationChanged(Location arg0) {
-			}
+				@Override
+				public void onLocationChanged(Location arg0) {
+				}
 
-			@Override
-			public void onProviderDisabled(String arg0) {}
+				@Override
+				public void onProviderDisabled(String arg0) {}
 
-			@Override
-			public void onProviderEnabled(String arg0)  {}
+				@Override
+				public void onProviderEnabled(String arg0)  {}
 
-			@Override
-			public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
+				@Override
+				public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
 
-		};
+			};
 
-		final Handler handler = new Handler();
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				setGPSPos();
-			}
-		}, 500);
+			final Handler handler = new Handler();
+			handler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					setGPSPos();
+				}
+			}, 500);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void setGPSPos() {
@@ -793,11 +944,13 @@ public class Venta extends PBase {
 				cpy=DT.getDouble(1);
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    }
 
 		try {
 			getLocation();
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			latitude=0;longitude=0;
 		}
 
@@ -868,6 +1021,7 @@ public class Venta extends PBase {
 			}
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return null;
 		}
 
@@ -878,56 +1032,88 @@ public class Venta extends PBase {
     // Aux
 
 	private void showItemMenu() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Repesaje","Borrar"};
+		try{
+			final AlertDialog Dialog;
+			final String[] selitems = {"Repesaje","Borrar"};
 
-		AlertDialog.Builder menudlg = new AlertDialog.Builder(this);
-		menudlg.setTitle("Producto venta");
+			AlertDialog.Builder menudlg = new AlertDialog.Builder(this);
+			menudlg.setTitle("Producto venta");
 
-		menudlg.setItems(selitems , new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				switch (item) {
-                    case 0:
-                    	browse=4;
-                        startActivity(new Intent(Venta.this,RepesajeLista.class));break;
-					case 1:
-						msgAskDel("Borrar producto");break;
+			menudlg.setItems(selitems , new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+					switch (item) {
+						case 0:
+							browse=4;
+							startActivity(new Intent(Venta.this,RepesajeLista.class));break;
+						case 1:
+							msgAskDel("Borrar producto");break;
+					}
+
+					dialog.cancel();
 				}
+			});
 
-				dialog.cancel();
-			}
-		});
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
 
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
+			Dialog = menudlg.create();
+			Dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 
-		Dialog = menudlg.create();
-		Dialog.show();
 	}
 
 	private void setControls(){
 
-		listView = (ListView) findViewById(R.id.listView1);
+		try{
+			listView = (ListView) findViewById(R.id.listView1);
 
-		lblProd= (TextView) findViewById(R.id.lblProd);
-		lblPres= (TextView) findViewById(R.id.lblPres);
-		lblCant= (TextView) findViewById(R.id.lblCant);
-		lblPrec= (TextView) findViewById(R.id.lblPNum);
-		lblTot= (TextView) findViewById(R.id.lblTot);
-		lblTit= (TextView) findViewById(R.id.txtRoadTit);
+			lblProd= (TextView) findViewById(R.id.lblProd);
+			lblPres= (TextView) findViewById(R.id.lblPres);
+			lblCant= (TextView) findViewById(R.id.lblCant);
+			lblPrec= (TextView) findViewById(R.id.lblPNum);
+			lblTot= (TextView) findViewById(R.id.lblTot);
+			lblTit= (TextView) findViewById(R.id.txtRoadTit);
 
-		imgroad= (ImageView) findViewById(R.id.imgRoadTit);
-		imgscan= (ImageView) findViewById(R.id.imageView13);imgscan.setVisibility(View.INVISIBLE);
+			imgroad= (ImageView) findViewById(R.id.imgRoadTit);
+			imgscan= (ImageView) findViewById(R.id.imageView13);
+
+			imgscan.setVisibility(View.INVISIBLE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	private void initValues(){
 		Cursor DT;
 		String contrib;
+
+		tiposcan="*";
+
+		try {
+			sql="SELECT TIPO_HH FROM P_ARCHIVOCONF WHERE RUTA='"+gl.ruta+"'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			tiposcan=DT.getString(0);
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			tiposcan="*";msgbox(e.getMessage());
+		}
+
+		if (tiposcan.equalsIgnoreCase("SOFTWARE")) {
+			softscanexist=detectBarcodeScanner();
+		} else {
+			softscanexist=false;
+		}
+		if (softscanexist) imgscan.setVisibility(View.VISIBLE);else imgscan.setVisibility(View.INVISIBLE);
 
 		try {
 			sql="SELECT INITPATH FROM P_EMPRESA WHERE EMPRESA='"+emp+"'";
@@ -938,6 +1124,7 @@ public class Venta extends PBase {
 			sinimp=sim.equalsIgnoreCase("S");
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			sinimp=false;
 		}
 
@@ -947,8 +1134,6 @@ public class Venta extends PBase {
 
 		gl.sinimp=sinimp;
 
-		//mu.msgbox(contrib+" // SINIMP "+sinimp);
-
 		lblProd.setText("");
 		lblPres.setText("");
 
@@ -956,6 +1141,7 @@ public class Venta extends PBase {
 			sql="DELETE FROM T_VENTA";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 
@@ -963,6 +1149,7 @@ public class Venta extends PBase {
 			sql="DELETE FROM T_PAGO";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 
@@ -970,6 +1157,7 @@ public class Venta extends PBase {
 			sql="DELETE FROM T_BONIFFALT";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 
@@ -977,6 +1165,7 @@ public class Venta extends PBase {
 			sql="DELETE FROM T_BONITEM";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 
@@ -988,14 +1177,11 @@ public class Venta extends PBase {
 
 		clsBonFiltro  clsBFilt=new clsBonFiltro(this,gl.ruta,gl.cliente);
 
-		//mu.msgbox("Filtro desc "+clsDFilt.estr);
-
 		dweek=mu.dayofweek();
 
 		lblPrec.setText(mu.frmcur(0));
 		lblTot.setText(mu.frmcur(0));
 
-		imgscan.setVisibility(View.INVISIBLE);
 
 	}
 
@@ -1008,59 +1194,75 @@ public class Venta extends PBase {
 
 			return DT.getCount()>0;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
 		}
 	}
 
 	private void msgAskExit(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	if (rutapos) doExit();else listAten();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if (rutapos) doExit();else listAten();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 	
 	private void msgAskDel(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	delItem();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) { }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					delItem();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { }
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 	
 	private void showCredit(){
-		if (hasCredits()){
-			Intent intent = new Intent(this,Cobro.class);
-			startActivity(intent);	
+		try{
+			if (hasCredits()){
+				Intent intent = new Intent(this,Cobro.class);
+				startActivity(intent);
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}
 	
 	private boolean hasCredits(){
@@ -1071,6 +1273,7 @@ public class Venta extends PBase {
 			DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) return true;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 	    }			
 		
@@ -1088,13 +1291,19 @@ public class Venta extends PBase {
 			DT=Con.OpenDT(sql);
 			if (DT.getCount()==0) msgbox("No existen los precios para nivel de precio del cliente");
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 	    }			
 	}
 	
 	private void doExit(){
-		gl.closeCliDet=true;
-		super.finish();
+		try{
+			gl.closeCliDet=true;
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void cliPorDia() {
@@ -1107,20 +1316,24 @@ public class Venta extends PBase {
 			DT=Con.OpenDT(sql);
 			clidia=DT.getCount();
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			clidia=0;
 		}
 			
 	}
 	
 	public String ltrim(String ss,int sw) {
-		int l=ss.length();
-		if (l>sw) {
-			ss=ss.substring(0,sw);	
-		} else {
-			String frmstr="%-"+sw+"s";	
-			ss=String.format(frmstr,ss);
+		try{
+			int l=ss.length();
+			if (l>sw) {
+				ss=ss.substring(0,sw);
+			} else {
+				String frmstr="%-"+sw+"s";
+				ss=String.format(frmstr,ss);
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
 		return ss;
 	}
 
@@ -1128,6 +1341,7 @@ public class Venta extends PBase {
 		try {
 			return app.ventaPeso(prodid);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return false;
 		}
 	}
@@ -1136,8 +1350,24 @@ public class Venta extends PBase {
 		try {
 			return app.prodBarra(prodid);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return false;
 		}
+	}
+
+	private boolean detectBarcodeScanner() {
+
+		String packagename="com.google.zxing.client.android";
+		PackageManager pm = this.getPackageManager();
+
+		try {
+			pm.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
+			return true;
+		} catch (PackageManager.NameNotFoundException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			toast("Aplicacion ZXing Barcode Scanner no esta instalada");return false;
+		}
+
 	}
 
 
@@ -1145,35 +1375,50 @@ public class Venta extends PBase {
 	
 	@Override
 	protected void onResume() {
-	    super.onResume();
-	    
-	    if (gl.closeVenta) super.finish();
-	    
-	    if (browse==1) {
-	    	browse=0;
-	    	processItem();return;
-	    }
-	    
-	    if (browse==2) {
-	    	browse=0;
-	    	processCant();return;
-	    }
-	    
-	    if (browse==3) {
-	    	browse=0;
-	    	if (gl.promapl) updDesc();return;
-	    }
+		try{
+			super.onResume();
 
-		if (browse==4) {
-			browse=0;
-			listItems();return;
+			if (gl.closeVenta) super.finish();
+
+			if (browse==1) {
+				browse=0;
+				processItem();return;
+			}
+
+			if (browse==2) {
+				browse=0;
+				processCant();return;
+			}
+
+			if (browse==3) {
+				browse=0;
+				if (gl.promapl) updDesc();return;
+			}
+
+			if (browse==4) {
+				browse=0;
+				listItems();return;
+			}
+
+			if (browse==5) {
+				browse=0;
+				processBarcode();return;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-	
+
+
 	}
 	
 	@Override
 	public void onBackPressed() {
-		msgAskExit("Salir sin terminar venta");
+		try{
+			msgAskExit("Salir sin terminar venta");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}			
 
 }

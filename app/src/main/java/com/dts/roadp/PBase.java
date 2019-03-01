@@ -1,15 +1,15 @@
 package com.dts.roadp;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v4.app.FragmentActivity;
 import android.view.Gravity;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-public class PBase extends FragmentActivity {
+public class PBase extends Activity {
 
 	protected int active;
 	protected SQLiteDatabase db;
@@ -49,7 +49,7 @@ public class PBase extends FragmentActivity {
 		du=new DateUtils();fecha=du.getActDateTime();
 		
 		keyboard = (InputMethodManager)getSystemService(this.INPUT_METHOD_SERVICE);
-		
+
 	    browse=0;
 	}
 	
@@ -88,7 +88,9 @@ public class PBase extends FragmentActivity {
 	}
 	
 	protected void toastlong(String msg) {
-		Toast.makeText(this,msg, Toast.LENGTH_LONG).show();
+		Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_LONG);
+		toast.setGravity(Gravity.CENTER, 0, 0);
+		toast.show();
 	}
 
 	protected void toastcent(String msg) {
@@ -100,7 +102,11 @@ public class PBase extends FragmentActivity {
 		toast.show();
 	}	
 	
-	
+	protected void addlog(String methodname,String msg,String info) {
+
+	}
+
+
 	// Activity Events
 	
 	@Override

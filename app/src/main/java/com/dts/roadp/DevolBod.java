@@ -37,6 +37,7 @@ public class DevolBod extends PBase {
 		setContentView(R.layout.activity_devol_bod);
 		
 		super.InitBase();
+		addlog("DevolBod",""+du.getActDateTime(),gl.vend);
 		
 			
 		listView = (ListView) findViewById(R.id.listView1);
@@ -53,46 +54,60 @@ public class DevolBod extends PBase {
 	// Events
 	
 	public void showProd(View view) {
-		((appGlobals) vApp).gstr="";
-		((appGlobals) vApp).tipo=1;
-		browse=1;
-				
-		Intent intent = new Intent(this,Exist.class);
-		startActivity(intent);
+		try{
+			((appGlobals) vApp).gstr="";
+			((appGlobals) vApp).tipo=1;
+			browse=1;
+
+			Intent intent = new Intent(this,Exist.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	public void finishDevol(View view){
-		if (!hasProducts()) {
-			mu.msgbox("¡No puede continuar, no ha agregado ninguno producto!");return;
+		try{
+			if (!hasProducts()) {
+				mu.msgbox("¡No puede continuar, no ha agregado ninguno producto!");return;
+			}
+
+			msgAskComplete("Aplicar devolución");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		msgAskComplete("Aplicar devolución");
+
 	}
 	
 	
 	// Main
 	
 	private void setHandlers(){
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
-				try {
-					Object lvObj = listView.getItemAtPosition(position);
-					clsClasses.clsExist vItem = (clsClasses.clsExist)lvObj;
-		           	
-					prodid=vItem.Cod;
-					
-					adapter.setSelectedIndex(position);
-					
-					savecant="";
-					setCant();
-		        } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-		        }
-			};
-	    });
-	    
+
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						clsClasses.clsExist vItem = (clsClasses.clsExist)lvObj;
+
+						prodid=vItem.Cod;
+
+						adapter.setSelectedIndex(position);
+
+						savecant="";
+						setCant();
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 	
 	private void listItems(){
@@ -138,6 +153,7 @@ public class DevolBod extends PBase {
 			  DT.moveToNext();
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }
 			 
@@ -146,86 +162,102 @@ public class DevolBod extends PBase {
 	}
 	
 	private void processItem(){
-		String pid;
-		
-		pid=((appGlobals) vApp).gstr;
-		if (mu.emptystr(pid)) {return;}
-		
-		prodid=pid;
-		
-		savecant="";
-		setCant();
+		try{
+			String pid;
+
+			pid=((appGlobals) vApp).gstr;
+			if (mu.emptystr(pid)) {return;}
+
+			prodid=pid;
+
+			savecant="";
+			setCant();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void setCant(){
-		
-		final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		getDisp();
-		alert.setTitle("Ingrese la cantidad ");
-		alert.setMessage("Existencias :  "+disp+" (B) / "+dispm+" (M)");
-		
-		final EditText input = new EditText(this);
-		input.setText(savecant);
-		input.setInputType(InputType.TYPE_CLASS_NUMBER);
-		
-		alert.setView(input);
+		try{
+			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		alert.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				closekeyb();
-			}
-		});
-		
-		alert.setNeutralButton("Estado Bueno",  new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				closekeyb();
-				setCant("B",input.getText().toString());
-			}
-		});
-		
-		alert.setPositiveButton("Estado Malo", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				closekeyb();
-				setCant("M",input.getText().toString());
-		  	}
-		});
-		
-		final AlertDialog dialog = alert.create();
-		dialog.show();
-		
-		showkeyb();
+			getDisp();
+			alert.setTitle("Ingrese la cantidad ");
+			alert.setMessage("Existencias :  "+disp+" (B) / "+dispm+" (M)");
+
+			final EditText input = new EditText(this);
+			input.setText(savecant);
+			input.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+			alert.setView(input);
+
+			alert.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					closekeyb();
+				}
+			});
+
+			alert.setNeutralButton("Estado Bueno",  new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					closekeyb();
+					setCant("B",input.getText().toString());
+				}
+			});
+
+			alert.setPositiveButton("Estado Malo", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					closekeyb();
+					setCant("M",input.getText().toString());
+				}
+			});
+
+			final AlertDialog dialog = alert.create();
+			dialog.show();
+
+			showkeyb();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	private void setCant(String est,String s){
 		double val;
-		
-		try {
-			val=Double.parseDouble(s);
-			if (val<0) throw new Exception();
-		} catch (Exception e) {	
-			mu.msgbox("Cantidad incorrecta");return;
-		}
-		
-		if (est.equalsIgnoreCase("B")) {
-			if (val>disp) {
-				savecant=s;
-				setCant();
-				mu.msgbox("Cantidad mayor que existencia : "+disp);
-				return;
+
+		try{
+			try {
+				val=Double.parseDouble(s);
+				if (val<0) throw new Exception();
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				mu.msgbox("Cantidad incorrecta");return;
 			}
-		} else {	
-			if (val>dispm) {
-				savecant=s;
-				setCant();
-				mu.msgbox("Cantidad mayor que existencia : "+dispm);
-				return;
+
+			if (est.equalsIgnoreCase("B")) {
+				if (val>disp) {
+					savecant=s;
+					setCant();
+					mu.msgbox("Cantidad mayor que existencia : "+disp);
+					return;
+				}
+			} else {
+				if (val>dispm) {
+					savecant=s;
+					setCant();
+					mu.msgbox("Cantidad mayor que existencia : "+dispm);
+					return;
+				}
 			}
+
+			cant=val;
+
+			addItem(est);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		cant=val;
-		
-		addItem(est);
+
 	}
 	
 	private void addItem(String est){
@@ -234,6 +266,7 @@ public class DevolBod extends PBase {
 			sql="INSERT INTO T_DEVOL VALUES('"+prodid+"',0,0)";
 			db.execSQL(sql);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 			
 		try {
@@ -244,6 +277,7 @@ public class DevolBod extends PBase {
 		    }
 			db.execSQL(sql);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return;
 		}
 	    
@@ -251,6 +285,7 @@ public class DevolBod extends PBase {
 			sql="DELETE FROM T_DEVOL WHERE CANT=0 AND CANTM=0";
 			db.execSQL(sql);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 		
@@ -264,6 +299,7 @@ public class DevolBod extends PBase {
 			sql="DELETE FROM T_DEVOL";
 			db.execSQL(sql);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 		
@@ -347,6 +383,7 @@ public class DevolBod extends PBase {
 			super.finish();
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 		   	mu.msgbox( e.getMessage());
 		}	
@@ -372,6 +409,7 @@ public class DevolBod extends PBase {
 			dispm=DT.getDouble(1);
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }
 	}
@@ -408,6 +446,7 @@ public class DevolBod extends PBase {
 		
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}	
 	}
@@ -437,51 +476,61 @@ public class DevolBod extends PBase {
 	}	
 	
 	private void msgAskComplete(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("¿" + msg + "?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	saveDevol();
-		    	//doExit();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg + "?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					saveDevol();
+					//doExit();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 
 	public void msgAskLimpiar(View view) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("¿Eliminar todos los productos de la lista?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	clearProd();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿Eliminar todos los productos de la lista?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					clearProd();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 
@@ -495,31 +544,47 @@ public class DevolBod extends PBase {
 				
 			return DT.getCount()>0;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
 		}	
 	}	
 	
 	private void doExit(){
-		super.finish();
+		try{
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	// Activity Events
 	
 	@Override
 	protected void onResume() {
-	    super.onResume();
-	    
-	    //if (((appGlobals) vApp).closeVenta) super.finish();
-	    
-	    if (browse==1) {
-	    	browse=0;
-	    	processItem();return;
-	    }
+		try{
+			super.onResume();
+
+			//if (((appGlobals) vApp).closeVenta) super.finish();
+
+			if (browse==1) {
+				browse=0;
+				processItem();return;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 	@Override
 	public void onBackPressed() {
-		msgAskExit("Salir sin terminar devolución");
+		try{
+			msgAskExit("Salir sin terminar devolución");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 }

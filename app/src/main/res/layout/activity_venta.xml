@@ -258,6 +258,8 @@
         android:layout_height="49dp"
         android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/imgNext"
+        android:clickable="true"
+        android:onClick="doSoftScan"
         android:src="@drawable/scan2" />
 
 </RelativeLayout>

@@ -18,6 +18,7 @@ public class DemoDataDlg extends PBase {
 		setContentView(R.layout.activity_demo_data_dlg);
 		
 		super.InitBase();
+		addlog("DemoDataDlg",""+du.getActDateTime(),gl.vend);
 		
 		txtNom = (EditText) findViewById(R.id.txtBoleta);
 		txtPrec = (EditText) findViewById(R.id.editText2);
@@ -38,38 +39,49 @@ public class DemoDataDlg extends PBase {
 		double val;
 		
 		s=txtNom.getText().toString();
-		if (mu.emptystr(s)) {
-			toasttop("Descripción incorrecta.");return;
-		}
-		
-		
-		if (gl.clsDemo.tipo>0) {
-			try {
-				s=txtPrec.getText().toString();
-				val=Double.parseDouble(s);
-				if (val<=0.1) throw new Exception();
-				
-				gl.clsDemo.val=val;
-			} catch (Exception e) {
-				toasttop("Precio incorrecto.");return;
+
+		try{
+			if (mu.emptystr(s)) {
+				toasttop("Descripción incorrecta.");return;
 			}
-			
+
+
+			if (gl.clsDemo.tipo>0) {
+				try {
+					s=txtPrec.getText().toString();
+					val=Double.parseDouble(s);
+					if (val<=0.1) throw new Exception();
+
+					gl.clsDemo.val=val;
+				} catch (Exception e) {
+					toasttop("Precio incorrecto.");return;
+				}
+
+			}
+
+			gl.clsDemo.Desc=txtNom.getText().toString();
+			gl.clsDemo.flag=1;
+
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-	
-		gl.clsDemo.Desc=txtNom.getText().toString();
-		gl.clsDemo.flag=1;
-		
-		super.finish();
+
 	}
 	
 	
 	private void toasttop(String msg) {
-		
-		if (mu.emptystr(msg)) return;
-		
-		Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_SHORT);  
-		toast.setGravity(Gravity.TOP , 0, 0);
-		toast.show();
+
+		try{
+			if (mu.emptystr(msg)) return;
+
+			Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_SHORT);
+			toast.setGravity(Gravity.TOP , 0, 0);
+			toast.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 
 	

@@ -19,13 +19,13 @@ public class ActDisp extends PBase {
 		setContentView(R.layout.activity_act_disp);
 		
 		super.InitBase();
+		addlog("ActDisp",""+du.getActDateTime(),gl.vend);
 		
 		pBar = (ProgressBar) findViewById(R.id.pBar);
 		
 		URL = ((appGlobals) vApp).wsURL;
 		prodid=((appGlobals) vApp).gstr;
-		
-		
+
 		ws=new clsWebService(this);
 		ws.URL=URL;
 		ws.execute();
@@ -55,6 +55,7 @@ public class ActDisp extends PBase {
 						
 				complete=true;
 			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 				istr=e.getMessage();
 			}
 			
@@ -64,15 +65,19 @@ public class ActDisp extends PBase {
 
 	@Override
 	public void wsCallBack(){
-		
-		if (ws.complete) {
-			processData();
-		} else {
-			mu.msgbox("No se puede conectar al servidor.");
+		try{
+			if (ws.complete) {
+				processData();
+			} else {
+				mu.msgbox("No se puede conectar al servidor.");
+			}
+
+			pBar.setVisibility(View.INVISIBLE);
+			isRunning=false;
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		pBar.setVisibility(View.INVISIBLE);
-		isRunning=false;
+
 	} 	
 
 	private void processData(){
@@ -94,6 +99,7 @@ public class ActDisp extends PBase {
 			super.finish();
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}
 		
@@ -105,7 +111,12 @@ public class ActDisp extends PBase {
 	
 	@Override
 	public void onBackPressed() {
-		if (!isRunning) super.onBackPressed();
+		try{
+
+			if (!isRunning) super.onBackPressed();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 	
 }

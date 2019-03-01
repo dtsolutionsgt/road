@@ -32,14 +32,16 @@
             android:layout_width="128dp"
             android:layout_height="48dp"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="0dp"
+            android:layout_marginStart="-5dp"
             android:layout_marginTop="5dp"
-            android:layout_marginEnd="0dp"
+            android:layout_marginEnd="5dp"
             android:layout_toStartOf="@+id/imageView2"
             android:layout_toEndOf="@+id/imageView1"
             android:clickable="true"
+            android:contentDescription="TODO"
             android:onClick="pendientePago"
-            android:src="@drawable/pago_pend" />
+            android:src="@drawable/pago_pend"
+            tools:ignore="OnClick" />
 
         <TextView
             android:id="@+id/lblCVence2"
@@ -48,11 +50,11 @@
             android:layout_below="@+id/imageView1"
             android:layout_alignRight="@+id/imageView1"
             android:layout_alignParentLeft="true"
-            android:layout_marginStart="1dp"
-            android:layout_marginLeft="129dp"
+            android:layout_marginStart="-14dp"
+            android:layout_marginLeft="114dp"
             android:layout_marginTop="0dp"
-            android:layout_marginEnd="-1dp"
-            android:layout_marginRight="-129dp"
+            android:layout_marginEnd="14dp"
+            android:layout_marginRight="-114dp"
             android:layout_toStartOf="@+id/textView4"
             android:layout_toEndOf="@+id/lblCVence"
             android:clickable="true"
@@ -60,7 +62,8 @@
             android:onClick="pendientePago"
             android:text="Pago Pendiente"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="15sp" />
+            android:textSize="15sp"
+            tools:ignore="OnClick" />
 
         <ImageView
             android:id="@+id/imageView1"
@@ -71,16 +74,19 @@
             android:layout_marginTop="5dp"
             android:clickable="true"
             android:onClick="paySelect"
-            android:src="@drawable/cobro" />
+            android:src="@drawable/cobro"
+            tools:ignore="OnClick" />
 
         <ImageView
             android:id="@+id/imageView2"
             android:layout_width="128dp"
             android:layout_height="48dp"
-            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="5dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="0dp"
             android:clickable="true"
+            android:contentDescription="TODO"
             android:onClick="payCash"
             android:src="@drawable/pago_efectivo" />
 
@@ -88,9 +94,11 @@
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/imageView2"
-            android:layout_alignParentRight="true"
             android:layout_below="@+id/imageView2"
+            android:layout_alignLeft="@+id/imageView2"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="0dp"
             android:clickable="true"
             android:gravity="center"
             android:onClick="payCash"
@@ -108,7 +116,8 @@
             android:layout_marginTop="20dp"
             android:clickable="true"
             android:onClick="payCred"
-            android:src="@drawable/pago" />
+            android:src="@drawable/pago"
+            tools:ignore="OnClick" />
 
         <TextView
             android:id="@+id/TextView02"
@@ -130,9 +139,11 @@
             android:id="@+id/lblCVence"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignRight="@+id/imageView1"
             android:layout_below="@+id/imageView1"
+            android:layout_alignRight="@+id/imageView1"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="0dp"
             android:clickable="true"
             android:gravity="center"
             android:onClick="paySelect"

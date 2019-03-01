@@ -135,9 +135,9 @@ public class AppMethods {
 		} catch (Exception e) {
 			val="N";
 		}
-
 		if (val.equalsIgnoreCase("S"))gl.peStockItf=true; else gl.peStockItf=false;
 
+		// gl.peModal
 		try {
 
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=3";	
@@ -149,9 +149,7 @@ public class AppMethods {
 		} catch (Exception e) {
 			gl.peModal="-";
 		}	
-		
-		//gl.peModal="APR";
-		
+
 		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=4";	
 			dt=Con.OpenDT(sql);
@@ -312,6 +310,20 @@ public class AppMethods {
 		} catch (Exception e) {
 			gl.peFormatoFactura="";
 		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=17";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) throw new Exception();
+
+			gl.peImprFactCorrecta=val.equalsIgnoreCase("S");
+		} catch (Exception e) {
+			gl.peImprFactCorrecta=false;
+		}
+
 	}
 
 

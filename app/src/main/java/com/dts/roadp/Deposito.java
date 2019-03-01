@@ -58,6 +58,7 @@ public class Deposito extends PBase {
 		setContentView(R.layout.activity_deposito);
 		
 		super.InitBase();
+		addlog("Deposito",""+du.getActDateTime(),gl.vend);
 		
 		spinBanco = (Spinner) findViewById(R.id.spinner1);
 		txtBol = (EditText) findViewById(R.id.txtBoleta);
@@ -106,11 +107,21 @@ public class Deposito extends PBase {
 	// Events
 	
 	public void listaDoc(View view){
-		showDocDialog();
+		try{
+			showDocDialog();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void saveDepos(View view){
-		msgAskSave("Guardar depósito");
+		try{
+			msgAskSave("Guardar depósito");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	// Main
@@ -132,6 +143,7 @@ public class Deposito extends PBase {
 			    	cuenta=spincuenta.get(position);
 			    	
 		        } catch (Exception e) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				   	mu.msgbox( e.getMessage());
 		        }			    	
 		    }
@@ -157,6 +169,7 @@ public class Deposito extends PBase {
 				vcheq+=val;
 			}		
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return;
 		}
 		
@@ -175,82 +188,90 @@ public class Deposito extends PBase {
 		
 		dialog.setContentView(R.layout.activity_depos_doc);
 		dialog.setTitle("Documentos pendientes");
-					
-		listView   = (ListView)  dialog.findViewById(R.id.listView1);
-		btnSave    = (ImageView) dialog.findViewById(R.id.imageView2);
-		btnCancel  = (ImageView) dialog.findViewById(R.id.imageView1);
-        btnSelAll  = (ImageView) dialog.findViewById(R.id.imageView10);
-        btnSelNone = (ImageView) dialog.findViewById(R.id.imageView11);
 
-        if (depparc==true) {
-			btnSelAll.setVisibility(View.VISIBLE);btnSelNone.setVisibility(View.VISIBLE);
-		} else {
-			btnSelAll.setVisibility(View.INVISIBLE);btnSelNone.setVisibility(View.INVISIBLE);
-		}
-			
-		adapter=new ListAdaptDepos(this, items);adapter.cursym=gl.peMon;
-		listView.setAdapter(adapter);
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-		    public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
-				int flag;
-				try {
-					clsClasses.clsDepos selitem = (clsClasses.clsDepos) adapter.getItem(position);
-					flag=selitem.Bandera;
+		try{
+			listView   = (ListView)  dialog.findViewById(R.id.listView1);
+			btnSave    = (ImageView) dialog.findViewById(R.id.imageView2);
+			btnCancel  = (ImageView) dialog.findViewById(R.id.imageView1);
+			btnSelAll  = (ImageView) dialog.findViewById(R.id.imageView10);
+			btnSelNone = (ImageView) dialog.findViewById(R.id.imageView11);
 
-					if (depparc==true) {
-						if (flag==0) flag=1; else flag=0;
-						selitem.Bandera=flag;
+			if (depparc==true) {
+				btnSelAll.setVisibility(View.VISIBLE);btnSelNone.setVisibility(View.VISIBLE);
+			} else {
+				btnSelAll.setVisibility(View.INVISIBLE);btnSelNone.setVisibility(View.INVISIBLE);
+			}
 
-						adapter.refreshItems();
-						adapter.setSelectedIndex(position);
+			adapter=new ListAdaptDepos(this, items);adapter.cursym=gl.peMon;
+			listView.setAdapter(adapter);
+
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+					int flag;
+					try {
+						clsClasses.clsDepos selitem = (clsClasses.clsDepos) adapter.getItem(position);
+						flag=selitem.Bandera;
+
+						if (depparc==true) {
+							if (flag==0) flag=1; else flag=0;
+							selitem.Bandera=flag;
+
+							adapter.refreshItems();
+							adapter.setSelectedIndex(position);
+						}
+
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				};
+			});
+
+			btnSave.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					scanValues();
+					dialog.dismiss();
+				}
+			});
+
+			btnCancel.setOnClickListener(new OnClickListener() {
+				@Override public void onClick(View v) {
+					dialog.dismiss();
+				}
+			});
+
+			btnSelAll.setOnClickListener(new OnClickListener() {
+				@Override public void onClick(View v) {
+					try {
+						for(int i = 0; i < items.size(); i++ ) items.get(i).Bandera=1;
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 					}
 
-				} catch (Exception e) {
+					adapter.notifyDataSetChanged();
+					scanValues();
 				}
-			};
-		});
-		
-		btnSave.setOnClickListener(new OnClickListener() {
-			@Override 
-			public void onClick(View v) {
-				scanValues();
-				dialog.dismiss();
-			}
-		});
-		
-		btnCancel.setOnClickListener(new OnClickListener() {
-			@Override public void onClick(View v) {
-				dialog.dismiss();
-			}
-		});
+			});
 
-        btnSelAll.setOnClickListener(new OnClickListener() {
-            @Override public void onClick(View v) {
-            	try {
-                    for(int i = 0; i < items.size(); i++ ) items.get(i).Bandera=1;
-                } catch (Exception e) {
-                }
+			btnSelNone.setOnClickListener(new OnClickListener() {
+				@Override public void onClick(View v) {
+					try {
+						for(int i = 0; i < items.size(); i++ ) items.get(i).Bandera=0;
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
 
-                adapter.notifyDataSetChanged();
-                scanValues();
-            }
-        });
+					adapter.notifyDataSetChanged();
+					scanValues();
+				}
+			});
 
-        btnSelNone.setOnClickListener(new OnClickListener() {
-            @Override public void onClick(View v) {
-            	try {
-                    for(int i = 0; i < items.size(); i++ ) items.get(i).Bandera=0;
-                } catch (Exception e) {
-                }
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 
-                adapter.notifyDataSetChanged();
-                scanValues();
-            }
-        });
-
-        dialog.show();
 			
 	}	
 	
@@ -278,6 +299,7 @@ public class Deposito extends PBase {
 					DTD.moveToFirst();
 					efect=DTD.getDouble(0);
 				} catch (Exception ee) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ee.getMessage(),"");
 					efect=0;
 				}
 				
@@ -287,6 +309,7 @@ public class Deposito extends PBase {
 					DTD.moveToFirst();
 					chec=DTD.getDouble(0);nchec=DTD.getInt(1);
 				} catch (Exception ee) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ee.getMessage(),"");
 					chec=0;nchec=0;
 				}
 				
@@ -313,6 +336,7 @@ public class Deposito extends PBase {
 			}
 				
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 		
 		try {
@@ -331,6 +355,7 @@ public class Deposito extends PBase {
 					DTD.moveToFirst();
 					efect=DTD.getDouble(0);
 				} catch (Exception ee) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ee.getMessage(),"");
 					efect=0;
 				}
 				
@@ -340,6 +365,7 @@ public class Deposito extends PBase {
 					DTD.moveToFirst();
 					chec=DTD.getDouble(0);nchec=DTD.getInt(1);
 				} catch (Exception ee) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ee.getMessage(),"");
 					chec=0;nchec=0;
 				}
 				
@@ -366,6 +392,7 @@ public class Deposito extends PBase {
 			}
 				
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}		
 		
 	}
@@ -400,7 +427,7 @@ public class Deposito extends PBase {
 			ins.init("D_DEPOS");
 			ins.add("COREL",corel);
 			ins.add("EMPRESA",((appGlobals) vApp).emp);
-			ins.add("FECHA",fecha);
+			ins.add("FECHA",du.getActDate());
 			ins.add("RUTA",((appGlobals) vApp).ruta);
 			ins.add("BANCO",bancoid);
 			ins.add("CUENTA",cuenta);
@@ -495,7 +522,8 @@ public class Deposito extends PBase {
 			
 			return true;
 			
-		} catch (Exception e) {	
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 		   	mu.msgbox( e.getMessage());return false;
 		}
@@ -504,17 +532,21 @@ public class Deposito extends PBase {
 	
 	private void finishDoc(){
 		claseFinDia = new clsFinDia(this);
+		try{
+			if (!saveDoc()) return;
 
-		if (!saveDoc()) return;
-
-		if (prn.isEnabled()) {
-			if (ddoc.buildPrint(corel,0)) prn.printask(printcallback);
-			claseFinDia.updateImpDeposito();
-		} else {
-			Toast.makeText(this,"Depósito guardado", Toast.LENGTH_SHORT).show();
-			super.finish();
+			if (prn.isEnabled()) {
+				if (ddoc.buildPrint(corel,0)) prn.printask(printcallback);
+				claseFinDia.updateImpDeposito();
+			} else {
+				Toast.makeText(this,"Depósito guardado", Toast.LENGTH_SHORT).show();
+				super.finish();
+			}
+			claseFinDia.updateDeposito();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		claseFinDia.updateDeposito();
+
 	}
 
 
@@ -538,6 +570,7 @@ public class Deposito extends PBase {
 			}
 					
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }
 					
@@ -551,83 +584,106 @@ public class Deposito extends PBase {
 	}	
 	
 	private boolean checkValues(){
-		
-		if (ttot==0) {
-			mu.msgbox("No está seleccionado ninguno documento");return false;	
-		}
-		
-		if (mu.emptystr(bancoid)) {
-			mu.msgbox("Falta definir banco");return false;
-		}
-		
-		bol=txtBol.getText().toString();
-		if (boldep==1) {
-			if (mu.emptystr(bol)) {
-				mu.msgbox("Falta definir boleto");txtBol.requestFocus();return false;
+		try{
+			if (ttot==0) {
+				mu.msgbox("No está seleccionado ninguno documento");return false;
 			}
+
+			if (mu.emptystr(bancoid)) {
+				mu.msgbox("Falta definir banco");return false;
+			}
+
+			bol=txtBol.getText().toString();
+			if (boldep==1) {
+				if (mu.emptystr(bol)) {
+					mu.msgbox("Falta definir boleto");txtBol.requestFocus();return false;
+				}
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
 		return true;
 	}
 	
 	private void msgAskSave(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("¿" + msg + "?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	finishDoc();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	doExit();
-		    }
-		});
-		
-		dialog.show();
+		try {
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg + "?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					finishDoc();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					doExit();
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
 	private void msgAskExit(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("¿" + msg + "?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	doExit();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	;
-		    }
-		});
-		
-		dialog.show();
+
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg + "?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					doExit();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 
 	
 	private void doExit(){
-		super.finish();
+		try {
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	// Activity Events
 	
 	@Override
 	public void onBackPressed() {
-		msgAskExit("Salir sin guardar depósito");
+		try{
+			msgAskExit("Salir sin guardar depósito");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	

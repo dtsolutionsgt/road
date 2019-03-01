@@ -53,6 +53,7 @@ public class BonList extends PBase {
 		setContentView(R.layout.activity_bon_list);
 		
 		super.InitBase();
+		addlog("BonList",""+du.getActDateTime(),gl.vend);
 		
 		listView =  (ListView) findViewById(R.id.listView1);
 		relMonto =  (RelativeLayout) findViewById(R.id.relMonto);
@@ -90,42 +91,58 @@ public class BonList extends PBase {
 	// Events
 	
 	public void nextScreen(View view) {
-		processNextScreen();
+		try{
+			processNextScreen();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void selectProd(View view) {
-		gl.gstr="";
-		browse=1;
-		
-		if (rutatipo.equalsIgnoreCase("P")) gl.prodtipo=0;else gl.prodtipo=1;
-		
-		Intent intent = new Intent(this,Producto.class);
-		startActivity(intent);	
+		try{
+			gl.gstr="";
+			browse=1;
+
+			if (rutatipo.equalsIgnoreCase("P")) gl.prodtipo=0;else gl.prodtipo=1;
+
+			Intent intent = new Intent(this,Producto.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 		
 	private void sethandlers() {
-		
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		    	  	  		    	  
-		    	try {
-		    		Object lvObj = listView.getItemAtPosition(position);
-		    		selitem = (clsBonifProd)lvObj;
-			         
-		       		adapter.setSelectedIndex(position);
-					selpos=position;	
-					
-					//if (tipolista!=2) msgAskDel("Eliminar producto de la lista ?");
-					if (tipolista==2) setVarCant();
-					if (tipolista==3) setVarAllCant();
-					
-			    } catch (Exception e) {
-			   	   mu.msgbox( e.getMessage());
-			    }
-			  	//return true;
-		   }
-		});				
+
+		try{
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+					try {
+						Object lvObj = listView.getItemAtPosition(position);
+						selitem = (clsBonifProd)lvObj;
+
+						adapter.setSelectedIndex(position);
+						selpos=position;
+
+						//if (tipolista!=2) msgAskDel("Eliminar producto de la lista ?");
+						if (tipolista==2) setVarCant();
+						if (tipolista==3) setVarAllCant();
+
+					} catch (Exception e) {
+							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+					//return true;
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}
 	
@@ -144,25 +161,31 @@ public class BonList extends PBase {
 		
 		imgComp.setVisibility(View.INVISIBLE);
 		imgAdd.setVisibility(View.INVISIBLE);
-		
-		switch (tipolista) {
-		case 0:  
-			s="Producto";break;
-		case 1:  
-			s="Lista fija";break;
-		case 2:  
-			s="Lista variable";
-			lblMarg.setText("+/- "+mu.frmdec(mmarg));
-			break;
-		case 3:  
-			s="Todos los productos";
-			imgAdd.setVisibility(View.VISIBLE);
-			lblMarg.setText("+/- "+mu.frmdec(mmarg));
-			break;	
+
+		try{
+			switch (tipolista) {
+				case 0:
+					s="Producto";break;
+				case 1:
+					s="Lista fija";break;
+				case 2:
+					s="Lista variable";
+					lblMarg.setText("+/- "+mu.frmdec(mmarg));
+					break;
+				case 3:
+					s="Todos los productos";
+					imgAdd.setVisibility(View.VISIBLE);
+					lblMarg.setText("+/- "+mu.frmdec(mmarg));
+					break;
+			}
+
+			lblTipo.setText(s);
+			listItems();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 		
-		lblTipo.setText(s);		
-		listItems();
+
 		
 	}
 	
@@ -223,6 +246,7 @@ public class BonList extends PBase {
 			}
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage()+"\n"+sql);
 		}	
 		
@@ -236,26 +260,32 @@ public class BonList extends PBase {
 		clsBonifProd item;
 		double cant,disp,diff;
 
-		for (int i = 0; i <items.size(); i++) {
+		try{
+			for (int i = 0; i <items.size(); i++) {
 
-			item=items.get(i);		
-			cant=item.cant;
+				item=items.get(i);
+				cant=item.cant;
 
-			if (cant>0) {
-				if (item.flag==0) {
-					disp=item.disp;	
-					diff=cant-disp;
+				if (cant>0) {
+					if (item.flag==0) {
+						disp=item.disp;
+						diff=cant-disp;
 
-					addFalt(item.id,diff);
+						addFalt(item.id,diff);
 
-					s="Se registro faltante :\n"+mu.frmdecno(diff)+" - "+item.nombre;
-					toast(s);
+						s="Se registro faltante :\n"+mu.frmdecno(diff)+" - "+item.nombre;
+						toast(s);
 
-				} else {	
-					addItem(item);	
-				}				
+					} else {
+						addItem(item);
+					}
+				}
 			}
-		}		
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
 	}
 	
 	private void addItem(clsBonifProd item) {
@@ -267,11 +297,11 @@ public class BonList extends PBase {
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			iidx=DT.getInt(0);
+			iidx++;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			iidx=0;
-		}	
-		iidx++;
-		
+		}
 		
 		try {
 			ins.init("T_BONITEM");
@@ -285,6 +315,7 @@ public class BonList extends PBase {
 				
 	    	db.execSQL(ins.sql());
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}		
 	}
@@ -300,6 +331,7 @@ public class BonList extends PBase {
 				
 	    	db.execSQL(ins.sql());
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}	
 		
@@ -307,53 +339,64 @@ public class BonList extends PBase {
 	
 	private void showStat() {
 		double btot=0,bmon=0,afalt,margval;
-			
-		if (tipolista<2) return;
-		
-		for (int i = 0; i <items.size(); i++) {
-			btot+=items.get(i).cant;
-			bmon+=items.get(i).cant*items.get(i).precio;
-		}	
-		
-		imgComp.setVisibility(View.INVISIBLE);completo=false;
-		
-		if (poruni==1) {
-			falt=valor-btot;
-			lblMonto.setText(mu.frmdecno(btot));
-			lblFalta.setText(mu.frmdecno(falt));	
-			
-			if (falt==0) {
-				imgComp.setVisibility(View.VISIBLE);completo=true;
+
+
+		try{
+			if (tipolista<2) return;
+
+			for (int i = 0; i <items.size(); i++) {
+				btot+=items.get(i).cant;
+				bmon+=items.get(i).cant*items.get(i).precio;
 			}
-			
-		} else {
-			
-			falt=valor-bmon;
-			lblMonto.setText(mu.frmdec(bmon));
-			lblFalta.setText(mu.frmdec(falt));	
-			
-			afalt=Math.abs(falt);
-			margval=valor*marg;
-			
-			if (afalt<=margval) {
-				imgComp.setVisibility(View.VISIBLE);completo=true;	
+
+			imgComp.setVisibility(View.INVISIBLE);completo=false;
+
+			if (poruni==1) {
+				falt=valor-btot;
+				lblMonto.setText(mu.frmdecno(btot));
+				lblFalta.setText(mu.frmdecno(falt));
+
+				if (falt==0) {
+					imgComp.setVisibility(View.VISIBLE);completo=true;
+				}
+
+			} else {
+
+				falt=valor-bmon;
+				lblMonto.setText(mu.frmdec(bmon));
+				lblFalta.setText(mu.frmdec(falt));
+
+				afalt=Math.abs(falt);
+				margval=valor*marg;
+
+				if (afalt<=margval) {
+					imgComp.setVisibility(View.VISIBLE);completo=true;
+				}
+
 			}
-			
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	
 	}
 	
 	private void processNextScreen() {
-		if (tipolista<2) {
-			nextItem();	
-		} else {
-			showStat();
-			if (completo) {
-				nextItem();	
+		try{
+			if (tipolista<2) {
+				nextItem();
 			} else {
-				mu.msgbox("Bonificación incompleta.");
+				showStat();
+				if (completo) {
+					nextItem();
+				} else {
+					mu.msgbox("Bonificación incompleta.");
+				}
 			}
-		}			
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void processItem() {
@@ -363,33 +406,38 @@ public class BonList extends PBase {
 		
 		pid=gl.gstr;
 		pname=gl.pprodname;
-		
-		if (mu.emptystr(pid)) return;
 
-		item = clsCls.new clsBonifProd();
+		try{
+			if (mu.emptystr(pid)) return;
 
-		item.id=pid;
-		item.nombre=pname;
+			item = clsCls.new clsBonifProd();
 
-		bcant=0;
-		item.cant=bcant;
-		item.cantmin=0;
+			item.id=pid;
+			item.nombre=pname;
 
-		item.precio=prc.precio( item.id,1,nivel,um,gl.umpeso,0);
-		item.prstr=mu.frmdec(item.precio);
-		item.costo=prc.costo;
+			bcant=0;
+			item.cant=bcant;
+			item.cantmin=0;
 
-		if (rutatipo.equalsIgnoreCase("V")) {
-			ddisp=getDisp(item.id);
-			item.disp=ddisp;
-			if (ddisp>0) item.flag=1;else item.flag=0;
-		} else {
-			item.flag=1;					
+			item.precio=prc.precio( item.id,1,nivel,um,gl.umpeso,0);
+			item.prstr=mu.frmdec(item.precio);
+			item.costo=prc.costo;
+
+			if (rutatipo.equalsIgnoreCase("V")) {
+				ddisp=getDisp(item.id);
+				item.disp=ddisp;
+				if (ddisp>0) item.flag=1;else item.flag=0;
+			} else {
+				item.flag=1;
+			}
+
+			items.add(item);
+
+			adapter.notifyDataSetChanged();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		items.add(item);	
-
-		adapter.notifyDataSetChanged();
 	}
 	
 	
@@ -404,64 +452,71 @@ public class BonList extends PBase {
 		valmi=selitem.cantmin;
 		val=selitem.disp;
 		ffalt=falt+selitem.cant;
-		if (val>ffalt) valmx=ffalt;else valmx=val;
-		
-		if (poruni==0) {
-			
-			ppr=selitem.precio;if (ppr<=0) ppr=1;
-			
-			val=valmi/ppr;
-			valmi=Math.floor(val);
-			
-			val=valmx/ppr;
-			valmx=Math.floor(val);
-		}
-		
-		
-		cmin=valmi;
-		cmax=valmx;
-		
-		
-		alert.setTitle("Cantidad");
-		alert.setMessage("Entre : "+mu.frmdecno(cmin)+" y "+mu.frmdecno(cmax));
-		
-		final EditText input = new EditText(this);
-		alert.setView(input);
-		
-		input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);	
-		input.setText(mu.frmdecno(selitem.cant));
-		input.requestFocus();
-		
-		
-		alert.setNegativeButton("Aplicar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				String s;
-				
-				try {
-			    	s=input.getText().toString();
-			    	icant=Double.parseDouble(s);
-			    	
-			    	if (icant<cmin) throw new Exception();
-			    	if (icant>cmax) throw new Exception();
-			    	
-			    	inputCant();
-				} catch (Exception e) {
-					mu.msgbox("Cantidad incorrecta");return;
-			    }
-			
-		  	}
-		});
 
-		alert.setPositiveButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
+		try{
+			if (val>ffalt) valmx=ffalt;else valmx=val;
+
+			if (poruni==0) {
+
+				ppr=selitem.precio;if (ppr<=0) ppr=1;
+
+				val=valmi/ppr;
+				valmi=Math.floor(val);
+
+				val=valmx/ppr;
+				valmx=Math.floor(val);
 			}
-		});
 
-		if (cmax>=cmin) {
-			alert.show();	
-		} else {
-			mu.msgbox("No hay existencia para aplicar");
+
+			cmin=valmi;
+			cmax=valmx;
+
+
+			alert.setTitle("Cantidad");
+			alert.setMessage("Entre : "+mu.frmdecno(cmin)+" y "+mu.frmdecno(cmax));
+
+			final EditText input = new EditText(this);
+			alert.setView(input);
+
+			input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			input.setText(mu.frmdecno(selitem.cant));
+			input.requestFocus();
+
+
+			alert.setNegativeButton("Aplicar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					String s;
+
+					try {
+						s=input.getText().toString();
+						icant=Double.parseDouble(s);
+
+						if (icant<cmin) throw new Exception();
+						if (icant>cmax) throw new Exception();
+
+						inputCant();
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox("Cantidad incorrecta");return;
+					}
+
+				}
+			});
+
+			alert.setPositiveButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+				}
+			});
+
+			if (cmax>=cmin) {
+				alert.show();
+			} else {
+				mu.msgbox("No hay existencia para aplicar");
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}
 	
 	private void setVarAllCant() {
@@ -470,200 +525,234 @@ public class BonList extends PBase {
 		
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		valmi=selitem.cantmin;
-		val=selitem.disp;
-		ffalt=falt+selitem.cant;
-		if (val>ffalt) valmx=ffalt;else valmx=val;
-		
-		if (poruni==0) {
-			
-			ppr=selitem.precio;if (ppr<=0) ppr=1;
-			
-			val=valmi/ppr;
-			valmi=Math.floor(val);
-			
-			val=valmx/ppr;
-			valmx=Math.floor(val);
-		}
-		
-		cmin=valmi;
-		cmax=valmx;
-		
-		alert.setTitle("Cantidad");
-		alert.setMessage("Entre : "+mu.frmdecno(cmin)+" y "+mu.frmdecno(cmax));
-		
-		final EditText input = new EditText(this);
-		alert.setView(input);
-		
-		input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);	
-		input.setText(mu.frmdecno(selitem.cant));
-		input.requestFocus();
-		
-		alert.setNegativeButton("Aplicar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				String s;
-				
-				try {
-			    	s=input.getText().toString();
-			    	icant=Double.parseDouble(s);
-			    	
-			    	if (icant<cmin) throw new Exception();
-			    	if (icant>cmax) throw new Exception();
-			    	
-			    	inputCant();
-				} catch (Exception e) {
-					mu.msgbox("Cantidad incorrecta");return;
-			    }
-			
-		  	}
-		});
+		try{
+			valmi=selitem.cantmin;
+			val=selitem.disp;
+			ffalt=falt+selitem.cant;
+			if (val>ffalt) valmx=ffalt;else valmx=val;
 
-		alert.setPositiveButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {}
-		});
-		
-		alert.setNeutralButton("Borrar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				try {
-					items.remove(selpos);
-					adapter.notifyDataSetChanged();
-				} catch (Exception e) {
-				}
+			if (poruni==0) {
+
+				ppr=selitem.precio;if (ppr<=0) ppr=1;
+
+				val=valmi/ppr;
+				valmi=Math.floor(val);
+
+				val=valmx/ppr;
+				valmx=Math.floor(val);
 			}
-		});
-		
 
-		if (cmax>=cmin) {
-			alert.show();	
-		} else {
-			mu.msgbox("No hay existencia para aplicar");
+			cmin=valmi;
+			cmax=valmx;
+
+			alert.setTitle("Cantidad");
+			alert.setMessage("Entre : "+mu.frmdecno(cmin)+" y "+mu.frmdecno(cmax));
+
+			final EditText input = new EditText(this);
+			alert.setView(input);
+
+			input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			input.setText(mu.frmdecno(selitem.cant));
+			input.requestFocus();
+
+			alert.setNegativeButton("Aplicar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					String s;
+
+					try {
+						s=input.getText().toString();
+						icant=Double.parseDouble(s);
+
+						if (icant<cmin) throw new Exception();
+						if (icant>cmax) throw new Exception();
+
+						inputCant();
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox("Cantidad incorrecta");return;
+					}
+
+				}
+			});
+
+			alert.setPositiveButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {}
+			});
+
+			alert.setNeutralButton("Borrar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					try {
+						items.remove(selpos);
+						adapter.notifyDataSetChanged();
+					} catch (Exception e) {
+							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+				}
+			});
+
+
+			if (cmax>=cmin) {
+				alert.show();
+			} else {
+				mu.msgbox("No hay existencia para aplicar");
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
 	}
 	
 	private void inputCant() {
-		selitem.cant=icant;
-		
-		adapter.notifyDataSetChanged();
-		showStat();
+		try{
+			selitem.cant=icant;
+
+			adapter.notifyDataSetChanged();
+			showStat();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	private void setItem() {
-		
-		try {
-			item=gl.bonus.get(pos);
-			
-			if (gl.bonus.get(pos).porcant.equalsIgnoreCase("S")) poruni=1;else poruni=0;			
-			
-			showBonList();
-		} catch (Exception e) {
+		try{
+			try {
+				item=gl.bonus.get(pos);
+
+				if (gl.bonus.get(pos).porcant.equalsIgnoreCase("S")) poruni=1;else poruni=0;
+
+				showBonList();
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			}
+
+			relMonto.setVisibility(View.GONE);dectipo=-1;
+
+			if (tipolista>=2) {
+				relMonto.setVisibility(View.VISIBLE);dectipo=0;
+			}
+
+			if (poruni==0) {
+				relMonto.setVisibility(View.VISIBLE);dectipo=1;
+			} else {
+				lblMarg.setText(" ");
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 		
-		relMonto.setVisibility(View.GONE);dectipo=-1;
-	
-		if (tipolista>=2) {
-			relMonto.setVisibility(View.VISIBLE);dectipo=0; 
-		}
-		
-		if (poruni==0) {
-			relMonto.setVisibility(View.VISIBLE);dectipo=1; 
-		} else {
-			lblMarg.setText(" ");
-		}
+
 	}
 	
 	private void nextItem() {
-		
-		applyBon();
-		
-		if (pos==mpos-1) {
-			super.finish();
-			return;
+
+		try{
+			applyBon();
+
+			if (pos==mpos-1) {
+				super.finish();
+				return;
+			}
+
+			pos++;
+			setItem();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
-		pos++;
-		setItem();
+
 	}
 	
 	private void msgAskDel(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {			      	
-				try {
-					items.remove(selpos);
-					adapter.notifyDataSetChanged();
-				} catch (Exception e) {
-					mu.msgbox(e.getMessage());
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					try {
+						items.remove(selpos);
+						adapter.notifyDataSetChanged();
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox(e.getMessage());
+					}
 				}
-			}
-		});
+			});
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {			      	
-				;
-			}
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}	
 	
 	private double getDisp(String prodid) {
 		Cursor DT;
 		double sdisp,bcant,bpcant;
-		
+
 		if (rutatipo.equalsIgnoreCase("V")) {
-			sql="SELECT SUM(CANT) FROM P_STOCK WHERE CODIGO='"+prodid+"'";	
+			sql="SELECT SUM(CANT) FROM P_STOCK WHERE CODIGO='"+prodid+"'";
 		} else {
-			sql="SELECT CANT FROM P_STOCKINV WHERE CODIGO='"+prodid+"'";	
+			sql="SELECT CANT FROM P_STOCKINV WHERE CODIGO='"+prodid+"'";
 		}
-		
+
 		try {
-	       	DT=Con.OpenDT(sql);
-       		DT.moveToFirst();
-  			sdisp=DT.getDouble(0);
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+			sdisp=DT.getDouble(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			sdisp=0;
-	    }	
-		
-		
+		}
+
 		if (prodid.equalsIgnoreCase(bonprodid)) bpcant=bonprodcant; else bpcant=0;
-			
+
 		// Total en lista de bonoficaciones
-		
+
 		bcant=0;
-		
+
 		return sdisp-bcant-bpcant;
 	}
 	
 	private double getMargin() {
 		Cursor DT;
 		double sdisp;
-			
+
 		try {
 			sql="SELECT BONVOLTOL FROM P_EMPRESA";
-	       	DT=Con.OpenDT(sql);
-       		DT.moveToFirst();
-  			sdisp=DT.getDouble(0);
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+			sdisp=DT.getDouble(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			sdisp=25;
-	    }	
-		
+		}
 		sdisp=sdisp/100;
-		
 		return sdisp;
 	}
 	
 	private void toastcnt(String msg) {
-		
-		if (mu.emptystr(msg)) return;
-		
-		Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_SHORT);  
-		toast.setGravity(Gravity.CENTER, 0, 0);
-		toast.show();
+
+		try{
+			if (mu.emptystr(msg)) return;
+
+			Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_SHORT);
+			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	private void clearByProd() {
@@ -672,6 +761,7 @@ public class BonList extends PBase {
 			sql="DELETE FROM T_BONITEM WHERE PRODID='"+bonprodid+"'";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}		
 		
@@ -679,40 +769,55 @@ public class BonList extends PBase {
 			sql="DELETE FROM T_BONIFFALT WHERE PRODID='"+bonprodid+"'";
 			db.execSQL(sql);
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 			
 	}
 	
 	protected void showkeyb(){
-		if (keyboard != null) keyboard.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+		try{
+			if (keyboard != null) keyboard.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 
 	private boolean prodPorPeso(String prodid) {
 		try {
 			return app.ventaPeso(prodid);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return false;
 		}
 	}
-
 
 	// Activity Events
 
 	@Override
 	protected void onResume() {
-	    super.onResume();
-	    
-	    if (browse==1) {
-	    	browse=0;
-	    	processItem();return;
-	    }
+		try{
+			super.onResume();
+
+			if (browse==1) {
+				browse=0;
+				processItem();return;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 	
 	@Override
 	public void onBackPressed() {
-		processNextScreen();
+		try{
+			processNextScreen();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}	
 	
 	

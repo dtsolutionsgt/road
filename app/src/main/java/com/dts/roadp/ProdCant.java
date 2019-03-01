@@ -2,7 +2,6 @@ package com.dts.roadp;
 
 import java.io.File;
 import java.text.DecimalFormat;
-
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
@@ -19,10 +18,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
+
 public class ProdCant extends PBase {
 
 	private EditText txtCant,txtPeso;
-	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot;
+	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot,lblCodProd;
 	private TextView lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso,lblPesoUni;
 	private ImageView imgProd,imgUpd,imgDel;	
 	
@@ -30,7 +30,7 @@ public class ProdCant extends PBase {
 	
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant;
-	private double cant,prec,icant,idisp,ipeso,umfactor;
+	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom,pesostock;
 	private boolean pexist,esdecimal,porpeso,esbarra;
 	
 	@Override
@@ -39,10 +39,11 @@ public class ProdCant extends PBase {
 		setContentView(R.layout.activity_prod_cant);
 		
 		super.InitBase();
-		
+		addlog("ProdCant",""+du.getActDateTime(),gl.vend);
+
 		setControls();
 				
-		prodid=gl.prod;
+		prodid=gl.prod;lblCodProd.setText(prodid);
 		um=gl.um;
 		nivel=gl.nivel;
 		rutatipo=gl.rutatipo;
@@ -51,7 +52,8 @@ public class ProdCant extends PBase {
 		imgUpd.setVisibility(View.INVISIBLE);
 		
 		prc=new Precio(this,mu,gl.peDec);
-		
+		getDisp();
+
 		setHandlers();
 
 		if (gl.peDecCant==0) {
@@ -73,83 +75,130 @@ public class ProdCant extends PBase {
 	// Events
 	
 	public void sendCant(View view) {
-		if (setCant(false)<1) applyCant();
+		try{
+			if (setCant(false)<1) applyCant();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 	
 	public void showPromo(View view){
-		gl.gstr=prodid;
-		
-		Intent intent = new Intent(this,ListaPromo.class);
-		startActivity(intent);
+		try{
+			gl.gstr=prodid;
+
+			Intent intent = new Intent(this,ListaPromo.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void showPic(View view){
-		gl.gstr=proddesc;
-		gl.imgpath=prodimg;
-		
-		Intent intent = new Intent(this,PicView.class);
-		startActivity(intent);
+		try{
+			gl.gstr=proddesc;
+			gl.imgpath=prodimg;
+
+			Intent intent = new Intent(this,PicView.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	public void doDelete(View view) {
-		msgAskDel("Borrar producto");
+		try{
+			msgAskDel("Borrar producto");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 		
 	public void askExist(View view) {
-				
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		
-		dialog.setTitle("Existencias bodega");
-		dialog.setMessage("Actualizar existencias ?");
-					
-		dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {
-		    	browse=1;
-		    	startActivity(new Intent(ProdCant.this,ComWSExist.class));
-		    }
-		});
-		
-		dialog.setNegativeButton("Cancelar", null);
-		
-		dialog.show();
+
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Existencias bodega");
+			dialog.setMessage("Actualizar existencias ?");
+
+			dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					browse=1;
+					startActivity(new Intent(ProdCant.this,ComWSExist.class));
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", null);
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 	
  	private void setHandlers(){
 
-		txtCant.addTextChangedListener(new TextWatcher() {
-			 
-		   	public void afterTextChanged(Editable s) {}
-			 
-		   	public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
-			 
-		   	public void onTextChanged(CharSequence s, int start,int before, int count) {
-		   		setCant(true);
-		   	}
-		});	
-		
-		txtCant.setOnKeyListener(new OnKeyListener() {
-			@Override 
-		    public boolean onKey(View v, int keyCode, KeyEvent event) {
-		        if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-		            (keyCode == KeyEvent.KEYCODE_ENTER)) {
-			        	sendCant(v);
-		          return true;
-		        }
-		        return false;
-		    }
-		});
+		try{
+			txtCant.addTextChangedListener(new TextWatcher() {
 
-        txtPeso.addTextChangedListener(new TextWatcher() {
+				public void afterTextChanged(Editable s) {}
 
-            public void afterTextChanged(Editable s) {}
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
 
-            public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+				public void onTextChanged(CharSequence s, int start,int before, int count) {
+					setCant(true);
+				}
+			});
 
-            public void onTextChanged(CharSequence s, int start,int before, int count) {
-                setPrecio();
-            }
-        });
+			txtCant.setOnKeyListener(new OnKeyListener() {
+				@Override
+				public boolean onKey(View v, int keyCode, KeyEvent event) {
+					if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+							(keyCode == KeyEvent.KEYCODE_ENTER)) {
+						if (porpeso) {
+							txtPeso.requestFocus();
+							txtPeso.setSelection(0,txtPeso.length());
+						} else {
+							sendCant(v);
+						}
+						return true;
+					}
+					return false;
+				}
+			});
+
+			txtPeso.addTextChangedListener(new TextWatcher() {
+
+				public void afterTextChanged(Editable s) {}
+
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+
+				public void onTextChanged(CharSequence s, int start,int before, int count) {
+					setPrecio();
+				}
+			});
+
+
+			txtPeso.setOnKeyListener(new OnKeyListener() {
+				@Override
+				public boolean onKey(View v, int keyCode, KeyEvent event) {
+					if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+							(keyCode == KeyEvent.KEYCODE_ENTER)) {
+						sendCant(v);
+						return true;
+					}
+					return false;
+				}
+			});
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 		
@@ -168,12 +217,13 @@ public class ProdCant extends PBase {
 			um=dt.getString(0);ubas=um;umfact=um;
 			lblBU.setText(ubas);gl.ubas=ubas;upres=ubas;
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("1-"+ e.getMessage());
 		}
 	
 		try {
 							
-			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO "+
+			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO,PESO_PROMEDIO "+
 				 "FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	dt=Con.OpenDT(sql);
 			dt.moveToFirst();
@@ -184,10 +234,12 @@ public class ProdCant extends PBase {
 			//prodimg=DT.getString(6);
 			prodimg=prodid;
 			proddesc=dt.getString(7);
-			
+			pesoprom = dt.getDouble(9);
+
 			if (dt.getString(7).equalsIgnoreCase("P")) pexist=true; else pexist=false;
 			
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		    mu.msgbox("1-"+ e.getMessage());
 	    }
 
@@ -197,6 +249,7 @@ public class ProdCant extends PBase {
 			dt.moveToFirst();
 			deccant=dt.getInt(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			deccant=0;
 		}
 
@@ -219,12 +272,13 @@ public class ProdCant extends PBase {
 				}
 			}
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("3-"+ e.getMessage());
 		}
 
 
 		prec=prc.precio(prodid,0,nivel,um,gl.umpeso,0);
-		
+
 		lblPrec.setText("Precio: "+mu.frmcur(0));
 
 		if (prec==0) {
@@ -242,6 +296,7 @@ public class ProdCant extends PBase {
   			icant=dt.getDouble(0);
   			ippeso=dt.getDouble(1);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			icant=0;ippeso=0;
 	    }	
 
@@ -258,9 +313,12 @@ public class ProdCant extends PBase {
 			idisp=getDispInv();	
 		}
 
+		idisp=mu.trunc(idisp);
+
 		if (porpeso) {
 			lblBU.setText(umstock);
 			upres = umstock;
+
 			lblPrec.setText(mu.frmcur(prec)+" x "+gl.umpeso);
 		} else {
 			lblPrec.setText(mu.frmcur(prec)+" x "+upres);
@@ -279,6 +337,7 @@ public class ProdCant extends PBase {
 		try {
 			txtCant.setSelection(txtCant.getText().length());
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
         txtPeso.setText(mu.frmdecimal(ippeso, gl.peDecImp));
@@ -292,15 +351,18 @@ public class ProdCant extends PBase {
 			
 		try {
 
-			sql="SELECT SUM(CANT) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
+			sql="SELECT SUM(CANT),SUM(PESO) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			
 			umstock=um;umfactor=1;
 			disp=dt.getDouble(0);
-
+			ipeso=dt.getDouble(1);
+			pesostock=ipeso/disp;
 			if (disp>0) return disp;
-		} catch (Exception e){ }
+		} catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
 		
 		try {
 			sql="SELECT UNIDADMEDIDA FROM P_STOCK WHERE (CODIGO='"+prodid+"')";	
@@ -341,10 +403,11 @@ public class ProdCant extends PBase {
 			disp=dt.getDouble(0);
             if (!porpeso) disp=disp/umfactor;
             ipeso=dt.getDouble(1);
-			
+			pesostock = ipeso/disp;
 			return disp;
 		} catch (Exception e) {
-	    }	
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+	    }
 		
 		return 0;
 	}
@@ -355,97 +418,121 @@ public class ProdCant extends PBase {
 	    	gl.dval=0;
 	    	super.finish();
 		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}	
 	}
 
 	private void applyCant() {
-		double ppeso;
+		double ppeso=0;
 
-		if (cant<0){
-			mu.msgbox("Cantidad incorrecta");txtCant.requestFocus();return;
-		}
-
-		if (rutatipo.equalsIgnoreCase("V")) {
-			if (cant>idisp) {
-				mu.msgbox("Cantidad mayor que disponible.");txtCant.requestFocus();return;
+		try{
+			if (cant<0){
+				mu.msgbox("Cantidad incorrecta");txtCant.requestFocus();return;
 			}
-		}
 
-		if (porpeso) {
+			if (rutatipo.equalsIgnoreCase("V")) {
+				if (cant>idisp) {
+					mu.msgbox("Cantidad mayor que disponible.");txtCant.requestFocus();return;
+				}
+			}
 
-			String spp=txtPeso.getText().toString();
+			if (porpeso) {
+
+				String spp=txtPeso.getText().toString();
 
 			try {
 				ppeso=Double.parseDouble(spp);
 				if (ppeso<=0) throw new Exception();
 			} catch (Exception e) {
-				mu.msgbox("Peso incorrect");txtPeso.requestFocus();return;
+				if (porpeso) {
+					mu.msgbox("Peso incorrect");txtPeso.requestFocus();return;
+				}
+
 			}
 		} else {
-			ppeso=0;
+			if (pesoprom==0) ppeso = pesostock*cant;else ppeso=pesoprom*cant;
 		}
 
 		gl.dval=cant;
-		if (porpeso) gl.dpeso=ppeso;else gl.dpeso=0;
+		gl.dpeso=ppeso;
 		gl.um=upres;
 		gl.umpres=upres;
 		gl.umstock=umstock;
 		gl.umfactor=umfactor;
+        gl.prectemp=prec;
 
-		hidekeyb();
-		super.finish();
+			hidekeyb();
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 
 	// Update Disp
 	
 	public void updDisp(){
-		
-		gl.gstr=prodid;
-		browse=1;
-		
-		Intent intent = new Intent(this,ActDisp.class);
-		startActivity(intent);
+
+		try{
+			gl.gstr=prodid;
+			browse=1;
+
+			Intent intent = new Intent(this,ActDisp.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 	
 	
 	// Aux
 	
 	private void setControls() {
-		
-		txtCant= (EditText) findViewById(R.id.txtMonto);
-		txtPeso= (EditText) findViewById(R.id.txtPeso);txtPeso.setVisibility(View.INVISIBLE);
-		lblDesc=(TextView) findViewById(R.id.lblFecha);
-		lblCant=(TextView) findViewById(R.id.lblCant);
-		lblPrec=(TextView) findViewById(R.id.lblPNum);
-		lblDisp=(TextView) findViewById(R.id.lblDisp);		
-		lblBU=(TextView) findViewById(R.id.lblBU);
-		lblTot=(TextView) findViewById(R.id.textView1);lblTot.setText("");
-		lblDispLbl=(TextView) findViewById(R.id.textView8);
-		lblPesoUni=(TextView) findViewById(R.id.textView25);lblPesoUni.setVisibility(View.INVISIBLE);
-        lblPesoLbl=(TextView) findViewById(R.id.textView24); lblPesoLbl.setVisibility(View.INVISIBLE);
-		lblFactor=(TextView) findViewById(R.id.textView22);lblFactor.setVisibility(View.INVISIBLE);
-		lblCantPeso=(TextView) findViewById(R.id.textView21);lblCantPeso.setText("");lblCantPeso.setVisibility(View.INVISIBLE);
-		imgProd=(ImageView) findViewById(R.id.imgPFoto);	
-		imgUpd=(ImageView) findViewById(R.id.imageView1);
-		imgDel=(ImageView) findViewById(R.id.imageView2);
+
+		try{
+			txtCant= (EditText) findViewById(R.id.txtMonto);
+			txtPeso= (EditText) findViewById(R.id.txtPeso);txtPeso.setVisibility(View.INVISIBLE);
+			lblDesc=(TextView) findViewById(R.id.lblFecha);
+			lblCant=(TextView) findViewById(R.id.lblCant);
+			lblPrec=(TextView) findViewById(R.id.lblPNum);
+			lblDisp=(TextView) findViewById(R.id.lblDisp);
+			lblBU=(TextView) findViewById(R.id.lblBU);
+			lblTot=(TextView) findViewById(R.id.textView1);lblTot.setText("");
+			lblDispLbl=(TextView) findViewById(R.id.textView8);
+			lblPesoUni=(TextView) findViewById(R.id.textView25);lblPesoUni.setVisibility(View.INVISIBLE);
+			lblPesoLbl=(TextView) findViewById(R.id.textView24); lblPesoLbl.setVisibility(View.INVISIBLE);
+			lblFactor=(TextView) findViewById(R.id.textView22);lblFactor.setVisibility(View.INVISIBLE);
+			lblCantPeso=(TextView) findViewById(R.id.textView21);lblCantPeso.setText("");lblCantPeso.setVisibility(View.INVISIBLE);
+			lblCodProd=(TextView) findViewById(R.id.txtRoadTit);
+			imgProd=(ImageView) findViewById(R.id.imgPFoto);
+			imgUpd=(ImageView) findViewById(R.id.imageView1);
+			imgDel=(ImageView) findViewById(R.id.imageView2);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 		
 	}
-	
+
+
 	private int setCant(boolean mode){
-		double cu,tv,corig,cround,fruni,frcant,adcant;
+		double cu,tv,corig,cround,fruni,frcant,adcant,vpeso=0,opeso;
 		boolean ajust=false;
 		
 		lblTot.setText("***");
 		if (mode) txtPeso.setText("0");
 
+
 		try {
-			cu=Double.parseDouble(txtCant.getText().toString());		
+			cu=Double.parseDouble(txtCant.getText().toString());
 			cant=cu;corig=cant;cround=Math.floor(cant);
 			esdecimal=corig!=cround;
 			cant=mu.round(cant,deccant);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			cant=-1;return -1;
 		}
 
@@ -476,26 +563,43 @@ public class ProdCant extends PBase {
 		try {
 			if (cant<0)	lblCant.setText(""); else lblCant.setText(String.valueOf(cant));
 			if (porpeso) {
-                tv=prec*cant*umfactor;
+                tv=prec*cant;
             } else {
                 tv=prec*cant;
             }
 
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			tv=0;mu.msgbox(e.getMessage());
 		}
 
         lblTot.setText(mu.frmcur(tv));
 
+		opeso=umfactor*cant;
 		try {
 			tv=umfactor*cant;
 			lblCantPeso.setText(mu.frmdecimal(tv,gl.peDecImp)+" "+gl.umpeso);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			lblCantPeso.setText("");
 			mu.msgbox(e.getMessage());
 		}
 
 		if (mode) txtPeso.setText(mu.frmdecimal(cant*umfactor, gl.peDecImp));
+
+		try {
+			if (mu.emptystr(txtPeso.getText().toString())) return 2;
+			vpeso=Double.parseDouble(txtPeso.getText().toString());
+		} catch (Exception e) {
+			if (porpeso) {
+				mu.msgbox("Peso incorrecto");return 2;
+			}
+
+		}
+
+		if (porpeso) {
+			if (!checkLimits(vpeso,opeso)) return 2;
+		}
 
 		if (ajust) {
 			msgAskAjust("Cantidad ajustada a : "+mu.frmdecimal(cant, gl.peDecImp)+". ¿Aplicar?");
@@ -505,13 +609,62 @@ public class ProdCant extends PBase {
 		}
 	}
 
+	private boolean checkLimits(double vpeso,double opeso) {
+
+		Cursor dt;
+		double pmin,pmax;
+		String ss;
+
+		try {
+
+			sql="SELECT PORCMINIMO,PORCMAXIMO FROM P_PORCMERMA WHERE PRODUCTO='"+prodid+"'";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount() == 0) {
+				msgbox("No está definido rango de repesaje para el producto, no se podrá modificar el peso");
+				//#EJC20190226: Si no está definido repesaje no se puede modificar el peso según observación de Carolina se debe dejar vender.
+				txtPeso.setEnabled(false);
+				return true;
+			}
+
+			dt.moveToFirst();
+
+			pmin = opeso - dt.getDouble(0) * opeso / 100;
+			pmax = opeso + dt.getDouble(1) * opeso / 100;
+
+			if (vpeso<pmin) {
+				ss="El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por debajo de los percentajes permitidos," +
+						" minimo : "+mu.frmdecimal(pmin, gl.peDecImp)+", no se puede aplicar.";
+				msgbox(ss);return false;
+			}
+
+			if (vpeso>pmax) {
+				ss="El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por debajo de los percentajes permitidos," +
+						" máximo : "+mu.frmdecimal(pmax, gl.peDecImp)+", no se puede aplicar.";
+				msgbox(ss);return false;
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return true;
+	}
+
 	private void setPrecio() {
-	    double cu,tv,corig,cround,fruni,frcant,adcant,ppeso;
+	    double cu,tv,corig,cround,fruni,frcant,adcant,ppeso=0;
 
         try {
             ppeso=Double.parseDouble(txtPeso.getText().toString());
         } catch (Exception e) {
-            lblTot.setText("***");mu.msgbox("Peso incorrecto");return;
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+
+            if (porpeso) {
+				lblTot.setText("***");
+				if (!mu.emptystr(txtPeso.getText().toString())) mu.msgbox("Peso incorrecto");
+				return;
+			}
         }
 
         prec=prc.precio(prodid,0,nivel,um,gl.umpeso,ppeso);
@@ -519,6 +672,7 @@ public class ProdCant extends PBase {
         try {
             tv=prec*ppeso;
         } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             tv=0;mu.msgbox(e.getMessage());
         }
 
@@ -528,17 +682,23 @@ public class ProdCant extends PBase {
             tv=umfactor*cant;
             lblCantPeso.setText(mu.frmdecimal(tv,gl.peDecImp)+" "+gl.umpeso);
         } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             lblCantPeso.setText("");
             mu.msgbox(e.getMessage());
         }
     }
 	
 	private void parseCant(double c) {
-		DecimalFormat frmdec = new DecimalFormat("#.####"); 
-		double ub;
-			
-		ub=c;
-		if (ub>0) txtCant.setText(frmdec.format(ub));
+		try{
+			DecimalFormat frmdec = new DecimalFormat("#.####");
+			double ub;
+
+			ub=c;
+			if (ub>0) txtCant.setText(frmdec.format(ub));
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}
 	
@@ -551,6 +711,7 @@ public class ProdCant extends PBase {
 			DT.moveToFirst();
 			return DT.getDouble(0);
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return 0;
 	    }		
 	}
@@ -562,6 +723,7 @@ public class ProdCant extends PBase {
             porpeso=app.ventaPeso(prodid);
             esbarra=app.prodBarra(prodid);
         } catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             porpeso=false;esbarra=false;
             msgbox(e.getMessage());
         }
@@ -582,98 +744,121 @@ public class ProdCant extends PBase {
     // Msg
 
 	private void msgSinPrecio(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
-					
-		dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	forceClose();
-		    }
-		});
-		dialog.show();
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
+
+			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					forceClose();
+				}
+			});
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
 	public void msgAskUpd(View view) {
-		
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("Actualizar disponible ?");
-				
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	updDisp();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) { }
-		});
-		
-		dialog.show();
+
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("Actualizar disponible ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					updDisp();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { }
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 			
 	}	
 	
 	private void msgAskDel(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-		    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  + " ?");
-		dialog.setIcon(R.drawable.ic_quest);
-					
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) {			      	
-		    	delItem();
-		    }
-		});
-		
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int which) { }
-		});
-		
-		dialog.show();
-			
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					delItem();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { }
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 
 	private void msgAskAjust(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg);
-		dialog.setIcon(R.drawable.ic_quest);
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
+			dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				applyCant();
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					applyCant();
+				}
+			});
 
-		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) { }
-		});
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { }
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
 	private void msgFactor(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle("Advertencia");
-		dialog.setMessage("¡" + msg + "!");
+			dialog.setTitle("Advertencia");
+			dialog.setMessage("¡" + msg + "!");
 
-		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {	
-				forceClose();
-			}
-		});
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					forceClose();
+				}
+			});
 
-		dialog.show();
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 
 	}
 
@@ -681,13 +866,18 @@ public class ProdCant extends PBase {
 	// Activity Events
 	
 	protected void onResume() {
-		
-	    super.onResume();
-	    
-	    if (browse==1) {
-	    	browse=0;
-	    	lblDisp.setText(mu.frmdec(getDispInv()));
-	    }
+
+		try{
+			super.onResume();
+
+			if (browse==1) {
+				browse=0;
+				lblDisp.setText(mu.frmdec(getDispInv()));
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
 	}
 
 }

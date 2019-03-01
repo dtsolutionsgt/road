@@ -6,11 +6,9 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
 import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -36,7 +34,6 @@ public class MainActivity extends PBase {
 	private BaseDatosVersion dbVers;
 	
 	private boolean rutapos,scanning=false;
-	private int fecha;
 	private String cs1,cs2,cs3,barcode;
 
 
@@ -46,6 +43,7 @@ public class MainActivity extends PBase {
         try {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
+
             grantPermissions();
         } catch (Exception e) {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -54,6 +52,34 @@ public class MainActivity extends PBase {
 
 	// Grant permissions
 
+	private void grantPermissions() {
+		try {
+			if (Build.VERSION.SDK_INT >= 23) {
+
+				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
+						&& checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
+						&& checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
+						&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED)
+				{
+					startApplication();
+				} else {
+                    // implementation 'com.android.support:appcompat-v7:28.0.0'
+                    /*
+					ActivityCompat.requestPermissions(this,
+							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+									Manifest.permission.ACCESS_FINE_LOCATION,
+									Manifest.permission.CALL_PHONE,
+									Manifest.permission.CAMERA}, 1);
+                    */
+				}
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+	}
+
 	private void startApplication() {
 
         try {
@@ -61,7 +87,7 @@ public class MainActivity extends PBase {
 
             this.setTitle("ROAD");
 
-            txtUser= (EditText) findViewById(R.id.txtUser);
+  			txtUser= (EditText) findViewById(R.id.txtUser);
             txtPass= (EditText) findViewById(R.id.txtMonto);
             lblRuta= (TextView) findViewById(R.id.lblCDisp);
             lblRTit= (TextView) findViewById(R.id.lblCUsed);
@@ -77,167 +103,160 @@ public class MainActivity extends PBase {
 
             initSession();
 
-            //#HS_20181206 Obtiene el supervisor de la ruta
             supervisorRuta();
-
             txtUser.setText("00100993");txtPass.setText("2613");
 
             gl.contlic=false;
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
 
 	}
 
-	private void grantPermissions() {
-		try {
-			if (Build.VERSION.SDK_INT >= 23) {
-
-				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
-			        && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
-					&& checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
-					&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED)
-				{
-					startApplication();
-				} else {
-					ActivityCompat.requestPermissions(this,
-							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-									     Manifest.permission.ACCESS_FINE_LOCATION,
-									     Manifest.permission.CALL_PHONE,
-									     Manifest.permission.CAMERA}, 1);
-				}
-			}
-
-	    } catch (Exception e) {
-			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-		}
-	}
-
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-		Toast.makeText(this,"req : "+requestCode, Toast.LENGTH_SHORT).show();
+	    try{
+            Toast.makeText(this,"req : "+requestCode, Toast.LENGTH_SHORT).show();
 
-		//switch (requestCode) {
+            //switch (requestCode) {
 
-			//case 0:
-				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
-						&& checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
-						&& checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
-						&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED) {
-					Toast.makeText(this, "GRANTED : " + requestCode, Toast.LENGTH_SHORT).show();
-					startApplication();
-				} else {
-					Toast.makeText(this, "failed " + requestCode, Toast.LENGTH_SHORT).show();
-					super.finish();
-				}
-				//break;
-		//}
+            //case 0:
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "GRANTED : " + requestCode, Toast.LENGTH_SHORT).show();
+                startApplication();
+            } else {
+                Toast.makeText(this, "failed " + requestCode, Toast.LENGTH_SHORT).show();
+                super.finish();
+            }
+            //break;
+            //}
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
 	}
 
+	//region Events
 
-	// Events
-	
-	public void doScan(View view) {
-		if (!detectBarcodeScanner()) return;
-
-		browse=4;
-		barcode="";
-
-		Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-		intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE", "QR_CODE_MODE");
-		startActivityForResult(intent, 0);
-	}
-
-	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		//if (requestCode == 0) {
-			if (resultCode == RESULT_OK) {
-				String contents = intent.getStringExtra("SCAN_RESULT");
-				barcode=contents;
-				toast("BC:"+barcode);
-			}
-		//}
-	}
-
-	
 	public void comMan(View view) {
-		entraComunicacion();			
+	    try{
+            entraComunicacion();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
 	}
 	
 	public void gotoMenu(){
-		
-		txtUser.setText("");txtPass.setText("");txtUser.requestFocus();
-		
-		Intent intent = new Intent(this, Menu.class);
-        startActivity(intent);
-}
+		try{
+            txtUser.setText("");txtPass.setText("");txtUser.requestFocus();
+
+            Intent intent = new Intent(this, Menu.class);
+            startActivity(intent);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
+    }
 
 	public void doLogin(View view) {
-		processLogIn();
+	    try{
+            processLogIn();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
 	}
 	
 	public void doRegister(View view) {
-	    startActivity(new Intent(this, LicRegis.class));		
+	    try{
+            startActivity(new Intent(this, LicRegis.class));
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
 	}
 
 	private void setHandlers() {
 
-		txtUser.setOnKeyListener(new OnKeyListener() {
-			@Override
-			public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
-				if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
-					switch (arg1) {
-						case KeyEvent.KEYCODE_ENTER:
-							//toast("key ");
-							txtPass.requestFocus();
-							return true;
-					}
-				}
-				return false;
-			}
-		});
+	    try{
+            txtUser.setOnKeyListener(new OnKeyListener() {
+                @Override
+                public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
+                    if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
+                        switch (arg1) {
+                            case KeyEvent.KEYCODE_ENTER:
+                                //toast("key ");
+                                txtPass.requestFocus();
+                                return true;
+                        }
+                    }
+                    return false;
+                }
+            });
 
-		txtPass.setOnKeyListener(new OnKeyListener() {
-			@Override
-			public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
-				if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
-					switch (arg1) {
-						case KeyEvent.KEYCODE_ENTER:
-							processLogIn();
-							return true;
-					}
-				}
-				return false;
-			}
-		});
+            txtPass.setOnKeyListener(new OnKeyListener() {
+                @Override
+                public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
+                    if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
+                        switch (arg1) {
+                            case KeyEvent.KEYCODE_ENTER:
+                                processLogIn();
+                                return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
 
 	}
 
 	private void compareSC(CharSequence s) {
-		String os,bc;
+	    try{
+            String os,bc;
 
-		bc=txtUser.getText().toString();
-		if (mu.emptystr(bc) || bc.length()<2) {
-			txtUser.setText("");
-			scanning=false;
-			return;
-		}
-		os=s.toString();
+            bc=txtUser.getText().toString();
+            if (mu.emptystr(bc) || bc.length()<2) {
+                txtUser.setText("");
+                scanning=false;
+                return;
+            }
+            os=s.toString();
 
-		if (bc.equalsIgnoreCase(os)) {
-			//Toast.makeText(this,"Codigo barra : " +bc, Toast.LENGTH_SHORT).show();
-			msgbox("Barra: "+bc);
-		}
+            if (bc.equalsIgnoreCase(os)) {
+                //Toast.makeText(this,"Codigo barra : " +bc, Toast.LENGTH_SHORT).show();
+                msgbox("Barra: "+bc);
+            }
 
-		txtUser.setText("");
-		scanning=false;
+            txtUser.setText("");
+            scanning=false;
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
 	}
 
+	//endregion
 
-	// Main
+	//region Main
 
 	private void initSession() {
 		Cursor DT;
 		String s, rn = "";
+		String vCellCom = "";
 
 		if (dbVacia()) {
 			gl.modoadmin=true;
@@ -249,17 +268,23 @@ public class MainActivity extends PBase {
 
 		try {
 			//#HS_20181122_1505 Se agrego el campo Impresion.
-			sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL FROM P_RUTA";
+			sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR FROM P_RUTA";
 			DT = Con.OpenDT(sql);
 			DT.moveToFirst();
 
 			gl.ruta = DT.getString(0);
+			gl.rutanom=DT.getString(1);
 			gl.vend = DT.getString(2);
 			gl.rutatipog = DT.getString(3);
 			s = DT.getString(3);
 			gl.wsURL = DT.getString(4);
 			gl.impresora = DT.getString(5);
 			gl.sucur = DT.getString(6);
+
+			if (!mu.emptystr(DT.getString(7))){
+				vCellCom = DT.getString(7);
+			}
+			gl.CellCom = (vCellCom.equalsIgnoreCase("S"));
 
 			rutapos = s.equalsIgnoreCase("R");
 
@@ -268,6 +293,7 @@ public class MainActivity extends PBase {
 			gl.vend = "0";
 			gl.rutatipog = "V";
 			gl.wsURL = "http://192.168.1.1/wsAndr/wsAndr.asmx";
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
 		if (rutapos) {
@@ -280,12 +306,13 @@ public class MainActivity extends PBase {
 
 		try {
 			//#HS_20181120_1616 Se agrego el campo UNIDAD_MEDIDA_PESO.//campo INCIDENCIA_NO_LECTURA
-			sql = "SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO,INCIDENCIA_NO_LECTURA FROM P_EMPRESA";
+			sql = " SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO," +
+				  " INCIDENCIA_NO_LECTURA FROM P_EMPRESA";
 			DT = Con.OpenDT(sql);
 			DT.moveToFirst();
 
 			gl.emp = DT.getString(0);
-			lblRuta.setText(DT.getString(1));
+			lblRuta.setText(DT.getString(1));gl.empnom =DT.getString(1);
 			gl.devol = DT.getInt(2) == 1;
 			s = DT.getString(3);
 			gl.usarpeso = s.equalsIgnoreCase("S");
@@ -297,6 +324,8 @@ public class MainActivity extends PBase {
 			gl.emp = "0";
 			lblRuta.setText("");
 			gl.devol = false;
+
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
 		gl.vendnom = "Vendedor 1";
@@ -305,12 +334,14 @@ public class MainActivity extends PBase {
 			File directory = new File(Environment.getExternalStorageDirectory() + "/SyncFold");
 			directory.mkdirs();
 		} catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 		try {
 			File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos");
 			directory.mkdirs();
 		} catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 
@@ -318,6 +349,7 @@ public class MainActivity extends PBase {
 			AppMethods app = new AppMethods(this, gl, Con, db);
 			app.parametrosExtra();
 		} catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			msgbox(e.getMessage());
 		}
 
@@ -338,61 +370,73 @@ public class MainActivity extends PBase {
 		Cursor DT;
 		String usr, pwd, dpwd;
 
+		try {
+
+		if (fecha>1903310000) {
+			msgAskLic("¡Su licencia expiró!");return false;
+		}
+
 		usr = txtUser.getText().toString().trim();
 		pwd = txtPass.getText().toString().trim();
 
-		if (mu.emptystr(usr)) {
-			mu.msgbox("Usuario incorrecto.");
-			return false;
-		}
-		if (mu.emptystr(pwd)) {
-			mu.msgbox("Contraseña incorrecta.");
-			return false;
-		}
+            if (mu.emptystr(usr)) {
+                mu.msgbox("Usuario incorrecto.");
+                return false;
+            }
+            if (mu.emptystr(pwd)) {
+                mu.msgbox("Contraseña incorrecta.");
+                return false;
+            }
 
-		if (usr.equalsIgnoreCase("DTS") && pwd.equalsIgnoreCase("DTS")) {
+            if (usr.equalsIgnoreCase("DTS") && pwd.equalsIgnoreCase("DTS")) {
 
-			gl.vendnom = "DTS";
-			gl.vend = "DTS";
-			gl.vnivel = 1;
-			gl.vnivprec = 1;
+                gl.vendnom = "DTS";
+                gl.vend = "DTS";
+                gl.vnivel = 1;
+                gl.vnivprec = 1;
 
-			return true;
-		}
+                return true;
+            }
 
-		if (usr.equalsIgnoreCase("Venta") && pwd.equalsIgnoreCase("Venta")) {
-			showDemoMenu();
-			return false;
-		}
+            if (usr.equalsIgnoreCase("Venta") && pwd.equalsIgnoreCase("Venta")) {
+                showDemoMenu();
+                return false;
+            }
 
-		try {
+            try {
 
-			sql = "SELECT NOMBRE,CLAVE,NIVEL,NIVELPRECIO FROM P_VENDEDOR WHERE CODIGO='" + usr + "'";
-			DT = Con.OpenDT(sql);
+                sql = "SELECT NOMBRE,CLAVE,NIVEL,NIVELPRECIO FROM P_VENDEDOR WHERE CODIGO='" + usr + "'";
+                DT = Con.OpenDT(sql);
 
-			if (DT.getCount() == 0) {
-				mu.msgbox("Usuario incorrecto !");
-				return false;
-			}
+                if (DT.getCount() == 0) {
+                    mu.msgbox("Usuario incorrecto !");
+                    return false;
+                }
 
-			DT.moveToFirst();
-			dpwd = DT.getString(1);
-			if (!pwd.equalsIgnoreCase(dpwd)) {
-				mu.msgbox("Contraseña incorrecta !");
-				return false;
-			}
+                DT.moveToFirst();
+                dpwd = DT.getString(1);
+                if (!pwd.equalsIgnoreCase(dpwd)) {
+                    mu.msgbox("Contraseña incorrecta !");
+                    return false;
+                }
 
-			gl.vendnom = DT.getString(0);
-			gl.vend = usr;
-			gl.vnivel = DT.getInt(2);
-			gl.vnivprec = DT.getInt(3);
+                gl.vendnom = DT.getString(0);
+                gl.vend = usr;
+                gl.vnivel = DT.getInt(2);
+                gl.vnivprec = DT.getInt(3);
 
-			return true;
+                return true;
 
-		} catch (Exception e) {
-			mu.msgbox(e.getMessage());
-			return false;
-		}
+            } catch (Exception e) {
+                addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+                mu.msgbox(e.getMessage());
+                return false;
+            }
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+            return false;
+        }
+
 
 	}
 
@@ -410,107 +454,81 @@ public class MainActivity extends PBase {
 			}
 
 		}catch(Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			Log.d("supervisorRuta error: ", e.getMessage());
 		}
 
 	}
 
+	//endregion
 
-	// Licencia
-
-	private boolean validaLicencia() {
-		Cursor dt;
-		String mac, lickey, idkey, binkey;
-		int fval, ff, lkey;
-
-		try {
-			mac = lic.getMac();
-			lkey = lic.getLicKey(mac);
-			lickey = lic.encodeLicence(lkey);
-
-			sql = "SELECT IDKEY,BINKEY FROM LIC_CLIENTE WHERE ID='" + mac + "'";
-			dt=Con.OpenDT(sql);
-			if (dt.getCount()==0) return false;
-			
-			dt.moveToFirst();		
-			idkey=dt.getString(0);
-			binkey=dt.getString(1);
-			
-			if (!idkey.equalsIgnoreCase(lickey)) return false;
-			
-			ff=du.getActDate();
-			fval=lic.decodeValue(binkey);
-			fval=fval-lkey;
-			
-			//Toast.makeText(this,""+fval, Toast.LENGTH_SHORT).show();
-			
-			if (fval==999999) return true;				
-			fval=fval*10000;
-			
-			if (fval>=ff) return true; else return false;
-			
-		} catch (Exception e) {
-			mu.msgbox(e.getMessage());return false;
-		}
-	
-	}
-
-
-	// Ventas Demo
+	//region Ventas Demo
 	
 	public void showDemoMenu() {
-		final AlertDialog Dialog;
-		final String[] selitems = {"Datos de cliente","Base de datos original","Borrar datos de venta"};
-	 		    
-		AlertDialog.Builder menudlg = new AlertDialog.Builder(this);
-		menudlg.setTitle("Datos de demo");
-					
-		menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
 
-				switch (item) {
-				case 0: 
-					Intent intent = new Intent(MainActivity.this,DemoData.class);
-					startActivity(intent);
-					break;
-				case 1:  
-					copyRawFile();break;
-				case 2:
-					borrarDatos(1);break;
-				}
+	    try{
+            final AlertDialog Dialog;
+            final String[] selitems = {"Datos de cliente","Base de datos original","Borrar datos de venta"};
 
-				dialog.cancel();	
-			}
-		});
-				
-		menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-		@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-			
-		Dialog = menudlg.create();
-		Dialog.show();
+            AlertDialog.Builder menudlg = new AlertDialog.Builder(this);
+            menudlg.setTitle("Datos de demo");
+
+            menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
+
+                    switch (item) {
+                        case 0:
+                            Intent intent = new Intent(MainActivity.this,DemoData.class);
+                            startActivity(intent);
+                            break;
+                        case 1:
+                            copyRawFile();break;
+                        case 2:
+                            borrarDatos(1);break;
+                    }
+
+                    dialog.cancel();
+                }
+            });
+
+            menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            Dialog = menudlg.create();
+            Dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
 	}	
 	
 	private void copyRawFile() {
 		String fn;
-		int rid,rslt;
+		int rid, rslt;
+        try{
+            Field[] fields = R.raw.class.getFields();
+            for(Field f : fields)
+                try {
+                    fn=f.getName();
+                    if (fn.equalsIgnoreCase("rd_param")) {
+                        rid=f.getInt(null);
+                        rslt=copyRawFile(rid);
+                        if (rslt==1) {
+                            Intent intent = new Intent(this,ComDrop.class);
+                            startActivity(intent);
+                        }
+                    }
+                }catch (Exception e) {
+                    addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                }
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
 
-		Field[] fields = R.raw.class.getFields();
-		for(Field f : fields)
-			try {
-				fn=f.getName();
-				if (fn.equalsIgnoreCase("rd_param")) {
-					rid=f.getInt(null);	
-					rslt=copyRawFile(rid);
-					if (rslt==1) {
-						Intent intent = new Intent(this,ComDrop.class);
-						startActivity(intent);	
-					}
-				}
-			} catch (Exception e) { }
 	}
 	
 	private int copyRawFile(int rawid) {
@@ -532,13 +550,13 @@ public class MainActivity extends PBase {
 			}
 			return 1;
 		} catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("Error : "+e.getMessage());return 0;
 		}	
 	}
 	
 	private void borrarDatos(int showmsg) {
-		String sql;
-		
+
 		try {
 			
 			db.beginTransaction();
@@ -571,55 +589,63 @@ public class MainActivity extends PBase {
 			if (showmsg==1) Toast.makeText(this,"Datos de venta borrados", Toast.LENGTH_SHORT).show();
 			
 		} catch (SQLException e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 			mu.msgbox("Error : " + e.getMessage());
 		}		
 		
 	}
-		
+
+	//endregion
 	
-	// Aux
+	//region Aux
 	
 	private void entraComunicacion() {
 
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+	    try{
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		alert.setTitle("Contraseña de administrador");//	alert.setMessage("Serial");
-		
-		final EditText input = new EditText(this);
-		alert.setView(input);
-		
-		input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-		input.setText("");
-		input.requestFocus();
-		
-		alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				String s;
-				
-				try {
-			    	s=input.getText().toString();
-			    			    	
-			    	if (s.equalsIgnoreCase("1965")) {
-			    		gl.modoadmin=true;
-			    		gl.autocom=0;
-						startActivity( new Intent(MainActivity.this,ComWS.class));
-			    	} else {	
-			    		mu.msgbox("Contraseña incorrecta");return;
-			    	}
-			    	
-				} catch (Exception e) {
-					
-			    }
-		  	}
-		});
+            alert.setTitle("Contraseña de administrador");//	alert.setMessage("Serial");
 
-		alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-			}
-		});
+            final EditText input = new EditText(this);
+            alert.setView(input);
 
-		alert.show();
+            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            input.setText("");
+            input.requestFocus();
+
+            alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    String s;
+
+                    try {
+                        s=input.getText().toString();
+
+                        if (s.equalsIgnoreCase("1965")) {
+                            gl.modoadmin=true;
+                            gl.autocom=0;
+                            startActivity( new Intent(MainActivity.this,ComWS.class));
+                        } else {
+                            mu.msgbox("Contraseña incorrecta");return;
+                        }
+
+                    } catch (Exception e) {
+                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                    }
+                }
+            });
+
+            alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                }
+            });
+
+            alert.show();
+        }catch (Exception  e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+
 	}
 
 	private boolean dbVacia() {
@@ -631,38 +657,81 @@ public class MainActivity extends PBase {
 
 			return dt.getCount()==0;
 		} catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return true;
 		}
 	}
 
-	private boolean detectBarcodeScanner() {
-
-		String packagename="com.google.zxing.client.android";
-		PackageManager pm = this.getPackageManager();
+	private boolean validaLicencia() {
+		Cursor dt;
+		String mac, lickey, idkey, binkey;
+		int fval, ff, lkey;
 
 		try {
-			pm.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
-			return true;
-		} catch (PackageManager.NameNotFoundException e) {
-			toast("Aplicacion ZXing Barcode Scanner no esta instalada");return false;
+			mac = lic.getMac();
+			lkey = lic.getLicKey(mac);
+			lickey = lic.encodeLicence(lkey);
+
+			sql = "SELECT IDKEY,BINKEY FROM LIC_CLIENTE WHERE ID='" + mac + "'";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return false;
+
+			dt.moveToFirst();
+			idkey=dt.getString(0);
+			binkey=dt.getString(1);
+
+			if (!idkey.equalsIgnoreCase(lickey)) return false;
+
+			ff=du.getActDate();
+			fval=lic.decodeValue(binkey);
+			fval=fval-lkey;
+
+			//Toast.makeText(this,""+fval, Toast.LENGTH_SHORT).show();
+
+			if (fval==999999) return true;
+			fval=fval*10000;
+
+			if (fval>=ff) return true; else return false;
+
+		} catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox(e.getMessage());return false;
 		}
 
 	}
 
-	// Activity Events
+	private void msgAskLic(String msg) {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle(R.string.app_name);
+		dialog.setMessage(msg  );
+		dialog.setIcon(R.drawable.ic_quest);
+
+		dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				finish();
+			}
+		});
+
+		dialog.show();
+
+	}
+
+	//endregion
+
+	//region Activity Events
 	
 	protected void onResume() {
-	    super.onResume();
-	    initSession();
-		txtUser.requestFocus();
-
-		if (browse==4) {
-			browse=0;
-			txtUser.setText("Sc:"+barcode);
-			//if (!mu.emptystr(barcode)) toast("Scanned :"+barcode);
-			return;
-		}
+	    try{
+            super.onResume();
+            initSession();
+            txtUser.requestFocus();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
 	}
+
+	//endregion
 
 }
 

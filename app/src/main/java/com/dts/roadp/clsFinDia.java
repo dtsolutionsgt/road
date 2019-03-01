@@ -19,10 +19,15 @@ public class clsFinDia extends PBase{
     private Context cont;
 
     public clsFinDia(Context context){
-        cont = context;
-        active=0;
-        Con = new BaseDatos(context);
-        opendb();
+        try{
+            cont = context;
+            active=0;
+            Con = new BaseDatos(context);
+            opendb();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
     }
 
     private void opendb() {
@@ -31,6 +36,7 @@ public class clsFinDia extends PBase{
             Con.vDatabase =db;
             active=1;
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             active= 0;
         }
     }
@@ -46,6 +52,7 @@ public class clsFinDia extends PBase{
             DT.moveToFirst();
             result = DT.getInt(0);
         }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("getCantFactura: " + e.getMessage());
         }
 
@@ -63,6 +70,7 @@ public class clsFinDia extends PBase{
             DT.moveToFirst();
             result = DT.getInt(0);
         }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("getCantFacturaAnuluadas: " + e.getMessage());
         }
 
@@ -80,6 +88,7 @@ public class clsFinDia extends PBase{
             DT.moveToFirst();
             result = DT.getInt(0);
         }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("getCantFacturaEfectuada: " + e.getMessage());
         }
 
@@ -100,6 +109,7 @@ public class clsFinDia extends PBase{
             }
 
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("setCorrelZ: "+ e.getMessage());
         }
         return corelz;
@@ -118,6 +128,7 @@ public class clsFinDia extends PBase{
                 rslt=DT.getInt(0);
             }
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("ultimoCierreFecha: " + e.getMessage());
         }
         return rslt;
@@ -137,6 +148,7 @@ public class clsFinDia extends PBase{
             }
 
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("getDevBodega: " + e.getMessage());
         }
         return rslt;
@@ -147,6 +159,7 @@ public class clsFinDia extends PBase{
             sql="UPDATE FinDia SET val5="+1;
             db.execSQL(sql);
         }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("updateDevBodega: " + e.getMessage());
         }
     }
@@ -166,6 +179,7 @@ public class clsFinDia extends PBase{
             }
 
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("getdeposito: " + e.getMessage());
         }
         return rslt;
@@ -176,6 +190,7 @@ public class clsFinDia extends PBase{
             sql="UPDATE FinDia SET val4="+2;
             db.execSQL(sql);
         }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("updateDeposito: " + e.getMessage());
         }
     }
@@ -195,6 +210,7 @@ public class clsFinDia extends PBase{
             }
 
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("getImpDeposito: " + e.getMessage());
         }
         return rslt;
@@ -205,6 +221,7 @@ public class clsFinDia extends PBase{
             sql="UPDATE FinDia SET val3="+3;
             db.execSQL(sql);
         }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("updateImpDeposito: " + e.getMessage());
         }
     }
@@ -223,6 +240,7 @@ public class clsFinDia extends PBase{
             }
 
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("getcomunicacion: " + e.getMessage());
         }
         return rslt;
@@ -233,6 +251,7 @@ public class clsFinDia extends PBase{
             sql="UPDATE FinDia SET val2="+4;
             db.execSQL(sql);
         }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("updateComunicacion: " + e.getMessage());
         }
     }
@@ -242,6 +261,7 @@ public class clsFinDia extends PBase{
             sql="UPDATE FinDia SET Corel="+1;
             db.execSQL(sql);
         }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("updateCorrelativoZ: " + e.getMessage());
         }
     }
@@ -251,6 +271,7 @@ public class clsFinDia extends PBase{
             sql="UPDATE FinDia SET val1="+du.getActDate();
             db.execSQL(sql);
         }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("updateFinDia: " + e.getMessage());
         }
     }
@@ -403,6 +424,7 @@ public class clsFinDia extends PBase{
             db.endTransaction();
 
         } catch (SQLException e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             db.endTransaction();
             //mu.msgbox("Error : " + e.getMessage());
             return false;
@@ -411,6 +433,5 @@ public class clsFinDia extends PBase{
         return true;
     }
 
-    ////////
 
 }

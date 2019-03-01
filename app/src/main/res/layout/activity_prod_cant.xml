@@ -104,14 +104,12 @@
 
             <EditText
                 android:id="@+id/txtMonto"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="32dp"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/lblBU"
-                android:layout_margin="4dp"
+                android:layout_alignParentStart="true"
                 android:background="@layout/blue_strip"
+                android:imeOptions="actionNext"
                 android:inputType="number"
                 android:maxLines="1"
                 android:paddingLeft="5dp"
@@ -404,7 +402,8 @@
         android:layout_toRightOf="@+id/layPres"
         android:text="TextView"
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:visibility="invisible" />
 
     <EditText
         android:id="@+id/txtPeso"

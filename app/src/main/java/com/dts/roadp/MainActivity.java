@@ -1,11 +1,12 @@
 package com.dts.roadp;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.lang.reflect.Field;
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,11 +21,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
-import android.database.SQLException;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.lang.reflect.Field;
 
 public class MainActivity extends PBase {
 
@@ -65,13 +66,15 @@ public class MainActivity extends PBase {
 				{
 					startApplication();
 				} else {
-/*
+                    // implementation 'com.android.support:appcompat-v7:28.0.0'
+                /*
 					ActivityCompat.requestPermissions(this,
 							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
 									Manifest.permission.ACCESS_FINE_LOCATION,
 									Manifest.permission.CALL_PHONE,
 									Manifest.permission.CAMERA}, 1);
-*/
+                */
+
 				}
 			}
 
@@ -274,6 +277,7 @@ public class MainActivity extends PBase {
 			DT.moveToFirst();
 
 			gl.ruta = DT.getString(0);
+			gl.rutanom=DT.getString(1);
 			gl.vend = DT.getString(2);
 			gl.rutatipog = DT.getString(3);
 			s = DT.getString(3);
@@ -312,7 +316,7 @@ public class MainActivity extends PBase {
 			DT.moveToFirst();
 
 			gl.emp = DT.getString(0);
-			lblRuta.setText(DT.getString(1));
+			lblRuta.setText(DT.getString(1));gl.empnom =DT.getString(1);
 			gl.devol = DT.getInt(2) == 1;
 			s = DT.getString(3);
 			gl.usarpeso = s.equalsIgnoreCase("S");

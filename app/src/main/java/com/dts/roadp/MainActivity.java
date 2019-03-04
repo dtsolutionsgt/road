@@ -73,8 +73,6 @@ public class MainActivity extends PBase {
 									Manifest.permission.ACCESS_FINE_LOCATION,
 									Manifest.permission.CALL_PHONE,
 									Manifest.permission.CAMERA}, 1);
-
-
 				}
 			}
 

@@ -482,8 +482,7 @@ public class Venta extends PBase {
 
 				lblProd.setText(DT.getString(0));
 			} catch (Exception e) {
-				addlog(new Object() {
-				}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 				mu.msgbox(e.getMessage());
 			}
 
@@ -550,13 +549,17 @@ public class Venta extends PBase {
 
 			if (prodPorPeso(prodid)) {
 				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, gl.dpeso);
+				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
+					if (prc.precioespecial>0) prec=prc.precioespecial;
+				}
 			} else {
 				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0);
+				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
+					if (prc.precioespecial>0) prec=prc.precioespecial;
+				}
 			}
 
-			if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
-				if (prc.precioespecial>0) prec=prc.precioespecial;
-			}
+
 
 			precsin = prc.precsin;
 			imp = prc.imp;
@@ -593,6 +596,11 @@ public class Venta extends PBase {
 	private void prodPrecio() {
 		try{
 			prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,gl.dpeso);
+
+            if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
+                if (prc.precioespecial>0) prec=prc.precioespecial;
+            }
+
 			prec=mu.round(prec,gl.peDec);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

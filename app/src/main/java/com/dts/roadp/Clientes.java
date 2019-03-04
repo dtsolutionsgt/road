@@ -42,7 +42,7 @@ public class Clientes extends PBase {
 	private EditText txtFiltro;
 	private TextView lblCant;
 
-	
+
 	private ArrayList<clsCDB> items= new ArrayList<clsCDB>();
 	private ArrayList<String> cobros= new ArrayList<String>();
 	private ArrayList<String> ppago= new ArrayList<String>();

@@ -50,7 +50,7 @@ public class MiscUtils {
 
 	//#CKFK 20190226 Agregué esta función porque necesito el formato sin moneda
 	public String frmcur_sm(double val) {
-		return curr+ffrmdec.format(val);
+		return ffrmdec.format(val);
 	}
 	
 	public String frmval(double val) {

@@ -395,7 +395,8 @@
             android:name=".Soporte"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-            android:windowSoftInputMode="stateHidden"/>
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".NotaCredito"></activity>
     </application>
 
 </manifest>

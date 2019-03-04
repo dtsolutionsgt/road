@@ -7,10 +7,8 @@ import java.util.function.Function;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.opengl.Visibility;
@@ -195,7 +193,7 @@ public class FacturaRes extends PBase {
 		
 		prn=new printer(this,printclose);
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
-		fdoc.deviceid =androidid();
+		fdoc.deviceid =gl.deviceId;
 
 		saved=false;
 		assignCorel();
@@ -260,7 +258,7 @@ public class FacturaRes extends PBase {
 			lblMPago.setVisibility(View.INVISIBLE);
 		}
 	}
-	
+
 	public void payCash(View view) {
 
 		try{
@@ -356,7 +354,7 @@ public class FacturaRes extends PBase {
 
 	}
 
-	
+
 	private void totalOrder(){
 		double dmaxmon;
 		
@@ -1508,7 +1506,7 @@ public class FacturaRes extends PBase {
 	//endregion
 
 	//region Aux
-	
+
 	public void askSave(View view) {
 		try{
 			checkPago();

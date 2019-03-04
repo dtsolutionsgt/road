@@ -292,10 +292,12 @@ public class ProdCant extends PBase {
 		try {
 			sql="SELECT CANT,PESO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
            	dt=Con.OpenDT(sql);
-           	
-       		dt.moveToFirst();
-  			icant=dt.getDouble(0);
-  			ippeso=dt.getDouble(1);
+
+           	if(dt.getCount()>0){
+				dt.moveToFirst();
+				icant=dt.getDouble(0);
+				ippeso=dt.getDouble(1);
+			}
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			icant=0;ippeso=0;

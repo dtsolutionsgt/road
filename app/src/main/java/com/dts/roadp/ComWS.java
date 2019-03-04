@@ -45,10 +45,10 @@ import java.util.ArrayList;
 
 public class ComWS extends PBase {
 	
-	private TextView lblInfo,lblParam,lblRec,lblEnv;
+	private TextView lblInfo,lblParam,lblRec,lblEnv,lblExis;
 	private ProgressBar barInfo;
 	private EditText txtRuta,txtWS,txtEmp;
-	private ImageView imgRec,imgEnv;
+	private ImageView imgRec,imgEnv,imgExis;
 	private RelativeLayout relExist,relPrecio,relStock;
 	
 	private int isbusy,fecha,lin,reccnt,ultcor,ultcor_ant;
@@ -107,7 +107,9 @@ public class ComWS extends PBase {
 		txtEmp= (EditText) findViewById(R.id.txtEmp);txtEmp.setEnabled(false);	
 		lblRec= (TextView) findViewById(R.id.btnRec);
 		imgRec= (ImageView) findViewById(R.id.imageView5);
+        imgExis=(ImageView) findViewById(R.id.imageView4);
 		lblEnv= (TextView) findViewById(R.id.btnSend);
+        lblExis= (TextView) findViewById(R.id.TextView02);
 		imgEnv= (ImageView) findViewById(R.id.imageView6);
 		relExist=(RelativeLayout) findViewById(R.id.relExist);
 		relPrecio=(RelativeLayout) findViewById(R.id.relPrecio);
@@ -3165,8 +3167,9 @@ public class ComWS extends PBase {
 		esvacio=false;
 		
 		lblEnv.setVisibility(View.VISIBLE);imgEnv.setVisibility(View.VISIBLE);
-		lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);			
-		relExist.setVisibility(View.VISIBLE);
+		lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
+        lblExis.setVisibility(View.INVISIBLE);imgExis.setVisibility(View.INVISIBLE);//#CKFK 20190304 Agregué esto para poder poner visible o invisible este botón
+        relExist.setVisibility(View.VISIBLE);
 		relPrecio.setVisibility(View.VISIBLE);
 		relStock.setVisibility(View.VISIBLE);
 
@@ -3190,6 +3193,7 @@ public class ComWS extends PBase {
 				lblInfo.setText("");
 				lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
 				lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+
 			}
 
 			//#HS 20181113_1241pm Quite la comparacion contra la letra V.
@@ -3212,7 +3216,7 @@ public class ComWS extends PBase {
 					} else {
 						relPrecio.setVisibility(View.INVISIBLE);
 						relExist.setVisibility(View.INVISIBLE);
-						relStock.setVisibility(View.VISIBLE);
+						relStock.setVisibility(View.INVISIBLE);
 					}
 				}
 			} else {

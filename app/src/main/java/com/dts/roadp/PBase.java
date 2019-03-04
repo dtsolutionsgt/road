@@ -4,10 +4,14 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.view.Gravity;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 
 public class PBase extends Activity {
 
@@ -103,6 +107,24 @@ public class PBase extends Activity {
 	}	
 	
 	protected void addlog(String methodname,String msg,String info) {
+
+		BufferedWriter writer = null;
+		FileWriter wfile;
+
+		try {
+
+			String fname = Environment.getExternalStorageDirectory()+"/roadlog.txt";
+			wfile=new FileWriter(fname,true);
+			writer = new BufferedWriter(wfile);
+
+			writer.write("Método: " + methodname + " Mensaje: " +msg + " Info: "+ info );
+			writer.write("\r\n");
+
+			writer.close();
+
+		} catch (Exception e) {
+			msgbox("Error " + e.getMessage());
+		}
 
 	}
 

@@ -124,6 +124,16 @@ public class FinDia extends PBase {
         }
 
     }
+    //#CKFK 20190304 Agregué funcion para llamar activity de comunicación.
+    public void ActivityComunicacion() {
+        try{
+            Intent intent = new Intent(this, ComWS.class);
+            startActivity(intent);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
 
     public void ActivityMenu() {
         try{
@@ -175,6 +185,14 @@ public class FinDia extends PBase {
                 addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
                 msgExit("No se pudo crear archivo de impresión.");
                 return;
+            }
+
+            //#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
+            if (gl.banderafindia == true) {
+                if (claseFinDia.getcomunicacion() != 4) {
+                    msgAskComunicacion();
+                    return;
+                }
             }
 
             try  {
@@ -625,7 +643,7 @@ public class FinDia extends PBase {
         try{
             fechaUltimoCierre = claseFinDia.ultimoCierreFecha();
 
-            //#HS_20181127_1033 Agregue validacion para cantidad de facturas.
+            //#HS_20181127_1033 Agregué validacion para cantidad de facturas.
             if (claseFinDia.getCantFactura() == 0) {
                 msgExit("No hay facturas.");
                 return false;
@@ -664,10 +682,18 @@ public class FinDia extends PBase {
                 }
             }
 
-            //#HS_20181127_1033 Agregue validacion para verificar si ya se realizo la impresion del deposito.
+            //#HS_20181127_1033 Agregué validación para verificar si ya se realizo la impresion del deposito.
             if (gl.banderafindia == true) {
                 if (claseFinDia.getImpresionDeposito() != 3) {
                     msgAskImpresionDeposito();
+                    return false;
+                }
+            }
+
+            //#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
+            if (gl.banderafindia == true) {
+                if (claseFinDia.getcomunicacion() != 4) {
+                    msgAskComunicacion();
                     return false;
                 }
             }
@@ -1548,6 +1574,30 @@ public class FinDia extends PBase {
             dialog1.setPositiveButton("Imprimir Documento", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     ActivityImpresionDeposito(1);
+                }
+            });
+
+            dialog1.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+
+    }
+
+    private void msgAskComunicacion() {
+
+        try{
+            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
+
+            dialog1.setTitle("Road");
+            dialog1.setMessage("No ha comunicado los datos");
+
+            dialog1.setIcon(R.drawable.ic_quest);
+
+            dialog1.setPositiveButton("Quiere comunicar los datos", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityComunicacion();
                 }
             });
 

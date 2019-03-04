@@ -155,7 +155,7 @@ public class MiscUtils {
 	public void msgbox(String msg) {
 
 		try{
-			if (msg==null || msg.isEmpty()) {return;}
+			if (msg==null || msg.isEmpty()) return;
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(cCont);
 
@@ -171,8 +171,7 @@ public class MiscUtils {
 
 		}catch (Exception ex)
 		{
-			Log.e("msg", ex.getMessage());
-		}
+			Log.e("msg", ex.getMessage());		}
 	}   
 	
 	public void msgbox(int v) {

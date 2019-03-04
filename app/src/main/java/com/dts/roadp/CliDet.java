@@ -77,6 +77,8 @@ public class CliDet extends PBase {
 	private String imagenbase64,path;
 	private Boolean imgPath, imgDB;
 	private PhotoViewAttacher zoomFoto;
+	private AppMethods app;
+	private double credito;
 	////
 	private double clim,cused,cdisp;
 	private int nivel,browse,merc;
@@ -114,7 +116,9 @@ public class CliDet extends PBase {
 		imgCobro= (ImageView) findViewById(R.id.imageView2);
 		imgDevol= (ImageView) findViewById(R.id.imageView1);
 		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
-		
+
+		app = new AppMethods(this, gl, Con, db);
+		credito=gl.credito;
 		/*
 		Con = new BaseDatos(this);
 	    opendb();
@@ -533,11 +537,16 @@ public class CliDet extends PBase {
 		//gl.rutatipo="V";
 
 		try{
+			if (gl.vcredito) {
+
+				if (credito<=0) {
+					msgAskFact();
+				}
+			}
+
 			if (!validaVenta()) return;
 
-			if(porcentaje == false) {
-				VerificaCantidad();
-			}
+
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -647,7 +656,35 @@ public class CliDet extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+	}
 
+	private void  msgAskFact() {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("Cliente no tiene credito, Desea continuar la facturacion al contado?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if(porcentaje == false) {
+						VerificaCantidad();
+					}
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					closekeyb();
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 
 	//#HS_20181207 Cuadro de dialogo para editar datos del cliente

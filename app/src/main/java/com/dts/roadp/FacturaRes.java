@@ -3,6 +3,7 @@ package com.dts.roadp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -12,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.opengl.Visibility;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +22,7 @@ import android.text.InputType;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebHistoryItem;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -31,6 +34,7 @@ public class FacturaRes extends PBase {
 	private ListView listView;
 	private TextView lblPago,lblFact,lblTalon,lblMPago,lblCred,lblPend,lblCash;
 	private ImageView imgBon,imgMPago,imgCred,imgPend, imgCash;
+	private CheckBox contadoCheck;
 
 	private List<String> spname = new ArrayList<String>();
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
@@ -68,6 +72,7 @@ public class FacturaRes extends PBase {
 		lblCred = (TextView) findViewById(R.id.TextView02);
 		lblPend = (TextView) findViewById(R.id.lblCVence2);
 		lblCash = (TextView) findViewById(R.id.textView4);
+		contadoCheck = (CheckBox) findViewById(R.id.checkContado);
 
 		imgBon = (ImageView) findViewById(R.id.imageView6);
 		imgMPago = (ImageView) findViewById(R.id.imageView1);
@@ -118,23 +123,44 @@ public class FacturaRes extends PBase {
 		}
 
 		if (media==4) {
-			lblCash.setVisibility(View.INVISIBLE);
-			imgCash.setVisibility(View.INVISIBLE);
-			lblPend.setVisibility(View.INVISIBLE);
-			imgPend.setVisibility(View.INVISIBLE);
-			imgCred.setVisibility(View.VISIBLE);
-			lblCred.setVisibility(View.VISIBLE);
-			imgMPago.setVisibility(View.INVISIBLE);
-			lblMPago.setVisibility(View.INVISIBLE);
+			contadoCheck.setVisibility(View.VISIBLE);
+			if(contadoCheck.isChecked()){
+				lblCash.setVisibility(View.VISIBLE);
+				imgCash.setVisibility(View.VISIBLE);
+				lblPend.setVisibility(View.INVISIBLE);
+				imgPend.setVisibility(View.INVISIBLE);
+				imgCred.setVisibility(View.INVISIBLE);
+				lblCred.setVisibility(View.INVISIBLE);
+				imgMPago.setVisibility(View.VISIBLE);
+				lblMPago.setVisibility(View.VISIBLE);
+			} else if(!contadoCheck.isChecked()) {
+				lblCash.setVisibility(View.INVISIBLE);
+				imgCash.setVisibility(View.INVISIBLE);
+				lblPend.setVisibility(View.INVISIBLE);
+				imgPend.setVisibility(View.INVISIBLE);
+				imgCred.setVisibility(View.VISIBLE);
+				lblCred.setVisibility(View.VISIBLE);
+				imgMPago.setVisibility(View.INVISIBLE);
+				lblMPago.setVisibility(View.INVISIBLE);
+			}
 
 			if (gl.vcredito) {
 
-                if (credito<=0) {
-                    imgCred.setVisibility(View.INVISIBLE);
-                    lblCred.setVisibility(View.INVISIBLE);
-                }
+				if (credito<=0) {
+					contadoCheck.setVisibility(View.INVISIBLE);
+				//	contadoCheck.setEnabled(false);
+				//	contadoCheck.setText("Cliente si credito, habilitado para pagar al contado.");
+					lblCash.setVisibility(View.VISIBLE);
+					imgCash.setVisibility(View.VISIBLE);
+					lblPend.setVisibility(View.INVISIBLE);
+					imgPend.setVisibility(View.INVISIBLE);
+					imgCred.setVisibility(View.INVISIBLE);
+					lblCred.setVisibility(View.INVISIBLE);
+					imgMPago.setVisibility(View.VISIBLE);
+					lblMPago.setVisibility(View.VISIBLE);
+				}
 
-            }
+			}
 
 		}
 		
@@ -208,6 +234,31 @@ public class FacturaRes extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
+	}
+
+	public void checkedBox(View view){
+		contadoCheck.setVisibility(View.VISIBLE);
+		if(contadoCheck.isChecked()){
+			contadoCheck.setText("Pagar al Credito");
+			lblCash.setVisibility(View.VISIBLE);
+			imgCash.setVisibility(View.VISIBLE);
+			lblPend.setVisibility(View.INVISIBLE);
+			imgPend.setVisibility(View.INVISIBLE);
+			imgCred.setVisibility(View.INVISIBLE);
+			lblCred.setVisibility(View.INVISIBLE);
+			imgMPago.setVisibility(View.VISIBLE);
+			lblMPago.setVisibility(View.VISIBLE);
+		} else if(!contadoCheck.isChecked()) {
+			contadoCheck.setText("Pagar al Contado");
+			lblCash.setVisibility(View.INVISIBLE);
+			imgCash.setVisibility(View.INVISIBLE);
+			lblPend.setVisibility(View.INVISIBLE);
+			imgPend.setVisibility(View.INVISIBLE);
+			imgCred.setVisibility(View.VISIBLE);
+			lblCred.setVisibility(View.VISIBLE);
+			imgMPago.setVisibility(View.INVISIBLE);
+			lblMPago.setVisibility(View.INVISIBLE);
+		}
 	}
 	
 	public void payCash(View view) {
@@ -304,6 +355,7 @@ public class FacturaRes extends PBase {
 		}
 
 	}
+
 	
 	private void totalOrder(){
 		double dmaxmon;

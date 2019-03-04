@@ -1327,6 +1327,35 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+            //#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
+			vSQL = "CREATE TABLE [P_STOCK_PALLET](" +
+					"[DOCUMENTO] TEXT NOT NULL," +
+					"[RUTA] TEXT NOT NULL," +
+					"[BARRAPALLET] TEXT NOT NULL, " +
+					"[CODIGO] TEXT NOT NULL, " +
+					"[BARRAPRODUCTO] TEXT NOT NULL," +
+					"[LOTEPRODUCTO] TEXT NOT NULL," +
+					"[CANT] REAL NOT NULL," +
+					"[COREL] TEXT NOT NULL," +
+					"[PRECIO] REAL NOT NULL," +
+					"[PESO] REAL NOT NULL," +
+					"[FECHA] INTEGER NOT NULL," +
+					"[ANULADO] INTEGER NOT NULL," +
+					"[CENTRO] TEXT NOT NULL," +
+					"[STATUS] TEXT NOT NULL," +
+					"[ENVIADO] INTEGER NOT NULL," +
+					"[CODIGOLIQUIDACION] INTEGER NOT NULL," +
+					"[COREL_D_MOV] TEXT NOT NULL," +
+					"[FECHA_SISTEMA] INTEGER NOT NULL," +
+					"[UNIDADMEDIDA] TEXT NOT NULL," +
+					"[DOC_ENTREGA] TEXT NOT NULL," +
+					" PRIMARY KEY ([DOCUMENTO]," +
+					"[RUTA]," +
+					"[BARRAPALLET]," +
+					"[CODIGO]," +
+					"[BARRAPRODUCTO], " +
+					"[LOTEPRODUCTO], " +
+					"[UNIDADMEDIDA]);";
 			
 			vSQL="CREATE TABLE [P_STOCK_APR] ("+
 					"[CODIGO] TEXT NOT NULL,"+

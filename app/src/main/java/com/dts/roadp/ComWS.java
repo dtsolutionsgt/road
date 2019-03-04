@@ -677,6 +677,7 @@ public class ComWS extends PBase {
             if (!AddTable("P_STOCK_APR")) return false;
             if (!AddTable("P_STOCK")) return false;
             if (!AddTable("P_STOCKB")) return false;
+            if (!AddTable("P_STOCK_PALLET")) return false;//#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
 			if (!AddTable("P_COBRO")) return false;
 			if (!AddTable("P_CLIGRUPO")) return false;
 			if (!AddTable("P_MEDIAPAGO")) return false;
@@ -1008,11 +1009,21 @@ public class ComWS extends PBase {
 
 			//CKFK 20190222 Agregué a la consulta el AND (ENVIADO = 0)
 			if (TN.equalsIgnoreCase("P_STOCKB")) {
-				SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
+				SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, " +
+                        "STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
 						"FROM P_STOCKB WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
 				return SQL;
 			}
+
+            //CKFK 20190304 Agregué la consulta para obtener los datos de P_STOCK_PALLET
+            if (TN.equalsIgnoreCase("P_STOCK_PALLET")) {
+                SQL = "SELECT DOCUMENTO, RUTA, BARRAPALLET, CODIGO, BARRAPRODUCTO, LOTEPRODUCTO, CANT, COREL, PRECIO, PESO, " +
+                      "UNIDADMEDIDA,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, DOC_ENTREGA  " +
+                      "FROM P_STOCK_PALLET WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+                      "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
+                return SQL;
+            }
 
 			if (TN.equalsIgnoreCase("P_CLIRUTA")) {
 				SQL = "SELECT RUTA,CLIENTE,SEMANA,DIA,SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'";

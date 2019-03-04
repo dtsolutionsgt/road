@@ -147,7 +147,7 @@ public class FinDia extends PBase {
 
         try{
             if (gl.peModal.equalsIgnoreCase("TOL")) {
-                //#EJC20190226: En comentario porque agregué el insert de d_mov encabezado, se debe hacer en otra pantalla el insert del detalle de lo que hay que devoler.
+                //#EJC20190226: En comentario porque agregué el insert de d_mov encabezado, se debe hacer en otra pantalla el insert del detalle de lo que hay que devolver.
                 //devProductos();
                 buildReportsTOL();
             } else {
@@ -210,6 +210,7 @@ public class FinDia extends PBase {
             }
 
             FinDia.super.finish();
+
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
@@ -1654,29 +1655,6 @@ public class FinDia extends PBase {
 
                 toastlong("No ha efectuado la devolución a bodega,debe proceder a realizarla antes de fin del dia");
 
-            /*AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-            dialog.setTitle("Road");
-            dialog.setMessage("No ha efectuado la devolución a bodega, ¿Quiere proceder a realizarla?");
-            dialog.setIcon(R.drawable.ic_quest);
-            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    if(gl.banderafindia == false)
-                    {
-                        startFDD();
-                    }else {
-                        startFDD();//iniciarFD();
-                    }
-                }
-            });
-
-            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityMenu();
-                }
-            });
-
-            dialog.show();*/
-
             } else  {
                 startFDD();
             }
@@ -1950,18 +1928,18 @@ public class FinDia extends PBase {
 
                 rep.empty();
                 vCadena = DT.getString(3);//Nombre
-                rep.ctrim(vCadena);
+                rep.add(rep.ctrim(vCadena));
                 vCadena = "R.U.C: " + DT.getString(6) + " DV." + DT.getString(7);
-                rep.ctrim(vCadena);
+                rep.add(rep.ctrim(vCadena));
                 vCadena = DT.getString(4);//Dirección
-                rep.ctrim(vCadena);
+                rep.add(rep.ctrim(vCadena));
                 vCadena = "# DE SERIE:" + gl.deviceId;
-                rep.ctrim(vCadena);
+                rep.add(rep.ctrim(vCadena));
                 vCadena = StringUtils.leftPad(du.shora(fecha),12) + StringUtils.leftPad(du.sfecha(fecha),20);
-                rep.ctrim(vCadena);
+                rep.add(rep.ctrim(vCadena));
                 rep.empty();
                 vCadena = "INFORME Z # " + corelz;
-                rep.ctrim(vCadena);
+                rep.add(rep.ctrim(vCadena));
                 rep.empty();
                 vCadena = "VENDEDOR: " + gl.vend;
                 rep.add(vCadena);
@@ -2082,7 +2060,7 @@ public class FinDia extends PBase {
                             DT.moveToNext();
 
                             if (!vAuxCorel.equalsIgnoreCase(DT.getString(0))){
-                                vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 10);
+                                vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
                                 vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
                                 vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8);
                                 vCadena +=   StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
@@ -2093,7 +2071,7 @@ public class FinDia extends PBase {
 
                         }  else{
 
-                            vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 10);
+                            vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
                             vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
                             vCadena += StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8);
                             vCadena +=  StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
@@ -2110,7 +2088,7 @@ public class FinDia extends PBase {
                         sumanograv = sumanograv + DT.getDouble(7);//NoGravado
                         sumagrav = sumagrav + DT.getDouble(6);//Gravado
 
-                        vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 10);
+                        vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
                         vCadena += StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
                         vCadena += StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8);
                         vCadena += StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
@@ -2129,10 +2107,10 @@ public class FinDia extends PBase {
 
                 vCadena = "Total";
                 rep.add(vCadena);
-                vCadena = StringUtils.leftPad(mu.frmcur(totgrav), 10, " ");
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur(totnograv), 9);
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur(TotItbm), 8);
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur(sumados), 9);
+                vCadena = StringUtils.leftPad(mu.frmcur_sm(totgrav), 10, " ");
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(totnograv), 9);
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(TotItbm), 8);
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(sumados), 9);
                 rep.add(vCadena);
             }
 
@@ -2148,7 +2126,7 @@ public class FinDia extends PBase {
     private void repPedidosTol() {
 
         Cursor DT;
-        String s1, s2, s3;
+        String s1;
         String vComunicacion = "";
         String vAuxCorel, vCadena;
         double sumagrav, sumaimp, sumanograv, totporfila, totgrav, totnograv, TotItbm, sumados, i;
@@ -2228,7 +2206,7 @@ public class FinDia extends PBase {
                             DT.moveToNext();
 
                             if (!vAuxCorel.equalsIgnoreCase(DT.getString(0))){
-                                vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 10);
+                                vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
                                 vCadena += StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
                                 vCadena += StringUtils.leftPad(mu.frmcur_sm(sumaimp),8);
                                 vCadena +=  StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
@@ -2239,7 +2217,7 @@ public class FinDia extends PBase {
 
                         }  else{
 
-                            vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 10);
+                            vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
                             vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
                             vCadena += StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8);
                             vCadena +=  StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
@@ -2274,10 +2252,10 @@ public class FinDia extends PBase {
 
                 vCadena = "Total";
                 rep.add(vCadena);
-                vCadena = StringUtils.leftPad(mu.frmcur(totgrav), 10);
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur(totnograv), 9);
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur(TotItbm), 8);
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur(sumados), 9);
+                vCadena = StringUtils.leftPad(mu.frmcur_sm(totgrav), 10);
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(totnograv), 9);
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(TotItbm), 8);
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(sumados), 9);
                 rep.add(vCadena);
             }
 
@@ -2309,27 +2287,33 @@ public class FinDia extends PBase {
             sql = "SELECT COREL, TOTAL, ANULADO FROM D_COBRO WHERE STATCOM='N'";
             DT = Con.OpenDT(sql);
 
-            if (DT.getCount() > 0) {
-                DT.moveToFirst();
+            if (DT != null){
 
-                while (!DT.isAfterLast()) {
+                if (DT.getCount() > 0) {
 
-                    anulado = (DT.getString(3).equalsIgnoreCase("S"));
+                    DT.moveToFirst();
 
-                    vCadena = DT.getString(0);
+                    while (!DT.isAfterLast()) {
 
-                    if (!anulado) TotalRecibos += DT.getDouble(1);
+                        anulado = (DT.getString(2).equalsIgnoreCase("S"));
 
-                    vCadena += StringUtils.leftPad(mu.frmcur(DT.getDouble(1)), 25);
-                    if (anulado)  vCadena += "  A";
+                        vCadena = DT.getString(0);
 
-                    rep.add(vCadena);
+                        if (!anulado) TotalRecibos += DT.getDouble(1);
 
+                        vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 25);
+                        if (anulado)  vCadena += "  A";
+
+                        rep.add(vCadena);
+
+                        DT.moveToNext();
+                    }
                 }
+
             }
 
             rep.line();
-            vCadena = "Total:  " + StringUtils.leftPad(mu.frmcur(TotalRecibos), 27);
+            vCadena = "Total:  " + StringUtils.leftPad(mu.frmcur_sm(TotalRecibos), 27);
             rep.add(vCadena);
             rep.empty();
 
@@ -2388,11 +2372,12 @@ public class FinDia extends PBase {
                         TotalNotaCredCred = TotalNotaCredCred + DT.getDouble(1);
                     }
 
-                    vCadena += StringUtils.leftPad(mu.frmcur(DT.getDouble(1)), 25);
+                    vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 25);
                     if (anulada)  vCadena += "  A";
 
                     rep.add(vCadena);
 
+                    DT.moveToNext();
                 }
             }
 
@@ -2423,20 +2408,21 @@ public class FinDia extends PBase {
                         TotalNotaCredCont += DT.getDouble(1);
                     }
 
-                    vCadena += StringUtils.leftPad(mu.frmcur(DT.getDouble(1)), 25);
+                    vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 25);
                     if (anulada)  vCadena += "  A";
 
                     rep.add(vCadena);
 
+                    DT.moveToNext();
                 }
             }
 
             rep.line();
-            vCadena = "Total NC Credito:  " + StringUtils.leftPad( mu.frmcur(TotalNotaCredCred), 27);
+            vCadena = "Total NC Credito:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCredCred), 27);
             rep.add(vCadena);
-            vCadena = "Total NC Contado:  " + StringUtils.leftPad( mu.frmcur(TotalNotaCredCont), 27);
+            vCadena = "Total NC Contado:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCredCont), 27);
             rep.add(vCadena);
-            vCadena = "Total:  " + StringUtils.leftPad( mu.frmcur(TotalNotaCred), 27);
+            vCadena = "Total:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCred), 27);
             rep.add(vCadena);
            rep.empty();
 
@@ -2492,13 +2478,13 @@ public class FinDia extends PBase {
                 sumados = totnograv + totgrav + TotItbm;
             }
 
-            vCadena = "Ventas Gravadas       :" + StringUtils.leftPad(mu.frmcur(totgrav), 13);
+            vCadena = "Ventas Gravadas       :" + StringUtils.leftPad(mu.frmcur_sm(totgrav), 13);
             rep.add(vCadena);
-            vCadena = "Ventas No Gravadas    :" + StringUtils.leftPad(mu.frmcur(totnograv), 13);
+            vCadena = "Ventas No Gravadas    :" + StringUtils.leftPad(mu.frmcur_sm(totnograv), 13);
             rep.add(vCadena);
-            vCadena = "Acumulado ITBM        :" + StringUtils.leftPad(mu.frmcur(TotItbm), 13);
+            vCadena = "Acumulado ITBM        :" + StringUtils.leftPad(mu.frmcur_sm(TotItbm), 13);
             rep.add(vCadena);
-            vCadena = "GT                    :" + StringUtils.leftPad(mu.frmcur(sumados), 13);
+            vCadena = "GT                    :" + StringUtils.leftPad(mu.frmcur_sm(sumados), 13);
             rep.add(vCadena);
             rep.empty();
 
@@ -2537,23 +2523,23 @@ public class FinDia extends PBase {
             rep.add(vCadena);
             rep.empty();
 
-            vCadena = "Venta Credito         :" + StringUtils.leftPad(mu.frmcur(vTotalCredito), 13);
+            vCadena = "Venta Credito         :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito), 13);
             rep.add(vCadena);
-            vCadena = "Total NC Credito      :" + StringUtils.leftPad(mu.frmcur(vTotalNC_Credito), 13);
+            vCadena = "Total NC Credito      :" + StringUtils.leftPad(mu.frmcur_sm(vTotalNC_Credito), 13);
             rep.add(vCadena);
-            vCadena = "Total Credito         :" + StringUtils.leftPad(mu.frmcur(vTotalCredito - vTotalNC_Credito), 13);
+            vCadena = "Total Credito         :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito - vTotalNC_Credito), 13);
             rep.add(vCadena);
-            vCadena = "Venta Contado         :" + StringUtils.leftPad(mu.frmcur(vTotalContado), 13);
+            vCadena = "Venta Contado         :" + StringUtils.leftPad(mu.frmcur_sm(vTotalContado), 13);
             rep.add(vCadena);
-            vCadena = "Total NC Contado      :" + StringUtils.leftPad(mu.frmcur(vTotalNC_Contado), 13);
+            vCadena = "Total NC Contado      :" + StringUtils.leftPad(mu.frmcur_sm(vTotalNC_Contado), 13);
             rep.add(vCadena);
-            vCadena = "Total Contado         :" + StringUtils.leftPad(mu.frmcur(vTotalContado - vTotalNC_Contado), 13);
+            vCadena = "Total Contado         :" + StringUtils.leftPad(mu.frmcur_sm(vTotalContado - vTotalNC_Contado), 13);
             rep.add(vCadena);
-            vCadena = "Venta Total           :" + StringUtils.leftPad(mu.frmcur(vTotalCredito + vTotalContado), 13);
+            vCadena = "Venta Total           :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
             rep.add(vCadena);
-            vCadena = "Gran Total           :" + StringUtils.leftPad(mu.frmcur(vTotalCredito + vTotalContado), 13);
+            vCadena = "Gran Total           :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
             rep.add(vCadena);
-            vCadena = "Total Recibos         :" + StringUtils.leftPad(mu.frmcur(TotalRecibos), 13);
+            vCadena = "Total Recibos         :" + StringUtils.leftPad(mu.frmcur_sm(TotalRecibos), 13);
             rep.add(vCadena);
             rep.empty();
 

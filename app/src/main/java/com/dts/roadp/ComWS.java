@@ -1742,6 +1742,7 @@ public class ComWS extends PBase {
 
 			}
 
+			ComWS.super.finish();
 			//listaFachada();
 
 		}catch (Exception e){
@@ -1763,6 +1764,10 @@ public class ComWS extends PBase {
 
             sql = listItems.get(0);
             db.execSQL(sql);
+
+            if (listItems.size() == 1){
+            	return true;
+			}
 
             sql = listItems.get(1);
             db.execSQL(sql);

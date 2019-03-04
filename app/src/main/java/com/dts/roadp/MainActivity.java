@@ -67,13 +67,13 @@ public class MainActivity extends PBase {
 					startApplication();
 				} else {
                     // implementation 'com.android.support:appcompat-v7:28.0.0'
-                /*
+
 					ActivityCompat.requestPermissions(this,
 							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
 									Manifest.permission.ACCESS_FINE_LOCATION,
 									Manifest.permission.CALL_PHONE,
 									Manifest.permission.CAMERA}, 1);
-                */
+
 
 				}
 			}

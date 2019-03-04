@@ -1,7 +1,10 @@
 package com.dts.roadp;
 
-import java.io.File;
-import java.text.DecimalFormat;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
@@ -13,11 +16,9 @@ import android.view.View.OnKeyListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
-import android.database.SQLException;
+
+import java.io.File;
+import java.text.DecimalFormat;
 
 public class ProdCant extends PBase {
 
@@ -183,7 +184,6 @@ public class ProdCant extends PBase {
 				}
 			});
 
-
 			txtPeso.setOnKeyListener(new OnKeyListener() {
 				@Override
 				public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -210,7 +210,6 @@ public class ProdCant extends PBase {
 		double ippeso=0;
 		
 		try {
-			
 			sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();			
@@ -276,8 +275,12 @@ public class ProdCant extends PBase {
 			mu.msgbox("3-"+ e.getMessage());
 		}
 
-
-		prec=prc.precio(prodid,0,nivel,um,gl.umpeso,0);
+		prec=prc.precio(prodid,1,nivel,um,gl.umpeso,0);
+		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
+			if (prc.precioespecial>0) {
+				prec=prc.precioespecial;
+			}
+		}
 
 		lblPrec.setText("Precio: "+mu.frmcur(0));
 
@@ -323,7 +326,6 @@ public class ProdCant extends PBase {
 		} else {
 			lblPrec.setText(mu.frmcur(prec)+" x "+upres);
 		}
-
 
 		if (pexist) lblDisp.setText(""+((int) idisp)); else lblDisp.setText("");
 		lblDisp.setText(mu.frmdecimal(idisp, gl.peDecImp)+" "+upres);
@@ -424,48 +426,55 @@ public class ProdCant extends PBase {
 	}
 
 	private void applyCant() {
-		double ppeso=0;
+		double ppeso = 0;
 
-		try{
-			if (cant<0){
-				mu.msgbox("Cantidad incorrecta");txtCant.requestFocus();return;
+		try {
+			if (cant < 0) {
+				mu.msgbox("Cantidad incorrecta");
+				txtCant.requestFocus();
+				return;
 			}
 
 			if (rutatipo.equalsIgnoreCase("V")) {
-				if (cant>idisp) {
-					mu.msgbox("Cantidad mayor que disponible.");txtCant.requestFocus();return;
+				if (cant > idisp) {
+					mu.msgbox("Cantidad mayor que disponible.");
+					txtCant.requestFocus();
+					return;
 				}
 			}
 
 			if (porpeso) {
 
-				String spp=txtPeso.getText().toString();
+				String spp = txtPeso.getText().toString();
 
-			try {
-				ppeso=Double.parseDouble(spp);
-				if (ppeso<=0) throw new Exception();
-			} catch (Exception e) {
-				if (porpeso) {
-					mu.msgbox("Peso incorrect");txtPeso.requestFocus();return;
+				try {
+					ppeso = Double.parseDouble(spp);
+					if (ppeso <= 0) throw new Exception();
+				} catch (Exception e) {
+					if (porpeso) {
+						mu.msgbox("Peso incorrect");
+						txtPeso.requestFocus();
+						return;
+					}
 				}
-
+			} else {
+				if (pesoprom == 0) ppeso = pesostock * cant;
+				else ppeso = pesoprom * cant;
 			}
-		} else {
-			if (pesoprom==0) ppeso = pesostock*cant;else ppeso=pesoprom*cant;
-		}
 
-		gl.dval=cant;
-		gl.dpeso=ppeso;
-		gl.um=upres;
-		gl.umpres=upres;
-		gl.umstock=umstock;
-		gl.umfactor=umfactor;
-        gl.prectemp=prec;
+			gl.dval = cant;
+			gl.dpeso = ppeso;
+			gl.um = upres;
+			gl.umpres = upres;
+			gl.umstock = umstock;
+			gl.umfactor = umfactor;
+			gl.prectemp = prec;
 
 			hidekeyb();
 			super.finish();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
 	}
@@ -517,7 +526,6 @@ public class ProdCant extends PBase {
 		
 	}
 
-
 	private int setCant(boolean mode){
 		double cu,tv,corig,cround,fruni,frcant,adcant,vpeso=0,opeso;
 		boolean ajust=false;
@@ -553,11 +561,17 @@ public class ProdCant extends PBase {
 			}
 		}
 
-		cant=mu.round(cant, gl.peDecImp);
+		cant = mu.round(cant, gl.peDecImp);
 		if (porpeso) {
-			prec=prc.precio(prodid,0,nivel,um,gl.umpeso,umfactor*cant);
+			prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, umfactor * cant);
+			if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, umfactor * cant)) {
+				if (prc.precioespecial > 0) prec = prc.precioespecial;
+			}
 		} else {
-			prec=prc.precio(prodid,0,nivel,um,gl.umpeso,0);
+			prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, 0);
+			if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, gl.dpeso)) {
+				if (prc.precioespecial > 0) prec = prc.precioespecial;
+			}
 		}
 
 		try {
@@ -667,7 +681,7 @@ public class ProdCant extends PBase {
 			}
         }
 
-        prec=prc.precio(prodid,0,nivel,um,gl.umpeso,ppeso);
+        //prec=prc.precio(prodid,0,nivel,um,gl.umpeso,ppeso);
 
         try {
             tv=prec*ppeso;

@@ -1,37 +1,32 @@
 package com.dts.roadp;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-
-import com.dts.roadp.clsClasses.clsCD;
-import com.dts.roadp.clsClasses.clsVenta;
-
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Toast;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Application;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
+
+import com.dts.roadp.clsClasses.clsVenta;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class Venta extends PBase {
 
@@ -472,121 +467,115 @@ public class Venta extends PBase {
 		clsDescuento clsDesc;
 		clsBonif clsBonif;
 		Cursor DT;
-		double cnt,vv;
+		double cnt, vv;
 		String s;
 
-		cnt=gl.dval;
+		cnt = gl.dval;
 
-		if (cnt<0) return;
+		if (cnt < 0) return;
 
-		try{
+		try {
 			try {
-				sql="SELECT DESCCORTA FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
-				DT=Con.OpenDT(sql);
+				sql = "SELECT DESCCORTA FROM P_PRODUCTO WHERE CODIGO='" + prodid + "'";
+				DT = Con.OpenDT(sql);
 				DT.moveToFirst();
 
 				lblProd.setText(DT.getString(0));
 			} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-				mu.msgbox( e.getMessage());
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+				mu.msgbox(e.getMessage());
 			}
 
-			cant=cnt;
-			um=gl.umpres;
+			cant = cnt;
+			um = gl.umpres;
 
-			lblCant.setText(mu.frmdecimal(cant,gl.peDecImp)+" "+ltrim(um,6));
+			lblCant.setText(mu.frmdecimal(cant, gl.peDecImp) + " " + ltrim(um, 6));
 			lblPres.setText("");
 
 
 			// Bonificacion
 
-			desc=0;
+			desc = 0;
 			prodPrecio();
 
-			prec=mu.round(prec,gl.peDec);
-
-			gl.bonprodid=prodid;
-			gl.bonprodcant=cant;
-
+			prec = mu.round(prec, gl.peDec);
+			gl.bonprodid = prodid;
+			gl.bonprodcant = cant;
 			gl.bonus.clear();
 
-			vv=cant*prec;vv=mu.round(vv,gl.peDec);
+			vv = cant * prec;vv = mu.round(vv, gl.peDec);
 
-			clsBonif=new clsBonif(this,prodid,cant,vv);
+			clsBonif = new clsBonif(this, prodid, cant, vv);
 			if (clsBonif.tieneBonif()) {
-				//  lista de prod bonif
-				for (int i = 0; i <clsBonif.items.size(); i++) {
-
+				for (int i = 0; i < clsBonif.items.size(); i++) {
 					gl.bonus.add(clsBonif.items.get(i));
-
-					//Toast.makeText(this,"Val tipolista  : "+clsBonif.items.get(i).tipolista, Toast.LENGTH_SHORT).show();
-					//s=clsBonif.items.get(i).valor+"  "+clsBonif.items.get(i).lista;
-					//Toast.makeText(this,s, Toast.LENGTH_SHORT).show();
 				}
 			}
 
+			// Descuento
 
-			// Descuento por producto
+			if (!gl.peModal.equalsIgnoreCase("TOL")) {
+				clsDesc = new clsDescuento(this, prodid, cant);
+				desc = clsDesc.getDesc();
+				mdesc = clsDesc.monto;
 
-			clsDesc=new clsDescuento(this,prodid,cant);
+				if (desc + mdesc > 0) {
 
-			desc=clsDesc.getDesc();
-			mdesc=clsDesc.monto;
+					browse = 3;
+					gl.promprod = prodid;
+					gl.promcant = cant;
 
-			//mu.msgbox(desc+"  ,  "+mdesc);
+					if (desc > 0) {
+						gl.prommodo = 0;
+						gl.promdesc = desc;
+					} else {
+						gl.prommodo = 1;
+						gl.promdesc = mdesc;
+					}
 
-			if (desc+mdesc>0) {
+					startActivity(new Intent(this, DescBon.class));
 
-				browse=3;
-				gl.promprod=prodid;
-				gl.promcant=cant;
-
-				if (desc>0) {
-					gl.prommodo=0;
-					gl.promdesc=desc;
 				} else {
-					gl.prommodo=1;
-					gl.promdesc=mdesc;
+					if (gl.bonus.size() > 0) {
+						Intent intent = new Intent(this, BonList.class);
+						startActivity(intent);
+					}
 				}
-
-				Intent intent = new Intent(this,DescBon.class);
-				startActivity(intent);
-
 			} else {
-
-				if (gl.bonus.size()>0) {
-					Intent intent = new Intent(this,BonList.class);
-					startActivity(intent);
-				}
 
 			}
 
 			//prodPrecio();
 
 			if (prodPorPeso(prodid)) {
-				prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,gl.dpeso);
+				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, gl.dpeso);
 			} else {
-				prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,0);
+				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0);
 			}
 
+			if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
+				if (prc.precioespecial>0) prec=prc.precioespecial;
+			}
 
-		precsin=prc.precsin;
-		imp=prc.imp;
-		impval=prc.impval;
-		descmon=prc.descmon;
-		tot=prc.tot;prodtot=tot;
-		totsin=prc.totsin;
-		percep=0;
+			precsin = prc.precsin;
+			imp = prc.imp;
+			impval = prc.impval;
+			descmon = prc.descmon;
+			tot = prc.tot;
+			prodtot = tot;
+			totsin = prc.totsin;
+			percep = 0;
 
 			//Toast.makeText(this,"Impval : "+impval+" , prec sin : "+precsin+" tot sin  "+totsin, Toast.LENGTH_LONG).show();
 
-			if (sinimp) lblPrec.setText(mu.frmcur(precsin));else lblPrec.setText(mu.frmcur(prec));
+			if (sinimp) lblPrec.setText(mu.frmcur(precsin));
+			else lblPrec.setText(mu.frmcur(prec));
 
 			addItem();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		} catch (Exception e) {
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
-
 
 	}
 

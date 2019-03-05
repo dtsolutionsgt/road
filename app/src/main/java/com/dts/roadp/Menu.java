@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -1441,13 +1442,19 @@ public class Menu extends PBase {
 	//#HS_20181207 Mensaje que muestra los ayudantes y vehiculos disponibles.
 
 	private void AyudanteVehiculo() {
+
 		try{
-			inputAyudanteVehiculo();
+
+			/*inputAyudanteVehiculo();
 
 			getlistAyudante();
 			getlistVehiculo();
 			getAyudante();
 			getVehiculo();
+            */
+
+            startActivity(new Intent(this,ayudante_vehiculo.class));
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -1457,6 +1464,7 @@ public class Menu extends PBase {
 	private void inputAyudanteVehiculo() {
 
 		try{
+
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 			alert.setTitle("AYUDANTE Y VEHÍCULO");
@@ -1464,7 +1472,8 @@ public class Menu extends PBase {
 			final LinearLayout layout = new LinearLayout(this);
 			layout.setOrientation(LinearLayout.VERTICAL);
 
-			//layout.addView(new TextView(this));
+
+		//layout.addView(new TextView(this));
 			layout.addView(lblAyudante);
 			layout.addView(Ayudante);
 			//layout.addView(new TextView(this));
@@ -1508,8 +1517,8 @@ public class Menu extends PBase {
 						spinlabel.setPadding(5, 0, 0, 0);
 						spinlabel.setTextSize(18);
 
-						gl.ayudanteID=listIDAyudante.get(position);
-						gl.ayudante=listAyudante.get(position);
+							gl.ayudanteID=listIDAyudante.get(position);
+							gl.ayudante=listAyudante.get(position);
 
 					} catch (Exception e) {
 						mu.msgbox( e.getMessage());
@@ -1571,9 +1580,9 @@ public class Menu extends PBase {
 
 		try
 		{
-			if(gl.ayudante==""){
+			if(gl.ayudanteID.equals("")){
 				msgAskAyudante();
-			}else if(gl.vehiculo == ""){
+			}else if(gl.vehiculoID.equals("")){
 				msgAskVehiculo();
 			}else{
 				mu.msgbox("Ayudante y Vehículo asignado a la ruta");
@@ -1590,15 +1599,25 @@ public class Menu extends PBase {
 		Cursor DT;
 
 		try {
-			sql="SELECT CODIGO,NOMBRE FROM P_VENDEDOR WHERE RUTA = '" + gl.ruta + "' AND NIVEL = 5";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
+			sql="SELECT CODIGO,NOMBRE FROM P_VENDEDOR WHERE RUTA = '" + gl.ruta + "' AND NIVEL = 5 " +
+			    "Union\n" +
+					" Select '','Seleccione un ayudante' from P_VENDEDOR";
 
-			while (!DT.isAfterLast())
-			{
-				listIDAyudante.add(DT.getString(0));
-				listAyudante.add(DT.getString(1));
-				DT.moveToNext();
+			DT=Con.OpenDT(sql);
+			if(DT.getCount()>0) {
+
+				DT.moveToFirst();
+
+				while (!DT.isAfterLast())
+				{
+					listIDAyudante.add(DT.getString(0));
+					listAyudante.add(DT.getString(1));
+					DT.moveToNext();
+				}
+
+			}else if(DT.getCount() == 0){
+				listIDVehiculo.add("");
+				listVehiculo.add("No hay ayudantes disponibles");
 			}
 
 			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listAyudante);
@@ -1617,7 +1636,9 @@ public class Menu extends PBase {
 		Cursor DT;
 
 		try {
-			sql="SELECT CODIGO, MARCA, PLACA FROM P_VEHICULO";
+			sql="SELECT CODIGO, MARCA, PLACA FROM P_VEHICULO " +
+			"Union \n" +
+					" Select '','Seleccione un vehículo','' from P_VEHICULO";
 			DT=Con.OpenDT(sql);
 
 			if(DT.getCount()>0) {
@@ -1655,14 +1676,15 @@ public class Menu extends PBase {
 			dialog.setIcon(R.drawable.ic_quest);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
+								public void onClick(DialogInterface dialog, int which) {
 
 				}
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					inputAyudanteVehiculo();
+					//inputAyudanteVehiculo();
+
 				}
 			});
 
@@ -1845,6 +1867,8 @@ public class Menu extends PBase {
 		}
 
 	}
+
+
 
 	//endregion
 }

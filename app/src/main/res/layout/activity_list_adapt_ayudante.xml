@@ -7,8 +7,8 @@
     tools:context=".ListAdaptAyudante">
 
     <RelativeLayout
-        android:layout_width="304dp"
-        android:layout_height="517dp"
+        android:layout_width="301dp"
+        android:layout_height="47dp"
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="8dp">
 

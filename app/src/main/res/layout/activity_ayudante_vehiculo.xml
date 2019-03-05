@@ -10,47 +10,54 @@
         android:id="@+id/textView68"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="3dp"
         android:text="Vehículo:"
         android:textColor="@android:color/black"
         android:textColorHint="@android:color/black"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.03"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.499" />
 
     <RelativeLayout
         android:id="@+id/relbotones"
         android:layout_width="304dp"
         android:layout_height="49dp"
-        android:layout_marginBottom="4dp"
-        android:background="@drawable/frame_rect"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/blank24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <Button
             android:id="@+id/btnOmitr"
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="0dp"
             android:layout_marginBottom="0dp"
-            android:background="@android:color/holo_red_light"
+            android:background="@drawable/frame_btn"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:text="Omitir"
             android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnAsignar"
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="2dp"
             android:layout_marginBottom="0dp"
-            android:background="@android:color/holo_blue_dark"
+            android:background="@drawable/frame_btn"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:text="Asignar"
             android:textStyle="bold" />
     </RelativeLayout>
@@ -59,30 +66,50 @@
         android:id="@+id/textView69"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="3dp"
         android:text="Ayudante:"
         android:textColor="@android:color/black"
+        android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="8dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ListView
         android:id="@+id/listAyudante"
-        android:layout_width="304dp"
-        android:layout_height="206dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/textView68"
         app:layout_constraintTop_toBottomOf="@+id/textView69"
+        app:layout_constraintVertical_bias="0.1"
         tools:layout_editor_absoluteX="8dp" />
 
     <ListView
         android:id="@+id/listVehiculo"
-        android:layout_width="304dp"
-        android:layout_height="182dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/relbotones"
         app:layout_constraintTop_toBottomOf="@+id/textView68"
+        app:layout_constraintVertical_bias="0.1"
         tools:layout_editor_absoluteX="8dp" />
+
+    <TextView
+        android:id="@+id/lblAyudante"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="No seleccionado"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/textView69"
+        tools:layout_editor_absoluteY="0dp" />
+
+    <TextView
+        android:id="@+id/lblVehiculo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="No seleccionado"
+        app:layout_constraintBottom_toTopOf="@+id/listVehiculo"
+        app:layout_constraintStart_toEndOf="@+id/textView68" />
 </android.support.constraint.ConstraintLayout>

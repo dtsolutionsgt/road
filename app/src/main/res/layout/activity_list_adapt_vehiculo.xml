@@ -7,8 +7,8 @@
     tools:context=".ListAdaptVehiculo">
 
     <RelativeLayout
-        android:layout_width="304dp"
-        android:layout_height="517dp"
+        android:layout_width="306dp"
+        android:layout_height="67dp"
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="8dp">
 

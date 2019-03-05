@@ -1454,9 +1454,7 @@ public class Menu extends PBase {
 			getVehiculo();
             */
 
-            Intent intent;
-            intent = new Intent(this,ayudante_vehiculo.class);
-            startActivity(intent);
+            startActivity(new Intent(this,ayudante_vehiculo.class));
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -1679,7 +1677,7 @@ public class Menu extends PBase {
 			dialog.setIcon(R.drawable.ic_quest);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
+								public void onClick(DialogInterface dialog, int which) {
 
 				}
 			});

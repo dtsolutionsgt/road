@@ -64,6 +64,7 @@ public class Precio {
 
 		if (cant==0) return false;
 
+		
 		prodPrecioEsp(ppeso,cliente,clitipo);
 		precioespecial=prec;
 		return prec>0;

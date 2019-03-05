@@ -403,8 +403,7 @@ public class Menu extends PBase {
 					break;
 
 				case 10:  // Cambio usuario
-					//askCambUsuario();
-					inputAyudanteVehiculo();
+					askCambUsuario();
 					break;
 
 				case 11:	// Inicio día

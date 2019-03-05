@@ -1697,9 +1697,7 @@ public class ComWS extends PBase {
                 synchronized (this) {
                     if (!lblInfo.getText().toString().matches(""))  lblInfo.setText(fprog);
                  }
-    		} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-    		}
+    		} catch (Exception e) {}
         }
  
     }	
@@ -2778,9 +2776,7 @@ public class ComWS extends PBase {
 			try {
 				Looper.prepare();
 				wsSendExecute();
-			} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			}
+			} catch (Exception e) {}
 
 	        return null;
 	    }
@@ -2790,27 +2786,20 @@ public class ComWS extends PBase {
 			try {
 				wsSendFinished();
 				Looper.loop();
-			}catch (Exception e) {
-				addlog(new Object() {
-				}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-			}
+			}catch (Exception e) {}
 		}
 	 
         @Override
         protected void onPreExecute() {
     		try {
-    		} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-    		}
+    		} catch (Exception e) {}
         }
 
         @Override
         protected void onProgressUpdate(Void... values) {
     		try {
     			lblInfo.setText(fprog);
-    		} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-    		}
+    		} catch (Exception e) { }
         }
 	 
     }
@@ -2925,9 +2914,7 @@ public class ComWS extends PBase {
 		@Override
 		protected void onProgressUpdate(Void... values) {
 			try {
-			} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			}
+			} catch (Exception e) {}
 		}
 
 	}	

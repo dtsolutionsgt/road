@@ -23,20 +23,25 @@ public class clsFinDia extends PBase{
             cont = context;
             active=0;
             Con = new BaseDatos(context);
-            opendb();
+            opendatabase();
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
     }
 
-    private void opendb() {
+    private void opendatabase() {
         try {
             db = Con.getWritableDatabase();
-            Con.vDatabase =db;
-            active=1;
+            if (db!= null)
+            {
+                Con.vDatabase =db;
+                active=1;
+            }else{
+                active = 0;
+            }
         } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox(e.getMessage());
             active= 0;
         }
     }

@@ -151,7 +151,7 @@ public class PBase extends Activity {
 		super.onBackPressed();
 	}
 	
-	private void opendb() {
+	public void opendb() {
 		try {
 			db = Con.getWritableDatabase();
 			if (db!= null)

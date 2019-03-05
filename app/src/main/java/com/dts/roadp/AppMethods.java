@@ -28,7 +28,8 @@ public class AppMethods {
 	private String sp;
 
 	public AppMethods(Context context,appGlobals global,BaseDatos dbconnection, SQLiteDatabase database) {
-		cont=context; 
+
+		cont=context;
 		gl=global;
 		Con=dbconnection;
 		db=database;
@@ -37,7 +38,9 @@ public class AppMethods {
 		upd=Con.Upd;
 	}
 	
-	public void reconnect(BaseDatos dbconnection, SQLiteDatabase database) {
+	public void reconnect(BaseDatos dbconnection, SQLiteDatabase database)
+	{
+
 		Con=dbconnection;
 		db=database;
 		

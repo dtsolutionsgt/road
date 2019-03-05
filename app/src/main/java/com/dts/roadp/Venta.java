@@ -112,6 +112,7 @@ public class Venta extends PBase {
 		showCredit();
 
 		setGPS();
+
 		cliPorDia();
 
 		validaNivelPrecio();
@@ -925,16 +926,22 @@ public class Venta extends PBase {
 	}
 
 	private void setGPSPos() {
-		Cursor DT;
+
+		Cursor DT = null;
 		int idist;
 
 		latitude=0;longitude=0;cpx=0;cpy=0;cdist=-1.0;
 
 		try {
+
 			sql="SELECT COORX,COORY FROM P_CLIENTE WHERE CODIGO='"+cliid+"'";
 
+			opendb();
+
            	DT=Con.OpenDT(sql);
-			if (DT.getCount()>0) {
+
+           	if (DT.getCount()>0)
+           	{
 				DT.moveToFirst();
 
 				cpx=DT.getDouble(0);

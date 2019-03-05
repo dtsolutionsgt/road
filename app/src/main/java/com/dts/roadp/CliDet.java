@@ -511,16 +511,20 @@ public class CliDet extends PBase {
 		//gl.rutatipo="V";
 
 		try{
+
+			if (!validaVenta()) return;//Se valida si hay correlativos de factura para la venta
+
 			if (gl.vcredito) {
 
 				if (credito<=0) {
 					msgAskFact();
+					return;
 				}
 			}
 
-			if (!validaVenta()) return;
-
-
+			if(porcentaje == false) {
+				VerificaCantidad();
+			}
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

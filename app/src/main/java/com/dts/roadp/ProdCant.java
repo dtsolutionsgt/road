@@ -605,6 +605,7 @@ public class ProdCant extends PBase {
 			if (mu.emptystr(txtPeso.getText().toString())) return 2;
 			vpeso=Double.parseDouble(txtPeso.getText().toString());
 		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			if (porpeso) {
 				mu.msgbox("Peso incorrecto");return 2;
 			}

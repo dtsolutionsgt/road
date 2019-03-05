@@ -80,7 +80,9 @@ public class BaseDatos extends SQLiteOpenHelper {
 
 	  		Cursor vCursor = null;
 
-		  try{
+		  try
+		  {
+
 			  vCursor = vDatabase.rawQuery(pSQL, null);
 
 		  }catch(Exception ex){

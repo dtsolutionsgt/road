@@ -98,17 +98,16 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="No seleccionado"
+        app:layout_constraintBottom_toTopOf="@+id/listAyudante"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/textView69"
-        tools:layout_editor_absoluteY="0dp" />
+        app:layout_constraintStart_toEndOf="@+id/textView69" />
 
     <TextView
         android:id="@+id/lblVehiculo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="12dp"
         android:text="No seleccionado"
         app:layout_constraintBottom_toTopOf="@+id/listVehiculo"
         app:layout_constraintStart_toEndOf="@+id/textView68" />

@@ -142,7 +142,7 @@ public class ayudante_vehiculo extends PBase {
 
                 item1.idVehiculo=DT.getString(0);
                 item1.marca=DT.getString(1);
-                item1.placa=DT.getString(1);
+                item1.placa=DT.getString(2);
 
                 items1.add(item1);
 

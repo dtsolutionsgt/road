@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#D0000000"
-    tools:context="${relativePackage}.${activityClass}" >
+    tools:context="${relativePackage}.${activityClass}">
 
     <RelativeLayout
         android:layout_width="256dp"
@@ -12,14 +12,14 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_marginTop="208dp"
-        android:background="@layout/frame_fill_white" >
+        android:background="@layout/frame_fill_white">
 
         <ImageView
             android:id="@+id/imageView1"
             android:layout_width="128dp"
             android:layout_height="128dp"
-            android:layout_alignParentRight="false"
             android:layout_alignParentTop="false"
+            android:layout_alignParentRight="false"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:src="@drawable/print_bt" />

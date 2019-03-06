@@ -1,18 +1,18 @@
 package com.dts.roadp;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import com.dts.roadp.clsClasses.clsCD;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.ArrayList;
+
 public class clsDataBuilder {
 
 	public ArrayList<String> items=new ArrayList<String>();
+
 	public String err;
 	
 	private Context cCont;
@@ -20,15 +20,16 @@ public class clsDataBuilder {
 	protected SQLiteDatabase db;
 	protected BaseDatos Con;
 
-	
 	private ArrayList<Integer> tcol=new ArrayList<Integer>();
-	
+	private ArrayList<String> sendlog=new ArrayList<String>();
+
+
 	private DateUtils DU;
 	private MiscUtils MU;
 	
-	private BufferedWriter writer = null;
-	private FileWriter wfile;
-	private String fname;
+	private BufferedWriter writer = null,lwriter = null;
+	private FileWriter wfile,lfile;
+	private String fname,logname;
 
 	public clsDataBuilder(Context context) {
 		
@@ -47,6 +48,7 @@ public class clsDataBuilder {
 		System.setProperty("line.separator","\r\n");
 		
 		fname = Environment.getExternalStorageDirectory()+"/SyncFold/rd_data.txt";
+		logname = Environment.getExternalStorageDirectory()+"/roadenvio.txt";
 	}
 	
 	public void close(){
@@ -57,6 +59,7 @@ public class clsDataBuilder {
 	
 	public void add(String si) {
 		items.add(si);
+		sendlog.add(si);
 	}
 	
 	public boolean insert(String tn,String ws){
@@ -110,8 +113,7 @@ public class clsDataBuilder {
 				  
 				si=SQL_;
 				
-				for (int i = 0; i < cc; i++)
-				{
+				for (int i = 0; i < cc; i++) {
 
 					ct=tcol.get(i);
 
@@ -131,12 +133,12 @@ public class clsDataBuilder {
 			    }
 				
 				si=si+")";
+
 				items.add(si);
+				sendlog.add(si);
 						  
 			    DT.moveToNext();
 			}
-
-		
 		} catch (Exception e) {
 			err=e.getMessage();return false;	
 		}
@@ -175,7 +177,34 @@ public class clsDataBuilder {
 				
 		return 1;		
 	}
-	
+
+	public void clearlog() {
+		sendlog.clear();
+	}
+
+	public void savelog() {
+		String s;
+
+		if (sendlog.size()==0) return ;
+
+		try {
+
+			lfile=new FileWriter(logname,false);
+			lwriter = new BufferedWriter(lfile);
+
+			for (int i = 0; i < sendlog.size(); i++) {
+				s=sendlog.get(i);
+				lwriter.write(s);lwriter.write("\r\n");
+			}
+
+			lwriter.close();
+
+		} catch(Exception e){
+			return;
+		}
+	}
+
+
 	// Private
 	
 	private int getCType(String cn,String ct) {

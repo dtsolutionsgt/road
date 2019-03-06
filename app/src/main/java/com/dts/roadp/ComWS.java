@@ -62,7 +62,7 @@ public class ComWS extends PBase {
 
 	private ArrayList<String> listItems=new ArrayList<String>();
 	private ArrayList<String> results=new ArrayList<String>();
-	
+
 	private ArrayList<clsClasses.clsEnvio> items=new ArrayList<clsClasses.clsEnvio>();
 	private ListAdaptEnvio adapter;
 	
@@ -1725,6 +1725,7 @@ public class ComWS extends PBase {
 		}
 
 		items.clear();
+		dbld.clearlog();
 
 		try{
 			envioFacturas();
@@ -1760,6 +1761,8 @@ public class ComWS extends PBase {
 				}
 
 			}
+
+            dbld.savelog();
 
 			ComWS.super.finish();
 			//listaFachada();
@@ -1812,7 +1815,6 @@ public class ComWS extends PBase {
     }
 
 	public void envioFacturas() {
-
 		Cursor DT;
 		String cor,fruta,tt;
 		int i,pc=0,pcc=0,ccorel;

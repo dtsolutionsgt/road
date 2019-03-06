@@ -1394,7 +1394,7 @@ public class ComWS extends PBase {
 			if (ultcor_ant!=ultcor) {
 				//#HS_20181129_1005 Agregue comparacion para las series.
 				if(ultSerie_ant != ultSerie){
-					msgbox("Nueva serie de faturación");
+					msgbox("Nueva serie de facturación");
 				}else if (ultcor_ant>0) {
 					msgbox("El último correlativo actualizado ( "+ultcor+" ) no coincide con último emitido ( "+ultcor_ant+" )!\n Por favor infore a su supervisor.");return;
 				}

@@ -154,6 +154,7 @@ public class ProdCant extends PBase {
 				public void onTextChanged(CharSequence s, int start,int before, int count) {
 					setCant(true);
 				}
+
 			});
 
 			txtCant.setOnKeyListener(new OnKeyListener() {

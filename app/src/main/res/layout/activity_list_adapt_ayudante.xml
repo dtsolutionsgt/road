@@ -7,8 +7,8 @@
     tools:context=".ListAdaptAyudante">
 
     <RelativeLayout
-        android:layout_width="301dp"
-        android:layout_height="47dp"
+        android:layout_width="297dp"
+        android:layout_height="46dp"
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="8dp">
 
@@ -28,8 +28,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/lblIdAyudante"
             android:layout_alignParentStart="true"
-            android:layout_marginStart="7dp"
-            android:layout_marginTop="0dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="1dp"
             android:text="Ayudante" />
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

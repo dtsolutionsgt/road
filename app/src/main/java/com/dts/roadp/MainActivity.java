@@ -221,7 +221,6 @@ public class MainActivity extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
-
 	}
 
 	private void compareSC(CharSequence s) {

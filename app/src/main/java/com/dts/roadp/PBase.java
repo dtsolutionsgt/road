@@ -84,11 +84,11 @@ public class PBase extends Activity {
 	}
 
 	protected void toast(String msg) {
-		Toast.makeText(this,msg, Toast.LENGTH_SHORT).show();
+		toastcent(msg);
 	}
 	
 	protected void toast(double val) {
-		this.toast(""+val);
+		toastcent(""+val);
 	}
 	
 	protected void toastlong(String msg) {

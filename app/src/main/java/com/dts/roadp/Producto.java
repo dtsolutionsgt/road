@@ -108,14 +108,19 @@ public class Producto extends PBase {
 					try {
 
 						Object lvObj = listView.getItemAtPosition(position);
-						clsCD vItem = (clsCD) lvObj;
-
-						itemid = vItem.Cod;
-						prname = vItem.Desc;
-						gl.um = vItem.um;
-						gl.pprodname = prname;
+						clsCD item = (clsCD) lvObj;
 
 						adapter.setSelectedIndex(position);
+
+						if (prodBarra(item.Cod)) {
+							toastcent("Producto tipo barra, no se puede ingresar la cantidad");
+							finish();return;
+						}
+
+						itemid = item.Cod;
+						prname = item.Desc;
+						gl.um = item.um;
+						gl.pprodname = prname;
 
 						appProd();
 					} catch (Exception e) {
@@ -133,14 +138,19 @@ public class Producto extends PBase {
 
 					try {
 						Object lvObj = listView.getItemAtPosition(position);
-						clsCD vItem = (clsCD) lvObj;
-
-						itemid = vItem.Cod;
-						prname = vItem.Desc;
-						gl.um = vItem.um;
-						gl.pprodname = prname;
+						clsCD item = (clsCD) lvObj;
 
 						adapter.setSelectedIndex(position);
+
+						if (prodBarra(item.Cod)) {
+							toastcent("Producto tipo barra, no se puede ingresar la cantidad");
+							finish();return true;
+						}
+
+						itemid = item.Cod;
+						prname = item.Desc;
+						gl.um = item.um;
+						gl.pprodname = prname;
 
 						appProd();
 					} catch (Exception e) {
@@ -542,13 +552,22 @@ public class Producto extends PBase {
 	}
 
     private boolean prodPorPeso(String prodid) {
-        try {
-            return app.ventaPeso(prodid);
-        } catch (Exception e) {
+		try {
+			return app.ventaPeso(prodid);
+		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        	return false;
-        }
-    }
+			return false;
+		}
+	}
+
+	private boolean prodBarra(String prodid) {
+		try {
+			return app.prodBarra(prodid);
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			return false;
+		}
+	}
 
     public void limpiaFiltro(View view) {
 		try{

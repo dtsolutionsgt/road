@@ -149,17 +149,16 @@ public class CliNuevo extends PBase {
 					spinlabel.setTextColor(Color.BLACK);
 					spinlabel.setPadding(5, 0, 0, 0);
 					spinlabel.setTextSize(16);
-				} catch (Exception e) {
+				/*} catch (Exception e) {
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 				}
 
-				try {
+				try {*/
 					scod = spincode.get(position);
 					nivel = Integer.parseInt(scod);
 				} catch (Exception e) {
-					addlog(new Object() {
-					}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(), "");
 					nivel = 0;
 				}
 			}
@@ -311,7 +310,7 @@ public class CliNuevo extends PBase {
 
 			}
 
-			try {
+		//	try {
 				ins.init("D_CLICOORD");
 
 				ins.add("CODIGO", corel);
@@ -321,12 +320,12 @@ public class CliNuevo extends PBase {
 				ins.add("STATCOM", "N");
 
 				db.execSQL(ins.sql());
-			} catch (SQLException e) {
+		/*	} catch (SQLException e) {
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 				msgbox(e.getMessage());
 			}
-
+		*/
 			db.setTransactionSuccessful();
 			db.endTransaction();
 
@@ -450,21 +449,22 @@ public class CliNuevo extends PBase {
 			  
 			  DT.moveToNext();
 			}
-					
-		} catch (Exception e) {
+
+	/*	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox(e.getMessage());
-	    }
+	    }*/
 					
 		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, spinlist);
 		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			
 		spinList.setAdapter(dataAdapter);
 			
-		try {
+		///try {
 			spinList.setSelection(0);
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox(e.getMessage());
 	    }
 		
 	}		

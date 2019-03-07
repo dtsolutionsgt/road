@@ -51,17 +51,12 @@ public class BonVenta extends PBase {
 			listView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-					try {
-						adapter.setSelectedIndex(position);
-					} catch (Exception e) {
-						mu.msgbox( e.getMessage());
-					}
-
+					adapter.setSelectedIndex(position);
 				}
 			});
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox( e.getMessage());
 		}
 
 		
@@ -73,7 +68,7 @@ public class BonVenta extends PBase {
 	
 	private void listItems() {
 		Cursor DT;
-		clsClasses.clsBonifProd item;	
+		clsClasses.clsBonifProd item;
 		double ddisp,bcant;
 		
 		items.clear();

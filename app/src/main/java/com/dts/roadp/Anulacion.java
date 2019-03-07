@@ -61,8 +61,8 @@ public class Anulacion extends PBase {
 		tipo=gl.tipo;
 		if (gl.peModal.equalsIgnoreCase("APR")) modoapr=true;
 		
-		if (tipo==0) lblTipo.setText("Pedido"); 
-		if (tipo==1) lblTipo.setText("Recibo");	
+		if (tipo==0) lblTipo.setText("Pedido");
+		if (tipo==1) lblTipo.setText("Recibo");
 		if (tipo==2) lblTipo.setText("Depósito");
 		if (tipo==3) lblTipo.setText("Factura");
 		if (tipo==4) lblTipo.setText("Recarga");
@@ -293,12 +293,12 @@ public class Anulacion extends PBase {
 			
 			mu.msgbox("El documento ha sido anulado.");
 			
-		    try {
+		//    try {
 		    	sql="DELETE FROM P_STOCK WHERE CANT=0 AND CANTM=0";
 				db.execSQL(sql);
-		    } catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		    }
+		//    } catch (Exception e) {
+		//		addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		//    }
 			
 			listItems();
 			
@@ -536,14 +536,14 @@ public class Anulacion extends PBase {
 				cant=DT.getDouble(1);
 				cantm=DT.getDouble(2);
 
-				try {
+			//	try {
 					sql="UPDATE P_STOCK SET CANT=CANT-"+cant+", CANTM=CANTM-"+cantm+" WHERE CODIGO='"+prod+"'";
 					db.execSQL(sql);
-				} catch (Exception e) {
+			/*	} catch (Exception e) {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 					mu.msgbox(e.getMessage()+"\n"+sql);
 				}
-
+			*/
 				DT.moveToNext();
 			}
 		}catch (Exception e){
@@ -578,6 +578,7 @@ public class Anulacion extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
+
 	}	
 	
 	private void anulRecib(String itemid) {
@@ -630,8 +631,6 @@ public class Anulacion extends PBase {
 		}
 
 		protected boolean buildDetail() {
-
-
 			return true;
 		}
 
@@ -744,7 +743,7 @@ public class Anulacion extends PBase {
 			facttot=DT.getDouble(0);
 			cli=DT.getString(3);
 					
-			try {
+		//	try {
 				
 				db.beginTransaction();
 				    			
@@ -776,12 +775,12 @@ public class Anulacion extends PBase {
 				db.setTransactionSuccessful();					
 				db.endTransaction();
 			
-			} catch (Exception e) {
+		/*	} catch (Exception e) {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 				db.endTransaction();
 				mu.msgbox("Error (nota credito) " + e.getMessage());return;
 			}
-			
+		*/
 			if (prn.isEnabled()) aprNotePrn(corel);
 			
 		} catch (Exception e) {
@@ -861,12 +860,12 @@ public class Anulacion extends PBase {
 			pcli=DT.getString(4);		
 			ptot=DT.getDouble(5);
 	
-		} catch (Exception e) {
+	/*	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(e.getMessage());return false;
 	    }	
 		
-		try {
+		try {*/
 			sql="SELECT RESOL,FECHARES,FECHAVIG,SERIE,CORELINI,CORELFIN FROM P_COREL";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
@@ -876,23 +875,23 @@ public class Anulacion extends PBase {
 			ff=DT.getInt(2);presvence="Resolucion vence : "+du.sfecha(ff);		
 			presrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
 			
-		} catch (Exception e) {
+	/*	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			Toast.makeText(this,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 	    }	
 		
-		try {
+		try {*/
 			sql="SELECT NOMBRE FROM P_VENDEDOR  WHERE CODIGO='"+pvend+"'";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
 			
 			pvendedor=DT.getString(0);
-		} catch (Exception e) {
+	/*	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			pvendedor=pvend;
 	    }	
-		
-		try {
+
+		try {*/
 			sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION FROM P_CLIENTE WHERE CODIGO='"+pcli+"'";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
@@ -903,8 +902,10 @@ public class Anulacion extends PBase {
 			
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			msgbox(e.getMessage());
 			pcliente=pcli;
-	    }	
+			pvendedor=pvend;
+	    }
 		
 			
 		return true;
@@ -1045,7 +1046,7 @@ public class Anulacion extends PBase {
 		
 		fcorel=0;fserie="";fres="";
 		try{
-			try {
+		//	try {
 				sql="SELECT SERIE,CORELULT,CORELINI,CORELFIN,RESOL FROM P_CORELNC WHERE RUTA='"+gl.ruta+"'";
 				DT=Con.OpenDT(sql);
 
@@ -1057,12 +1058,12 @@ public class Anulacion extends PBase {
 				fres=DT.getString(4);
 
 				fcorel=ca1+1;
-			} catch (Exception e) {
+			/*} catch (Exception e) {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 				fcorel=0;fserie="";
 				msgbox("No existe correlativo disponible, no se puede emitir la nota de crédito");
 				return;
-			}
+			}*/
 
 			if (fcorel>cf) {
 				msgbox("Se ha acabado el talonario de notas de crédito. No se puede continuar con la anulación de factura.");

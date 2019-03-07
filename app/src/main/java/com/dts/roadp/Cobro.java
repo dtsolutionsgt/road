@@ -33,12 +33,14 @@ public class Cobro extends PBase {
 	private Runnable printcallback,printclose;
 	private printer prn;
 	private clsDocCobro fdoc;
+	private clsDocFactura fdocf;
 	
 	private String cliid,itemid,prodid,sefect,corel,fserie,dtipo;
 	private double ttot,tsel,tpag,tpend,vefect,plim;
 	private boolean peexit;
 	private int fflag=1,fcorel;
-	
+	private String crrf;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -79,6 +81,7 @@ public class Cobro extends PBase {
 		
 		prn=new printer(this,printclose);
 		fdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp);
+		fdocf = new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
 					
 	}
 
@@ -88,6 +91,7 @@ public class Cobro extends PBase {
 	public void paySelect(View view) {
 
 		try{
+
 			calcSelected();
 
 			if (tsel==0) {
@@ -102,8 +106,10 @@ public class Cobro extends PBase {
 
 			Intent intent = new Intent(this,Pago.class);
 			startActivity(intent);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+            msgbox("Error al seleccionar metodo de pago: "+e.getMessage());
 		}
 
 	}
@@ -111,6 +117,7 @@ public class Cobro extends PBase {
 	public void payCash(View view) {
 
 		try{
+
 			calcSelected();
 
 			if (tsel==0) {
@@ -118,6 +125,7 @@ public class Cobro extends PBase {
 			}
 
 			inputEfectivo();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -134,33 +142,42 @@ public class Cobro extends PBase {
 	}
 
 	public void checkAll(View view) {
+
 	    try{
-        for (int i = 0; i <items.size(); i++) {
-            items.get(i).flag=1;
-            dtipo=items.get(i).Tipo;
 
-            if (dtipo.equalsIgnoreCase("R")) {
-				for (int ii = 0; ii <i; ii++) {
-					items.get(i).flag=0;
-				}
-				break;
-			}
 
-        }
+	        if(items.size()>0){
+                for (int i = 0; i <items.size(); i++) {
+                    items.get(i).flag=1;
+                    dtipo=items.get(i).Tipo;
 
-			adapter.refreshItems();
+                    if (dtipo.equalsIgnoreCase("R")) {
+                        for (int ii = 0; ii <i; ii++) {
+                            items.get(i).flag=0;
+                        }
+                        break;
+                    }
 
-			calcSelected();
-			showTotals();
-		}catch (Exception e){
+                }
+
+                adapter.refreshItems();
+
+                calcSelected();
+                showTotals();
+            }
+
+
+	    }catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
+		    msgbox("checkAll: "+ e.getMessage());
+	    }
 
 	}
 
 	public void checkNone(View view) {
 
 		try{
+
 			for (int i = 0; i <items.size(); i++) {
 				items.get(i).flag=0;
 			}
@@ -169,6 +186,7 @@ public class Cobro extends PBase {
 
 			calcSelected();
 			showTotals();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -176,8 +194,10 @@ public class Cobro extends PBase {
 	}
 
 	public void sinRef(View view) {
-		try{
-			gl.pagomodo=1;
+
+	    try{
+
+		    gl.pagomodo=1;
 			gl.pagoval=0;
 			gl.pagolim=0;
 			gl.pagocobro=true;
@@ -185,9 +205,11 @@ public class Cobro extends PBase {
 
 			Intent intent = new Intent(this,Pago.class);
 			startActivity(intent);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
+			mu.msgbox("Sin referencia: " + e.getMessage());
+	    }
 
 
 	}
@@ -195,41 +217,39 @@ public class Cobro extends PBase {
 	private void setHandlers(){
 
 		try{
+
 			listView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					int flag;
-					try {
+
 						Object lvObj = listView.getItemAtPosition(position);
 						clsClasses.clsCobro vItem = (clsClasses.clsCobro) lvObj;
 
 						adapter.setSelectedIndex(position);
 
-					dtipo=vItem.Tipo;
-					if (dtipo.equalsIgnoreCase("R")) clearAll();
 						dtipo=vItem.Tipo;
 						if (dtipo.equalsIgnoreCase("R")) clearAll();
+							dtipo=vItem.Tipo;
+							if (dtipo.equalsIgnoreCase("R")) clearAll();
 
-						flag = vItem.flag;
-						if (flag == 0) flag = 1;
-						else flag = 0;
-						vItem.flag = flag;
+							flag = vItem.flag;
+							if (flag == 0) flag = 1;
+							else flag = 0;
+							vItem.flag = flag;
 
-						adapter.refreshItems();
+							adapter.refreshItems();
 
-						calcSelected();
-						showTotals();
+							calcSelected();
+							showTotals();
 
-					} catch (Exception e) {
-						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-						mu.msgbox(e.getMessage());
-					}
 				}
 
-				;
 			});
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		    mu.msgbox("SetHandlers: " + e.getMessage());
 		}
 
 	}
@@ -277,22 +297,26 @@ public class Cobro extends PBase {
 				items.add(vItem);	
 			 
 				DT.moveToNext();
+
 			}
-			
+
+            adapter=new ListAdaptCobro(this,items);adapter.cursym=gl.peMon;
+            listView.setAdapter(adapter);
+
+            calcSelected();
+            showTotals();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox(e.getMessage());
+		   	mu.msgbox("listItems: "+ e.getMessage());
 	    }
-			 
-		adapter=new ListAdaptCobro(this,items);adapter.cursym=gl.peMon;
-		listView.setAdapter(adapter);
-		
-		calcSelected();
-		showTotals();
+
 	}	
 	
 	private void createDoc(){
-		try{
+
+	    try{
+
 			if (gl.pagomodo==0) {
 				docList();
 				if (!applyPay()) return;
@@ -301,15 +325,23 @@ public class Cobro extends PBase {
 
 			if (saveCobro()) {
 				listItems();
-				if (prn.isEnabled()) {
-					fdoc.buildPrint(corel,0);
-					prn.printask(printclose);
+				if (dtipo.equalsIgnoreCase("R")) {
+					if (prn.isEnabled()) {
+						fdocf.buildPrint(crrf,0);
+						prn.printask(printclose);
+					}
+				}else {
+					if (prn.isEnabled()) {
+						fdoc.buildPrint(corel,0);
+						prn.printask(printclose);
+					}
 				}
 			}
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
+		    mu.msgbox("createDoc: " + e.getMessage());
+	    }
 
 	}
 	
@@ -405,45 +437,50 @@ public class Cobro extends PBase {
 				
 			sql="SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
 			DT=Con.OpenDT(sql);
-		
-			DT.moveToFirst();
-			while (!DT.isAfterLast()) {
 
-				if (mu.emptystr(dtipo)) {
-					ins.init("D_COBROP");
-					ins.add("COREL",corel);
-				} else {
-					if (dtipo.equalsIgnoreCase("R")) {
-						ins.init("D_FACTURAP");
-						ins.add("COREL",doc);
-					} else {
-						ins.init("D_COBROP");
-						ins.add("COREL",corel);
-					}
+			if (DT.getCount()>0){
 
-				}
+                DT.moveToFirst();
+                while (!DT.isAfterLast()) {
+
+                    if (mu.emptystr(dtipo)) {
+                        ins.init("D_COBROP");
+                        ins.add("COREL",corel);
+                    } else {
+                        if (dtipo.equalsIgnoreCase("R")) {
+                            ins.init("D_FACTURAP");
+                            ins.add("COREL",doc);
+                        } else {
+                            ins.init("D_COBROP");
+                            ins.add("COREL",corel);
+                        }
+
+                    }
 
 
 
-				ins.add("ITEM",DT.getInt(0));
-				ins.add("ANULADO","N");
-				ins.add("EMPRESA",gl.emp);
-				ins.add("CODPAGO",DT.getInt(1));
-				ins.add("TIPO",DT.getString(2));
-				ins.add("VALOR",DT.getDouble(3));	
-				ins.add("DESC1",DT.getString(4));
-				ins.add("DESC2",DT.getString(5));
-				ins.add("DESC3",DT.getString(6));
-				ins.add("DEPOS","N");
-				
-				db.execSQL(ins.sql());				
-					
-			    DT.moveToNext();				
-			}		
-			
-			// Ultimo corel
-			sql="UPDATE P_CORRELREC SET ACTUAL="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";	
-			db.execSQL(sql);
+                    ins.add("ITEM",DT.getInt(0));
+                    ins.add("ANULADO","N");
+                    ins.add("EMPRESA",gl.emp);
+                    ins.add("CODPAGO",DT.getInt(1));
+                    ins.add("TIPO",DT.getString(2));
+                    ins.add("VALOR",DT.getDouble(3));
+                    ins.add("DESC1",DT.getString(4));
+                    ins.add("DESC2",DT.getString(5));
+                    ins.add("DESC3",DT.getString(6));
+                    ins.add("DEPOS","N");
+
+                    db.execSQL(ins.sql());
+
+                    DT.moveToNext();
+                }
+
+                // Ultimo corel
+                sql="UPDATE P_CORRELREC SET ACTUAL="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";
+                db.execSQL(sql);
+
+            }
+
 			   
 			db.setTransactionSuccessful();
 			
@@ -452,6 +489,8 @@ public class Cobro extends PBase {
 			if (!mu.emptystr(dtipo)) {
 
 				if (dtipo.equalsIgnoreCase("R")) {
+
+					crrf = doc;
 
 					db.beginTransaction();
 
@@ -479,7 +518,7 @@ public class Cobro extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
-		   	mu.msgbox(e.getMessage());return false;
+		   	mu.msgbox("saveCobro_ "+ e.getMessage());return false;
 		}
 		
 		return true;
@@ -488,19 +527,32 @@ public class Cobro extends PBase {
 	private String correlativo_factura(){
 
 		Cursor DT;
+        int cor=0;
+        String crr = "";
 
 		try{
 
 			sql="SELECT SERIE,ACTUAL FROM P_CORRELREC WHERE RUTA='"+gl.ruta+"'" ;
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			int cor=DT.getInt(1)+1;
-			return DT.getString(0) + StringUtils.right("000000" + Integer.toString(cor), 6);
+
+			if(DT.getCount()>0){
+
+                DT.moveToFirst();
+                cor =DT.getInt(1)+1;
+
+				crr= DT.getString(0) + StringUtils.right("000000" + Integer.toString(cor), 6);
+
+            }else{
+				crr=gl.ruta+"_"+mu.getCorelBase();
+			}
+
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			return gl.ruta+"_"+mu.getCorelBase();
 		}
+
+		return crr;
+
 	}
 
 	private void docList(){
@@ -508,6 +560,7 @@ public class Cobro extends PBase {
 		int j=0;
 		
 		try {
+
 			sql="DELETE FROM T_PAGOD";
 			db.execSQL(sql);
 			
@@ -537,7 +590,7 @@ public class Cobro extends PBase {
 			
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox(e.getMessage());
+		   	mu.msgbox("docList: "+ e.getMessage());
 	    }	
 		
 	}
@@ -548,47 +601,59 @@ public class Cobro extends PBase {
 	    int id;
 				
 		try {
-			sql="SELECT SUM(VALOR) FROM T_PAGO";
+
+		    sql="SELECT SUM(VALOR) FROM T_PAGO";
 			DT=Con.OpenDT(sql);
+
 			if (DT.getCount()==0) {
 				mu.msgbox("Total de pagos = 0 ");return false;
 			}
 			
 			DT.moveToFirst();		
+
 			tpago=DT.getDouble(0);
 			apago=tpago;
 			
 			sql="SELECT ITEM,MONTO FROM T_PAGOD";
 			DT=Con.OpenDT(sql);
 
-			DT.moveToFirst();
-			while (!DT.isAfterLast()) {
-				id=DT.getInt(0);
-			  	monto=DT.getDouble(1);
-			  
-			  	if (apago>=monto) {
-			  		saldo=monto;
-			  		apago-=saldo;
-			  	} else {	
-			  		saldo=apago;
-			  		apago=0;
-			  	}
-			  	
-				sql="UPDATE T_PAGOD SET PAGO="+saldo+" WHERE ITEM="+id;
-				db.execSQL(sql);
-			 	
-				//MU.msgbox(sql+"\n"+apago);
-				
-			  	if (apago<=0) break;
-			  	
-				DT.moveToNext();
-			}
-			
-			return true;
-			
+			if(DT.getCount()>0){
+
+                DT.moveToFirst();
+
+                while (!DT.isAfterLast()) {
+                    id=DT.getInt(0);
+                    monto=DT.getDouble(1);
+
+                    if (apago>=monto) {
+                        saldo=monto;
+                        apago-=saldo;
+                    } else {
+                        saldo=apago;
+                        apago=0;
+                    }
+
+                    sql="UPDATE T_PAGOD SET PAGO="+saldo+" WHERE ITEM="+id;
+                    db.execSQL(sql);
+
+                    //MU.msgbox(sql+"\n"+apago);
+
+                    if (apago<=0) break;
+
+                    DT.moveToNext();
+
+                }
+
+                return true;
+
+            }else  {
+                return  false;
+            }
+
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox(e.getMessage());return false;
+		   	mu.msgbox("ApplayPay: "+ e.getMessage());return false;
 	    }
 		
 	}
@@ -597,7 +662,9 @@ public class Cobro extends PBase {
 	// Pago Efectivo
 	
 	private void inputEfectivo() {
+
 		try{
+
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 			alert.setTitle("Pago Efectivo");
@@ -629,6 +696,7 @@ public class Cobro extends PBase {
 			});
 
 			alert.show();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -639,6 +707,7 @@ public class Cobro extends PBase {
 		double epago;
 		
 		try {
+
 			epago=Double.parseDouble(sefect);
 			if (epago==0) return;
 			
@@ -688,12 +757,12 @@ public class Cobro extends PBase {
 		}
  	}
 	
-	
-	
 	// Aux
 	
 	private void showTotals(){
+
 		try{
+
 			lblSel.setText(mu.frmcur(tsel));
 			lblPag.setText(mu.frmcur(tpag));
 
@@ -705,15 +774,19 @@ public class Cobro extends PBase {
 			} else {
 				lblPend.setText(mu.frmcur(0));
 			}
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			msgbox("No es posible mostrar los totales "+e.getMessage());
 		}
 
 
 	}
 	
 	private void calcSelected() {
+
 		try{
+
 			clsClasses.clsCobro vItem;
 			Object lvObj;
 			int flag,dc;
@@ -721,25 +794,27 @@ public class Cobro extends PBase {
 
 			tsel=0;
 
-			try {
-				dc=adapter.getCount();
-			} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-				return;
-			}
+			if (adapter.getCount()>0){
 
-			for (int i = 0; i < dc; i++ ) {
-				lvObj = listView.getItemAtPosition(i);
-				vItem = (clsClasses.clsCobro)lvObj;
+                dc=adapter.getCount();
 
-				flag=vItem.flag;
-				if (flag==1) {
-					val=vItem.Saldo;
-					tsel+=val;
-				}
-			}
+                for (int i = 0; i < dc; i++ ) {
+                    lvObj = listView.getItemAtPosition(i);
+                    vItem = (clsClasses.clsCobro)lvObj;
+
+                    flag=vItem.flag;
+                    if (flag==1) {
+                        val=vItem.Saldo;
+                        tsel+=val;
+                    }
+                }
+
+            }
+
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		    msgbox("calcSelected: "+ e.getMessage());
 		}
 
 		
@@ -761,23 +836,36 @@ public class Cobro extends PBase {
 		double tp;
 				
 		try {
+
 			sql="SELECT SUM(PAGO) FROM D_COBROD "+
 		         "WHERE (ANULADO='N') AND (DOCUMENTO='"+doc+"') AND (TIPODOC='"+ptipo+"') ";
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			
-			tp=DT.getDouble(0);
+
+	        if(DT.getCount()>0){
+
+                DT.moveToFirst();
+
+                tp=DT.getDouble(0);
+
+            }else{
+	            tp=0;
+            }
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	tp=0;
-	    }	
-		
+	    }
+
 		return tp;
+
 	}
 	
 	private void initSession(){
+
 		try {
+
 			sql="DELETE FROM T_PAGO";
+
 			db.execSQL(sql);
 			
 			sql="DELETE FROM T_PAGOD";
@@ -785,8 +873,9 @@ public class Cobro extends PBase {
 			
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox(e.getMessage());
+		   	mu.msgbox("initSession"+ e.getMessage());
 	    }
+
 	}
 	
 	private boolean assignCorel(){
@@ -796,16 +885,19 @@ public class Cobro extends PBase {
 		fcorel=0;fserie="";
 			
 		try {
+
 			sql="SELECT SERIE,INICIAL,FINAL,ACTUAL FROM P_CORRELREC WHERE RUTA='"+gl.ruta+"'";	
 			DT=Con.OpenDT(sql);
-				
+
+			if(DT.getCount()==0)return false;
+
 			DT.moveToFirst();
-			
+
 			fserie=DT.getString(0);
 			ci=DT.getInt(1);
 			cf=DT.getInt(2);
 			ca=DT.getInt(3);
-			
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			fcorel=0;fserie="";
@@ -816,10 +908,13 @@ public class Cobro extends PBase {
 		if (fcorel>cf) toast("Se ha acabado el talonario de los recibos.");
 		
 		return true;
+
 	}
 	
 	private void askPrint() {
-		try{
+
+	    try{
+
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle("Road");
@@ -839,21 +934,25 @@ public class Cobro extends PBase {
 
 
 			dialog.show();
-		}catch (Exception e){
+
+	    }catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 	}
 
 	private void exit() {
-		try{
+
+	    try{
+
 			showTotals();
 			if(tpend>0) {
 				msgAskExit("Tiene documentos pendientes de pago. Salir");
 			} else {
 				finish();
 			}
-		}catch (Exception e){
+
+	    }catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
@@ -863,7 +962,9 @@ public class Cobro extends PBase {
 	// MsgDialogs
 	
 	private void msgAskOverPayd(String msg) {
-		try{
+
+	    try{
+
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle(R.string.app_name);
@@ -884,15 +985,17 @@ public class Cobro extends PBase {
 			});
 
 			dialog.show();
-		}catch (Exception e){
+
+	    }catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 			
 	}	
 	
 	private void msgAskSave(String msg) {
-		try{
+
+	    try{
+
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle(R.string.app_name);
@@ -913,15 +1016,17 @@ public class Cobro extends PBase {
 			});
 
 			dialog.show();
-		}catch (Exception e){
+
+	    }catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 			
 	}
 
 	private void msgAskExit(String msg) {
-		try{
+
+	    try{
+
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle(R.string.app_name);
@@ -942,10 +1047,10 @@ public class Cobro extends PBase {
 			});
 
 			dialog.show();
-		}catch (Exception e){
+
+	    }catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 
 	}
 
@@ -954,7 +1059,9 @@ public class Cobro extends PBase {
 	
 	@Override
  	protected void onResume() {
-		try{
+
+	    try{
+
 			super.onResume();
 
 			if (browse==1) {
@@ -963,21 +1070,22 @@ public class Cobro extends PBase {
 
 				if (gl.pagado) createDoc();
 			}
-		}catch (Exception e){
+
+	    }catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	    
 	}
 
 	@Override
 	public void onBackPressed() {
-		try{
+
+	    try{
 			exit();
 		}catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 	}
-	
+
 }

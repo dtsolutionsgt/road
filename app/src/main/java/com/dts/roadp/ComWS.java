@@ -99,7 +99,7 @@ public class ComWS extends PBase {
 		
 		dbld=new clsDataBuilder(this);
 		claseFindia=new clsFinDia(this);
-		
+
 		lblInfo= (TextView) findViewById(R.id.lblETipo);
 		lblParam= (TextView) findViewById(R.id.lblProd);
 		barInfo= (ProgressBar) findViewById(R.id.progressBar2);
@@ -272,6 +272,9 @@ public class ComWS extends PBase {
 		if (isbusy==1) {
 			toastcent("Por favor, espere que se termine la tarea actual.");return;
 		}
+
+
+
 	}
 
 	//region Main
@@ -444,7 +447,7 @@ public class ComWS extends PBase {
 		    		} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		    		   	sstr=e.getMessage();
-		    	    }	
+		    	    }
 	        	}
 	        }
 	        
@@ -464,7 +467,7 @@ public class ComWS extends PBase {
 	
 		METHOD_NAME = "Commit";
 		sstr="OK";
-		
+
 		if (dbld.size()==0) return 1;
 		
 		s="";
@@ -670,7 +673,8 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}	
+			val="N";
+		}
 		
 		if (val.equalsIgnoreCase("S")) gl.peStockItf=true; else gl.peStockItf=false;
 				
@@ -1437,7 +1441,7 @@ public class ComWS extends PBase {
 		}
 
 	}
-		
+
 	private boolean validaDatos(boolean completo) {
 
 		Cursor dt;
@@ -2747,7 +2751,7 @@ public class ComWS extends PBase {
 
 		running=1;fstr="No connect";scon=0;
         errflag=false;
-					
+
 		try {
 
 			if (getTest()==1) scon=1;

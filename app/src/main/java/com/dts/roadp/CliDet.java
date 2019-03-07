@@ -138,20 +138,21 @@ public class CliDet extends PBase {
 			StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
 			StrictMode.setVmPolicy(builder.build());
 
-			try {
+		//	try {
 
 				Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 				File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
 				intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
 				startActivityForResult(intento1,codResult);
 
-			}catch (Exception e){
+		/*	}catch (Exception e){
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				//mu.msgbox("tomarFoto: "+ e.getMessage());
 				mu.msgbox("No se puede activar la camara. ");
-			}
+			}*/
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox(e.getMessage());
 		}
 
 
@@ -775,7 +776,7 @@ public class CliDet extends PBase {
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("sms:"+to)));
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		msgbox("No pudo enviar mensaje : "+e.getMessage());
+			msgbox("No pudo enviar mensaje : "+e.getMessage());
 		}
 
 		//try {
@@ -794,11 +795,12 @@ public class CliDet extends PBase {
 
 		//to="42161467";
 
-		if (to.length()==0) {
-			msgbox("Número incorrecto ");return;
-		}
-
 		try {
+
+			if (to.length()==0) {
+				msgbox("Número incorrecto ");return;
+			}
+
 			Intent callIntent = new Intent(Intent.ACTION_CALL);
 			callIntent.setData(Uri.parse("tel:"+to));
 			startActivity(callIntent);

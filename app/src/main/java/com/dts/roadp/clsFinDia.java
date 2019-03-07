@@ -17,6 +17,7 @@ public class clsFinDia extends PBase{
     private android.database.sqlite.SQLiteDatabase db;
     private BaseDatos Con;
     private Context cont;
+    String sp;
 
     public clsFinDia(Context context){
         try{
@@ -29,6 +30,7 @@ public class clsFinDia extends PBase{
         }
 
     }
+    private AppMethods claseAppMethods;
 
     private void opendatabase() {
         try {
@@ -64,42 +66,7 @@ public class clsFinDia extends PBase{
         return result;
     }
 
-    public int getCantFacturaAnuluadas(){
-        Cursor DT;
-        int result=0;
-
-        try
-        {
-            sql="SELECT COUNT(COREL) FROM D_FACTURA WHERE DEPOS<>'S'";
-            DT=Con.OpenDT(sql);
-            DT.moveToFirst();
-            result = DT.getInt(0);
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            msgbox("getCantFacturaAnuluadas: " + e.getMessage());
-        }
-
-        return result;
-    }
-
-    public int getCantFacturaEfectuada(){
-        Cursor DT;
-        int result=0;
-
-        try
-        {
-            sql="SELECT COUNT(COREL) FROM D_FACTURA WHERE DEPOS<>'N'";
-            DT=Con.OpenDT(sql);
-            DT.moveToFirst();
-            result = DT.getInt(0);
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            msgbox("getCantFacturaEfectuada: " + e.getMessage());
-        }
-
-        return result;
-    }
-
+    //#HS_20181121_1431 Esta función anteriormente pertenecía a la clase FinDia.
     public int setCorrelZ(){
         Cursor DT;
         int corelz=0;
@@ -120,6 +87,7 @@ public class clsFinDia extends PBase{
         return corelz;
     }
 
+    //#HS_20181121_1642 Esta función anteriormente pertenecía a la clase FinDia.
     public int ultimoCierreFecha() {
         Cursor DT;
         int rslt=0;
@@ -159,9 +127,9 @@ public class clsFinDia extends PBase{
         return rslt;
     }
 
-    public void updateDevBodega(){
+    public void updateDevBodega(int valor){
         try{
-            sql="UPDATE FinDia SET val5="+1;
+            sql="UPDATE FinDia SET val5 = " + String.valueOf(valor);
             db.execSQL(sql);
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -190,9 +158,9 @@ public class clsFinDia extends PBase{
         return rslt;
     }
 
-    public void updateDeposito(){
+    public void updateDeposito(int valor){
         try{
-            sql="UPDATE FinDia SET val4="+2;
+            sql="UPDATE FinDia SET val4 = " + String.valueOf(valor);
             db.execSQL(sql);
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -221,9 +189,9 @@ public class clsFinDia extends PBase{
         return rslt;
     }
 
-    public void updateImpDeposito(){
+    public void updateImpDeposito(int valor){
         try{
-            sql="UPDATE FinDia SET val3="+3;
+            sql="UPDATE FinDia SET val3 = " + String.valueOf(valor);
             db.execSQL(sql);
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -231,7 +199,7 @@ public class clsFinDia extends PBase{
         }
     }
 
-    public int getcomunicacion() {
+    public int getComunicacion() {
         Cursor DT;
         int rslt=0;
 
@@ -251,9 +219,9 @@ public class clsFinDia extends PBase{
         return rslt;
     }
 
-    public void updateComunicacion(){
+    public void updateComunicacion(int valor){
         try{
-            sql="UPDATE FinDia SET val2="+4;
+            sql="UPDATE FinDia SET val2 = " + String.valueOf(valor);
             db.execSQL(sql);
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -261,9 +229,73 @@ public class clsFinDia extends PBase{
         }
     }
 
-    public void updateCorrelativoZ(){
+    //#CKFK 20190305 Creé esta función para saber si ya se generó el cierre Z
+    public int getGeneroCierreZ() {
+        Cursor DT;
+        int rslt=0;
+
+        try {
+            sql="SELECT val6 FROM FinDia";
+            DT=Con.OpenDT(sql);
+
+            if(DT.getCount()>0){
+                DT.moveToFirst();
+                rslt=DT.getInt(0);
+            }
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            msgbox("getGeneroCierreZ: " + e.getMessage());
+        }
+        return rslt;
+    }
+
+    //#CKFK 20190305 Creé esta función para actualizar el val6 en la tabla FinDia
+    public void updateGeneroCierreZ(int valor){
         try{
-            sql="UPDATE FinDia SET Corel="+1;
+            sql=" UPDATE FinDia SET val6 = " + String.valueOf(valor);
+            db.execSQL(sql);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            msgbox("updateComunicacion: " + e.getMessage());
+        }
+    }
+
+    //#CKFK 20190305 Creé esta función para saber si ya se imprimió el cierre Z
+    public int getImprimioCierreZ() {
+        Cursor DT;
+        int rslt=0;
+
+        try {
+            sql="SELECT val7 FROM FinDia";
+            DT=Con.OpenDT(sql);
+
+            if(DT.getCount()>0){
+                DT.moveToFirst();
+                rslt=DT.getInt(0);
+            }
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            msgbox("getGeneroCierreZ: " + e.getMessage());
+        }
+        return rslt;
+    }
+
+    //#CKFK 20190305 Creé esta función para actualizar el val7 en la tabla FinDia
+    public void updateImprimioCierreZ(int valor){
+        try{
+            sql=" UPDATE FinDia SET val7 = " + String.valueOf(valor);
+            db.execSQL(sql);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            msgbox("updateComunicacion: " + e.getMessage());
+        }
+    }
+
+    public void updateCorrelativoZ(int valor){
+        try{
+            sql="UPDATE FinDia SET Corel = " + String.valueOf(valor);
             db.execSQL(sql);
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -271,9 +303,9 @@ public class clsFinDia extends PBase{
         }
     }
 
-    public void updateFinDia(){
+    public void updateFinDia(int valor){
         try{
-            sql="UPDATE FinDia SET val1="+du.getActDate();
+            sql="UPDATE FinDia SET val1 = " + String.valueOf(valor);
             db.execSQL(sql);
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -438,5 +470,90 @@ public class clsFinDia extends PBase{
         return true;
     }
 
+    public int getDocPendientesDeposito(){
+
+        int pend = 0;
+        Cursor DT;
+
+        try{
+
+            pend = 0;
+
+            sql = " SELECT E.COREL FROM D_FACTURA E INNER JOIN D_FACTURAP P ON E.COREL = P.COREL " +
+                  " WHERE E.ANULADO='N' AND E.DEPOS<>'S' AND P.TIPO <>'K'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount()>0){
+                pend = pend + DT.getCount();
+            }
+
+            sql = "SELECT COREL FROM D_COBRO WHERE ANULADO='N' AND DEPOS<>'S' ";
+            DT = Con.OpenDT(sql);
+            if (DT.getCount()>0){
+                pend = pend + DT.getCount();
+            }
+
+
+        }catch (Exception ex){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
+            mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName() + "\n" + ex.getMessage());
+        }
+
+        return pend;
+
+    }
+
+    public int getFactCount(String ss, String pps) {
+
+        Cursor DT;
+        int cnt = 0;
+
+        try {
+
+            sql = ss;
+            DT = Con.OpenDT(sql);
+            sp = "";
+
+            if (DT.getCount()>0){
+
+                cnt = DT.getCount();
+                sp += pps + " ";
+                sp = sp + cnt + "\n";
+
+            }
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox(sql + "\n" + e.getMessage());
+        }
+
+        return cnt;
+    }
+
+    public int getDeposCount(String ss, String pps) {
+
+        Cursor DT;
+        int cnt = 0;
+        String st;
+
+        try {
+
+            sql = ss;
+            DT = Con.OpenDT(sql);
+            sp = "";
+
+            if (DT.getCount()>0){
+                cnt = DT.getCount();
+                sp += pps + " ";
+                sp = sp + cnt + "\n";
+            }
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox(sql + "\n" + e.getMessage());
+        }
+
+        return cnt;
+    }
 
 }

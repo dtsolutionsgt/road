@@ -1,23 +1,17 @@
 package com.dts.roadp;
 
 import java.io.File;
-import java.io.StringReader;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
-import android.widget.CalendarView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -45,9 +39,6 @@ public class FinDia extends PBase {
     private double val, tot, tte, ttc, ttk, tto, tre, trc, tro, tote, totc, depe, depc, bale, balc;
     private boolean idle = true, fullfd, fail;
     private clsFinDia claseFinDia;
-    private DateUtils claseDateUtils;
-    private AppMethods claseAppMethods;
-    private clsDocument claseDocumento;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,14 +86,20 @@ public class FinDia extends PBase {
 
     public void iniciaCierre(View view) {
         //#HS_20181128_0906 Agregue validacion para FinDia.
-        if (gl.banderafindia == true) {
-            if (validaFinDia()) msgAskFinDiaTrue();
+        if (gl.banderafindia) {
+           //if (validaFinDia()) #CKFK 20190305 Quité la validación de aquí
+             if (!yaInicioFinDia())  {
+                 msgAskFinDiaTrue();
+             }else{
+                 validaFinDia();
+             }
         } else {
-            if (validaFinDia()) msgAsk();
+            //if (validaFinDia()) #CKFK 20190305 Quité la validación de aquí
+                msgAsk();
         }
     }
 
-    //#HS_20181123_0950 Agrege funcion para llamar activity deposito.
+    //#HS_20181123_0950 Agregué funcion para llamar activity deposito.
     public void ActivityDeposito() {
         try{
             Intent deposito = new Intent(this, Deposito.class);
@@ -114,7 +111,7 @@ public class FinDia extends PBase {
     }
 
     //#HS_20181123_1014 Agregue funcion para llamar activity de reimpresion de deposito.
-    public void ActivityImpresionDeposito(int doctipo) {
+    public void ActivityImpresion(int doctipo) {
         try{
             gl.tipo = doctipo;
             Intent intent = new Intent(this, Reimpresion.class);
@@ -124,6 +121,7 @@ public class FinDia extends PBase {
         }
 
     }
+
     //#CKFK 20190304 Agregué funcion para llamar activity de comunicación.
     public void ActivityComunicacion() {
         try{
@@ -156,12 +154,9 @@ public class FinDia extends PBase {
         fail = false;
 
         try{
-            if (gl.peModal.equalsIgnoreCase("TOL")) {
-                //#EJC20190226: En comentario porque agregué el insert de d_mov encabezado, se debe hacer en otra pantalla el insert del detalle de lo que hay que devolver.
-                //devProductos();
-                buildReportsTOL();
-            } else {
-                //devProductos();
+
+
+            if (!gl.peModal.equalsIgnoreCase("TOL")) {
                 buildReports();
             }
 
@@ -188,18 +183,15 @@ public class FinDia extends PBase {
             }
 
             //#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
-            if (gl.banderafindia == true) {
-                if (claseFinDia.getcomunicacion() != 4) {
+            if (gl.banderafindia) {
+                if (claseFinDia.getComunicacion() != 4) {
                     msgAskComunicacion();
                     return;
                 }
             }
 
-            try  {
+            if (!gl.banderafindia) {
                 db.execSQL("UPDATE FinDia SET val1="+du.getActDate());
-            } catch (Exception e) {
-                addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-                msgbox("No se pudo actualizar fecha de cierre.");
             }
 
             Toast.makeText(FinDia.this, "Cierre del día completo.", Toast.LENGTH_SHORT).show();
@@ -229,34 +221,6 @@ public class FinDia extends PBase {
 
             FinDia.super.finish();
 
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-
-    }
-
-	//#HS_20181127_1052 Agregué funcion de inicio de FinDia.
-	public void iniciarFD()  {
-
-        try{
-            File fd = new File(Environment.getExternalStorageDirectory() + "/SyncFold/findia.txt");
-            FileUtils.deleteQuietly(fd);
-
-            idle = false;
-            fail = false;
-
-            if (gl.peModal.equalsIgnoreCase("TOL")) {
-                devProductos();
-                buildReportsTOL();
-            } else {
-                //devProductos();
-                buildReports();
-            }
-
-            ((appGlobals) vApp).modoadmin = false;
-            ((appGlobals) vApp).autocom = 1;
-            startActivity(new Intent(this, ComWS.class));
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
@@ -525,103 +489,18 @@ public class FinDia extends PBase {
             ins.add("FECHA",fecha);
             ins.add("TIPO","D");
             ins.add("USUARIO",((appGlobals) vApp).vend);
-            ins.add("REFERENCIA","Cierre de dia");
+            ins.add("REFERENCIA","Devolucion");
             ins.add("STATCOM","N");
             ins.add("IMPRES",0);
             ins.add("CODIGOLIQUIDACION",0);
             db.execSQL(ins.sql());
-            db.setTransactionSuccessful();
-            db.endTransaction();
 
-            return true;
-
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            db.endTransaction();
-            //mu.msgbox( e.getMessage());
-            return false;
-        }
-
-    }
-
-	private boolean devProductos() {
-		Cursor DT;
-		String corel,pcod,plote,um;
-		Double pcant,pcantm,ppeso;
-		claseFinDia = new clsFinDia(this);
-		int i;
-
-
-		corel=gl.ruta+"_"+mu.getCorelBase();devcorel=corel;
-		gl.corel_d_mov=corel;
-
-        try {
-
-            db.beginTransaction();
-
-            ins.init("D_MOV");
-            ins.add("COREL", corel);
-            ins.add("RUTA", ((appGlobals) vApp).ruta);
-            ins.add("ANULADO", "N");
-            ins.add("FECHA", fecha);
-            ins.add("TIPO", "D");
-            ins.add("USUARIO", ((appGlobals) vApp).vend);
-            ins.add("REFERENCIA", "Cierre de dia");
-            ins.add("STATCOM", "N");
-            ins.add("IMPRES", 0);
-            ins.add("CODIGOLIQUIDACION", 0);
-
-            db.execSQL(ins.sql());
-
-            sql = "SELECT CODIGO,LOTE,SUM(CANT),SUM(CANTM),SUM(PESO),UNIDADMEDIDA FROM P_STOCK GROUP BY CODIGO,LOTE,UNIDADMEDIDA " +
-                    "HAVING SUM(CANT)>0 OR SUM(CANTM) >0";
-            DT = Con.OpenDT(sql);
-
-            i = 0;
-
-            if (DT.getCount() > 0) {
-
-                DT.moveToFirst();
-
-                while (!DT.isAfterLast()) {
-
-                    pcod = DT.getString(0);
-                    plote = DT.getString(1);
-                    pcant = DT.getDouble(2);
-                    pcantm = DT.getDouble(3);
-                    ppeso = DT.getDouble(4);
-                    um = DT.getString(5);
-
-					ins.init("D_MOVD");
-
-					ins.add("COREL",corel);
-					ins.add("PRODUCTO",pcod);
-					ins.add("CANT",pcant);
-					ins.add("CANTM",pcantm);
-					ins.add("PESO",ppeso);
-					ins.add("PESOM",ppeso);
-					ins.add("LOTE",plote);
-					ins.add("CODIGOLIQUIDACION",0);
-					ins.add("UNIDADMEDIDA",um);
-
-                    db.execSQL(ins.sql());
-
-                    DT.moveToNext();
-                    i++;
-                }
-            }
-
-            if (gl.peModal.equalsIgnoreCase("TOL")) {
-                sql = "DELETE FROM P_STOCK";
-                db.execSQL(sql);
-            }
+            sql="UPDATE FinDia SET val5 = 1";
+            db.execSQL(sql);
 
             db.setTransactionSuccessful();
             db.endTransaction();
 
-            claseFinDia.updateDevBodega();
-
-            //Toast.makeText(this,"Devolucion aplicada "+i, Toast.LENGTH_SHORT).show();
             return true;
 
         } catch (Exception e) {
@@ -641,12 +520,12 @@ public class FinDia extends PBase {
         claseFinDia = new clsFinDia(this);
 
         try{
+
             fechaUltimoCierre = claseFinDia.ultimoCierreFecha();
 
             //#HS_20181127_1033 Agregué validacion para cantidad de facturas.
             if (claseFinDia.getCantFactura() == 0) {
-                msgExit("No hay facturas.");
-                return false;
+                msgExit("No hay facturas, no se puede realizar el Fin de Día");
             }
 
             if (fullfd) {
@@ -656,169 +535,80 @@ public class FinDia extends PBase {
                     return false;
                 }
 
-                setFactCor();
-                if (fcorel == 0) {
-                    msgExit("No Están definidos los correlativos de factura.");
-                    return false;
+                if (gl.peModal.equalsIgnoreCase("APR")) {
+                    setFactCor();
+                    if (fcorel == 0) {
+                        msgExit("No Están definidos los correlativos de factura.");
+                        return false;
+                    }
                 }
 
                 corelz = claseFinDia.setCorrelZ();
                 if (corelz == 0) {
                     //msgExit("No esta definido correlativo de cierre Z.");return false;
-                    claseFinDia.updateCorrelativoZ();
+                    claseFinDia.updateCorrelativoZ(1);
                 }
             }
 
             if (du.getActDate() == fechaUltimoCierre) {
                 msgExit("Fin de Día ya fue efectuado el día de hoy");
+
+                Toast.makeText(FinDia.this, "Cierre del día completo.", Toast.LENGTH_SHORT).show();
+
+                gl.findiaactivo=true;
+                gl.modoadmin = false;
+                gl.autocom = 1;
+
+                FinDia.super.finish();
+
                 return false;
             }
 
-            //#HS_20181127_1033 Agregue validacion para verificar si ya se realizo el deposito.
             if (gl.banderafindia == true) {
-                if (claseFinDia.getDeposito() != 2) {
+                //#CKFK 20190304 Agregué validación para verificar si ya se realizó la devolución a Bodega.
+                if (claseFinDia.getDevBodega() != 5 ){
+                    if (!Ya_Realizo_Devolucion()){
+                        msgAskDevInventario();
+                        return false;
+                    }
+                }
+
+                //#CKFK 20190305 Agregué validación para verificar si ya se realizó el depósito
+                if ((claseFinDia.getDeposito() != 4) && (claseFinDia.getDocPendientesDeposito()>0)) {
                     msgAskDeposito();
                     return false;
                 }
-            }
 
-            //#HS_20181127_1033 Agregué validación para verificar si ya se realizo la impresion del deposito.
-            if (gl.banderafindia == true) {
-                if (claseFinDia.getImpresionDeposito() != 3) {
-                    msgAskImpresionDeposito();
+                //#CKFK 20190304 Agregué validación para verificar si ya se realizó la impresión del depósito.
+                if (gl.sinimp) {
+                    claseFinDia.updateImpDeposito(3);
+                }
+                else {
+                    if (claseFinDia.getImpresionDeposito() != 3) {
+                        msgAskImpresionDeposito();
+                        return false;
+                    }
+                }
+
+                //#CKFK 20190304 Agregué validación para verificar si ya se generó el cierreZ.
+                if ((claseFinDia.getGeneroCierreZ()!=6) && (claseFinDia.getImprimioCierreZ()!=7)){
+                    msgAskGeneraCierreZ();
                     return false;
                 }
-            }
 
-            //#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
-            if (gl.banderafindia == true) {
-                if (claseFinDia.getcomunicacion() != 4) {
-                    msgAskComunicacion();
-                    return false;
+                //#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
+                if (claseFinDia.getComunicacion() != 4) {
+                        msgAskComunicacion();
+                        return false;
                 }
+
             }
 
-            // pendiente deposito
-            pend = 0;
-
-        try {
-            sql = "SELECT COREL FROM D_FACTURA WHERE ANULADO='N' AND DEPOS<>'S' ";
-            DT = Con.OpenDT(sql);
-            pend = pend + DT.getCount();
-
-            sql = "SELECT COREL FROM D_FACTURAP WHERE ANULADO='N' AND TIPO='K' ";
-            DT = Con.OpenDT(sql);
-            pend = pend - DT.getCount();
-
-        } catch (Exception e) {
-        }
-
-        try {
-            sql = "SELECT COREL FROM D_COBRO WHERE ANULADO='N' AND DEPOS<>'S' ";
-            DT = Con.OpenDT(sql);
-            pend = pend + DT.getCount();
-        } catch (Exception e) {
-        }
-
-		if (pend>0) {
-			msgExitDepos("Existen documentos pendientes a depositar.");return false;
-		}
-
-            pend = getFactCount("SELECT SERIE,CORELATIVO FROM D_FACTURA", "Facturas :");
-            if (pend == 0) {
-                msgExit("No se puede realizar Cierre del día. No está registrada ninguna factura.");
-                return false;
-            }
-
-            try {
-                //  pendiente envio
-
-                pend = 0;
-                sp = "";
-
-                pend = pend + getFactCount("SELECT SERIE,CORELATIVO FROM D_FACTURA WHERE STATCOM<>'S'", "Facturas :");
-                pend = pend + claseAppMethods.getDocCount("SELECT COREL FROM D_PEDIDO WHERE STATCOM<>'S'", "Pedidos :");
-                pend = pend + claseAppMethods.getDocCount("SELECT COREL FROM D_COBRO WHERE STATCOM<>'S'", "Recibos :");
-                pend = pend + getDeposCount("SELECT TOTAL FROM D_DEPOS WHERE STATCOM<>'S'", "Depositos :");
-                pend = pend + claseAppMethods.getDocCount("SELECT COREL FROM D_MOV WHERE STATCOM<>'S'", "Inventario :");
-                //pend=pend+getDocCount("SELECT RUTA  FROM D_ATENCION WHERE STATCOM<>'N'","A:");
-
-                if (pend > 0) {
-                    //msgExitCom("Existen datos pendientes de envio. Realize envio de datos antes de cierre del día.\n"+sp);return false;
-                }
-            } catch (Exception e) {
-                addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            }
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
-
         return true;
-    }
-
-    private int getFactCount(String ss, String pps) {
-        Cursor DT;
-        int cnt;
-        String st;
-
-        try {
-            sql = ss;
-            DT = Con.OpenDT(sql);
-            cnt = DT.getCount();
-            sp += pps + " ";
-			
-			/*
-			if (cnt>0) {
-				
-				DT.moveToFirst();
-				while (!DT.isAfterLast()) {
-					st=st+DT.getString(0)+"-"+DT.getInt(1)+", ";
-					DT.moveToNext();
-				}				
-				sp=sp+st+"\n";
-			}
-			*/
-
-            sp = sp + cnt + "\n";
-
-            return cnt;
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox(sql + "\n" + e.getMessage());
-            return 0;
-        }
-    }
-
-    private int getDeposCount(String ss, String pps) {
-        Cursor DT;
-        int cnt;
-        String st;
-
-        try {
-            sql = ss;
-            DT = Con.OpenDT(sql);
-            cnt = DT.getCount();
-            sp += pps + " ";
-			/*
-			if (cnt>0) {				
-				DT.moveToFirst();
-				while (!DT.isAfterLast()) {
-					st=st+mu.frmdec(DT.getDouble(0))+", ";
-					DT.moveToNext();
-				}				
-				sp=sp+st+"\n";
-			}
-			*/
-
-            sp = sp + cnt + "\n";
-
-            return cnt;
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox(sql + "\n" + e.getMessage());
-            return 0;
-        }
     }
 
     private boolean validaPagosPend() {
@@ -841,7 +631,34 @@ public class FinDia extends PBase {
 
     }
 
-    private void requisitosFinDia() {
+    //Impresion Cierre Z
+    private void imprimeCierreZ(){
+
+        try {
+
+            File f1 = new File(Environment.getExternalStorageDirectory() + "/SyncFold/findia.txt");
+            File f2 = new File(Environment.getExternalStorageDirectory() + "/print.txt");
+            FileUtils.copyFile(f1, f2);
+
+            if (!gl.sinimp) {
+                if (prn.isEnabled())  {
+                    final Handler shandler = new Handler();
+                    shandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run()  {
+                            Intent intent = new Intent(FinDia.this, PrintDialog.class);
+                            startActivity(intent);
+                        }
+                    }, 2000);
+                }
+            }
+
+            claseFinDia.updateImprimioCierreZ(7);
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+            msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+        }
 
     }
 
@@ -1464,23 +1281,6 @@ public class FinDia extends PBase {
 
     }
 
-
-    // Aux
-
-    //#HS_20181121_1431 Se dejo en comentario porque se agrego a la clase clsFinDia.
-	/*private void setCorrelZ() {
-		Cursor DT;
-
-		try {
-			sql="SELECT Corel FROM FinDia";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			corelz=DT.getInt(0);
-		} catch (Exception e) {
-			corelz=0;
-		}
-	}*/
-
     private void setFactCor() {
         Cursor DT;
 
@@ -1504,23 +1304,6 @@ public class FinDia extends PBase {
         }
     }
 
-    //#HS_20181121_1642 Se puso en comentario porque se agregó en la clase clsFinDia.
-	/*private int ultimoCierreFecha() {
-		Cursor DT;
-		int rslt=0;
-
-		try {
-			sql="SELECT val1 FROM FinDia";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			rslt=DT.getInt(0);
-		} catch (Exception e) {
-			rslt=0;
-		}
-
-		return rslt;
-	}*/
-
     private void delPrintFiles() {
         try {
             new File(Environment.getExternalStorageDirectory() + "/print.txt").delete();
@@ -1534,22 +1317,24 @@ public class FinDia extends PBase {
         }
     }
 
-
-    // Mensajes
-
     private void msgAskDeposito() {
 
         try{
             AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
 
             dialog1.setTitle("Road");
-            dialog1.setMessage("No se ha realizado el depósito.");
+            dialog1.setMessage("No se ha realizado el depósito. ¿Quiere realizar el depósito?");
 
             dialog1.setIcon(R.drawable.ic_quest);
 
-            dialog1.setPositiveButton("Realizar Depósito.", new DialogInterface.OnClickListener() {
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     ActivityDeposito();
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
                 }
             });
 
@@ -1567,13 +1352,45 @@ public class FinDia extends PBase {
             AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
 
             dialog1.setTitle("Road");
-            dialog1.setMessage("Debe imprimir el recibo de depósito");
+            dialog1.setMessage("Debe imprimir el recibo de depósito. ¿Imprimir depósito?");
 
             dialog1.setIcon(R.drawable.ic_quest);
 
-            dialog1.setPositiveButton("Imprimir Documento", new DialogInterface.OnClickListener() {
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    ActivityImpresionDeposito(1);
+                    ActivityImpresion(1);
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+            dialog1.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+    }
+
+    private void msgAskComunicacion() {
+
+        try{
+            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
+
+            dialog1.setTitle("Road");
+            dialog1.setMessage("No ha comunicado los datos.¿Quiere comunicar los datos?");
+
+            dialog1.setIcon(R.drawable.ic_quest);
+
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityComunicacion();
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
                 }
             });
 
@@ -1585,28 +1402,33 @@ public class FinDia extends PBase {
 
     }
 
-    private void msgAskComunicacion() {
+    private void msgAskGeneraCierreZ() {
 
-        try{
+        try {
             AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
 
             dialog1.setTitle("Road");
-            dialog1.setMessage("No ha comunicado los datos");
+            dialog1.setMessage("No ha generado el Cierre Z. ¿Quiere generarlo ahora?");
 
             dialog1.setIcon(R.drawable.ic_quest);
 
-            dialog1.setPositiveButton("Quiere comunicar los datos", new DialogInterface.OnClickListener() {
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    ActivityComunicacion();
+                    buildReportsTOL();
+                    imprimeCierreZ();
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
                 }
             });
 
             dialog1.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
         }
-
-
     }
 
     private void msgAsk() {
@@ -1638,14 +1460,12 @@ public class FinDia extends PBase {
 
     }
 
-	private void msgAskFinDiaTrue()
-	{
-
+	private void msgAskFinDiaTrue()	{
         try{
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
             dialog.setTitle("Road");
-            dialog.setMessage("Este proceso prepara el sistema para el siguiente día de venta. Continuar ?");
+            dialog.setMessage("Este proceso prepara el sistema para el siguiente día de venta. Continuar?");
             dialog.setIcon(R.drawable.ic_quest);
             dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
@@ -1662,12 +1482,9 @@ public class FinDia extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
-
 	}
 
-	private void msgAsk2()
-	{
+	private void msgAsk2()	{
 
         try{
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -1678,7 +1495,7 @@ public class FinDia extends PBase {
 
             dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    msgAskDevInventario();
+                    validaFinDia();//#CKFK 20190305 Agregué esta validación aquí porque aquí es que inicia el proceso
                 }
             });
 
@@ -1691,7 +1508,7 @@ public class FinDia extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
-			
+
 	}
 
 	//#HS_20181121_1506 Se creo la pregunta para la devolución de inventario.
@@ -1756,57 +1573,6 @@ public class FinDia extends PBase {
 
     }
 
-	private void msgExitCom(String msg) {
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle(R.string.app_name);
-            dialog.setMessage(msg);
-
-            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-
-                    ((appGlobals) vApp).tipo=0;
-                    Intent intent = new Intent(FinDia.this,ComWS.class);
-                    startActivity(intent);
-
-                    //FinDia.super.finish();
-                }
-            });
-
-            dialog.show();
-
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-	}
-	
-	private void msgExitDepos(String msg) {
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle(R.string.app_name);
-            dialog.setMessage(msg);
-
-            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-
-                    ((appGlobals) vApp).tipo=0;
-                    Intent intent = new Intent(FinDia.this,Deposito.class);
-                    startActivity(intent);
-
-                    //FinDia.super.finish();
-                }
-            });
-
-            dialog.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-	}
-	
 	public void msgAskFlag(View view) {
         try{
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -1831,11 +1597,11 @@ public class FinDia extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
-			
+
 	}
 
-    private boolean Tiene_Inventario_Devolucion()
-    {
+	//#EJC 20190226 Creé esta función para saber si hay inventario para devolver
+    private boolean Tiene_Inventario_Devolucion(){
 
         boolean TieneInvDevol = false;
 
@@ -1906,8 +1672,8 @@ public class FinDia extends PBase {
 
     }
 
-    private boolean Ya_Realizo_Devolucion()
-    {
+    //#EJC 20190226 Creé esta función para saber si ya se había realizado la devolución
+    private boolean Ya_Realizo_Devolucion(){
 
         boolean Ya_Realizo_Devol = false;
 
@@ -1916,8 +1682,6 @@ public class FinDia extends PBase {
         try
         {
 
-            double vTotalLbsB = 0;
-            double vTotalUB = 0;
             boolean vTieneInvDevol = false;
 
             sql = "SELECT STATCOM FROM D_MOV WHERE TIPO = 'D' AND ANULADO = 'N'";
@@ -1931,15 +1695,21 @@ public class FinDia extends PBase {
                 if (vTieneInvDevol)
                 {
                     Ya_Realizo_Devol = false;
+                    claseFinDia.updateDevBodega(0);
 
                 }else
                 {
                     Ya_Realizo_Devol = Inserta_Enc_D_Mov();
+                    claseFinDia.updateDevBodega(5);
                 }
 
+            }else if (claseFinDia.getDevBodega() == 5)
+            {
+                Ya_Realizo_Devol = true;
             }else
             {
                 Ya_Realizo_Devol = true;
+                claseFinDia.updateDevBodega(5);
             }
 
         }catch (Exception e) {
@@ -1951,12 +1721,37 @@ public class FinDia extends PBase {
 
     }
 
+    private boolean yaInicioFinDia(){
+
+        boolean vInicio=false;
+        Cursor DT;
+
+        try{
+
+            sql="SELECT val5 FROM findia ";
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()>0){
+                DT.moveToFirst();
+
+                vInicio=((DT.getInt(0)==5));
+
+            }
+
+        }catch (Exception ex){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
+            mu.msgbox(ex.getMessage());
+        }
+
+        return vInicio;
+
+    }
+
 	// Activity Events
 	@Override
 	public void onBackPressed() {
 		if (idle) super.onBackPressed();
 	}
-
 
 	//region "Funciones y procedimientos creados para generar el reporte Cierre Z de Toledano"
 
@@ -1969,8 +1764,8 @@ public class FinDia extends PBase {
         try {
 
             rep.empty();
-            sql = "SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO " +
-                    " FROM P_SUCURSAL WHERE CODIGO='" + gl.sucur + "'";
+            sql = " SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO " +
+                  " FROM P_SUCURSAL WHERE CODIGO='" + gl.sucur + "'";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -2021,7 +1816,9 @@ public class FinDia extends PBase {
             }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
-        rep.save();
+        if (rep.save()){
+            claseFinDia.updateGeneroCierreZ(6);
+        }
 
     }
 

@@ -30,7 +30,8 @@ public class Anulacion extends PBase {
 	public  clsRepBuilder rep;
 	private clsDocAnul doc;
 	private clsDocFactura fdoc;
-	
+	private clsFinDia claseFindia;
+
 	private clsClasses.clsCFDV sitem;
 	
 	private int tipo,depparc,fcorel;	
@@ -562,38 +563,21 @@ public class Anulacion extends PBase {
 			sql="UPDATE D_MOV SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
 
-			sql="SELECT PRODUCTO,CANT,CANTM FROM D_MOVD WHERE (COREL='"+itemid+"')";
+			sql="SELECT PRODUCTO,CANT,CANTM, UNIDADMEDIDA FROM D_MOVD WHERE (COREL='"+itemid+"')";
 			DT=Con.OpenDT(sql);
 
-			DT.moveToFirst();
-			while (!DT.isAfterLast()) {
-
-				prod=DT.getString(0);
-				cant=DT.getDouble(1);
-				cantm=DT.getDouble(2);
-
-				try {
-					sql="INSERT INTO P_STOCK VALUES ('"+prod+"',0,0,0,0, '"+prod+"','',0,'N', '','',0,0,'')";
-					db.execSQL(sql);
-				} catch (Exception e) {
-					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-					toast(e.getMessage());
-				}
-
-				try {
-					sql="UPDATE P_STOCK SET CANT=CANT+"+cant+", CANTM=CANTM+"+cantm+" WHERE CODIGO='"+prod+"'";
-					db.execSQL(sql);
-				} catch (Exception e) {
-					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-				}
-
-				DT.moveToNext();
+			if(DT.getCount()>0){
+				sql="INSERT INTO P_STOCK SELECT PRODUCTO, CANT, CANTM, PESO, 0, LOTE, '',0,'N', '','',0,0,'', UNIDADMEDIDA " +
+					"FROM D_MOVD";
+				db.execSQL(sql);
 			}
+
+			sql="UPDATE FinDia SET val5 = 0";
+			db.execSQL(sql);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-
-		
 	}	
 	
 	private void anulRecib(String itemid) {

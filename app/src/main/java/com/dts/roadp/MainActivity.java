@@ -269,29 +269,36 @@ public class MainActivity extends PBase {
 			//#HS_20181122_1505 Se agrego el campo Impresion.
 			sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR FROM P_RUTA";
 			DT = Con.OpenDT(sql);
-			DT.moveToFirst();
 
-			gl.ruta = DT.getString(0);
-			gl.rutanom=DT.getString(1);
-			gl.vend = DT.getString(2);
-			gl.rutatipog = DT.getString(3);
-			s = DT.getString(3);
-			gl.wsURL = DT.getString(4);
-			gl.impresora = DT.getString(5);
-			gl.sucur = DT.getString(6);
+			if (DT.getCount()>0){
 
-			if (!mu.emptystr(DT.getString(7))){
-				vCellCom = DT.getString(7);
-			}
-			gl.CellCom = (vCellCom.equalsIgnoreCase("S"));
+                DT.moveToFirst();
 
-			rutapos = s.equalsIgnoreCase("R");
+                gl.ruta = DT.getString(0);
+                gl.rutanom=DT.getString(1);
+                gl.vend = DT.getString(2);
+                gl.rutatipog = DT.getString(3);
+                s = DT.getString(3);
+                gl.wsURL = DT.getString(4);
+                gl.impresora = DT.getString(5);
+                gl.sucur = DT.getString(6);
+
+                if (!mu.emptystr(DT.getString(7))){
+                    vCellCom = DT.getString(7);
+                }
+                gl.CellCom = (vCellCom.equalsIgnoreCase("S"));
+
+                rutapos = s.equalsIgnoreCase("R");
+
+            }else{
+                gl.ruta = "";
+                gl.rutanom = "";
+                gl.vend = "0";
+                gl.rutatipog = "V";
+                gl.wsURL = "http://192.168.1.1/wsAndr/wsAndr.asmx";
+            }
 
 		} catch (Exception e) {
-			gl.ruta = "";
-			gl.vend = "0";
-			gl.rutatipog = "V";
-			gl.wsURL = "http://192.168.1.1/wsAndr/wsAndr.asmx";
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
@@ -308,22 +315,26 @@ public class MainActivity extends PBase {
 			sql = " SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO," +
 				  " INCIDENCIA_NO_LECTURA FROM P_EMPRESA";
 			DT = Con.OpenDT(sql);
-			DT.moveToFirst();
 
-			gl.emp = DT.getString(0);
-			lblRuta.setText(DT.getString(1));gl.empnom =DT.getString(1);
-			gl.devol = DT.getInt(2) == 1;
-			s = DT.getString(3);
-			gl.usarpeso = s.equalsIgnoreCase("S");
-			gl.banderafindia=DT.getInt(4) == 1;
-			gl.umpeso = DT.getString(6);
-			gl.incNoLectura = DT.getInt(7)==1; //#HS_20181211 Agregue campo incNoLectura para validacion en cliente.
-			gl.depparc = DT.getInt(5)==1;
+			if (DT.getCount()>0){
+                DT.moveToFirst();
+
+                gl.emp = DT.getString(0);
+                lblRuta.setText(DT.getString(1));gl.empnom =DT.getString(1);
+                gl.devol = DT.getInt(2) == 1;
+                s = DT.getString(3);
+                gl.usarpeso = s.equalsIgnoreCase("S");
+                gl.banderafindia=DT.getInt(4) == 1;
+                gl.umpeso = DT.getString(6);
+                gl.incNoLectura = DT.getInt(7)==1; //#HS_20181211 Agregue campo incNoLectura para validacion en cliente.
+                gl.depparc = DT.getInt(5)==1;
+            }else{
+                gl.emp = "0";
+                lblRuta.setText("");
+                gl.devol = false;
+            }
+
 		} catch (Exception e) {
-			gl.emp = "0";
-			lblRuta.setText("");
-			gl.devol = false;
-
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
@@ -342,7 +353,6 @@ public class MainActivity extends PBase {
 		} catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 
 		//Id de Dispositivo
 		gl.deviceId = androidid();

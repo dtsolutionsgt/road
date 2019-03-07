@@ -50,17 +50,20 @@ public class AppMethods {
 
 	//Función para saber la cantidad de registros en una tabla
 	public int getDocCount(String ss,String pps) {
+
 		Cursor DT;
-		int cnt;
+		int cnt =0;
 		String st;
 
 		try {
 			sql=ss;
 			DT=Con.OpenDT(sql);
-			cnt=DT.getCount();
-			st=pps+" "+cnt;
 
-			sp=sp+st+"\n";
+			if (DT.getCount()>0){
+				cnt=DT.getCount();
+				st=pps+" "+cnt;
+				sp=sp+st+"\n";
+			}
 
 			return cnt;
 		} catch (Exception e) {
@@ -71,8 +74,9 @@ public class AppMethods {
 
 	//Función para saber la cantidad de registros en una tabla específica
 	public int getDocCountTipo(String tipo) {
+
 		Cursor DT;
-		int cnt;
+		int cnt = 0;
 		String st, ss;
 		String pps = "";
 
@@ -81,43 +85,49 @@ public class AppMethods {
 			switch(tipo) {
 				case "Facturas":
 
-					sql="SELECT COREL FROM D_FACTURA";
+					sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_FACTURA";
 					break;
 
 				case "Pedidos":
 
-					sql="SELECT COREL FROM D_PEDIDO";
+					sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_PEDIDO";
 					break;
 
 				case "Cobros":
 
-					sql="SELECT DOCUMENTO FROM P_COBRO";
+					sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_COBRO";
 					break;
 
 				case "Devolucion":
 
-					sql="SELECT COREL FROM D_NOTACRED";
+					sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_NOTACRED";
 					break;
 
 				case "Inventario":
 
-					sql=" SELECT COREL FROM P_STOCK " +
-					    " UNION SELECT COREL FROM P_STOCKB " +
-					    " UNION SELECT COREL FROM P_STOCK_PALLET";
+					sql=" SELECT IFNULL(SUM(A.CANT),0) AS CANT " +
+						" FROM (SELECT IFNULL(COUNT(DOCUMENTO),0) AS CANT FROM P_STOCK " +
+						" UNION SELECT IFNULL(COUNT(DOCUMENTO),0) AS CANT FROM P_STOCKB " +
+						" UNION SELECT IFNULL(COUNT(DOCUMENTO),0) AS CAN FROM P_STOCK_PALLET) A";
 					break;
 			}
 
 			DT=Con.OpenDT(sql);
-			cnt=DT.getCount();
-			st=pps+" "+cnt;
 
+			if (DT.getCount()>0){
+			    DT.moveToFirst();
+				cnt=DT.getInt(0);
+			}
+
+			st=pps+" "+cnt;
 			sp=sp+st+"\n";
 
-			return cnt;
 		} catch (Exception e) {
-			//mu.msgbox(sql+"\n"+e.getMessage());
-			return 0;
+
 		}
+
+		return cnt;
+
 	}
 
 

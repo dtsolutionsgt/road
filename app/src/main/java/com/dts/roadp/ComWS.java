@@ -98,6 +98,7 @@ public class ComWS extends PBase {
 		System.setProperty("line.separator","\r\n");
 		
 		dbld=new clsDataBuilder(this);
+		claseFindia=new clsFinDia(this);
 		
 		lblInfo= (TextView) findViewById(R.id.lblETipo);
 		lblParam= (TextView) findViewById(R.id.lblProd);
@@ -176,8 +177,9 @@ public class ComWS extends PBase {
 
             if (ExistenDatos()) {
                 BorraDatosAnteriores("¿Tiene facturas, pedidos, cobros, devoluciones o inventario, está seguro de borrar los datos?");
-            }
-
+            }else{
+				msgAskConfirmaRecibido();
+			}
         }
         else{
             msgAskConfirmaRecibido();
@@ -198,6 +200,11 @@ public class ComWS extends PBase {
 				}
 			}
 
+			if (gl.banderafindia) {
+				if (!puedeComunicar()) {
+					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");return;
+				}
+			}
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -219,7 +226,29 @@ public class ComWS extends PBase {
 
 			
 	}	
-	
+
+	private boolean puedeComunicar(){
+
+		boolean vPuedeCom =false;
+
+		try{
+
+			//#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
+			if (gl.banderafindia) {
+
+				return ((claseFindia.getImprimioCierreZ() == 7));
+
+			}else{
+			return  true;
+		}
+
+		}catch (Exception ex){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
+		}
+
+		return vPuedeCom;
+	}
+
 	public void askExist(View view) {
 
 		try{
@@ -243,9 +272,6 @@ public class ComWS extends PBase {
 		if (isbusy==1) {
 			toastcent("Por favor, espere que se termine la tarea actual.");return;
 		}
-
-
-			
 	}
 
 	//region Main
@@ -326,11 +352,11 @@ public class ComWS extends PBase {
 
 		try{
 
-			pend=pend+getDocCount("SELECT SERIE,CORELATIVO FROM D_FACTURA WHERE STATCOM<>'S'","Fact: ");
-			pend=pend+getDocCount("SELECT COREL FROM D_PEDIDO WHERE STATCOM<>'S'","Ped: ");
-			pend=pend+getDocCount("SELECT COREL FROM D_COBRO WHERE STATCOM<>'S'","Rec: ");
-			pend=pend+getDocCount("SELECT TOTAL FROM D_DEPOS WHERE STATCOM<>'S'","Dep: ");
-			pend=pend+getDocCount("SELECT COREL FROM D_MOV WHERE STATCOM<>'S'","Inv : ");
+			pend=pend+getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_FACTURA WHERE STATCOM<>'S'","Fact: ");
+			pend=pend+getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_PEDIDO WHERE STATCOM<>'S'","Ped: ");
+			pend=pend+getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_COBRO WHERE STATCOM<>'S'","Rec: ");
+			pend=pend+getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_DEPOS WHERE STATCOM<>'S'","Dep: ");
+			pend=pend+getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_MOV WHERE STATCOM<>'S'","Inv : ");
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -631,13 +657,19 @@ public class ComWS extends PBase {
 
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=2";	
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
-			
-			val=DT.getString(0);
+
+			if (DT.getCount()>0){
+
+				DT.moveToFirst();
+
+				val=DT.getString(0);
+
+			}else {
+				val="N";
+			}
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			val="N";
 		}	
 		
 		if (val.equalsIgnoreCase("S")) gl.peStockItf=true; else gl.peStockItf=false;
@@ -753,6 +785,7 @@ public class ComWS extends PBase {
 
                 sql = listItems.get(i);esql=sql;
                 sql=sql.replace("INTO VENDEDORES","INTO P_VENDEDOR");
+				sql=sql.replace("INTO P_RAZONNOSCAN","INTO P_CODNOLEC");
 
 				try {
 					writer.write(sql);writer.write("\r\n");
@@ -1140,7 +1173,7 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_CODNOLEC")) {
-			SQL = "SELECT * FROM P_CODNOLEC";
+			SQL = "SELECT CODIGO, DESCRIPCION AS NOMBRE  FROM P_RAZONNOSCAN";
 			return SQL;
 		}
 
@@ -1749,17 +1782,18 @@ public class ComWS extends PBase {
 
 			envioFinDia();
 
+			claseFindia.updateComunicacion(2);
+			claseFindia.updateFinDia(du.getActDate());
+
 			if (envioparcial == false) {
 
 				findiaactivo=gl.findiaactivo;
 				if (ultimoCierreFecha()==du.getActDate()) findiaactivo=true;
 
 				if (findiaactivo) {
-					claseFindia = new clsFinDia(this);
 					FinDia();
 					claseFindia.eliminarTablasD();
 				}
-
 			}
 
             dbld.savelog();
@@ -1784,12 +1818,12 @@ public class ComWS extends PBase {
 
             AddTableVL("P_LIQUIDACION") ;
 
-            sql = listItems.get(0);
-            db.execSQL(sql);
-
-            if (listItems.size() == 1){
-            	return true;
+			if (listItems.size()< 2){
+				return true;
 			}
+
+            sql = listItems.get(0);
+			db.execSQL(sql);
 
             sql = listItems.get(1);
             db.execSQL(sql);
@@ -2496,7 +2530,6 @@ public class ComWS extends PBase {
 
 			if (envioparcial) commitSQL();
 
-
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			fstr=e.getMessage();
@@ -2713,6 +2746,7 @@ public class ComWS extends PBase {
 	public void wsSendExecute(){
 
 		running=1;fstr="No connect";scon=0;
+        errflag=false;
 					
 		try {
 
@@ -2745,13 +2779,16 @@ public class ComWS extends PBase {
 		//senv="Envio completo\n";
 
 		try{
+            if (scon==0) {
+                lblInfo.setText(fstr);writeErrLog(fstr);
+                mu.msgbox(fstr);
+            }
+
 			if (!errflag) {
 				lblInfo.setText(" ");
-				if (scon==0) {
-					lblInfo.setText(fstr);writeErrLog(fstr);mu.msgbox(fstr);
-				}
 			} else {
-				lblInfo.setText(fstr);writeErrLog(fterr);mu.msgbox(fterr);
+				lblInfo.setText(fstr);writeErrLog(fterr);
+				mu.msgbox(fterr);
 			}
 
 			if (envioparcial) mu.msgbox(senv);
@@ -2943,20 +2980,25 @@ public class ComWS extends PBase {
 		txtEmp.setText(gEmpresa);
 		
 		try {
+
 			sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='"+ruta+"'";
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			
-			//if (gl.tipo==0) {
-			//	wsurl=DT.getString(1);			
-			//} else {	
-			//	wsurl=DT.getString(0);
-			//}
-			
-			wsurl=DT.getString(0);
-			
-			URL=wsurl;
-			txtWS.setText(URL);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+
+				//if (gl.tipo==0) {
+				//	wsurl=DT.getString(1);
+				//} else {
+				//	wsurl=DT.getString(0);
+				//}
+
+				wsurl=DT.getString(0);
+
+				URL=wsurl;
+				txtWS.setText(URL);
+			}
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//MU.msgbox(e.getMessage());
@@ -3000,27 +3042,34 @@ public class ComWS extends PBase {
 	}
 
 	private int getDocCount(String ss,String pps) {
-		Cursor DT;
-		int cnt;
+
+	    Cursor DT;
+		int cnt = 0;
 		String st;
 
 		try {
+
 			sql=ss;
 			DT=Con.OpenDT(sql);
-			cnt=DT.getCount();
 
-			if (cnt>0) {
+            if (DT.getCount()>0){
+				DT.moveToFirst();
+            	cnt=DT.getInt(0);
+            }
+
+            if (cnt>0) {
 				st=pps+" "+cnt;
 				sp=sp+st+", ";
 			}
 
-			return cnt;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(sql+"\n"+e.getMessage());
-			return 0;
 		}
-	}
+
+        return cnt;
+
+    }
 
 	private boolean validaLicencia() {
 		Cursor dt;
@@ -3068,16 +3117,19 @@ public class ComWS extends PBase {
 	
 	private int ultCorel() {
 		Cursor DT;
-		int crl;
+		int crl = 0;
 		
 		try {
 			sql="SELECT CORELULT FROM P_COREL";
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			crl=DT.getInt(0);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				crl=DT.getInt(0);
+			}
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			crl=0;
 		}	
 		
 		return crl;
@@ -3112,12 +3164,15 @@ public class ComWS extends PBase {
 
 		try {
 
-			sql="SELECT EMAIL FROM P_RUTA";
+			sql="SELECT IFNULL(EMAIL,0) AS FECHA FROM P_RUTA";
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
 
 			if(DT.getCount()>0){
+
+                DT.moveToFirst();
+
 				fecha=DT.getInt(0);
+
 				if (fecha==0)
 				{
 					fecha = 1001010000 ;//#HS_20181129_0945 Cambie los valores de fecha porque deben se yymmdd hhmm
@@ -3349,16 +3404,13 @@ public class ComWS extends PBase {
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					claseFindia = new clsFinDia(ComWS.this);
 					claseFindia.eliminarTablasD();
 					msgAskConfirmaRecibido();
 				}
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					msgAskConfirmaRecibido();
-				}
+				public void onClick(DialogInterface dialog, int which) {}
 			});
 
 			dialog.show();

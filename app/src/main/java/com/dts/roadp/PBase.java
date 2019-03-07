@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -106,7 +107,23 @@ public class PBase extends Activity {
 		toast.show();
 	}	
 	
-	protected void addlog(String methodname,String msg,String info) {
+	protected void addlog(final String methodname, String msg, String info) {
+
+		final String vmethodname = methodname;
+		final String vmsg = msg;
+		final String vinfo = info;
+
+		final Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				setAddlog(vmethodname,vmsg, vinfo);
+			}
+		}, 500);
+
+	}
+
+	protected void setAddlog(String methodname,String msg,String info) {
 
 		BufferedWriter writer = null;
 		FileWriter wfile;
@@ -125,7 +142,6 @@ public class PBase extends Activity {
 		} catch (Exception e) {
 			msgbox("Error " + e.getMessage());
 		}
-
 	}
 
 

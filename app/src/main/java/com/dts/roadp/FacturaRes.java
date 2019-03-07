@@ -1584,7 +1584,7 @@ public class FacturaRes extends PBase {
 		try {
 			sql="SELECT SUM(VALOR) FROM T_PAGO";	
 			DT=Con.OpenDT(sql);
-				
+
 			DT.moveToFirst();
 			
 			tpago=DT.getDouble(0);

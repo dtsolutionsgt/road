@@ -453,7 +453,7 @@ public class ProdCant extends PBase {
 					if (ppeso <= 0) throw new Exception();
 				} catch (Exception e) {
 					if (porpeso) {
-						mu.msgbox("Peso incorrect");
+						mu.msgbox("Peso incorrecto");
 						txtPeso.requestFocus();
 						return;
 					}
@@ -649,13 +649,13 @@ public class ProdCant extends PBase {
 			pmax = opeso + dt.getDouble(1) * opeso / 100;
 
 			if (vpeso<pmin) {
-				ss="El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por debajo de los percentajes permitidos," +
+				ss="El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por debajo de los porcentajes permitidos," +
 						" minimo : "+mu.frmdecimal(pmin, gl.peDecImp)+", no se puede aplicar.";
 				msgbox(ss);return false;
 			}
 
 			if (vpeso>pmax) {
-				ss="El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por debajo de los percentajes permitidos," +
+				ss="El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por encima de los percentajes permitidos," +
 						" máximo : "+mu.frmdecimal(pmax, gl.peDecImp)+", no se puede aplicar.";
 				msgbox(ss);return false;
 			}

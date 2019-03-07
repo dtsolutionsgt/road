@@ -794,22 +794,27 @@ public class Cobro extends PBase {
 
 			tsel=0;
 
-			if (adapter.getCount()>0){
+			if (adapter!=null){
 
-                dc=adapter.getCount();
+				if (adapter.getCount()>0){
 
-                for (int i = 0; i < dc; i++ ) {
-                    lvObj = listView.getItemAtPosition(i);
-                    vItem = (clsClasses.clsCobro)lvObj;
+					dc=adapter.getCount();
 
-                    flag=vItem.flag;
-                    if (flag==1) {
-                        val=vItem.Saldo;
-                        tsel+=val;
-                    }
-                }
+					for (int i = 0; i < dc; i++ ) {
+						lvObj = listView.getItemAtPosition(i);
+						vItem = (clsClasses.clsCobro)lvObj;
 
-            }
+						flag=vItem.flag;
+						if (flag==1) {
+							val=vItem.Saldo;
+							tsel+=val;
+						}
+					}
+
+				}
+
+
+			}
 
 
 		}catch (Exception e){

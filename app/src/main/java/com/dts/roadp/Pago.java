@@ -796,7 +796,6 @@ public class Pago extends PBase {
 				public void onClick(DialogInterface dialog, int which) {
 					if (totalPago()>0){
 						gl.pagado = true;
-						toast("doexit");
 						doExit();
 					}
 				}

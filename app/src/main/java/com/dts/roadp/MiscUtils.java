@@ -50,7 +50,7 @@ public class MiscUtils {
 
 	//#CKFK 20190226 Agregué esta función porque necesito el formato sin moneda
 	public String frmcur_sm(double val) {
-		return curr+ffrmdec.format(val);
+		return ffrmdec.format(val);
 	}
 	
 	public String frmval(double val) {
@@ -155,24 +155,26 @@ public class MiscUtils {
 	public void msgbox(String msg) {
 
 		try{
-			if (msg==null || msg.isEmpty()) {return;}
 
-			AlertDialog.Builder dialog = new AlertDialog.Builder(cCont);
+			if (!emptystr(msg)){
 
-			dialog.setTitle(R.string.app_name);
-			dialog.setMessage(msg);
+				AlertDialog.Builder dialog = new AlertDialog.Builder(cCont);
 
-			dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					//Toast.makeText(getApplicationContext(), "Yes button pressed",Toast.LENGTH_SHORT).show();
-				}
-			});
-			dialog.show();
+				dialog.setTitle(R.string.app_name);
+				dialog.setMessage(msg);
+
+				dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						//Toast.makeText(getApplicationContext(), "Yes button pressed",Toast.LENGTH_SHORT).show();
+					}
+				});
+				dialog.show();
+
+			}
 
 		}catch (Exception ex)
 		{
-			Log.e("msg", ex.getMessage());
-		}
+			Log.e("msg", ex.getMessage());		}
 	}   
 	
 	public void msgbox(int v) {

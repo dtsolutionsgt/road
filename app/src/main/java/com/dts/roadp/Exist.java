@@ -1,10 +1,5 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
-import com.dts.roadp.clsClasses.clsExist;
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,11 +10,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.dts.roadp.clsClasses.clsExist;
+
+import java.util.ArrayList;
 
 public class Exist extends PBase {
 
@@ -206,16 +204,17 @@ public class Exist extends PBase {
 
 		try {
 
-			//vSQL="SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT),SUM(P_STOCK.CANTM) "+
-			//     "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
-			//if (vF.length()>0) vSQL=vSQL+"AND ((P_PRODUCTO.DESCLARGA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
-			//vSQL+="GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA ORDER BY P_PRODUCTO.DESCLARGA";
-
 			sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA " +
 					"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
-			if (vF.length() > 0)
-				sql = sql + "AND ((P_PRODUCTO.DESCLARGA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
-			sql += "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA ORDER BY P_PRODUCTO.DESCLARGA ";
+			if (vF.length() > 0) sql = sql + "AND ((P_PRODUCTO.DESCLARGA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
+			sql += "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA ";
+			sql += "UNION ";
+			sql += "SELECT P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA " +
+					"FROM P_STOCKB INNER JOIN P_PRODUCTO ON P_STOCKB.CODIGO=P_PRODUCTO.CODIGO ";
+			if (vF.length() > 0) sql = sql + "AND ((P_PRODUCTO.DESCLARGA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
+			sql += "GROUP BY P_STOCKB.CODIGO, P_PRODUCTO.DESCLARGA ";
+			sql += "ORDER BY P_PRODUCTO.DESCLARGA";
+
 			dp = Con.OpenDT(sql);
 
 			if (dp.getCount() == 0) {
@@ -227,16 +226,23 @@ public class Exist extends PBase {
 			lblReg.setText(" ( " + dp.getCount() + " ) ");
 			dp.moveToFirst();
 
+
 			while (!dp.isAfterLast()) {
 
 				pcod=dp.getString(0);
                 valt=0;pesot=0;
 
-				sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT),SUM(P_STOCK.CANTM),P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS,SUM(P_STOCK.PESO)  " +
-						"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  ";
-				sql += "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
-                        "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
-                        "ORDER BY P_STOCK.CANT";
+				sql =  "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT) AS TOTAL,SUM(P_STOCK.CANTM),P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS,SUM(P_STOCK.PESO)  " +
+					   "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  " +
+					   "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
+                       "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS ";
+           		sql+=  "UNION ";
+				sql+=  "SELECT P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCKB.CANT) AS TOTAL, 0 AS Expr2,P_STOCKB.UNIDADMEDIDA, '' AS Expr4, P_STOCKB.DOCUMENTO,P_STOCKB.CENTRO,P_STOCKB.STATUS, SUM(P_STOCKB.PESO) AS Expr3 "+
+				       "FROM  P_STOCKB INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCKB.CODIGO "+
+				       "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
+					   "GROUP BY P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCKB.UNIDADMEDIDA,P_STOCKB.DOCUMENTO,P_STOCKB.CENTRO,P_STOCKB.STATUS "+
+				       "ORDER BY TOTAL ";
+
 				dt = Con.OpenDT(sql);
 				icnt=dt.getCount();
                 if (icnt==1) {
@@ -251,9 +257,9 @@ public class Exist extends PBase {
 				item.items=icnt;
 				items.add(item);
 
-				if (dt.getCount() == 0) return;
+				//if (dt.getCount() == 0) return;
 
-				dt.moveToFirst();
+				if (dt.getCount()>0) dt.moveToFirst();
 				while (!dt.isAfterLast()) {
 
 					cod = dt.getString(0);

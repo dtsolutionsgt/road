@@ -30,6 +30,7 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".ayudante_vehiculo" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"

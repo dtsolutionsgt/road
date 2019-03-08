@@ -86,7 +86,6 @@ public class Aprofam1 extends PBase {
 	}
 
 	public void doExit(View view) {
-
 		try{
 			super.finish();
 
@@ -107,17 +106,20 @@ public class Aprofam1 extends PBase {
 		    		spinlabel.setTextColor(Color.BLACK);
 			    	spinlabel.setPadding(5, 0, 0, 0);
 			    	spinlabel.setTextSize(22);
+
+					ref1=code1.get(position);
 		        } catch (Exception e) {
 		    		addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					ref1="*";
 		        }
 
-		    	try {
+		    /*	try {
 		    		ref1=code1.get(position);
 		        } catch (Exception e) {
 		    		addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		        	ref1="*";
 		        }
-
+			*/
 		    }
 
 		    @Override
@@ -137,17 +139,20 @@ public class Aprofam1 extends PBase {
 		  	    	spinlabel.setTextColor(Color.BLACK);
 			    	spinlabel.setPadding(5, 0, 0, 0);
 			    	spinlabel.setTextSize(22);
+
+					ref2=code2.get(position);
 		        } catch (Exception e) {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					ref2="*";
 		        }
 
-		    	try {
+		    /*	try {
 		    		ref2=code2.get(position);
 		        } catch (Exception e) {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		        	ref2="*";
 		        }
-
+			*/
 		    }
 
 		    @Override

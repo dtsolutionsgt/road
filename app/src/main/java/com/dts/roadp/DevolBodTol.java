@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class DevolBodTol extends PBase {
 
     private ListView listView;
-    private TextView lblReg;
+    private TextView lblReg,lblTot;
     private ImageView imgNext;
 
     private ArrayList<clsClasses.clsExist> items= new ArrayList<clsClasses.clsExist>();
@@ -36,6 +36,7 @@ public class DevolBodTol extends PBase {
 
         listView = (ListView) findViewById(R.id.listView1);
         lblReg = (TextView) findViewById(R.id.textView61);lblReg.setText("");
+        lblTot = (TextView) findViewById(R.id.textView70);lblTot.setText("");
         imgNext = (ImageView) findViewById(R.id.imgTitLogo);
 
         setHandlers();
@@ -98,13 +99,19 @@ public class DevolBodTol extends PBase {
         double val, valm, valt, peso, pesot;
         int icnt;
 
-        items.clear();
+        items.clear(); valt=0;pesot=0;
 
         try {
 
-            sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA " +
-                  "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
-            sql += "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA ORDER BY P_PRODUCTO.DESCLARGA ";
+            sql =  "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA " +
+                   "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
+            sql += "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA ";
+            sql += "UNION ";
+            sql += "SELECT P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA " +
+                   "FROM P_STOCKB INNER JOIN P_PRODUCTO ON P_STOCKB.CODIGO=P_PRODUCTO.CODIGO ";
+            sql += "GROUP BY P_STOCKB.CODIGO, P_PRODUCTO.DESCLARGA ";
+            sql += "ORDER BY P_PRODUCTO.DESCLARGA";
+
             dp = Con.OpenDT(sql);
 
             if (dp.getCount() == 0) {
@@ -119,13 +126,18 @@ public class DevolBodTol extends PBase {
             while (!dp.isAfterLast()) {
 
                 pcod=dp.getString(0);
-                valt=0;pesot=0;
 
-                sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT),SUM(P_STOCK.CANTM),P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,SUM(P_STOCK.PESO)  " +
-                      "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  ";
-                sql+= "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
-                      "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE " +
-                      "ORDER BY P_STOCK.CANT";
+                sql =  "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT) AS TOTAL,SUM(P_STOCK.CANTM),P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS,SUM(P_STOCK.PESO)  " +
+                        "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  " +
+                        "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
+                        "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS ";
+                sql+=  "UNION ";
+                sql+=  "SELECT P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCKB.CANT) AS TOTAL, 0 AS Expr2,P_STOCKB.UNIDADMEDIDA, '' AS Expr4, P_STOCKB.DOCUMENTO,P_STOCKB.CENTRO,P_STOCKB.STATUS, SUM(P_STOCKB.PESO)  "+
+                        "FROM  P_STOCKB INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCKB.CODIGO "+
+                        "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
+                        "GROUP BY P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCKB.UNIDADMEDIDA,P_STOCKB.DOCUMENTO,P_STOCKB.CENTRO,P_STOCKB.STATUS "+
+                        "ORDER BY TOTAL ";
+
                 dt = Con.OpenDT(sql);
                 icnt=dt.getCount();
                 if (icnt==1) {
@@ -140,9 +152,7 @@ public class DevolBodTol extends PBase {
                 item.items=icnt;
                 items.add(item);
 
-                if (dt.getCount() == 0) return;
-
-                dt.moveToFirst();
+                if (dt.getCount() > 0) dt.moveToFirst();
                 while (!dt.isAfterLast()) {
 
                     cod = dt.getString(0);
@@ -150,7 +160,7 @@ public class DevolBodTol extends PBase {
                     val = dt.getDouble(2);
                     valm = dt.getDouble(3);
                     um = dt.getString(4);
-                    peso =  dt.getDouble(6);
+                    peso =  dt.getDouble(9);
 
                     valt += val + valm;
                     pesot += peso ;
@@ -213,6 +223,9 @@ public class DevolBodTol extends PBase {
 
                 dp.moveToNext();
             }
+
+            lblTot.setText("Cant : " + mu.frmdecno(valt)+" Peso : "+pesot+" "+gl.umpeso);
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());

@@ -1,35 +1,14 @@
 package com.dts.roadp;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import org.apache.commons.io. IOUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.security.KeyStore;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.Lifecycle;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -42,24 +21,18 @@ import android.util.JsonToken;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebSettings;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import uk.co.senab.photoview.PhotoViewAttacher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.widget.ZoomControls;
 
 import static android.app.Activity.RESULT_OK;
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
@@ -77,6 +50,8 @@ public class CliDet extends PBase {
 	private String imagenbase64,path;
 	private Boolean imgPath, imgDB;
 	private PhotoViewAttacher zoomFoto;
+	private AppMethods app;
+	private double credito;
 	////
 	private double clim,cused,cdisp;
 	private int nivel,browse,merc;
@@ -114,7 +89,9 @@ public class CliDet extends PBase {
 		imgCobro= (ImageView) findViewById(R.id.imageView2);
 		imgDevol= (ImageView) findViewById(R.id.imageView1);
 		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
-		
+
+		app = new AppMethods(this, gl, Con, db);
+		credito=gl.credito;
 		/*
 		Con = new BaseDatos(this);
 	    opendb();
@@ -161,20 +138,21 @@ public class CliDet extends PBase {
 			StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
 			StrictMode.setVmPolicy(builder.build());
 
-			try {
+		//	try {
 
 				Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 				File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
 				intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
 				startActivityForResult(intento1,codResult);
 
-			}catch (Exception e){
+		/*	}catch (Exception e){
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				//mu.msgbox("tomarFoto: "+ e.getMessage());
 				mu.msgbox("No se puede activar la camara. ");
-			}
+			}*/
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox(e.getMessage());
 		}
 
 
@@ -256,7 +234,7 @@ public class CliDet extends PBase {
 		
 		try {
 			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
-				"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST "+
+				"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO "+
 				 "FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
            	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
@@ -295,6 +273,7 @@ public class CliDet extends PBase {
 			gl.vcredito = DT.getString(13).equalsIgnoreCase("S");
 			gl.vcheque = DT.getString(14).equalsIgnoreCase("S");
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
+			gl.clitipo = DT.getString(16);
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -533,7 +512,16 @@ public class CliDet extends PBase {
 		//gl.rutatipo="V";
 
 		try{
-			if (!validaVenta()) return;
+
+			if (!validaVenta()) return;//Se valida si hay correlativos de factura para la venta
+
+			if (gl.vcredito) {
+
+				if (credito<=0) {
+					msgAskFact();
+					return;
+				}
+			}
 
 			if(porcentaje == false) {
 				VerificaCantidad();
@@ -647,7 +635,35 @@ public class CliDet extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+	}
 
+	private void  msgAskFact() {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("Cliente no tiene credito, Desea continuar la facturacion al contado?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if(porcentaje == false) {
+						VerificaCantidad();
+					}
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					closekeyb();
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 
 	//#HS_20181207 Cuadro de dialogo para editar datos del cliente
@@ -760,7 +776,7 @@ public class CliDet extends PBase {
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("sms:"+to)));
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		msgbox("No pudo enviar mensaje : "+e.getMessage());
+			msgbox("No pudo enviar mensaje : "+e.getMessage());
 		}
 
 		//try {
@@ -779,11 +795,12 @@ public class CliDet extends PBase {
 
 		//to="42161467";
 
-		if (to.length()==0) {
-			msgbox("Número incorrecto ");return;
-		}
-
 		try {
+
+			if (to.length()==0) {
+				msgbox("Número incorrecto ");return;
+			}
+
 			Intent callIntent = new Intent(Intent.ACTION_CALL);
 			callIntent.setData(Uri.parse("tel:"+to));
 			startActivity(callIntent);

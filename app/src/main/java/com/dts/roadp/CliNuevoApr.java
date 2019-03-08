@@ -141,12 +141,12 @@ public class CliNuevoApr extends PBase {
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-					try {
+				//	try {
 						TextView spinlabel=(TextView) parentView.getChildAt(0);
 						spinlabel.setTypeface(lblFecha.getTypeface());
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 
 				@Override
@@ -157,12 +157,12 @@ public class CliNuevoApr extends PBase {
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-					try {
+				//	try {
 						TextView spinlabel=(TextView) parentView.getChildAt(0);
 						spinlabel.setTypeface(lblFecha.getTypeface());
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 
 				@Override
@@ -173,12 +173,12 @@ public class CliNuevoApr extends PBase {
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-					try {
+				//	try {
 						TextView spinlabel=(TextView) parentView.getChildAt(0);
 						spinlabel.setTypeface(lblFecha.getTypeface());
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 
 				@Override
@@ -189,12 +189,12 @@ public class CliNuevoApr extends PBase {
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-					try {
+				//	try {
 						TextView spinlabel=(TextView) parentView.getChildAt(0);
 						spinlabel.setTypeface(lblFecha.getTypeface());
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 
 				@Override
@@ -205,12 +205,12 @@ public class CliNuevoApr extends PBase {
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-					try {
+				//	try {
 						TextView spinlabel=(TextView) parentView.getChildAt(0);
 						spinlabel.setTypeface(lblFecha.getTypeface());
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 
 				@Override
@@ -221,12 +221,12 @@ public class CliNuevoApr extends PBase {
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-					try {
+				//	try {
 						TextView spinlabel=(TextView) parentView.getChildAt(0);
 						spinlabel.setTypeface(lblFecha.getTypeface());
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 
 				@Override
@@ -276,13 +276,13 @@ public class CliNuevoApr extends PBase {
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			iddep=dt.getString(0);
-		} catch (Exception e) {
+	/*	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());return;
 		}
 
 		
-		try {
+		try {*/
 	
 			ins.init("D_CLINUEVO_APR");
 
@@ -310,6 +310,7 @@ public class CliNuevoApr extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 			mu.msgbox(e.getMessage());
+		//	return;
 		}			
 	}
 	   
@@ -357,107 +358,105 @@ public class CliNuevoApr extends PBase {
 		boolean valido=true;
 		cuimsg="";
 
-		// Acá se compara la expresión regular con el string ingresado
-		Pattern pattern = Pattern.compile(PATTERN_CUI);
-		// Match the given input against this pattern
-		Matcher matcher = pattern.matcher(Cui);
-		boolean validCui= matcher.matches();
+		try {
+			// Acá se compara la expresión regular con el string ingresado
+			Pattern pattern = Pattern.compile(PATTERN_CUI);
+			// Match the given input against this pattern
+			Matcher matcher = pattern.matcher(Cui);
+			boolean validCui = matcher.matches();
 
-		// Se reemplazan los espacios en blanco en la cadena (si tiene)
-		Cui = Cui.replace(" ", "");
+			// Se reemplazan los espacios en blanco en la cadena (si tiene)
+			Cui = Cui.replace(" ", "");
 
-		//Si la cadena cumple con la expresion regular debemos de verificar que sea un CUI válido
-		if(validCui ==true){
+			//Si la cadena cumple con la expresion regular debemos de verificar que sea un CUI válido
+			if (validCui == true) {
 
-			// Extraemos el numero del DPI
-			String no = Cui.substring(0, 8);
-			// Extraemos el numero de Departamento
-			int depto = Integer.parseInt(Cui.substring(9, 11));
-			// Extraemos el numero de Municipio
-			int muni = Integer.parseInt(Cui.substring(11,13));
+				// Extraemos el numero del DPI
+				String no = Cui.substring(0, 8);
+				// Extraemos el numero de Departamento
+				int depto = Integer.parseInt(Cui.substring(9, 11));
+				// Extraemos el numero de Municipio
+				int muni = Integer.parseInt(Cui.substring(11, 13));
 
-			// Se extra el numero validador
-			int ver = Integer.parseInt(Cui.substring(8,9));
+				// Se extra el numero validador
+				int ver = Integer.parseInt(Cui.substring(8, 9));
 
-			// Array con la cantidad de municipios que contiene cada departamento.
+				// Array con la cantidad de municipios que contiene cada departamento.
 
-			int munisPorDepto[] = {
-					/* 01 - Guatemala tiene:      */ 17 /* municipios. */,
-					/* 02 - El Progreso tiene:    */  8 /* municipios. */,
-					/* 03 - Sacatepéquez tiene:   */ 16 /* municipios. */,
-					/* 04 - Chimaltenango tiene:  */ 16 /* municipios. */,
-					/* 05 - Escuintla tiene:      */ 13 /* municipios. */,
-					/* 06 - Santa Rosa tiene:     */ 14 /* municipios. */,
-					/* 07 - Sololá tiene:         */ 19 /* municipios. */,
-					/* 08 - Totonicapán tiene:    */  8 /* municipios. */,
-					/* 09 - Quetzaltenango tiene: */ 24 /* municipios. */,
-					/* 10 - Suchitepéquez tiene:  */ 21 /* municipios. */,
-					/* 11 - Retalhuleu tiene:     */  9 /* municipios. */,
-					/* 12 - San Marcos tiene:     */ 30 /* municipios. */,
-					/* 13 - Huehuetenango tiene:  */ 32 /* municipios. */,
-					/* 14 - Quiché tiene:         */ 21 /* municipios. */,
-					/* 15 - Baja Verapaz tiene:   */  8 /* municipios. */,
-					/* 16 - Alta Verapaz tiene:   */ 17 /* municipios. */,
-					/* 17 - Petén tiene:          */ 14 /* municipios. */,
-					/* 18 - Izabal tiene:         */  5 /* municipios. */,
-					/* 19 - Zacapa tiene:         */ 11 /* municipios. */,
-					/* 20 - Chiquimula tiene:     */ 11 /* municipios. */,
-					/* 21 - Jalapa tiene:         */  7 /* municipios. */,
-					/* 22 - Jutiapa tiene:        */ 17 /* municipios. */
-			};
+				int munisPorDepto[] = {
+						/* 01 - Guatemala tiene:      */ 17 /* municipios. */,
+						/* 02 - El Progreso tiene:    */  8 /* municipios. */,
+						/* 03 - Sacatepéquez tiene:   */ 16 /* municipios. */,
+						/* 04 - Chimaltenango tiene:  */ 16 /* municipios. */,
+						/* 05 - Escuintla tiene:      */ 13 /* municipios. */,
+						/* 06 - Santa Rosa tiene:     */ 14 /* municipios. */,
+						/* 07 - Sololá tiene:         */ 19 /* municipios. */,
+						/* 08 - Totonicapán tiene:    */  8 /* municipios. */,
+						/* 09 - Quetzaltenango tiene: */ 24 /* municipios. */,
+						/* 10 - Suchitepéquez tiene:  */ 21 /* municipios. */,
+						/* 11 - Retalhuleu tiene:     */  9 /* municipios. */,
+						/* 12 - San Marcos tiene:     */ 30 /* municipios. */,
+						/* 13 - Huehuetenango tiene:  */ 32 /* municipios. */,
+						/* 14 - Quiché tiene:         */ 21 /* municipios. */,
+						/* 15 - Baja Verapaz tiene:   */  8 /* municipios. */,
+						/* 16 - Alta Verapaz tiene:   */ 17 /* municipios. */,
+						/* 17 - Petén tiene:          */ 14 /* municipios. */,
+						/* 18 - Izabal tiene:         */  5 /* municipios. */,
+						/* 19 - Zacapa tiene:         */ 11 /* municipios. */,
+						/* 20 - Chiquimula tiene:     */ 11 /* municipios. */,
+						/* 21 - Jalapa tiene:         */  7 /* municipios. */,
+						/* 22 - Jutiapa tiene:        */ 17 /* municipios. */
+				};
 
 
+				//Verificamos que no se haya ingresado 0 en la posicion de depto o municipio
+				if ((muni == 0 || depto == 0) || (muni == 0 && depto == 0)) {
+					valido = false;
+					cuimsg += "CUI no válido";
+				} else {
+					//Si el numero de depto ingresado en la cadena es mayor 22 es cui invalido
+					cuimsg += "munixdepto: " + munisPorDepto.length;
+					if (depto > munisPorDepto.length) {
+						valido = false;
+						cuimsg += "CUI no válido Departamento fuera de rango";
+					} else {
+						//si depto es menor o igual a 22
 
-			//Verificamos que no se haya ingresado 0 en la posicion de depto o municipio
-			if((muni==0 || depto==0) || (muni==0 && depto==0)){
-				valido=false;
-				cuimsg+="CUI no válido";
-			}
+						cuimsg += "Municipios maximos: " + munisPorDepto[depto - 1];
+						//se valida que el municipio ingresado en la cadena este dentro del rango del depto
+						if (muni > munisPorDepto[depto - 1]) {
+							valido = false;
+							cuimsg += "CUI no válido municipio fuera de rango";
+						} else {
 
-			else{
-				//Si el numero de depto ingresado en la cadena es mayor 22 es cui invalido
-				cuimsg+="munixdepto: " + munisPorDepto.length;
-				if(depto > munisPorDepto.length ){
-					valido=false;
-					cuimsg+="CUI no válido Departamento fuera de rango";
-				}
-				else{
-					//si depto es menor o igual a 22
+							// si es valido
+							int total = 0;
+							//Se realiza la siguiente Ooperación
+							for (int i = 0; i < no.length(); i++) {
+								cuimsg += "-" + no.substring(i, i + 1);
+								total += (Integer.parseInt(no.substring(i, i + 1))) * (i + 2);
+							}
 
-					cuimsg+="Municipios maximos: " +  munisPorDepto[depto -1];
-					//se valida que el municipio ingresado en la cadena este dentro del rango del depto
-					if(muni > munisPorDepto[depto -1]){
-						valido=false;
-						cuimsg+="CUI no válido municipio fuera de rango";
-					}
+							// al total de la anterior operación se le saca el mod 11
 
-					else{
+							int modulo = total % 11;
+							cuimsg += "CUI con módulo" + modulo;
 
-						// si es valido
-						int total=0;
-						//Se realiza la siguiente Ooperación
-						for(int i=0; i<no.length(); i++){
-							cuimsg+="-" +no.substring(i,i+1);
-							total += (Integer.parseInt(no.substring(i,i+1)))*(i + 2);
-						}
-
-						// al total de la anterior operación se le saca el mod 11
-
-						int modulo=total%11;
-						cuimsg+="CUI con módulo" + modulo;
-
-						// Si el mod es igual al numero verificador el cui es valido , sino es invalido
-						if(modulo!=ver){
-							valido=false;
+							// Si el mod es igual al numero verificador el cui es valido , sino es invalido
+							if (modulo != ver) {
+								valido = false;
+							}
 						}
 					}
 				}
+
+			} else {
+				valido = false;
 			}
 
-		} else{
-			valido=false;
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 		//se retorna el booleano que indica si el cui es válido o no
 		return valido;
 	}
@@ -556,43 +555,43 @@ public class CliNuevoApr extends PBase {
 		   ArrayAdapter<String> darel = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, itemrel);
 		   darel.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		   sprel.setAdapter(darel);sprel.setSelection(0);
-	   } catch (Exception e) {
+	/*   } catch (Exception e) {
 		   addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 	   }
 	   
-	   try {
+	   try { */
 		   ArrayAdapter<String> dagru = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, itemgru);
 		   dagru.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		   spgru.setAdapter(dagru);spgru.setSelection(0);
-	   } catch (Exception e) {
+	/*   } catch (Exception e) {
 		   addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 	   }
 	   
-	   try { // CA=CT
+	   try { */// CA=CT
 		   ArrayAdapter<String> daesc = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, itemesc);
 		   daesc.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		   spesc.setAdapter(daesc);spesc.setSelection(0);
-	   } catch (Exception e) {
+	/*   } catch (Exception e) {
 		   addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 	   }
 	   
-	   try { 
+	   try { */
 		   ArrayAdapter<String> daest = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, itemest);
 		   daest.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		   spest.setAdapter(daest);spest.setSelection(0);
-	   } catch (Exception e) {
+	/*   } catch (Exception e) {
 		   addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 	   }
 	   
-	   try { //MA = M, FE=F, TE=3
+	   try { *///MA = M, FE=F, TE=3
 		   ArrayAdapter<String> dagen = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, itemgen);
 		   dagen.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		   spgen.setAdapter(dagen);spgen.setSelection(0);
-	   } catch (Exception e) {
+	/*   } catch (Exception e) {
 		   addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 	   }
 	   
-	   try { 
+	   try { */
 		   ArrayAdapter<String> dahij = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, itemhij);
 		   dahij.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		   sphij.setAdapter(dahij);sphij.setSelection(0);
@@ -702,7 +701,6 @@ public class CliNuevoApr extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 
 	}
 	

@@ -86,8 +86,7 @@ public class CliGPS extends PBase {
 				updateItem(latitude, longitude);
 			}
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(), "");
 		}
 
 	}
@@ -139,14 +138,13 @@ public class CliGPS extends PBase {
 
 	private void showStaticMap() {
 
-		if (latitude == 0 && longitude == 0) {
-			toastcent("¡Posición desconicida, no se puede mostrar mapa!");
-			imgMap.setImageResource(R.drawable.blank48);
-			return;
-		}
-
-
 		try {
+			if (latitude == 0 && longitude == 0) {
+				toastcent("¡Posición desconicida, no se puede mostrar mapa!");
+				imgMap.setImageResource(R.drawable.blank48);
+				return;
+			}
+
 
 			final String URL = "https://maps.googleapis.com/maps/api/staticmap?" +
 					"center=" + latitude + "," + longitude + "&" +
@@ -190,8 +188,7 @@ public class CliGPS extends PBase {
 			setImageFromUrl.execute();
 
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(), "");
 		}
 
 	}
@@ -200,13 +197,13 @@ public class CliGPS extends PBase {
 		try {
 			sql = "UPDATE P_CLIENTE SET coorx=" + px + ",coory=" + py + " WHERE CODIGO='" + cod + "'";
 			db.execSQL(sql);
-		} catch (SQLException e) {
+		/*} catch (SQLException e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			msgbox(e.getMessage());
 		}
 
-		try {
+		try {*/
 			ins.init("D_CLICOORD");
 
 			ins.add("CODIGO", cod);
@@ -217,8 +214,7 @@ public class CliGPS extends PBase {
 
 			db.execSQL(ins.sql());
 		} catch (SQLException e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(), sql);
 			msgbox(e.getMessage());
 		}
 
@@ -238,15 +234,13 @@ public class CliGPS extends PBase {
 
 		try {
 			getLocation();
-		} catch (Exception e) {
+		/*} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-			latitude = 0;
-			longitude = 0;
 		}
 
 
-		try {
+		try {*/
 			idle = true;
 			pbar.setVisibility(View.INVISIBLE);
 
@@ -262,8 +256,9 @@ public class CliGPS extends PBase {
 				}, 500);
 			}
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(), "");
+			latitude = 0;
+			longitude = 0;
 		}
 
 	}

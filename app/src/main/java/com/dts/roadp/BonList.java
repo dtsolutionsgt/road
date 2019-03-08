@@ -121,7 +121,7 @@ public class BonList extends PBase {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-					try {
+			//		try {
 						Object lvObj = listView.getItemAtPosition(position);
 						selitem = (clsBonifProd)lvObj;
 
@@ -132,15 +132,16 @@ public class BonList extends PBase {
 						if (tipolista==2) setVarCant();
 						if (tipolista==3) setVarAllCant();
 
-					} catch (Exception e) {
-							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				/*	} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 						mu.msgbox( e.getMessage());
 					}
-					//return true;
+					return true;*/
 				}
 			});
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox( e.getMessage());
 		}
 
 		
@@ -185,21 +186,18 @@ public class BonList extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 		
-
-		
 	}
 	
 	private void listItems() {
 		Cursor DT;
 		clsClasses.clsBonifProd item;	
 		double ddisp,bcant;
-		
-		items.clear();
-		
-		//mu.msgbox("Lista : " +lista+"  ,   TipoLista : "+tipolista);
-		
 		try {
-			
+
+			items.clear();
+
+			//mu.msgbox("Lista : " +lista+"  ,   TipoLista : "+tipolista);
+
 			switch (tipolista) {
 			case 0:  
 				sql="SELECT CODIGO,DESCLARGA,1,0 FROM P_PRODUCTO WHERE (CODIGO='"+lista+"')";break;
@@ -244,16 +242,16 @@ public class BonList extends PBase {
 			 
 			  DT.moveToNext();
 			}
-			
+
+			adapter=new ListAdaptBonif(this,items);
+			listView.setAdapter(adapter);
+
+			showStat();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage()+"\n"+sql);
 		}	
-		
-		adapter=new ListAdaptBonif(this,items);
-		listView.setAdapter(adapter);
-		
-		showStat();
+
 	}
 	
 	private void applyBon() {
@@ -305,14 +303,14 @@ public class BonList extends PBase {
 		
 		try {
 			ins.init("T_BONITEM");
-			
+
 			ins.add("ITEM",iidx);
 			ins.add("PRODID",bonprodid);
 			ins.add("BONIID",item.id);
 			ins.add("CANT",item.cant);
 			ins.add("PRECIO",item.precio);
 			ins.add("COSTO",item.costo);
-				
+
 	    	db.execSQL(ins.sql());
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -328,12 +326,12 @@ public class BonList extends PBase {
 			ins.add("PRODID",bonprodid);
 			ins.add("PRODUCTO",prid);
 			ins.add("CANT",prcant);
-				
+
 	    	db.execSQL(ins.sql());
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
-		}	
+		}
 		
 	}
 	
@@ -487,19 +485,23 @@ public class BonList extends PBase {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					String s;
 
-					try {
+				//	try {
 						s=input.getText().toString();
 						icant=Double.parseDouble(s);
 
-						if (icant<cmin) throw new Exception();
-						if (icant>cmax) throw new Exception();
+					//	if (icant<cmin) throw new Exception();
+					//	if (icant>cmax) throw new Exception();
 
-						inputCant();
-					} catch (Exception e) {
+						if (icant<cmin || icant>cmax){
+							mu.msgbox("Cantidad incorrecta");return;
+						}else {
+							inputCant();
+						}
+
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-						mu.msgbox("Cantidad incorrecta");return;
 					}
-
+				*/
 				}
 			});
 
@@ -559,19 +561,26 @@ public class BonList extends PBase {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					String s;
 
-					try {
+				//	try {
 						s=input.getText().toString();
 						icant=Double.parseDouble(s);
 
-						if (icant<cmin) throw new Exception();
+					/*	if (icant<cmin) throw new Exception();
 						if (icant>cmax) throw new Exception();
+					*/
+						if(icant>cmin || icant>cmax){
+							mu.msgbox("Cantidad incorrecta");
+							return;
+						}else{
+							inputCant();
+						}
 
-						inputCant();
-					} catch (Exception e) {
+
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 						mu.msgbox("Cantidad incorrecta");return;
 					}
-
+				*/
 				}
 			});
 
@@ -581,12 +590,13 @@ public class BonList extends PBase {
 
 			alert.setNeutralButton("Borrar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
-					try {
+				//	try {
 						items.remove(selpos);
 						adapter.notifyDataSetChanged();
-					} catch (Exception e) {
-							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				/*	} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 					}
+				*/
 				}
 			});
 
@@ -616,16 +626,16 @@ public class BonList extends PBase {
 	
 	private void setItem() {
 		try{
-			try {
+		//	try {
 				item=gl.bonus.get(pos);
 
 				if (gl.bonus.get(pos).porcant.equalsIgnoreCase("S")) poruni=1;else poruni=0;
 
 				showBonList();
-			} catch (Exception e) {
+		/*	} catch (Exception e) {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			}
-
+		*/
 			relMonto.setVisibility(View.GONE);dectipo=-1;
 
 			if (tipolista>=2) {
@@ -672,19 +682,19 @@ public class BonList extends PBase {
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					try {
+				//	try {
 						items.remove(selpos);
 						adapter.notifyDataSetChanged();
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 						mu.msgbox(e.getMessage());
 					}
+				*/
 				}
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					;
 				}
 			});
 
@@ -700,7 +710,7 @@ public class BonList extends PBase {
 		Cursor DT;
 		double sdisp,bcant,bpcant;
 
-		if (rutatipo.equalsIgnoreCase("V")) {
+		/*if (rutatipo.equalsIgnoreCase("V")) {
 			sql="SELECT SUM(CANT) FROM P_STOCK WHERE CODIGO='"+prodid+"'";
 		} else {
 			sql="SELECT CANT FROM P_STOCKINV WHERE CODIGO='"+prodid+"'";
@@ -719,6 +729,29 @@ public class BonList extends PBase {
 
 		// Total en lista de bonoficaciones
 
+		bcant=0;
+
+		return sdisp-bcant-bpcant;*/
+
+		try {
+
+			if (rutatipo.equalsIgnoreCase("V")) {
+				sql="SELECT SUM(CANT) FROM P_STOCK WHERE CODIGO='"+prodid+"'";
+			} else {
+				sql="SELECT CANT FROM P_STOCKINV WHERE CODIGO='"+prodid+"'";
+			}
+
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+			sdisp=DT.getDouble(0);
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			sdisp=0;
+		}
+
+		if (prodid.equalsIgnoreCase(bonprodid)) bpcant=bonprodcant; else bpcant=0;
+		// Total en lista de bonoficaciones
 		bcant=0;
 
 		return sdisp-bcant-bpcant;
@@ -760,12 +793,12 @@ public class BonList extends PBase {
 		try {
 			sql="DELETE FROM T_BONITEM WHERE PRODID='"+bonprodid+"'";
 			db.execSQL(sql);
-		} catch (SQLException e) {
+	/*	} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}		
 		
-		try {
+		try {*/
 			sql="DELETE FROM T_BONIFFALT WHERE PRODID='"+bonprodid+"'";
 			db.execSQL(sql);
 		} catch (SQLException e) {

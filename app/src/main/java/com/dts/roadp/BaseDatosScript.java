@@ -1148,6 +1148,19 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX P_PRODPRECIO_idx2 ON P_PRODPRECIO(NIVEL)";
 			database.execSQL(vSQL);
 
+			vSQL="CREATE TABLE [TMP_PRECESPEC] ("+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[VALOR] TEXT NOT NULL,"+
+					"[PRODUCTO] TEXT NOT NULL,"+
+					"[PRECIO] REAL NOT NULL,"+
+					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL,"+
+					"PRIMARY KEY ([CODIGO],[VALOR],[PRODUCTO],[UNIDADMEDIDA])"+
+					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE INDEX TMP_PRECESPEC_idx1 ON TMP_PRECESPEC(PRODUCTO)";
+			database.execSQL(vSQL);
+
 
 			vSQL="CREATE TABLE [P_PRODUCTO] ("+
 					"[CODIGO] TEXT NOT NULL,"+
@@ -1271,7 +1284,19 @@ public class BaseDatosScript {
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
 			database.execSQL(vSQL);
-			
+
+			vSQL="CREATE TABLE [P_SUCURSAL] ("+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[EMPRESA] TEXT NOT NULL,"+
+					"[DESCRIPCION] TEXT NOT NULL,"+
+					"[NOMBRE] TEXT NOT NULL,"+
+					"[DIRECCION] INTEGER NOT NULL,"+
+					"[TELEFONO] TEXT NOT NULL,"+
+					"[NIT] TEXT NOT NULL,"+
+					"[TEXTO] TEXT NOT NULL,"+
+					"PRIMARY KEY ([CODIGO])"+
+					");";
+			database.execSQL(vSQL);
 
 			vSQL="CREATE TABLE [P_STOCK] ("+
 					"[CODIGO] TEXT NOT NULL,"+
@@ -1315,7 +1340,32 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-			
+            //#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
+			vSQL = "CREATE TABLE [P_STOCK_PALLET](" +
+					"[DOCUMENTO] TEXT NOT NULL," +
+					"[RUTA] TEXT NOT NULL," +
+					"[BARRAPALLET] TEXT NOT NULL, " +
+					"[CODIGO] TEXT NOT NULL, " +
+					"[BARRAPRODUCTO] TEXT NOT NULL," +
+					"[LOTEPRODUCTO] TEXT NOT NULL," +
+					"[CANT] REAL NOT NULL," +
+					"[COREL] TEXT NOT NULL," +
+					"[PRECIO] REAL NOT NULL," +
+					"[PESO] REAL NOT NULL," +
+					"[FECHA] INTEGER NOT NULL," +
+					"[ANULADO] INTEGER NOT NULL," +
+					"[CENTRO] TEXT NOT NULL," +
+					"[STATUS] TEXT NOT NULL," +
+					"[ENVIADO] INTEGER NOT NULL," +
+					"[CODIGOLIQUIDACION] INTEGER NOT NULL," +
+					"[COREL_D_MOV] TEXT NOT NULL," +
+					"[FECHA_SISTEMA] INTEGER NOT NULL," +
+					"[UNIDADMEDIDA] TEXT NOT NULL," +
+					"[DOC_ENTREGA] TEXT NOT NULL," +
+					" PRIMARY KEY ([DOCUMENTO],[RUTA],[BARRAPALLET],[CODIGO]," +
+                    "[BARRAPRODUCTO],[LOTEPRODUCTO],[UNIDADMEDIDA]));";
+			database.execSQL(vSQL);
+
 			vSQL="CREATE TABLE [P_STOCK_APR] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[CANT] REAL NOT NULL,"+

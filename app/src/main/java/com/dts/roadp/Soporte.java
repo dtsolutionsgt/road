@@ -46,9 +46,8 @@ public class Soporte extends PBase {
 
     public void doEnvio(View view) {
         tipo=3;
-        //msgAsk("Enviar archivo de envio");
-        toastcent("Pendiente implementación");
-    }
+        msgAsk("Enviar archivo de envio");
+     }
 
     public void doError(View view) {
         tipo=4;
@@ -57,9 +56,8 @@ public class Soporte extends PBase {
 
     public void doBitacora(View view) {
         tipo=5;
-        // msgAsk("Enviar archivo de bitacora");
-        toastcent("Pendiente implementación");
-    }
+        msgAsk("Enviar archivo de bitacora");
+     }
 
     //endregion
 
@@ -101,26 +99,31 @@ public class Soporte extends PBase {
         fname= Environment.getExternalStorageDirectory()+"/roadcarga.txt";
         file=new File(fname);
 
-        send("El archivo de carga no existe. Antes de enviar, debe realizar una carga de datos");
+        send("El archivo de carga no existe. Debe realizar una carga de datos");
     }
 
     private void sendEnvio() {
+        body="Envio \n"+body;
+        fname= Environment.getExternalStorageDirectory()+"/roadenvio.txt";
+        file=new File(fname);
 
-        send("");
+        send("El archivo de envio no existe. Debe realizar un envio de datos");
     }
 
     private void sendError() {
         body="Error de envío \n"+body;
-        fname= Environment.getExternalStorageDirectory()+"/roaderr.txt";
+        fname= Environment.getExternalStorageDirectory()+"/roaderror.txt";
         file=new File(fname);
 
         send("El archivo de detalle de error de envío no existe");
-
     }
 
     private void sendBitacora() {
+        body="Error de envío \n"+body;
+        fname= Environment.getExternalStorageDirectory()+"/roadlog.txt";
+        file=new File(fname);
 
-        send("");
+        send("El archivo de bitacora no existe");
     }
 
     //endregion

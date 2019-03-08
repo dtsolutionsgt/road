@@ -2,26 +2,31 @@ package com.dts.roadp;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.os.Build;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.Layout;
+import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebHistoryItem;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +36,9 @@ public class FacturaRes extends PBase {
 	private ListView listView;
 	private TextView lblPago,lblFact,lblTalon,lblMPago,lblCred,lblPend,lblCash;
 	private ImageView imgBon,imgMPago,imgCred,imgPend, imgCash;
+	private CheckBox contadoCheck;
+	private TextView lblVuelto;
+	private EditText txtVuelto;
 
 	private List<String> spname = new ArrayList<String>();
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
@@ -46,7 +54,7 @@ public class FacturaRes extends PBase {
 	private int fecha,fechae,fcorel,clidia,media;
 	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt;
 	private int cyear, cmonth, cday, dweek,stp=0;
-	
+
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
 	private boolean acum,cleandprod,peexit,pago,saved,rutapos,porpeso;
 
@@ -56,7 +64,7 @@ public class FacturaRes extends PBase {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_factura_res);
-		
+
 		super.InitBase();
         addlog("FacturaRes",""+du.getActDateTime(),gl.vend);
 		
@@ -68,6 +76,7 @@ public class FacturaRes extends PBase {
 		lblCred = (TextView) findViewById(R.id.TextView02);
 		lblPend = (TextView) findViewById(R.id.lblCVence2);
 		lblCash = (TextView) findViewById(R.id.textView4);
+		contadoCheck = (CheckBox) findViewById(R.id.checkContado);
 
 		imgBon = (ImageView) findViewById(R.id.imageView6);
 		imgMPago = (ImageView) findViewById(R.id.imageView1);
@@ -75,7 +84,10 @@ public class FacturaRes extends PBase {
 		imgPend = (ImageView) findViewById(R.id.imageView12);
 		imgCash = (ImageView) findViewById(R.id.imageView2);
 
-		cliid=gl.cliente;	
+
+		lblVuelto = new TextView(this,null);
+		txtVuelto = new EditText(this,null);
+		cliid=gl.cliente;
 		rutapos=gl.rutapos;
 		media=gl.media;
 		credito=gl.credito;
@@ -96,6 +108,7 @@ public class FacturaRes extends PBase {
 		}	
 		
 		if (media==1) {
+			contadoCheck.setVisibility(View.INVISIBLE);
 			imgCred.setVisibility(View.INVISIBLE);
 			lblCred.setVisibility(View.INVISIBLE);
 			lblCash.setVisibility(View.VISIBLE);
@@ -107,6 +120,7 @@ public class FacturaRes extends PBase {
 		}
 
 		if (media <= 3){
+			contadoCheck.setVisibility(View.INVISIBLE);
 			imgMPago.setVisibility(View.VISIBLE);
 			lblMPago.setVisibility(View.VISIBLE);
 			imgCred.setVisibility(View.INVISIBLE);
@@ -118,23 +132,44 @@ public class FacturaRes extends PBase {
 		}
 
 		if (media==4) {
-			lblCash.setVisibility(View.INVISIBLE);
-			imgCash.setVisibility(View.INVISIBLE);
-			lblPend.setVisibility(View.INVISIBLE);
-			imgPend.setVisibility(View.INVISIBLE);
-			imgCred.setVisibility(View.VISIBLE);
-			lblCred.setVisibility(View.VISIBLE);
-			imgMPago.setVisibility(View.INVISIBLE);
-			lblMPago.setVisibility(View.INVISIBLE);
+			contadoCheck.setVisibility(View.VISIBLE);
+			if(contadoCheck.isChecked()){
+				lblCash.setVisibility(View.VISIBLE);
+				imgCash.setVisibility(View.VISIBLE);
+				lblPend.setVisibility(View.INVISIBLE);
+				imgPend.setVisibility(View.INVISIBLE);
+				imgCred.setVisibility(View.INVISIBLE);
+				lblCred.setVisibility(View.INVISIBLE);
+				imgMPago.setVisibility(View.VISIBLE);
+				lblMPago.setVisibility(View.VISIBLE);
+			} else if(!contadoCheck.isChecked()) {
+				lblCash.setVisibility(View.INVISIBLE);
+				imgCash.setVisibility(View.INVISIBLE);
+				lblPend.setVisibility(View.INVISIBLE);
+				imgPend.setVisibility(View.INVISIBLE);
+				imgCred.setVisibility(View.VISIBLE);
+				lblCred.setVisibility(View.VISIBLE);
+				imgMPago.setVisibility(View.INVISIBLE);
+				lblMPago.setVisibility(View.INVISIBLE);
+			}
 
 			if (gl.vcredito) {
 
-                if (credito<=0) {
-                    imgCred.setVisibility(View.INVISIBLE);
-                    lblCred.setVisibility(View.INVISIBLE);
-                }
+				if (credito<=0) {
+					contadoCheck.setVisibility(View.INVISIBLE);
+				//	contadoCheck.setEnabled(false);
+				//	contadoCheck.setText("Cliente si credito, habilitado para pagar al contado.");
+					lblCash.setVisibility(View.VISIBLE);
+					imgCash.setVisibility(View.VISIBLE);
+					lblPend.setVisibility(View.INVISIBLE);
+					imgPend.setVisibility(View.INVISIBLE);
+					imgCred.setVisibility(View.INVISIBLE);
+					lblCred.setVisibility(View.INVISIBLE);
+					imgMPago.setVisibility(View.VISIBLE);
+					lblMPago.setVisibility(View.VISIBLE);
+				}
 
-            }
+			}
 
 		}
 		
@@ -169,12 +204,17 @@ public class FacturaRes extends PBase {
 		
 		prn=new printer(this,printclose);
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
-		fdoc.deviceid =androidid();
+		fdoc.deviceid =gl.deviceId;
 
 		saved=false;
 		assignCorel();
 		
 		cliPorDia();
+
+		setHandlers();
+
+		txtVuelto.setInputType(InputType.TYPE_CLASS_NUMBER);
+
 	}
 	
 	
@@ -206,46 +246,129 @@ public class FacturaRes extends PBase {
 			startActivity(intent);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("paySelect: " + e.getMessage());
 		}
 
 	}
-	
+
+	public void checkedBox(View view){
+		contadoCheck.setVisibility(View.VISIBLE);
+		if(contadoCheck.isChecked()){
+			contadoCheck.setText("Pagar al Credito");
+			lblCash.setVisibility(View.VISIBLE);
+			imgCash.setVisibility(View.VISIBLE);
+			lblPend.setVisibility(View.INVISIBLE);
+			imgPend.setVisibility(View.INVISIBLE);
+			imgCred.setVisibility(View.INVISIBLE);
+			lblCred.setVisibility(View.INVISIBLE);
+			imgMPago.setVisibility(View.VISIBLE);
+			lblMPago.setVisibility(View.VISIBLE);
+		} else if(!contadoCheck.isChecked()) {
+			contadoCheck.setText("Pagar al Contado");
+			lblCash.setVisibility(View.INVISIBLE);
+			imgCash.setVisibility(View.INVISIBLE);
+			lblPend.setVisibility(View.INVISIBLE);
+			imgPend.setVisibility(View.INVISIBLE);
+			imgCred.setVisibility(View.VISIBLE);
+			lblCred.setVisibility(View.VISIBLE);
+			imgMPago.setVisibility(View.INVISIBLE);
+			lblMPago.setVisibility(View.INVISIBLE);
+		}
+	}
+
 	public void payCash(View view) {
 
 		try{
+
 			if (fcorel==0) {
 				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
 			}
 
 			//inputEfectivo();
 			inputVuelto();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("payCash: " + e.getMessage());
 		}
 
 	}
 	
 	public void payCred(View view) {
+
 		try{
+
 			if (fcorel==0) {
 				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
 			}
 
 			inputCredito();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("payCred: " + e.getMessage());
 		}
 
 	}
 	
 	public void showBon(View view) {
+
 		try{
+
 			Intent intent = new Intent(this,BonVenta.class);
 			startActivity(intent);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
+	}
+
+	private void setHandlers(){
+
+		try{
+
+			txtVuelto.addTextChangedListener(new TextWatcher() {
+
+				public void afterTextChanged(Editable s) {}
+
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+
+				public void onTextChanged(CharSequence s, int start,int before, int count) {
+
+					//Davuelto();
+				}
+
+			});
+
+			txtVuelto.setOnKeyListener(new View.OnKeyListener() {
+				@Override
+				public boolean onKey(View v, int keyCode, KeyEvent event) {
+					if ((keyCode == KeyEvent.KEYCODE_ENTER)) {
+
+						DaVuelto(v);
+
+						return true;
+					}else if ((keyCode == KeyEvent.KEYCODE_DEL)){
+						lblVuelto.setText("");
+					}
+
+					return false;
+				}
+			});
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	public void DaVuelto(View view) {
+		try{
+			Davuelto();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 
 	//endregion
@@ -258,6 +381,7 @@ public class FacturaRes extends PBase {
 		descgtotal=gl.descgtotal;
 
 		try{
+
 			//descgmon=(double) (stot0*descg/100);
 			descgmon=(double) (descg*descgtotal/100);
 			totalOrder();
@@ -271,21 +395,26 @@ public class FacturaRes extends PBase {
 					}
 				}, 300);
 			}
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("processFinalPromo: " + e.getMessage());
 		}
 
 	}
 	
 	public void showPromo(){
+
 		try {
+
 			browse=1;
 			gl.promprod="";
 			gl.promcant=0;
 			gl.promdesc=descg;
 			
 			Intent intent = new Intent(this,DescBon.class);
-			startActivity(intent);	
+			startActivity(intent);
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox( e.getMessage());
@@ -294,17 +423,21 @@ public class FacturaRes extends PBase {
 	}
 	
 	private void updDesc(){
+
 		try{
+
 			descg=gl.promdesc;
 			//descgmon=(double) (stot0*descg/100);
 			descgmon=(double) (descg*descgtotal/100);
 			totalOrder();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 	}
-	
+
+
 	private void totalOrder(){
 		double dmaxmon;
 		
@@ -335,6 +468,7 @@ public class FacturaRes extends PBase {
 			fillTotals();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("totalOrder: " + e.getMessage());
 		}
 
 		
@@ -482,6 +616,7 @@ public class FacturaRes extends PBase {
 		*/
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("finishOrder: "  + e.getMessage());
 		}
 
 		
@@ -520,16 +655,17 @@ public class FacturaRes extends PBase {
 			fecha=du.getActDateTime();
 		}
 
-		
-		try {
-			sql="SELECT MAX(ITEM) FROM D_FACT_LOG";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			mitem=DT.getInt(0);
-		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			mitem=0;
-		}
+
+        sql="SELECT MAX(ITEM) FROM D_FACT_LOG";
+        DT=Con.OpenDT(sql);
+
+        if(DT.getCount()>0){
+            DT.moveToFirst();
+            mitem=DT.getInt(0);
+        }else{
+            mitem=0;
+        }
+
 		mitem++;
 		
 		try {
@@ -721,24 +857,19 @@ public class FacturaRes extends PBase {
 			db.endTransaction();
 			 
 			saved=true;
-			
-		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			db.endTransaction();
-		   	mu.msgbox("Error (factura) " + e.getMessage());return false;
-		}
-		
-		try {
+
 			upd.init("P_CLIRUTA");
 			upd.add("BANDERA",0);
 			//upd.Where("CLIENTE='"+cliid+"' AND DIA="+dweek);
 			upd.Where("CLIENTE='"+cliid+"'");
 	
 			db.execSQL(upd.SQL());
-		} catch (SQLException e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			mu.msgbox("Error  : " + e.getMessage());
-		}	
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            db.endTransaction();
+            mu.msgbox("Error (factura) " + e.getMessage());return false;
+        }
 		
 		saveAtten(tot);
 		
@@ -858,7 +989,7 @@ public class FacturaRes extends PBase {
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			mu.msgbox("rebajaStockUM: "+e.getMessage());
 		}
 	}
 	
@@ -984,23 +1115,29 @@ public class FacturaRes extends PBase {
 		try {
 			sql="SELECT SUM(DESMON),SUM(TOTAL),SUM(IMP) FROM T_VENTA";	
 			DT=Con.OpenDT(sql);
-				
-			DT.moveToFirst();
-			
-			tot=DT.getDouble(1);
-			stot0=tot+DT.getDouble(0);
-			
-			totimp=DT.getDouble(2);
-			
-			return DT.getDouble(0);
+
+			if(DT.getCount()>0){
+                DT.moveToFirst();
+
+                tot=DT.getDouble(1);
+                stot0=tot+DT.getDouble(0);
+
+                totimp=DT.getDouble(2);
+
+                return DT.getDouble(0);
+            }else {
+			    return 0;
+            }
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			tot=0;
-			mu.msgbox( e.getMessage());return 0;
+			mu.msgbox("totalDescProd: " + e.getMessage());
+
+			return 0;
 		}	
 		
 	}
- 	
+
 	private void assignCorel(){
 		Cursor DT;
 		int ca,ci,cf,ca1,ca2;
@@ -1008,34 +1145,37 @@ public class FacturaRes extends PBase {
 		fcorel=0;fserie="";
 			
 		try {
-			sql="SELECT SERIE,CORELULT,CORELINI,CORELFIN FROM P_COREL WHERE RUTA='"+gl.ruta+"'";	
+
+			sql="SELECT SERIE,CORELULT,CORELINI,CORELFIN FROM P_COREL WHERE RUTA='"+gl.ruta+"'";
 			DT=Con.OpenDT(sql);
-				
-			DT.moveToFirst();
-			
-			fserie=DT.getString(0);
-			ca1=DT.getInt(1);
-			ci=DT.getInt(2);
-			cf=DT.getInt(3);
-			
-		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			fcorel=0;fserie="";
-			mu.msgbox("No esta definido correlativo de factura. No se puede continuar con la venta.\n"+e.getMessage());
-			return;
-		}	
-			
-		try {
-			sql="SELECT MAX(COREL) FROM D_FACT_LOG WHERE RUTA='"+gl.ruta+"' AND SERIE='"+fserie+"'";	
+
+			if(DT.getCount()>0){
+                DT.moveToFirst();
+
+                fserie=DT.getString(0);
+                ca1=DT.getInt(1);
+                ci=DT.getInt(2);
+                cf=DT.getInt(3);
+            }else  {
+                fcorel=0;fserie="";
+                mu.msgbox("No esta definido correlativo de factura. No se puede continuar con la venta.\n");
+                return;
+            }
+
+
+			sql="SELECT MAX(COREL) FROM D_FACT_LOG WHERE RUTA='"+gl.ruta+"' AND SERIE='"+fserie+"'";
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			
-			ca2=DT.getInt(0);
-		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			ca2=0;
-		}
-		
+
+			if (DT.getCount()>0){
+
+                DT.moveToFirst();
+
+                ca2=DT.getInt(0);
+
+            }else {
+                ca2=0;
+            }
+
 		ca=ca1;if (ca2>ca) ca=ca2;
 		fcorel=ca+1;
 		
@@ -1052,7 +1192,12 @@ public class FacturaRes extends PBase {
 		s="Talonario : "+fcorel+" / "+cf+"\n";
 		s=s+"Disponible : "+(cf-fcorel);
 		lblTalon.setText(s);
-		
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox("assignCorel: " + e.getMessage());
+        }
+
 	}
 	
 	private boolean esProductoConStock(String prcodd) {
@@ -1061,11 +1206,20 @@ public class FacturaRes extends PBase {
 		try {
 			sql="SELECT TIPO FROM P_PRODUCTO WHERE CODIGO='"+prcodd+"'";
            	DT=Con.OpenDT(sql);
-           	DT.moveToFirst();
-			
-           	return DT.getString(0).equalsIgnoreCase("P");
+
+           	if(DT.getCount()>0){
+
+                DT.moveToFirst();
+
+                return DT.getString(0).equalsIgnoreCase("P");
+            }else {
+           	    return false;
+            }
+
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox("esProductoConStock: " + e.getMessage());
 			return false;
 	    }		
 	}
@@ -1115,22 +1269,36 @@ public class FacturaRes extends PBase {
 	}
 	
 	private void inputVuelto() {
+
 		try{
+
 			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 			alert.setTitle("A pagar : "+mu.frmcur(tot));
 			alert.setMessage("Pagado con billete : ");
 
-			final EditText input = new EditText(this);
-			alert.setView(input);
+			final LinearLayout layout   = new LinearLayout(this);
+			layout.setOrientation(LinearLayout.VERTICAL);
 
-			input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-			input.setText("");
-			input.requestFocus();
+			if(txtVuelto.getParent()!= null){
+				txtVuelto.setText("");
+				((ViewGroup)txtVuelto.getParent()).removeView(txtVuelto);
+			}
+
+			if(lblVuelto.getParent()!= null){
+				lblVuelto.setText("");
+				((ViewGroup)lblVuelto.getParent()).removeView(lblVuelto);
+			}
+
+			layout.addView(txtVuelto);
+			layout.addView(lblVuelto);lblVuelto.setTextSize(20);lblVuelto.setTextColor(Color.rgb(54,184,238));lblVuelto.setGravity(Gravity.LEFT);
+
+			alert.setView(layout);
 
 			showkeyb();
+			alert.create();
 
-			alert.setPositiveButton("Vuelto", new DialogInterface.OnClickListener() {
+			/*alert.setPositiveButton("Vuelto", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					double pg,vuel;
 
@@ -1159,31 +1327,74 @@ public class FacturaRes extends PBase {
 					}
 
 				}
-			});
+			});*/
 
-			alert.setNegativeButton("Exacto", new DialogInterface.OnClickListener() {
+			alert.setPositiveButton("Pagar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
+
 					peexit=false;
-					svuelt=""+tot;
-					sefect=""+tot;
+					svuelt= txtVuelto.getText().toString();
+
+						svuelt=""+tot;
+						sefect=""+tot;
+
+
 					applyCash();
 					checkPago();
+
 				}
 			});
 
-			alert.setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					peexit=true;
+					lblVuelto.setText("");
+					txtVuelto.setText("");
+					layout.removeAllViews();
+
 				}
 			});
 
 			alert.show();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("InputVuelto: " + e.getMessage());
 		}
 
 	}
-	
+
+	public void Davuelto(){
+
+		try{
+
+			double pg,vuel;
+
+			svuelt= txtVuelto.getText().toString();
+
+			if (!svuelt.equals("")){
+
+				pg=Double.parseDouble(svuelt);
+
+				if (pg > 0) {
+
+					if (pg<tot) {
+						msgbox("Monto menor que total");
+					}
+
+					vuel=pg-tot;
+
+					lblVuelto.setText(String.format("    Vuelto: " + mu.frmcur(vuel)) );
+
+				}
+
+			}
+
+		}catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
+
 	public void vuelto(String msg) {
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -1247,7 +1458,9 @@ public class FacturaRes extends PBase {
 	}
 	
 	private void inputCredito() {
+
 		try{
+
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 			alert.setTitle("Pago Crédito");
@@ -1280,6 +1493,7 @@ public class FacturaRes extends PBase {
 			});
 
 			alert.show();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -1374,6 +1588,7 @@ public class FacturaRes extends PBase {
 			desc1=s;
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("checkNum: " + e.getMessage());
 		}
 
 		return true;
@@ -1413,17 +1628,19 @@ public class FacturaRes extends PBase {
 		double tpago;
 		
 		try {
-			sql="SELECT SUM(VALOR) FROM T_PAGO";	
+
+			sql="SELECT SUM(VALOR) FROM T_PAGO";
 			DT=Con.OpenDT(sql);
-				
-			DT.moveToFirst();
-			
-			tpago=DT.getDouble(0);
-		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			tpago=0;
-			mu.msgbox( e.getMessage());
-		}
+
+			if(DT.getCount()>0){
+
+                DT.moveToFirst();
+
+                tpago=DT.getDouble(0);
+
+            }else  {
+			    tpago=0;
+            }
 		
 		s=mu.frmcur(tpago);
 		
@@ -1436,7 +1653,12 @@ public class FacturaRes extends PBase {
 			//if (rutapos) askSavePos(); else askSave();			
 			finishOrder();
 		}
-		
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox( e.getMessage());
+        }
+
 	}
 
 	private String androidid() {
@@ -1456,7 +1678,7 @@ public class FacturaRes extends PBase {
 	//endregion
 
 	//region Aux
-	
+
 	public void askSave(View view) {
 		try{
 			checkPago();
@@ -1589,13 +1811,13 @@ public class FacturaRes extends PBase {
 	}	
 	
 	private void clearGlobals() {
+
 		try {
+
 			db.execSQL("DELETE FROM T_PAGO");
-		} catch (SQLException e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}
-		try {
+
 			db.execSQL("DELETE FROM T_BONITEM WHERE PRODID='*'");
+
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
@@ -1623,10 +1845,16 @@ public class FacturaRes extends PBase {
 		try {
 			sql="SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE (P_CLIRUTA.DIA ="+dweek+") ";
 			DT=Con.OpenDT(sql);
-			clidia=DT.getCount();
+
+			if(DT.getCount()>0){
+                clidia=DT.getCount();
+            }else {
+                clidia=0;
+            }
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			clidia=0;
+            mu.msgbox("cliPorDia: " + e.getMessage() );
 		}
 			
 	}
@@ -1635,7 +1863,6 @@ public class FacturaRes extends PBase {
 		try {
 			return app.ventaPeso(prodid);
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return false;
 		}
 	}
@@ -1657,7 +1884,7 @@ public class FacturaRes extends PBase {
 	//endregion
 	
 	// Activity Events
-	
+
 	@Override
 	protected void onResume() {
 		try{
@@ -1666,6 +1893,7 @@ public class FacturaRes extends PBase {
 			checkPromo();
 
 			checkPago();
+
 			if (browse==1) {
 				browse=0;
 				if (gl.promapl) updDesc();

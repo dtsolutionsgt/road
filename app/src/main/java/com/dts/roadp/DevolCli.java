@@ -65,6 +65,7 @@ public class DevolCli extends PBase {
 			startActivity(intent);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("showProd:  " + e.getMessage());
 		}
 
 	}	
@@ -91,7 +92,7 @@ public class DevolCli extends PBase {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
 
-					try {
+
 						Object lvObj = listView.getItemAtPosition(position);
 						clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
 
@@ -99,16 +100,13 @@ public class DevolCli extends PBase {
 
 						updCant(vItem.id);
 
-					} catch (Exception e) {
-						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-						mu.msgbox( e.getMessage());
-					}
 				}
 			});
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("setHandlers: " + e.getMessage());
 		}
-
 	    
 	}
 	
@@ -193,17 +191,14 @@ public class DevolCli extends PBase {
 		try {
 			sql="SELECT CODIGO,CODDEV,CANT FROM T_CxCD WHERE Item="+item;	
 			DT=Con.OpenDT(sql);
+
+			if(DT.getCount()==0) return;
+
 			DT.moveToFirst();	
 			
 			prid=DT.getString(0);
 			rz=DT.getString(1);
-			
-			
-		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			return;
-		}	
-		
+
 		browse=2;
 		
 		itempos=item;
@@ -213,6 +208,12 @@ public class DevolCli extends PBase {
 		
 		Intent intent = new Intent(this,DevCliCant.class);
 		startActivity(intent);
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox("updCant: " + e.getMessage());
+		}
+
 	}
 	
 	private void processCant(){
@@ -373,6 +374,7 @@ public class DevolCli extends PBase {
 			Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();
 			
 			super.finish();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();

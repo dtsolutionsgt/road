@@ -41,7 +41,8 @@ public class Clientes extends PBase {
 	private Spinner spinList,spinFilt;
 	private EditText txtFiltro;
 	private TextView lblCant;
-	
+
+
 	private ArrayList<clsCDB> items= new ArrayList<clsCDB>();
 	private ArrayList<String> cobros= new ArrayList<String>();
 	private ArrayList<String> ppago= new ArrayList<String>();
@@ -69,7 +70,7 @@ public class Clientes extends PBase {
 		spinFilt = (Spinner) findViewById(R.id.spinner8);
 		txtFiltro = (EditText) findViewById(R.id.txtMonto);
 		lblCant= (TextView) findViewById(R.id.lblCant);
-				
+
 		setHandlers();
 
 		selid="";selidx=-1;
@@ -142,7 +143,7 @@ public class Clientes extends PBase {
 				@Override
 				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 					boolean pedit,pbor;
-					try {
+				//	try {
 						Object lvObj = listView.getItemAtPosition(position);
 						clsClasses.clsCDB item = (clsClasses.clsCDB) lvObj;
 
@@ -159,9 +160,9 @@ public class Clientes extends PBase {
 							if (pedit) msgAskEdit("Cambiar datos de cliente nuevo");
 						}
 
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 					return true;
 				}
 			});
@@ -172,7 +173,7 @@ public class Clientes extends PBase {
 					TextView spinlabel;
 					String scod;
 
-					try {
+				//	try {
 						spinlabel=(TextView)parentView.getChildAt(0);
 						spinlabel.setTextColor(Color.BLACK);
 						spinlabel.setPadding(5, 0, 0, 0);
@@ -182,10 +183,10 @@ public class Clientes extends PBase {
 
 						listItems();
 
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 						mu.msgbox( e.getMessage());
-					}
+					}*/
 
 				}
 
@@ -226,6 +227,7 @@ public class Clientes extends PBase {
 			});
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox( e.getMessage());
 		}
 
 	}
@@ -253,12 +255,12 @@ public class Clientes extends PBase {
 			if (DT.getCount()>0) {
 				DT.moveToFirst();
 				for (int i = 0; i <DT.getCount(); i++) {
-					try {
+				//	try {
 						cobros.add(DT.getString(0));
 						DT.moveToNext();
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-					}
+					}*/
 				}
 			}
 
@@ -279,12 +281,12 @@ public class Clientes extends PBase {
 			if (DT.getCount()>0) {
 				DT.moveToFirst();
 				for (int i = 0; i <DT.getCount(); i++) {
-					try {
+				//	try {
 						ss=DT.getString(0);
 						if (!ppago.contains(ss)) ppago.add(ss);
 						DT.moveToNext();
-					} catch (Exception e) {
-					}
+				/*	} catch (Exception e) {
+					}*/
 				}
 			}
 
@@ -582,16 +584,16 @@ public class Clientes extends PBase {
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 
-				try {
+			//	try {
 					code=String.valueOf(DT.getInt(0));
 					name=DT.getString(1);
 
 					listcode.add(code);
 					listname.add(name);
-				} catch (Exception e) {
+			/*	} catch (Exception e) {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 					mu.msgbox(e.getMessage());
-				}
+				}*/
 				DT.moveToNext();
 			}
 		} catch (Exception e) {
@@ -618,13 +620,13 @@ public class Clientes extends PBase {
 
 			mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					try {
+				//	try {
 						//String opcion=listcode.get(item);
 						showCliente();
 
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 			});
 

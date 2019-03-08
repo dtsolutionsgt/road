@@ -149,6 +149,9 @@ public class DevolBodCan extends PBase {
             sql="DELETE FROM P_STOCK";
             db.execSQL(sql);
 
+            sql="UPDATE FinDia SET val5 = 5";
+            db.execSQL(sql);
+
             db.setTransactionSuccessful();
             db.endTransaction();
 

@@ -1,22 +1,17 @@
 package com.dts.roadp;
 
 import java.io.File;
-import java.io.StringReader;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.CalendarView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,9 +39,6 @@ public class FinDia extends PBase {
     private double val, tot, tte, ttc, ttk, tto, tre, trc, tro, tote, totc, depe, depc, bale, balc;
     private boolean idle = true, fullfd, fail;
     private clsFinDia claseFinDia;
-    private DateUtils claseDateUtils;
-    private AppMethods claseAppMethods;
-    private clsDocument claseDocumento;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,14 +86,20 @@ public class FinDia extends PBase {
 
     public void iniciaCierre(View view) {
         //#HS_20181128_0906 Agregue validacion para FinDia.
-        if (gl.banderafindia == true) {
-            if (validaFinDia()) msgAskFinDiaTrue();
+        if (gl.banderafindia) {
+           //if (validaFinDia()) #CKFK 20190305 Quité la validación de aquí
+             if (!yaInicioFinDia())  {
+                 msgAskFinDiaTrue();
+             }else{
+                 validaFinDia();
+             }
         } else {
-            if (validaFinDia()) msgAsk();
+            //if (validaFinDia()) #CKFK 20190305 Quité la validación de aquí
+                msgAsk();
         }
     }
 
-    //#HS_20181123_0950 Agrege funcion para llamar activity deposito.
+    //#HS_20181123_0950 Agregué funcion para llamar activity deposito.
     public void ActivityDeposito() {
         try{
             Intent deposito = new Intent(this, Deposito.class);
@@ -113,10 +111,21 @@ public class FinDia extends PBase {
     }
 
     //#HS_20181123_1014 Agregue funcion para llamar activity de reimpresion de deposito.
-    public void ActivityImpresionDeposito(int doctipo) {
+    public void ActivityImpresion(int doctipo) {
         try{
             gl.tipo = doctipo;
             Intent intent = new Intent(this, Reimpresion.class);
+            startActivity(intent);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+    //#CKFK 20190304 Agregué funcion para llamar activity de comunicación.
+    public void ActivityComunicacion() {
+        try{
+            Intent intent = new Intent(this, ComWS.class);
             startActivity(intent);
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -145,12 +154,9 @@ public class FinDia extends PBase {
         fail = false;
 
         try{
-            if (gl.peModal.equalsIgnoreCase("TOL")) {
-                //#EJC20190226: En comentario porque agregué el insert de d_mov encabezado, se debe hacer en otra pantalla el insert del detalle de lo que hay que devoler.
-                //devProductos();
-                buildReportsTOL();
-            } else {
-                //devProductos();
+
+
+            if (!gl.peModal.equalsIgnoreCase("TOL")) {
                 buildReports();
             }
 
@@ -176,11 +182,16 @@ public class FinDia extends PBase {
                 return;
             }
 
-            try  {
+            //#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
+            if (gl.banderafindia) {
+                if (claseFinDia.getComunicacion() != 4) {
+                    msgAskComunicacion();
+                    return;
+                }
+            }
+
+            if (!gl.banderafindia) {
                 db.execSQL("UPDATE FinDia SET val1="+du.getActDate());
-            } catch (Exception e) {
-                addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-                msgbox("No se pudo actualizar fecha de cierre.");
             }
 
             Toast.makeText(FinDia.this, "Cierre del día completo.", Toast.LENGTH_SHORT).show();
@@ -209,34 +220,7 @@ public class FinDia extends PBase {
             }
 
             FinDia.super.finish();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
 
-
-    }
-
-	//#HS_20181127_1052 Agregué funcion de inicio de FinDia.
-	public void iniciarFD()  {
-
-        try{
-            File fd = new File(Environment.getExternalStorageDirectory() + "/SyncFold/findia.txt");
-            FileUtils.deleteQuietly(fd);
-
-            idle = false;
-            fail = false;
-
-            if (gl.peModal.equalsIgnoreCase("TOL")) {
-                devProductos();
-                buildReportsTOL();
-            } else {
-                //devProductos();
-                buildReports();
-            }
-
-            ((appGlobals) vApp).modoadmin = false;
-            ((appGlobals) vApp).autocom = 1;
-            startActivity(new Intent(this, ComWS.class));
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
@@ -485,56 +469,6 @@ public class FinDia extends PBase {
 
     }
 
-    //CKFK 20190226 Modifiqué este procedimiento a como debe ser el fin de día en Toledano
-    private void buildReportsTOL() {
-
-        rep.empty();
-        /*rep.add("CIERRE DEL DIA");
-        rep.line();
-        rep.add("Vendedor : " + gl.vend + " " + gl.vendnom);
-        rep.add("Fecha : " + du.sfecha(fecha) + " " + du.shora(fecha));*/
-        //claseDocumento.encabezado(""); Preguntarle a Jaros como usa el encabezado que esta en P_ENCABEZADO_REPORTES_HH
-        rep.empty();
-
-        if (fullfd) {
-            rep.line();
-            rep.add("INFORME Z #" + corelz);
-        }
-
-        rep.line();
-
-        repPedidosTol();
-        repFacturasTol();
-        repCobrosTol();
-        repNotasCreditoTol();
-        repProductos();
-        repDevolTotal();
-        repEstadoMalo();
-
-        repTotalesTol();
-
-        try {
-
-            sql = "DELETE FROM D_REPFINDIA";
-            db.execSQL(sql);
-
-            for (int i = 0; i < rep.items.size(); i++) {
-                s = rep.items.get(i).trim();
-
-                sql = "INSERT INTO D_REPFINDIA VALUES ('" + gl.ruta + "'," + i + ",'" + s + "')";
-                db.execSQL(sql);
-            }
-
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            msgbox(new Object() {
-            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
-        }
-
-        rep.save();
-
-    }
-
 	//#EJC20190226: Insertar solo cabecera de d_mov.
     private boolean Inserta_Enc_D_Mov() {
 
@@ -555,11 +489,15 @@ public class FinDia extends PBase {
             ins.add("FECHA",fecha);
             ins.add("TIPO","D");
             ins.add("USUARIO",((appGlobals) vApp).vend);
-            ins.add("REFERENCIA","Cierre de dia");
+            ins.add("REFERENCIA","Devolucion");
             ins.add("STATCOM","N");
             ins.add("IMPRES",0);
             ins.add("CODIGOLIQUIDACION",0);
             db.execSQL(ins.sql());
+
+            sql="UPDATE FinDia SET val5 = 1";
+            db.execSQL(sql);
+
             db.setTransactionSuccessful();
             db.endTransaction();
 
@@ -573,99 +511,8 @@ public class FinDia extends PBase {
         }
 
     }
-
-	private boolean devProductos() {
-		Cursor DT;
-		String corel,pcod,plote,um;
-		Double pcant,pcantm,ppeso;
-		claseFinDia = new clsFinDia(this);
-		int i;
-
-
-		corel=gl.ruta+"_"+mu.getCorelBase();devcorel=corel;
-		gl.corel_d_mov=corel;
-
-        try {
-
-            db.beginTransaction();
-
-            ins.init("D_MOV");
-            ins.add("COREL", corel);
-            ins.add("RUTA", ((appGlobals) vApp).ruta);
-            ins.add("ANULADO", "N");
-            ins.add("FECHA", fecha);
-            ins.add("TIPO", "D");
-            ins.add("USUARIO", ((appGlobals) vApp).vend);
-            ins.add("REFERENCIA", "Cierre de dia");
-            ins.add("STATCOM", "N");
-            ins.add("IMPRES", 0);
-            ins.add("CODIGOLIQUIDACION", 0);
-
-            db.execSQL(ins.sql());
-
-            sql = "SELECT CODIGO,LOTE,SUM(CANT),SUM(CANTM),SUM(PESO),UNIDADMEDIDA FROM P_STOCK GROUP BY CODIGO,LOTE,UNIDADMEDIDA " +
-                    "HAVING SUM(CANT)>0 OR SUM(CANTM) >0";
-            DT = Con.OpenDT(sql);
-
-            i = 0;
-
-            if (DT.getCount() > 0) {
-
-                DT.moveToFirst();
-
-                while (!DT.isAfterLast()) {
-
-                    pcod = DT.getString(0);
-                    plote = DT.getString(1);
-                    pcant = DT.getDouble(2);
-                    pcantm = DT.getDouble(3);
-                    ppeso = DT.getDouble(4);
-                    um = DT.getString(5);
-
-					ins.init("D_MOVD");
-
-					ins.add("COREL",corel);
-					ins.add("PRODUCTO",pcod);
-					ins.add("CANT",pcant);
-					ins.add("CANTM",pcantm);
-					ins.add("PESO",ppeso);
-					ins.add("PESOM",ppeso);
-					ins.add("LOTE",plote);
-					ins.add("CODIGOLIQUIDACION",0);
-					ins.add("UNIDADMEDIDA",um);
-
-                    db.execSQL(ins.sql());
-
-                    DT.moveToNext();
-                    i++;
-                }
-            }
-
-            if (gl.peModal.equalsIgnoreCase("TOL")) {
-                sql = "DELETE FROM P_STOCK";
-                db.execSQL(sql);
-            }
-
-            db.setTransactionSuccessful();
-            db.endTransaction();
-
-            claseFinDia.updateDevBodega();
-
-            //Toast.makeText(this,"Devolucion aplicada "+i, Toast.LENGTH_SHORT).show();
-            return true;
-
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            db.endTransaction();
-            //mu.msgbox( e.getMessage());
-            return false;
-        }
-
-    }
-
 
     // Validaciones
-
     private boolean validaFinDia() {
         Cursor DT;
         int pend, fechaUltimoCierre;
@@ -673,12 +520,12 @@ public class FinDia extends PBase {
         claseFinDia = new clsFinDia(this);
 
         try{
+
             fechaUltimoCierre = claseFinDia.ultimoCierreFecha();
 
-            //#HS_20181127_1033 Agregue validacion para cantidad de facturas.
+            //#HS_20181127_1033 Agregué validacion para cantidad de facturas.
             if (claseFinDia.getCantFactura() == 0) {
-                msgExit("No hay facturas.");
-                return false;
+                msgExit("No hay facturas, no se puede realizar el Fin de Día");
             }
 
             if (fullfd) {
@@ -688,161 +535,80 @@ public class FinDia extends PBase {
                     return false;
                 }
 
-                setFactCor();
-                if (fcorel == 0) {
-                    msgExit("No Están definidos los correlativos de factura.");
-                    return false;
+                if (gl.peModal.equalsIgnoreCase("APR")) {
+                    setFactCor();
+                    if (fcorel == 0) {
+                        msgExit("No Están definidos los correlativos de factura.");
+                        return false;
+                    }
                 }
 
                 corelz = claseFinDia.setCorrelZ();
                 if (corelz == 0) {
                     //msgExit("No esta definido correlativo de cierre Z.");return false;
-                    claseFinDia.updateCorrelativoZ();
+                    claseFinDia.updateCorrelativoZ(1);
                 }
             }
 
             if (du.getActDate() == fechaUltimoCierre) {
                 msgExit("Fin de Día ya fue efectuado el día de hoy");
+
+                Toast.makeText(FinDia.this, "Cierre del día completo.", Toast.LENGTH_SHORT).show();
+
+                gl.findiaactivo=true;
+                gl.modoadmin = false;
+                gl.autocom = 1;
+
+                FinDia.super.finish();
+
                 return false;
             }
 
-            //#HS_20181127_1033 Agregue validacion para verificar si ya se realizo el deposito.
             if (gl.banderafindia == true) {
-                if (claseFinDia.getDeposito() != 2) {
+                //#CKFK 20190304 Agregué validación para verificar si ya se realizó la devolución a Bodega.
+                if (claseFinDia.getDevBodega() != 5 ){
+                    if (!Ya_Realizo_Devolucion()){
+                        msgAskDevInventario();
+                        return false;
+                    }
+                }
+
+                //#CKFK 20190305 Agregué validación para verificar si ya se realizó el depósito
+                if ((claseFinDia.getDeposito() != 4) && (claseFinDia.getDocPendientesDeposito()>0)) {
                     msgAskDeposito();
                     return false;
                 }
-            }
 
-            //#HS_20181127_1033 Agregue validacion para verificar si ya se realizo la impresion del deposito.
-            if (gl.banderafindia == true) {
-                if (claseFinDia.getImpresionDeposito() != 3) {
-                    msgAskImpresionDeposito();
+                //#CKFK 20190304 Agregué validación para verificar si ya se realizó la impresión del depósito.
+                if (gl.sinimp) {
+                    claseFinDia.updateImpDeposito(3);
+                }
+                else {
+                    if (claseFinDia.getImpresionDeposito() != 3) {
+                        msgAskImpresionDeposito();
+                        return false;
+                    }
+                }
+
+                //#CKFK 20190304 Agregué validación para verificar si ya se generó el cierreZ.
+                if ((claseFinDia.getGeneroCierreZ()!=6) && (claseFinDia.getImprimioCierreZ()!=7)){
+                    msgAskGeneraCierreZ();
                     return false;
                 }
-            }
 
-            // pendiente deposito
-            pend = 0;
-
-        try {
-            sql = "SELECT COREL FROM D_FACTURA WHERE ANULADO='N' AND DEPOS<>'S' ";
-            DT = Con.OpenDT(sql);
-            pend = pend + DT.getCount();
-
-            sql = "SELECT COREL FROM D_FACTURAP WHERE ANULADO='N' AND TIPO='K' ";
-            DT = Con.OpenDT(sql);
-            pend = pend - DT.getCount();
-
-        } catch (Exception e) {
-        }
-
-        try {
-            sql = "SELECT COREL FROM D_COBRO WHERE ANULADO='N' AND DEPOS<>'S' ";
-            DT = Con.OpenDT(sql);
-            pend = pend + DT.getCount();
-        } catch (Exception e) {
-        }
-
-		if (pend>0) {
-			msgExitDepos("Existen documentos pendientes a depositar.");return false;
-		}
-
-            pend = getFactCount("SELECT SERIE,CORELATIVO FROM D_FACTURA", "Facturas :");
-            if (pend == 0) {
-                msgExit("No se puede realizar Cierre del día. No está registrada ninguna factura.");
-                return false;
-            }
-
-            try {
-                //  pendiente envio
-
-                pend = 0;
-                sp = "";
-
-                pend = pend + getFactCount("SELECT SERIE,CORELATIVO FROM D_FACTURA WHERE STATCOM<>'S'", "Facturas :");
-                pend = pend + claseAppMethods.getDocCount("SELECT COREL FROM D_PEDIDO WHERE STATCOM<>'S'", "Pedidos :");
-                pend = pend + claseAppMethods.getDocCount("SELECT COREL FROM D_COBRO WHERE STATCOM<>'S'", "Recibos :");
-                pend = pend + getDeposCount("SELECT TOTAL FROM D_DEPOS WHERE STATCOM<>'S'", "Depositos :");
-                pend = pend + claseAppMethods.getDocCount("SELECT COREL FROM D_MOV WHERE STATCOM<>'S'", "Inventario :");
-                //pend=pend+getDocCount("SELECT RUTA  FROM D_ATENCION WHERE STATCOM<>'N'","A:");
-
-                if (pend > 0) {
-                    //msgExitCom("Existen datos pendientes de envio. Realize envio de datos antes de cierre del día.\n"+sp);return false;
+                //#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
+                if (claseFinDia.getComunicacion() != 4) {
+                        msgAskComunicacion();
+                        return false;
                 }
-            } catch (Exception e) {
-                addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+
             }
+
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
-
         return true;
-    }
-
-    private int getFactCount(String ss, String pps) {
-        Cursor DT;
-        int cnt;
-        String st;
-
-        try {
-            sql = ss;
-            DT = Con.OpenDT(sql);
-            cnt = DT.getCount();
-            sp += pps + " ";
-			
-			/*
-			if (cnt>0) {
-				
-				DT.moveToFirst();
-				while (!DT.isAfterLast()) {
-					st=st+DT.getString(0)+"-"+DT.getInt(1)+", ";
-					DT.moveToNext();
-				}				
-				sp=sp+st+"\n";
-			}
-			*/
-
-            sp = sp + cnt + "\n";
-
-            return cnt;
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox(sql + "\n" + e.getMessage());
-            return 0;
-        }
-    }
-
-    private int getDeposCount(String ss, String pps) {
-        Cursor DT;
-        int cnt;
-        String st;
-
-        try {
-            sql = ss;
-            DT = Con.OpenDT(sql);
-            cnt = DT.getCount();
-            sp += pps + " ";
-			/*
-			if (cnt>0) {				
-				DT.moveToFirst();
-				while (!DT.isAfterLast()) {
-					st=st+mu.frmdec(DT.getDouble(0))+", ";
-					DT.moveToNext();
-				}				
-				sp=sp+st+"\n";
-			}
-			*/
-
-            sp = sp + cnt + "\n";
-
-            return cnt;
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox(sql + "\n" + e.getMessage());
-            return 0;
-        }
     }
 
     private boolean validaPagosPend() {
@@ -865,13 +631,38 @@ public class FinDia extends PBase {
 
     }
 
-    private void requisitosFinDia() {
+    //Impresion Cierre Z
+    private void imprimeCierreZ(){
+
+        try {
+
+            File f1 = new File(Environment.getExternalStorageDirectory() + "/SyncFold/findia.txt");
+            File f2 = new File(Environment.getExternalStorageDirectory() + "/print.txt");
+            FileUtils.copyFile(f1, f2);
+
+            if (!gl.sinimp) {
+                if (prn.isEnabled())  {
+                    final Handler shandler = new Handler();
+                    shandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run()  {
+                            Intent intent = new Intent(FinDia.this, PrintDialog.class);
+                            startActivity(intent);
+                        }
+                    }, 2000);
+                }
+            }
+
+            claseFinDia.updateImprimioCierreZ(7);
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+            msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+        }
 
     }
 
-
     // Reportes
-
     private void repProductos() {
         Cursor DT;
         String s1, s2, s3, s4, s5, ump;
@@ -1490,23 +1281,6 @@ public class FinDia extends PBase {
 
     }
 
-
-    // Aux
-
-    //#HS_20181121_1431 Se dejo en comentario porque se agrego a la clase clsFinDia.
-	/*private void setCorrelZ() {
-		Cursor DT;
-
-		try {
-			sql="SELECT Corel FROM FinDia";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			corelz=DT.getInt(0);
-		} catch (Exception e) {
-			corelz=0;
-		}
-	}*/
-
     private void setFactCor() {
         Cursor DT;
 
@@ -1530,23 +1304,6 @@ public class FinDia extends PBase {
         }
     }
 
-    //#HS_20181121_1642 Se puso en comentario porque se agregó en la clase clsFinDia.
-	/*private int ultimoCierreFecha() {
-		Cursor DT;
-		int rslt=0;
-
-		try {
-			sql="SELECT val1 FROM FinDia";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			rslt=DT.getInt(0);
-		} catch (Exception e) {
-			rslt=0;
-		}
-
-		return rslt;
-	}*/
-
     private void delPrintFiles() {
         try {
             new File(Environment.getExternalStorageDirectory() + "/print.txt").delete();
@@ -1560,22 +1317,24 @@ public class FinDia extends PBase {
         }
     }
 
-
-    // Mensajes
-
     private void msgAskDeposito() {
 
         try{
             AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
 
             dialog1.setTitle("Road");
-            dialog1.setMessage("No se ha realizado el depósito.");
+            dialog1.setMessage("No se ha realizado el depósito. ¿Quiere realizar el depósito?");
 
             dialog1.setIcon(R.drawable.ic_quest);
 
-            dialog1.setPositiveButton("Realizar Depósito.", new DialogInterface.OnClickListener() {
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     ActivityDeposito();
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
                 }
             });
 
@@ -1593,13 +1352,45 @@ public class FinDia extends PBase {
             AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
 
             dialog1.setTitle("Road");
-            dialog1.setMessage("Debe imprimir el recibo de depósito");
+            dialog1.setMessage("Debe imprimir el recibo de depósito. ¿Imprimir depósito?");
 
             dialog1.setIcon(R.drawable.ic_quest);
 
-            dialog1.setPositiveButton("Imprimir Documento", new DialogInterface.OnClickListener() {
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    ActivityImpresionDeposito(1);
+                    ActivityImpresion(1);
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+            dialog1.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+    }
+
+    private void msgAskComunicacion() {
+
+        try{
+            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
+
+            dialog1.setTitle("Road");
+            dialog1.setMessage("No ha comunicado los datos.¿Quiere comunicar los datos?");
+
+            dialog1.setIcon(R.drawable.ic_quest);
+
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityComunicacion();
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
                 }
             });
 
@@ -1609,6 +1400,35 @@ public class FinDia extends PBase {
         }
 
 
+    }
+
+    private void msgAskGeneraCierreZ() {
+
+        try {
+            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
+
+            dialog1.setTitle("Road");
+            dialog1.setMessage("No ha generado el Cierre Z. ¿Quiere generarlo ahora?");
+
+            dialog1.setIcon(R.drawable.ic_quest);
+
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    buildReportsTOL();
+                    imprimeCierreZ();
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+            dialog1.show();
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+        }
     }
 
     private void msgAsk() {
@@ -1640,14 +1460,12 @@ public class FinDia extends PBase {
 
     }
 
-	private void msgAskFinDiaTrue()
-	{
-
+	private void msgAskFinDiaTrue()	{
         try{
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
             dialog.setTitle("Road");
-            dialog.setMessage("Este proceso prepara el sistema para el siguiente día de venta. Continuar ?");
+            dialog.setMessage("Este proceso prepara el sistema para el siguiente día de venta. Continuar?");
             dialog.setIcon(R.drawable.ic_quest);
             dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
@@ -1664,12 +1482,9 @@ public class FinDia extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
-
 	}
 
-	private void msgAsk2()
-	{
+	private void msgAsk2()	{
 
         try{
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -1680,7 +1495,7 @@ public class FinDia extends PBase {
 
             dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    msgAskDevInventario();
+                    validaFinDia();//#CKFK 20190305 Agregué esta validación aquí porque aquí es que inicia el proceso
                 }
             });
 
@@ -1693,7 +1508,7 @@ public class FinDia extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
-			
+
 	}
 
 	//#HS_20181121_1506 Se creo la pregunta para la devolución de inventario.
@@ -1706,29 +1521,6 @@ public class FinDia extends PBase {
                 startActivity(new Intent(this,DevolBodTol.class));
 
                 toastlong("No ha efectuado la devolución a bodega,debe proceder a realizarla antes de fin del dia");
-
-            /*AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-            dialog.setTitle("Road");
-            dialog.setMessage("No ha efectuado la devolución a bodega, ¿Quiere proceder a realizarla?");
-            dialog.setIcon(R.drawable.ic_quest);
-            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    if(gl.banderafindia == false)
-                    {
-                        startFDD();
-                    }else {
-                        startFDD();//iniciarFD();
-                    }
-                }
-            });
-
-            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityMenu();
-                }
-            });
-
-            dialog.show();*/
 
             } else  {
                 startFDD();
@@ -1781,57 +1573,6 @@ public class FinDia extends PBase {
 
     }
 
-	private void msgExitCom(String msg) {
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle(R.string.app_name);
-            dialog.setMessage(msg);
-
-            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-
-                    ((appGlobals) vApp).tipo=0;
-                    Intent intent = new Intent(FinDia.this,ComWS.class);
-                    startActivity(intent);
-
-                    //FinDia.super.finish();
-                }
-            });
-
-            dialog.show();
-
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-	}
-	
-	private void msgExitDepos(String msg) {
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle(R.string.app_name);
-            dialog.setMessage(msg);
-
-            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-
-                    ((appGlobals) vApp).tipo=0;
-                    Intent intent = new Intent(FinDia.this,Deposito.class);
-                    startActivity(intent);
-
-                    //FinDia.super.finish();
-                }
-            });
-
-            dialog.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-	}
-	
 	public void msgAskFlag(View view) {
         try{
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -1856,12 +1597,11 @@ public class FinDia extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
-			
+
 	}
 
-
-    private boolean Tiene_Inventario_Devolucion()
-    {
+	//#EJC 20190226 Creé esta función para saber si hay inventario para devolver
+    private boolean Tiene_Inventario_Devolucion(){
 
         boolean TieneInvDevol = false;
 
@@ -1932,9 +1672,8 @@ public class FinDia extends PBase {
 
     }
 
-
-    private boolean Ya_Realizo_Devolucion()
-    {
+    //#EJC 20190226 Creé esta función para saber si ya se había realizado la devolución
+    private boolean Ya_Realizo_Devolucion(){
 
         boolean Ya_Realizo_Devol = false;
 
@@ -1943,8 +1682,6 @@ public class FinDia extends PBase {
         try
         {
 
-            double vTotalLbsB = 0;
-            double vTotalUB = 0;
             boolean vTieneInvDevol = false;
 
             sql = "SELECT STATCOM FROM D_MOV WHERE TIPO = 'D' AND ANULADO = 'N'";
@@ -1958,15 +1695,21 @@ public class FinDia extends PBase {
                 if (vTieneInvDevol)
                 {
                     Ya_Realizo_Devol = false;
+                    claseFinDia.updateDevBodega(0);
 
                 }else
                 {
                     Ya_Realizo_Devol = Inserta_Enc_D_Mov();
+                    claseFinDia.updateDevBodega(5);
                 }
 
+            }else if (claseFinDia.getDevBodega() == 5)
+            {
+                Ya_Realizo_Devol = true;
             }else
             {
                 Ya_Realizo_Devol = true;
+                claseFinDia.updateDevBodega(5);
             }
 
         }catch (Exception e) {
@@ -1978,14 +1721,106 @@ public class FinDia extends PBase {
 
     }
 
+    private boolean yaInicioFinDia(){
+
+        boolean vInicio=false;
+        Cursor DT;
+
+        try{
+
+            sql="SELECT val5 FROM findia ";
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()>0){
+                DT.moveToFirst();
+
+                vInicio=((DT.getInt(0)==5));
+
+            }
+
+        }catch (Exception ex){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
+            mu.msgbox(ex.getMessage());
+        }
+
+        return vInicio;
+
+    }
 
 	// Activity Events
-	
 	@Override
 	public void onBackPressed() {
 		if (idle) super.onBackPressed();
 	}
 
+	//region "Funciones y procedimientos creados para generar el reporte Cierre Z de Toledano"
+
+    //CKFK 20190226 Modifiqué este procedimiento a como debe ser el fin de día en Toledano
+    private void buildReportsTOL() {
+
+        Cursor DT;
+        String vCadena;
+
+        try {
+
+            rep.empty();
+            sql = " SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO " +
+                  " FROM P_SUCURSAL WHERE CODIGO='" + gl.sucur + "'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                rep.empty();
+                vCadena = DT.getString(3);//Nombre
+                rep.add(rep.ctrim(vCadena));
+                vCadena = "R.U.C: " + DT.getString(6) + " DV." + DT.getString(7);
+                rep.add(rep.ctrim(vCadena));
+                vCadena = DT.getString(4);//Dirección
+                rep.add(rep.ctrim(vCadena));
+                vCadena = "# DE SERIE:" + gl.deviceId;
+                rep.add(rep.ctrim(vCadena));
+                vCadena = StringUtils.leftPad(du.shora(fecha),12) + StringUtils.leftPad(du.sfecha(fecha),20);
+                rep.add(rep.ctrim(vCadena));
+                rep.empty();
+                vCadena = "INFORME Z # " + corelz;
+                rep.add(rep.ctrim(vCadena));
+                rep.empty();
+                vCadena = "VENDEDOR: " + gl.vend;
+                rep.add(vCadena);
+                rep.empty();
+
+            }
+
+            repPedidosTol();
+            repFacturasTol();
+            repCobrosTol();
+            repNotasCreditoTol();
+            repProductos();
+            repDevolTotal();
+            repEstadoMalo();
+            repTotalesTol();
+
+            sql = "DELETE FROM D_REPFINDIA";
+            db.execSQL(sql);
+
+            for (int i = 0; i < rep.items.size(); i++) {
+                s = rep.items.get(i).trim();
+
+                sql = "INSERT INTO D_REPFINDIA VALUES ('" + gl.ruta + "'," + i + ",'" + s + "')";
+                db.execSQL(sql);
+            }
+
+        } catch (Exception e) {
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+        }
+
+        if (rep.save()){
+            claseFinDia.updateGeneroCierreZ(6);
+        }
+
+    }
 
     //CKFK 20190226 Agregué esta función para generar el listado de facturas de Toledano
     private void repFacturasTol() {
@@ -2009,19 +1844,19 @@ public class FinDia extends PBase {
 
             //IIf(Not CellCom Or gFinDia, " WHERE F.STATCOM = 'N' ", " ")
             if ((!gl.CellCom) || (gl.banderafindia)) {
-                vComunicacion = " WHERE F.STATCOM = 'N' ";
+                vComunicacion = " AND F.STATCOM = 'N' ";
             }
 
             //sql="SELECT SERIE,CORELATIVO,TOTAL,ANULADO FROM D_FACTURA WHERE BANDERA<>'F' ORDER BY CORELATIVO";
             sql = " SELECT F.SERIE, F.CORELATIVO, F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO, " +
                     " SUM(D.PRECIODOC * D.CANT) AS GRAVADO, 0 AS NO_GRAVADO " +
                     " FROM D_FACTURA F INNER JOIN D_FACTURAD D ON F.COREL = D .COREL " +
-                    vComunicacion + " AND D.IMP > 0 " +
+                    " WHERE D.IMP > 0 " + vComunicacion +
                     " GROUP BY F.SERIE, F.CORELATIVO, F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO " +
                     " UNION SELECT F.SERIE, F.CORELATIVO, F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO, " +
                     " 0 AS GRAVADO, SUM(D.TOTAL) AS NO_GRAVADO " +
                     " FROM D_FACTURA F INNER JOIN D_FACTURAD D ON F.COREL = D .COREL " +
-                    vComunicacion + " AND D.IMP = 0 " +
+                    " WHERE D.IMP = 0 " + vComunicacion +
                     " GROUP BY F.SERIE, F.CORELATIVO, F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO";
             DT = Con.OpenDT(sql);
 
@@ -2072,10 +1907,10 @@ public class FinDia extends PBase {
                             DT.moveToNext();
 
                             if (!vAuxCorel.equalsIgnoreCase(DT.getString(0))){
-                                vCadena = StringUtils.right( StringUtils.leftPad(mu.frmcur_sm(sumagrav), 10),10);
-                                vCadena += StringUtils.right( StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9),9);
-                                vCadena += StringUtils.right( StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8),8);
-                                vCadena +=  StringUtils.right( StringUtils.leftPad(mu.frmcur_sm(totporfila), 9),9) + " F";
+                                vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
+                                vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
+                                vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8);
+                                vCadena +=   StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
                                 rep.add(vCadena);
                             }
 
@@ -2083,10 +1918,10 @@ public class FinDia extends PBase {
 
                         }  else{
 
-                            vCadena = StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(sumagrav), 10),10);
-                            vCadena +=  StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9),9);
-                            vCadena += StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8),8);
-                            vCadena +=  StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(totporfila), 9),9) + " F";
+                            vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
+                            vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
+                            vCadena += StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8);
+                            vCadena +=  StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
                             rep.add(vCadena);
                         }
                     }
@@ -2100,13 +1935,14 @@ public class FinDia extends PBase {
                         sumanograv = sumanograv + DT.getDouble(7);//NoGravado
                         sumagrav = sumagrav + DT.getDouble(6);//Gravado
 
-                        vCadena = StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(sumagrav), 10),10);
-                        vCadena += StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9),9);
-                        vCadena += StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8),8);
-                        vCadena += StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(totporfila), 9),9) + " F";
+                        vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
+                        vCadena += StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
+                        vCadena += StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8);
+                        vCadena += StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
                         rep.add(vCadena);
 
                     }
+
                     i += 1;
 
                     DT.moveToNext();
@@ -2118,10 +1954,10 @@ public class FinDia extends PBase {
 
                 vCadena = "Total";
                 rep.add(vCadena);
-                vCadena = StringUtils.leftPad(mu.frmcur(totgrav), 10, " ");
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur(totnograv), 9, " ");
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur(TotItbm), 8, " ");
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur(sumados), 9, " ");
+                vCadena = StringUtils.leftPad(mu.frmcur_sm(totgrav), 10, " ");
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(totnograv), 9);
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(TotItbm), 8);
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(sumados), 9);
                 rep.add(vCadena);
             }
 
@@ -2135,8 +1971,9 @@ public class FinDia extends PBase {
 
     //CKFK 20190226 Agregué esta función para generar el listado de pedidos de Toledano
     private void repPedidosTol() {
+
         Cursor DT;
-        String s1, s2, s3;
+        String s1;
         String vComunicacion = "";
         String vAuxCorel, vCadena;
         double sumagrav, sumaimp, sumanograv, totporfila, totgrav, totnograv, TotItbm, sumados, i;
@@ -2154,18 +1991,18 @@ public class FinDia extends PBase {
         try {
 
             if ((!gl.CellCom) || (gl.banderafindia)) {
-                vComunicacion = " WHERE F.STATCOM = 'N' ";
+                vComunicacion = " AND F.STATCOM = 'N' ";
             }
 
             sql = " SELECT F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO, " +
                     " SUM(D.PRECIODOC * D.CANT) AS GRAVADO, 0 AS NO_GRAVADO " +
                     " FROM D_PEDIDO F INNER JOIN D_PEDIDOD D ON F.COREL = D .COREL " +
-                    vComunicacion + " AND D.IMP > 0 " +
+                    " WHERE D.IMP > 0 " + vComunicacion +
                     " GROUP BY F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO " +
                     " UNION SELECT F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO, " +
                     " 0 AS GRAVADO, SUM(D.TOTAL) AS NO_GRAVADO " +
                     " FROM D_PEDIDO F INNER JOIN D_PEDIDOD D ON F.COREL = D .COREL " +
-                    vComunicacion + " AND D.IMP = 0 " +
+                    " WHERE D.IMP = 0 " + vComunicacion +
                     " GROUP BY F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO ";
             DT = Con.OpenDT(sql);
 
@@ -2216,10 +2053,10 @@ public class FinDia extends PBase {
                             DT.moveToNext();
 
                             if (!vAuxCorel.equalsIgnoreCase(DT.getString(0))){
-                                vCadena = StringUtils.right( StringUtils.leftPad(mu.frmcur_sm(sumagrav), 10),10);
-                                vCadena += StringUtils.right( StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9),9);
-                                vCadena += StringUtils.right( StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8),8);
-                                vCadena +=  StringUtils.right( StringUtils.leftPad(mu.frmcur_sm(totporfila), 9),9) + " F";
+                                vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
+                                vCadena += StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
+                                vCadena += StringUtils.leftPad(mu.frmcur_sm(sumaimp),8);
+                                vCadena +=  StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
                                 rep.add(vCadena);
                             }
 
@@ -2227,10 +2064,10 @@ public class FinDia extends PBase {
 
                         }  else{
 
-                            vCadena = StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(sumagrav), 10),10);
-                            vCadena +=  StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9),9);
-                            vCadena += StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8),8);
-                            vCadena +=  StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(totporfila), 9),9) + " F";
+                            vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
+                            vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
+                            vCadena += StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8);
+                            vCadena +=  StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
                             rep.add(vCadena);
                         }
                     }
@@ -2244,10 +2081,10 @@ public class FinDia extends PBase {
                         sumanograv = sumanograv + DT.getDouble(7);//NoGravado
                         sumagrav = sumagrav + DT.getDouble(6);//Gravado
 
-                        vCadena = StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(sumagrav), 10),10);
-                        vCadena += StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9),9);
-                        vCadena += StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8),8);
-                        vCadena += StringUtils.right(StringUtils.leftPad(mu.frmcur_sm(totporfila), 9),9) + " F";
+                        vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 10);
+                        vCadena += StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
+                        vCadena += StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8);
+                        vCadena += StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
                         rep.add(vCadena);
 
                     }
@@ -2262,10 +2099,10 @@ public class FinDia extends PBase {
 
                 vCadena = "Total";
                 rep.add(vCadena);
-                vCadena = StringUtils.leftPad(mu.frmcur(totgrav), 10, " ");
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur(totnograv), 9, " ");
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur(TotItbm), 8, " ");
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur(sumados), 9, " ");
+                vCadena = StringUtils.leftPad(mu.frmcur_sm(totgrav), 10);
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(totnograv), 9);
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(TotItbm), 8);
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(sumados), 9);
                 rep.add(vCadena);
             }
 
@@ -2280,47 +2117,56 @@ public class FinDia extends PBase {
     //CKFK 20190226 Agregué esta función para generar el listado de cobros de Toledano
     private void repCobrosTol(){
 
+        String vCadena;
+        Cursor DT;
+        int TotalRecibos = 0;
+        boolean anulado;
+
         try{
 
-            /* S = "LISTADO DE COBROS"
-        SP.WriteLine(S)
-        SP.WriteLine(gPrLine)
+             vCadena = "LISTADO DE COBROS";
+             rep.add(vCadena);
+             rep.line();
 
-        S = "No. Rec " & Space(10) & "Total" & Space(10) & "  E"
-        SP.WriteLine(S)
+             vCadena= "No. Rec "  + StringUtils.leftPad("Total",10)  + StringUtils.leftPad("E",12);
+             rep.add(vCadena);
 
-        SQL = "SELECT COREL, TOTAL, ANULADO FROM D_COBRO WHERE STATCOM='N'"
+            sql = "SELECT COREL, TOTAL, ANULADO FROM D_COBRO WHERE STATCOM='N'";
+            DT = Con.OpenDT(sql);
 
-        Try
-        openDT(DT, SQL)
-        Catch ex As Exception
-        MsgBox(ex.Message)
-        If Not SP Is Nothing Then SP.Close()
-        Return -1
-        End Try
+            if (DT != null){
 
-        TotalRecibos = 0
+                if (DT.getCount() > 0) {
 
-        If DT.Rows.Count > 0 Then
+                    DT.moveToFirst();
 
-        For i = 0 To DT.Rows.Count - 1
+                    while (!DT.isAfterLast()) {
 
-        anulada = IIf(DT.Rows(i).Item("ANULADO") = "N", False, True)
-        S = DT.Rows(i).Item("COREL")
+                        anulado = (DT.getString(2).equalsIgnoreCase("S"));
 
-        If Not anulada Then TotalRecibos = TotalRecibos + DT.Rows(i).Item("TOTAL")
+                        vCadena = DT.getString(0);
 
-        S = S & Strings.Right(Space(25) & FrmCur(DT.Rows(i).Item("TOTAL")), 25) & IIf(anulada, "  A", "")
-        SP.WriteLine(S)
-        Next
-        End If
-        SP.WriteLine(gPrLine)
-        S = "Total:  " + Strings.Right(Space(27) & FrmCur(TotalRecibos), 27)
-        SP.WriteLine(S)
-        SP.WriteLine(" ")
-        DT.Reset()*/
+                        if (!anulado) TotalRecibos += DT.getDouble(1);
+
+                        vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 25);
+                        if (anulado)  vCadena += "  A";
+
+                        rep.add(vCadena);
+
+                        DT.moveToNext();
+                    }
+                }
+
+            }
+
+            rep.line();
+            vCadena = "Total:  " + StringUtils.leftPad(mu.frmcur_sm(TotalRecibos), 27);
+            rep.add(vCadena);
+            rep.empty();
 
         }catch (Exception ex){
+            mu.msgbox("Cobros: " + ex.getMessage());
+            fail = true;
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
         }
     }
@@ -2328,96 +2174,108 @@ public class FinDia extends PBase {
     //CKFK 20190226 Agregué esta función para generar el listado de notas de crédito de Toledano
     private void repNotasCreditoTol(){
 
+        Cursor DT;
+        String vCadena;
+        boolean anulada;
+        double TotalNotaCred = 0;
+        double TotalNotaCredCred = 0;
+        double TotalNotaCredCont = 0;
+
         try{
 
-            /* S = "LISTADO DE NOTAS DE CREDITO"
-            SP.WriteLine(S)
-            SP.WriteLine(gPrLine)
+            vCadena = "LISTADO DE NOTAS DE CREDITO";
+            rep.add(vCadena);
+            rep.line();
 
-            S = "No. N.C " & Space(10) & "Total" & Space(10) & "  E"
-            SP.WriteLine(S)
+            vCadena = "No. N.C " + StringUtils.leftPad("Total",10) + StringUtils.leftPad("E",12);
+            rep.add(vCadena);
 
-            S = "AFECTAN CREDITO"
-            SP.WriteLine(S)
-            SP.WriteLine(gPrLine)
+            vCadena = "AFECTAN CREDITO";
+            rep.add(vCadena);
+            rep.line();
 
-            SQL = "SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N, D_FACTURAP F " & _
-                 " WHERE N.FACTURA = F.COREL AND N.STATCOM='N'  AND F.TIPO = 'K'  " & _
-                 " UNION SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N, D_CXC C " & _
-                 " WHERE N.FACTURA = C.COREL AND N.STATCOM='N' "
+            sql = " SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N, D_FACTURAP F " +
+                  " WHERE N.FACTURA = F.COREL AND N.STATCOM='N'  AND F.TIPO = 'K'  " +
+                  " UNION SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N, D_CXC C " +
+                  " WHERE N.FACTURA = C.COREL AND N.STATCOM='N' ";
 
-            Try
-                openDT(DT, SQL)
-            Catch ex As Exception
-                MsgBox(ex.Message)
-                If Not SP Is Nothing Then SP.Close()
-                Return -1
-            End Try
+            DT = Con.OpenDT(sql);
 
-            TotalNotaCred = 0
-            TotalNotaCredCred = 0
-            TotalNotaCredCont = 0
+            TotalNotaCred = 0;
+            TotalNotaCredCred = 0;
+            TotalNotaCredCont = 0;
 
-            If DT.Rows.Count > 0 Then
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
 
-                For i = 0 To DT.Rows.Count - 1
+                while (!DT.isAfterLast()) {
 
-                    anulada = IIf(DT.Rows(i).Item("ANULADO") = "N", False, True)
-                    S = DT.Rows(i).Item("COREL")
+                    anulada = (DT.getString(3).equalsIgnoreCase("S"));
 
-                    If Not anulada Then
-                        TotalNotaCred = TotalNotaCred + DT.Rows(i).Item("TOTAL")
-                        TotalNotaCredCred = TotalNotaCredCred + DT.Rows(i).Item("TOTAL")
-                    End If
+                    vCadena = DT.getString(0);
 
-                    S = S & Strings.Right(Space(25) & FrmCur(DT.Rows(i).Item("TOTAL")), 25) & IIf(anulada, "  A", "")
-                    SP.WriteLine(S)
-                Next
-            End If
+                    if (!anulada) {
+                        TotalNotaCred = TotalNotaCred + DT.getDouble(1);
+                        TotalNotaCredCred = TotalNotaCredCred + DT.getDouble(1);
+                    }
 
-            S = "AFECTAN CONTADO"
-            SP.WriteLine(S)
-            SP.WriteLine(gPrLine)
+                    vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 25);
+                    if (anulada)  vCadena += "  A";
 
-            SQL = "SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N " & _
-                  " WHERE N.STATCOM='N' AND N.FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO <> 'K')"
+                    rep.add(vCadena);
 
-            Try
-                openDT(DT, SQL)
-            Catch ex As Exception
-                MsgBox(ex.Message)
-                If Not SP Is Nothing Then SP.Close()
-                Return -1
-            End Try
+                    DT.moveToNext();
+                }
+            }
 
-            If DT.Rows.Count > 0 Then
+            vCadena = "AFECTAN CONTADO";
+            rep.add(vCadena);
+            rep.line();
 
-                For i = 0 To DT.Rows.Count - 1
+            sql = " SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N " +
+                  " WHERE N.STATCOM='N' AND N.FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO <> 'K')";
 
-                    anulada = IIf(DT.Rows(i).Item("ANULADO") = "N", False, True)
-                    S = DT.Rows(i).Item("COREL")
+            DT = Con.OpenDT(sql);
 
-                    If Not anulada Then
-                        TotalNotaCred = TotalNotaCred + DT.Rows(i).Item("TOTAL")
-                        TotalNotaCredCont = TotalNotaCredCont + DT.Rows(i).Item("TOTAL")
-                    End If
+            TotalNotaCred = 0;
+            TotalNotaCredCred = 0;
+            TotalNotaCredCont = 0;
 
-                    S = S & Strings.Right(Space(25) & FrmCur(DT.Rows(i).Item("TOTAL")), 25) & IIf(anulada, "  A", "")
-                    SP.WriteLine(S)
-                Next
-            End If
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
 
-            SP.WriteLine(gPrLine)
-            S = "Total NC Credito:  " + Strings.Right(Space(27) & FrmCur(TotalNotaCredCred), 27)
-            SP.WriteLine(S)
-            S = "Total NC Contado:  " + Strings.Right(Space(27) & FrmCur(TotalNotaCredCont), 27)
-            SP.WriteLine(S)
-            S = "Total:  " + Strings.Right(Space(27) & FrmCur(TotalNotaCred), 27)
-            SP.WriteLine(S)
-            SP.WriteLine(" ")
-            DT.Reset()*/
+                while (!DT.isAfterLast()) {
+
+                    anulada = (DT.getString(3).equalsIgnoreCase("S"));
+
+                    vCadena = DT.getString(0);
+
+                    if (!anulada) {
+                        TotalNotaCred +=  DT.getDouble(1);
+                        TotalNotaCredCont += DT.getDouble(1);
+                    }
+
+                    vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 25);
+                    if (anulada)  vCadena += "  A";
+
+                    rep.add(vCadena);
+
+                    DT.moveToNext();
+                }
+            }
+
+            rep.line();
+            vCadena = "Total NC Credito:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCredCred), 27);
+            rep.add(vCadena);
+            vCadena = "Total NC Contado:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCredCont), 27);
+            rep.add(vCadena);
+            vCadena = "Total:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCred), 27);
+            rep.add(vCadena);
+           rep.empty();
 
         }catch (Exception ex){
+            mu.msgbox("Notas de crédito: " + ex.getMessage());
+            fail = true;
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
 
         }
@@ -2427,136 +2285,468 @@ public class FinDia extends PBase {
     //CKFK 20190226 Agregué esta función para generar los totales del Cierre Z
     private void repTotalesTol() {
 
+        Cursor DT;
+        String vCadena, vComunicacion;
+        double totgrav = 0;
+        double totnograv = 0;
+        double TotItbm = 0;
+        double sumados = 0;
+
         try{
 
-            /*
+            vComunicacion = "";
 
-            S = "ACUMULADOS A LA FECHA"
-            SP.WriteLine(CenterTrim(S))
-            SP.WriteLine("")
-            S = "Ventas Gravadas       :" + Strings.Right(Space(13) & FrmCur(totgrav), 13)
-            SP.WriteLine(S)
-            S = "Ventas No Gravadas    :" + Strings.Right(Space(13) & FrmCur(totnograv), 13)
-            SP.WriteLine(S)
-            S = "Acumulado ITBM        :" + Strings.Right(Space(13) & FrmCur(TotItbm), 13)
-            SP.WriteLine(S)
-            S = "GT                    :" + Strings.Right(Space(13) & FrmCur(sumados), 13)
-            SP.WriteLine(S)
-            SP.WriteLine("")
+            vCadena = "ACUMULADOS A LA FECHA";
+            rep.add(vCadena);
+            rep.empty();
 
-            'Totales para liquidacion
-            S = "Facturas Credito      :" + Strings.Right(Space(13) & CStr(FacturasCredito()), 13)
-            SP.WriteLine(S)
-            S = "Facturas Contado      :" + Strings.Right(Space(13) & CStr(FacturasContado()), 13)
-            SP.WriteLine(S)
-            S = "Facturas Anuladas     :" + Strings.Right(Space(13) & CStr(FacturasAnuladas()), 13)
-            SP.WriteLine(S)
-            S = "Cantidad Facturas     :" + Strings.Right(Space(13) & CStr(TotalFacturas()), 13)
-            SP.WriteLine(S)
-            S = "Recibos               :" + Strings.Right(Space(13) & CStr(TotRecibos()), 13)
-            SP.WriteLine(S)
-            S = "Recibos anulados      :" + Strings.Right(Space(13) & CStr(RecibosAnulados()), 13)
-            SP.WriteLine(S)
-            'S = "Notas de credito      :" + Strings.Right(Space(13) & CStr(TotNotaC()), 13)
-            'SP.WriteLine(S)
-            S = "Cantidad de NC        :" + Strings.Right(Space(13) & CStr(NotasCredito()), 13)
-            SP.WriteLine(S)
-            S = "Cant. NC anuladas     :" + Strings.Right(Space(13) & CStr(NotasCreditoAnuladas()), 13)
-            SP.WriteLine(S)
-            SP.WriteLine("")
+            if ((!gl.CellCom) || (gl.banderafindia)) {
+                vComunicacion = " AND F.STATCOM = 'N' ";
+            }
+            sql = " SELECT IFNULL(SUM(S.IMPMONTO),0) AS IMPMONTO, IFNULL(SUM(S.GRAVADO),0) AS GRAVADO, " +
+                  " IFNULL(SUM(S.NO_GRAVADO),0) AS NO_GRAVADO " +
+                  " FROM (SELECT SUM(D.IMP) AS IMPMONTO, " +
+                  " SUM(D.PRECIODOC * D.CANT) AS GRAVADO, 0 AS NO_GRAVADO " +
+                  " FROM D_FACTURA F INNER JOIN D_FACTURAD D ON F.COREL = D .COREL " +
+                  " WHERE D.IMP > 0 " + vComunicacion +
+                  " AND F.ANULADO = 'N' " +
+                  " UNION SELECT SUM(D.IMP) AS IMPMONTO, " +
+                  " 0 AS GRAVADO, SUM(D.TOTAL) AS NO_GRAVADO " +
+                  " FROM D_FACTURA F INNER JOIN D_FACTURAD D ON F.COREL = D .COREL " +
+                  " WHERE D.IMP = 0 " + vComunicacion +
+                  " AND F.ANULADO = 'N') S ";
+            DT = Con.OpenDT(sql);
 
-            Dim vTotalNC_Credito As Double = TotNotaC_Credito()
-            Dim vTotalNC_Contado As Double = TotNotaC_Contado()
-            Dim vTotalCredito As Double = TotalCredito2()
-            Dim vTotalContado As Double = TotalEfectivo2()
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                totnograv = totnograv + DT.getDouble(2);
+                totgrav = totgrav + DT.getDouble(1);
+                TotItbm = TotItbm + DT.getDouble(0);
+                sumados = totnograv + totgrav + TotItbm;
+            }
 
-            S = "Venta Credito         :" + Strings.Right(Space(13) & FrmCur(vTotalCredito), 13)
-            SP.WriteLine(S)
-            S = "Total NC Credito      :" + Strings.Right(Space(13) & FrmCur(vTotalNC_Credito), 13)
-            SP.WriteLine(S)
-            S = "Total Credito         :" + Strings.Right(Space(13) & FrmCur(vTotalCredito - vTotalNC_Credito), 13)
-            SP.WriteLine(S)
-            S = "Venta Contado         :" + Strings.Right(Space(13) & FrmCur(vTotalContado), 13)
-            SP.WriteLine(S)
-            S = "Total NC Contado      :" + Strings.Right(Space(13) & FrmCur(vTotalNC_Contado), 13)
-            SP.WriteLine(S)
-            S = "Total Contado         :" + Strings.Right(Space(13) & FrmCur(vTotalContado - vTotalNC_Contado), 13)
-            SP.WriteLine(S)
-            'S = "Venta Total           :" + Strings.Right(Space(13) & FrmCur(totgrav + totnograv + TotItbm), 13)
-            'SP.WriteLine(S)
-            S = "Venta Total           :" + Strings.Right(Space(13) & FrmCur(vTotalCredito + vTotalContado), 13)
-            SP.WriteLine(S)
-            S = "Gran Total           :" + Strings.Right(Space(13) & FrmCur(vTotalCredito + vTotalContado), 13)
-            SP.WriteLine(S)
-            S = "Total Recibos         :" + Strings.Right(Space(13) & FrmCur(TotalRecibos), 13)
-            SP.WriteLine(S)
-            SP.WriteLine("")
+            vCadena = "Ventas Gravadas       :" + StringUtils.leftPad(mu.frmcur_sm(totgrav), 13);
+            rep.add(vCadena);
+            vCadena = "Ventas No Gravadas    :" + StringUtils.leftPad(mu.frmcur_sm(totnograv), 13);
+            rep.add(vCadena);
+            vCadena = "Acumulado ITBM        :" + StringUtils.leftPad(mu.frmcur_sm(TotItbm), 13);
+            rep.add(vCadena);
+            vCadena = "GT                    :" + StringUtils.leftPad(mu.frmcur_sm(sumados), 13);
+            rep.add(vCadena);
+            rep.empty();
 
-            Try
-                SQL = "select serie,corelult from p_corel"
-                openDT(DT2, SQL)
-                If DT2.Rows.Count > 0 Then
-                    S = "Siguiente Factura     :" + Strings.Right(Space(13) & Trim(DT2.Rows(0).Item("SERIE")) + Strings.Right("000000" & Trim(Str(DT2.Rows(0).Item("CORELULT") + 1)), 6), 13)
-                Else
-                    S = "Siguiente Factura     :" & Strings.Right(Space(13) & "0", 13)
-                End If
-                SP.WriteLine(S)
-                DT2.Reset()
-            Catch ex As Exception
-                MsgBox("Error " & ex.Message)
-            End Try
+            String CorelZ = "";
+            int vFacturasCredito = FacturasCredito();
+            int vFacturasContado = FacturasContado();
+            int vFacturasAnuladas = FacturasAnuladas();
+            int vTotalFacturas = TotalFacturas();
+            int vTotRecibos = TotRecibos();
+            int vRecibosAnulados=RecibosAnulados();
+            int vNotasCredito=NotasCredito();
+            int vNotasCreditoAnuladas=NotasCreditoAnuladas();
+            double vTotalNC_Credito = TotNotaC_Credito();
+            double vTotalNC_Contado = TotNotaC_Contado();
+            double vTotalCredito = TotalCredito2();
+            double vTotalContado = TotalEfectivo2();
+            double TotalRecibos=0;
+            int corelativoZ = 0;
 
-            Try
+            //Totales para liquidacion
+            vCadena = "Facturas Credito      :" + StringUtils.leftPad(mu.frmint(vFacturasCredito), 13);
+            rep.add(vCadena);
+            vCadena = "Facturas Contado      :" + StringUtils.leftPad(mu.frmint(vFacturasContado), 13);
+            rep.add(vCadena);
+            vCadena = "Facturas Anuladas     :" + StringUtils.leftPad(mu.frmint(vFacturasAnuladas), 13);
+            rep.add(vCadena);
+            vCadena = "Cantidad Facturas     :" + StringUtils.leftPad(mu.frmint(vTotalFacturas), 13);
+            rep.add(vCadena);
+            vCadena = "Recibos               :" + StringUtils.leftPad(mu.frmint(vTotRecibos), 13);
+            rep.add(vCadena);
+            vCadena = "Recibos anulados      :" + StringUtils.leftPad(mu.frmint(vRecibosAnulados), 13);
+            rep.add(vCadena);
+            vCadena = "Cantidad de NC        :" + StringUtils.leftPad(mu.frmint(vNotasCredito), 13);
+            rep.add(vCadena);
+            vCadena = "Cant. NC anuladas     :" + StringUtils.leftPad(mu.frmint(vNotasCreditoAnuladas), 13);
+            rep.add(vCadena);
+            rep.empty();
 
-                SQL = "SELECT SERIE, ACTUAL FROM P_CORRELREC"
-                openDT(DT2, SQL)
-                If DT2.Rows.Count > 0 Then
-                    S = "Siguiente Recibo      :" & Strings.Right(Space(13) & Trim(DT2.Rows(0).Item("SERIE")) + Strings.Right("000000" & Trim(DT2.Rows(0).Item("ACTUAL") + 1), 6), 13)
-                Else
-                    S = "Siguiente Recibo      :" & Strings.Right(Space(13) & "0", 13)
-                End If
-                SP.WriteLine(S)
-                DT2.Reset()
-            Catch ex As Exception
-                MsgBox("Error " & ex.Message)
-            End Try
+            vCadena = "Venta Credito         :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito), 13);
+            rep.add(vCadena);
+            vCadena = "Total NC Credito      :" + StringUtils.leftPad(mu.frmcur_sm(vTotalNC_Credito), 13);
+            rep.add(vCadena);
+            vCadena = "Total Credito         :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito - vTotalNC_Credito), 13);
+            rep.add(vCadena);
+            vCadena = "Venta Contado         :" + StringUtils.leftPad(mu.frmcur_sm(vTotalContado), 13);
+            rep.add(vCadena);
+            vCadena = "Total NC Contado      :" + StringUtils.leftPad(mu.frmcur_sm(vTotalNC_Contado), 13);
+            rep.add(vCadena);
+            vCadena = "Total Contado         :" + StringUtils.leftPad(mu.frmcur_sm(vTotalContado - vTotalNC_Contado), 13);
+            rep.add(vCadena);
+            vCadena = "Venta Total           :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
+            rep.add(vCadena);
+            vCadena = "Gran Total           :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
+            rep.add(vCadena);
+            vCadena = "Total Recibos         :" + StringUtils.leftPad(mu.frmcur_sm(TotalRecibos), 13);
+            rep.add(vCadena);
+            rep.empty();
 
-            Try
+            sql = "select serie,corelult from p_corel";
+            DT = Con.OpenDT(sql);
 
-                SQL = "SELECT SERIE, ACTUAL FROM P_CORREL_OTROS WHERE TIPO = 'NC'"
-                openDT(DT2, SQL)
-                If DT2.Rows.Count > 0 Then
-                    S = "Siguiente Nota Credito:" & Strings.Right(Space(13) & Trim(DT2.Rows(0).Item("SERIE")) + Strings.Right("000000" & Trim(DT2.Rows(0).Item("ACTUAL") + 1), 6), 13)
-                Else
-                    S = "Siguiente Nota Credito:" & Strings.Right(Space(13) & "0", 13)
-                End If
-                SP.WriteLine(S)
-                DT2.Reset()
-            Catch ex As Exception
-                MsgBox("Error " & ex.Message)
-            End Try
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                vCadena = "Siguiente Factura     :" + StringUtils.leftPad(DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)+1), 6),13);
+             }else{
+                vCadena = "Siguiente Factura     :" + StringUtils.leftPad("0", 13);
+             }
+             rep.add(vCadena);
 
-            '*** OSCAR4
-            If CorelZ <> "" Then
-                Dim corelativoZ As Integer = CInt(DaCorelativoZ()) + 1
-                S = "Siguiente Informe Z   :" + Strings.Right(Space(13) & CStr(corelativoZ), 13)
-            Else
-                S = "Siguiente Informe Z   :" + Strings.Right(Space(13) & "0", 13)
-            End If
+            sql = "SELECT SERIE, ACTUAL FROM P_CORRELREC";
+            DT = Con.OpenDT(sql);
 
-            '***
-            SP.WriteLine(S)
+            if (DT.getCount() > 0){
+                DT.moveToFirst();
+                vCadena = "Siguiente Recibo      :" + StringUtils.leftPad(DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)+1), 6),13);
+            }else{
+                vCadena = "Siguiente Recibo      :" + StringUtils.leftPad("0", 13);
+            }
+                rep.add(vCadena);
 
-            rep.add("Siguiente factura     :" + fserie + " - " + fcorel);
-            rep.add("Siguiente Recibo      :" + fserie + StringUtils.right("000000" + Integer.toString(fcorel), 6));
-            rep.add("Siguiente Nota Credito: " + fserie + StringUtils.right("000000" + Integer.toString(fcorel), 6));
-            rep.add("Siguiente Informe Z   : " + mu.CStr(corelz + 1));
+            sql = "SELECT SERIE, ACTUAL FROM P_CORREL_OTROS WHERE TIPO = 'NC'";
+            DT = Con.OpenDT(sql);
 
-             */
+            if (DT.getCount() > 0){
+                DT.moveToFirst();
+                vCadena = "Siguiente Nota Credito:" + StringUtils.leftPad(DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)+1), 6),13);
+            }else{
+                vCadena = "Siguiente Nota Credito:" + StringUtils.leftPad("0", 13);
+            }
+            rep.add(vCadena);
+
+            if (StringUtils.isNotBlank(CorelZ)){
+                corelativoZ = corelz + 1;
+                vCadena = "Siguiente Informe Z   :" + StringUtils.leftPad(mu.frmint(corelativoZ), 13);
+            }else{
+                vCadena = "Siguiente Informe Z   :" + StringUtils.leftPad("0", 13);
+            }
+
+            rep.add(vCadena);
+
         }catch (Exception ex){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
-
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+            fail = true;
         }
 
     }
+
+    private int FacturasCredito(){
+
+        Cursor DT;
+        int vFacturasCredito = 0;
+
+        try{
+
+            sql = " SELECT IFNULL(COUNT(F.COREL),0) AS TOTAL " +
+                  " FROM D_FACTURA F " +
+                  " WHERE F.COREL IN (SELECT P.COREL FROM D_FACTURAP P WHERE (P.TIPO = 'K') " +
+                  " AND P.ANULADO='N') AND F.RUTA='" + gl.ruta + "'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vFacturasCredito = DT.getInt(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vFacturasCredito;
+    }
+
+    private int FacturasContado(){
+
+        Cursor DT;
+        int vFacturasContado = 0;
+
+        try{
+
+            sql = " SELECT IFNULL(COUNT(F.COREL),0) AS TOTAL " +
+                  " FROM D_FACTURA F " +
+                  " WHERE F.COREL IN (SELECT P.COREL FROM D_FACTURAP P WHERE (P.TIPO = 'E' OR P.TIPO = 'C')" +
+                  " AND P.ANULADO='N') AND F.RUTA='" + gl.ruta + "'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vFacturasContado = DT.getInt(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vFacturasContado;
+    }
+
+    private int FacturasAnuladas(){
+
+        Cursor DT;
+        int vFacturasAnuladas = 0;
+
+        try{
+
+            sql = " SELECT IFNULL(COUNT(F.COREL),0) AS TOTAL " +
+                    " FROM D_FACTURA F " +
+                    " WHERE F.RUTA='" + gl.ruta + "' AND F.ANULADO='S'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vFacturasAnuladas = DT.getInt(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vFacturasAnuladas;
+    }
+
+    private int TotalFacturas(){
+
+        Cursor DT;
+        int vTotalFacturas = 0;
+
+        try{
+
+            sql = " SELECT IFNULL(COUNT(F.COREL),0) AS TOTAL " +
+                    " FROM D_FACTURA F " +
+                    " WHERE F.RUTA='" + gl.ruta + "'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vTotalFacturas = DT.getInt(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vTotalFacturas;
+    }
+
+    private int TotRecibos(){
+
+        Cursor DT;
+        int vTotRecibos = 0;
+
+        try{
+
+            sql =  " SELECT IFNULL(COUNT(F.COREL),0) AS TOTAL " +
+                   " FROM D_COBRO F " +
+                   " WHERE F.RUTA='" + gl.ruta + "'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vTotRecibos = DT.getInt(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vTotRecibos;
+    }
+
+    private int RecibosAnulados(){
+
+        Cursor DT;
+        int vTotRecibosAnulados = 0;
+
+        try{
+
+            sql =  " SELECT IFNULL(COUNT(F.COREL),0) AS TOTAL " +
+                    " FROM D_COBRO F " +
+                    " WHERE F.RUTA='" + gl.ruta + "' AND F.ANULADO='S'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vTotRecibosAnulados = DT.getInt(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vTotRecibosAnulados;
+    }
+
+    private int NotasCredito(){
+
+        Cursor DT;
+        int vTotNotasCredito = 0;
+
+        try{
+
+            sql =  " SELECT IFNULL(COUNT(NC.COREL),0) AS TOTAL " +
+                   " FROM D_NOTACRED NC " +
+                   " WHERE NC.RUTA='" + gl.ruta + "'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vTotNotasCredito = DT.getInt(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vTotNotasCredito;
+    }
+
+    private int NotasCreditoAnuladas(){
+
+        Cursor DT;
+        int vTotNotasCredAnul = 0;
+
+        try{
+
+            sql =  " SELECT IFNULL(COUNT(NC.COREL),0) AS TOTAL " +
+                    " FROM D_NOTACRED NC " +
+                    " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='S'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vTotNotasCredAnul = DT.getInt(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vTotNotasCredAnul;
+    }
+
+    private int TotNotaC_Credito(){
+
+        Cursor DT;
+        int vTotNotaC_Credito = 0;
+
+        try{
+
+            sql =  " SELECT IFNULL(COUNT(NC.COREL),0) AS TOTAL " +
+                   " FROM D_NOTACRED NC " +
+                   " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='N' " +
+                   " AND (FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO = 'K')" +
+                   " OR   FACTURA IN (SELECT COREL FROM D_CXC))";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vTotNotaC_Credito = DT.getInt(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vTotNotaC_Credito;
+    }
+
+    private int TotNotaC_Contado(){
+
+        Cursor DT;
+        int vTotNotaC_Contado = 0;
+
+        try{
+
+            sql =  " SELECT IFNULL(COUNT(NC.COREL),0) AS TOTAL " +
+                    " FROM D_NOTACRED NC " +
+                    " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='N' " +
+                    " AND NC.FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO <> 'K')";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vTotNotaC_Contado = DT.getInt(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vTotNotaC_Contado;
+    }
+
+    private int TotalCredito2(){
+
+        Cursor DT;
+        int vTotCredito2 = 0;
+
+        try{
+
+            sql = " SELECT IFNULL(SUM(F.TOTAL),0) AS TOTAL " +
+                  " FROM D_FACTURAP P, D_FACTURA F " +
+                  " WHERE P.TIPO = 'K' AND P.COREL=F.COREL " +
+                  " AND F.RUTA='" + gl.ruta + "' AND P.ANULADO='N'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vTotCredito2 = DT.getInt(0);
+            }
+        }catch (Exception ex){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vTotCredito2;
+    }
+
+    private int TotalEfectivo2(){
+
+        Cursor DT;
+        int vTotEfectivo2 = 0;
+
+        try{
+
+            sql = " SELECT IFNULL(SUM(F.TOTAL),0) AS TOTAL FROM D_FACTURA F " +
+                  " WHERE F.COREL  IN (SELECT COREL FROM D_FACTURAP P WHERE (P.TIPO <>'K') )" +
+                  " AND F.RUTA='" + gl.ruta + "' AND F.ANULADO='N' ";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vTotEfectivo2 = DT.getInt(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vTotEfectivo2;
+    }
+
+    //endregion
+
 }

@@ -1,18 +1,5 @@
 package com.dts.roadp;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapPrimitive;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -41,12 +28,27 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.ArrayList;
+
 public class ComWS extends PBase {
 	
-	private TextView lblInfo,lblParam,lblRec,lblEnv;
+	private TextView lblInfo,lblParam,lblRec,lblEnv,lblExis;
 	private ProgressBar barInfo;
 	private EditText txtRuta,txtWS,txtEmp;
-	private ImageView imgRec,imgEnv;
+	private ImageView imgRec,imgEnv,imgExis;
 	private RelativeLayout relExist,relPrecio,relStock;
 	
 	private int isbusy,fecha,lin,reccnt,ultcor,ultcor_ant;
@@ -60,7 +62,7 @@ public class ComWS extends PBase {
 
 	private ArrayList<String> listItems=new ArrayList<String>();
 	private ArrayList<String> results=new ArrayList<String>();
-	
+
 	private ArrayList<clsClasses.clsEnvio> items=new ArrayList<clsClasses.clsEnvio>();
 	private ListAdaptEnvio adapter;
 	
@@ -96,7 +98,8 @@ public class ComWS extends PBase {
 		System.setProperty("line.separator","\r\n");
 		
 		dbld=new clsDataBuilder(this);
-		
+		claseFindia=new clsFinDia(this);
+
 		lblInfo= (TextView) findViewById(R.id.lblETipo);
 		lblParam= (TextView) findViewById(R.id.lblProd);
 		barInfo= (ProgressBar) findViewById(R.id.progressBar2);
@@ -105,7 +108,9 @@ public class ComWS extends PBase {
 		txtEmp= (EditText) findViewById(R.id.txtEmp);txtEmp.setEnabled(false);	
 		lblRec= (TextView) findViewById(R.id.btnRec);
 		imgRec= (ImageView) findViewById(R.id.imageView5);
+        imgExis=(ImageView) findViewById(R.id.imageView4);
 		lblEnv= (TextView) findViewById(R.id.btnSend);
+        lblExis= (TextView) findViewById(R.id.TextView02);
 		imgEnv= (ImageView) findViewById(R.id.imageView6);
 		relExist=(RelativeLayout) findViewById(R.id.relExist);
 		relPrecio=(RelativeLayout) findViewById(R.id.relPrecio);
@@ -172,8 +177,9 @@ public class ComWS extends PBase {
 
             if (ExistenDatos()) {
                 BorraDatosAnteriores("¿Tiene facturas, pedidos, cobros, devoluciones o inventario, está seguro de borrar los datos?");
-            }
-
+            }else{
+				msgAskConfirmaRecibido();
+			}
         }
         else{
             msgAskConfirmaRecibido();
@@ -194,6 +200,11 @@ public class ComWS extends PBase {
 				}
 			}
 
+			if (gl.banderafindia) {
+				if (!puedeComunicar()) {
+					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");return;
+				}
+			}
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -215,7 +226,29 @@ public class ComWS extends PBase {
 
 			
 	}	
-	
+
+	private boolean puedeComunicar(){
+
+		boolean vPuedeCom =false;
+
+		try{
+
+			//#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
+			if (gl.banderafindia) {
+
+				return ((claseFindia.getImprimioCierreZ() == 7));
+
+			}else{
+			return  true;
+		}
+
+		}catch (Exception ex){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
+		}
+
+		return vPuedeCom;
+	}
+
 	public void askExist(View view) {
 
 		try{
@@ -241,7 +274,7 @@ public class ComWS extends PBase {
 		}
 
 
-			
+
 	}
 
 	//region Main
@@ -322,11 +355,11 @@ public class ComWS extends PBase {
 
 		try{
 
-			pend=pend+getDocCount("SELECT SERIE,CORELATIVO FROM D_FACTURA WHERE STATCOM<>'S'","Fact: ");
-			pend=pend+getDocCount("SELECT COREL FROM D_PEDIDO WHERE STATCOM<>'S'","Ped: ");
-			pend=pend+getDocCount("SELECT COREL FROM D_COBRO WHERE STATCOM<>'S'","Rec: ");
-			pend=pend+getDocCount("SELECT TOTAL FROM D_DEPOS WHERE STATCOM<>'S'","Dep: ");
-			pend=pend+getDocCount("SELECT COREL FROM D_MOV WHERE STATCOM<>'S'","Inv : ");
+			pend=pend+getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_FACTURA WHERE STATCOM<>'S'","Fact: ");
+			pend=pend+getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_PEDIDO WHERE STATCOM<>'S'","Ped: ");
+			pend=pend+getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_COBRO WHERE STATCOM<>'S'","Rec: ");
+			pend=pend+getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_DEPOS WHERE STATCOM<>'S'","Dep: ");
+			pend=pend+getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_MOV WHERE STATCOM<>'S'","Inv : ");
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -414,7 +447,7 @@ public class ComWS extends PBase {
 		    		} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		    		   	sstr=e.getMessage();
-		    	    }	
+		    	    }
 	        	}
 	        }
 	        
@@ -434,7 +467,7 @@ public class ComWS extends PBase {
 	
 		METHOD_NAME = "Commit";
 		sstr="OK";
-		
+
 		if (dbld.size()==0) return 1;
 		
 		s="";
@@ -627,14 +660,21 @@ public class ComWS extends PBase {
 
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=2";	
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
-			
-			val=DT.getString(0);
+
+			if (DT.getCount()>0){
+
+				DT.moveToFirst();
+
+				val=DT.getString(0);
+
+			}else {
+				val="N";
+			}
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			val="N";
-		}	
+		}
 		
 		if (val.equalsIgnoreCase("S")) gl.peStockItf=true; else gl.peStockItf=false;
 				
@@ -660,8 +700,10 @@ public class ComWS extends PBase {
 			if (!AddTable("P_FACTORCONV")) return false;
 			if (!AddTable("P_LINEA")) return false;
 			if (!AddTable("P_PRODPRECIO")) return false;
+			if (!AddTable("TMP_PRECESPEC")) return false;
 			if (!AddTable("P_DESCUENTO")) return false;
 			if (!AddTable("P_EMPRESA")) return false;
+			if (!AddTable("P_SUCURSAL")) return false;
 			if (!AddTable("P_BANCO")) return false;
 			if (!AddTable("P_STOCKINV")) return false;
 
@@ -676,6 +718,7 @@ public class ComWS extends PBase {
             if (!AddTable("P_STOCK_APR")) return false;
             if (!AddTable("P_STOCK")) return false;
             if (!AddTable("P_STOCKB")) return false;
+            if (!AddTable("P_STOCK_PALLET")) return false;//#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
 			if (!AddTable("P_COBRO")) return false;
 			if (!AddTable("P_CLIGRUPO")) return false;
 			if (!AddTable("P_MEDIAPAGO")) return false;
@@ -746,6 +789,7 @@ public class ComWS extends PBase {
 
                 sql = listItems.get(i);esql=sql;
                 sql=sql.replace("INTO VENDEDORES","INTO P_VENDEDOR");
+				sql=sql.replace("INTO P_RAZONNOSCAN","INTO P_CODNOLEC");
 
 				try {
 					writer.write(sql);writer.write("\r\n");
@@ -882,7 +926,6 @@ public class ComWS extends PBase {
 
 	//#EJC20181120: Inserta los documentos que bajaron a la HH
 	private boolean Actualiza_Documentos() {
-
         DateUtils DU = new DateUtils();
         int Now=du.getFechaActual();
 
@@ -916,8 +959,7 @@ public class ComWS extends PBase {
                 return  false;
             }
 
-        }catch (Exception e)
-        {
+        }catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             Log.e("Error",e.getMessage());
             return  false;
@@ -1007,40 +1049,50 @@ public class ComWS extends PBase {
 
 			//CKFK 20190222 Agregué a la consulta el AND (ENVIADO = 0)
 			if (TN.equalsIgnoreCase("P_STOCKB")) {
-				SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
+				SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, " +
+                        "STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
 						"FROM P_STOCKB WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
 				return SQL;
 			}
 
-			if (TN.equalsIgnoreCase("P_CLIRUTA")) {
-				SQL = "SELECT RUTA,CLIENTE,SEMANA,DIA,SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'";
-				return SQL;
-			}
+            //CKFK 20190304 Agregué la consulta para obtener los datos de P_STOCK_PALLET
+            if (TN.equalsIgnoreCase("P_STOCK_PALLET")) {
+                SQL = "SELECT DOCUMENTO, RUTA, BARRAPALLET, CODIGO, BARRAPRODUCTO, LOTEPRODUCTO, CANT, COREL, PRECIO, PESO, " +
+                      "UNIDADMEDIDA,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, DOC_ENTREGA  " +
+                      "FROM P_STOCK_PALLET WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+                      "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
+                return SQL;
+            }
 
-			if (TN.equalsIgnoreCase("P_CLIENTE")) {
-				SQL = " SELECT CODIGO,NOMBRE,BLOQUEADO,TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL, ";
-				SQL += "NIVELPRECIO,MEDIAPAGO,LIMITECREDITO,DIACREDITO,DESCUENTO,BONIFICACION, ";
-				SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
-				SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
-				SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
-				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
-				SQL += "FROM P_CLIENTE ";
-				SQL += "WHERE (CODIGO IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') )) ";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_CLIRUTA")) {
+			SQL = "SELECT RUTA,CLIENTE,SEMANA,DIA,SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'";
+			return SQL;
+		}
 
-			//#HS_20181220 Tabla de Fachadas cliente.
-			if (TN.equalsIgnoreCase("P_CLIENTE_FACHADA")) {
-				SQL = " SELECT * FROM P_CLIENTE_FACHADA ";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_CLIENTE")) {
+			SQL = " SELECT CODIGO,NOMBRE,BLOQUEADO,TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL, ";
+			SQL += "NIVELPRECIO,MEDIAPAGO,LIMITECREDITO,DIACREDITO,DESCUENTO,BONIFICACION, ";
+			SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
+			SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
+			SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
+			SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
+			SQL += "FROM P_CLIENTE ";
+			SQL += "WHERE (CODIGO IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') )) ";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("P_CLIDIR")) {
-				SQL = " SELECT * FROM P_CLIDIR ";
-				SQL += " WHERE (P_CLIDIR.CODIGO_CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') ))";
-				return SQL;
-			}
+		//#HS_20181220 Tabla de Fachadas cliente.
+		if (TN.equalsIgnoreCase("P_CLIENTE_FACHADA")) {
+			SQL = " SELECT * FROM P_CLIENTE_FACHADA ";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CLIDIR")) {
+			SQL = " SELECT * FROM P_CLIDIR ";
+			SQL += " WHERE (P_CLIDIR.CODIGO_CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') ))";
+			return SQL;
+		}
        /*       if (TN.equalsIgnoreCase("P_PRODUCTO")) {
            SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
            SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, DESCUENTO,BONIFICACION, ";
@@ -1050,287 +1102,300 @@ public class ComWS extends PBase {
        }
 	   */
 
-			if (TN.equalsIgnoreCase("P_PRODUCTO")) {
-				SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
-				SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, ISNULL(DESCUENTO,'N') AS DESCUENTO, ISNULL(BONIFICACION,'N') AS BONIFICACION, ";
-				SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN, ";
-				SQL += "VIDEO,VENTA_POR_PESO,ES_PROD_BARRA,UNID_INV,VENTA_POR_PAQUETE,VENTA_POR_FACTOR_CONV,ES_SERIALIZADO,PARAM_CADUCIDAD, ";
-				SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
-				SQL += "FROM P_PRODUCTO WHERE (CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "')) ";
-				SQL += "OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) ";
-				return SQL;
+		if (TN.equalsIgnoreCase("P_PRODUCTO")) {
+			SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
+			SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, ISNULL(DESCUENTO,'N') AS DESCUENTO, ISNULL(BONIFICACION,'N') AS BONIFICACION, ";
+			SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN, ";
+			SQL += "VIDEO,VENTA_POR_PESO,ES_PROD_BARRA,UNID_INV,VENTA_POR_PAQUETE,VENTA_POR_FACTOR_CONV,ES_SERIALIZADO,PARAM_CADUCIDAD, ";
+			SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
+			SQL += "FROM P_PRODUCTO WHERE (CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "')) ";
+			SQL += "OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) ";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_FACTORCONV")) {
+			//#EJC20181112
+			//SQL = "SELECT PRODUCTO,UNIDADSUPERIOR,FACTORCONVERSION,UNIDADMINIMA FROM P_FACTORCONV ";
+			SQL = " SELECT * FROM P_FACTORCONV WHERE " +
+					" ((PRODUCTO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
+					" OR PRODUCTO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "')))";
+
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_LINEA")) {
+			SQL = "SELECT CODIGO,MARCA,NOMBRE FROM P_LINEA ";
+			SQL += "WHERE (CODIGO IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')))";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_PRODPRECIO")) {
+
+			SQL = "SELECT CODIGO,NIVEL,PRECIO,UNIDADMEDIDA FROM P_PRODPRECIO ";
+			SQL += " WHERE ( (CODIGO IN ( SELECT CODIGO FROM P_PRODUCTO WHERE (LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE RUTA='" + ActRuta + "')) ) ) ";
+			SQL += " OR  (CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "')) ) ";
+			SQL += " AND (NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'))) ";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("TMP_PRECESPEC")) {
+			SQL = "SELECT CODIGO,VALOR,PRODUCTO,PRECIO,UNIDADMEDIDA FROM TMP_PRECESPEC ";
+			SQL += " WHERE RUTA='" + ActRuta + "' ";
+			return SQL;
+		}
+
+
+		if (TN.equalsIgnoreCase("P_DESCUENTO")) {
+			SQL = "SELECT  CLIENTE,CTIPO,PRODUCTO,PTIPO,TIPORUTA,RANGOINI,RANGOFIN,DESCTIPO,VALOR,GLOBDESC,PORCANT,dbo.AndrDateIni(FECHAINI),dbo.AndrDateFin(FECHAFIN),CODDESC,NOMBRE ";
+			SQL += "FROM P_DESCUENTO WHERE DATEDIFF(D, FECHAINI,GETDATE()) >=0 AND DATEDIFF(D,GETDATE(), FECHAFIN) >=0";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_EMPRESA")) {
+			SQL = "SELECT * FROM P_EMPRESA WHERE EMPRESA = '" + gEmpresa + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_RUTA")) {
+			SQL = "SELECT * FROM P_RUTA WHERE CODIGO = '" + ActRuta + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_BANCO")) {
+			SQL = "SELECT * FROM P_BANCO WHERE EMPRESA = '" + gEmpresa + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_STOCKINV")) {
+			SQL = "SELECT * FROM P_STOCKINV";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CODATEN")) {
+			SQL = "SELECT * FROM P_CODATEN";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CODNOLEC")) {
+			SQL = "SELECT CODIGO, DESCRIPCION AS NOMBRE  FROM P_RAZONNOSCAN";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CODDEV")) {
+			SQL = "SELECT * FROM P_CODDEV";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_NIVELPRECIO")) {
+			SQL = "SELECT * FROM P_NIVELPRECIO ";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CLIGRUPO")) {
+			SQL = "SELECT CODIGO,CLIENTE FROM P_CLIGRUPO WHERE (CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'))";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_STOCK_APR")) {
+			SQL = "SELECT CODIGO, CANT, PESO " +
+					"FROM P_STOCK_APR WHERE RUTA='" + ActRuta + "' ";
+			//SQL = "SELECT CODIGO,CANT,0 AS CANTM,PESO FROM P_STOCK WHERE RUTA='" + ActRuta + "'";
+			//idbg=SQL;
+			return SQL;
+		}
+
+		//#HS_20181212 Agregue campos ID_TRANSACCION, REFERENCIA, ASIGNACION.
+		if (TN.equalsIgnoreCase("P_COBRO")) {
+			SQL = "SELECT  DOCUMENTO, EMPRESA, RUTA, CLIENTE, TIPODOC, VALORORIG, SALDO, CANCELADO, dbo.AndrDate(FECHAEMIT),dbo.AndrDate(FECHAV),'' AS CONTRASENA, ID_TRANSACCION, REFERENCIA, ASIGNACION ";
+			SQL += "FROM P_COBRO WHERE (RUTA='" + ActRuta + "') AND CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "')) ";
+			//idbg=SQL;
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_COREL")) {
+			SQL = "SELECT RESOL,SERIE,CORELINI,CORELFIN,CORELULT,dbo.AndrDate(FECHARES),RUTA,dbo.AndrDate(FECHAVIG),RESGUARDO,VALOR1 FROM P_COREL WHERE RUTA='" + ActRuta + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CORELNC")) {
+			SQL = "SELECT RESOL,SERIE,CORELINI,CORELFIN,CORELULT,dbo.AndrDate(FECHARES),RUTA,dbo.AndrDate(FECHAVIG),RESGUARDO,VALOR1 FROM P_CORELNC WHERE RUTA='" + ActRuta + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CORRELREC")) {
+			SQL = "SELECT RUTA,SERIE,INICIAL,FINAL,ACTUAL,ENVIADO FROM P_CORRELREC WHERE RUTA='" + ActRuta + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CORREL_OTROS")) {
+			SQL = "SELECT RUTA,SERIE,TIPO,INICIAL,FINAL,ACTUAL,ENVIADO FROM P_CORREL_OTROS WHERE RUTA='" + ActRuta + "'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_MEDIAPAGO")) {
+			SQL = "SELECT CODIGO,NOMBRE,ACTIVO,NIVEL,PORCOBRO FROM P_MEDIAPAGO WHERE ACTIVO='S'";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_ARCHIVOCONF")) {
+			SQL = "SELECT RUTA,TIPO_HH,IDIOMA,TIPO_IMPRESORA,SERIAL_HH,MODIF_PESO,PUERTO_IMPRESION,LBS_O_KGS,NOTA_CREDITO FROM P_ARCHIVOCONF WHERE (RUTA='" + ActRuta + "')";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_ENCABEZADO_REPORTESHH")) {
+			SQL = "SELECT CODIGO,TEXTO,SUCURSAL FROM P_ENCABEZADO_REPORTESHH";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_BONIF")) {
+			SQL = "SELECT  CLIENTE, CTIPO, PRODUCTO, PTIPO, TIPORUTA, TIPOBON, RANGOINI, RANGOFIN, TIPOLISTA, TIPOCANT, VALOR," +
+					"LISTA, CANTEXACT, GLOBBON, PORCANT, dbo.AndrDate(FECHAINI), dbo.AndrDate(FECHAFIN), CODDESC, NOMBRE, EMP " +
+					"FROM P_BONIF WHERE ((dbo.AndrDate(FECHAINI)<=" + ff + ") AND (dbo.AndrDate(FECHAFIN)>=" + fi + "))";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_BONLIST")) {
+			SQL = "SELECT CODIGO,PRODUCTO,CANT,CANTMIN,NOMBRE FROM P_BONLIST";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_PRODGRUP")) {
+			SQL = "SELECT CODIGO,PRODUCTO,NOMBRE FROM P_PRODGRUP";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_IMPUESTO")) {
+			SQL = "SELECT CODIGO,VALOR FROM P_IMPUESTO";
+			return SQL;
+		}
+
+		//#HS_20181206 Agregue Ruta.
+		if (TN.equalsIgnoreCase("P_VENDEDOR")) {
+
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				SQL = "SELECT CODIGO,NOMBRE,CLAVE,RUTA,NIVEL,NIVELPRECIO,ISNULL(BODEGA,0) AS BODEGA,ISNULL(SUBBODEGA,0) AS SUBBODEGA,'' AS COD_VEHICULO,0 AS LIQUIDANDO,0 AS BLOQUEADO,0 AS DEVOLUCION_SAP  " +
+						"FROM VENDEDORES  WHERE (RUTA='" + ActRuta + "') ";
+			} else {
+				SQL = "SELECT CODIGO,NOMBRE,CLAVE,RUTA,NIVEL,NIVELPRECIO,ISNULL(BODEGA,0) AS BODEGA,ISNULL(SUBBODEGA,0) AS SUBBODEGA,COD_VEHICULO,LIQUIDANDO,BLOQUEADO,DEVOLUCION_SAP  " +
+						"FROM P_VENDEDOR  WHERE (RUTA='" + ActRuta + "') OR (NIVEL=1) ";
 			}
 
-			if (TN.equalsIgnoreCase("P_FACTORCONV")) {
-				//#EJC20181112
-				//SQL = "SELECT PRODUCTO,UNIDADSUPERIOR,FACTORCONVERSION,UNIDADMINIMA FROM P_FACTORCONV ";
-				SQL = " SELECT * FROM P_FACTORCONV WHERE " +
-						" ((PRODUCTO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
-						" OR PRODUCTO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "')))";
+			return SQL;
+		}
 
-				return SQL;
-			}
+		//#HS_20181207 Agregue campos de P_VEHICULO.
+		if (TN.equalsIgnoreCase("P_VEHICULO")) {
+			SQL = "SELECT CODIGO,MARCA,PLACA,PESO,KM_MILLAS,TIPO FROM P_VEHICULO";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("P_LINEA")) {
-				SQL = "SELECT CODIGO,MARCA,NOMBRE FROM P_LINEA ";
-				SQL += "WHERE (CODIGO IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')))";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_MUNI")) {
+			SQL = "SELECT * FROM P_MUNI";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("P_PRODPRECIO")) {
+		if (TN.equalsIgnoreCase("P_REF1")) {
+			SQL = "SELECT * FROM P_REF1";
+			return SQL;
+		}
 
-				SQL = "SELECT CODIGO,NIVEL,PRECIO,UNIDADMEDIDA FROM P_PRODPRECIO ";
-				SQL += " WHERE ( (CODIGO IN ( SELECT CODIGO FROM P_PRODUCTO WHERE (LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE RUTA='" + ActRuta + "')) ) ) ";
-				SQL += " OR  (CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "')) ) ";
-				SQL += " AND (NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'))) ";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_REF2")) {
+			SQL = "SELECT * FROM P_REF2";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("P_DESCUENTO")) {
-				SQL = "SELECT  CLIENTE,CTIPO,PRODUCTO,PTIPO,TIPORUTA,RANGOINI,RANGOFIN,DESCTIPO,VALOR,GLOBDESC,PORCANT,dbo.AndrDateIni(FECHAINI),dbo.AndrDateFin(FECHAFIN),CODDESC,NOMBRE ";
-				SQL += "FROM P_DESCUENTO WHERE DATEDIFF(D, FECHAINI,GETDATE()) >=0 AND DATEDIFF(D,GETDATE(), FECHAFIN) >=0";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_EMPRESA")) {
-				SQL = "SELECT * FROM P_EMPRESA WHERE EMPRESA = '" + gEmpresa + "'";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_RUTA")) {
-				SQL = "SELECT * FROM P_RUTA WHERE CODIGO = '" + ActRuta + "'";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_BANCO")) {
-				SQL = "SELECT * FROM P_BANCO WHERE EMPRESA = '" + gEmpresa + "'";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_STOCKINV")) {
-				SQL = "SELECT * FROM P_STOCKINV";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_CODATEN")) {
-				SQL = "SELECT * FROM P_CODATEN";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_CODNOLEC")) {
-				SQL = "SELECT * FROM P_CODNOLEC";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_CODDEV")) {
-				SQL = "SELECT * FROM P_CODDEV";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_NIVELPRECIO")) {
-				SQL = "SELECT * FROM P_NIVELPRECIO ";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_CLIGRUPO")) {
-				SQL = "SELECT CODIGO,CLIENTE FROM P_CLIGRUPO WHERE (CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'))";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_STOCK_APR")) {
-				SQL = "SELECT CODIGO, CANT, PESO " +
-						"FROM P_STOCK_APR WHERE RUTA='" + ActRuta + "' ";
-				//SQL = "SELECT CODIGO,CANT,0 AS CANTM,PESO FROM P_STOCK WHERE RUTA='" + ActRuta + "'";
-				//idbg=SQL;
-				return SQL;
-			}
-
-			//#HS_20181212 Agregue campos ID_TRANSACCION, REFERENCIA, ASIGNACION.
-			if (TN.equalsIgnoreCase("P_COBRO")) {
-				SQL = "SELECT  DOCUMENTO, EMPRESA, RUTA, CLIENTE, TIPODOC, VALORORIG, SALDO, CANCELADO, dbo.AndrDate(FECHAEMIT),dbo.AndrDate(FECHAV),'' AS CONTRASENA, ID_TRANSACCION, REFERENCIA, ASIGNACION ";
-				SQL += "FROM P_COBRO WHERE (RUTA='" + ActRuta + "') AND CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "')) ";
-				//idbg=SQL;
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_COREL")) {
-				SQL = "SELECT RESOL,SERIE,CORELINI,CORELFIN,CORELULT,dbo.AndrDate(FECHARES),RUTA,dbo.AndrDate(FECHAVIG),RESGUARDO,VALOR1 FROM P_COREL WHERE RUTA='" + ActRuta + "'";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_CORELNC")) {
-				SQL = "SELECT RESOL,SERIE,CORELINI,CORELFIN,CORELULT,dbo.AndrDate(FECHARES),RUTA,dbo.AndrDate(FECHAVIG),RESGUARDO,VALOR1 FROM P_CORELNC WHERE RUTA='" + ActRuta + "'";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_CORRELREC")) {
-				SQL = "SELECT RUTA,SERIE,INICIAL,FINAL,ACTUAL,ENVIADO FROM P_CORRELREC WHERE RUTA='" + ActRuta + "'";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_CORREL_OTROS")) {
-				SQL = "SELECT RUTA,SERIE,TIPO,INICIAL,FINAL,ACTUAL,ENVIADO FROM P_CORREL_OTROS WHERE RUTA='" + ActRuta + "'";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_MEDIAPAGO")) {
-				SQL = "SELECT CODIGO,NOMBRE,ACTIVO,NIVEL,PORCOBRO FROM P_MEDIAPAGO WHERE ACTIVO='S'";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_ARCHIVOCONF")) {
-				SQL = "SELECT RUTA,TIPO_HH,IDIOMA,TIPO_IMPRESORA,SERIAL_HH,MODIF_PESO,PUERTO_IMPRESION,LBS_O_KGS,NOTA_CREDITO FROM P_ARCHIVOCONF WHERE (RUTA='" + ActRuta + "')";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_ENCABEZADO_REPORTESHH")) {
-				SQL = "SELECT CODIGO,TEXTO,SUCURSAL FROM P_ENCABEZADO_REPORTESHH";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_BONIF")) {
-				SQL = "SELECT  CLIENTE, CTIPO, PRODUCTO, PTIPO, TIPORUTA, TIPOBON, RANGOINI, RANGOFIN, TIPOLISTA, TIPOCANT, VALOR," +
-						"LISTA, CANTEXACT, GLOBBON, PORCANT, dbo.AndrDate(FECHAINI), dbo.AndrDate(FECHAFIN), CODDESC, NOMBRE, EMP " +
-						"FROM P_BONIF WHERE ((dbo.AndrDate(FECHAINI)<=" + ff + ") AND (dbo.AndrDate(FECHAFIN)>=" + fi + "))";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_BONLIST")) {
-				SQL = "SELECT CODIGO,PRODUCTO,CANT,CANTMIN,NOMBRE FROM P_BONLIST";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_PRODGRUP")) {
-				SQL = "SELECT CODIGO,PRODUCTO,NOMBRE FROM P_PRODGRUP";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_IMPUESTO")) {
-				SQL = "SELECT CODIGO,VALOR FROM P_IMPUESTO";
-				return SQL;
-			}
-
-			//#HS_20181206 Agregue Ruta.
-			if (TN.equalsIgnoreCase("P_VENDEDOR")) {
-
-				if (gl.peModal.equalsIgnoreCase("TOL")) {
-					SQL = "SELECT CODIGO,NOMBRE,CLAVE,RUTA,NIVEL,NIVELPRECIO,ISNULL(BODEGA,0) AS BODEGA,ISNULL(SUBBODEGA,0) AS SUBBODEGA,'' AS COD_VEHICULO,0 AS LIQUIDANDO,0 AS BLOQUEADO,0 AS DEVOLUCION_SAP  " +
-							"FROM VENDEDORES  WHERE (RUTA='" + ActRuta + "') ";
-				} else {
-					SQL = "SELECT CODIGO,NOMBRE,CLAVE,RUTA,NIVEL,NIVELPRECIO,ISNULL(BODEGA,0) AS BODEGA,ISNULL(SUBBODEGA,0) AS SUBBODEGA,COD_VEHICULO,LIQUIDANDO,BLOQUEADO,DEVOLUCION_SAP  " +
-							"FROM P_VENDEDOR  WHERE (RUTA='" + ActRuta + "') OR (NIVEL=1) ";
-				}
-
-				return SQL;
-			}
-
-			//#HS_20181207 Agregue campos de P_VEHICULO.
-			if (TN.equalsIgnoreCase("P_VEHICULO")) {
-				SQL = "SELECT CODIGO,MARCA,PLACA,PESO,KM_MILLAS,TIPO FROM P_VEHICULO";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_MUNI")) {
-				SQL = "SELECT * FROM P_MUNI";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_REF1")) {
-				SQL = "SELECT * FROM P_REF1";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_REF2")) {
-				SQL = "SELECT * FROM P_REF2";
-				return SQL;
-			}
-
-			if (TN.equalsIgnoreCase("P_REF3")) {
-				SQL = "SELECT * FROM P_REF3";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_REF3")) {
+			SQL = "SELECT * FROM P_REF3";
+			return SQL;
+		}
 
 
-			// Objetivos
+		// Objetivos
 
-			if (TN.equalsIgnoreCase("O_PROD")) {
-				SQL = "SELECT RUTA, CODIGO, METAV, METAU, ACUMV, ACUMU FROM O_PROD WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("O_PROD")) {
+			SQL = "SELECT RUTA, CODIGO, METAV, METAU, ACUMV, ACUMU FROM O_PROD WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("O_LINEA")) {
-				SQL = "SELECT RUTA, CODIGO, METAV, METAU, ACUMV, ACUMU FROM O_LINEA WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("O_LINEA")) {
+			SQL = "SELECT RUTA, CODIGO, METAV, METAU, ACUMV, ACUMU FROM O_LINEA WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("O_RUTA")) {
-				SQL = "SELECT * FROM O_RUTA WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("O_RUTA")) {
+			SQL = "SELECT * FROM O_RUTA WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("O_COBRO")) {
-				SQL = "SELECT * FROM O_COBRO WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("O_COBRO")) {
+			SQL = "SELECT * FROM O_COBRO WHERE (RUTA='" + ActRuta + "') AND (OBJANO=" + ObjAno + ") AND (OBJMES=" + ObjMes + ")";
+			return SQL;
+		}
 
 
-			// Mercadeo
+		// Mercadeo
 
-			if (TN.equalsIgnoreCase("P_MEREQTIPO")) {
-				SQL = "SELECT * FROM P_MEREQTIPO";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_MEREQTIPO")) {
+			SQL = "SELECT * FROM P_MEREQTIPO";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("P_MEREQUIPO")) {
-				SQL = "SELECT * FROM P_MEREQUIPO ";
-				SQL = SQL + "WHERE (CLIENTE IN  (SELECT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "' ) )";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_MEREQUIPO")) {
+			SQL = "SELECT * FROM P_MEREQUIPO ";
+			SQL = SQL + "WHERE (CLIENTE IN  (SELECT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "' ) )";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("P_MERESTADO")) {
-				SQL = "SELECT * FROM P_MERESTADO";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_MERESTADO")) {
+			SQL = "SELECT * FROM P_MERESTADO";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("P_MERPREGUNTA")) {
-				SQL = "SELECT * FROM P_MERPREGUNTA";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_MERPREGUNTA")) {
+			SQL = "SELECT * FROM P_MERPREGUNTA";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("P_MERRESP")) {
-				SQL = "SELECT * FROM P_MERRESP";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_MERRESP")) {
+			SQL = "SELECT * FROM P_MERRESP";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("P_MERMARCACOMP")) {
-				SQL = "SELECT * FROM P_MERMARCACOMP";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_MERMARCACOMP")) {
+			SQL = "SELECT * FROM P_MERMARCACOMP";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("P_MERPRODCOMP")) {
-				SQL = "SELECT * FROM P_MERPRODCOMP";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_MERPRODCOMP")) {
+			SQL = "SELECT * FROM P_MERPRODCOMP";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("P_PORCMERMA")) {
-				SQL = "SELECT EMPRESA,SUCURSAL,RUTA,PRODUCTO,PORCENTAJEMERMA,PORCMINIMO,PORCMAXIMO FROM P_PORCMERMA WHERE (RUTA='" + ActRuta + "')";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_PORCMERMA")) {
+			SQL = "SELECT EMPRESA,SUCURSAL,RUTA,PRODUCTO,PORCENTAJEMERMA,PORCMINIMO,PORCMAXIMO FROM P_PORCMERMA WHERE (RUTA='" + ActRuta + "')";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("LIC_CLIENTE")) {
-				SQL = "SELECT * FROM LIC_CLIENTE WHERE ID='" + mac + "'";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("LIC_CLIENTE")) {
+			SQL = "SELECT * FROM LIC_CLIENTE WHERE ID='" + mac + "'";
+			return SQL;
+		}
 
-			if (TN.equalsIgnoreCase("P_PARAMEXT")) {
-				SQL = "SELECT ID,Nombre,Valor FROM P_PARAMEXT WHERE ((idRuta='" + ActRuta + "') OR (ISNULL(idRuta,'')=''))";
-				return SQL;
-			}
+		if (TN.equalsIgnoreCase("P_PARAMEXT")) {
+			SQL = "SELECT ID,Nombre,Valor FROM P_PARAMEXT WHERE ((idRuta='" + ActRuta + "') OR (ISNULL(idRuta,'')=''))";
+			return SQL;
+		}
 
 		if (TN.equalsIgnoreCase("P_LIQUIDACION")) {
             SQL = "SELECT RUTA,ESTADO FROM P_LIQUIDACION WHERE (RUTA='" + ActRuta + "') AND (FECHA>='" + fsql + "') ";
             return SQL;
         }
+
+		if (TN.equalsIgnoreCase("P_SUCURSAL")) {
+			SQL = " SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO " +
+				  " FROM P_SUCURSAL WHERE CODIGO IN (SELECT SUCURSAL FROM P_RUTA WHERE CODIGO = '" + ActRuta + "')";
+			return SQL;
+		}
 
 		return SQL;
 	}   
@@ -1366,7 +1431,7 @@ public class ComWS extends PBase {
 			if (ultcor_ant!=ultcor) {
 				//#HS_20181129_1005 Agregue comparacion para las series.
 				if(ultSerie_ant != ultSerie){
-					msgbox("Nueva serie de faturación");
+					msgbox("Nueva serie de facturación");
 				}else if (ultcor_ant>0) {
 					msgbox("El último correlativo actualizado ( "+ultcor+" ) no coincide con último emitido ( "+ultcor_ant+" )!\n Por favor infore a su supervisor.");return;
 				}
@@ -1376,7 +1441,7 @@ public class ComWS extends PBase {
 		}
 
 	}
-		
+
 	private boolean validaDatos(boolean completo) {
 
 		Cursor dt;
@@ -1669,9 +1734,7 @@ public class ComWS extends PBase {
                 synchronized (this) {
                     if (!lblInfo.getText().toString().matches(""))  lblInfo.setText(fprog);
                  }
-    		} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-    		}
+    		} catch (Exception e) {}
         }
  
     }	
@@ -1699,6 +1762,7 @@ public class ComWS extends PBase {
 		}
 
 		items.clear();
+		dbld.clearlog();
 
 		try{
 			envioFacturas();
@@ -1722,19 +1786,23 @@ public class ComWS extends PBase {
 
 			envioFinDia();
 
+			claseFindia.updateComunicacion(2);
+			claseFindia.updateFinDia(du.getActDate());
+
 			if (envioparcial == false) {
 
 				findiaactivo=gl.findiaactivo;
 				if (ultimoCierreFecha()==du.getActDate()) findiaactivo=true;
 
 				if (findiaactivo) {
-					claseFindia = new clsFinDia(this);
 					FinDia();
 					claseFindia.eliminarTablasD();
 				}
-
 			}
 
+            dbld.savelog();
+
+			ComWS.super.finish();
 			//listaFachada();
 
 		}catch (Exception e){
@@ -1754,8 +1822,12 @@ public class ComWS extends PBase {
 
             AddTableVL("P_LIQUIDACION") ;
 
+			if (listItems.size()< 2){
+				return true;
+			}
+
             sql = listItems.get(0);
-            db.execSQL(sql);
+			db.execSQL(sql);
 
             sql = listItems.get(1);
             db.execSQL(sql);
@@ -1781,7 +1853,6 @@ public class ComWS extends PBase {
     }
 
 	public void envioFacturas() {
-
 		Cursor DT;
 		String cor,fruta,tt;
 		int i,pc=0,pcc=0,ccorel;
@@ -2463,7 +2534,6 @@ public class ComWS extends PBase {
 
 			if (envioparcial) commitSQL();
 
-
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			fstr=e.getMessage();
@@ -2680,7 +2750,8 @@ public class ComWS extends PBase {
 	public void wsSendExecute(){
 
 		running=1;fstr="No connect";scon=0;
-					
+        errflag=false;
+
 		try {
 
 			if (getTest()==1) scon=1;
@@ -2712,13 +2783,16 @@ public class ComWS extends PBase {
 		//senv="Envio completo\n";
 
 		try{
+            if (scon==0) {
+                lblInfo.setText(fstr);writeErrLog(fstr);
+                mu.msgbox(fstr);
+            }
+
 			if (!errflag) {
 				lblInfo.setText(" ");
-				if (scon==0) {
-					lblInfo.setText(fstr);writeErrLog(fstr);mu.msgbox(fstr);
-				}
 			} else {
-				lblInfo.setText(fstr);writeErrLog(fterr);mu.msgbox(fterr);
+				lblInfo.setText(fstr);writeErrLog(fterr);
+				mu.msgbox(fterr);
 			}
 
 			if (envioparcial) mu.msgbox(senv);
@@ -2745,9 +2819,7 @@ public class ComWS extends PBase {
 			try {
 				Looper.prepare();
 				wsSendExecute();
-			} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			}
+			} catch (Exception e) {}
 
 	        return null;
 	    }
@@ -2757,27 +2829,20 @@ public class ComWS extends PBase {
 			try {
 				wsSendFinished();
 				Looper.loop();
-			}catch (Exception e) {
-				addlog(new Object() {
-				}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-			}
+			}catch (Exception e) {}
 		}
 	 
         @Override
         protected void onPreExecute() {
     		try {
-    		} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-    		}
+    		} catch (Exception e) {}
         }
 
         @Override
         protected void onProgressUpdate(Void... values) {
     		try {
     			lblInfo.setText(fprog);
-    		} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-    		}
+    		} catch (Exception e) { }
         }
 	 
     }
@@ -2892,9 +2957,7 @@ public class ComWS extends PBase {
 		@Override
 		protected void onProgressUpdate(Void... values) {
 			try {
-			} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			}
+			} catch (Exception e) {}
 		}
 
 	}	
@@ -2921,20 +2984,25 @@ public class ComWS extends PBase {
 		txtEmp.setText(gEmpresa);
 		
 		try {
+
 			sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='"+ruta+"'";
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			
-			//if (gl.tipo==0) {
-			//	wsurl=DT.getString(1);			
-			//} else {	
-			//	wsurl=DT.getString(0);
-			//}
-			
-			wsurl=DT.getString(0);
-			
-			URL=wsurl;
-			txtWS.setText(URL);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+
+				//if (gl.tipo==0) {
+				//	wsurl=DT.getString(1);
+				//} else {
+				//	wsurl=DT.getString(0);
+				//}
+
+				wsurl=DT.getString(0);
+
+				URL=wsurl;
+				txtWS.setText(URL);
+			}
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//MU.msgbox(e.getMessage());
@@ -2978,27 +3046,34 @@ public class ComWS extends PBase {
 	}
 
 	private int getDocCount(String ss,String pps) {
-		Cursor DT;
-		int cnt;
+
+	    Cursor DT;
+		int cnt = 0;
 		String st;
 
 		try {
+
 			sql=ss;
 			DT=Con.OpenDT(sql);
-			cnt=DT.getCount();
 
-			if (cnt>0) {
+            if (DT.getCount()>0){
+				DT.moveToFirst();
+            	cnt=DT.getInt(0);
+            }
+
+            if (cnt>0) {
 				st=pps+" "+cnt;
 				sp=sp+st+", ";
 			}
 
-			return cnt;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(sql+"\n"+e.getMessage());
-			return 0;
 		}
-	}
+
+        return cnt;
+
+    }
 
 	private boolean validaLicencia() {
 		Cursor dt;
@@ -3046,16 +3121,19 @@ public class ComWS extends PBase {
 	
 	private int ultCorel() {
 		Cursor DT;
-		int crl;
+		int crl = 0;
 		
 		try {
 			sql="SELECT CORELULT FROM P_COREL";
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			crl=DT.getInt(0);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				crl=DT.getInt(0);
+			}
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			crl=0;
 		}	
 		
 		return crl;
@@ -3090,12 +3168,15 @@ public class ComWS extends PBase {
 
 		try {
 
-			sql="SELECT EMAIL FROM P_RUTA";
+			sql="SELECT IFNULL(EMAIL,0) AS FECHA FROM P_RUTA";
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
 
 			if(DT.getCount()>0){
+
+                DT.moveToFirst();
+
 				fecha=DT.getInt(0);
+
 				if (fecha==0)
 				{
 					fecha = 1001010000 ;//#HS_20181129_0945 Cambie los valores de fecha porque deben se yymmdd hhmm
@@ -3134,8 +3215,9 @@ public class ComWS extends PBase {
 		esvacio=false;
 		
 		lblEnv.setVisibility(View.VISIBLE);imgEnv.setVisibility(View.VISIBLE);
-		lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);			
-		relExist.setVisibility(View.VISIBLE);
+		lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
+        lblExis.setVisibility(View.INVISIBLE);imgExis.setVisibility(View.INVISIBLE);//#CKFK 20190304 Agregué esto para poder poner visible o invisible este botón
+        relExist.setVisibility(View.VISIBLE);
 		relPrecio.setVisibility(View.VISIBLE);
 		relStock.setVisibility(View.VISIBLE);
 
@@ -3148,7 +3230,6 @@ public class ComWS extends PBase {
 				dt=Con.OpenDT(sql);
 				esvacio=dt.getCount()==0;
 			} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 				//msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 				esvacio=true;
 			}
@@ -3160,6 +3241,7 @@ public class ComWS extends PBase {
 				lblInfo.setText("");
 				lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
 				lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+
 			}
 
 			//#HS 20181113_1241pm Quite la comparacion contra la letra V.
@@ -3182,7 +3264,7 @@ public class ComWS extends PBase {
 					} else {
 						relPrecio.setVisibility(View.INVISIBLE);
 						relExist.setVisibility(View.INVISIBLE);
-						relStock.setVisibility(View.VISIBLE);
+						relStock.setVisibility(View.INVISIBLE);
 					}
 				}
 			} else {
@@ -3326,16 +3408,13 @@ public class ComWS extends PBase {
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					claseFindia = new clsFinDia(ComWS.this);
 					claseFindia.eliminarTablasD();
 					msgAskConfirmaRecibido();
 				}
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					msgAskConfirmaRecibido();
-				}
+				public void onClick(DialogInterface dialog, int which) {}
 			});
 
 			dialog.show();

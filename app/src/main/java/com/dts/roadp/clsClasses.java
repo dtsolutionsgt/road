@@ -94,5 +94,13 @@ public class clsClasses {
 		public double peso,can;
 		public String sid,speso,sbol,scan,stot;
 	}
-	
+
+	public class  clsAyudante{
+		public String idayudante;
+		public String nombreayudante;
+	}
+
+	public class clsVehiculo{
+		public String idVehiculo,marca,placa;
+	}
 }

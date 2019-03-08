@@ -31,7 +31,7 @@ public class CliNuevoAprEdit extends PBase {
 	
 	private String cli,cui,idmun="*",idrel,idgru,idesc,idest,idgen;
 	private int numhij,fechanac=0;
-		
+
 	final String[] itemrel = {"CATOLICA", "EVANGELICA", "MORMON", "TESTIGO JEHOVA", "OTROS"}; 
 	final String[] itemgru = {"LADINO", "INDIGENA", "MORENO DE COLOR", "NO APLICA"};	
 	final String[] itemesc = {"ANALFABETA", "PRIMARIA", "BASICO", "UNIVERSIDAD","CARRERA TECNICA UNIVERSITARIA", "MAESTRIA"};	
@@ -124,8 +124,6 @@ public class CliNuevoAprEdit extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-
-
 	}
  
 	public void doFecha(View view) {
@@ -155,12 +153,12 @@ public class CliNuevoAprEdit extends PBase {
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-					try {
+				//	try {
 						TextView spinlabel=(TextView) parentView.getChildAt(0);
 						spinlabel.setTypeface(lblFecha.getTypeface());
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 
 				@Override
@@ -171,12 +169,12 @@ public class CliNuevoAprEdit extends PBase {
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-					try {
+				//	try {
 						TextView spinlabel=(TextView) parentView.getChildAt(0);
 						spinlabel.setTypeface(lblFecha.getTypeface());
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 
 				@Override
@@ -187,12 +185,12 @@ public class CliNuevoAprEdit extends PBase {
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-					try {
+				//	try {
 						TextView spinlabel=(TextView) parentView.getChildAt(0);
 						spinlabel.setTypeface(lblFecha.getTypeface());
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 
 				@Override
@@ -203,12 +201,12 @@ public class CliNuevoAprEdit extends PBase {
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-					try {
+				//	try {
 						TextView spinlabel=(TextView) parentView.getChildAt(0);
 						spinlabel.setTypeface(lblFecha.getTypeface());
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 
 				@Override
@@ -219,12 +217,12 @@ public class CliNuevoAprEdit extends PBase {
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-					try {
+				//	try {
 						TextView spinlabel=(TextView) parentView.getChildAt(0);
 						spinlabel.setTypeface(lblFecha.getTypeface());
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 
 				@Override
@@ -235,12 +233,12 @@ public class CliNuevoAprEdit extends PBase {
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-					try {
+				//	try {
 						TextView spinlabel=(TextView) parentView.getChildAt(0);
 						spinlabel.setTypeface(lblFecha.getTypeface());
-					} catch (Exception e) {
+				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}
+					}*/
 				}
 
 				@Override
@@ -330,13 +328,13 @@ public class CliNuevoAprEdit extends PBase {
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			iddep=dt.getString(0);
-		} catch (Exception e) {
+	/*	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());return;
 		}
 
 		
-		try {
+		try {*/
 
 			db.beginTransaction();
 
@@ -380,7 +378,7 @@ public class CliNuevoAprEdit extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
-			mu.msgbox(e.getMessage());
+			mu.msgbox(e.getMessage());return;
 		}		   
 
 	}
@@ -637,11 +635,11 @@ public class CliNuevoAprEdit extends PBase {
 				if (itemrel[i].substring(0,2).equalsIgnoreCase(cod)) sidx=i;
 			}
 			sprel.setAdapter(darel);sprel.setSelection(sidx);
-		} catch (Exception e) {
+	/*	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		try {
+		try {*/
 			ArrayAdapter<String> dagru = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, itemgru);
 			dagru.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			sidx=0;cod=idgru.substring(0,2);
@@ -649,11 +647,11 @@ public class CliNuevoAprEdit extends PBase {
 				if (itemgru[i].substring(0,2).equalsIgnoreCase(cod)) sidx=i;
 			}
 			spgru.setAdapter(dagru);spgru.setSelection(sidx);
-		} catch (Exception e) {
+	/*	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		try { // CA=CT
+		try { */// CA=CT
 			ArrayAdapter<String> daesc = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, itemesc);
 			daesc.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			sidx=0;cod=idesc.substring(0,2);if (cod.equalsIgnoreCase("CA")) cod="CT";
@@ -661,11 +659,11 @@ public class CliNuevoAprEdit extends PBase {
 				if (itemesc[i].substring(0,2).equalsIgnoreCase(cod)) sidx=i;
 			}
 			spesc.setAdapter(daesc);spesc.setSelection(sidx);
-		} catch (Exception e) {
+	/*	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		try { 
+		try { */
 			ArrayAdapter<String> daest = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, itemest);
 			daest.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -681,11 +679,11 @@ public class CliNuevoAprEdit extends PBase {
 			}
 			
 			spest.setAdapter(daest);spest.setSelection(sidx);
-		} catch (Exception e) {
+	/*	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		try { //MA = M, FE=F, TE=3
+		try { *///MA = M, FE=F, TE=3
 			ArrayAdapter<String> dagen = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, itemgen);
 			dagen.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			sidx=0;cod=idgen;
@@ -696,11 +694,11 @@ public class CliNuevoAprEdit extends PBase {
 				if (itemgen[i].substring(0,2).equalsIgnoreCase(cod)) sidx=i;
 			}
 			spgen.setAdapter(dagen);spgen.setSelection(sidx);
-		} catch (Exception e) {
+	/*	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		try { 
+		try { */
 			ArrayAdapter<String> dahij = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, itemhij);
 			dahij.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			sphij.setAdapter(dahij);sphij.setSelection(numhij);

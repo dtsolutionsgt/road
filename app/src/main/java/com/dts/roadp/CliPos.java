@@ -230,18 +230,18 @@ public class CliPos extends PBase {
 				txtNIT.requestFocus();return;
 			}
 
-			try {
+		//	try {
 				sql="SELECT Nombre FROM P_CLIENTE WHERE CODIGO='"+NIT+"'";
 				DT=Con.OpenDT(sql);
 				DT.moveToFirst();
 
 				txtNom.setText(DT.getString(0));
-			} catch (Exception e) {
+		/*	} catch (Exception e) {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-				txtNom.setText("");
-			}
+			}*/
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			txtNom.setText("");
 		}
 
 	}
@@ -315,6 +315,7 @@ public class CliPos extends PBase {
 			//MU.msgbox("E", e.getMessage());
 
 			try {
+
 				upd.init("P_CLIENTE");
 				upd.add("NOMBRE",Nom);
 				upd.Where("CODIGO='"+NIT+"'");
@@ -322,11 +323,13 @@ public class CliPos extends PBase {
 				db.execSQL(upd.SQL());
 
 				return true;
+
 			} catch (SQLException e1) {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 				mu.msgbox(e1.getMessage());return false;
 			}
-		}	
+
+		}
 
 	}
 

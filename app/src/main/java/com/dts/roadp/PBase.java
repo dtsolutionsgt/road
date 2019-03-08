@@ -4,10 +4,15 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 
 public class PBase extends Activity {
 
@@ -80,11 +85,11 @@ public class PBase extends Activity {
 	}
 
 	protected void toast(String msg) {
-		Toast.makeText(this,msg, Toast.LENGTH_SHORT).show();
+		toastcent(msg);
 	}
 	
 	protected void toast(double val) {
-		this.toast(""+val);
+		toastcent(""+val);
 	}
 	
 	protected void toastlong(String msg) {
@@ -102,8 +107,41 @@ public class PBase extends Activity {
 		toast.show();
 	}	
 	
-	protected void addlog(String methodname,String msg,String info) {
+	protected void addlog(final String methodname, String msg, String info) {
 
+		final String vmethodname = methodname;
+		final String vmsg = msg;
+		final String vinfo = info;
+
+		final Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				setAddlog(vmethodname,vmsg, vinfo);
+			}
+		}, 500);
+
+	}
+
+	protected void setAddlog(String methodname,String msg,String info) {
+
+		BufferedWriter writer = null;
+		FileWriter wfile;
+
+		try {
+
+			String fname = Environment.getExternalStorageDirectory()+"/roadlog.txt";
+			wfile=new FileWriter(fname,true);
+			writer = new BufferedWriter(wfile);
+
+			writer.write("Método: " + methodname + " Mensaje: " +msg + " Info: "+ info );
+			writer.write("\r\n");
+
+			writer.close();
+
+		} catch (Exception e) {
+			msgbox("Error " + e.getMessage());
+		}
 	}
 
 
@@ -129,7 +167,7 @@ public class PBase extends Activity {
 		super.onBackPressed();
 	}
 	
-	private void opendb() {
+	public void opendb() {
 		try {
 			db = Con.getWritableDatabase();
 			if (db!= null)

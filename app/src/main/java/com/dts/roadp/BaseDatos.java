@@ -84,6 +84,7 @@ public class BaseDatos extends SQLiteOpenHelper {
 		  {
 
 			  vCursor = vDatabase.rawQuery(pSQL, null);
+			  vCursor.moveToLast();
 
 		  }catch(Exception ex){
 			  msgbox(new Object() {

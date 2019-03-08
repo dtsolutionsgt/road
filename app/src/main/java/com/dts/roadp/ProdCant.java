@@ -347,22 +347,35 @@ public class ProdCant extends PBase {
 	}
 	
 	private double getDisp() {
+
 		Cursor dt;
-		double disp;
+		double disp = 0;
 		double umf1 =1;
 		double umf2 =1;
 			
 		try {
 
-			sql="SELECT SUM(CANT),SUM(PESO) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
+			sql=" SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO " +
+				" FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
 			dt=Con.OpenDT(sql);
-			dt.moveToFirst();
-			
-			umstock=um;umfactor=1;
-			disp=dt.getDouble(0);
-			ipeso=dt.getDouble(1);
-			pesostock=ipeso/disp;
+
+			if (dt.getCount()>0){
+
+				dt.moveToFirst();
+
+				umstock=um;umfactor=1;
+
+				disp=dt.getDouble(0);
+				ipeso=dt.getDouble(1);
+
+				pesostock=ipeso/(disp==0?1:disp);
+
+			}
+
 			if (disp>0) return disp;
+
+			dt.close();
+
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
@@ -370,9 +383,15 @@ public class ProdCant extends PBase {
 		try {
 			sql="SELECT UNIDADMEDIDA FROM P_STOCK WHERE (CODIGO='"+prodid+"')";	
 			dt=Con.OpenDT(sql);
-			dt.moveToFirst();
-			
-			umstock=dt.getString(0);
+
+			if (dt.getCount()>0){
+
+				dt.moveToFirst();
+				umstock=dt.getString(0);
+
+			}
+
+			dt.close();
 
 			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+um+"') AND (UNIDADMINIMA='"+ubas+"')";	
 			dt=Con.OpenDT(sql);
@@ -385,7 +404,9 @@ public class ProdCant extends PBase {
 					//#EJC20181127: No mostrar mensaje por versión de aprofam.
 				//msgFactor("No existe factor de conversión para "+um);return 0;
 			}	
-					
+
+			dt.close();
+
 			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+ubas+"')";	
 			dt=Con.OpenDT(sql);
 			if (dt.getCount()>0) {
@@ -396,22 +417,32 @@ public class ProdCant extends PBase {
 				//#EJC20181127: No mostrar mensaje por versión de aprofam.
 				//msgFactor("No existe factor de conversión para "+um);return 0;
 			}
-			
+			dt.close();
+
 			umfactor=umf1/umf2;			
 			
-			sql="SELECT SUM(CANT),SUM(PESO) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
+			sql="SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO FROM P_STOCK " +
+				" WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
 			dt=Con.OpenDT(sql);
-			dt.moveToFirst();
-			
-			disp=dt.getDouble(0);
-            if (!porpeso) disp=disp/umfactor;
-            ipeso=dt.getDouble(1);
-			pesostock = ipeso/disp;
+
+			if(dt.getCount()>0){
+
+				dt.moveToFirst();
+
+				disp=dt.getDouble(0);
+				if (!porpeso) disp=disp/umfactor;
+				ipeso=dt.getDouble(1);
+				pesostock = ipeso/disp;
+			}
+
+			dt.close();
+
 			return disp;
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    }
-		
+
 		return 0;
 	}
 
@@ -528,18 +559,24 @@ public class ProdCant extends PBase {
 	}
 
 	private int setCant(boolean mode){
-		double cu,tv,corig,cround,fruni,frcant,adcant,vpeso=0,opeso;
+		double cu=0.0,tv,corig,cround,fruni,frcant,adcant,vpeso=0,opeso;
 		boolean ajust=false;
 		
 		lblTot.setText("***");
 		if (mode) txtPeso.setText("0");
 
+		cu=0;
 
 		try {
-			cu=Double.parseDouble(txtCant.getText().toString());
+			if (txtCant.getText().toString().trim()!=""){
+				cu=Double.parseDouble(txtCant.getText().toString());
+			}
+
 			cant=cu;corig=cant;cround=Math.floor(cant);
-			esdecimal=corig!=cround;
+			esdecimal=(corig!=cround)?true:false;
 			cant=mu.round(cant,deccant);
+
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			cant=-1;return -1;
@@ -637,7 +674,7 @@ public class ProdCant extends PBase {
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount() == 0) {
-				msgbox("No está definido rango de repesaje para el producto, no se podrá modificar el peso");
+				//msgbox("No está definido rango de repesaje para el producto, no se podrá modificar el peso");
 				//#EJC20190226: Si no está definido repesaje no se puede modificar el peso según observación de Carolina se debe dejar vender.
 				txtPeso.setEnabled(false);
 				return true;

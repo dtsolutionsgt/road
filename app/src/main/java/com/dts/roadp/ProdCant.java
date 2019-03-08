@@ -674,7 +674,7 @@ public class ProdCant extends PBase {
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount() == 0) {
-				//msgbox("No está definido rango de repesaje para el producto, no se podrá modificar el peso");
+				toast("No está definido rango de repesaje para el producto, no se podrá modificar el peso");
 				//#EJC20190226: Si no está definido repesaje no se puede modificar el peso según observación de Carolina se debe dejar vender.
 				txtPeso.setEnabled(false);
 				return true;

@@ -119,10 +119,11 @@
             android:id="@+id/txtWS"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/txtRuta"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/txtRuta"
-            android:ems="10" />
+            android:ems="10"
+            android:hint="http://172.16.10.9/rdc7_sap_qas_andr/wsandr.asmx" />
 
         <TextView
             android:id="@+id/textView3"

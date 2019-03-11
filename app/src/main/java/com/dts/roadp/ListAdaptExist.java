@@ -80,8 +80,8 @@ public class ListAdaptExist extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		holder.lblDesc.setText(items.get(position).Desc);
-		holder.lblCod.setText(items.get(position).Cod);
+		holder.lblDesc.setText(items.get(position).Cod);
+		holder.lblCod.setText(items.get(position).Desc);
 
 		holder.lblLote.setText(items.get(position).Lote);
         holder.lblLotem.setText(items.get(position).Lote);

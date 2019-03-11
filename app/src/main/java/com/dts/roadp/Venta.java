@@ -29,7 +29,6 @@ import android.widget.Toast;
 
 import com.dts.roadp.clsClasses.clsVenta;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class Venta extends PBase {
@@ -59,7 +58,6 @@ public class Venta extends PBase {
 	private int nivel,dweek,clidia;
 	private boolean sinimp,rutapos,softscanexist,porpeso,usarscan;
 
-	private DecimalFormat ffrmprec;
 	private AppMethods app;
 
 	// Location
@@ -68,9 +66,9 @@ public class Venta extends PBase {
 
 	private LocationListener locationListener;
 
-	private boolean isGPSEnabled,isNetworkEnabled,canGetLocation;
+	private boolean isGPSEnabled,isNetworkEnabled;
 	private double  latitude,longitude;
-	private String  cod,barcode;
+	private String  barcode;
 
 	private static final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
 	private static final long  MIN_TIME_BW_UPDATES = 1000; // in Milliseconds
@@ -107,7 +105,6 @@ public class Venta extends PBase {
 		if (rutapos) imgroad.setImageResource(R.drawable.pedidos_3_gray);
 
 		prc=new Precio(this,mu,gl.peDec);
-		ffrmprec = new DecimalFormat("#0.0000");
 
 		setHandlers();
 
@@ -124,7 +121,7 @@ public class Venta extends PBase {
 	}
 
 
-	// Events
+	//region Events
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		try{
@@ -132,7 +129,7 @@ public class Venta extends PBase {
 			if (resultCode == RESULT_OK) {
 				String contents = intent.getStringExtra("SCAN_RESULT");
 				barcode=contents;
-				toast("BC:"+barcode);
+				toast(barcode);
 			}
 			//}
 		}catch (Exception e){
@@ -143,7 +140,7 @@ public class Venta extends PBase {
 
 	public void doFocus(View view) {
 		try {
-			txtBarra.setText("");txtBarra.requestFocus();
+			txtBarra.requestFocus();
 		} catch (Exception e) {}
 	}
 
@@ -339,7 +336,7 @@ public class Venta extends PBase {
 				handlerTimer.postDelayed(new Runnable() {
 					public void run() {
 						barcode = txtBarra.getText().toString();
-						txtBarra.setText("");txtBarra.requestFocus();
+						txtBarra.requestFocus();
 						if (!mu.emptystr(barcode)) addBarcode();
 
 					}
@@ -349,18 +346,20 @@ public class Venta extends PBase {
 
 	}
 
+	//endregion
 
-	// Main
+	//region Main
 
 	public void listItems() {
 		Cursor DT;
 		clsVenta item;
 		double tt;
+		int ii;
 
-		items.clear();tot=0;ttimp=0;ttperc=0;
+		items.clear();tot=0;ttimp=0;ttperc=0;selidx=-1;ii=0;
 
 		try {
-			sql="SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, T_VENTA.TOTAL, T_VENTA.CANT, T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, T_VENTA.PESO " +
+			sql="SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, T_VENTA.TOTAL, T_VENTA.CANT, T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, T_VENTA.PESO, T_VENTA.UMSTOCK " +
 				 "FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO "+
 				 "ORDER BY P_PRODUCTO.DESCCORTA ";
 
@@ -375,7 +374,7 @@ public class Venta extends PBase {
 
 					item = clsCls.new clsVenta();
 
-					item.Cod=DT.getString(0);
+					item.Cod=DT.getString(0);if (item.Cod.equalsIgnoreCase(prodid)) selidx=ii;
 					item.Nombre=DT.getString(1);
 					item.Cant=DT.getDouble(3);
 					item.Prec=DT.getDouble(4);
@@ -383,7 +382,7 @@ public class Venta extends PBase {
 					item.sdesc=mu.frmdec(item.Desc)+" %";
 					item.imp=DT.getDouble(6);
 					item.percep=DT.getDouble(7);
-					item.um=DT.getString(8);
+					if (prodPorPeso(item.Cod)) 	item.um=DT.getString(10);else item.um=DT.getString(8);
 					item.Peso=DT.getDouble(9);
 
 					item.val=mu.frmdecimal(item.Cant,gl.peDecImp)+" "+ltrim(item.um,6);
@@ -406,7 +405,7 @@ public class Venta extends PBase {
 					ttimp+=item.imp;
 					ttperc+=item.percep;
 
-					DT.moveToNext();
+					DT.moveToNext();ii++;
 				}
 			}
 
@@ -425,6 +424,12 @@ public class Venta extends PBase {
 		} else {
 			tot=mu.round(tot,gl.peDec);
 			lblTot.setText(mu.frmcur(tot));
+		}
+
+
+		if (selidx>-1) {
+			adapter.setSelectedIndex(selidx);
+			listView.smoothScrollToPosition(selidx);
 		}
 
 	}
@@ -728,16 +733,21 @@ public class Venta extends PBase {
 		}
 	}
 
+	//endregion
 
-	// Barras
+	//region Barras
 
 	private void addBarcode() {
-		toast(barcode);
+		gl.barra=barcode;
 		if (barraBolsa()) {
+			txtBarra.setText("");
 			listItems();return;
 		}
-		if (barraProducto()) return;
+		if (barraProducto()) {
+			txtBarra.setText("");return;
+		}
 		toastlong("¡La barra "+barcode+" no existe!");
+		txtBarra.setText("");
 	}
 
 	private boolean barraBolsa() {
@@ -762,7 +772,19 @@ public class Venta extends PBase {
 				uum = dt.getString(3);
 
 				//if (sinimp) precdoc=precsin; else precdoc=prec;
-				prec = 1;
+
+				if (prodPorPeso(prodid)) {
+					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, ppeso);
+					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,ppeso)) {
+						if (prc.precioespecial>0) prec=prc.precioespecial;
+					}
+				} else {
+					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0);
+					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
+						if (prc.precioespecial>0) prec=prc.precioespecial;
+					}
+				}
+
 				pprecdoc = prec;
 				prodtot = prec;
 
@@ -778,12 +800,10 @@ public class Venta extends PBase {
 					db.execSQL(ins.sql());
 				} catch (Exception e) {
 					if (chkBorrar.isChecked()) {
-						db.execSQL("DELETE FROM T_BARRA WHERE BARRA='"+barcode+"' AND CODIGO=''"+prodid+"'");
+						borraBarra();
 					} else {
-						msgAskBarra("¿Borrar la barra "+barcode+"?");
+						msgAskBarra("Borrar la barra "+barcode);
 					}
-
-					msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 				}
 
 				ins.init("T_VENTA");
@@ -841,9 +861,13 @@ public class Venta extends PBase {
 				pprecio=dt.getDouble(2);
 			}
 
-			sql="UPDATE T_VENTA SET Cant="+ccant+",Peso="+ppeso+",Total="+prodtot+" WHERE PRODUCTO='"+prodid+"'";
+			sql="UPDATE T_VENTA SET Cant="+ccant+",Peso="+ppeso+",Total="+pprecio+" WHERE PRODUCTO='"+prodid+"'";
 			db.execSQL(sql);
 
+			sql="DELETE FROM T_VENTA WHERE Cant=0";
+			db.execSQL(sql);
+
+			listItems();
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
@@ -874,8 +898,18 @@ public class Venta extends PBase {
 		return false;
 	}
 
+	private void borraBarra() {
+		try {
+			db.execSQL("DELETE FROM T_BARRA WHERE BARRA='"+gl.barra+"' AND CODIGO='"+prodid+"'");
+			actualizaTotalesBarra();
+		} catch (Exception e) {
+		}
+	}
 
-	// No atencion
+
+	//endregion
+
+	//region No atencion
 
 	private void listAten(){
 		Cursor DT;
@@ -1031,8 +1065,9 @@ public class Venta extends PBase {
 
 	}
 
+	//endregion
 
-	// Location
+	//region Location
 
 	private void setGPS() {
 
@@ -1133,9 +1168,9 @@ public class Venta extends PBase {
 			isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
 			if (!isGPSEnabled && !isNetworkEnabled) {
-				this.canGetLocation = false;
+
 			} else {
-				this.canGetLocation = true;
+
 				if (isNetworkEnabled) {
 					locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,MIN_TIME_BW_UPDATES,
 							MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
@@ -1174,8 +1209,9 @@ public class Venta extends PBase {
 		return location;
 	}
 
+	//endregion
 
-	// Messages
+	//region Messages
 
 	private void msgAskExit(String msg) {
 		try{
@@ -1241,13 +1277,7 @@ public class Venta extends PBase {
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					try {
-						db.execSQL("DELETE FROM T_BARRA WHERE BARRA='"+barcode+"' AND CODIGO=''"+prodid+"'");
-						actualizaTotalesBarra();
-					} catch (Exception e) {
-						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-					}
-
+					borraBarra();
 				}
 			});
 
@@ -1263,8 +1293,9 @@ public class Venta extends PBase {
 
 	}
 
+	//endregion
 
-	// Aux
+	//region Aux
 
 	private void showItemMenu() {
 		try{
@@ -1565,8 +1596,9 @@ public class Venta extends PBase {
 
 	}
 
+	//endregion
 
-	// Activity Events
+	//region Activity Events
 	
 	@Override
 	protected void onResume() {
@@ -1601,7 +1633,6 @@ public class Venta extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-
 	}
 	
 	@Override
@@ -1612,6 +1643,8 @@ public class Venta extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	}			
+	}
+
+	//endregion
 
 }

@@ -18,7 +18,7 @@ public class appGlobals extends Application {
 	public int autocom,nuevaFecha,pagomodo,filtrocli;
 	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor,prectemp;
 	public boolean CellCom;
-	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov;
+	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra;
 
     public boolean vcredito,vcheque,vchequepost;
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,contlic,devol,modoadmin;

@@ -119,7 +119,7 @@ public class Soporte extends PBase {
     }
 
     private void sendBitacora() {
-        body="Error de envío \n"+body;
+        body="Bitacora \n"+body;
         fname= Environment.getExternalStorageDirectory()+"/roadlog.txt";
         file=new File(fname);
 

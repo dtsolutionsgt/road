@@ -1,20 +1,13 @@
 package com.dts.roadp;
 
-import java.util.Currency;
-import java.util.Locale;
-
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.provider.Settings;
 import android.view.Gravity;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Currency;
+import java.util.Locale;
 
 public class AppMethods {
 
@@ -345,13 +338,22 @@ public class AppMethods {
 
     public boolean ventaPeso(String cod) {
         Cursor DT;
+        String umm;
 
         try {
-            String sql = "SELECT VENTA_POR_PESO FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
-            DT = Con.OpenDT(sql);
-            DT.moveToFirst();
+            //String sql = "SELECT VENTA_POR_PESO FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+            //DT = Con.OpenDT(sql);
+            //DT.moveToFirst();
+           	//return  DT.getInt(0)==1;
 
-           return  DT.getInt(0)==1;
+			String sql = "SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE CODIGO='" + cod + "' AND NIVEL="+gl.nivel;
+			DT = Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			umm=DT.getString(0);
+
+			return  umm.equalsIgnoreCase(gl.umpeso);
+
         } catch (Exception e) {
             toast(e.getMessage());
             return false;

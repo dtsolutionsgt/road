@@ -73,7 +73,7 @@ public class ProdCant extends PBase {
 	}
 
 	
-	// Events
+	//region Events
 	
 	public void sendCant(View view) {
 		try{
@@ -202,9 +202,10 @@ public class ProdCant extends PBase {
 
 
 	}
-		
-	
-	// Main
+
+	//endregion
+
+	//region Main
  	
 	private void showData() {
 		Cursor dt;
@@ -511,8 +512,9 @@ public class ProdCant extends PBase {
 
 	}
 
+	//endregion
 
-	// Update Disp
+	//region Update Disp
 	
 	public void updDisp(){
 
@@ -527,9 +529,10 @@ public class ProdCant extends PBase {
 		}
 
 	}
+
+	//endregion
 	
-	
-	// Aux
+	//region Aux
 	
 	private void setControls() {
 
@@ -793,8 +796,9 @@ public class ProdCant extends PBase {
         super.finish();
     }
 
+	//endregion
 
-    // Msg
+    //region Msg
 
 	private void msgSinPrecio(String msg) {
 		try{
@@ -915,8 +919,9 @@ public class ProdCant extends PBase {
 
 	}
 
-	
-	// Activity Events
+	//endregion
+
+	//region Activity Events
 	
 	protected void onResume() {
 
@@ -932,5 +937,7 @@ public class ProdCant extends PBase {
 		}
 
 	}
+
+	//endregion
 
 }

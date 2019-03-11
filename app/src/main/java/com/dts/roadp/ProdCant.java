@@ -210,6 +210,7 @@ public class ProdCant extends PBase {
 	private void showData() {
 		Cursor dt;
 		double ippeso=0;
+
 		
 		try {
 			sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";

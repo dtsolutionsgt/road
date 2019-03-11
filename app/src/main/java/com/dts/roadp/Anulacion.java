@@ -459,7 +459,8 @@ public class Anulacion extends PBase {
 					db.execSQL(ins.sql());
 
 				} catch (Exception e) {
-					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+					//#CKFK 20190308 Este addlog lo quité porque da error porque el registro ya existe y en ese caso solo se va a hacer el update.
+					//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 					//mu.msgbox(e.getMessage());
 				}
 
@@ -503,8 +504,6 @@ public class Anulacion extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-
-
 	}
 	
 	private void anulDeposParc(String itemid) {

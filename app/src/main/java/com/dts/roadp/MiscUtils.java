@@ -15,6 +15,8 @@ public class MiscUtils {
 	private Context cCont;
 	private DecimalFormat ffrmdec,ffrmint,ffrmdec2,ffrmgps; 
 	private String curr;
+
+	private PBase pB;
 	
 	public MiscUtils(Context context,String currsymb) {
 		cCont=context; 
@@ -174,35 +176,50 @@ public class MiscUtils {
 
 		}catch (Exception ex)
 		{
-			Log.e("msg", ex.getMessage());		}
+			pB = new PBase();
+			pB.addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"msgbox(String msg)");}
 	}   
 	
 	public void msgbox(int v) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(cCont);
-    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(String.valueOf(v));
-		
-		dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-    	    public void onClick(DialogInterface dialog, int which) {			      	
-    	    }
-    	});
-		dialog.show();
+
+		try{
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(cCont);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(String.valueOf(v));
+
+			dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+			dialog.show();
+
+		}catch (Exception ex)
+		{
+			pB = new PBase();
+			pB.addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"msgbox(int v)");}
 	
 	}   
 	
 	public void msgbox(double v) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(cCont);
-    	
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(String.valueOf(v));
-		
-		dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-    	    public void onClick(DialogInterface dialog, int which) {			      	
-    	    }
-    	});
-		dialog.show();
-	
+		try {
+			AlertDialog.Builder dialog = new AlertDialog.Builder(cCont);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(String.valueOf(v));
+
+			dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+			dialog.show();
+
+		}catch (Exception ex)
+		{
+			pB = new PBase();
+			pB.addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"msgbox(double v)");
+		}
 	}   
 	
 	/*

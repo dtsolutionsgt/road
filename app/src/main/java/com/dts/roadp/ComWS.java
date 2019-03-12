@@ -297,7 +297,8 @@ public class ComWS extends PBase {
 
 	private void runRecep() {
 
-		try{
+		try
+		{
 			if (isbusy==1) return;
 
 			if (!setComParams()) return;
@@ -310,8 +311,10 @@ public class ComWS extends PBase {
 			lblInfo.setText("Iniciando proceso de carga..");
 
 			lblInfo.setText("Conectando ...");
+
 			wsRtask = new AsyncCallRec();
 			wsRtask.execute();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -801,6 +804,8 @@ public class ComWS extends PBase {
 			
 		    prn=0;jj=0;
 
+		    Log.d("M","So far we are good");
+
 			dbT.beginTransaction();
 
 			for (int i = 0; i < rc; i++)
@@ -816,7 +821,7 @@ public class ComWS extends PBase {
 					writer.write("\r\n");
 				} catch (Exception e)
 				{
-
+					Log.d("M","Something happend here " + e.getMessage());
 				}
 
 				try
@@ -826,18 +831,21 @@ public class ComWS extends PBase {
 				}
 				catch (Exception e)
 				{
+					Log.d("M","Something happend there " + e.getMessage());
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage() + "EJC","Yo fui " + sql);
 					Log.e("z", e.getMessage());
 				}
 
 
                 try {
-                	if (i % 10==0) {
+                	if (i % 10==0)
+                	{
 						fprog = "Procesando: " + i + " de: " + (rc-1);
 						wsRtask.onProgressUpdate();
 						SystemClock.sleep(20);
 					}
-                } catch (Exception e) {
+                } catch (Exception e)
+				{
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
                     Log.e("z", e.getMessage());
                 }
@@ -845,6 +853,8 @@ public class ComWS extends PBase {
 
 			dbT.setTransactionSuccessful();
 			dbT.endTransaction();
+
+			Log.d("M","We are ok");
 
 			fprog = "Documento de inventario recibido en BOF...";
 			wsRtask.onProgressUpdate();
@@ -3530,6 +3540,7 @@ public class ComWS extends PBase {
 			dialog.setNegativeButton("Cancelar", null);
 
 			dialog.show();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

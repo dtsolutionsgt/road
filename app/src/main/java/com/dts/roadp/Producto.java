@@ -112,9 +112,15 @@ public class Producto extends PBase {
 
 						adapter.setSelectedIndex(position);
 
-						if (prodBarra(item.Cod)) {
-							toastcent("Producto tipo barra, no se puede ingresar la cantidad");
-							finish();return;
+						switch (prodtipo) {
+
+							case  1:
+
+								if (prodBarra(item.Cod)) {
+									toastcent("Producto tipo barra, no se puede ingresar la cantidad");
+									finish();return;
+								}
+
 						}
 
 						itemid = item.Cod;

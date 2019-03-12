@@ -38,7 +38,8 @@ public class Producto extends PBase {
 	
 	private String famid,itemid,pname,prname,um,ubas;
 	private int act,prodtipo;
-	private double disp;
+	private double disp_und;
+	private double disp_peso;
 	boolean ordPorNombre;
 	
 	@Override
@@ -363,7 +364,7 @@ public class Producto extends PBase {
 		try{
 			for (int i = items.size()-1; i >=0; i--) {
 				if (getDisp(items.get(i).Cod)) {
-					sdisp=mu.frmdecimal(disp,gl.peDecImp)+" "+ltrim(um,6);
+					sdisp=mu.frmdecimal(disp_und,gl.peDecImp)+" "+ltrim(um,6)+"  "+mu.frmdecimal(disp_peso,gl.peDecImp)+" "+ltrim(gl.umpeso,6);
 					items.get(i).Text=sdisp;
 				} else {
 					items.remove(i);
@@ -384,53 +385,84 @@ public class Producto extends PBase {
 		double umf1,umf2,umfactor;
         boolean porpeso=prodPorPeso(prodid);
 
-        disp=0;
+        disp_und =0;
 		
 		try {			
-			sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
+			//sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
+			sql=" SELECT UNIDADMEDIDA FROM P_STOCK WHERE (CODIGO='"+prodid+"') " +
+			    " UNION \n" +
+				" SELECT UNIDADMEDIDA FROM P_STOCKB WHERE (CODIGO='" + prodid + "') ";
 			dt=Con.OpenDT(sql);
-			dt.moveToFirst();			
-			um=dt.getString(0);
+
+			if (dt.getCount()>0){
+				dt.moveToFirst();
+				um=dt.getString(0);
+			}
+
+			dt.close();
 			
 			sql="SELECT UNIDBAS	FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
 			dt=Con.OpenDT(sql);
-			dt.moveToFirst();
 
-			ubas=dt.getString(0);
+			if (dt.getCount()>0){
+				dt.moveToFirst();
+				ubas=dt.getString(0);
+			}
+
+			dt.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
 		}
 		
 		try {
-			sql="SELECT IFNULL(SUM(CANT),0) FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
+			sql=" SELECT  IFNULL(SUM(A.CANT),0) AS CANT, IFNULL(SUM(A.PESO),0) AS PESO " +
+				" FROM(SELECT IFNULL(SUM(CANT),0) AS CANT, IFNULL(SUM(PESO),0) AS PESO " +
+				" FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')" +
+			    " UNION \n" +
+			    " SELECT IFNULL(SUM(CANT),0) AS CANT, IFNULL(SUM(PESO),0) AS PESO " +
+				" FROM P_STOCKB WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')) AS A";
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()>0) {
 
 				dt.moveToFirst();
-				disp=dt.getDouble(0);
+				disp_und =dt.getDouble(0);
+				disp_peso =dt.getDouble(1);
 			}
 
-			if (disp==0) {
+			dt.close();
 
-				sql="SELECT SUM(CANT) FROM P_STOCKB WHERE (CODIGO='"+prodid+"') ";
+			if (disp_und ==0) {
+
+				sql=" SELECT  IFNULL(SUM(A.CANT),0) AS CANT, IFNULL(SUM(A.PESO),0) AS PESO " +
+					" FROM(SELECT IFNULL(SUM(CANT),0) AS CANT, IFNULL(SUM(PESO),0) AS PESO " +
+					" FROM P_STOCK WHERE (CODIGO='"+prodid+"')" +
+					" UNION \n" +
+					" SELECT IFNULL(SUM(CANT),0) AS CANT, IFNULL(SUM(PESO),0) AS PESO " +
+					" FROM P_STOCKB WHERE (CODIGO='"+prodid+"')) AS A";
 				dt=Con.OpenDT(sql);
 
 				if (dt.getCount()>0) {
 					dt.moveToFirst();
-					disp=dt.getDouble(0);
+					disp_und =dt.getDouble(0);
+					disp_peso =dt.getDouble(1);
 				}
 			}
 
-			if (disp>0)	return true;
+			dt.close();
+
+			if (disp_und >0)	return true;
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    }
 		
 		try {
-			sql="SELECT UNIDADMEDIDA FROM P_STOCK WHERE (CODIGO='"+prodid+"')";	
+			sql="SELECT UNIDADMEDIDA FROM P_STOCK WHERE (CODIGO='"+prodid+"')" +
+				" UNION \n" +
+				" SELECT UNIDADMEDIDA FROM P_STOCKB WHERE (CODIGO='"+prodid+"')";
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()>0){
@@ -439,6 +471,7 @@ public class Producto extends PBase {
 				umstock=dt.getString(0);
 			}
 
+			dt.close();
 
 			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
 				"WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+um+"') AND (UNIDADMINIMA='"+ubas+"')";
@@ -451,36 +484,48 @@ public class Producto extends PBase {
 				return false;
 			}
 
+			dt.close();
+
 			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
 				"WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+ubas+"')";
 			dt=Con.OpenDT(sql);
+
 			if (dt.getCount()>0) {
 				dt.moveToFirst();			
 				umf2=dt.getDouble(0);
 			} else {	
 				return false;
 			}
-			
-			umfactor=umf1/umf2;			
-			
-			sql=" SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO " +
-				" FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
+
+			dt.close();
+
+			umfactor=umf1/umf2;
+
+			sql=" SELECT  IFNULL(SUM(A.CANT),0) AS CANT, IFNULL(SUM(A.PESO),0) AS PESO " +
+				" FROM(SELECT IFNULL(SUM(CANT),0) AS CANT, IFNULL(SUM(PESO),0) AS PESO " +
+				" FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')" +
+				" UNION \n" +
+				" SELECT IFNULL(SUM(CANT),0) AS CANT, IFNULL(SUM(PESO),0) AS PESO " +
+				" FROM P_STOCKB WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')) AS A";
 			dt=Con.OpenDT(sql);
 			if(dt.getCount()>0) {
 				dt.moveToFirst();
-				disp=dt.getDouble(0);
+				disp_und =dt.getDouble(0);
+				disp_peso =dt.getDouble(1);
 			}
 
-			if (disp==0) {
+			dt.close();
+
+			/*if (disp_und ==0) {
 				sql="SELECT SUM(CANT),SUM(PESO) FROM P_STOCKB WHERE (CODIGO='"+prodid+"')";
 				dt=Con.OpenDT(sql);
 				if(dt.getCount()>0) {
 					dt.moveToFirst();
-					disp=dt.getDouble(0);
+					disp_und =dt.getDouble(0);
 				}
 			}
 
-			if (!porpeso) disp=disp/umfactor; else disp=dt.getDouble(1);
+			if (!porpeso) disp_und = disp_und /umfactor; else disp_und =dt.getDouble(1);*/
 
 			return true;
 		} catch (Exception e) {

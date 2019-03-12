@@ -224,7 +224,7 @@ public class DevolBodTol extends PBase {
                 dp.moveToNext();
             }
 
-            lblTot.setText("Cant : " + mu.frmdecno(valt)+" Peso : "+pesot+" "+gl.umpeso);
+            lblTot.setText("Cant : " + mu.frmdecno(valt)+" Peso : "+ mu.round(pesot,gl.peDec)+" "+gl.umpeso);
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

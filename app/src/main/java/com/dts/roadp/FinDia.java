@@ -512,7 +512,7 @@ public class FinDia extends PBase {
 
     }
 
-    // Validaciones
+    // Validaciones del fin de día
     private boolean validaFinDia() {
         Cursor DT;
         int pend, fechaUltimoCierre;
@@ -1753,7 +1753,24 @@ public class FinDia extends PBase {
 		if (idle) super.onBackPressed();
 	}
 
-	//region "Funciones y procedimientos creados para generar el reporte Cierre Z de Toledano"
+
+    @Override
+    protected void onResume() {
+        try{
+
+            if (gl.findiaactivo){
+                super.finish();
+            }
+
+            super.onResume();
+
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+    //region "Funciones y procedimientos creados para generar el reporte Cierre Z de Toledano"
 
     //CKFK 20190226 Modifiqué este procedimiento a como debe ser el fin de día en Toledano
     private void buildReportsTOL() {

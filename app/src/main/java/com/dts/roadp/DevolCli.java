@@ -40,15 +40,15 @@ public class DevolCli extends PBase {
 		
 		listView = (ListView) findViewById(R.id.listView1);
 	
-		emp=((appGlobals) vApp).emp;
-		estado=((appGlobals) vApp).devtipo;
-		cliid=((appGlobals) vApp).cliente;
+		emp=gl.emp;
+		estado=gl.devtipo;
+		cliid=gl.cliente;
 		
 		setHandlers();
 		
 		browse=0;
 		fecha=du.getActDateTime();
-		((appGlobals) vApp).devrazon="0";
+		gl.devrazon="0";
 		
 		clearData();
 	}
@@ -273,9 +273,17 @@ public class DevolCli extends PBase {
 			ins.add("CANT",cant);
 			ins.add("CODDEV",raz);
 			ins.add("TOTAL",0);
-			ins.add("PRECIO",0);
-			ins.add("PRECLISTA",0);
-			ins.add("REF","");
+			ins.add("PRECIO",gl.dvprec);
+			ins.add("PRECLISTA",gl.dvpreclista);
+			ins.add("REF","Ninguna");
+			ins.add("PESO",gl.dvpeso);
+			ins.add("FECHA_CAD",0);
+			ins.add("LOTE",gl.dvlote);
+            ins.add("UMVENTA",gl.dvumventa);
+            ins.add("UMSTOCK",gl.dvumstock);
+            ins.add("UMPESO",gl.dvumpeso);
+            ins.add("FACTOR",gl.dvfactor);
+            ins.add("POR_PESO",String.valueOf(gl.dvporpeso));
 			
 	    	db.execSQL(ins.sql());
 	    	
@@ -310,21 +318,46 @@ public class DevolCli extends PBase {
 			ins.init("D_CxC");
 			
 			ins.add("COREL",corel);
-			ins.add("RUTA",((appGlobals) vApp).ruta);
-			ins.add("CLIENTE",((appGlobals) vApp).cliente);
+			ins.add("RUTA",gl.ruta);
+			ins.add("CLIENTE",gl.cliente);
 			ins.add("FECHA",fecha);
 			ins.add("ANULADO","N");
-			ins.add("EMPRESA",((appGlobals) vApp).emp);
+			ins.add("EMPRESA",gl.emp);
 			ins.add("TIPO",estado);
 			ins.add("REFERENCIA","");
 			ins.add("IMPRES",0);
 			ins.add("STATCOM","N");
-			ins.add("VENDEDOR",((appGlobals) vApp).vend);
+			ins.add("VENDEDOR",gl.vend);
 			ins.add("TOTAL",0);
+			ins.add("SUPERVISOR",0);
+			ins.add("AYUDANTE",gl.ayudanteID);
+			ins.add("CODIGOLIQUIDACION",0);
+			ins.add("ESTADO","S");
 		
 			db.execSQL(ins.sql());
+
+            ins.init("D_NOTACRED");
+
+            ins.add("COREL",corel);
+            ins.add("ANULADO","N");
+            ins.add("FECHA",fecha);
+            ins.add("RUTA",gl.ruta);
+            ins.add("VENDEDOR",gl.vend);
+            ins.add("CLIENTE",gl.cliente);
+            ins.add("TOTAL",0);
+            ins.add("FACTURA","");
+            ins.add("SERIE","");
+            ins.add("CORELATIVO","");
+            ins.add("STATCOM","N");
+            ins.add("CODIGOLIQUIDACION",0);
+            ins.add("RESOLNC","N");
+            ins.add("SERIEFACT",0);
+            ins.add("CORELFACT",0);
+            ins.add("IMPRES",0);
+
+            db.execSQL(ins.sql());
 			
-			sql="SELECT Item,CODIGO,CANT,CODDEV FROM T_CxCD WHERE CANT>0";
+			sql="SELECT Item,CODIGO,CANT,CODDEV,TOTAL,PRECIO,PRECLISTA,REF,PESO,LOTE,UMVENTA,UMSTOCK,UMPESO,FACTOR FROM T_CxCD WHERE CANT>0";
 			DT=Con.OpenDT(sql);
 	
 			DT.moveToFirst();
@@ -334,21 +367,40 @@ public class DevolCli extends PBase {
 				pcant=DT.getDouble(2);
 				
 			  	ins.init("D_CxCD");
+
 				ins.add("COREL",corel);
 				ins.add("ITEM",DT.getInt(0));
 				ins.add("CODIGO",DT.getString(1));
 				ins.add("CANT",DT.getDouble(2));
 				ins.add("CODDEV",DT.getString(3));
 				ins.add("ESTADO",estado);
-				ins.add("TOTAL",0);
-				ins.add("PRECIO",0);
-				ins.add("PRECLISTA",0);
-				ins.add("REF","");
-				ins.add("PESO",0);
+				ins.add("TOTAL",DT.getDouble(4));
+				ins.add("PRECIO",DT.getDouble(5));
+				ins.add("PRECLISTA",DT.getDouble(6));
+				ins.add("REF",DT.getString(7));
+				ins.add("PESO",DT.getDouble(8));
 				ins.add("FECHA_CAD",0);
-				ins.add("LOTE","");
-			
+				ins.add("LOTE",DT.getString(9));
+                ins.add("UMVENTA",DT.getString(10));
+                ins.add("UMSTOCK",DT.getString(11));
+                ins.add("UMPESO",DT.getString(12));
+                ins.add("FACTOR",DT.getDouble(13));
 			    db.execSQL(ins.sql());
+
+                ins.init("D_NOTACREDD");
+
+                ins.add("COREL",corel);
+                ins.add("PRODUCTO",DT.getString(1));
+                ins.add("PRECIO_ORIG",DT.getDouble(5));
+                ins.add("PRECIO_ACT",0);
+                ins.add("CANT",DT.getDouble(2));
+                ins.add("PESO",DT.getDouble(4));
+                ins.add("POR_PRESO",DT.getDouble(5));
+                ins.add("UMVENTA",DT.getString(10));
+                ins.add("UMSTOCK",DT.getString(11));
+                ins.add("UMPESO",DT.getString(12));
+                ins.add("FACTOR",DT.getDouble(13));
+                db.execSQL(ins.sql());
 			    
 			    try {
 			    	sql="INSERT INTO P_STOCK VALUES ('"+pcod+"',0,0,0)";

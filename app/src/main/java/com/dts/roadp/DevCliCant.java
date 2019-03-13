@@ -20,11 +20,13 @@ import android.widget.AdapterView.OnItemSelectedListener;
 
 public class DevCliCant extends PBase {
 	
-	private EditText txtCant,lblPrec,txtLote;
+	private EditText txtCant,lblPrec,txtLote,txtkgs,txtPrecio;
 	private RelativeLayout rlCant;
 	private TextView lblDesc,lblBU,lblPrecVenta;
 	private Spinner spin,cmbum;
 	private CheckBox chkTieneLote;
+
+	private AppMethods app;
 	
 	private ArrayList<String> spincode= new ArrayList<String>();
 	private ArrayList<String> spinlist = new ArrayList<String>();
@@ -33,7 +35,7 @@ public class DevCliCant extends PBase {
 	private ArrayList<String> cmbumlist = new ArrayList<String>();
 	
 	private String prodid,estado,razon,devrazon,raz;
-	private double cant,icant,factor,precioventa=00.;
+	private double cant,icant,factor=0.0,precioventa=00.;
 	private  String um="", ummin,umcambiar;
 	private Precio prc;
 
@@ -54,14 +56,16 @@ public class DevCliCant extends PBase {
 	
 		setHandlers();
 		
-		((appGlobals) vApp).dval=-1;
+		gl.dval=-1;
 		
 		showkeyb();
-		
+
+		gl.dvporpeso = prodPorPeso(prodid);
+
 		fillSpinner();
 		fillcmbUM();
 
-		devrazon=((appGlobals) vApp).devrazon;
+		devrazon=gl.devrazon;
 		razon=devrazon;
 		setSpinVal(devrazon);
 
@@ -78,6 +82,7 @@ public class DevCliCant extends PBase {
 	public void sendCant(View view) {
 
 		try{
+
 			setCant();
 
 			if (cant<0){
@@ -88,8 +93,32 @@ public class DevCliCant extends PBase {
 				mu.msgbox("Debe definir una razón de devolución.");return;
 			}
 
-			((appGlobals) vApp).dval=cant;
-			((appGlobals) vApp).devrazon=razon;
+			gl.dval=cant;
+			gl.devrazon=razon;
+
+			if(txtkgs.getText().toString().trim().equalsIgnoreCase("")){
+				gl.dvpeso = 0.0;
+			}else{
+				gl.dvpeso = Double.parseDouble(txtkgs.getText().toString());
+			}
+
+			gl.dvumpeso = gl.umpeso;
+			gl.dvumstock = um;
+			gl.dvumventa = umcambiar;
+
+			if(txtLote.getText().toString().trim().equalsIgnoreCase("")){
+				mu.msgbox("Lote no puede ser vacío, por favor ingrese un lote.");return;
+			}else {
+				gl.dvlote =txtLote.getText().toString();
+			}
+
+			if(txtPrecio.getText().toString().trim().equalsIgnoreCase("")){
+				gl.dvprec = 0.0;
+			}else{
+				gl.dvprec =Double.parseDouble(txtPrecio.getText().toString());
+			}
+
+			gl.dvfactor = factor;
 
 			//hidekeyb();
 			super.finish();
@@ -310,27 +339,32 @@ public class DevCliCant extends PBase {
 
 		try {
 
-			sql="SELECT UNIDADSUPERIOR,FACTORCONVERSION FROM P_FACTORCONV WHERE PRODUCTO='"+prodid+"' AND UNIDADSUPERIOR<>'"+gl.umpeso+"'  ORDER BY UNIDADSUPERIOR";
-			DT=Con.OpenDT(sql);
+			if(gl.dvporpeso==false){
 
-			if (DT.getCount()>0) {
+				sql="SELECT UNIDADSUPERIOR,FACTORCONVERSION FROM P_FACTORCONV WHERE PRODUCTO='"+prodid+"' AND UNIDADSUPERIOR<>'"+gl.umpeso+"'  ORDER BY UNIDADSUPERIOR";
+				DT=Con.OpenDT(sql);
 
-				DT.moveToFirst();
-				while (!DT.isAfterLast()) {
+				if (DT.getCount()>0) {
 
-					iname=DT.getString(0);
-					ifactor=DT.getString(1);
+					DT.moveToFirst();
+					while (!DT.isAfterLast()) {
 
-					cmbumfact.add(Double.parseDouble(ifactor));
-					cmbumlist.add(iname);
+						iname=DT.getString(0);
+						ifactor=DT.getString(1);
 
-					DT.moveToNext();
+						cmbumfact.add(Double.parseDouble(ifactor));
+						cmbumlist.add(iname);
+
+						DT.moveToNext();
+					}
+
+					ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, cmbumlist);
+					dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+					cmbum.setAdapter(dataAdapter);
+
+
 				}
-
-				ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, cmbumlist);
-				dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-				cmbum.setAdapter(dataAdapter);
 
 			}else{
 
@@ -392,14 +426,14 @@ public class DevCliCant extends PBase {
 			rlCant= (RelativeLayout) findViewById(R.id.rlCant);
 			lblPrec=(EditText) findViewById(R.id.txtPrecio);
 			txtLote = (EditText) findViewById(R.id.txtLote);
+			txtkgs = (EditText) findViewById(R.id.txtkgs);
+			txtPrecio = (EditText) findViewById(R.id.txtPrecio);
 
 			lblDesc=(TextView) findViewById(R.id.lblFecha);
 			lblPrecVenta = (TextView)findViewById(R.id.lblPrecioVenta);
-
 			lblBU=(TextView) findViewById(R.id.lblBU);
 
 			spin = (Spinner) findViewById(R.id.spinner1);
-
 			cmbum = (Spinner) findViewById(R.id.cmbUM);
 
 			prc=new Precio(this,mu,gl.peDec);
@@ -513,6 +547,15 @@ public class DevCliCant extends PBase {
 		}
 
 		return  fact;
+	}
+
+	private boolean prodPorPeso(String prodid) {
+		try {
+			return app.ventaPeso(prodid);
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			return false;
+		}
 	}
 
 }

@@ -2969,7 +2969,7 @@ public class ComWS extends PBase {
 					
 			dbld.clear();
 			dbld.add("DELETE FROM P_DOC_ENVIADOS_HH WHERE DOCUMENTO='"+docstock+"'");
-			dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('"+docstock+"','"+ActRuta+"','"+univdate+"',1)");	
+			dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('"+docstock+"','"+ActRuta+"','"+univdate+"',1)");
 						
 			if (commitSQL()==1) conflag=1; else conflag=0;
 					

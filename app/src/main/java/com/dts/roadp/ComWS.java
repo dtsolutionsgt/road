@@ -306,6 +306,12 @@ public class ComWS extends PBase {
 
 			if (!setComParams()) return;
 
+			View view = this.getCurrentFocus();
+			view.clearFocus();
+			if (view != null) {
+				keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
+			}
+
 			isbusy=1;
 			ultcor_ant=ultCorel();
 			ultSerie_ant=ultSerie();
@@ -614,7 +620,7 @@ public class ComWS extends PBase {
 	        	        
 	        return 1;
 	    } catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		    sstr=e.getMessage();
 	    }
 		
@@ -1677,7 +1683,7 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			scon=0;
 			fstr="No se puede conectar al web service. "+e.getMessage();
-			//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			Log.d("E",fstr+sstr);
 		}
 		
 	}
@@ -1751,13 +1757,13 @@ public class ComWS extends PBase {
 			} catch (Exception e) {
 				if (scon==0){
 					fstr="No se puede conectar al web service : "+sstr;
+					lblInfo.setText(fstr);
 				}
-				//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),fstr);
 				msgbox(fstr);
 			}
 
 			if (scon==0){
-				msgbox(fstr);
+				Log.d("doInBackground",fstr+sstr);
 			}
 
             return null;
@@ -1768,7 +1774,7 @@ public class ComWS extends PBase {
 			try{
 				wsFinished();
 			}catch(Exception e){
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				Log.d("onPostExecute",e.getMessage());
 			}
 
         }
@@ -1777,7 +1783,7 @@ public class ComWS extends PBase {
         protected void onPreExecute() {
     		try {
     		} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				Log.d("onPreExecute",e.getMessage());
     		}
         }
  
@@ -1787,7 +1793,9 @@ public class ComWS extends PBase {
                 synchronized (this) {
                     if (!lblInfo.getText().toString().matches(""))  lblInfo.setText(fprog);
                  }
-    		} catch (Exception e) {}
+    		} catch (Exception e) {
+				Log.d("onProgressUpdate",e.getMessage());
+			}
         }
  
     }	
@@ -1922,19 +1930,19 @@ public class ComWS extends PBase {
 			}
 			
 			pcc=DT.getCount();pc=0;i=0;
-				
+
 			DT.moveToFirst();
 
 			dbld.clear();
 
 			while (!DT.isAfterLast()) {
-				
-				cor=DT.getString(0);  
+
+				cor=DT.getString(0);
 				fruta=DT.getString(1);
-				ccorel=DT.getInt(2);  
-				
+				ccorel=DT.getInt(2);
+
 				dbg="::";
-				
+
 				try {
 
 					i+=1;fprog="Factura "+i;wsStask.onProgressUpdate();
@@ -1953,7 +1961,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_REL_PROD_BON","WHERE COREL='"+cor+"'");
 					dbld.insert("D_BONIFFALT","WHERE COREL='"+cor+"'");
 
-					dbld.add("UPDATE P_COREL SET CORELULT="+ccorel+"  WHERE RUTA='"+fruta+"'");	
+					dbld.add("UPDATE P_COREL SET CORELULT="+ccorel+"  WHERE RUTA='"+fruta+"'");
 
 					if (envioparcial) {
 						if (commitSQL() == 1) {
@@ -1966,13 +1974,13 @@ public class ComWS extends PBase {
 							dbg = sstr;
 						}
 					}
-							
+
 				} catch (Exception e) {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 					fterr+="\n"+e.getMessage();
 					dbg=e.getMessage();
 				}
-				
+
 			    DT.moveToNext();
 			}
 
@@ -3334,7 +3342,7 @@ public class ComWS extends PBase {
 					lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
 					lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
 
-                    if (recep && ExistenDatosSinEnviar()) {
+                    if ((recep && ExistenDatosSinEnviar())) {
                         //Visibiliza los relative layout en base a los parámetro de P_PARAMEXT
                         relExist.setVisibility(gl.peBotInv && !rutatipo.equalsIgnoreCase("P")?View.VISIBLE:View.INVISIBLE);
                         relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);

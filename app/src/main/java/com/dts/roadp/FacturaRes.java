@@ -103,8 +103,8 @@ public class FacturaRes extends PBase {
 			imgMPago.setVisibility(View.VISIBLE);
 			lblCred.setText("Pago\nCrédito");
 			//imgCred.setImageResource(R.drawable.credit);
-		}	
-		
+		}
+
 		if (media==1) {
 			contadoCheck.setVisibility(View.INVISIBLE);
 			imgCred.setVisibility(View.INVISIBLE);
@@ -130,7 +130,7 @@ public class FacturaRes extends PBase {
 		}
 
 		if (media==4) {
-			contadoCheck.setVisibility(View.VISIBLE);
+			/*contadoCheck.setVisibility(View.VISIBLE);
 			if(contadoCheck.isChecked()){
 				lblCash.setVisibility(View.VISIBLE);
 				imgCash.setVisibility(View.VISIBLE);
@@ -151,7 +151,7 @@ public class FacturaRes extends PBase {
 				lblMPago.setVisibility(View.INVISIBLE);
 			}
 
-			if (gl.vcredito) {
+			if (gl.vcredito) {*/
 
 				if (credito<=0) {
 					contadoCheck.setVisibility(View.INVISIBLE);
@@ -165,9 +165,18 @@ public class FacturaRes extends PBase {
 					lblCred.setVisibility(View.INVISIBLE);
 					imgMPago.setVisibility(View.VISIBLE);
 					lblMPago.setVisibility(View.VISIBLE);
+				}else if(credito > 0){
+					contadoCheck.setVisibility(View.INVISIBLE);
+					lblCash.setVisibility(View.INVISIBLE);
+					imgCash.setVisibility(View.INVISIBLE);
+					lblPend.setVisibility(View.INVISIBLE);
+					imgPend.setVisibility(View.INVISIBLE);
+					imgCred.setVisibility(View.VISIBLE);
+					lblCred.setVisibility(View.VISIBLE);
+					imgMPago.setVisibility(View.INVISIBLE);
+					lblMPago.setVisibility(View.INVISIBLE);
 				}
-
-			}
+		//	}
 
 		}
 		

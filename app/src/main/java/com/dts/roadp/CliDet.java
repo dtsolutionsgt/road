@@ -1,9 +1,13 @@
 package com.dts.roadp;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.NumberFormat;
+import java.util.Date;
+import java.text.*;
+
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -35,6 +39,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import uk.co.senab.photoview.PhotoViewAttacher;
 import android.database.Cursor;
+import com.dts.roadp.clsDocument;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -49,14 +54,14 @@ public class CliDet extends PBase {
 	private Exist Existencia = new Exist();
 	private String cod,tel, Nombre, NIT;
 	//#HS_20181220 Variables para fachada;
-	private String imagenbase64,path;
+	private String imagenbase64,path,fechav;
 	private Boolean imgPath, imgDB;
 	private PhotoViewAttacher zoomFoto;
 	private AppMethods app;
 	private double credito;
 	////
-	private double clim,cused,cdisp;
-	private int nivel,browse,merc;
+	private double clim,cused,cdisp,cred;
+	private int nivel,browse,merc,fechaven,medPago;
 	private boolean porcentaje = false;
 	private byte[] imagenBit;
 	
@@ -96,7 +101,7 @@ public class CliDet extends PBase {
 		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
 
 		app = new AppMethods(this, gl, Con, db);
-		credito=gl.credito;
+	//	credito=gl.credito;
 		/*
 		Con = new BaseDatos(this);
 	    opendb();
@@ -470,6 +475,22 @@ public class CliDet extends PBase {
 
 	}
 
+	public String sfecha(int f) {
+		int vy,vm,vd;
+		String s;
+
+		vy=(int) f/100000000;f=f % 100000000;
+		vm=(int) f/1000000;f=f % 1000000;
+		vd=(int) f/10000;f=f % 10000;
+
+		s="";
+		if (vd>9) { s=s+String.valueOf(vd)+"-";} else {s=s+"0"+String.valueOf(vd)+"-";}
+		if (vm>9) { s=s+String.valueOf(vm)+"-20";} else {s=s+"0"+String.valueOf(vm)+"-20";}
+		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
+
+		return s;
+	}
+
 	public void inputFachada(){
 
 		try{
@@ -511,23 +532,49 @@ public class CliDet extends PBase {
 		
 	}
 
-
 	//  Misc
 
-	public void showVenta(View view) {
+	public void showVenta(View view){
 		//Float cantidad;
 		//gl.rutatipo="V";
-
+		String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+		Cursor DT;
 		try{
 
 			if (!validaVenta()) return;//Se valida si hay correlativos de factura para la venta
 
-			if (gl.vcredito) {
 
-				if (credito<=0) {
+			sql = "SELECT MEDIAPAGO, LIMITECREDITO FROM P_CLIENTE WHERE CODIGO ='"+cod+"'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			medPago=DT.getInt(0);
+			cred=DT.getInt(1);
+
+			if (medPago == 4) {
+
+				sql = "SELECT FECHAV FROM P_COBRO WHERE CLIENTE ='"+cod+"'";
+
+				DT=Con.OpenDT(sql);
+				DT.moveToFirst();
+
+				for(int i = 0; i != DT.getCount(); i++){
+
+					fechaven=DT.getInt(0 );fechav=sfecha(fechaven);
+					DT.moveToPosition(i);
+
+					if(date.compareTo(fechav) < 0){
+						msgAskFactV();
+						return;
+					}
+
+				}
+
+				if (cred<=0) {
 					msgAskFact();
 					return;
 				}
+
 			}
 
 			if(porcentaje == false) {
@@ -536,6 +583,7 @@ public class CliDet extends PBase {
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("showVenta: " + e.getMessage());
 		}
 
 
@@ -662,6 +710,35 @@ public class CliDet extends PBase {
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					closekeyb();
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
+
+	private void  msgAskFactV() {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("La factura con el codigo: "+cod+" Expiro en la fecha: "+fechav);
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if(porcentaje == false) {
+						msgAskFact();
+					}
+				}
+			});
+
+			dialog.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					closekeyb();
 				}

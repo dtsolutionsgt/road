@@ -66,7 +66,7 @@ public class clsDocFactura extends clsDocument {
 			DT.moveToFirst();
 			
 			resol="Resolucion No. : "+DT.getString(0);
-			ff=DT.getInt(1);resfecha="De Fecha : "+sfecha(ff);
+			ff=DT.getInt(1);resfecha="De Fecha: "+sfecha(ff);
 			ff=DT.getInt(2);resvence="Vigente hasta: "+sfecha(ff);
 			//#EJC20181130: Se cambió el mensaje por revisión de auditor de SAT.
 //			ff=DT.getInt(2);resvence="Resolucion vence : "+sfecha(ff);

@@ -57,7 +57,7 @@ public class MainActivity extends PBase {
 
 	private void grantPermissions() {
 		try {
-			if (Build.VERSION.SDK_INT >= 23) {
+			if (Build.VERSION.SDK_INT >= 20) {
 
 				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
 						&& checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
@@ -751,7 +751,7 @@ public class MainActivity extends PBase {
             initSession();
             txtUser.requestFocus();
         }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+           addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 	}
 

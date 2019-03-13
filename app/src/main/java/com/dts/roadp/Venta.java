@@ -74,6 +74,7 @@ public class Venta extends PBase {
 	private static final long  MIN_TIME_BW_UPDATES = 1000; // in Milliseconds
 
 
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -478,11 +479,10 @@ public class Venta extends PBase {
 
 		try {
 			try {
-				sql = "SELECT DESCCORTA FROM P_PRODUCTO WHERE CODIGO='" + prodid + "'";
+				sql = "SELECT CODIGO,DESCCORTA FROM P_PRODUCTO WHERE CODIGO='" + prodid + "'";
 				DT = Con.OpenDT(sql);
 				DT.moveToFirst();
-
-				lblProd.setText(DT.getString(0));
+				lblProd.setText(DT.getString(0) +" - "+ DT.getString(1));
 			} catch (Exception e) {
 				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 				mu.msgbox(e.getMessage());

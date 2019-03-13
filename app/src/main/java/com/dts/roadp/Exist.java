@@ -515,12 +515,12 @@ public class Exist extends PBase {
                             }
                             break;
                         case 1:
-                            rep.add3lrr(item.Lote,item.Peso,item.Valor);break;
+                            rep.add3lrr(item.Lote,item.Valor,item.Peso);break;
                         case 2:
                             rep.add("Estado malo");
-                            rep.add3lrr(item.Lote,item.PesoM,item.ValorM);break;
+                            rep.add3lrr(item.Lote,item.ValorM,item.PesoM);break;
                         case 3:
-                            rep.add3lrr("Total",item.PesoT,item.ValorT);break;
+                            rep.add3lrr("Total",item.ValorT,item.PesoT);break;
                     }
 
 					//rep.add3lrr(item.Cod,item.Peso,item.Valor);

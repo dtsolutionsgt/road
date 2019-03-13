@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 public class ListAdaptVenta extends BaseAdapter {
@@ -75,8 +74,8 @@ public class ListAdaptVenta extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 							
-		holder.lblCod.setText(items.get(position).Cod);
-		holder.lblNombre.setText(items.get(position).Nombre);
+		holder.lblCod.setText(items.get(position).Nombre);
+		holder.lblNombre.setText(items.get(position).Cod);
 		
 		//val=items.get(position).Cant;
 		//holder.lblCant.setText(frmdec.format(val)+" "+items.get(position).um);
@@ -104,7 +103,7 @@ public class ListAdaptVenta extends BaseAdapter {
 	
 	
 	static class ViewHolder {
-		TextView  lblCod,lblNombre,lblCant,lblPrec,lblDesc,lblTot,lblPeso;
+		TextView  lblCod, lblNombre,lblCant,lblPrec,lblDesc,lblTot,lblPeso;
 	}
 	
 }

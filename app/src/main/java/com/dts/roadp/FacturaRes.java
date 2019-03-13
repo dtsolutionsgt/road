@@ -1,8 +1,5 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -10,13 +7,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.Layout;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -30,6 +25,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FacturaRes extends PBase {
 
@@ -216,8 +214,7 @@ public class FacturaRes extends PBase {
 		txtVuelto.setInputType(InputType.TYPE_CLASS_NUMBER);
 
 	}
-	
-	
+
 	//region Events
 	
 	public void prevScreen(View view) {
@@ -437,7 +434,6 @@ public class FacturaRes extends PBase {
 
 	}
 
-
 	private void totalOrder(){
 		double dmaxmon;
 		
@@ -642,7 +638,7 @@ public class FacturaRes extends PBase {
 	}
 
 	private boolean saveOrder(){
-		Cursor DT;
+		Cursor dt;
 		String vprod,vumstock,vumventa;
 		double vcant,vpeso,vfactor,peso,factpres;
 		int mitem;		
@@ -657,11 +653,11 @@ public class FacturaRes extends PBase {
 
 
         sql="SELECT MAX(ITEM) FROM D_FACT_LOG";
-        DT=Con.OpenDT(sql);
+        dt=Con.OpenDT(sql);
 
-        if(DT.getCount()>0){
-            DT.moveToFirst();
-            mitem=DT.getInt(0);
+        if(dt.getCount()>0){
+            dt.moveToFirst();
+            mitem=dt.getInt(0);
         }else{
             mitem=0;
         }
@@ -671,13 +667,10 @@ public class FacturaRes extends PBase {
 		try {
 			
 			sql="SELECT SUM(TOTAL),SUM(DESMON),SUM(IMP),SUM(PESO) FROM T_VENTA";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 			
-			//desc=DT.getDouble(1);
-			//tot=DT.getDouble(0)-desc;
-			//imp=DT.getDouble(2);
-			peso=DT.getDouble(3);
+			peso=dt.getDouble(3);
 			
 			db.beginTransaction();
 			    			
@@ -722,49 +715,49 @@ public class FacturaRes extends PBase {
 			db.execSQL(ins.sql());
 						
 			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK FROM T_VENTA";
-			DT=Con.OpenDT(sql);
+			dt=Con.OpenDT(sql);
 	
-			DT.moveToFirst();
-			while (!DT.isAfterLast()) {
+			dt.moveToFirst();
+			while (!dt.isAfterLast()) {
 
-				porpeso=prodPorPeso(DT.getString(0));
-				factpres=DT.getDouble(12);
-				peso=DT.getDouble(8);
+				porpeso=prodPorPeso(dt.getString(0));
+				factpres=dt.getDouble(12);
+				peso=dt.getDouble(8);
 
 			  	ins.init("D_FACTURAD");
 				ins.add("COREL",corel);
-				ins.add("PRODUCTO",DT.getString(0));
+				ins.add("PRODUCTO",dt.getString(0));
 				ins.add("EMPRESA",gl.emp);
 				ins.add("ANULADO","N");
-				ins.add("CANT",DT.getDouble(1));
-				ins.add("PRECIO",DT.getDouble(2));
-				ins.add("IMP",DT.getDouble(3));
-				ins.add("DES",DT.getDouble(4));
-				ins.add("DESMON",DT.getDouble(5));
-				ins.add("TOTAL",DT.getDouble(6));
-				ins.add("PRECIODOC",DT.getDouble(7));
-				ins.add("PESO",DT.getDouble(8));
-				ins.add("VAL1",DT.getDouble(9));
-				ins.add("VAL2",DT.getString(10));				
-				ins.add("UMVENTA",DT.getString(11));
-				ins.add("FACTOR",DT.getDouble(12));
-				ins.add("UMSTOCK",DT.getString(13));
+				ins.add("CANT",dt.getDouble(1));
+				ins.add("PRECIO",dt.getDouble(2));
+				ins.add("IMP",dt.getDouble(3));
+				ins.add("DES",dt.getDouble(4));
+				ins.add("DESMON",dt.getDouble(5));
+				ins.add("TOTAL",dt.getDouble(6));
+				ins.add("PRECIODOC",dt.getDouble(7));
+				ins.add("PESO",dt.getDouble(8));
+				ins.add("VAL1",dt.getDouble(9));
+				ins.add("VAL2",dt.getString(10));
+				ins.add("UMVENTA",dt.getString(11));
+				ins.add("FACTOR",dt.getDouble(12));
+				ins.add("UMSTOCK",dt.getString(13));
 				ins.add("UMPESO",gl.umpeso); //#HS_20181120_1625 Se agrego el valor gl.umpeso anteriormente estaba ""
 				
 			    db.execSQL(ins.sql());
 
-			    vprod=DT.getString(0);
-				vumstock=DT.getString(13);
-				vcant=DT.getDouble(1);
-				vpeso=DT.getDouble(8);
+			    vprod=dt.getString(0);
+				vumstock=dt.getString(13);
+				vcant=dt.getDouble(1);
+				vpeso=dt.getDouble(8);
 				vfactor=vpeso/(vcant*factpres);
-				vumventa=DT.getString(11);
+				vumventa=dt.getString(11);
 
-				if (esProductoConStock(DT.getString(0))) {
+				if (esProductoConStock(dt.getString(0))) {
 					rebajaStockUM(vprod, vumstock, vcant, vfactor, vumventa,factpres,peso);
 				}
 
-			    DT.moveToNext();
+			    dt.moveToNext();
 			}
 
 			// Pago
@@ -772,51 +765,50 @@ public class FacturaRes extends PBase {
 			if(!gl.cobroPendiente) {
 
 				sql = "SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
-				DT = Con.OpenDT(sql);
+				dt = Con.OpenDT(sql);
 
-				DT.moveToFirst();
-				while (!DT.isAfterLast()) {
+				dt.moveToFirst();
+				while (!dt.isAfterLast()) {
 
 					ins.init("D_FACTURAP");
 					ins.add("COREL", corel);
-					ins.add("ITEM", DT.getInt(0));
+					ins.add("ITEM", dt.getInt(0));
 					ins.add("ANULADO", "N");
 					ins.add("EMPRESA", gl.emp);
-					ins.add("CODPAGO", DT.getInt(1));
-					ins.add("TIPO", DT.getString(2));
-					ins.add("VALOR", DT.getDouble(3));
-					ins.add("DESC1", DT.getString(4));
-					ins.add("DESC2", DT.getString(5));
-					ins.add("DESC3", DT.getString(6));
+					ins.add("CODPAGO", dt.getInt(1));
+					ins.add("TIPO", dt.getString(2));
+					ins.add("VALOR", dt.getDouble(3));
+					ins.add("DESC1", dt.getString(4));
+					ins.add("DESC2", dt.getString(5));
+					ins.add("DESC3", dt.getString(6));
 					ins.add("DEPOS", "");
 
 					db.execSQL(ins.sql());
 
-					DT.moveToNext();
+					dt.moveToNext();
 				}
 
 			} else {
 
 				try {
+					ins.init("P_COBRO");
 
-						ins.init("P_COBRO");
+					ins.add("DOCUMENTO", corel);
+					ins.add("EMPRESA", gl.emp);
+					ins.add("RUTA", gl.ruta);
+					ins.add("CLIENTE", gl.cliente);
+					ins.add("TIPODOC", "R");
+					ins.add("VALORORIG", tot);
+					ins.add("SALDO", tot);
+					ins.add("CANCELADO", 0);
+					ins.add("FECHAEMIT", fecha);
+					ins.add("FECHAV", fecha);
+					ins.add("CONTRASENA", corel);
+					ins.add("ID_TRANSACCION", 0);
+					ins.add("REFERENCIA", 0);
+					ins.add("ASIGNACION", 0);
 
-						ins.add("DOCUMENTO", corel);
-						ins.add("EMPRESA", gl.emp);
-						ins.add("RUTA", gl.ruta);
-						ins.add("CLIENTE", gl.cliente);
-						ins.add("TIPODOC", "R");
-						ins.add("VALORORIG", tot);
-						ins.add("SALDO", tot);
-						ins.add("CANCELADO", 0);
-						ins.add("FECHAEMIT", fecha);
-						ins.add("FECHAV", fecha);
-						ins.add("CONTRASENA", corel);
-						ins.add("ID_TRANSACCION", 0);
-						ins.add("REFERENCIA", 0);
-						ins.add("ASIGNACION", 0);
-
-						db.execSQL(ins.sql());
+					db.execSQL(ins.sql());
 
 					Toast.makeText(this, "Se guardo la factura pendiente de pago",Toast.LENGTH_LONG).show();
 
@@ -837,8 +829,46 @@ public class FacturaRes extends PBase {
 			ins.add("DIRECCION",gl.fdir);
 			
 			db.execSQL(ins.sql());
-					
-			
+
+			//  Barras
+
+			sql="INSERT INTO D_FACTURA_BARRA SELECT * FROM P_STOCKB WHERE BARRA IN (SELECT BARRA FROM T_BARRA)";
+			db.execSQL(sql);
+
+			sql="UPDATE D_FACTURA_BARRA SET Corel='"+corel+"' WHERE Corel=''";
+			db.execSQL(sql);
+
+			try {
+
+				sql="SELECT BARRA,CODIGO,PESO FROM P_STOCKB WHERE BARRA IN (SELECT BARRA FROM T_BARRA)";
+				dt=Con.OpenDT(sql);
+
+				if (dt.getCount()>0) dt.moveToFirst();
+				while (!dt.isAfterLast()) {
+
+					ins.init("D_STOCKB_DEV");
+
+					ins.add("BARRA",dt.getString(0));
+					ins.add("RUTA",gl.ruta);
+					ins.add("VENDEDOR",gl.vend);
+					ins.add("CODIGO",dt.getString(1));
+					ins.add("COREL",corel);
+					ins.add("FECHA",fecha);
+					ins.add("PESO",dt.getDouble(2));
+					ins.add("CODIGOLIQUIDACION",0);
+
+					db.execSQL(ins.sql());
+
+					dt.moveToNext();
+				}
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+				msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			}
+
+			sql="DELETE FROM P_STOCKB WHERE BARRA IN (SELECT BARRA FROM T_BARRA)";
+			db.execSQL(sql);
+
 			// Actualizacion de ultimo correlativo
 			
 			sql="UPDATE P_COREL SET CORELULT="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";	

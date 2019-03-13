@@ -1,7 +1,5 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,11 +7,12 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class Anulacion extends PBase {
 
@@ -37,8 +36,7 @@ public class Anulacion extends PBase {
 	private int tipo,depparc,fcorel;	
 	private String selid,itemid,fserie,fres;
 	private boolean modoapr=false;
-	
-		
+
 	// impresion nota credito
 	
 	private ArrayList<String> lines= new ArrayList<String>();
@@ -93,7 +91,7 @@ public class Anulacion extends PBase {
 	}
 
 	
-	// Events
+	//region Events
 	
 	public void anulDoc(View view){
 		try{
@@ -107,9 +105,10 @@ public class Anulacion extends PBase {
 		}
 
 	}
-		
 
-	// Main
+	//endregion
+
+	//region Main
 	
 	private void setHandlers(){
 		try{
@@ -293,13 +292,9 @@ public class Anulacion extends PBase {
 			
 			mu.msgbox("El documento ha sido anulado.");
 			
-		//    try {
-		    	sql="DELETE FROM P_STOCK WHERE CANT=0 AND CANTM=0";
-				db.execSQL(sql);
-		//    } catch (Exception e) {
-		//		addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		//    }
-			
+			sql="DELETE FROM P_STOCK WHERE CANT=0 AND CANTM=0";
+			db.execSQL(sql);
+
 			listItems();
 			
 		} catch (Exception e) {
@@ -308,9 +303,10 @@ public class Anulacion extends PBase {
 		   	mu.msgbox(e.getMessage());	
 		}
 	}
+
+	//endregion
 	
-	
-	// Documents
+	//region Documents
 	
 	private void anulPedido(String itemid) {
 
@@ -333,9 +329,6 @@ public class Anulacion extends PBase {
 		String prod,um;
 
 		try{
-			if (modoapr) {
-				//if (!aprValidaNC()) return;
-			}
 
 			sql="SELECT PRODUCTO,UMSTOCK FROM D_FACTURAD WHERE Corel='"+itemid+"'";
 			DT=Con.OpenDT(sql);
@@ -355,9 +348,25 @@ public class Anulacion extends PBase {
 
 			sql="UPDATE D_FACTURA  SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
+
 			sql="UPDATE D_FACTURAD SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
+
 			sql="UPDATE D_FACTURAP SET Anulado='S' WHERE COREL='"+itemid+"'";
+			db.execSQL(sql);
+
+			//  Barras
+
+			sql="INSERT INTO P_STOCKB SELECT * FROM D_FACTURA_BARRA WHERE Corel='"+itemid+"'";
+			db.execSQL(sql);
+
+			sql="UPDATE P_STOCKB SET Corel='' WHERE Corel='"+itemid+"'";
+			db.execSQL(sql);
+
+			sql="DELETE FROM D_FACTURA_BARRA WHERE Corel='"+itemid+"'";
+			db.execSQL(sql);
+
+			sql="DELETE FROM D_STOCKB_DEV WHERE Corel='"+itemid+"'";
 			db.execSQL(sql);
 
 			anulBonif(itemid);
@@ -367,8 +376,6 @@ public class Anulacion extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
-
-			
 	}
 	
 	private void anulBonif(String itemid) {
@@ -593,14 +600,14 @@ public class Anulacion extends PBase {
 		}
 		
 	}
+
+	//endregion
 	
-	
-	// Impresion
+	//region Impresion
 	
 	private void ImpresionFactura() {
 		try{
 			if (fdoc.buildPrint(itemid,3,Con,db)) prn.printask();
-
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -678,9 +685,10 @@ public class Anulacion extends PBase {
 		}
 		
 	}
-		
+
+	//endregion
 	
-	// Aprofam
+	//region Aprofam
 	
 	private boolean aprValidaNC() {
 		Cursor DT;
@@ -859,12 +867,6 @@ public class Anulacion extends PBase {
 			pcli=DT.getString(4);		
 			ptot=DT.getDouble(5);
 	
-	/*	} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			msgbox(e.getMessage());return false;
-	    }	
-		
-		try {*/
 			sql="SELECT RESOL,FECHARES,FECHAVIG,SERIE,CORELINI,CORELFIN FROM P_COREL";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
@@ -874,23 +876,12 @@ public class Anulacion extends PBase {
 			ff=DT.getInt(2);presvence="Resolucion vence : "+du.sfecha(ff);		
 			presrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
 			
-	/*	} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			Toast.makeText(this,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
-	    }	
-		
-		try {*/
 			sql="SELECT NOMBRE FROM P_VENDEDOR  WHERE CODIGO='"+pvend+"'";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
 			
 			pvendedor=DT.getString(0);
-	/*	} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			pvendedor=pvend;
-	    }	
 
-		try {*/
 			sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION FROM P_CLIENTE WHERE CODIGO='"+pcli+"'";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
@@ -905,8 +896,7 @@ public class Anulacion extends PBase {
 			pcliente=pcli;
 			pvendedor=pvend;
 	    }
-		
-			
+
 		return true;
 		
 	}
@@ -1076,9 +1066,10 @@ public class Anulacion extends PBase {
 
 				
 	}
+
+	//endregion
 	
-	
-	// Aux
+	//region Aux
 	
 	private void msgAsk(String msg) {
 
@@ -1100,7 +1091,6 @@ public class Anulacion extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 			
 	}	
 
@@ -1149,6 +1139,8 @@ public class Anulacion extends PBase {
 		try {
 			sql="SELECT TIPO FROM P_PRODUCTO WHERE CODIGO='"+prcodd+"'";
            	DT=Con.OpenDT(sql);
+           	if (DT.getCount()==0) return false;
+
            	DT.moveToFirst();
 			
            	return DT.getString(0).equalsIgnoreCase("P");
@@ -1157,5 +1149,7 @@ public class Anulacion extends PBase {
 			return false;
 	    }		
 	}
-	
+
+	//endregion
+
 }

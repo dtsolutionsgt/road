@@ -379,7 +379,22 @@ public class AppMethods {
         }
     }
 
-	
+	public boolean ventaRepesaje(String cod) {
+		Cursor DT;
+		String umm;
+
+		try {
+			String sql = "SELECT VENTA_POR_PESO FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+			DT = Con.OpenDT(sql);
+			DT.moveToFirst();
+			return  DT.getInt(0)==1;
+		} catch (Exception e) {
+			toast(e.getMessage());
+			return false;
+		}
+	}
+
+
 	// Common
 	
 	protected void toast(String msg) {

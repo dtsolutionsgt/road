@@ -622,7 +622,6 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX D_FACTURA_STOCK_idx1 ON D_FACTURA_STOCK(COREL)";
 			database.execSQL(vSQL);
 
-
 			vSQL="CREATE TABLE [D_FACTURA_BARRA] ("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[BARRA] TEXT NOT NULL,"+
@@ -640,6 +639,7 @@ public class BaseDatosScript {
 					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
 					"[COREL_D_MOV] TEXT NOT NULL,"+
 					"[UNIDADMEDIDA] TEXT NOT NULL,"+
+					"[DOC_ENTREGA] TEXT NOT NULL,"+
 					"PRIMARY KEY ([RUTA],[BARRA],[DOCUMENTO],[STATUS])"+
 					");";
 			database.execSQL(vSQL);

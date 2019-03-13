@@ -3349,6 +3349,11 @@ public class ComWS extends PBase {
                         relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
                     }
 
+                    if (recep && !ExisteInventario()){
+						relExist.setVisibility(gl.peBotInv && !rutatipo.equalsIgnoreCase("P")?View.VISIBLE:View.INVISIBLE);
+						relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+					}
+
 				}
 
 		}catch (Exception e) {
@@ -3425,6 +3430,26 @@ public class ComWS extends PBase {
 
     };
 
+	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
+	public boolean ExisteInventario(){
+
+		try {
+
+			int CantInventario;
+
+			clsAppM = new AppMethods(this, gl, Con, db);
+
+			CantInventario = clsAppM.getDocCountTipo("Inventario",false);
+
+			return  ((CantInventario>0));
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			msgbox(e.getMessage());
+			return false;
+		}
+
+	};
 	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
 	public boolean ExistenDatos(){
 

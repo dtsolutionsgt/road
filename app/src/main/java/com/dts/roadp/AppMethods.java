@@ -66,7 +66,7 @@ public class AppMethods {
 	}
 
 	//Función para saber la cantidad de registros en una tabla específica
-	public int getDocCountTipo(String tipo) {
+	public int getDocCountTipo(String tipo, boolean sinEnviar) {
 
 		Cursor DT;
 		int cnt = 0;
@@ -79,21 +79,25 @@ public class AppMethods {
 				case "Facturas":
 
 					sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_FACTURA";
+					sql += (sinEnviar?" WHERE STATCOM = 'N'":"");
 					break;
 
 				case "Pedidos":
 
 					sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_PEDIDO";
+					sql += (sinEnviar?" WHERE STATCOM = 'N'":"");
 					break;
 
 				case "Cobros":
 
 					sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_COBRO";
+					sql += (sinEnviar?" WHERE STATCOM = 'N'":"");
 					break;
 
 				case "Devolucion":
 
 					sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_NOTACRED";
+					sql += (sinEnviar?" WHERE STATCOM = 'N'":"");
 					break;
 
 				case "Inventario":
@@ -375,7 +379,22 @@ public class AppMethods {
         }
     }
 
-	
+	public boolean ventaRepesaje(String cod) {
+		Cursor DT;
+		String umm;
+
+		try {
+			String sql = "SELECT VENTA_POR_PESO FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+			DT = Con.OpenDT(sql);
+			DT.moveToFirst();
+			return  DT.getInt(0)==1;
+		} catch (Exception e) {
+			toast(e.getMessage());
+			return false;
+		}
+	}
+
+
 	// Common
 	
 	protected void toast(String msg) {

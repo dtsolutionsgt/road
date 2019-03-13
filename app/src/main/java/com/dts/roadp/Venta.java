@@ -74,6 +74,7 @@ public class Venta extends PBase {
 	private static final long  MIN_TIME_BW_UPDATES = 1000; // in Milliseconds
 
 
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

@@ -12,18 +12,20 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Base64;
-import android.util.JsonToken;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +36,6 @@ import android.content.Intent;
 import uk.co.senab.photoview.PhotoViewAttacher;
 import android.database.Cursor;
 
-import static android.app.Activity.RESULT_OK;
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 public class CliDet extends PBase {
@@ -43,6 +44,7 @@ public class CliDet extends PBase {
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol;
 	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol,imgRoadTit;
+	private RadioButton chknc,chkncv;
 
 	private Exist Existencia = new Exist();
 	private String cod,tel, Nombre, NIT;
@@ -80,7 +82,10 @@ public class CliDet extends PBase {
 		lblCLim= (TextView) findViewById(R.id.lblCLim);
 		lblCUsed= (TextView) findViewById(R.id.lblCUsed);
 		lblCDisp= (TextView) findViewById(R.id.lblCDisp);
-		
+
+		chknc = new RadioButton(this,null);
+		chkncv = new RadioButton(this,null);
+
 		relV= (RelativeLayout) findViewById(R.id.relVenta);
 		relP= (RelativeLayout) findViewById(R.id.relPreventa);
 		relD= (RelativeLayout) findViewById(R.id.relDespacho);
@@ -105,10 +110,10 @@ public class CliDet extends PBase {
 		*/
 		cod=gl.cliente;
 		
-		if (!gl.devol) {
+		/*if (!gl.devol) {
 			lblDevol.setVisibility(View.INVISIBLE);
 			imgDevol.setVisibility(View.INVISIBLE);
-		}	
+		}*/
 		
 		showData();
 		calcCredit();
@@ -121,6 +126,8 @@ public class CliDet extends PBase {
 		defineGeoPos();
 
 		miniFachada();
+
+		setHandlers();
 
 		//Toast.makeText(this, "Create activity : ", Toast.LENGTH_SHORT).show();
 	}
@@ -756,7 +763,7 @@ public class CliDet extends PBase {
 
 	public void showDevol(View view){
 		try{
-			msgAskTipoDev("Devolucion de producto en estado ... ");
+			msgAskTipoDev();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -835,7 +842,7 @@ public class CliDet extends PBase {
 
 	}
 
-	private void msgAskTipoDev(String msg) {
+	private void msgAskTipoEstadoDev(String msg) {
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -857,6 +864,61 @@ public class CliDet extends PBase {
 			});
 
 			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
+
+	}
+
+	private void msgAskTipoDev() {
+
+		try{
+
+			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Devolución");
+
+			final LinearLayout layout   = new LinearLayout(this);
+			layout.setOrientation(LinearLayout.VERTICAL);
+
+			if(chknc.getParent()!= null){
+				((ViewGroup) chknc.getParent()).removeView(chknc);
+			}
+
+			if(chkncv.getParent()!= null){
+				((ViewGroup) chknc.getParent()).removeView(chknc);
+			}
+
+			chknc.setText("Nota de crédito");
+			chkncv.setText("Nota de crédito con venta");
+
+			layout.addView(chknc);
+            layout.addView(chkncv);
+
+			alert.setView(layout);
+
+			showkeyb();
+
+			alert.create();
+
+			alert.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					msgAskTipoEstadoDev("Devolución de producto en estado...");
+					layout.removeAllViews();
+				}
+			});
+
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					layout.removeAllViews();
+
+				}
+			});
+
+			alert.show();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -942,6 +1004,79 @@ public class CliDet extends PBase {
 	}
 
 
+	//Region Events
+
+	private void setHandlers(){
+
+		try {
+
+            chknc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+				    if (chknc.isChecked()==true){
+						chkncv.setChecked(false);
+                        gl.tiponcredito = 1;
+				    }
+
+				}
+			});
+
+			chkncv.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+				    if (chkncv.isChecked()==true){
+						chknc.setChecked(false);
+				    	gl.tiponcredito = 2;
+                    }
+
+				}
+			});
+
+		}catch (Exception e){
+		addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+	}
+
+	}
+
+	private void msgAskExit(String msg) {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg + "?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					doExit();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	private void doExit(){
+		try{
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
 	// Activity Events
 	
 	@Override
@@ -1007,6 +1142,16 @@ public class CliDet extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	}	
+	}
+
+	@Override
+	public void onBackPressed() {
+		try{
+			msgAskExit("Salir sin terminar");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
 
 }

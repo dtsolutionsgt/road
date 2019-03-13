@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -18,19 +20,26 @@ import android.widget.AdapterView.OnItemSelectedListener;
 
 public class DevCliCant extends PBase {
 	
-	private EditText txtCant;
+	private EditText txtCant,lblPrec,txtLote;
 	private RelativeLayout rlCant;
-	private TextView lblDesc,lblPrec,lblBU;
-	private Spinner spin;
+	private TextView lblDesc,lblBU,lblPrecVenta;
+	private Spinner spin,cmbum;
+	private CheckBox chkTieneLote;
 	
 	private ArrayList<String> spincode= new ArrayList<String>();
 	private ArrayList<String> spinlist = new ArrayList<String>();
+
+	private ArrayList<Double> cmbumfact= new ArrayList<Double>();
+	private ArrayList<String> cmbumlist = new ArrayList<String>();
 	
 	private String prodid,estado,razon,devrazon,raz;
-	private double cant,icant;
+	private double cant,icant,factor,precioventa=00.;
+	private  String um="", ummin,umcambiar;
+	private Precio prc;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_dev_cli_cant);
 		
@@ -50,13 +59,18 @@ public class DevCliCant extends PBase {
 		showkeyb();
 		
 		fillSpinner();
-		
+		fillcmbUM();
+
 		devrazon=((appGlobals) vApp).devrazon;
 		razon=devrazon;
 		setSpinVal(devrazon);
-		
+
+		setComboValor(um);
+
+		ummin = getUMminima();
+
 		showData();
-		
+
 	}
 
 	// Events
@@ -79,6 +93,7 @@ public class DevCliCant extends PBase {
 
 			//hidekeyb();
 			super.finish();
+			
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -100,7 +115,7 @@ public class DevCliCant extends PBase {
 			    	spinlabel.setTextColor(Color.BLACK);
 			    	spinlabel.setPadding(5, 0, 0, 0);
 			    	spinlabel.setTextSize(18);
-			    
+
 			    	razon=spincode.get(position);
 
 		    	} catch (Exception e) {
@@ -115,7 +130,49 @@ public class DevCliCant extends PBase {
 		        return;
 		    }
 
-		});		
+		});
+
+		cmbum.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				TextView cmblabel;
+
+				try{
+
+					cmblabel=(TextView)parent.getChildAt(0);
+					cmblabel.setTextColor(Color.BLACK);
+					cmblabel.setPadding(5, 0, 0, 0);
+					cmblabel.setTextSize(18);
+
+					factor=cmbumfact.get(position);
+					umcambiar = cmbumlist.get(position);
+
+					lblPrec.setText(String.valueOf(getPrecio()));
+
+				}catch (Exception e){
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					mu.msgbox( e.getMessage());
+				}
+
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+
+			}
+		});
+
+		chkTieneLote.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+				if (chkTieneLote.isChecked()==false){
+					txtLote.setEnabled(true);
+				}else{
+					txtLote.setEnabled(false);
+				}
+			}
+		});
 		
 	}
 	
@@ -125,6 +182,7 @@ public class DevCliCant extends PBase {
 		int ex=0;
 		
 		try {
+
 			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA "+
 				 "FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	DT=Con.OpenDT(sql);
@@ -138,11 +196,15 @@ public class DevCliCant extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   mu.msgbox("1-"+ e.getMessage());
-	    }	
-		
-		lblPrec.setText("");
-		
+	    }
+
+		precioventa = prc.precio(prodid,1,gl.nivel,um,gl.umpeso,0);
+		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
+			if (prc.precioespecial>0) precioventa=prc.precioespecial;
+		}
+
 		try {
+
 			sql="SELECT CANT FROM T_CxCD WHERE CODIGO='"+prodid+"' AND CODDEV='"+raz+"'";
            	DT=Con.OpenDT(sql);
            	
@@ -158,7 +220,10 @@ public class DevCliCant extends PBase {
 	    }	
 
 		if (icant>0) parseCant(icant);
-		
+
+		lblPrecVenta.setText(um);
+		txtLote.setEnabled(false);
+
 	}
 	
 	private void setCant(){
@@ -232,8 +297,55 @@ public class DevCliCant extends PBase {
 			spin.setSelection(0);
 	    }
 		
-	}	
-	
+	}
+
+	private void fillcmbUM(){
+		Cursor DT;
+		String ifactor,iname;
+
+		cmbumfact.add(0.0);
+		cmbumlist.add("Seleccione UM....");
+
+		getUMCliente();
+
+		try {
+
+			sql="SELECT UNIDADSUPERIOR,FACTORCONVERSION FROM P_FACTORCONV WHERE PRODUCTO='"+prodid+"' AND UNIDADSUPERIOR<>'"+gl.umpeso+"'  ORDER BY UNIDADSUPERIOR";
+			DT=Con.OpenDT(sql);
+
+			if (DT.getCount()>0) {
+
+				DT.moveToFirst();
+				while (!DT.isAfterLast()) {
+
+					iname=DT.getString(0);
+					ifactor=DT.getString(1);
+
+					cmbumfact.add(Double.parseDouble(ifactor));
+					cmbumlist.add(iname);
+
+					DT.moveToNext();
+				}
+
+				ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, cmbumlist);
+				dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+				cmbum.setAdapter(dataAdapter);
+
+			}else{
+
+				cmbum.setSelection(0);
+				lblPrec.setText(String.valueOf(precioventa));
+
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			cmbum.setSelection(0);
+		}
+
+	}
+
 	private void setSpinVal(String vc){
 		int pos=0;
 		String s;
@@ -252,22 +364,155 @@ public class DevCliCant extends PBase {
 			spin.setSelection(0);
 	    }
 	}
-	
+
+	public void setComboValor(String um){
+		int pos=0;
+		String s;
+
+		for(int i = 0; i <cmbumlist.size(); i++ ) {
+			s=cmbumlist.get(i);
+			if (s.equalsIgnoreCase(um)) {
+				pos=i;break;
+			}
+		}
+
+		try {
+			cmbum.setSelection(pos);
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			cmbum.setSelection(0);
+		}
+	}
+
 	private void setControls() {
+
 		try{
+
 			txtCant= (EditText) findViewById(R.id.txtMonto);
 			rlCant= (RelativeLayout) findViewById(R.id.rlCant);
+			lblPrec=(EditText) findViewById(R.id.txtPrecio);
+			txtLote = (EditText) findViewById(R.id.txtLote);
 
 			lblDesc=(TextView) findViewById(R.id.lblFecha);
-			lblPrec=(TextView) findViewById(R.id.lblPNum);
+			lblPrecVenta = (TextView)findViewById(R.id.lblPrecioVenta);
 
 			lblBU=(TextView) findViewById(R.id.lblBU);
 
 			spin = (Spinner) findViewById(R.id.spinner1);
+
+			cmbum = (Spinner) findViewById(R.id.cmbUM);
+
+			prc=new Precio(this,mu,gl.peDec);
+
+			chkTieneLote = (CheckBox) findViewById(R.id.chkTieneLote);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	}	
-	
+	}
+
+	private void getUMCliente(){
+
+		Cursor dt;
+
+		try {
+
+			sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0){
+
+				dt.moveToFirst();
+				um=dt.getString(0);
+
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox("1-"+ e.getMessage());
+		}
+
+	}
+
+	private String getUMminima(){
+		Cursor dt;
+		String umbas="";
+
+		try{
+
+			sql="SELECT UNIDBAS FROM P_PRODUCTO WHERE CODIGO = '" + prodid +"' AND ES_PROD_BARRA = 0";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0){
+
+				dt.moveToFirst();
+				umbas=dt.getString(0);
+
+			}else {
+
+				sql = " SELECT UM_SALIDA FROM P_PRODUCTO "+
+				" WHERE CODIGO = '" + prodid + "' AND ES_PROD_BARRA = 1 ";
+				dt=Con.OpenDT(sql);
+
+				if (dt.getCount()>0){
+
+					dt.moveToFirst();
+					umbas=dt.getString(0);
+
+				}
+			}
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
+		return umbas;
+
+	}
+
+	private Double getPrecio(){
+		Double prec=0.0,proprecio=0.0;
+		Double fact1,fact2;
+
+		try{
+
+			if (umcambiar!=um){
+				fact1 = getFactor(umcambiar);
+				fact2 = getFactor(um);
+
+				if (fact2>0)proprecio=fact1/fact2;
+
+			} proprecio = (umcambiar==um?1:proprecio);
+
+			prec = precioventa * proprecio;
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+		return	prec;
+	}
+
+	private Double getFactor(String vUM){
+		Cursor DT;
+		Double fact=0.0;
+
+		try{
+
+			sql = "SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE UNIDADSUPERIOR = '" + vUM + "' AND PRODUCTO = '"+ prodid +"' AND UNIDADMINIMA='"+ummin+"'";
+			DT=Con.OpenDT(sql);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				fact = Double.parseDouble(DT.getString(0));
+			}
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+		return  fact;
+	}
+
 }

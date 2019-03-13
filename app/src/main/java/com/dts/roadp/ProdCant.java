@@ -211,7 +211,7 @@ public class ProdCant extends PBase {
 		Cursor dt;
 		double ippeso=0;
 
-		
+
 		try {
 			sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
 			dt=Con.OpenDT(sql);
@@ -727,7 +727,11 @@ public class ProdCant extends PBase {
         //prec=prc.precio(prodid,0,nivel,um,gl.umpeso,ppeso);
 
         try {
-            tv=prec*ppeso;
+			if (porpeso) {
+				tv=prec*ppeso;
+			} else {
+				tv=prec*cant;
+			}
         } catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             tv=0;mu.msgbox(e.getMessage());

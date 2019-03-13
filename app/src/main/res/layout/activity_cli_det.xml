@@ -545,12 +545,13 @@
             android:id="@+id/imageView1"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_alignParentRight="true"
             android:layout_alignParentTop="false"
+            android:layout_alignParentRight="true"
             android:adjustViewBounds="true"
             android:clickable="true"
             android:onClick="showDevol"
-            android:src="@drawable/devolucion_color" />
+            android:src="@drawable/devolucion_color"
+            android:visibility="visible" />
 
         <RelativeLayout
             android:layout_width="wrap_content"

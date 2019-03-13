@@ -451,7 +451,7 @@ public class clsFinDia extends PBase{
 
 
             corelz++;
-            sql="UPDATE FinDia SET Corel="+corelz;
+            sql="UPDATE FinDia SET Corel="+corelz+", val1 = 0,val2= 0,val3= 0,val4= 0,val5= 0,val6= 0,val7= 0,val8= 0";
             db.execSQL(sql);
 
 			/*sql="UPDATE P_RUTA SET Email='0'";

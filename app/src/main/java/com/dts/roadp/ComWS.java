@@ -186,6 +186,7 @@ public class ComWS extends PBase {
 				fechaUltimoCierre = claseFindia.ultimoCierreFecha();
 
 				if ((du.getActDate() == fechaUltimoCierre) && ExistenDatos()) {
+					//claseFindia.
 					claseFindia.eliminarTablasD();
 				}
 
@@ -1672,9 +1673,9 @@ public class ComWS extends PBase {
 			}
 				
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			scon=0;
 			fstr="No se puede conectar al web service. "+e.getMessage();
+			//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 		
 	}
@@ -1752,9 +1753,17 @@ public class ComWS extends PBase {
 			{
 				wsExecute();
 			} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				if (scon==0){
+					fstr="No se puede conectar al web service : "+sstr;
+				}
+				//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),fstr);
+				msgbox(fstr);
 			}
-            
+
+			if (scon==0){
+				msgbox(fstr);
+			}
+
             return null;
         }
  

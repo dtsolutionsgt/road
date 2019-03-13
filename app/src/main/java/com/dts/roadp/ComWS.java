@@ -3274,11 +3274,6 @@ public class ComWS extends PBase {
 		
 		esvacio=false;
 
-		//#HS_20181121_0910 Se creó la funcion Get_Fecha_Inventario().
-
-			int fc=Get_Fecha_Inventario();
-			recep=fc==du.getActDate();
-
 			try{
 				try {
 					sql="SELECT * FROM P_RUTA";
@@ -3307,6 +3302,12 @@ public class ComWS extends PBase {
 					}
 
 					return;
+				}
+
+				//#HS_20181121_0910 Se creó la funcion Get_Fecha_Inventario().
+				if (!esvacio){
+					int fc=Get_Fecha_Inventario();
+					recep=fc==du.getActDate();
 				}
 
 				//Visible botón y texto de envío

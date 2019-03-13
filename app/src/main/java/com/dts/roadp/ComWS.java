@@ -306,6 +306,7 @@ public class ComWS extends PBase {
 
 			if (!setComParams()) return;
 
+			//#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
 			View view = this.getCurrentFocus();
 			view.clearFocus();
 			if (view != null) {
@@ -313,8 +314,11 @@ public class ComWS extends PBase {
 			}
 
 			isbusy=1;
-			ultcor_ant=ultCorel();
-			ultSerie_ant=ultSerie();
+
+			if (!esvacio){
+				ultcor_ant=ultCorel();
+				ultSerie_ant=ultSerie();
+			}
 
 			barInfo.setVisibility(View.VISIBLE);barInfo.invalidate();
 			lblInfo.setText("Iniciando proceso de carga..");
@@ -1763,7 +1767,7 @@ public class ComWS extends PBase {
 			}
 
 			if (scon==0){
-				Log.d("doInBackground",fstr+sstr);
+			//	Log.d("doInBackground",fstr+sstr);
 			}
 
             return null;

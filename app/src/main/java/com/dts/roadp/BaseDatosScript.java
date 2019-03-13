@@ -877,7 +877,7 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-			vSQL="CREATE INDEX D_CxCD_idx1 ON D_CxCD(COREL)";
+			vSQL="CREATE INDEX D_NOTACREDD_idx1 ON D_NOTACREDD(COREL)";
 			database.execSQL(vSQL);
 
 

@@ -4,9 +4,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 
-import java.security.spec.ECField;
-import java.util.ArrayList;
 import com.dts.roadp.clsClasses.clsFinDiaItems;
+
+import java.util.ArrayList;
 
 //#HS_20181121_1548 Se agregó lpa clase para FinDia.
 public class clsFinDia extends PBase{
@@ -346,6 +346,8 @@ public class clsFinDia extends PBase{
                 }
             }
 
+            sql="DELETE FROM D_FACTURA_BARRA";db.execSQL(sql);
+            sql="DELETE FROM D_STOCKB_DEV";db.execSQL(sql);
 
             sql="SELECT COREL FROM D_PEDIDO WHERE STATCOM='S'";
             DT=Con.OpenDT(sql);

@@ -1,7 +1,5 @@
 package com.dts.roadp;
 
-import java.io.File;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +17,8 @@ import android.widget.Toast;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+
+import java.io.File;
 
 //  validaFinDia - Fin de Dia ya fue efectuado 
 //  devproductos - delete from P_stock
@@ -257,7 +257,10 @@ public class FinDia extends PBase {
                     db.execSQL(sql);
                     sql = "DELETE FROM D_FACTURA_STOCK WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
-
+                    sql = "DELETE FROM D_FACTURA_BARRA WHERE COREL='" + corel + "'";
+                    db.execSQL(sql);
+                    sql = "DELETE FROM D_STOCKB_DEV WHERE COREL='" + corel + "'";
+                    db.execSQL(sql);
                     sql = "DELETE FROM D_BONIF";
                     db.execSQL(sql);
                     sql = "DELETE FROM D_BONIF_LOTES";

@@ -1,10 +1,14 @@
 package com.dts.roadp;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Environment;
 import android.widget.Toast;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class clsDocument {
 
@@ -40,8 +44,9 @@ public class clsDocument {
 	}
 	
 	public boolean buildPrint(String corel,int reimpres) {
+		setAddlog("Build print",""+DU.getActDateTime(),"");
 
-	    modofact="*";
+		modofact="*";
 		rep.clear();
 				
 		if (!buildHeader(corel,reimpres)) return false;
@@ -133,7 +138,6 @@ public class clsDocument {
 	}
 
     protected void saveHeadLines(int reimpres) {
-
         String s;
 
         rep.empty();rep.empty();
@@ -267,6 +271,7 @@ public class clsDocument {
 			} catch (Exception e1) { }
 			
 		} catch (Exception e) {
+			setAddlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 		}		
 		
@@ -291,7 +296,8 @@ public class clsDocument {
 
 			saveHeadLines(reimpres);
 		} catch (Exception e) {
-			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
+			setAddlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 		}		
 
 		return true;
@@ -326,9 +332,10 @@ public class clsDocument {
 
 			return true;
 		} catch (Exception e) {
-			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
-		}		
-		
+			setAddlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();
+			return false;
+		}
 	}
 	
 	public boolean emptystr(String s){
@@ -387,15 +394,38 @@ public class clsDocument {
 	public void toast(String msg) {
 		Toast.makeText(cont,msg, Toast.LENGTH_SHORT).show();	
 	}
-	
+
+	public void setAddlog(String methodname,String msg,String info) {
+
+		BufferedWriter writer = null;
+		FileWriter wfile;
+
+		try {
+
+			String fname = Environment.getExternalStorageDirectory()+"/roadlog.txt";
+			wfile=new FileWriter(fname,true);
+			writer = new BufferedWriter(wfile);
+
+			writer.write("Método: " + methodname + " Mensaje: " +msg + " Info: "+ info );
+			writer.write("\r\n");
+
+			writer.close();
+
+		} catch (Exception e) {
+			//msgbox("Error " + e.getMessage());
+		}
+	}
+
 	private void opendb() {
 		
 		try {
 			db = Con.getWritableDatabase();
 		 	Con.vDatabase =db;
 	    } catch (Exception e) {
-	    	Toast.makeText(cont,"Opendb "+e.getMessage(), Toast.LENGTH_LONG).show();
-	    }
+	    	//Toast.makeText(cont,"Opendb "+e.getMessage(), Toast.LENGTH_LONG).show();
+			setAddlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+
+		}
 	}	
 		
 }

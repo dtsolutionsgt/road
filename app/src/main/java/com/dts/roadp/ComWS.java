@@ -152,10 +152,12 @@ public class ComWS extends PBase {
 
         envioparcial=gl.peEnvioParcial;
 
-		//txtRuta.setText("8001-1");
-		//txtEmp.setText("03");
-		//txtWS.setText("http://192.168.1.69/wsAndr/wsandr.asmx");
+		if (esvacio) txtWS.setEnabled(true);
 
+		if (mu.emptystr(txtRuta.getText().toString())) {
+			txtRuta.setText("8001-1");txtEmp.setText("03");
+			txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
+		}
 
 		//txtRuta.setText("0005-1");
 		//txtWS.setText("http://192.168.1.112/wsAndr/wsandr.asmx");
@@ -164,7 +166,7 @@ public class ComWS extends PBase {
 	}
 
 	
-	// Events
+	//region Events
 	
 	public void askRec(View view) {
 
@@ -273,9 +275,9 @@ public class ComWS extends PBase {
 			toastcent("Por favor, espere que se termine la tarea actual.");return;
 		}
 
-
-
 	}
+
+	//endregion
 
 	//region Main
 
@@ -1641,23 +1643,17 @@ public class ComWS extends PBase {
 		try{
 			if (fstr.equalsIgnoreCase("Sync OK")) {
 
-				lblInfo.setText(" ");
+				lblInfo.setText(" ");s = "Recepción completa.";
 
-		    s="Recepción completa.";
-			
-			//if (!esvacio) {
-				if (stockflag==1) {
-					s=s+"\nSe actualizó inventario.";
+				if (stockflag == 1) {
+					s = s + "\nSe actualizó inventario.";
 				}
 
-            estandartInventario();
+				estandartInventario();
+				validaDatos(true);
+				if (stockflag == 1) sendConfirm();
 
-
-            validaDatos(true);
-					
-				if (stockflag==1) sendConfirm();
-
-					msgAskExit(s);
+				msgAskExit(s);
 
 				/*
             } else {
@@ -1672,13 +1668,13 @@ public class ComWS extends PBase {
 
 			}
 			*/
-		} else {	
-			lblInfo.setText(fstr);
-			mu.msgbox("Ocurrió error : \n"+fstr+" ("+reccnt+") " + ferr);
-			isbusy=0;
-            barInfo.setVisibility(View.INVISIBLE);
-			return;
-		}
+			} else {
+				lblInfo.setText(fstr);
+				mu.msgbox("Ocurrió error : \n" + fstr + " (" + reccnt + ") " + ferr);
+				isbusy = 0;
+				barInfo.setVisibility(View.INVISIBLE);
+				return;
+			}
 
 			pendientes=validaPendientes();
 			visibilidadBotones();
@@ -1894,6 +1890,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_FACTURAD_LOTES","WHERE COREL='"+cor+"'");
 					dbld.insert("D_FACTURAF","WHERE COREL='"+cor+"'");
 
+					dbld.insert("D_STOCKB_DEV","WHERE COREL='"+cor+"'");
 					dbld.insert("D_BONIF" ,"WHERE COREL='"+cor+"'");
 					dbld.insert("D_BONIF_LOTES","WHERE COREL='"+cor+"'");
 					dbld.insert("D_REL_PROD_BON","WHERE COREL='"+cor+"'");
@@ -1920,8 +1917,11 @@ public class ComWS extends PBase {
 				}
 				
 			    DT.moveToNext();
-			}	
-		
+			}
+
+			sql="DELETE FROM D_FACTURA_BARRA";db.execSQL(sql);
+			sql="DELETE FROM D_STOCKB_DEV";db.execSQL(sql);
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			fstr=e.getMessage();dbg=fstr;
@@ -2903,6 +2903,7 @@ public class ComWS extends PBase {
 			conflag=0;
 					
 			dbld.clear();
+			dbld.add("DELETE FROM P_DOC_ENVIADOS_HH WHERE DOCUMENTO='"+docstock+"'");
 			dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('"+docstock+"','"+ActRuta+"','"+univdate+"',1)");	
 						
 			if (commitSQL()==1) conflag=1; else conflag=0;
@@ -3067,8 +3068,8 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			mu.msgbox(sql+"\n"+e.getMessage());
+			//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			//mu.msgbox(sql+"\n"+e.getMessage());
 		}
 
         return cnt;
@@ -3138,7 +3139,6 @@ public class ComWS extends PBase {
 		
 		return crl;
 	}
-
 	//#HS_20181129_1006 Agregue funcion para obtener la serie.
 	private String ultSerie(){
 		Cursor DT;
@@ -3160,7 +3160,6 @@ public class ComWS extends PBase {
 
 		return serie;
 	}
-
 	//#HS_20181121_1048 Se creo la funcion Get_Fecha_Inventario().
 	private int Get_Fecha_Inventario() 	{
 		Cursor DT;
@@ -3172,20 +3171,15 @@ public class ComWS extends PBase {
 			DT=Con.OpenDT(sql);
 
 			if(DT.getCount()>0){
-
                 DT.moveToFirst();
-
 				fecha=DT.getInt(0);
-
-				if (fecha==0)
-				{
+				if (fecha==0) 				{
 					fecha = 1001010000 ;//#HS_20181129_0945 Cambie los valores de fecha porque deben se yymmdd hhmm
 				}
-
 			}
 
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 		return fecha;
@@ -3344,7 +3338,6 @@ public class ComWS extends PBase {
 		}
 
 	}
-
 	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
     public boolean ExistenDatos(){
 
@@ -3383,8 +3376,7 @@ public class ComWS extends PBase {
 
 					if (gl.modoadmin) {
 						restarApp();
-					}
-					else {
+					} else {
 						finish();
 					};
 				}

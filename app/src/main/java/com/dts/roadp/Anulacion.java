@@ -12,6 +12,8 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 
 public class Anulacion extends PBase {
@@ -65,6 +67,7 @@ public class Anulacion extends PBase {
 		if (tipo==3) lblTipo.setText("Factura");
 		if (tipo==4) lblTipo.setText("Recarga");
 		if (tipo==5) lblTipo.setText("Devolución a bodega");
+		if (tipo==6) lblTipo.setText("Nota de crédito");
 		
 		itemid="*";
 				
@@ -209,8 +212,13 @@ public class Anulacion extends PBase {
 			if (tipo==5) {
 				sql="SELECT COREL,REFERENCIA,FECHA,0 "+
 					 "FROM D_MOV WHERE (TIPO='D') AND (ANULADO='N') AND (STATCOM='N') ORDER BY FECHA DESC ";	
-			}			
-			
+			}
+
+			if (tipo==6) {
+				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.CODIGO, P_CLIENTE.NOMBRE,D_NOTACRED.TOTAL,FECHA "+
+					"FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
+					"WHERE (D_NOTACRED.ANULADO='N') AND (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC ";
+			}
 			    		
 			DT=Con.OpenDT(sql);
 			
@@ -292,8 +300,10 @@ public class Anulacion extends PBase {
 			
 			if (tipo==4) anulRecarga(itemid);
 			
-			if (tipo==5) anulDevol(itemid);			
-			
+			if (tipo==5) anulDevol(itemid);
+
+			if (tipo==6) anulNotaCredito(itemid);
+
 			db.setTransactionSuccessful();
 			db.endTransaction();
 			
@@ -340,17 +350,22 @@ public class Anulacion extends PBase {
 			sql="SELECT PRODUCTO,UMSTOCK FROM D_FACTURAD WHERE Corel='"+itemid+"'";
 			DT=Con.OpenDT(sql);
 
-			DT.moveToFirst();
-			while (!DT.isAfterLast()) {
+			if (DT.getCount()>0){
 
-				prod=DT.getString(0);
-				um=DT.getString(1);
+				DT.moveToFirst();
 
-				if (valexist(prod)) {
-					revertStock(itemid,prod,um);
+				while (!DT.isAfterLast()) {
+
+					prod=DT.getString(0);
+					um=DT.getString(1);
+
+					if (valexist(prod)) {
+						revertStock(itemid,prod,um);
+					}
+
+					DT.moveToNext();
 				}
 
-				DT.moveToNext();
 			}
 
 			sql="UPDATE D_FACTURA  SET Anulado='S' WHERE COREL='"+itemid+"'";
@@ -606,6 +621,83 @@ public class Anulacion extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 		
+	}
+
+	private void anulNotaCredito(String itemid) {
+		try{
+
+			Cursor DT2;
+			String vCorelFactura = "";
+			String PrCorel = "";
+			String vCorelDevol;
+			boolean vAnulNotaCredito;
+
+			sql = "SELECT FACTURA FROM D_NOTACRED WHERE COREL = '" + itemid + "'";
+			DT2=Con.OpenDT(sql);
+
+			if (DT2.getCount()>0){
+				DT2.moveToFirst();
+				vCorelFactura = DT2.getString(0);
+			}
+
+			DT2.close();
+
+			PrCorel = vCorelFactura;
+
+			if (ExisteFactura(PrCorel)){
+				anulFactura(PrCorel);// vAnulNotaCredito = true;
+			}else{
+				vCorelDevol = PrCorel;
+			}
+
+			/*SQL = "UPDATE D_CXC SET ANULADO='S' WHERE COREL='" + vCorelDevol + "' AND TIPO  = 'N' "
+			If Not ExecSQL(False) Then
+			vError += 1
+			End If
+
+			If vError = 0 Then
+
+					SQL = "UPDATE D_NOTACRED SET ANULADO='S' WHERE COREL='" + vCorelNotaC + "'"
+			If Not ExecSQL(False) Then
+			vError += 1
+			End If
+
+			If vError = 0 Then
+					Anul_Devol = True
+			End If
+
+			End If
+
+			End If*/
+
+			sql="UPDATE D_NOTACRED  SET Anulado='S' WHERE COREL='"+itemid+"'";
+			db.execSQL(sql);
+			sql="UPDATE D_CXC SET Anulado='S' WHERE COREL='"+itemid+"'";
+			db.execSQL(sql);
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
+	}
+
+	private boolean ExisteFactura(String vCorel){
+
+		Cursor DT;
+		boolean vExisteFactura = false;
+
+		try{
+
+			sql = "SELECT COREL FROM D_FACTURA WHERE COREL = '" + vCorel + "'";
+			DT=Con.OpenDT(sql);
+
+			vExisteFactura = (DT.getCount()>0?true:false);
+
+		}catch (Exception ex){
+
+		}
+
+		return vExisteFactura;
 	}
 
 	//endregion

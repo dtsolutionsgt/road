@@ -893,9 +893,21 @@ public class BaseDatosScript {
 					"PRIMARY KEY ([BARRA],[RUTA],[VENDEDOR],[CODIGO],[COREL])"+
 					");";
 			database.execSQL(vSQL);
-			
-			
-            return 1;
+
+			vSQL="CREATE TABLE [D_BONIF_BARRA] ("+
+				 "[COREL] TEXT NOT NULL," +
+				 "[BARRA] TEXT NOT NULL," +
+				 "[PESO] REAL NOT NULL," +
+				 "[PRODUCTO] TEXT NOT NULL," +
+				 "[UMVENTA] TEXT NOT NULL," +
+				 "[UMSTOCK] TEXT NOT NULL," +
+				 "[UMPESO] TEXT NOT NULL," +
+				 "[FACTOR] REAL NOT NULL," +
+				 "PRIMARY KEY ([COREL],[BARRA])"+
+				 ");";
+			database.execSQL(vSQL);
+
+			return 1;
 		} catch (SQLiteException e) {
 		   	msgbox(e.getMessage());
 		   	return 0;

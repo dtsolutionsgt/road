@@ -427,7 +427,7 @@ public class Menu extends PBase {
 
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Factura","Pedido","Recibo","Deposito","Recarga","Devoluci�n a bodega","Cierre de dia"};
+			final String[] selitems = {"Factura","Pedido","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia", "Nota crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.reimpresion48);
@@ -451,6 +451,8 @@ public class Menu extends PBase {
 							menuImprDoc(5);break;
 						case 6:
 							menuImprDoc(99);break;
+						case 7:
+							menuImprDoc(6);break;
 					}
 
 					dialog.cancel();
@@ -480,7 +482,7 @@ public class Menu extends PBase {
 
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia"};
+			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia", "Nota de crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.reimpresion48);
@@ -502,6 +504,8 @@ public class Menu extends PBase {
 							menuImprDoc(5);break;
 						case 5:
 							menuImprDoc(99);break;
+						case 6:
+							menuImprDoc(6);break;
 					}
 
 					dialog.cancel();
@@ -531,7 +535,7 @@ public class Menu extends PBase {
 
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia","Nota de credito"};
+			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia","Nota de crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.reimpresion48);
@@ -584,11 +588,11 @@ public class Menu extends PBase {
 
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Pedido","Recibo","Deposito"};
+			final String[] selitems = {"Pedido","Recibo","Deposito","Nota de crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.reimpresion48);
-			menudlg.setTitle("Reimpresi�n");
+			menudlg.setTitle("Reimpresión");
 
 			menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
@@ -600,6 +604,8 @@ public class Menu extends PBase {
 							menuImprDoc(1);break;
 						case 2:
 							menuImprDoc(2);break;
+						case 3:
+							menuImprDoc(6);break;
 					}
 
 					dialog.cancel();
@@ -644,11 +650,11 @@ public class Menu extends PBase {
 	public void showVoidMenuTodo() {
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Factura","Pedido","Recibo","Deposito","Recarga","Devolución a bodega"};
+			final String[] selitems = {"Factura","Pedido","Recibo","Deposito","Recarga","Devolución a bodega", "Nota crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.anulacion48);
-			menudlg.setTitle("Anulaci�n");
+			menudlg.setTitle("Anulación");
 
 			menudlg.setItems(selitems ,	new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
@@ -666,6 +672,8 @@ public class Menu extends PBase {
 							gl.tipo=4;break;
 						case 5:
 							gl.tipo=5;break;
+						case 6:
+							gl.tipo=6;break;
 					}
 
 					menuAnulDoc();
@@ -696,7 +704,7 @@ public class Menu extends PBase {
 		try{
 
 			final AlertDialog Dialog;
-			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega"};
+			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega", "Nota crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.anulacion48);
@@ -716,6 +724,8 @@ public class Menu extends PBase {
 							gl.tipo=4;break;
 						case 4:
 							gl.tipo=5;break;
+						case 5:
+							gl.tipo=6;break;
 					}
 
 					menuAnulDoc();
@@ -748,7 +758,7 @@ public class Menu extends PBase {
 		try{
 
 		}catch (Exception e){final AlertDialog Dialog;
-			final String[] selitems = {"Pedido","Recibo","Deposito"};
+			final String[] selitems = {"Pedido","Recibo","Deposito", "Nota crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.anulacion48);
@@ -764,6 +774,8 @@ public class Menu extends PBase {
 							gl.tipo=1;break;
 						case 2:
 							gl.tipo=2;break;
+						case 3:
+							gl.tipo=6;break;
 					}
 
 					menuAnulDoc();

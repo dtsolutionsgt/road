@@ -1,38 +1,29 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.dts.roadp.clsClasses.clsCDB;
-
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Application;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-import android.widget.Toast;
+
+import com.dts.roadp.clsClasses.clsCDB;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Clientes extends PBase {
@@ -118,6 +109,7 @@ public class Clientes extends PBase {
 	private void setHandlers(){
 
 		try{
+
 			listView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
@@ -164,6 +156,14 @@ public class Clientes extends PBase {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 					}*/
 					return true;
+				}
+			});
+
+			listView.setOnTouchListener(new SwipeListener(this) {
+				public void onSwipeRight() {
+					finish();
+				}
+				public void onSwipeLeft() {
 				}
 			});
 
@@ -225,6 +225,7 @@ public class Clientes extends PBase {
 					if (tl==0 || tl>1) listItems();
 				}
 			});
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox( e.getMessage());

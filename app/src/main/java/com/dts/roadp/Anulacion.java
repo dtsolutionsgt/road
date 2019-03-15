@@ -106,12 +106,16 @@ public class Anulacion extends PBase {
 
 	}
 
-	//endregion
-
-	//region Main
-	
 	private void setHandlers(){
 		try{
+
+			listView.setOnTouchListener(new SwipeListener(this) {
+				public void onSwipeRight() {
+					onBackPressed();
+				}
+				public void onSwipeLeft() {}
+			});
+
 			listView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
@@ -155,9 +159,12 @@ public class Anulacion extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	
 	}
-	
+
+	//endregion
+
+	//region Main
+
 	public void listItems() {
 		Cursor DT;
 		clsClasses.clsCFDV vItem;	

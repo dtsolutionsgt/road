@@ -74,7 +74,6 @@ public class Venta extends PBase {
 	private static final long  MIN_TIME_BW_UPDATES = 1000; // in Milliseconds
 
 
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -271,8 +270,17 @@ public class Venta extends PBase {
 	}
 
 	private void setHandlers(){
-
 		try{
+
+			listView.setOnTouchListener(new SwipeListener(this) {
+				public void onSwipeRight() {
+					onBackPressed();
+				}
+				public void onSwipeLeft() {
+					finishOrder(null);
+				}
+			});
+
 			listView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
@@ -284,10 +292,14 @@ public class Venta extends PBase {
 						prodid=vItem.Cod;
 						adapter.setSelectedIndex(position);
 
-						if (prodBarra(prodid)) return;
-
-						setCant();
-
+						if (prodBarra(prodid)) {
+							gl.gstr=prodid;
+							gl.gstr2=vItem.Nombre;
+							browse=4;
+							startActivity(new Intent(Venta.this,RepesajeLista.class));
+						} else {
+							setCant();
+						}
 					} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 						mu.msgbox( e.getMessage());
@@ -306,9 +318,9 @@ public class Venta extends PBase {
 						prodid=vItem.Cod;
 						adapter.setSelectedIndex(position);
 
-						if (prodBarra(prodid)) return true;
+						//if (prodBarra(prodid)) return true;
 
-						if (prodPorPeso(prodid)) {
+						if (prodRepesaje(prodid)) {
 							gl.gstr=prodid;
 							gl.gstr2=vItem.Nombre;
 							showItemMenu();
@@ -1575,6 +1587,15 @@ public class Venta extends PBase {
 	private boolean prodBarra(String prodid) {
 		try {
 			return app.prodBarra(prodid);
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			return false;
+		}
+	}
+
+	private boolean prodRepesaje(String prodid) {
+		try {
+			return app.ventaRepesaje(prodid);
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return false;

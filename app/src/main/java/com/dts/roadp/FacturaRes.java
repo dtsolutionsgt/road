@@ -325,6 +325,17 @@ public class FacturaRes extends PBase {
 
 		try{
 
+			listView.setOnTouchListener(new SwipeListener(this) {
+				public void onSwipeRight() {
+					prevScreen(null);
+				}
+				public void onSwipeLeft() {
+					if (imgCash.getVisibility()==View.VISIBLE) {
+						payCash(null);
+					}
+				}
+			});
+
 			txtVuelto.addTextChangedListener(new TextWatcher() {
 
 				public void afterTextChanged(Editable s) {}

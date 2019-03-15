@@ -1,25 +1,25 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relwsmail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@layout/back"
-    tools:context=".ComDrop" >
+    tools:context=".ComDrop">
 
     <RelativeLayout
         android:id="@+id/relRoad"
         android:layout_width="match_parent"
-        android:layout_height="48dp" >
+        android:layout_height="48dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:layout_centerVertical="true"
-            android:background="#9A999E" >
-        </RelativeLayout>
+            android:background="#9A999E"></RelativeLayout>
 
         <TextView
             android:id="@+id/txtRoadTit"
@@ -36,8 +36,8 @@
             android:id="@+id/ImageView01"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:layout_marginBottom="5dp"
             android:adjustViewBounds="true"
             android:src="@drawable/logo_panel" />
@@ -59,8 +59,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/lblETipo"
         android:layout_centerHorizontal="true"
-        android:paddingBottom="10dp"
         android:paddingTop="5dp"
+        android:paddingBottom="10dp"
         android:text="Archivo de parametros"
         android:textSize="15sp" />
 
@@ -68,8 +68,8 @@
         android:id="@+id/lblCPago"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
-        android:layout_alignParentRight="true"
         android:layout_below="@+id/btnRec"
+        android:layout_alignParentRight="true"
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:visibility="invisible" />
@@ -78,8 +78,8 @@
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
         android:onClick="writeData"
         android:text="Button"
         android:visibility="invisible" />
@@ -92,7 +92,7 @@
         android:layout_alignParentBottom="false"
         android:layout_centerHorizontal="true"
         android:layout_margin="1dp"
-        android:background="@layout/frame_rect" >
+        android:background="@layout/frame_rect">
 
         <TextView
             android:id="@+id/textView2"
@@ -110,7 +110,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/textView2"
-            android:ems="10" >
+            android:ems="10">
 
             <requestFocus />
         </EditText>
@@ -162,12 +162,12 @@
         android:layout_above="@+id/relativeLayout1"
         android:layout_alignParentRight="true"
         android:background="@layout/back"
-        android:minHeight="18dp"
         android:minWidth="64dp"
+        android:minHeight="18dp"
         android:onClick="comManual"
-        android:paddingBottom="3dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
+        android:paddingBottom="3dp"
         android:text="Manual"
         android:textSize="15sp"
         android:visibility="invisible" />
@@ -176,12 +176,12 @@
         android:id="@+id/lblETipo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/relRoad"
         android:layout_alignLeft="@+id/relativeLayout1"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/relRoad"
         android:gravity="center_horizontal"
-        android:paddingBottom="10dp"
         android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:text="Procesado" />
 
     <ProgressBar
@@ -222,8 +222,8 @@
         android:layout_below="@+id/imageView5"
         android:layout_toLeftOf="@+id/textView1"
         android:background="@layout/back"
-        android:minHeight="32dp"
         android:minWidth="64dp"
+        android:minHeight="32dp"
         android:onClick="askRec"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
@@ -237,8 +237,8 @@
         android:layout_below="@+id/imageView6"
         android:layout_toRightOf="@+id/textView1"
         android:background="@layout/back"
-        android:minHeight="32dp"
         android:minWidth="64dp"
+        android:minHeight="32dp"
         android:onClick="askSend"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
@@ -259,12 +259,12 @@
         android:id="@+id/relbotpan"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:layout_margin="1dp"
-        android:background="@layout/blue_strip" >
+        android:background="@layout/blue_strip">
 
         <TextView
             android:id="@+id/textView9"
@@ -298,7 +298,7 @@
         android:id="@+id/relExist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/relativeLayout1" >
+        android:layout_above="@+id/relativeLayout1">
 
         <ImageView
             android:id="@+id/imageView1"
@@ -313,9 +313,9 @@
             android:id="@+id/textView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignRight="@+id/imageView1"
             android:layout_below="@+id/imageView1"
+            android:layout_alignRight="@+id/imageView1"
+            android:layout_alignParentLeft="true"
             android:gravity="center_horizontal"
             android:text="Existencias"
             android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -327,7 +327,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/relativeLayout1"
-        android:layout_centerHorizontal="true" >
+        android:layout_centerHorizontal="true">
 
         <ImageView
             android:id="@+id/ImageView03"
@@ -342,9 +342,9 @@
             android:id="@+id/TextView01"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignRight="@+id/ImageView03"
             android:layout_below="@+id/ImageView03"
+            android:layout_alignRight="@+id/ImageView03"
+            android:layout_alignParentLeft="true"
             android:gravity="center_horizontal"
             android:text="Precios"
             android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -355,7 +355,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/relativeLayout1"
-        android:layout_alignParentRight="true" >
+        android:layout_alignParentRight="true">
 
         <ImageView
             android:id="@+id/ImageView04"
@@ -370,9 +370,9 @@
             android:id="@+id/TextView02"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignRight="@+id/ImageView04"
             android:layout_below="@+id/ImageView04"
+            android:layout_alignRight="@+id/ImageView04"
+            android:layout_alignParentLeft="true"
             android:gravity="center_horizontal"
             android:text="Recarga"
             android:textAppearance="?android:attr/textAppearanceSmall" />

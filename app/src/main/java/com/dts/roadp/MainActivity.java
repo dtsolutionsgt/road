@@ -1,6 +1,7 @@
 package com.dts.roadp;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,8 +11,8 @@ import android.database.SQLException;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -62,7 +63,8 @@ public class MainActivity extends PBase {
 				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
 						&& checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
 						&& checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
-						&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED)
+						&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
+                        && checkSelfPermission(Manifest.permission.READ_PHONE_STATE)== PackageManager.PERMISSION_GRANTED)
 				{
 					startApplication();
 				} else {
@@ -70,7 +72,9 @@ public class MainActivity extends PBase {
 						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
 							Manifest.permission.ACCESS_FINE_LOCATION,
 							Manifest.permission.CALL_PHONE,
-							Manifest.permission.CAMERA}, 1);
+							Manifest.permission.CAMERA,
+                            Manifest.permission.READ_PHONE_STATE
+                        }, 1);
 				}
 			}
 
@@ -125,7 +129,9 @@ public class MainActivity extends PBase {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
-                    && checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED) {
+                    && checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.READ_PHONE_STATE)== PackageManager.PERMISSION_GRANTED)
+            {
                 Toast.makeText(this, "GRANTED : " + requestCode, Toast.LENGTH_SHORT).show();
                 startApplication();
             } else {
@@ -729,12 +735,14 @@ public class MainActivity extends PBase {
 
 	}
 
-	private String androidid() {
+	@SuppressLint("MissingPermission")
+    private String androidid() {
 		String uniqueID="";
 		try {
-			uniqueID = Settings.Secure.getString(getContentResolver(),
-					Settings.Secure.ANDROID_ID);
-		} catch (Exception e) {
+			//uniqueID = Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID);
+            TelephonyManager tm = (TelephonyManager) this.getSystemService(this.TELEPHONY_SERVICE);
+            uniqueID = tm.getDeviceId();
+ 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			uniqueID="0000000000";
 		}

@@ -79,7 +79,7 @@ public class Repesaje extends PBase {
     }
 
 
-    // Events
+    //region Events
 
     public void doSave(View view) {
         try{
@@ -100,6 +100,14 @@ public class Repesaje extends PBase {
     }
 
     public void doApply(View view) {
+        totales();
+
+        if (esbarra) {
+            if (ocant!=tcant) {
+                msgbox("La cantidad de bolsas incorrecta");return;
+            }
+        }
+
         try{
             if (!checkLimits()) return;
 
@@ -192,8 +200,9 @@ public class Repesaje extends PBase {
 
     }
 
+    //endregion
 
-    // Main
+    //region Main
 
     private void listItems() {
         try{
@@ -204,14 +213,12 @@ public class Repesaje extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
-
     }
 
     private void loadItem() {
         try{
             if (esbarra) {
-
+                loadBarras();
             } else {
                 loadItemSingle();
             }
@@ -240,8 +247,28 @@ public class Repesaje extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());
         }
+    }
 
-     }
+    private void loadBarras() {
+        Cursor DT;
+
+        try {
+            sql = "SELECT SUM(PESO),SUM(PRECIO),COUNT(BARRA) FROM T_BARRA WHERE CODIGO='"+prodid+"' ";
+
+            DT = Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            lblOCant.setText(""+DT.getInt(2));
+            lblOPeso.setText(mu.frmdecimal(DT.getDouble(0),gl.peDecImp));
+            lblPrec.setText(mu.frmdecimal(DT.getDouble(1),2));
+
+            opeso=DT.getDouble(0);
+            ocant=DT.getDouble(2);
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox(e.getMessage());
+        }
+    }
 
     private void saveItem() {
         try{
@@ -325,11 +352,58 @@ public class Repesaje extends PBase {
    }
 
     private void applyBarra() {
+        Cursor dt;
+        double rf,pp0,pp,ppr,tp,dtp;
+        String bar;
 
+        try {
+
+            rf=tpeso/opeso;rf=mu.roundr(rf,gl.peDec);tp=0;
+
+            sql = "SELECT BARRA,PESO FROM T_BARRA WHERE CODIGO='"+prodid+"' ";
+            dt = Con.OpenDT(sql);
+            dt.moveToFirst();
+
+            while (!dt.isAfterLast()) {
+                bar=dt.getString(0);
+                pp0=dt.getDouble(1);pp=pp0*rf;ppr=mu.roundr(pp,gl.peDec);
+                tp+=ppr;
+
+                sql="UPDATE T_BARRA SET PESO="+ppr+" WHERE CODIGO='"+prodid+"' AND BARRA='"+bar+"'";
+                db.execSQL(sql);
+
+                dt.moveToNext();
+            }
+
+            tp=mu.roundr(tp,gl.peDec+2);
+            dtp=tpeso-tp;
+            dtp=mu.roundr(dtp,gl.peDec+2);// diferencia por redondeo
+
+            sql = "SELECT BARRA,PESO FROM T_BARRA WHERE CODIGO='"+prodid+"' ";
+            dt = Con.OpenDT(sql);
+            dt.moveToFirst();
+            bar=dt.getString(0);
+            pp=dt.getDouble(1);
+
+            // agregar la diferencia a la primera barra
+            sql="UPDATE T_BARRA SET PESO=PESO+"+dtp+" WHERE CODIGO='"+prodid+"' AND BARRA='"+bar+"'";
+            db.execSQL(sql);
+
+            // actualizar peso en T_VENTA
+            sql="UPDATE T_VENTA SET PESO="+tpeso+" WHERE PRODUCTO='"+prodid+"'";
+            db.execSQL(sql);
+
+            finish();
+            toastcent("Repesaje aplicado");
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox(e.getMessage());
+        }
     }
 
+    //endregion
 
-    // Calculator
+    //region Calculator
 
     private void prepareCalculator() {
         try{
@@ -395,11 +469,14 @@ public class Repesaje extends PBase {
         }
     }
 
+    //endregion
 
-    // Aux
+    //region Aux
 
     private boolean checkItem() {
         String ss;
+
+        totales();
 
         try {
             ss = txtPeso.getText().toString();
@@ -414,6 +491,10 @@ public class Repesaje extends PBase {
             ss = txtBol.getText().toString();
             ival=Integer.parseInt(ss);
             if (ival<=0) throw new Exception();
+
+            if (ival+tcant>ocant) {
+                msgbox("Cantidad de bolsas mayor que cantidad de bolsas escaneadas.");txtBol.requestFocus();return false;
+            }
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox("Cantidad incorrecta.");txtBol.requestFocus();return false;
@@ -436,6 +517,7 @@ public class Repesaje extends PBase {
         try{
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
+            dialog.setTitle("Repesaje");
             dialog.setMessage(msg  + " ?");
             dialog.setIcon(R.drawable.ic_quest);
 
@@ -459,11 +541,11 @@ public class Repesaje extends PBase {
 
     private void totales() {
         try{
-            tcant=ritems.size();
+            tcant=0;tpeso=0;
 
-            tpeso=0;
             for (int i = 0; i <ritems.size(); i++) {
-                tpeso=tpeso+ritems.get(i).peso;
+                tpeso+=ritems.get(i).peso;
+                tcant+=ritems.get(i).bol;
             }
 
             lblCant.setText("" + tcant);
@@ -512,8 +594,9 @@ public class Repesaje extends PBase {
         return true;
     }
 
+    //endregion
 
-    // Messages
+    //region Messages
 
     private void msgAskApply(String msg) {
         try{
@@ -540,8 +623,9 @@ public class Repesaje extends PBase {
 
     }
 
+    //endregion
 
-    // Activity events
+    //region Activity events
 
     @Override
     public void onBackPressed() {
@@ -553,5 +637,6 @@ public class Repesaje extends PBase {
 
     }
 
+    //endregion
 
 }

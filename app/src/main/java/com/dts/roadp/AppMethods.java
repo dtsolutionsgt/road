@@ -31,9 +31,7 @@ public class AppMethods {
 		upd=Con.Upd;
 	}
 	
-	public void reconnect(BaseDatos dbconnection, SQLiteDatabase database)
-	{
-
+	public void reconnect(BaseDatos dbconnection, SQLiteDatabase database) 	{
 		Con=dbconnection;
 		db=database;
 		

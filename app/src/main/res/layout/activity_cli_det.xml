@@ -1,20 +1,21 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relclimain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@layout/back"
-    tools:context=".CliDet" >
+    tools:context=".CliDet">
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:layout_above="@+id/rellaycr"
+        android:layout_below="@+id/relRoad"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="false"
-        android:layout_below="@+id/relRoad"
-        android:layout_marginRight="64dp" >
+        android:layout_marginRight="64dp">
 
         <TextView
             android:id="@+id/lblTel"
@@ -32,12 +33,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:paddingBottom="3dp"
+            android:layout_alignParentRight="true"
             android:paddingLeft="5dp"
-            android:paddingRight="5dp"
             android:paddingTop="3dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="3dp"
             android:text="Nombre"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="18sp"
@@ -47,12 +48,12 @@
             android:id="@+id/lblPres"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/lblNom"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/lblNom"
-            android:paddingBottom="3dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
+            android:paddingBottom="3dp"
             android:text="Representante"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="18sp" />
@@ -62,9 +63,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/lblProd"
+            android:layout_below="@+id/lblPres"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/lblPres"
             android:layout_marginBottom="32dp"
             android:layout_weight="1"
             android:width="0dip"
@@ -108,7 +109,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:clickable="true"
-            android:onClick="setGPS" >
+            android:onClick="setGPS">
 
             <ImageView
                 android:id="@+id/imageView3"
@@ -123,9 +124,9 @@
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/imageView3"
                 android:ellipsize="end"
@@ -155,10 +156,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:paddingBottom="3dp"
             android:paddingLeft="10dp"
-            android:paddingRight="5dp"
             android:paddingTop="3dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="3dp"
             android:text="Crédito"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="18sp" />
@@ -167,12 +168,12 @@
             android:id="@+id/lblCUsed"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/lblCDisp"
             android:layout_below="@+id/lblCLim"
+            android:layout_alignRight="@+id/lblCDisp"
             android:layout_toRightOf="@+id/lblCheq"
             android:gravity="right"
-            android:paddingBottom="5dp"
             android:paddingRight="10dp"
+            android:paddingBottom="5dp"
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textStyle="bold" />
@@ -184,8 +185,8 @@
             android:layout_below="@+id/lblPTotal"
             android:layout_toRightOf="@+id/lblCheq"
             android:gravity="right"
-            android:paddingBottom="5dp"
             android:paddingRight="10dp"
+            android:paddingBottom="5dp"
             android:text="00.000.000.00"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="18sp"
@@ -199,8 +200,8 @@
             android:layout_alignRight="@+id/lblCUsed"
             android:layout_toRightOf="@+id/lblCheq"
             android:gravity="right"
-            android:paddingBottom="5dp"
             android:paddingRight="10dp"
+            android:paddingBottom="5dp"
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textStyle="bold" />
@@ -220,8 +221,8 @@
             android:id="@+id/lblPTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/lblBU"
             android:layout_below="@+id/lblFecha"
+            android:layout_alignLeft="@+id/lblBU"
             android:paddingBottom="3dp"
             android:text="Usado :"
             android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -230,8 +231,8 @@
             android:id="@+id/lblCheq"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/lblPTotal"
             android:layout_below="@+id/lblPTotal"
+            android:layout_alignLeft="@+id/lblPTotal"
             android:paddingBottom="5dp"
             android:text="Disponible :"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -243,8 +244,8 @@
         android:id="@+id/lblCPago"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_below="@+id/relativeLayout1"
+        android:layout_alignParentRight="true"
         android:text="Devolucion"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#FFFFFF"
@@ -254,8 +255,8 @@
         android:id="@+id/lblCValor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:gravity="center_horizontal"
         android:text="Cobros"
         android:textAppearance="?android:attr/textAppearanceSmall"
@@ -265,41 +266,41 @@
     <RelativeLayout
         android:layout_width="64dp"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/relRoad"
         android:layout_alignBottom="@+id/relativeLayout1"
         android:layout_alignParentLeft="false"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="false"
-        android:layout_below="@+id/relRoad" >
+        android:layout_alignParentRight="true">
 
         <RelativeLayout
             android:id="@+id/relVenta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignWithParentIfMissing="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_alignWithParentIfMissing="true"
             android:clickable="true"
-            android:onClick="showVenta" >
+            android:onClick="showVenta">
 
             <ImageView
                 android:id="@+id/imageView4"
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
-                android:layout_alignParentBottom="false"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="false"
                 android:clickable="false"
-                android:paddingBottom="6dp"
                 android:paddingTop="6dp"
+                android:paddingBottom="6dp"
                 android:src="@drawable/next48" />
 
             <TextView
                 android:id="@+id/textView1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_below="@+id/imageView4"
+                android:layout_alignParentLeft="true"
                 android:gravity="center_horizontal"
                 android:paddingBottom="5dp"
                 android:text="VENTA"
@@ -312,33 +313,33 @@
             android:id="@+id/relPreventa"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="false"
             android:layout_alignWithParentIfMissing="true"
             android:layout_below="@+id/relVenta"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="false"
             android:clickable="true"
-            android:onClick="showPreventa" >
+            android:onClick="showPreventa">
 
             <ImageView
                 android:id="@+id/ImageView01"
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
-                android:layout_alignParentBottom="false"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="false"
                 android:clickable="true"
                 android:onClick="showPreventa"
-                android:paddingBottom="6dp"
                 android:paddingTop="6dp"
+                android:paddingBottom="6dp"
                 android:src="@drawable/next48" />
 
             <TextView
                 android:id="@+id/TextView01"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_below="@+id/ImageView01"
+                android:layout_alignParentLeft="true"
                 android:gravity="center_horizontal"
                 android:paddingBottom="5dp"
                 android:text="PREVENTA"
@@ -351,24 +352,24 @@
             android:id="@+id/relDespacho"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="false"
             android:layout_alignWithParentIfMissing="true"
             android:layout_below="@+id/relPreventa"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="false"
             android:clickable="true"
-            android:onClick="showDespacho" >
+            android:onClick="showDespacho">
 
             <ImageView
                 android:id="@+id/ImageView02"
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
-                android:layout_alignParentBottom="false"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="false"
                 android:clickable="false"
-                android:paddingBottom="6dp"
                 android:paddingTop="6dp"
+                android:paddingBottom="6dp"
                 android:src="@drawable/next48" />
 
             <TextView
@@ -391,10 +392,10 @@
             android:id="@+id/relCamara"
             android:layout_width="match_parent"
             android:layout_height="62dp"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:layout_marginBottom="5dp"
+            android:layout_alignParentBottom="true"
             android:layout_marginStart="0dp"
+            android:layout_marginBottom="5dp"
             android:onClick="tomarFoto">
 
             <ImageView
@@ -403,20 +404,20 @@
                 android:layout_height="40dp"
                 android:layout_alignParentStart="true"
                 android:layout_marginStart="0dp"
-                android:paddingBottom="6dp"
                 android:paddingEnd="6dp"
+                android:paddingBottom="6dp"
                 android:src="@drawable/camara" />
 
             <TextView
                 android:id="@+id/textView20"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
                 android:layout_below="@+id/imgCamara"
-                android:layout_marginBottom="5dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
                 android:layout_marginLeft="0dp"
                 android:layout_marginTop="0dp"
+                android:layout_marginBottom="5dp"
                 android:gravity="center_horizontal"
                 android:paddingBottom="5dp"
                 android:text="CÁMARA"
@@ -433,25 +434,24 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" >
+        android:layout_alignParentTop="true">
 
         <RelativeLayout
             android:id="@+id/relRoadbar"
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:layout_centerVertical="true"
-            android:background="#9A999E" >
-        </RelativeLayout>
+            android:background="#9A999E"></RelativeLayout>
 
         <ImageView
             android:id="@+id/imgTitLogo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:layout_marginBottom="5dp"
             android:adjustViewBounds="true"
             android:src="@drawable/logo_panel" />
@@ -485,12 +485,12 @@
         android:id="@+id/relbotpan"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:layout_margin="1dp"
-        android:background="@layout/blue_strip" >
+        android:background="@layout/blue_strip">
 
         <TextView
             android:id="@+id/textView9"
@@ -514,12 +514,12 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/relbotpan"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="false"
+        android:layout_alignParentRight="true"
         android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp"
         android:layout_marginTop="3dp"
-        android:padding="2dp" >
+        android:layout_marginRight="3dp"
+        android:padding="2dp">
 
         <ImageView
             android:id="@+id/imgPFoto"
@@ -557,18 +557,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/textView4"
-            android:layout_alignParentBottom="false"
             android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="false"
             android:layout_toLeftOf="@+id/imgPFoto"
-            android:layout_toRightOf="@+id/imgImg" >
+            android:layout_toRightOf="@+id/imgImg">
 
             <ImageView
                 android:id="@+id/imageView5"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:clickable="true"
                 android:onClick="callWaze"
@@ -578,9 +578,9 @@
                 android:id="@+id/textView5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/imageView5"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/imageView5"
                 android:gravity="center_horizontal"
                 android:text="Waze"
                 android:textAppearance="?android:attr/textAppearanceSmall"
@@ -591,17 +591,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/textView4"
-            android:layout_alignParentBottom="false"
             android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="false"
             android:layout_toLeftOf="@+id/imageView1"
-            android:layout_toRightOf="@+id/imgPFoto" >
+            android:layout_toRightOf="@+id/imgPFoto">
 
             <ImageView
                 android:id="@+id/imageView2"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_alignParentBottom="false"
                 android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="false"
                 android:layout_centerHorizontal="true"
                 android:adjustViewBounds="true"
                 android:clickable="true"
@@ -612,9 +612,9 @@
                 android:id="@+id/textView6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/imageView2"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/imageView2"
                 android:gravity="center_horizontal"
                 android:text="Cobro"
                 android:textAppearance="?android:attr/textAppearanceSmall"
@@ -637,8 +637,8 @@
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="false"
             android:layout_below="@+id/imgPFoto"
+            android:layout_alignParentBottom="false"
             android:layout_centerHorizontal="true"
             android:gravity="center_horizontal"
             android:paddingBottom="3dp"

@@ -1970,7 +1970,6 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-
 			vSQL="CREATE TABLE [T_BARRA] ("+
 					"[BARRA] TEXT NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+

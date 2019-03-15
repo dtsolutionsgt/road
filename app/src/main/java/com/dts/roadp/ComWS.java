@@ -49,7 +49,7 @@ public class ComWS extends PBase {
 	private ProgressBar barInfo;
 	private EditText txtRuta,txtWS,txtEmp;
 	private ImageView imgRec,imgEnv,imgExis;
-	private RelativeLayout relExist,relPrecio,relStock;
+	private RelativeLayout ralBack,relExist,relPrecio,relStock;
 	
 	private int isbusy,fecha,lin,reccnt,ultcor,ultcor_ant;
 	private String err,ruta,rutatipo,sp,docstock,ultSerie,ultSerie_ant;
@@ -107,15 +107,13 @@ public class ComWS extends PBase {
 		txtWS= (EditText) findViewById(R.id.txtWS);txtWS.setEnabled(false);
 		txtEmp= (EditText) findViewById(R.id.txtEmp);txtEmp.setEnabled(false);
 
-		//Botones
 		lblRec= (TextView) findViewById(R.id.btnRec);
 		lblEnv= (TextView) findViewById(R.id.btnSend);
 
-		//Imágenes
 		imgEnv= (ImageView) findViewById(R.id.imageView6);
 		imgRec= (ImageView) findViewById(R.id.imageView5);
 
-		//Relative Layout
+		ralBack=(RelativeLayout) findViewById(R.id.relwsmail);
 		relExist=(RelativeLayout) findViewById(R.id.relExist);
 		relPrecio=(RelativeLayout) findViewById(R.id.relPrecio);
 		relStock=(RelativeLayout) findViewById(R.id.relStock);
@@ -166,6 +164,8 @@ public class ComWS extends PBase {
 		//txtRuta.setText("0005-1");
 		//txtWS.setText("http://192.168.1.112/wsAndr/wsandr.asmx");
 		//txtEmp.setText("03");
+
+		setHandlers();
 
 	}
 
@@ -288,9 +288,18 @@ public class ComWS extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 		if (isbusy==1) {
-			toastcent("Por favor, espere que se termine la tarea actual.");return;
+			toastcent("Por favor, espere hasta que se termine la tarea actual.");return;
 		}
 
+	}
+
+	private void setHandlers() {
+		ralBack.setOnTouchListener(new SwipeListener(this) {
+			public void onSwipeRight() {
+				onBackPressed();
+			}
+			public void onSwipeLeft() {}
+		});
 	}
 
 	//endregion

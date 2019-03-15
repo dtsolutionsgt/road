@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
+
 public class DevolCli extends PBase {
 
 	private ListView listView;
@@ -134,7 +136,7 @@ public class DevolCli extends PBase {
 			
 			sql="SELECT T_CxCD.CODIGO, T_CxCD.CANT, P_CODDEV.DESCRIPCION, P_PRODUCTO.DESCCORTA, T_CxCD.ITEM,T_CxCD.PESO,T_CxCD.TOTAL "+
 			     " FROM T_CxCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_CxCD.CODIGO "+
-				 " INNER JOIN P_CODDEV ON (P_CODDEV.CODIGO=T_CxCD.CODDEV AND P_CODDEV.ESTADO='"+estado+"') "+
+				 " LEFT JOIN P_CODDEV ON (P_CODDEV.CODIGO=T_CxCD.CODDEV AND P_CODDEV.ESTADO='"+estado+"') "+
 			     " ORDER BY P_PRODUCTO.DESCCORTA";
 			
 			DT=Con.OpenDT(sql);
@@ -154,7 +156,7 @@ public class DevolCli extends PBase {
 
             cntprd = cntprd+1;
             cntunis = cntunis + Double.parseDouble(s);
-            cntkgs = cntkgs + DT.getDouble(5);
+            cntkgs = mu.round(cntkgs + DT.getDouble(5),gl.peDec);
             cntotl = mu.round(cntotl + DT.getDouble(6),gl.peDec);
 
 			  items.add(vItem);	
@@ -334,8 +336,9 @@ public class DevolCli extends PBase {
 		String corel,pcod;
 		Double pcant;
 		
-		corel=gl.ruta+"_"+mu.getCorelBase();
-		
+		gl.dvcorreld = obtienecorrel("D");
+		gl.dvcorrelnc = obtienecorrel("NC");
+
 		try {
 
 		    if (gl.tiponcredito==1){
@@ -344,7 +347,7 @@ public class DevolCli extends PBase {
 
                 ins.init("D_CxC");
 
-                ins.add("COREL",corel);
+                ins.add("COREL",gl.dvcorreld);
                 ins.add("RUTA",gl.ruta);
                 ins.add("CLIENTE",gl.cliente);
                 ins.add("FECHA",fecha);
@@ -365,14 +368,14 @@ public class DevolCli extends PBase {
 
                 ins.init("D_NOTACRED");
 
-                ins.add("COREL",corel);
+                ins.add("COREL",gl.dvcorrelnc);
                 ins.add("ANULADO","N");
                 ins.add("FECHA",fecha);
                 ins.add("RUTA",gl.ruta);
                 ins.add("VENDEDOR",gl.vend);
                 ins.add("CLIENTE",gl.cliente);
                 ins.add("TOTAL",cntotl);
-                ins.add("FACTURA",corel);
+                ins.add("FACTURA",gl.dvcorreld);
                 ins.add("SERIE","0");
                 ins.add("CORELATIVO","0");
                 ins.add("STATCOM","N");
@@ -395,7 +398,7 @@ public class DevolCli extends PBase {
 
                     ins.init("D_CxCD");
 
-                    ins.add("COREL",corel);
+                    ins.add("COREL",gl.dvcorreld);
                     ins.add("ITEM",DT.getInt(0));
                     ins.add("CODIGO",DT.getString(1));
                     ins.add("CANT",DT.getDouble(2));
@@ -416,7 +419,7 @@ public class DevolCli extends PBase {
 
                     ins.init("D_NOTACREDD");
 
-                    ins.add("COREL",corel);
+                    ins.add("COREL",gl.dvcorrelnc);
                     ins.add("PRODUCTO",DT.getString(1));
                     ins.add("PRECIO_ORIG",DT.getDouble(5));
                     ins.add("PRECIO_ACT",0);
@@ -429,28 +432,41 @@ public class DevolCli extends PBase {
                     ins.add("FACTOR",DT.getDouble(13));
                     db.execSQL(ins.sql());
 
-                    try {
-                        sql="INSERT INTO P_STOCK VALUES ('"+pcod+"',0,0,0)";
-                        db.execSQL(sql);
-                    } catch (Exception e) {
-                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-                    }
+                    if (!gl.peModal.equalsIgnoreCase("TOL")) {
 
-                    if (estado.equalsIgnoreCase("M")) {
-                        sql="UPDATE P_STOCK SET CANTM=CANTM+"+pcant+" WHERE CODIGO='"+pcod+"'";
-                    } else {
-                        sql="UPDATE P_STOCK SET CANT=CANT+"+pcant+" WHERE CODIGO='"+pcod+"'";
+                        try {
+                            sql="INSERT INTO P_STOCK VALUES ('"+pcod+"',0,0,0)";
+                            db.execSQL(sql);
+                        } catch (Exception e) {
+                            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+                        }
+
+                        if (estado.equalsIgnoreCase("M")) {
+                            sql="UPDATE P_STOCK SET CANTM=CANTM+"+pcant+" WHERE CODIGO='"+pcod+"'";
+                        } else {
+                            sql="UPDATE P_STOCK SET CANT=CANT+"+pcant+" WHERE CODIGO='"+pcod+"'";
+                        }
+                        db.execSQL(sql);
+
                     }
-                    db.execSQL(sql);
 
                     DT.moveToNext();
                 }
+
+                sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactuald+" WHERE RUTA='"+gl.ruta+"' AND TIPO='D'";
+                db.execSQL(sql);
+
+                sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactualnc+" WHERE RUTA='"+gl.ruta+"' AND TIPO='NC'";
+                db.execSQL(sql);
 
                 db.setTransactionSuccessful();
 
                 db.endTransaction();
 
                 Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();
+
+                gl.closeCliDet = true;
+                gl.closeVenta = true;
 
                 super.finish();
 
@@ -461,7 +477,6 @@ public class DevolCli extends PBase {
                     Intent i = new Intent(this, CliDet.class);
                     gl.dvbrowse=3;
                     gl.dvdispventa = cntotl;
-                    gl.dvcorrel = corel;
                     gl.dvestado = estado;
                     startActivity(i);
 
@@ -481,7 +496,43 @@ public class DevolCli extends PBase {
 
 
 	// Aux 
-	
+
+    private String obtienecorrel(String tipo){
+	    String correl="";
+        Cursor DT;
+
+	    try{
+
+
+           sql="SELECT SERIE,ACTUAL+1,FINAL,INICIAL FROM P_CORREL_OTROS WHERE RUTA='"+gl.ruta+"' AND TIPO='"+tipo+"'";
+            DT=Con.OpenDT(sql);
+
+            if(DT.getCount()>0){
+
+                DT.moveToFirst();
+
+                correl=DT.getString(0) + StringUtils.right("00000" + Integer.toString(DT.getInt(1)), 5);
+
+                if (tipo.equals("D")){
+                    gl.dvactuald = String.valueOf(DT.getInt(1));
+                }else{
+                    gl.dvactualnc = String.valueOf(DT.getInt(1));
+                }
+
+            }else{
+
+                correl=gl.ruta+"_"+mu.getCorelBase();
+
+            }
+
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+	    }
+
+        return  correl;
+
+    }
+
 	private void clearData(){
 		try {
 			sql="DELETE FROM T_CxCD";
@@ -542,6 +593,7 @@ public class DevolCli extends PBase {
 			});
 
 			dialog.show();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -565,6 +617,9 @@ public class DevolCli extends PBase {
 	
 	private void doExit(){
 		try{
+            if(gl.dvbrowse!=0){
+                gl.dvbrowse =0;
+            }
 			super.finish();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

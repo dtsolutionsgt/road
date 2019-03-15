@@ -217,8 +217,8 @@ public class Venta extends PBase {
 			}
 
 			if (gl.dvbrowse!=0){
-				if (tot>gl.dvdispventa){
-					mu.msgbox("Monto total mayor al disponible!");return;
+				if (tot<gl.dvdispventa){
+					mu.msgbox("Monto total menor al disponible!");return;
 				}
 			}
 
@@ -1241,6 +1241,9 @@ public class Venta extends PBase {
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
+					if(gl.dvbrowse!=0){
+						gl.dvbrowse =0;
+					}
 					if (rutapos) doExit();else listAten();
 				}
 			});

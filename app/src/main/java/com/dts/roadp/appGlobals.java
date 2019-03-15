@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class appGlobals extends Application {
 
 	public String ruta,rutanom,sucur,rutatipo,rutatipog,vend,vendnom,gstr,gstr2,prod,um,umpres,umstock,cliente,clitipo;
-	public String ubas,emp, empnom,imgpath,umpeso,impresora, tipoImpresora, codSupervisor, ayudante, ayudanteID, vehiculo, vehiculoID;
+	public String ubas,emp, empnom,imgpath,umpeso,lotedf,impresora, tipoImpresora, codSupervisor, ayudante, ayudanteID, vehiculo, vehiculoID;
 	public String wsURL,bonprodid,pprodname,contrib,ateninistr,tcorel;
 	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,atentini,vnivel,vnivprec,media;
 	public int autocom,nuevaFecha,pagomodo,filtrocli;
@@ -31,7 +31,7 @@ public class appGlobals extends Application {
 	public int dvbrowse=0;
     public boolean dvporpeso;
     public double dvdispventa;
-    public String dvcorrel,dvestado;
+    public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc;
 
 	// Parametros Extra
 	public String peModal,peMon,peFormatoFactura;

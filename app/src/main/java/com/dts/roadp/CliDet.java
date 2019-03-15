@@ -609,7 +609,11 @@ public class CliDet extends PBase {
 			if(cantidad == 0){
 				mu.msgbox("No hay existencias disponibles.");
 			}else{
-				runVenta();
+				if(gl.tiponcredito == 2){
+					return;
+				}else {
+					runVenta();
+				}
 			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1053,6 +1057,42 @@ public class CliDet extends PBase {
 
 	//Region Events
 
+	private void setHandlers(){
+
+		try {
+
+            chknc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+				    if (chknc.isChecked()==true){
+						chkncv.setChecked(false);
+                        gl.tiponcredito = 1;
+				    }
+
+				}
+			});
+
+			chkncv.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+				    if (chkncv.isChecked()==true){
+						chknc.setChecked(false);
+				    	gl.tiponcredito = 2;
+
+						VerificaCantidad();
+
+                    }
+
+				}
+			});
+
+		}catch (Exception e){
+		addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+	}
+
+	}
 
 	private void msgAskExit(String msg) {
 		try{
@@ -1085,6 +1125,9 @@ public class CliDet extends PBase {
 	private void doExit(){
 		try{
 			super.finish();
+            if(gl.dvbrowse!=0){
+                gl.dvbrowse =0;
+            }
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

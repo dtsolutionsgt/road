@@ -117,10 +117,10 @@ public class CliDet extends PBase {
 		
 		showData();
 		calcCredit();
-		
+
 		browse=0;
 		merc=1;
-		
+
 		habilitaOpciones();
 		
 		defineGeoPos();
@@ -128,6 +128,7 @@ public class CliDet extends PBase {
 		miniFachada();
 
 		setHandlers();
+
 
 		//Toast.makeText(this, "Create activity : ", Toast.LENGTH_SHORT).show();
 	}
@@ -348,6 +349,7 @@ public class CliDet extends PBase {
 	}
 	
 	private void initVenta(){
+
 		try{
 			if (gl.peModal.equalsIgnoreCase("APR")) {
 				startActivity(new Intent(this,Aprofam1.class));
@@ -1127,6 +1129,20 @@ public class CliDet extends PBase {
 				browse=0;
 				showData();return;
 			}
+
+			if (gl.dvbrowse!=0){
+
+				gl.rutatipo = "V";
+
+				browse =3;
+
+				if (browse==3){//Se utiliza para la devolución de cliente.
+					initVenta();return;
+				}return;
+
+			}
+
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

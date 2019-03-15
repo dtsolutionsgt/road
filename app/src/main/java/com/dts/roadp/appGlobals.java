@@ -27,8 +27,12 @@ public class appGlobals extends Application {
 
 	//Devolución Cliente
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;
-	public Double dvfactor,dvpeso,dvprec,dvpreclista;
+	public double dvfactor,dvpeso,dvprec,dvpreclista,dvtotal;
+	public int dvbrowse=0;
     public boolean dvporpeso;
+    public double dvdispventa;
+    public String dvcorrel,dvestado;
+
 	// Parametros Extra
 	public String peModal,peMon,peFormatoFactura;
 	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec;

@@ -194,6 +194,7 @@ public class Venta extends PBase {
 				}
 			}
 
+
 			ss=ss+"acum : "+clsDeG.acum+" , limit "+clsDeG.maxlimit+"\n";
 			ss=ss+"Valor : "+clsDeG.valor+"\n";
 			ss=ss+"acum : "+clsDeG.valacum+"\n";
@@ -216,6 +217,11 @@ public class Venta extends PBase {
 
 			}
 
+			if (gl.dvbrowse!=0){
+				if (tot>gl.dvdispventa){
+					mu.msgbox("Monto total mayor al disponible!");return;
+				}
+			}
 
 			if (rutatipo.equalsIgnoreCase("V")) {
 				Intent intent = new Intent(this,FacturaRes.class);

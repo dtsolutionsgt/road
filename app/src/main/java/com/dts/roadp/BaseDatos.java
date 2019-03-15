@@ -77,18 +77,13 @@ public class BaseDatos extends SQLiteOpenHelper {
 	  }
 	  
 	  public Cursor OpenDT(String pSQL) {
+	  	Cursor vCursor = null;
 
-	  		Cursor vCursor = null;
-
-		  try
-		  {
-
+		  try {
 			  vCursor = vDatabase.rawQuery(pSQL, null);
 			  vCursor.moveToLast();
-
 		  }catch(Exception ex){
-			  msgbox(new Object() {
-			  }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+		  	//msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
 		  }
 
 		  return vCursor;

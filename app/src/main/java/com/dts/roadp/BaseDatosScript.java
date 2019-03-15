@@ -164,6 +164,10 @@ public class BaseDatosScript {
 					"[STATCOM] TEXT NOT NULL,"+
 					"[VENDEDOR] TEXT NOT NULL,"+
 					"[TOTAL] REAL NOT NULL,"+
+					"[SUPERVISOR] TEXT NOT NULL,"+
+					"[AYUDANTE] TEXT NOT NULL,"+
+					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
+					"[ESTADO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);
@@ -186,6 +190,10 @@ public class BaseDatosScript {
 					"[PESO] REAL NOT NULL,"+
 					"[FECHA_CAD] INTEGER NOT NULL,"+
 					"[LOTE] TEXT NOT NULL,"+
+					"[UMVENTA] TEXT NOT NULL,"+
+					"[UMSTOCK] TEXT NOT NULL,"+
+					"[UMPESO] TEXT NOT NULL,"+
+					"[FACTOR] REAL NOT NULL,"+
 					"PRIMARY KEY ([COREL],[ITEM])"+
 					");";
 			database.execSQL(vSQL);
@@ -851,6 +859,25 @@ public class BaseDatosScript {
 					"[IMPRES] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE TABLE [D_NOTACREDD] ("+
+					"[COREL] TEXT NOT NULL,"+
+					"[PRODUCTO] TEXT NOT NULL,"+
+					"[PRECIO_ORIG] REAL NOT NULL,"+
+					"[PRECIO_ACT] REAL NOT NULL,"+
+					"[CANT] REAL NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[POR_PRESO] TEXT NOT NULL,"+
+					"[UMVENTA] TEXT NOT NULL,"+
+					"[UMSTOCK] TEXT NOT NULL,"+
+					"[UMPESO] TEXT NOT NULL,"+
+					"[FACTOR] REAL NOT NULL,"+
+					"PRIMARY KEY ([COREL],[PRODUCTO])"+
+					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE INDEX D_NOTACREDD_idx1 ON D_NOTACREDD(COREL)";
 			database.execSQL(vSQL);
 
 
@@ -1897,6 +1924,14 @@ public class BaseDatosScript {
 					"[PRECIO] REAL NOT NULL,"+
 					"[PRECLISTA] REAL NOT NULL,"+
 					"[REF] TEXT NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[FECHA_CAD] INTEGER NOT NULL,"+
+					"[LOTE] TEXT NOT NULL,"+
+					"[UMVENTA] TEXT NOT NULL,"+
+					"[UMSTOCK] TEXT NOT NULL,"+
+					"[UMPESO] TEXT NOT NULL,"+
+					"[FACTOR] REAL NOT NULL,"+
+					"[POR_PESO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([Item])"+
 					");";
 			database.execSQL(vSQL);	             

@@ -1,6 +1,8 @@
 package com.dts.roadp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.Gravity;
@@ -392,6 +394,63 @@ public class AppMethods {
 		}
 	}
 
+	public void estandartInventario()  {
+		Cursor dt,df;
+		String cod,ub,us,lote,doc,stat;
+		double cant,cantm,fact;
+
+		try {
+
+			sql="SELECT P_STOCK.CODIGO,P_STOCK.UNIDADMEDIDA, P_PRODUCTO.UNIDBAS, P_STOCK.CANT, " +
+					"P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.STATUS, P_STOCK.CANTM  " +
+					"FROM  P_STOCK INNER JOIN P_PRODUCTO ON P_STOCK.CODIGO=P_PRODUCTO.CODIGO";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()==0) return;
+
+			dt.moveToFirst();
+			while (!dt.isAfterLast()) {
+
+				cod=dt.getString(0);
+				us=dt.getString(1);
+				ub=dt.getString(2);
+				cant=dt.getDouble(3);
+				lote = dt.getString(4);
+				doc = dt.getString(5);
+				stat = dt.getString(6);
+				cantm=dt.getDouble(7);
+
+				if (!ub.equalsIgnoreCase(us)) {
+
+					sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+us+"') AND (UNIDADMINIMA='"+ub+"')";
+					df=Con.OpenDT(sql);
+
+					if (df.getCount()>0) {
+
+						df.moveToFirst();
+						fact=df.getDouble(0);
+						cant=cant*fact;
+						cantm=cantm*fact;
+
+						sql="UPDATE P_STOCK SET CANT="+cant+",CANTM="+cantm+",UNIDADMEDIDA='"+ub+"'  " +
+								"WHERE (CODIGO='"+cod+"') AND (UNIDADMEDIDA='"+us+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
+						db.execSQL(sql);
+					} else {
+						msgbox("No existe factor conversion para el producto : "+cod);
+						sql="DELETE FROM P_STOCK WHERE CODIGO='"+cod+"'";
+						db.execSQL(sql);
+					}
+				}
+
+				dt.moveToNext();
+			}
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+	}
+
 
 	// Common
 	
@@ -407,6 +466,30 @@ public class AppMethods {
 		} else{
 			return false;
 		}
+	}
+
+	public void msgbox(String msg) {
+
+		try{
+
+			if (!emptystr(msg)){
+
+				AlertDialog.Builder dialog = new AlertDialog.Builder(cont);
+
+				dialog.setTitle(R.string.app_name);
+				dialog.setMessage(msg);
+
+				dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						//Toast.makeText(getApplicationContext(), "Yes button pressed",Toast.LENGTH_SHORT).show();
+					}
+				});
+				dialog.show();
+
+			}
+
+		}catch (Exception ex)
+			{toast(ex.getMessage());}
 	}
 
 }

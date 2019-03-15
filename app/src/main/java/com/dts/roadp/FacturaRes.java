@@ -54,6 +54,7 @@ public class FacturaRes extends PBase {
 	private int cyear, cmonth, cday, dweek,stp=0;
 
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
+	private double dispventa;
 	private boolean acum,cleandprod,peexit,pago,saved,rutapos,porpeso;
 
 
@@ -90,6 +91,7 @@ public class FacturaRes extends PBase {
 		media=gl.media;
 		credito=gl.credito;
 		gl.cobroPendiente = false;
+		dispventa = gl.dvdispventa;
 
 		app = new AppMethods(this, gl, Con, db);
 			
@@ -716,8 +718,13 @@ public class FacturaRes extends PBase {
 			ins.add("DEPOS","N");
 			ins.add("PEDCOREL","");
 			ins.add("REFERENCIA","");
-			ins.add("ASIGNACION","");    
-			ins.add("SUPERVISOR","");
+			if (gl.dvbrowse!=0){
+				ins.add("ASIGNACION",gl.dvcorrel);
+			}else{
+				ins.add("ASIGNACION","");
+			}
+
+			ins.add("SUPERVISOR",gl.codSupervisor);
 			ins.add("AYUDANTE",gl.ayudanteID);//#HS_20181207 Agregue parametro de ayudanteID
 			ins.add("VEHICULO",gl.vehiculoID);//#HS_20181207 Agregue parametro de vehiculoID
 			ins.add("CODIGOLIQUIDACION",0);
@@ -725,6 +732,121 @@ public class FacturaRes extends PBase {
     		
 			db.execSQL(ins.sql());
 						
+			//INSERTA las tablas de devolución de  producto.
+
+			if (gl.dvbrowse!=0){
+
+				Cursor DT;
+				String dcorel,pcod;
+				Double pcant;
+				dcorel = gl.dvcorrel;
+
+				ins.init("D_CxC");
+
+				ins.add("COREL",dcorel);
+				ins.add("RUTA",gl.ruta);
+				ins.add("CLIENTE",gl.cliente);
+				ins.add("FECHA",fecha);
+				ins.add("ANULADO","S");
+				ins.add("EMPRESA",gl.emp);
+				ins.add("TIPO", gl.dvestado);
+				ins.add("REFERENCIA",corel);
+				ins.add("IMPRES",0);
+				ins.add("STATCOM","N");
+				ins.add("VENDEDOR",gl.vend);
+				ins.add("TOTAL",dispventa);
+				ins.add("SUPERVISOR",gl.codSupervisor);
+				ins.add("AYUDANTE",gl.ayudanteID);
+				ins.add("CODIGOLIQUIDACION",0);
+				ins.add("ESTADO","S");
+
+				db.execSQL(ins.sql());
+
+				ins.init("D_NOTACRED");
+
+				ins.add("COREL",dcorel);
+				ins.add("ANULADO","S");
+				ins.add("FECHA",fecha);
+				ins.add("RUTA",gl.ruta);
+				ins.add("VENDEDOR",gl.vend);
+				ins.add("CLIENTE",gl.cliente);
+				ins.add("TOTAL",dispventa);
+				ins.add("FACTURA",corel);
+				ins.add("SERIE","0");
+				ins.add("CORELATIVO","0");
+				ins.add("STATCOM","N");
+				ins.add("CODIGOLIQUIDACION",0);
+				ins.add("RESOLNC","N");
+				ins.add("SERIEFACT",0);
+				ins.add("CORELFACT",0);
+				ins.add("IMPRES",0);
+
+				db.execSQL(ins.sql());
+
+				sql="SELECT Item,CODIGO,CANT,CODDEV,TOTAL,PRECIO,PRECLISTA,REF,PESO,LOTE,UMVENTA,UMSTOCK,UMPESO,FACTOR,POR_PESO FROM T_CxCD WHERE CANT>0";
+				DT=Con.OpenDT(sql);
+
+				DT.moveToFirst();
+				while (!DT.isAfterLast()) {
+
+					pcod=DT.getString(1);
+					pcant=DT.getDouble(2);
+
+					ins.init("D_CxCD");
+
+					ins.add("COREL",dcorel);
+					ins.add("ITEM",DT.getInt(0));
+					ins.add("CODIGO",DT.getString(1));
+					ins.add("CANT",DT.getDouble(2));
+					ins.add("CODDEV",DT.getString(3));
+					ins.add("ESTADO",gl.dvestado);
+					ins.add("TOTAL",DT.getDouble(4));
+					ins.add("PRECIO",DT.getDouble(5));
+					ins.add("PRECLISTA",DT.getDouble(6));
+					ins.add("REF",DT.getString(7));
+					ins.add("PESO",DT.getDouble(8));
+					ins.add("FECHA_CAD",0);
+					ins.add("LOTE",DT.getString(9));
+					ins.add("UMVENTA",DT.getString(10));
+					ins.add("UMSTOCK",DT.getString(11));
+					ins.add("UMPESO",DT.getString(12));
+					ins.add("FACTOR",DT.getDouble(13));
+					db.execSQL(ins.sql());
+
+					ins.init("D_NOTACREDD");
+
+					ins.add("COREL",dcorel);
+					ins.add("PRODUCTO",DT.getString(1));
+					ins.add("PRECIO_ORIG",DT.getDouble(5));
+					ins.add("PRECIO_ACT",0);
+					ins.add("CANT",DT.getDouble(2));
+					ins.add("PESO",DT.getDouble(8));
+					ins.add("POR_PRESO", DT.getString(14));
+					ins.add("UMVENTA",DT.getString(10));
+					ins.add("UMSTOCK",DT.getString(11));
+					ins.add("UMPESO",DT.getString(12));
+					ins.add("FACTOR",DT.getDouble(13));
+					db.execSQL(ins.sql());
+
+					try {
+						sql="INSERT INTO P_STOCK VALUES ('"+pcod+"',0,0,0)";
+						db.execSQL(sql);
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+					}
+
+					if (gl.dvestado.equalsIgnoreCase("M")) {
+						sql="UPDATE P_STOCK SET CANTM=CANTM+"+pcant+" WHERE CODIGO='"+pcod+"'";
+					} else {
+						sql="UPDATE P_STOCK SET CANT=CANT+"+pcant+" WHERE CODIGO='"+pcod+"'";
+					}
+					db.execSQL(sql);
+
+					DT.moveToNext();
+				}
+			}
+
+			//Termina insert de devolución
 			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK FROM T_VENTA";
 			dt=Con.OpenDT(sql);
 	
@@ -896,8 +1018,12 @@ public class FacturaRes extends PBase {
 			db.setTransactionSuccessful();
 				
 			db.endTransaction();
-			 
+
 			saved=true;
+
+			if(gl.dvbrowse!=0){
+				gl.dvbrowse =0;
+			}
 
 			upd.init("P_CLIRUTA");
 			upd.add("BANDERA",0);

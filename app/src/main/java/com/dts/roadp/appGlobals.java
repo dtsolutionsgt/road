@@ -13,7 +13,7 @@ public class appGlobals extends Application {
 
 	public String ruta,rutanom,sucur,rutatipo,rutatipog,vend,vendnom,gstr,gstr2,prod,um,umpres,umstock,cliente,clitipo;
 	public String ubas,emp, empnom,imgpath,umpeso,impresora, tipoImpresora, codSupervisor, ayudante, ayudanteID, vehiculo, vehiculoID;
-	public String devtipo,devrazon,wsURL,bonprodid,pprodname,contrib,ateninistr,tcorel;
+	public String wsURL,bonprodid,pprodname,contrib,ateninistr,tcorel;
 	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,atentini,vnivel,vnivprec,media;
 	public int autocom,nuevaFecha,pagomodo,filtrocli;
 	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor,prectemp;
@@ -24,6 +24,14 @@ public class appGlobals extends Application {
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,contlic,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo;
 	public int mpago;
+
+	//Devolución Cliente
+	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;
+	public double dvfactor,dvpeso,dvprec,dvpreclista,dvtotal;
+	public int dvbrowse=0;
+    public boolean dvporpeso;
+    public double dvdispventa;
+    public String dvcorrel,dvestado;
 
 	// Parametros Extra
 	public String peModal,peMon,peFormatoFactura;

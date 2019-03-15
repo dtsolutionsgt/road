@@ -28,6 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.ksoap2.SoapEnvelope;
@@ -99,6 +100,7 @@ public class ComWS extends PBase {
 		
 		dbld=new clsDataBuilder(this);
 		claseFindia=new clsFinDia(this);
+		clsAppM = new AppMethods(this, gl, Con, db);
 
 		lblInfo= (TextView) findViewById(R.id.lblETipo);
 		lblParam= (TextView) findViewById(R.id.lblProd);
@@ -188,6 +190,7 @@ public class ComWS extends PBase {
 				fechaUltimoCierre = claseFindia.ultimoCierreFecha();
 
 				if ((du.getActDate() == fechaUltimoCierre) && ExistenDatos()) {
+					//claseFindia.
 					claseFindia.eliminarTablasD();
 				}
 
@@ -288,6 +291,58 @@ public class ComWS extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 		if (isbusy==1) {
+			toastcent("Por favor, espere que se termine la tarea actual.");return;
+		}
+
+	}
+
+	public void askPrecios(View view) {
+
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Precios");
+			dialog.setMessage("¿Actualizar precios?");
+
+			dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					runPrecios();
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", null);
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+		if (isbusy==1) {
+			toastcent("Por favor, espere que se termine la tarea actual.");return;
+		}
+
+	}
+
+	public void askRecarga(View view) {
+
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Recarga de inventario");
+			dialog.setMessage("¿Recargar inventario?");
+
+			dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					runRecarga();
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", null);
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+		if (isbusy==1) {
 			toastcent("Por favor, espere hasta que se termine la tarea actual.");return;
 		}
 
@@ -314,9 +369,19 @@ public class ComWS extends PBase {
 
 			if (!setComParams()) return;
 
+			//#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
+			View view = this.getCurrentFocus();
+			view.clearFocus();
+			if (view != null) {
+				keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
+			}
+
 			isbusy=1;
-			ultcor_ant=ultCorel();
-			ultSerie_ant=ultSerie();
+
+			if (!esvacio){
+				ultcor_ant=ultCorel();
+				ultSerie_ant=ultSerie();
+			}
 
 			barInfo.setVisibility(View.VISIBLE);barInfo.invalidate();
 			lblInfo.setText("Iniciando proceso de carga..");
@@ -363,7 +428,27 @@ public class ComWS extends PBase {
 		}
 
 	}
-	
+
+	private void runPrecios() {
+		try{
+			super.finish();
+			startActivity(new Intent(this,ComWSPrec.class));
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	private void runRecarga() {
+		try{
+			super.finish();
+			startActivity(new Intent(this,ComWSRec.class));
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
 	public void writeData(View view){
 
 		try{
@@ -622,8 +707,7 @@ public class ComWS extends PBase {
 	        	        
 	        return 1;
 	    } catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		    sstr=e.getMessage();
+			sstr=e.getMessage();
 	    }
 		
 		return 0;
@@ -1197,7 +1281,7 @@ public class ComWS extends PBase {
 
 		if (TN.equalsIgnoreCase("TMP_PRECESPEC")) {
 			SQL = "SELECT CODIGO,VALOR,PRODUCTO,PRECIO,UNIDADMEDIDA FROM TMP_PRECESPEC ";
-			SQL += " WHERE RUTA='" + ActRuta + "' ";
+			SQL += " WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') ";
 			return SQL;
 		}
 
@@ -1569,64 +1653,6 @@ public class ComWS extends PBase {
 
 		return true;
 	}
-	
-	private void estandartInventario()  {
-		Cursor dt,df;
-		String cod,ub,us,lote,doc,stat;
-		double cant,cantm,fact;
-	
-		try {
-
-			sql="SELECT P_STOCK.CODIGO,P_STOCK.UNIDADMEDIDA, P_PRODUCTO.UNIDBAS, P_STOCK.CANT, " +
-					"P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.STATUS, P_STOCK.CANTM  " +
-					"FROM  P_STOCK INNER JOIN P_PRODUCTO ON P_STOCK.CODIGO=P_PRODUCTO.CODIGO";
-			dt=Con.OpenDT(sql);
-		
-			if (dt.getCount()==0) return;
-
-			dt.moveToFirst();
-			while (!dt.isAfterLast()) {
-
-				cod=dt.getString(0);
-				us=dt.getString(1);
-				ub=dt.getString(2);
-				cant=dt.getDouble(3);
-				lote = dt.getString(4);
-				doc = dt.getString(5);
-				stat = dt.getString(6);
-				cantm=dt.getDouble(7);
-
-				if (!ub.equalsIgnoreCase(us)) {
-					
-					sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+us+"') AND (UNIDADMINIMA='"+ub+"')";	
-					df=Con.OpenDT(sql);
-					
-					if (df.getCount()>0) {
-						
-						df.moveToFirst();
-						fact=df.getDouble(0);
-						cant=cant*fact;
-						cantm=cantm*fact;
-						
-						sql="UPDATE P_STOCK SET CANT="+cant+",CANTM="+cantm+",UNIDADMEDIDA='"+ub+"'  " +
-							"WHERE (CODIGO='"+cod+"') AND (UNIDADMEDIDA='"+us+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
-						db.execSQL(sql);
-					} else {
-						msgbox("No existe factor conversion para el producto : "+cod);
-						sql="DELETE FROM P_STOCK WHERE CODIGO='"+cod+"'";
-						db.execSQL(sql);	
-					}
-				}
-
-				dt.moveToNext();
-			}
-
-		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-		}
-
-	}
 
 	//#HS_20181123_1623 Agregue funcion FinDia para el commit y update de tablas.
 	private boolean FinDia() {
@@ -1683,9 +1709,9 @@ public class ComWS extends PBase {
 			}
 				
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			scon=0;
 			fstr="No se puede conectar al web service. "+e.getMessage();
+			Log.d("E",fstr+sstr);
 		}
 		
 	}
@@ -1704,9 +1730,11 @@ public class ComWS extends PBase {
 					s = s + "\nSe actualizó inventario.";
 				}
 
-				estandartInventario();
+				clsAppM.estandartInventario();
 				validaDatos(true);
 				if (stockflag == 1) sendConfirm();
+
+				SetStatusRecTo("1");
 
 				msgAskExit(s);
 
@@ -1757,9 +1785,17 @@ public class ComWS extends PBase {
 			{
 				wsExecute();
 			} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				if (scon==0){
+					fstr="No se puede conectar al web service : "+sstr;
+					lblInfo.setText(fstr);
+				}
+				msgbox(fstr);
 			}
-            
+
+			if (scon==0){
+			//	Log.d("doInBackground",fstr+sstr);
+			}
+
             return null;
         }
  
@@ -1768,7 +1804,7 @@ public class ComWS extends PBase {
 			try{
 				wsFinished();
 			}catch(Exception e){
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				Log.d("onPostExecute",e.getMessage());
 			}
 
         }
@@ -1776,8 +1812,9 @@ public class ComWS extends PBase {
         @Override
         protected void onPreExecute() {
     		try {
+				SetStatusRecTo("");
     		} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				Log.d("onPreExecute",e.getMessage());
     		}
         }
  
@@ -1787,7 +1824,9 @@ public class ComWS extends PBase {
                 synchronized (this) {
                     if (!lblInfo.getText().toString().matches(""))  lblInfo.setText(fprog);
                  }
-    		} catch (Exception e) {}
+    		} catch (Exception e) {
+				Log.d("onProgressUpdate",e.getMessage());
+			}
         }
  
     }	
@@ -1922,19 +1961,19 @@ public class ComWS extends PBase {
 			}
 			
 			pcc=DT.getCount();pc=0;i=0;
-				
+
 			DT.moveToFirst();
 
 			dbld.clear();
 
 			while (!DT.isAfterLast()) {
-				
-				cor=DT.getString(0);  
+
+				cor=DT.getString(0);
 				fruta=DT.getString(1);
-				ccorel=DT.getInt(2);  
-				
+				ccorel=DT.getInt(2);
+
 				dbg="::";
-				
+
 				try {
 
 					i+=1;fprog="Factura "+i;wsStask.onProgressUpdate();
@@ -1953,7 +1992,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_REL_PROD_BON","WHERE COREL='"+cor+"'");
 					dbld.insert("D_BONIFFALT","WHERE COREL='"+cor+"'");
 
-					dbld.add("UPDATE P_COREL SET CORELULT="+ccorel+"  WHERE RUTA='"+fruta+"'");	
+					dbld.add("UPDATE P_COREL SET CORELULT="+ccorel+"  WHERE RUTA='"+fruta+"'");
 
 					if (envioparcial) {
 						if (commitSQL() == 1) {
@@ -1966,13 +2005,13 @@ public class ComWS extends PBase {
 							dbg = sstr;
 						}
 					}
-							
+
 				} catch (Exception e) {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 					fterr+="\n"+e.getMessage();
 					dbg=e.getMessage();
 				}
-				
+
 			    DT.moveToNext();
 			}
 
@@ -2961,7 +3000,7 @@ public class ComWS extends PBase {
 					
 			dbld.clear();
 			dbld.add("DELETE FROM P_DOC_ENVIADOS_HH WHERE DOCUMENTO='"+docstock+"'");
-			dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('"+docstock+"','"+ActRuta+"','"+univdate+"',1)");	
+			dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('"+docstock+"','"+ActRuta+"','"+univdate+"',1)");
 						
 			if (commitSQL()==1) conflag=1; else conflag=0;
 					
@@ -3266,11 +3305,6 @@ public class ComWS extends PBase {
 		
 		esvacio=false;
 
-		//#HS_20181121_0910 Se creó la funcion Get_Fecha_Inventario().
-
-			int fc=Get_Fecha_Inventario();
-			recep=fc==du.getActDate();
-
 			try{
 				try {
 					sql="SELECT * FROM P_RUTA";
@@ -3301,52 +3335,156 @@ public class ComWS extends PBase {
 					return;
 				}
 
-				//Visible botón y texto de envío
+				//#HS_20181121_0910 Se creó la funcion Get_Fecha_Inventario().
+				if (!esvacio){
+					int fc=Get_Fecha_Inventario();
+					recep=fc==du.getActDate();
+				}
+
+				//Invisible botón y texto de envío
 				lblEnv.setVisibility(View.INVISIBLE);
 				imgEnv.setVisibility(View.INVISIBLE);
 
-				//Visible botón y texto de recepción
+				//Invisible botón y texto de recepción
 				lblRec.setVisibility(View.INVISIBLE);
 				imgRec.setVisibility(View.INVISIBLE);
 
-				//Si hay datos pendientes de envío
-				if (pendientes) {
+				//Tiene documentos
+				boolean TieneFact,TienePedidos,TieneCobros,TieneDevol,YaComunico, TieneInventario, TieneOtros;
 
-					lblInfo.setText("Pendiente : "+sp);
+				TieneFact = (clsAppM.getDocCountTipo("Facturas",false)>0?true:false);
+				TienePedidos = (clsAppM.getDocCountTipo("Pedidos",false)>0?true:false);
+				TieneCobros = (clsAppM.getDocCountTipo("Cobros",false)>0?true:false);
+				TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",false)>0?true:false);
+				YaComunico=(claseFindia.getComunicacion() == 4?true:false);
+				TieneInventario=(clsAppM.getDocCountTipo("Inventario",false)>0?true:false);
 
-					lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
-					lblEnv.setVisibility(View.VISIBLE);imgEnv.setVisibility(View.VISIBLE);
+				if (gl.peModal.equalsIgnoreCase("TOL"))
+                    {
+                        if(claseFindia.yaHizoFindeDia())
+                            {
+                                if (YaComunico)
+                                {
+                                    if ((rutatipo.equalsIgnoreCase("V") && !TieneInventario) || (!rutatipo.equalsIgnoreCase("V")))
+                                        {
+                                            lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
+                                            lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+											if (StringUtils.equals(GetStatusRec(),"1"))
+												{
+													relExist.setVisibility(gl.peBotInv?View.VISIBLE:View.INVISIBLE);
+													relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+													relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+												}
+											else
+												{
+													relExist.setVisibility(View.INVISIBLE);
+													relStock.setVisibility(View.INVISIBLE);
+													relPrecio.setVisibility(View.INVISIBLE);
+												}
+                                        }
+                                    else if ((rutatipo.equalsIgnoreCase("V") && TieneInventario &&
+                                            (TieneFact || TieneCobros || TieneDevol || TienePedidos)) ||
+                                            (!rutatipo.equalsIgnoreCase("V")))
+                                        {
+                                            lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
+                                            lblEnv.setVisibility(View.VISIBLE); imgEnv.setVisibility(View.VISIBLE);
+                                            relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+                                            relExist.setVisibility(View.INVISIBLE);
+                                            relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+                                        }
+                                }
+                            }
+                        else
+                            {
+                                if ((!YaComunico) &&  !(TieneFact || TienePedidos) && !TieneCobros && !TieneDevol)
+                                    {
+                                        lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
+                                        lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+										if (StringUtils.equals(GetStatusRec(),"1"))
+											{
+												relExist.setVisibility(gl.peBotInv?View.VISIBLE:View.INVISIBLE);
+												relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+												relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+											}
+										else
+											{
+												relExist.setVisibility(View.INVISIBLE);
+												relStock.setVisibility(View.INVISIBLE);
+												relPrecio.setVisibility(View.INVISIBLE);
+											}
+                                    }
+                                else
+                                    {
+                                        if (YaComunico)
+                                            {
+                                                lblRec.setVisibility(View.VISIBLE);	imgRec.setVisibility(View.VISIBLE);
+                                                lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
 
-					if (recep && ExistenDatos()) {
-						//Visibiliza los relative layout en base a los parámetro de P_PARAMEXT
-						relExist.setVisibility(gl.peBotInv && !rutatipo.equalsIgnoreCase("P")?View.VISIBLE:View.INVISIBLE);
-						relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
-						relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
-					} else {
-						relPrecio.setVisibility(View.INVISIBLE);
-						relExist.setVisibility(View.INVISIBLE);
-						relStock.setVisibility(View.INVISIBLE);
-					}
-				} else {
+												if (StringUtils.equals(GetStatusRec(),"1"))
+													{
+														relExist.setVisibility(gl.peBotInv?View.VISIBLE:View.INVISIBLE);
+														relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+														relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+													}
+												else
+													{
+														relExist.setVisibility(View.INVISIBLE);
+														relStock.setVisibility(View.INVISIBLE);
+														relPrecio.setVisibility(View.INVISIBLE);
+													}
+                                            }
+                                        else
+                                            {
+                                                lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
+                                                lblEnv.setVisibility(View.VISIBLE);imgEnv.setVisibility(View.VISIBLE);
+												relExist.setVisibility(View.INVISIBLE);
+												relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+												relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+                                            }
+                                    }
+                            }
+                    }
+				else
+                    {
+                        if(((rutatipo.equalsIgnoreCase("V")) || (rutatipo.equalsIgnoreCase("D")) && !TieneInventario)
+                                ||((!rutatipo.equalsIgnoreCase("V")) && (!rutatipo.equalsIgnoreCase("D"))))
+                            {
 
-					lblInfo.setText("");
+                            	lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
+								lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
 
-					lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
-					lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+								if (StringUtils.equals(GetStatusRec(),"1"))
+									{
+										relExist.setVisibility(gl.peBotInv?View.VISIBLE:View.INVISIBLE);
+										relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+										relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+									}
+                                else
+									{
+										relExist.setVisibility(View.INVISIBLE);
+										relStock.setVisibility(View.INVISIBLE);
+										relPrecio.setVisibility(View.INVISIBLE);
+									}
 
-                    if (recep && ExistenDatosSinEnviar()) {
-                        //Visibiliza los relative layout en base a los parámetro de P_PARAMEXT
-                        relExist.setVisibility(gl.peBotInv && !rutatipo.equalsIgnoreCase("P")?View.VISIBLE:View.INVISIBLE);
-                        relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
-                        relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+                            }
+                        else
+                            {
+                                if (((((rutatipo.equalsIgnoreCase("V")) || (rutatipo.equalsIgnoreCase("D")))&& TieneInventario
+                                && (TieneFact || TieneCobros || TienePedidos) || TieneDevol)) ||((!rutatipo.equalsIgnoreCase("V"))
+                                        && (!rutatipo.equalsIgnoreCase("D"))))
+                                    {
+                                        lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
+										lblEnv.setVisibility(View.VISIBLE);imgEnv.setVisibility(View.VISIBLE);
+                                        relExist.setVisibility(View.INVISIBLE);
+										relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+                                        relPrecio.setVisibility(View.INVISIBLE);
+                                    }
+                            }
                     }
 
-				}
-
-		}catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(), sql);
-		}
-		
+			}catch (Exception e) {
+			    addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(), sql);
+		    }
 	}
 	
 	private void paramsExtra() {
@@ -3392,6 +3530,7 @@ public class ComWS extends PBase {
 		}
 
 	}
+
 	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
     public boolean ExistenDatosSinEnviar(){
 
@@ -3416,6 +3555,27 @@ public class ComWS extends PBase {
         }
 
     };
+
+	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
+	public boolean ExisteInventario(){
+
+		try {
+
+			int CantInventario;
+
+			clsAppM = new AppMethods(this, gl, Con, db);
+
+			CantInventario = clsAppM.getDocCountTipo("Inventario",false);
+
+			return  ((CantInventario>0));
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			msgbox(e.getMessage());
+			return false;
+		}
+
+	};
 
 	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
 	public boolean ExistenDatos(){
@@ -3468,6 +3628,7 @@ public class ComWS extends PBase {
 
 
 	}
+
 	// #JP corregido 20190226
 	private void BorraDatosAnteriores(String msg) {
 		try{
@@ -3548,6 +3709,47 @@ public class ComWS extends PBase {
 
 
 	}
+
+	public void SetStatusRecTo(String estado)
+	{
+		try
+		{
+			sql = "UPDATE P_RUTA SET PARAM2='" + StringUtils.trim(estado) + "'";
+			db.execSQL(sql);
+		}
+		catch (Exception ex)
+		{
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+ " " + ex.getMessage());
+		}
+
+	}
+
+	public String GetStatusRec()
+	{
+		Cursor DT;
+		String vGetStatusRec = "";
+		try
+			{
+				sql = "SELECT PARAM2 FROM P_RUTA ";
+				DT = Con.OpenDT(sql);
+
+				if (DT.getCount()> 0)
+				{
+					DT.moveToFirst();
+					vGetStatusRec = DT.getString(0);
+				}
+			}
+
+		catch (Exception ex)
+			{
+				Log.d("GetStatusRec","Something happend here " + ex.getMessage());
+				msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+ " " + ex.getMessage());
+			}
+
+		return  vGetStatusRec;
+	}
+
 
 	//endregion
 

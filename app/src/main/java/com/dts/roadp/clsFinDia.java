@@ -453,7 +453,7 @@ public class clsFinDia extends PBase{
 
 
             corelz++;
-            sql="UPDATE FinDia SET Corel="+corelz;
+            sql="UPDATE FinDia SET Corel="+corelz+", val1 = 0,val2= 0,val3= 0,val4= 0,val5= 0,val6= 0,val7= 0,val8= 0";
             db.execSQL(sql);
 
 			/*sql="UPDATE P_RUTA SET Email='0'";
@@ -556,6 +556,39 @@ public class clsFinDia extends PBase{
         }
 
         return cnt;
+    }
+
+    public boolean yaHizoFindeDia() {
+
+        Cursor DT;
+        boolean vFinDia = false;
+        int fechaUltimoCierre = ultimoCierreFecha();
+
+        try{
+
+            sql = "SELECT val1 FROM FinDia";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                if (DT.getInt(0) == 0) {
+                    vFinDia = false;
+                } else {
+                    if (du.getActDate() == fechaUltimoCierre) {
+                        vFinDia = true;
+                    } else {
+                        vFinDia = false;
+                    }
+                }
+            }
+
+        }catch (Exception ex){
+            vFinDia=false;
+
+        }
+
+        return  vFinDia;
     }
 
 }

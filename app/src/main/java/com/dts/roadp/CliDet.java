@@ -209,40 +209,6 @@ public class CliDet extends PBase {
 
 	}
 
-	private void setHandlers(){
-
-		try {
-
-			chknc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-					if (chknc.isChecked()==true){
-						chkncv.setChecked(false);
-						gl.tiponcredito = 1;
-					}
-
-				}
-			});
-
-			chkncv.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-					if (chkncv.isChecked()==true){
-						chknc.setChecked(false);
-						gl.tiponcredito = 2;
-					}
-
-				}
-			});
-
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-	}
-
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1093,6 +1059,7 @@ public class CliDet extends PBase {
 	}
 
 	}
+
 
 	private void msgAskExit(String msg) {
 		try{

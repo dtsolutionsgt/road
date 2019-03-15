@@ -67,9 +67,6 @@ public class DevCliCant extends PBase {
 
 		devrazon=gl.devrazon;
 		razon=devrazon;
-		setSpinVal(devrazon);
-
-		setComboValor(um);
 
 		ummin = getUMminima();
 
@@ -114,11 +111,15 @@ public class DevCliCant extends PBase {
 
 			if(txtPrecio.getText().toString().trim().equalsIgnoreCase("")){
 				gl.dvprec = 0.0;
+				gl.dvpreclista = 0.0;
 			}else{
 				gl.dvprec =Double.parseDouble(txtPrecio.getText().toString());
+				gl.dvpreclista = gl.dvprec;
 			}
 
 			gl.dvfactor = factor;
+
+			gl.dvtotal = cant*gl.dvprec;
 
 			//hidekeyb();
 			super.finish();
@@ -176,7 +177,7 @@ public class DevCliCant extends PBase {
 					factor=cmbumfact.get(position);
 					umcambiar = cmbumlist.get(position);
 
-					lblPrec.setText(String.valueOf(getPrecio()));
+					lblPrec.setText(String.valueOf(mu.round(getPrecio(),gl.peDec)));
 
 				}catch (Exception e){
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -215,43 +216,57 @@ public class DevCliCant extends PBase {
 			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA "+
 				 "FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-							  
-			ubas=DT.getString(0);
-			
-			lblBU.setText(ubas);((appGlobals) vApp).ubas=ubas;
-			lblDesc.setText(DT.getString(7));
-			
-		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   mu.msgbox("1-"+ e.getMessage());
-	    }
+
+           	if (DT.getCount()>0){
+				DT.moveToFirst();
+				ubas=DT.getString(0);
+
+				lblBU.setText(ubas);((appGlobals) vApp).ubas=ubas;
+				lblDesc.setText(DT.getString(7));
+			}
 
 		precioventa = prc.precio(prodid,1,gl.nivel,um,gl.umpeso,0);
 		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
 			if (prc.precioespecial>0) precioventa=prc.precioespecial;
 		}
+		precioventa = mu.round(precioventa,gl.peDec);
 
-		try {
-
-			sql="SELECT CANT FROM T_CxCD WHERE CODIGO='"+prodid+"' AND CODDEV='"+raz+"'";
+			sql="SELECT CANT,PESO,PRECIO,UMVENTA,LOTE FROM T_CxCD WHERE CODIGO='"+prodid+"' AND CODDEV='"+raz+"'";
            	DT=Con.OpenDT(sql);
-           	
-       		DT.moveToFirst();
-  			icant=DT.getDouble(0);
-  			razon=raz;
-  			
-  			setSpinVal(razon);
-  			
+
+           	if (DT.getCount()>0){
+
+				DT.moveToFirst();
+				icant=DT.getDouble(0);
+				razon=raz;
+				umcambiar = DT.getString(3);
+				txtLote.setText(DT.getString(4));
+				txtPrecio.setText(String.valueOf(DT.getDouble(2)));
+                txtkgs.setText(String.valueOf(DT.getDouble(1)));
+
+				setSpinVal(razon);
+				setComboValor(umcambiar);
+
+				if (icant>0) parseCant(icant);
+
+				lblPrecVenta.setText(umcambiar);
+
+				txtLote.setEnabled(false);
+
+			}else{
+
+				setSpinVal(devrazon);
+				setComboValor(um);
+
+				lblPrecVenta.setText(um);
+				txtLote.setEnabled(false);
+
+			}
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			icant=0;
 	    }	
-
-		if (icant>0) parseCant(icant);
-
-		lblPrecVenta.setText(um);
-		txtLote.setEnabled(false);
 
 	}
 	

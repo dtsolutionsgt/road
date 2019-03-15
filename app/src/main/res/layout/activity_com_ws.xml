@@ -335,7 +335,7 @@
             android:layout_height="56dp"
             android:layout_alignParentTop="true"
             android:clickable="true"
-            android:onClick="askExist"
+            android:onClick="askPrecios"
             android:src="@drawable/cobro" />
 
         <TextView
@@ -363,7 +363,7 @@
             android:layout_height="56dp"
             android:layout_alignParentTop="true"
             android:clickable="true"
-            android:onClick="askExist"
+            android:onClick="askRecarga"
             android:src="@drawable/inventario48" />
 
         <TextView

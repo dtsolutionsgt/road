@@ -963,6 +963,8 @@ public class Menu extends PBase {
 				}
 			}
 
+			//gl.peSolicInv=true;
+
 			if (gl.peSolicInv) {
 				selitems[itempos]="Solicitud de inventario";itempos++;
 			}

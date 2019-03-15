@@ -732,10 +732,8 @@ public class MainActivity extends PBase {
 		});
 
 		dialog.show();
-
 	}
 
-	
 	@SuppressLint("MissingPermission")
     private String androidid() {
 		String uniqueID="";

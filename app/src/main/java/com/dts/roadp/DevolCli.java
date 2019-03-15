@@ -1,7 +1,5 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,10 +8,12 @@ import android.database.SQLException;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class DevolCli extends PBase {
 
@@ -478,7 +478,8 @@ public class DevolCli extends PBase {
 		}	
 		
 	}
-	
+
+
 	// Aux 
 	
 	private void clearData(){

@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -35,8 +37,8 @@ public class DevCliCant extends PBase {
 	private ArrayList<String> cmbumlist = new ArrayList<String>();
 	
 	private String prodid,estado,razon,devrazon,raz;
-	private double cant,icant,factor=0.0,precioventa=00.;
-	private  String um="", ummin,umcambiar;
+	private double cant,icant,factor=0.0,precioventa=0.0,pesoprom=0.0,clcpeso=0.0;
+	private  String um="", ummin="",umcambiar="";
 	private Precio prc;
 
 	@Override
@@ -50,15 +52,17 @@ public class DevCliCant extends PBase {
 		
 		setControls();
 		
-		prodid=((appGlobals) vApp).prod;
-		estado=((appGlobals) vApp).devtipo;
-		raz=((appGlobals) vApp).gstr;
-	
-		setHandlers();
-		
+		prodid=gl.prod;
+		estado=gl.devtipo;
+		raz=gl.gstr;
+
+		prc=new Precio(this,mu,gl.peDec);
+
 		gl.dval=-1;
 		
 		showkeyb();
+
+		app = new AppMethods(this, gl, Con, db);
 
 		gl.dvporpeso = prodPorPeso(prodid);
 
@@ -71,6 +75,12 @@ public class DevCliCant extends PBase {
 		ummin = getUMminima();
 
 		showData();
+
+		setHandlers();
+
+		txtkgs.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		txtCant.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		txtPrecio.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
 	}
 
@@ -86,8 +96,10 @@ public class DevCliCant extends PBase {
 				mu.msgbox("Cantidad incorrecta");return;
 			}
 
-			if (razon.equalsIgnoreCase("0")){
-				mu.msgbox("Debe definir una razón de devolución.");return;
+			if (estado.equalsIgnoreCase("M")) {
+				if (razon.equalsIgnoreCase("0")){
+					mu.msgbox("Debe definir una razón de devolución.");return;
+				}
 			}
 
 			gl.dval=cant;
@@ -119,7 +131,11 @@ public class DevCliCant extends PBase {
 
 			gl.dvfactor = factor;
 
-			gl.dvtotal = cant*gl.dvprec;
+			if(gl.dvporpeso==true){
+				gl.dvtotal = gl.dvpeso*gl.dvprec;
+			}else{
+				gl.dvtotal = cant*gl.dvprec;
+			}
 
 			//hidekeyb();
 			super.finish();
@@ -177,7 +193,12 @@ public class DevCliCant extends PBase {
 					factor=cmbumfact.get(position);
 					umcambiar = cmbumlist.get(position);
 
-					lblPrec.setText(String.valueOf(mu.round(getPrecio(),gl.peDec)));
+					clcpeso=pesoprom*factor;
+
+                    if (gl.dvporpeso==false){
+						lblPrec.setText(String.valueOf(mu.round(getPrecio(),gl.peDec)));
+                        txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+                    }
 
 				}catch (Exception e){
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -197,12 +218,35 @@ public class DevCliCant extends PBase {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
 				if (chkTieneLote.isChecked()==false){
+					txtLote.setText(gl.lotedf);
 					txtLote.setEnabled(true);
 				}else{
 					txtLote.setEnabled(false);
 				}
 			}
 		});
+
+		txtCant.setOnKeyListener(new View.OnKeyListener() {
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+				if ((keyCode == KeyEvent.KEYCODE_ENTER)) {
+
+					if (gl.dvporpeso==false){
+						if (clcpeso!=0){
+							txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+						}else{
+							txtkgs.setText(String.valueOf(mu.round(pesoprom*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+						}
+
+					}
+
+					return true;
+				}
+				return false;
+			}
+		});
+
 		
 	}
 	
@@ -213,22 +257,36 @@ public class DevCliCant extends PBase {
 		
 		try {
 
-			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA "+
-				 "FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
+			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,PESO_PROMEDIO "+
+				 " FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	DT=Con.OpenDT(sql);
 
            	if (DT.getCount()>0){
 				DT.moveToFirst();
 				ubas=DT.getString(0);
-
+				pesoprom = DT.getDouble(8);
 				lblBU.setText(ubas);((appGlobals) vApp).ubas=ubas;
 				lblDesc.setText(DT.getString(7));
 			}
 
-		precioventa = prc.precio(prodid,1,gl.nivel,um,gl.umpeso,0);
+		/*precioventa = prc.precio(prodid,1,gl.nivel,um,gl.umpeso,0);
 		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
 			if (prc.precioespecial>0) precioventa=prc.precioespecial;
+		}*/
+
+
+		if (prodPorPeso(prodid)) {
+			precioventa = prc.precio(prodid, 1, gl.nivel, um, gl.umpeso, gl.dpeso);
+			if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
+				if (prc.precioespecial>0) precioventa=prc.precioespecial;
+			}
+		} else {
+			precioventa = prc.precio(prodid, 1, gl.nivel, um, gl.umpeso, 0);
+			if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
+				if (prc.precioespecial>0) precioventa=prc.precioespecial;
+			}
 		}
+
 		precioventa = mu.round(precioventa,gl.peDec);
 
 			sql="SELECT CANT,PESO,PRECIO,UMVENTA,LOTE FROM T_CxCD WHERE CODIGO='"+prodid+"' AND CODDEV='"+raz+"'";
@@ -260,6 +318,10 @@ public class DevCliCant extends PBase {
 
 				lblPrecVenta.setText(um);
 				txtLote.setEnabled(false);
+
+				if (gl.dvporpeso==true){
+					lblPrec.setText(String.valueOf(precioventa));
+				}
 
 			}
 
@@ -384,7 +446,8 @@ public class DevCliCant extends PBase {
 			}else{
 
 				cmbum.setSelection(0);
-				lblPrec.setText(String.valueOf(precioventa));
+				txtPrecio.setEnabled(false);
+
 
 			}
 
@@ -572,5 +635,15 @@ public class DevCliCant extends PBase {
 			return false;
 		}
 	}
+
+    @Override
+    public void onBackPressed() {
+        try{
+            super.onBackPressed();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
 
 }

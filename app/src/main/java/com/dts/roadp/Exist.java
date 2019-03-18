@@ -17,6 +17,8 @@ import android.widget.TextView;
 
 import com.dts.roadp.clsClasses.clsExist;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 
 public class Exist extends PBase {
@@ -37,7 +39,9 @@ public class Exist extends PBase {
 	private clsDocExist doc;
 	private printer prn;
 	private Runnable printclose;
-	
+
+	private AppMethods clsAppM;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -47,7 +51,9 @@ public class Exist extends PBase {
 		addlog("Exist",""+du.getActDateTime(),gl.vend);
 		
 		tipo=((appGlobals) vApp).tipo;
-		
+
+		clsAppM = new AppMethods(this, gl, Con, db);
+
 		listView = (ListView) findViewById(R.id.listView1);
 		txtFilter = (EditText) findViewById(R.id.txtMonto);
 		lblReg = (TextView) findViewById(R.id.textView1);lblReg.setText("");
@@ -165,24 +171,29 @@ public class Exist extends PBase {
 	}
 
 	public float CantExistencias() {
-
 		Cursor DT;
-		float cantidad=0;
+		float cantidad=0,cantb=0;
 
 		try {
 
 			sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.CANT,P_STOCK.CANTM,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
 					"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
-
 			if (Con != null){
 				DT = Con.OpenDT(sql);
-
 				cantidad = DT.getCount();
 			}else {
 				cantidad = 0;
 			}
 
+			sql = "SELECT BARRA FROM P_STOCKB";
+			if (Con != null){
+				DT = Con.OpenDT(sql);
+				cantb = DT.getCount();
+			}else {
+				cantb = 0;
+			}
 
+			cantidad=cantidad+cantb;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return 0;
@@ -478,7 +489,7 @@ public class Exist extends PBase {
 		public clsDocExist(Context context, int printwidth) {
 			super(context, printwidth,gl.peMon,gl.peDecImp);
 
-			nombre="Existencias";
+			nombre="REPORTE DE EXISTENCIAS";
 			numero="";
 			serie="";
 			ruta=gl.ruta;
@@ -496,8 +507,12 @@ public class Exist extends PBase {
 				String vf=txtFilter.getText().toString();
 				if (!mu.emptystr(vf)) rep.add("Filtro : "+vf);
 
-				rep.add("REPORTE DE EXISTENCIAS");
+				rep.empty();
 				rep.line();lns=items.size();
+
+				rep.add("Cod  Descripcion");
+				rep.add("Lote         Cantidad UM     Peso UM");
+				rep.line();
 
 				for (int i = 0; i <items.size(); i++) {
 
@@ -507,12 +522,12 @@ public class Exist extends PBase {
 
                     switch (item.flag) {
                         case 0:
-                            rep.add(item.Desc);
-                            if (ic<2) {
+                            rep.add(item.Cod + " " + item.Desc);
+                            /*if (ic<2) {
                                 if (!(lote==null || lote.isEmpty())) rep.add(item.Cod);
                             } else {
                                 rep.add(item.Cod);
-                            }
+                            }*/
                             break;
                         case 1:
                             rep.add3lrr(item.Lote,item.Valor,item.Peso);break;
@@ -538,9 +553,28 @@ public class Exist extends PBase {
 
 		protected boolean buildFooter() {
 
+			double SumaPeso = 0;
+			double SumaCant = 0;
+
 			try {
-				rep.add("Total líneas : "+lns);
-				rep.add("");rep.add("");rep.add("");rep.add("");
+
+				SumaPeso = clsAppM.getPeso();
+				SumaCant = clsAppM.getCantidad();
+
+				rep.empty();
+				rep.add("Total unidades:" + StringUtils.leftPad(mu.frmdecimal(SumaCant,gl.peDecImp), 10));
+				rep.add("Total peso:" + StringUtils.leftPad(mu.frmdecimal(SumaPeso,gl.peDecImp), 10));
+				rep.add("Total registros : "+lns);
+				rep.empty();
+				rep.empty();
+				rep.empty();
+				rep.add("Firma Vendedor" + StringUtils.leftPad( "____________________",5));
+				rep.empty();
+				rep.empty();
+				rep.add("Firma Auditor" + StringUtils.leftPad("____________________",6));
+				rep.empty();
+				rep.empty();
+				rep.empty();
 
 				return true;
 			} catch (Exception e) {

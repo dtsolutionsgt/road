@@ -9,7 +9,12 @@ import java.util.Date;
 import java.text.*;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -24,7 +29,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -33,10 +37,12 @@ import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
-import android.content.DialogInterface;
-import android.content.Intent;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.NumberFormat;
+
 import uk.co.senab.photoview.PhotoViewAttacher;
 import android.database.Cursor;
 import com.dts.roadp.clsDocument;
@@ -47,7 +53,7 @@ public class CliDet extends PBase {
 
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol;
-	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
+	private RelativeLayout relMain,relV,relP,relD,relCamara;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol,imgRoadTit;
 	private RadioButton chknc,chkncv;
 
@@ -91,35 +97,26 @@ public class CliDet extends PBase {
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
 
-		relV= (RelativeLayout) findViewById(R.id.relVenta);
-		relP= (RelativeLayout) findViewById(R.id.relPreventa);
-		relD= (RelativeLayout) findViewById(R.id.relDespacho);
-		relCamara = (RelativeLayout) findViewById(R.id.relCamara);
+		relMain=(RelativeLayout) findViewById(R.id.relclimain);
+		relV=(RelativeLayout) findViewById(R.id.relVenta);
+		relP=(RelativeLayout) findViewById(R.id.relPreventa);
+		relD=(RelativeLayout) findViewById(R.id.relDespacho);
+		relCamara=(RelativeLayout) findViewById(R.id.relCamara);
 		
 		imgCobro= (ImageView) findViewById(R.id.imageView2);
 		imgDevol= (ImageView) findViewById(R.id.imageView1);
 		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
 
 		app = new AppMethods(this, gl, Con, db);
-	//	credito=gl.credito;
-		/*
-		Con = new BaseDatos(this);
-	    opendb();
-	    ins=Con.Ins;upd=Con.Upd;
+		credito=gl.credito;
 
-		vApp=this.getApplication();
-		mu=new MiscUtils(this);
-		du=new DateUtils();
-		
-		keyboard = (InputMethodManager)getSystemService(this.INPUT_METHOf_SERVICE);
-		*/
 		cod=gl.cliente;
 		
 		/*if (!gl.devol) {
 			lblDevol.setVisibility(View.INVISIBLE);
 			imgDevol.setVisibility(View.INVISIBLE);
 		}*/
-		
+
 		showData();
 		calcCredit();
 
@@ -134,8 +131,26 @@ public class CliDet extends PBase {
 
 		setHandlers();
 
+	}
 
-		//Toast.makeText(this, "Create activity : ", Toast.LENGTH_SHORT).show();
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		try{
+			super.onSaveInstanceState(savedInstanceState);
+			savedInstanceState.putString("CLIID", cod);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		try{
+			super.onRestoreInstanceState(savedInstanceState);
+			String cliid=savedInstanceState.getString("CLIID");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 
 
@@ -203,6 +218,7 @@ public class CliDet extends PBase {
 		}
 
 	}
+
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -612,7 +628,11 @@ public class CliDet extends PBase {
 			if(cantidad == 0){
 				mu.msgbox("No hay existencias disponibles.");
 			}else{
-				runVenta();
+				if(gl.tiponcredito == 2){
+					return;
+				}else {
+					runVenta();
+				}
 			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1089,14 +1109,14 @@ public class CliDet extends PBase {
 
 		try {
 
-            chknc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			chknc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-				    if (chknc.isChecked()==true){
+					if (chknc.isChecked()==true){
 						chkncv.setChecked(false);
-                        gl.tiponcredito = 1;
-				    }
+						gl.tiponcredito = 1;
+					}
 
 				}
 			});
@@ -1105,19 +1125,23 @@ public class CliDet extends PBase {
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-				    if (chkncv.isChecked()==true){
+					if (chkncv.isChecked()==true){
 						chknc.setChecked(false);
-				    	gl.tiponcredito = 2;
-                    }
+						gl.tiponcredito = 2;
+
+						VerificaCantidad();
+
+					}
 
 				}
 			});
 
 		}catch (Exception e){
-		addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-	}
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 
 	}
+
 
 	private void msgAskExit(String msg) {
 		try{
@@ -1150,42 +1174,17 @@ public class CliDet extends PBase {
 	private void doExit(){
 		try{
 			super.finish();
+            if(gl.dvbrowse!=0){
+                gl.dvbrowse =0;
+            }
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 	}
+
 
 	// Activity Events
-	
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-
-		try{
-			super.onSaveInstanceState(savedInstanceState);
-
-			savedInstanceState.putString("CLIID", cod);
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-	}
-
-	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
-
-		try{
-			super.onRestoreInstanceState(savedInstanceState);
-
-			String cliid=savedInstanceState.getString("CLIID");
-
-			//Toast.makeText(this, "Restored from a shitty crash : "+cliid, Toast.LENGTH_SHORT).show();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-		
-	}
 
 	@Override
 	protected void onResume() {
@@ -1223,18 +1222,6 @@ public class CliDet extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
-	}
-
-	@Override
-	protected void onPause() {
-		try{
-			super.onPause();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
 	}
 
 	@Override

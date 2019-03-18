@@ -1,30 +1,29 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
-import com.dts.roadp.clsClasses.clsMenu;
-
-import android.os.Bundle;
-import android.text.InputType;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.GridView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.AdapterView.OnItemClickListener;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.text.InputType;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.dts.roadp.clsClasses.clsMenu;
+
+import java.util.ArrayList;
 
 public class Menu extends PBase {
 
@@ -428,7 +427,7 @@ public class Menu extends PBase {
 
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Factura","Pedido","Recibo","Deposito","Recarga","Devoluci�n a bodega","Cierre de dia"};
+			final String[] selitems = {"Factura","Pedido","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia", "Nota crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.reimpresion48);
@@ -452,6 +451,8 @@ public class Menu extends PBase {
 							menuImprDoc(5);break;
 						case 6:
 							menuImprDoc(99);break;
+						case 7:
+							menuImprDoc(6);break;
 					}
 
 					dialog.cancel();
@@ -481,7 +482,7 @@ public class Menu extends PBase {
 
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia"};
+			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia", "Nota de crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.reimpresion48);
@@ -503,6 +504,8 @@ public class Menu extends PBase {
 							menuImprDoc(5);break;
 						case 5:
 							menuImprDoc(99);break;
+						case 6:
+							menuImprDoc(6);break;
 					}
 
 					dialog.cancel();
@@ -532,7 +535,7 @@ public class Menu extends PBase {
 
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia","Nota de credito"};
+			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia","Nota de crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.reimpresion48);
@@ -585,11 +588,11 @@ public class Menu extends PBase {
 
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Pedido","Recibo","Deposito"};
+			final String[] selitems = {"Pedido","Recibo","Deposito","Nota de crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.reimpresion48);
-			menudlg.setTitle("Reimpresi�n");
+			menudlg.setTitle("Reimpresión");
 
 			menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
@@ -601,6 +604,8 @@ public class Menu extends PBase {
 							menuImprDoc(1);break;
 						case 2:
 							menuImprDoc(2);break;
+						case 3:
+							menuImprDoc(6);break;
 					}
 
 					dialog.cancel();
@@ -645,11 +650,11 @@ public class Menu extends PBase {
 	public void showVoidMenuTodo() {
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Factura","Pedido","Recibo","Deposito","Recarga","Devolución a bodega"};
+			final String[] selitems = {"Factura","Pedido","Recibo","Deposito","Recarga","Devolución a bodega", "Nota crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.anulacion48);
-			menudlg.setTitle("Anulaci�n");
+			menudlg.setTitle("Anulación");
 
 			menudlg.setItems(selitems ,	new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
@@ -667,6 +672,8 @@ public class Menu extends PBase {
 							gl.tipo=4;break;
 						case 5:
 							gl.tipo=5;break;
+						case 6:
+							gl.tipo=6;break;
 					}
 
 					menuAnulDoc();
@@ -697,7 +704,7 @@ public class Menu extends PBase {
 		try{
 
 			final AlertDialog Dialog;
-			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega"};
+			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega", "Nota crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.anulacion48);
@@ -717,6 +724,8 @@ public class Menu extends PBase {
 							gl.tipo=4;break;
 						case 4:
 							gl.tipo=5;break;
+						case 5:
+							gl.tipo=6;break;
 					}
 
 					menuAnulDoc();
@@ -749,7 +758,7 @@ public class Menu extends PBase {
 		try{
 
 		}catch (Exception e){final AlertDialog Dialog;
-			final String[] selitems = {"Pedido","Recibo","Deposito"};
+			final String[] selitems = {"Pedido","Recibo","Deposito", "Nota crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.anulacion48);
@@ -765,6 +774,8 @@ public class Menu extends PBase {
 							gl.tipo=1;break;
 						case 2:
 							gl.tipo=2;break;
+						case 3:
+							gl.tipo=6;break;
 					}
 
 					menuAnulDoc();
@@ -963,6 +974,8 @@ public class Menu extends PBase {
 					selitems[itempos]="Recarga manual";itempos++;
 				}
 			}
+
+			//gl.peSolicInv=true;
 
 			if (gl.peSolicInv) {
 				selitems[itempos]="Solicitud de inventario";itempos++;
@@ -1211,7 +1224,7 @@ public class Menu extends PBase {
 	public void showInvMenuUtils() {
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ","Soporte"};
+			final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ","Soporte","Serial del dipositivo"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.utils48);
@@ -1229,6 +1242,8 @@ public class Menu extends PBase {
 							menuCorelZ();break;
 						case 3:
 							startActivity(new Intent(Menu.this,Soporte.class));break;
+						case 4:
+							msgbox("Serial# : "+gl.deviceId);break;
 					}
 
 					dialog.cancel();

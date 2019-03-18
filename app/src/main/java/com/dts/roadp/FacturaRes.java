@@ -336,6 +336,17 @@ public class FacturaRes extends PBase {
 
 		try{
 
+			listView.setOnTouchListener(new SwipeListener(this) {
+				public void onSwipeRight() {
+					prevScreen(null);
+				}
+				public void onSwipeLeft() {
+					if (imgCash.getVisibility()==View.VISIBLE) {
+						payCash(null);
+					}
+				}
+			});
+
 			txtVuelto.addTextChangedListener(new TextWatcher() {
 
 				public void afterTextChanged(Editable s) {}
@@ -558,6 +569,10 @@ public class FacturaRes extends PBase {
 				if (!saveOrder()) return;
 			}
 
+			if(gl.dvbrowse!=0){
+				gl.dvbrowse =0;
+			}
+
 			clsBonifSave bonsave=new clsBonifSave(this,corel,"V");
 
 			bonsave.ruta=gl.ruta;
@@ -717,7 +732,7 @@ public class FacturaRes extends PBase {
 			ins.add("PEDCOREL","");
 			ins.add("REFERENCIA","");
 			if (gl.dvbrowse!=0){
-				ins.add("ASIGNACION",gl.dvcorrel);
+				ins.add("ASIGNACION",gl.dvcorreld);
 			}else{
 				ins.add("ASIGNACION","");
 			}
@@ -735,13 +750,12 @@ public class FacturaRes extends PBase {
 			if (gl.dvbrowse!=0){
 
 				Cursor DT;
-				String dcorel,pcod;
+				String pcod;
 				Double pcant;
-				dcorel = gl.dvcorrel;
 
 				ins.init("D_CxC");
 
-				ins.add("COREL",dcorel);
+				ins.add("COREL",gl.dvcorreld);
 				ins.add("RUTA",gl.ruta);
 				ins.add("CLIENTE",gl.cliente);
 				ins.add("FECHA",fecha);
@@ -762,7 +776,7 @@ public class FacturaRes extends PBase {
 
 				ins.init("D_NOTACRED");
 
-				ins.add("COREL",dcorel);
+				ins.add("COREL",gl.dvcorrelnc);
 				ins.add("ANULADO","S");
 				ins.add("FECHA",fecha);
 				ins.add("RUTA",gl.ruta);
@@ -792,7 +806,7 @@ public class FacturaRes extends PBase {
 
 					ins.init("D_CxCD");
 
-					ins.add("COREL",dcorel);
+					ins.add("COREL",gl.dvcorreld);
 					ins.add("ITEM",DT.getInt(0));
 					ins.add("CODIGO",DT.getString(1));
 					ins.add("CANT",DT.getDouble(2));
@@ -813,7 +827,7 @@ public class FacturaRes extends PBase {
 
 					ins.init("D_NOTACREDD");
 
-					ins.add("COREL",dcorel);
+					ins.add("COREL",gl.dvcorrelnc);
 					ins.add("PRODUCTO",DT.getString(1));
 					ins.add("PRECIO_ORIG",DT.getDouble(5));
 					ins.add("PRECIO_ACT",0);
@@ -826,25 +840,40 @@ public class FacturaRes extends PBase {
 					ins.add("FACTOR",DT.getDouble(13));
 					db.execSQL(ins.sql());
 
-					try {
-						sql="INSERT INTO P_STOCK VALUES ('"+pcod+"',0,0,0)";
-						db.execSQL(sql);
-					} catch (Exception e) {
-						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-					}
+					if (!gl.peModal.equalsIgnoreCase("TOL")) {
 
-					if (gl.dvestado.equalsIgnoreCase("M")) {
-						sql="UPDATE P_STOCK SET CANTM=CANTM+"+pcant+" WHERE CODIGO='"+pcod+"'";
-					} else {
-						sql="UPDATE P_STOCK SET CANT=CANT+"+pcant+" WHERE CODIGO='"+pcod+"'";
+						try {
+							sql="INSERT INTO P_STOCK VALUES ('"+pcod+"',0,0,0)";
+							db.execSQL(sql);
+						} catch (Exception e) {
+							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+						}
+
+						if (gl.dvestado.equalsIgnoreCase("M")) {
+							sql="UPDATE P_STOCK SET CANTM=CANTM+"+pcant+" WHERE CODIGO='"+pcod+"'";
+						} else {
+							sql="UPDATE P_STOCK SET CANT=CANT+"+pcant+" WHERE CODIGO='"+pcod+"'";
+						}
+						db.execSQL(sql);
+
 					}
-					db.execSQL(sql);
 
 					DT.moveToNext();
+
 				}
+
+				sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactuald+" WHERE RUTA='"+gl.ruta+"' AND TIPO='D'";
+				db.execSQL(sql);
+
+				sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactualnc+" WHERE RUTA='"+gl.ruta+"' AND TIPO='NC'";
+				db.execSQL(sql);
+
+				Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();
+
 			}
 
 			//Termina insert de devolución
+
 			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK FROM T_VENTA";
 			dt=Con.OpenDT(sql);
 	
@@ -1018,10 +1047,6 @@ public class FacturaRes extends PBase {
 			db.endTransaction();
 
 			saved=true;
-
-			if(gl.dvbrowse!=0){
-				gl.dvbrowse =0;
-			}
 
 			upd.init("P_CLIRUTA");
 			upd.add("BANDERA",0);
@@ -1982,6 +2007,10 @@ public class FacturaRes extends PBase {
 			db.execSQL("DELETE FROM T_PAGO");
 
 			db.execSQL("DELETE FROM T_BONITEM WHERE PRODID='*'");
+
+			if(gl.dvbrowse!=0){
+				gl.dvbrowse =0;
+			}
 
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

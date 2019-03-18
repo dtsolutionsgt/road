@@ -893,9 +893,21 @@ public class BaseDatosScript {
 					"PRIMARY KEY ([BARRA],[RUTA],[VENDEDOR],[CODIGO],[COREL])"+
 					");";
 			database.execSQL(vSQL);
-			
-			
-            return 1;
+
+			vSQL="CREATE TABLE [D_BONIF_BARRA] ("+
+				 "[COREL] TEXT NOT NULL," +
+				 "[BARRA] TEXT NOT NULL," +
+				 "[PESO] REAL NOT NULL," +
+				 "[PRODUCTO] TEXT NOT NULL," +
+				 "[UMVENTA] TEXT NOT NULL," +
+				 "[UMSTOCK] TEXT NOT NULL," +
+				 "[UMPESO] TEXT NOT NULL," +
+				 "[FACTOR] REAL NOT NULL," +
+				 "PRIMARY KEY ([COREL],[BARRA])"+
+				 ");";
+			database.execSQL(vSQL);
+
+			return 1;
 		} catch (SQLiteException e) {
 		   	msgbox(e.getMessage());
 		   	return 0;
@@ -1548,7 +1560,6 @@ public class BaseDatosScript {
 			database.execSQL(vSQL);
 			vSQL="CREATE INDEX P_MEDIAPAGO_idx2 ON P_MEDIAPAGO(PORCOBRO)";
 			database.execSQL(vSQL);
-			
 
 			vSQL="CREATE TABLE [P_RUTA] ("+
 					"[CODIGO] TEXT NOT NULL,"+
@@ -1731,6 +1742,8 @@ public class BaseDatosScript {
 					"[CODDESC] INTEGER NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"[EMP] TEXT NOT NULL,"+
+					"[UMPRODUCTO] TEXT NOT NULL,"+
+					"[UMBONIFICACION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CLIENTE],[CTIPO],[PRODUCTO],[PTIPO],[TIPORUTA],[TIPOBON],[RANGOINI])"+
 					");";
 			database.execSQL(vSQL);
@@ -2004,7 +2017,6 @@ public class BaseDatosScript {
 					"PRIMARY KEY ([ITEM])"+
 					");";
 			database.execSQL(vSQL);
-
 
 			vSQL="CREATE TABLE [T_BARRA] ("+
 					"[BARRA] TEXT NOT NULL,"+

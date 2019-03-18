@@ -33,9 +33,7 @@ public class AppMethods {
 		upd=Con.Upd;
 	}
 	
-	public void reconnect(BaseDatos dbconnection, SQLiteDatabase database)
-	{
-
+	public void reconnect(BaseDatos dbconnection, SQLiteDatabase database) 	{
 		Con=dbconnection;
 		db=database;
 		
@@ -453,6 +451,133 @@ public class AppMethods {
 
 	}
 
+	public double getPeso()
+	{
+
+		Cursor DT;
+		double sumaPesoB=0;
+		double sumaPeso=0;
+
+		sql = "SELECT IFNULL(SUM(S.PESO),0) AS PESOTOT " +
+				" FROM P_STOCKB S, P_PRODUCTO P " +
+				" WHERE P.ES_PROD_BARRA = 1 AND S.CODIGO= P.CODIGO AND (S.COREL = '' OR S.COREL IS NULL)" +
+				" AND S.BARRA NOT IN (SELECT BARRA FROM D_BONIF_BARRA WHERE COREL NOT IN " +
+				" (SELECT COREL FROM D_FACTURA WHERE ANULADO = 'S'))";
+		DT=Con.OpenDT(sql);
+
+		if (DT.getCount()>0) {
+			DT.moveToFirst();
+			sumaPesoB=DT.getDouble(0);
+		}
+
+		DT.close();
+
+		sql = " SELECT IFNULL(SUM(S.PESO),0) AS PESOTOT " +
+		      " FROM P_STOCK_PALLET S, P_PRODUCTO P " +
+		      " WHERE P.ES_PROD_BARRA = 1 AND S.CODIGO= P.CODIGO AND (S.COREL = '' OR S.COREL IS NULL)" +
+		      " AND S.BARRAPRODUCTO NOT IN (SELECT BARRA FROM D_BONIF_BARRA WHERE COREL NOT IN " +
+			  " (SELECT COREL FROM D_FACTURA WHERE ANULADO = 'S'))";
+		DT=Con.OpenDT(sql);
+
+		if (DT.getCount()>0) {
+			DT.moveToFirst();
+			sumaPesoB+=DT.getDouble(0);
+		}
+
+		DT.close();
+
+		sql = " SELECT SUM(S.PESO) AS PESOTOT, SUM(S.CANT) AS CANTUNI " +
+		      " FROM P_STOCK S, P_PRODUCTO P " +
+		      " WHERE P.ES_PROD_BARRA = 0 AND S.CODIGO= P.CODIGO AND S.CANT > 0";
+		DT=Con.OpenDT(sql);
+
+		if (DT.getCount()>0) {
+			DT.moveToFirst();
+			sumaPeso=DT.getDouble(0);
+		}
+
+		DT.close();
+
+		sql = " SELECT SUM(S.PESO) AS PESOTOT " +
+		      " FROM P_STOCK_PALLET S, P_PRODUCTO P " +
+		      " WHERE P.ES_PROD_BARRA = 0 AND S.CODIGO= P.CODIGO AND S.CANT > 0";
+		DT=Con.OpenDT(sql);
+
+		if (DT.getCount()>0) {
+			DT.moveToFirst();
+			sumaPeso+=DT.getDouble(0);
+		}
+
+		DT.close();
+
+		sumaPeso = sumaPeso + sumaPesoB;
+
+		return sumaPeso;
+	}
+
+	public double getCantidad()
+	{
+
+		Cursor DT;
+		double sumaCantB=0;
+		double sumaCant=0;
+
+		sql = "SELECT IFNULL(COUNT(S.CODIGO),0) AS CANTUNI " +
+				" FROM P_STOCKB S, P_PRODUCTO P " +
+				" WHERE P.ES_PROD_BARRA = 1 AND S.CODIGO= P.CODIGO AND (S.COREL = '' OR S.COREL IS NULL)" +
+				" AND S.BARRA NOT IN (SELECT BARRA FROM D_BONIF_BARRA WHERE COREL NOT IN " +
+				" (SELECT COREL FROM D_FACTURA WHERE ANULADO = 'S'))";
+		DT=Con.OpenDT(sql);
+
+		if (DT.getCount()>0) {
+			DT.moveToFirst();
+			sumaCantB=DT.getDouble(0);
+		}
+
+		DT.close();
+
+		sql = " SELECT IFNULL(COUNT(S.CODIGO),0) AS CANTUNI " +
+				" FROM P_STOCK_PALLET S, P_PRODUCTO P " +
+				" WHERE P.ES_PROD_BARRA = 1 AND S.CODIGO= P.CODIGO AND (S.COREL = '' OR S.COREL IS NULL)" +
+				" AND S.BARRAPRODUCTO NOT IN (SELECT BARRA FROM D_BONIF_BARRA WHERE COREL NOT IN " +
+				" (SELECT COREL FROM D_FACTURA WHERE ANULADO = 'S'))";
+		DT=Con.OpenDT(sql);
+
+		if (DT.getCount()>0) {
+			DT.moveToFirst();
+			sumaCantB+=DT.getDouble(0);
+		}
+
+		DT.close();
+
+		sql = " SELECT SUM(S.CANT) AS CANTUNI " +
+				" FROM P_STOCK S, P_PRODUCTO P " +
+				" WHERE P.ES_PROD_BARRA = 0 AND S.CODIGO= P.CODIGO AND S.CANT > 0";
+		DT=Con.OpenDT(sql);
+
+		if (DT.getCount()>0) {
+			DT.moveToFirst();
+			sumaCant=DT.getDouble(0);
+		}
+
+		DT.close();
+
+		sql = " SELECT SUM(S.CANT) AS CANTUNI " +
+			  " FROM P_STOCK_PALLET S, P_PRODUCTO P " +
+			  " WHERE P.ES_PROD_BARRA = 0 AND S.CODIGO= P.CODIGO AND S.CANT > 0";
+		DT=Con.OpenDT(sql);
+
+		if (DT.getCount()>0) {
+			DT.moveToFirst();
+			sumaCant+=DT.getDouble(0);
+		}
+
+		DT.close();
+
+		sumaCant = sumaCant + sumaCantB;
+
+		return sumaCant;
+	}
 
 	// Common
 	

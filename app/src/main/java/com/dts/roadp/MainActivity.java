@@ -1,6 +1,7 @@
 package com.dts.roadp;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,8 +11,8 @@ import android.database.SQLException;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -62,7 +63,8 @@ public class MainActivity extends PBase {
 				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
 						&& checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
 						&& checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
-						&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED)
+						&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
+                        && checkSelfPermission(Manifest.permission.READ_PHONE_STATE)== PackageManager.PERMISSION_GRANTED)
 				{
 					startApplication();
 				} else {
@@ -70,7 +72,9 @@ public class MainActivity extends PBase {
 						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
 							Manifest.permission.ACCESS_FINE_LOCATION,
 							Manifest.permission.CALL_PHONE,
-							Manifest.permission.CAMERA}, 1);
+							Manifest.permission.CAMERA,
+                            Manifest.permission.READ_PHONE_STATE
+                        }, 1);
 				}
 			}
 
@@ -125,7 +129,9 @@ public class MainActivity extends PBase {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
-                    && checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED) {
+                    && checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.READ_PHONE_STATE)== PackageManager.PERMISSION_GRANTED)
+            {
                 Toast.makeText(this, "GRANTED : " + requestCode, Toast.LENGTH_SHORT).show();
                 startApplication();
             } else {
@@ -313,7 +319,7 @@ public class MainActivity extends PBase {
 		try {
 			//#HS_20181120_1616 Se agrego el campo UNIDAD_MEDIDA_PESO.//campo INCIDENCIA_NO_LECTURA
 			sql = " SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO," +
-				  " INCIDENCIA_NO_LECTURA FROM P_EMPRESA";
+				  " INCIDENCIA_NO_LECTURA, LOTE_POR_DEFECTO FROM P_EMPRESA";
 			DT = Con.OpenDT(sql);
 
 			if (DT.getCount()>0){
@@ -328,6 +334,7 @@ public class MainActivity extends PBase {
                 gl.umpeso = DT.getString(6);
                 gl.incNoLectura = DT.getInt(7)==1; //#HS_20181211 Agregue campo incNoLectura para validacion en cliente.
                 gl.depparc = DT.getInt(5)==1;
+                gl.lotedf = DT.getString(8);
             }else{
                 gl.emp = "0";
                 lblRuta.setText("");
@@ -726,15 +733,16 @@ public class MainActivity extends PBase {
 		});
 
 		dialog.show();
-
 	}
 
-	private String androidid() {
+	@SuppressLint("MissingPermission")
+    private String androidid() {
 		String uniqueID="";
 		try {
-			uniqueID = Settings.Secure.getString(getContentResolver(),
-					Settings.Secure.ANDROID_ID);
-		} catch (Exception e) {
+			//uniqueID = Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID);
+            TelephonyManager tm = (TelephonyManager) this.getSystemService(this.TELEPHONY_SERVICE);
+            uniqueID = tm.getDeviceId();
+ 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			uniqueID="0000000000";
 		}

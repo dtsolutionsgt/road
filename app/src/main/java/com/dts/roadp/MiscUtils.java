@@ -1,14 +1,12 @@
 package com.dts.roadp;
 
-import java.util.Calendar;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.text.DecimalFormat;
+import java.util.Calendar;
 
 public class MiscUtils {
 		
@@ -264,6 +262,20 @@ public class MiscUtils {
 		return v;
 	}
 
+	public double roundr(double val,int ndec) {
+		double v,pw;
+
+		if (ndec>10)return val;
+
+		if (ndec<0) ndec=0;
+		v=val;
+		pw=Math.pow(10,ndec);
+		v=v*pw;
+		v=Math.round(v);
+		v=v/pw;
+
+		return v;
+	}
 
 	public double trunc(double val) {
 		double v,pw;

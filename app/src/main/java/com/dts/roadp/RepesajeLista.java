@@ -1,6 +1,5 @@
 package com.dts.roadp;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -54,9 +53,14 @@ public class RepesajeLista extends PBase {
     }
 
 
-    // Events
+    //region Events
 
     public void repesaje(View view) {
+
+        if (items.size()==0) {
+            msgbox("No se puede realizar repesaje");return;
+        }
+
         try{
             browse=1;
             startActivity(new Intent(this,Repesaje.class));
@@ -96,8 +100,9 @@ public class RepesajeLista extends PBase {
 
     }
 
+    //endregion
 
-    // Main
+    //region Main
 
     private void listItems() {
         try{
@@ -108,7 +113,7 @@ public class RepesajeLista extends PBase {
     }
 
     private void listItemsSingle() {
-        Cursor DT;
+        Cursor dt;
         clsClasses.clsCD item;
 
         items.clear();
@@ -116,20 +121,20 @@ public class RepesajeLista extends PBase {
         try {
             sql = "SELECT PESO,TOTAL FROM T_VENTA WHERE PRODUCTO='"+prodid+"' ";
 
-            DT = Con.OpenDT(sql);
-            DT.moveToFirst();
+            dt = Con.OpenDT(sql);
+            dt.moveToFirst();
 
             item = clsCls.new clsCD();
 
             item.Cod = prodid;
-            item.Desc = mu.frmdecimal(DT.getDouble(0),gl.peDecImp);
-            item.Text = mu.frmdecimal(DT.getDouble(1),2);
+            item.Desc = mu.frmdecimal(dt.getDouble(0),gl.peDecImp);
+            item.Text = mu.frmdecimal(dt.getDouble(1),2);
 
             items.add(item);
 
             lblCant.setText("1");
-            lblPrec.setText(mu.frmdecimal(DT.getDouble(0),gl.peDecImp));
-            lblTot.setText(mu.frmdecimal(DT.getDouble(1),2));
+            lblPrec.setText(mu.frmdecimal(dt.getDouble(0),gl.peDecImp));
+            lblTot.setText(mu.frmdecimal(dt.getDouble(1),2));
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -141,18 +146,54 @@ public class RepesajeLista extends PBase {
     }
 
     private void listItemsBarra() {
-        try{
+        Cursor dt;
+        clsClasses.clsCD item;
+        double ppeso,pprec,tpeso=0,tprec=0;
 
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        items.clear();
+
+        try {
+            sql = "SELECT BARRA,PESO,PRECIO FROM T_BARRA WHERE CODIGO='"+prodid+"' ";
+            dt = Con.OpenDT(sql);
+            dt.moveToFirst();
+
+            while (!dt.isAfterLast()) {
+
+                item = clsCls.new clsCD();
+
+                ppeso=mu.round(dt.getDouble(1),gl.peDecImp);tpeso+=ppeso;
+                pprec=mu.round(dt.getDouble(2),2);tprec+=pprec;
+
+                item.Cod = dt.getString(0);
+                item.Desc = mu.frmdecimal(ppeso,gl.peDecImp);
+                item.Text = mu.frmdecimal(pprec,2);
+
+                items.add(item);
+
+                dt.moveToNext();
+            }
+
+            lblCant.setText(""+items.size());
+            lblPrec.setText(mu.frmdecimal(tpeso,gl.peDecImp));
+            lblTot.setText(mu.frmdecimal(tprec,2));
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox(e.getMessage());
         }
+
+        adapter=new ListAdaptRepesList(this, items);
+        listView.setAdapter(adapter);
 
     }
 
-    // Aux
+    //endregion
 
+    //region Aux
 
-// Activity Events
+    //endregion
+
+    //region Activity Events
 
     @Override
     protected void onResume() {
@@ -169,4 +210,7 @@ public class RepesajeLista extends PBase {
 
 
     }
+
+    //endregion
+
 }

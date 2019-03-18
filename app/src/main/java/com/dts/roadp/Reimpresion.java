@@ -1,25 +1,19 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.Settings;
-import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
+
+import java.util.ArrayList;
 
 public class Reimpresion extends PBase {
 
@@ -119,13 +113,17 @@ public class Reimpresion extends PBase {
 		}
 
 	}
-	
 
-	// Main
-	
 	private void setHandlers(){
-
 		try{
+
+			listView.setOnTouchListener(new SwipeListener(this) {
+				public void onSwipeRight() {
+					onBackPressed();
+				}
+				public void onSwipeLeft() {}
+			});
+
 			listView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
@@ -167,10 +165,11 @@ public class Reimpresion extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-	
 	}
-	
+
+
+	// Main
+
 	public void listItems() {
 		Cursor DT;
 		clsClasses.clsCFDV vItem;	

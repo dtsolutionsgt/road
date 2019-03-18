@@ -1027,14 +1027,14 @@ public class CliDet extends PBase {
 
 		try {
 
-            chknc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			chknc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-				    if (chknc.isChecked()==true){
+					if (chknc.isChecked()==true){
 						chkncv.setChecked(false);
-                        gl.tiponcredito = 1;
-				    }
+						gl.tiponcredito = 1;
+					}
 
 				}
 			});
@@ -1043,20 +1043,20 @@ public class CliDet extends PBase {
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-				    if (chkncv.isChecked()==true){
+					if (chkncv.isChecked()==true){
 						chknc.setChecked(false);
-				    	gl.tiponcredito = 2;
+						gl.tiponcredito = 2;
 
 						VerificaCantidad();
 
-                    }
+					}
 
 				}
 			});
 
 		}catch (Exception e){
-		addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-	}
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 
 	}
 

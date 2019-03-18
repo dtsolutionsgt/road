@@ -341,9 +341,12 @@ public class Anulacion extends PBase {
 
 	}	
 	
-	private void anulFactura(String itemid) {
+	private boolean anulFactura(String itemid) {
+
 		Cursor DT;
 		String prod,um;
+
+		boolean vAnulFactura=false;
 
 		try{
 
@@ -394,9 +397,21 @@ public class Anulacion extends PBase {
 			anulBonif(itemid);
 
 			ImpresionFactura();
+
+			sql = "UPDATE D_NOTACRED SET ANULADO ='S' WHERE FACTURA ='" + itemid + "'";
+			db.execSQL(sql);
+
+			sql = "UPDATE D_CXC SET ANULADO ='S' WHERE REFERENCIA ='" + itemid + "' AND TIPO  = 'N' ";
+			db.execSQL(sql);
+
+			vAnulFactura=true;
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			vAnulFactura=false;
 		}
+
+		return vAnulFactura;
 
 	}
 	
@@ -577,9 +592,6 @@ public class Anulacion extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-
-
-		
 	}
 	
 	private void anulDevol(String itemid) {
@@ -623,14 +635,15 @@ public class Anulacion extends PBase {
 		
 	}
 
-	private void anulNotaCredito(String itemid) {
-		try{
+	private boolean anulNotaCredito(String itemid) {
 
-			Cursor DT2;
-			String vCorelFactura = "";
-			String PrCorel = "";
-			String vCorelDevol;
-			boolean vAnulNotaCredito;
+		Cursor DT2;
+		String vCorelFactura = "";
+		String vCorelDevol="";
+		boolean vAnulNotaCredito=false;
+		String vCorelNotaC = itemid;
+
+		try{
 
 			sql = "SELECT FACTURA FROM D_NOTACRED WHERE COREL = '" + itemid + "'";
 			DT2=Con.OpenDT(sql);
@@ -642,43 +655,28 @@ public class Anulacion extends PBase {
 
 			DT2.close();
 
-			PrCorel = vCorelFactura;
+			itemid = vCorelFactura;//En la variable vCorelFactura se guarda el corel de la Factura si es una NC con venta y sino el corel de D_CXC
 
-			if (ExisteFactura(PrCorel)){
-				anulFactura(PrCorel);// vAnulNotaCredito = true;
+			if (ExisteFactura(itemid)){
+				vAnulNotaCredito = (anulFactura(itemid)?true:false);
 			}else{
-				vCorelDevol = PrCorel;
+				vCorelDevol = itemid;
+
+				sql = "UPDATE D_CXC SET ANULADO='S' WHERE COREL='" + vCorelDevol + "' AND TIPO  = 'N' ";
+				db.execSQL(sql);
+
+				sql = "UPDATE D_NOTACRED SET ANULADO='S' WHERE COREL='" + vCorelNotaC + "'";
+				db.execSQL(sql);
+
+				vAnulNotaCredito=true;
 			}
-
-			/*SQL = "UPDATE D_CXC SET ANULADO='S' WHERE COREL='" + vCorelDevol + "' AND TIPO  = 'N' "
-			If Not ExecSQL(False) Then
-			vError += 1
-			End If
-
-			If vError = 0 Then
-
-					SQL = "UPDATE D_NOTACRED SET ANULADO='S' WHERE COREL='" + vCorelNotaC + "'"
-			If Not ExecSQL(False) Then
-			vError += 1
-			End If
-
-			If vError = 0 Then
-					Anul_Devol = True
-			End If
-
-			End If
-
-			End If*/
-
-			sql="UPDATE D_NOTACRED  SET Anulado='S' WHERE COREL='"+itemid+"'";
-			db.execSQL(sql);
-			sql="UPDATE D_CXC SET Anulado='S' WHERE COREL='"+itemid+"'";
-			db.execSQL(sql);
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			vAnulNotaCredito=false;
 		}
 
+		return vAnulNotaCredito;
 	}
 
 	private boolean ExisteFactura(String vCorel){

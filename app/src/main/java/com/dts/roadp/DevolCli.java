@@ -13,9 +13,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
 
 public class DevolCli extends PBase {
 
@@ -489,9 +489,8 @@ public class DevolCli extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
-		   	mu.msgbox( e.getMessage());
-		}	
-		
+		   	mu.msgbox(e.getMessage());
+		}
 	}
 
 
@@ -502,9 +501,7 @@ public class DevolCli extends PBase {
         Cursor DT;
 
 	    try{
-
-
-           sql="SELECT SERIE,ACTUAL+1,FINAL,INICIAL FROM P_CORREL_OTROS WHERE RUTA='"+gl.ruta+"' AND TIPO='"+tipo+"'";
+            sql="SELECT SERIE,ACTUAL+1,FINAL,INICIAL FROM P_CORREL_OTROS WHERE RUTA='"+gl.ruta+"' AND TIPO='"+tipo+"'";
             DT=Con.OpenDT(sql);
 
             if(DT.getCount()>0){

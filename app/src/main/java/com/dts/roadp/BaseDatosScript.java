@@ -1560,7 +1560,6 @@ public class BaseDatosScript {
 			database.execSQL(vSQL);
 			vSQL="CREATE INDEX P_MEDIAPAGO_idx2 ON P_MEDIAPAGO(PORCOBRO)";
 			database.execSQL(vSQL);
-			
 
 			vSQL="CREATE TABLE [P_RUTA] ("+
 					"[CODIGO] TEXT NOT NULL,"+
@@ -1743,6 +1742,8 @@ public class BaseDatosScript {
 					"[CODDESC] INTEGER NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"[EMP] TEXT NOT NULL,"+
+					"[UMPRODUCTO] TEXT NOT NULL,"+
+					"[UMBONIFICACION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CLIENTE],[CTIPO],[PRODUCTO],[PTIPO],[TIPORUTA],[TIPOBON],[RANGOINI])"+
 					");";
 			database.execSQL(vSQL);

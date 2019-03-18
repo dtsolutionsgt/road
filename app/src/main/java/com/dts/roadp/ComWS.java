@@ -903,44 +903,35 @@ public class ComWS extends PBase {
 
 			dbT.beginTransaction();
 
-			for (int i = 0; i < rc; i++)
-			{
+			for (int i = 0; i < rc; i++) {
 
                 sql = listItems.get(i);esql=sql;
                 sql=sql.replace("INTO VENDEDORES","INTO P_VENDEDOR");
 				sql=sql.replace("INTO P_RAZONNOSCAN","INTO P_CODNOLEC");
 
-				try
-				{
+				try {
 					writer.write(sql);
 					writer.write("\r\n");
-				} catch (Exception e)
-				{
+				} catch (Exception e) {
 					Log.d("M","Something happend here " + e.getMessage());
 				}
 
-				try
-				{
+				try {
 					dbT = ConT.getWritableDatabase();
 					dbT.execSQL(sql);
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 					Log.d("M","Something happend there " + e.getMessage());
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage() + "EJC","Yo fui " + sql);
 					Log.e("z", e.getMessage());
 				}
 
-
                 try {
-                	if (i % 10==0)
-                	{
+                	if (i % 10==0) 	{
 						fprog = "Procesando: " + i + " de: " + (rc-1);
 						wsRtask.onProgressUpdate();
 						SystemClock.sleep(20);
 					}
-                } catch (Exception e)
-				{
+                } catch (Exception e) {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
                     Log.e("z", e.getMessage());
                 }
@@ -966,7 +957,6 @@ public class ComWS extends PBase {
 			} catch (Exception e) {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			}
-
 
 			try {
 				writer.close();
@@ -1390,7 +1380,7 @@ public class ComWS extends PBase {
 
 		if (TN.equalsIgnoreCase("P_BONIF")) {
 			SQL = "SELECT  CLIENTE, CTIPO, PRODUCTO, PTIPO, TIPORUTA, TIPOBON, RANGOINI, RANGOFIN, TIPOLISTA, TIPOCANT, VALOR," +
-					"LISTA, CANTEXACT, GLOBBON, PORCANT, dbo.AndrDate(FECHAINI), dbo.AndrDate(FECHAFIN), CODDESC, NOMBRE, EMP " +
+					"LISTA, CANTEXACT, GLOBBON, PORCANT, dbo.AndrDate(FECHAINI), dbo.AndrDate(FECHAFIN), CODDESC, NOMBRE, EMP, UMPRODUCTO , UMBONIFICACION " +
 					"FROM P_BONIF WHERE ((dbo.AndrDate(FECHAINI)<=" + ff + ") AND (dbo.AndrDate(FECHAFIN)>=" + fi + "))";
 			return SQL;
 		}
@@ -1738,24 +1728,13 @@ public class ComWS extends PBase {
 
 				msgAskExit(s);
 
-				/*
-            } else {
-				isbusy=0;
-				esvacio=false;
-				SystemClock.sleep(100);
-				//#EJC20190226:Evita cargar datos dos veces.
-				//if (validaDatos(false)) runRecep();
-                //#EJC20190226_1308: Reiniciar la App
-                msgAskExit(s);
-				return;
-
-			}
-			*/
 			} else {
 				lblInfo.setText(fstr);
-				mu.msgbox("Ocurrió error : \n" + fstr + " (" + reccnt + ") " + ferr);
+				mu.msgbox("Ocurrió error : \n" + fstr + " (" + reccnt + ") ");
+				mu.msgbox("::"+esql);
 				isbusy = 0;
 				barInfo.setVisibility(View.INVISIBLE);
+				addlog("Recepcion",fstr,esql);
 				return;
 			}
 
@@ -1781,19 +1760,14 @@ public class ComWS extends PBase {
 		@Override
         protected Void doInBackground(String... params) {
 
-			try
-			{
+			try {
 				wsExecute();
 			} catch (Exception e) {
 				if (scon==0){
 					fstr="No se puede conectar al web service : "+sstr;
-					lblInfo.setText(fstr);
+					//lblInfo.setText(fstr);
 				}
-				msgbox(fstr);
-			}
-
-			if (scon==0){
-			//	Log.d("doInBackground",fstr+sstr);
+				//msgbox(fstr);
 			}
 
             return null;

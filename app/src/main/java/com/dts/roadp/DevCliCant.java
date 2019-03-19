@@ -285,7 +285,7 @@ public class DevCliCant extends PBase {
 				pesoprom = DT.getDouble(8);
 				//lblBU.setText(ubas);
 				gl.ubas=ubas;
-				lblDesc.setText(DT.getString(7));
+				lblDesc.setText(prodid + " " + DT.getString(7));
 			}
 
 		/*precioventa = prc.precio(prodid,1,gl.nivel,um,gl.umpeso,0);

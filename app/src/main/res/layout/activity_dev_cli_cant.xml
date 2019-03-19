@@ -142,6 +142,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginLeft="152dp"
             android:layout_marginTop="13dp"
+            android:enabled="false"
             android:inputType="number"
             android:text="0"
             android:textSize="18sp"

@@ -1971,6 +1971,7 @@ public class BaseDatosScript {
 					"[UMPESO] TEXT NOT NULL,"+
 					"[FACTOR] REAL NOT NULL,"+
 					"[POR_PESO] TEXT NOT NULL,"+
+					"[TIENE_LOTE] INTEGER,"+
 					"PRIMARY KEY ([Item])"+
 					");";
 			database.execSQL(vSQL);	             

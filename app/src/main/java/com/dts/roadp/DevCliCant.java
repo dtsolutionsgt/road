@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
@@ -54,7 +55,8 @@ public class DevCliCant extends PBase {
 		
 		prodid=gl.prod;
 		estado=gl.devtipo;
-		raz=gl.gstr;
+		raz=gl.devrazon;
+		gl.tienelote = 0;
 
 		prc=new Precio(this,mu,gl.peDec);
 
@@ -78,9 +80,14 @@ public class DevCliCant extends PBase {
 
 		setHandlers();
 
-		txtkgs.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        txtkgs.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 		txtCant.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 		txtPrecio.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+		//Limita cantidad de decimales para los EditText.
+        txtPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(gl.peDec)});
+       //txtCant.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(gl.peDec)});
+        txtkgs.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(gl.peDec)});
 
 	}
 
@@ -135,6 +142,12 @@ public class DevCliCant extends PBase {
 				gl.dvtotal = gl.dvpeso*gl.dvprec;
 			}else{
 				gl.dvtotal = cant*gl.dvprec;
+			}
+
+			if (chkTieneLote.isChecked()==true){
+				gl.tienelote = 0;
+			}else{
+				gl.tienelote = 1;
 			}
 
 			//hidekeyb();
@@ -193,10 +206,13 @@ public class DevCliCant extends PBase {
 					factor=cmbumfact.get(position);
 					umcambiar = cmbumlist.get(position);
 
-					clcpeso=pesoprom*factor;
+                    clcpeso=pesoprom*factor;
 
                     if (gl.dvporpeso==false){
 						lblPrec.setText(String.valueOf(mu.round(getPrecio(),gl.peDec)));
+                        txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+                    }else{
+                        lblPrec.setText(String.valueOf(precioventa));
                         txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
                     }
 
@@ -218,9 +234,9 @@ public class DevCliCant extends PBase {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
 				if (chkTieneLote.isChecked()==false){
-					txtLote.setText(gl.lotedf);
 					txtLote.setEnabled(true);
 				}else{
+                    txtLote.setText(gl.lotedf);
 					txtLote.setEnabled(false);
 				}
 			}
@@ -239,6 +255,8 @@ public class DevCliCant extends PBase {
 							txtkgs.setText(String.valueOf(mu.round(pesoprom*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
 						}
 
+					}else{
+						txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
 					}
 
 					return true;
@@ -265,7 +283,8 @@ public class DevCliCant extends PBase {
 				DT.moveToFirst();
 				ubas=DT.getString(0);
 				pesoprom = DT.getDouble(8);
-				lblBU.setText(ubas);((appGlobals) vApp).ubas=ubas;
+				//lblBU.setText(ubas);
+				gl.ubas=ubas;
 				lblDesc.setText(DT.getString(7));
 			}
 
@@ -289,7 +308,7 @@ public class DevCliCant extends PBase {
 
 		precioventa = mu.round(precioventa,gl.peDec);
 
-			sql="SELECT CANT,PESO,PRECIO,UMVENTA,LOTE FROM T_CxCD WHERE CODIGO='"+prodid+"' AND CODDEV='"+raz+"'";
+			sql="SELECT CANT,PESO,PRECIO,UMVENTA,LOTE,TIENE_LOTE FROM T_CxCD WHERE CODIGO='"+prodid+"'";
            	DT=Con.OpenDT(sql);
 
            	if (DT.getCount()>0){
@@ -298,9 +317,18 @@ public class DevCliCant extends PBase {
 				icant=DT.getDouble(0);
 				razon=raz;
 				umcambiar = DT.getString(3);
-				txtLote.setText(DT.getString(4));
 				txtPrecio.setText(String.valueOf(DT.getDouble(2)));
                 txtkgs.setText(String.valueOf(DT.getDouble(1)));
+				gl.tienelote = DT.getInt(5);
+				txtLote.setText(DT.getString(4));
+
+				if(gl.tienelote==1){
+					chkTieneLote.setChecked(false);
+					txtLote.setEnabled(true);
+				}else{
+					chkTieneLote.setChecked(true);
+					txtLote.setEnabled(false);
+				}
 
 				setSpinVal(razon);
 				setComboValor(umcambiar);
@@ -309,12 +337,10 @@ public class DevCliCant extends PBase {
 
 				lblPrecVenta.setText(umcambiar);
 
-				txtLote.setEnabled(false);
-
 			}else{
 
 				setSpinVal(devrazon);
-				setComboValor(um);
+				setComboValor(gl.ubas);
 
 				lblPrecVenta.setText(um);
 				txtLote.setEnabled(false);
@@ -328,7 +354,11 @@ public class DevCliCant extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			icant=0;
-	    }	
+	    }
+
+	    if (estado.equals("B")){
+	        spin.setEnabled(false);
+        }
 
 	}
 	
@@ -416,7 +446,6 @@ public class DevCliCant extends PBase {
 
 		try {
 
-			if(gl.dvporpeso==false){
 
 				sql="SELECT UNIDADSUPERIOR,FACTORCONVERSION FROM P_FACTORCONV WHERE PRODUCTO='"+prodid+"' AND UNIDADSUPERIOR<>'"+gl.umpeso+"'  ORDER BY UNIDADSUPERIOR";
 				DT=Con.OpenDT(sql);
@@ -443,13 +472,10 @@ public class DevCliCant extends PBase {
 
 				}
 
-			}else{
+            if(gl.tiponcredito==1){
+                txtPrecio.setEnabled(true);
 
-				cmbum.setSelection(0);
-				txtPrecio.setEnabled(false);
-
-
-			}
+            }
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -483,7 +509,7 @@ public class DevCliCant extends PBase {
 
 		for(int i = 0; i <cmbumlist.size(); i++ ) {
 			s=cmbumlist.get(i);
-			if (s.equalsIgnoreCase(um)) {
+			if (s.equalsIgnoreCase((um==gl.umpeso?gl.ubas:um))) {
 				pos=i;break;
 			}
 		}

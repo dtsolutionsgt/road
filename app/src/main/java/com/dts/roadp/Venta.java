@@ -218,7 +218,7 @@ public class Venta extends PBase {
 
 			if (gl.dvbrowse!=0){
 				if (tot<gl.dvdispventa){
-					mu.msgbox("Monto total menor al disponible!");return;
+					mu.msgbox("¡Monto de factura es menor a la de crédito!!");return;
 				}
 			}
 
@@ -1284,7 +1284,6 @@ public class Venta extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 
 	}
 

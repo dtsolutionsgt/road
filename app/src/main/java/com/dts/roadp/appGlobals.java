@@ -29,7 +29,7 @@ public class appGlobals extends Application {
 	//Devolución Cliente
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;
 	public double dvfactor,dvpeso,dvprec,dvpreclista,dvtotal;
-	public int dvbrowse=0;
+	public int dvbrowse=0,tienelote;
     public boolean dvporpeso;
     public double dvdispventa;
     public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc;

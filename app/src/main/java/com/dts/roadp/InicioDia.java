@@ -7,15 +7,14 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.dts.roadp.clsClasses.clsExist;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import com.dts.roadp.clsClasses.clsExist;
 
 
 public class InicioDia extends PBase implements View.OnClickListener{
@@ -31,7 +30,8 @@ public class InicioDia extends PBase implements View.OnClickListener{
     final int mes = c.get(Calendar.MONTH);
     final int dia = c.get(Calendar.DAY_OF_MONTH);
     final int anio = c.get(Calendar.YEAR);
-    private int cyear, cmonth, cday, fechae;
+    private int cyear, cmonth, cday;
+    private long fechae;
     private boolean seleccionFecha;
 
     //#HS_20181212 para imprimir el inventario

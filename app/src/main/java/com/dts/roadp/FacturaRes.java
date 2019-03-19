@@ -48,8 +48,9 @@ public class FacturaRes extends PBase {
 	private printer prn;
 	private clsDocFactura fdoc;
 	private AppMethods app;
-	
-	private int fecha,fechae,fcorel,clidia,media;
+
+	private long fecha,fechae;
+	private int fcorel,clidia,media;
 	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt;
 	private int cyear, cmonth, cday, dweek,stp=0;
 
@@ -1238,7 +1239,7 @@ public class FacturaRes extends PBase {
 	}
 		
 	private void saveAtten(double tot) {
-		int ti,tf,td;
+		long ti,tf,td;
 		
 		ti=gl.atentini;tf=du.getActDateTime();
 		td=du.timeDiff(tf,ti);if (td<1) td=1;

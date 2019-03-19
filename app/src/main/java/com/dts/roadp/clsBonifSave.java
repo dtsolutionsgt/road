@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 public class clsBonifSave {
 
 	public String ruta,cliente,emp;
-	public int fecha;
+	public long fecha;
 	
 	private int active;
 	private SQLiteDatabase db;

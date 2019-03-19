@@ -1,8 +1,5 @@
 package com.dts.roadp;
 
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class DateUtils {
@@ -10,7 +7,7 @@ public class DateUtils {
 	public DateUtils() {
 	}
 	
-	public String sfecha(int f) {
+	public String sfecha(long f) {
 		int vy,vm,vd;
 		String s;
 		
@@ -26,7 +23,7 @@ public class DateUtils {
 		return s;
 	}
 	
-	public String sfechash(int f) {
+	public String sfechash(long f) {
 		int vy,vm,vd;
 		String s;
 		
@@ -41,8 +38,8 @@ public class DateUtils {
 		return s;
 	}
 	
-	public String shora(int vValue) {
-		int h,m;
+	public String shora(long vValue) {
+		long h,m;
 		String sh,sm;
 			
 		h=vValue % 10000;
@@ -54,7 +51,7 @@ public class DateUtils {
 	
 	
 	public String geActTimeStr(){
-		int f,ch,cm,cs;
+		long f,ch,cm,cs;
 		String s,ss;
 		
 		final Calendar c = Calendar.getInstance();
@@ -71,7 +68,7 @@ public class DateUtils {
 	}
 	
 	public String sSecond(){
-		int cs;
+		long cs;
 		String sss;
 		
 		final Calendar c = Calendar.getInstance();
@@ -83,8 +80,8 @@ public class DateUtils {
 		return sss;
 	}
 	
-	public String univfecha(int f) {
-		int vy,vm,vd,m,h;
+	public String univfecha(long f) {
+		long vy,vm,vd,m,h;
 		String s;
 		
 		//yyyyMMdd hh:mm:ss
@@ -108,7 +105,7 @@ public class DateUtils {
 		return s;
 	}
 
-	public String univfechasinhora(int f) {
+	public String univfechasinhora(long f) {
 		int vy,vm,vd;
 		String s;
 
@@ -126,15 +123,15 @@ public class DateUtils {
 		return s;
 	}
 	
-	public String univfechaext(int f) {
-		int vy,vm,vd;
+	public String univfechaext(long f) {
+		long vy,vm,vd;
 		String s;
 		
 		//yyyyMMdd hh:mm:ss
 		
-		vy=(int) f/10000;f=f % 10000;
-		vm=(int) f/100;f=f % 100;
-		vd=(int) f;
+		vy=(long) f/10000;f=f % 10000;
+		vm=(long) f/100;f=f % 100;
+		vd=(long) f;
 			
 		s=""+vy; 
 		if (vm>9) s=s+vm; else s=s+"0"+vm;
@@ -144,15 +141,15 @@ public class DateUtils {
 		return s;
 	}
 
-	public String univfechasql(int f) {
-		int vy,vm,vd;
+	public String univfechasql(long f) {
+		long vy,vm,vd;
 		String sy,sm,sd;
 
 		//yyyy-MM-dd
 
-		vy=(int) f/100000000;f=f % 100000000;
-		vm=(int) f/1000000;f=f % 1000000;
-		vd=(int) f/10000;f=f % 10000;
+		vy=(long) f/100000000;f=f % 100000000;
+		vm=(long) f/1000000;f=f % 1000000;
+		vd=(long) f/10000;f=f % 10000;
 
 		if (vy>9) sy="20"+vy; else sy="200"+vy;
 		if (vm>9) sm="-"+vm; else sm="-0"+vm;
@@ -161,21 +158,21 @@ public class DateUtils {
 		return sy+sm+sd;
 	}
 
-	public int ffecha00(int f) {
-		f=(int) f/10000;
+	public long ffecha00(long f) {
+		f=(long) f/10000;
 		f=f*10000;
 		return f;
 	}
 	
-	public int ffecha24(int f) {
-		f=(int) f/10000;
+	public long ffecha24(long f) {
+		f=(long) f/10000;
 		f=f*10000+2359;
 		return f;
 	}
 
 	//#HS_20181121_1008 Funcion para fecha sin hora.
-	public int cfechaSinHora(int year,int month, int day) {
-		int c;
+	public long cfechaSinHora(int year,int month, int day) {
+		long c;
 		c=year % 100;
 		c=c*10000+month*100+day;
 
@@ -183,21 +180,21 @@ public class DateUtils {
 		return c; //*10000;
 	}
 	  
-	public int cfecha(int year,int month, int day) {
-		int c;
+	public long cfecha(int year,int month, int day) {
+		long c;
 		c=year % 100;
 		c=c*10000+month*100+day;
 
 		return c*10000;
 	}
 	
-	public int parsedate(int date,int hour,int min) {
-		int f;
+	public long parsedate(int date,int hour,int min) {
+		long f;
 		f=date+100*hour+min;
 		return f;
 	}
 		
-	public int getyear(int f) {
+	public int getyear(long f) {
 		int vy;
 				
 		vy=(int) f/100000000;f=f % 100000000;
@@ -206,7 +203,7 @@ public class DateUtils {
 		return vy;
 	}
 	
-	public int getmonth(int f) {
+	public int getmonth(long f) {
 		int vy,vm;
 				
 		vy=(int) f/100000000;f=f % 100000000;
@@ -215,7 +212,7 @@ public class DateUtils {
 		return vm;
 	}
 	
-	public int getday(int f) {
+	public int getday(long f) {
 		int vy,vm,vd;
 				
 		vy=(int) f/100000000;f=f % 100000000;
@@ -244,10 +241,9 @@ public class DateUtils {
 		
 	}
 	
-	public int timeDiff(int v1,int v2) {
-		int h1,m1,h2,m2,vm1,vm2,dif;
-		
-			
+	public long timeDiff(long v1,long v2) {
+		long h1,m1,h2,m2,vm1,vm2,dif;
+
 		h1=v1 % 10000;m1=h1 % 100;h1=(int) h1/100;
 		vm1=h1*60+m1;
 		
@@ -261,7 +257,7 @@ public class DateUtils {
 		
 	}
 	
-	public int dayofweek(int f) {
+	public int dayofweek(long f) {
 		int y,m,d,dw;
 	     
 		final Calendar c = Calendar.getInstance();
@@ -275,8 +271,9 @@ public class DateUtils {
 	    return dw;
 	}
 	
-	public int getActDate(){
-		int f,cyear,cmonth,cday;
+	public long getActDate(){
+		long f;
+		int cyear,cmonth,cday;
 		
 		final Calendar c = Calendar.getInstance();
 		cyear = c.get(Calendar.YEAR);
@@ -289,8 +286,9 @@ public class DateUtils {
 	}
 
 	//#HS_20181121_1008 Funcion para obtener la fecha sin hora.
-	public int getFechaActual(){
-		int f,cyear,cmonth,cday,ch,cm,fecha;
+	public long getFechaActual(){
+		long f,fecha;
+		int cyear,cmonth,cday,ch,cm;
 
 		final Calendar c = Calendar.getInstance();
 		cyear = c.get(Calendar.YEAR);
@@ -304,8 +302,9 @@ public class DateUtils {
 		return fecha;
 	}
 	
-	public int getActDateTime(){
-		int f,cyear,cmonth,cday,ch,cm,fecha;
+	public long getActDateTime(){
+		long f,fecha;
+		int cyear,cmonth,cday,ch,cm;
 		
 		final Calendar c = Calendar.getInstance();
 		cyear = c.get(Calendar.YEAR);
@@ -321,7 +320,8 @@ public class DateUtils {
 	}
 		
 	public String getActDateStr(){
-		int f,cyear,cmonth,cday;
+		long f;
+		int cyear,cmonth,cday;
 		
 		final Calendar c = Calendar.getInstance();
 		cyear = c.get(Calendar.YEAR);
@@ -333,8 +333,9 @@ public class DateUtils {
 		return sfecha(f);
 	}
 	
-	public int getCorelBase(){
-		int f,cyear,cmonth,cday,ch,cm,cs,vd,vh;
+	public long getCorelBase(){
+		long f;
+		int cyear,cmonth,cday,ch,cm,cs,vd,vh;
 		
 		final Calendar c = Calendar.getInstance();
 		

@@ -1034,7 +1034,7 @@ public class Venta extends PBase {
 	}
 
 	private void saveAtten(String codnoate) {
-		int ti,tf,td;
+		long ti,tf,td;
 
 		ti=gl.atentini;tf=du.getActDateTime();
 		td=du.timeDiff(tf,ti);if (td<1) td=1;

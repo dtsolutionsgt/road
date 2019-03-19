@@ -684,7 +684,8 @@ public class MainActivity extends PBase {
 	private boolean validaLicencia() {
 		Cursor dt;
 		String mac, lickey, idkey, binkey;
-		int fval, ff, lkey;
+		int fval, lkey;
+		long ff;
 
 		try {
 			mac = lic.getMac();

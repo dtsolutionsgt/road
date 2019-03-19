@@ -375,7 +375,8 @@ public class CliDet extends PBase {
 	
 	private boolean validaVenta() {
 		Cursor DT;
-		int ci,cf,ca1,ca2,fecha_vigencia, diferencia;
+		int ci,cf,ca1,ca2;
+		long fecha_vigencia, diferencia;
 		double dd;
 		boolean resguardo=false;
 

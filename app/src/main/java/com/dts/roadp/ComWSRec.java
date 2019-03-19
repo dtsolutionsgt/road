@@ -674,7 +674,7 @@ public class ComWSRec extends PBase {
     {
 
         DateUtils DU = new DateUtils();
-        int Now=du.getFechaActual();
+        long Now=du.getFechaActual();
 
         String ruta = txtRuta.getText().toString().trim();
 

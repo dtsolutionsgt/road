@@ -1,16 +1,17 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
-import com.dts.roadp.clsClasses.clsCDB;
-
-import android.app.DialogFragment;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -18,16 +19,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
-import android.database.SQLException;
-import android.graphics.Color;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 public class PedidoRes extends PBase {
 
@@ -54,7 +49,7 @@ public class PedidoRes extends PBase {
 	private printer prn;
 	private clsDocPedido pdoc;
 	
-	private int fecha,fechae;
+	private long fecha,fechae;
 	private String itemid,cliid,corel;
 	private int cyear, cmonth, cday,dweek;
 	
@@ -444,7 +439,7 @@ public class PedidoRes extends PBase {
 	}
  	
 	private void saveAtten() {
-		int ti,tf,td;
+		long ti,tf,td;
 		
 		ti=gl.atentini;tf=du.getActDateTime();
 		td=du.timeDiff(tf,ti);if (td<1) td=1;

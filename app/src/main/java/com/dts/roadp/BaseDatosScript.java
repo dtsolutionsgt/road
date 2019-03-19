@@ -751,7 +751,20 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-			
+
+			vSQL="CREATE TABLE [D_BONIF_BARRA] ("+
+					"[COREL] TEXT NOT NULL," +
+					"[BARRA] TEXT NOT NULL," +
+					"[PESO] REAL NOT NULL," +
+					"[PRODUCTO] TEXT NOT NULL," +
+					"[UMVENTA] TEXT NOT NULL," +
+					"[UMSTOCK] TEXT NOT NULL," +
+					"[UMPESO] TEXT NOT NULL," +
+					"[FACTOR] REAL NOT NULL," +
+					"PRIMARY KEY ([COREL],[BARRA])"+
+					");";
+			database.execSQL(vSQL);
+
 			vSQL="CREATE TABLE [D_BONIF_LOTES] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
@@ -764,6 +777,30 @@ public class BaseDatosScript {
 					"[FACTOR] REAL NOT NULL,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO],[LOTE])"+
 					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE TABLE [D_BONIF_STOCK] ("+
+					"[COREL] TEXT NOT NULL,"+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[CANT] REAL NOT NULL,"+
+					"[CANTM] REAL NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[plibra] REAL NOT NULL,"+
+					"[LOTE] TEXT NOT NULL,"+
+					"[DOCUMENTO] TEXT NOT NULL,"+
+					"[FECHA] INTEGER NOT NULL,"+
+					"[ANULADO] INTEGER NOT NULL,"+
+					"[CENTRO] TEXT NOT NULL,"+
+					"[STATUS] TEXT NOT NULL,"+
+					"[ENVIADO] INTEGER NOT NULL,"+
+					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
+					"[COREL_D_MOV] TEXT NOT NULL,"+
+					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL,"+
+					"PRIMARY KEY ([COREL],[CODIGO],[LOTE],[DOCUMENTO],[STATUS],[UNIDADMEDIDA])"+
+					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE INDEX D_BONIF_STOCK_idx1 ON D_BONIF_STOCK(COREL)";
 			database.execSQL(vSQL);
 			
 
@@ -892,19 +929,6 @@ public class BaseDatosScript {
 					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([BARRA],[RUTA],[VENDEDOR],[CODIGO],[COREL])"+
 					");";
-			database.execSQL(vSQL);
-
-			vSQL="CREATE TABLE [D_BONIF_BARRA] ("+
-				 "[COREL] TEXT NOT NULL," +
-				 "[BARRA] TEXT NOT NULL," +
-				 "[PESO] REAL NOT NULL," +
-				 "[PRODUCTO] TEXT NOT NULL," +
-				 "[UMVENTA] TEXT NOT NULL," +
-				 "[UMSTOCK] TEXT NOT NULL," +
-				 "[UMPESO] TEXT NOT NULL," +
-				 "[FACTOR] REAL NOT NULL," +
-				 "PRIMARY KEY ([COREL],[BARRA])"+
-				 ");";
 			database.execSQL(vSQL);
 
 			return 1;
@@ -1923,6 +1947,8 @@ public class BaseDatosScript {
 					"[PORCANT] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"[EMP] TEXT NOT NULL,"+
+					"[UMPRODUCTO] TEXT NOT NULL,"+
+					"[UMBONIFICACION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([ID])"+
 					");";
 			database.execSQL(vSQL);			

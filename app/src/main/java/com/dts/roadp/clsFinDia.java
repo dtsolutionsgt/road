@@ -303,7 +303,7 @@ public class clsFinDia extends PBase{
         }
     }
 
-    public void updateFinDia(int valor){
+    public void updateFinDia(long valor){
         try{
             sql="UPDATE FinDia SET val1 = " + String.valueOf(valor);
             db.execSQL(sql);

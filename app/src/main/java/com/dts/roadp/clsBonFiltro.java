@@ -23,7 +23,7 @@ public class clsBonFiltro {
 	private DateUtils DU;
 	
 	private String cliid,rutaid;
-	private int fecha;	
+	private long fecha;
 	
 	public clsBonFiltro(Context context,String ruta,String cliente) {
 		
@@ -84,8 +84,8 @@ public class clsBonFiltro {
 		
 		
 		try {
-			
-			vSQL="SELECT CLIENTE,CTIPO,PRODUCTO,PTIPO,TIPORUTA,RANGOINI,RANGOFIN,TIPOBON,VALOR,GLOBBON,PORCANT,FECHAINI,FECHAFIN,CODDESC,NOMBRE,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,EMP "+
+
+			vSQL="SELECT CLIENTE,CTIPO,PRODUCTO,PTIPO,TIPORUTA,RANGOINI,RANGOFIN,TIPOBON,VALOR,GLOBBON,PORCANT,FECHAINI,FECHAFIN,CODDESC,NOMBRE,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,EMP,UMPRODUCTO,UMBONIFICACION "+
 					"FROM P_BONIF WHERE (CTIPO=0) OR "+
 					"((CTIPO=1) AND (CLIENTE='" + cliid + "')) OR "+
 					"((CTIPO=2) AND (CLIENTE='" + CTipoNeg + "')) OR "+

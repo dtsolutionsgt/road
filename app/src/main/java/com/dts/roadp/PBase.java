@@ -31,7 +31,8 @@ public class PBase extends Activity {
 	protected InputMethodManager keyboard;	
 	
 	protected int itemid,browse,mode;
-	protected int selid,selidx,fecha,deposito;
+	protected int selid,selidx,deposito;
+	protected long fecha;
 	protected String s,ss;
 
 	@Override

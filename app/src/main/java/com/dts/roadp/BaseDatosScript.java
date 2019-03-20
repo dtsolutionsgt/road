@@ -1952,7 +1952,6 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX T_DESC_idx4 ON T_DESC(RANGOFIN)";
 			database.execSQL(vSQL);		
 			
-			
 			vSQL="CREATE TABLE [T_BONIF] ("+
 					"[ID] INTEGER NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+

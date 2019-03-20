@@ -1864,7 +1864,29 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+			vSQL="CREATE TABLE [P_IMPRESORA]("+
+					"[IDIMPRESORA] TEXT NOT NULL,"+
+					"[NUMSERIE] TEXT NOT NULL,"+
+					"[MARCA] TEXT NOT NULL,"+
+					"[CREADA] TEXT NOT NULL,"+
+					"[MODIFICADA] TEXT NOT NULL,"+
+					"[FECHA_CREADA] INTEGER NOT NULL,"+
+					"[FECHA_MODIFICADA] INTEGER NOT NULL,"+
+					"PRIMARY KEY ([IDIMPRESORA])"+
+			        ");";
+			database.execSQL(vSQL);
 
+			vSQL= "CREATE TABLE [P_HANDHELD]("+
+					"[NUMPLACA] TEXT NOT NULL,"+
+					"[NUMSERIE] TEXT NOT NULL,"+
+					"[MARCA] TEXT NOT NULL,"+
+					"[CREADA] TEXT NOT NULL,"+
+					"[MODIFICADA] TEXT NOT NULL,"+
+					"[FECHA_CREADA] INTEGER NOT NULL,"+
+					"[FECHA_MODIFICADA] INTEGER NOT NULL,"+
+					"PRIMARY KEY ([NUMPLACA])"+
+					");";
+			database.execSQL(vSQL);
 
 			return 1;
 			 
@@ -1971,6 +1993,7 @@ public class BaseDatosScript {
 					"[UMPESO] TEXT NOT NULL,"+
 					"[FACTOR] REAL NOT NULL,"+
 					"[POR_PESO] TEXT NOT NULL,"+
+					"[TIENE_LOTE] INTEGER,"+
 					"PRIMARY KEY ([Item])"+
 					");";
 			database.execSQL(vSQL);	             

@@ -108,7 +108,12 @@ public class MainActivity extends PBase {
             initSession();
 
             supervisorRuta();
-            txtUser.setText("00100993");txtPass.setText("2613");
+
+            //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
+            if (gl.debug){
+                txtUser.setText("00100993");txtPass.setText("2613");
+            }
+
 
             gl.contlic=false;
         } catch (Exception e) {

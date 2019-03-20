@@ -173,7 +173,18 @@ public class FacturaRes extends PBase {
 			}
 
 		}
-		
+
+		if (gl.dvbrowse!=0){
+			lblCash.setVisibility(View.VISIBLE);
+			imgCash.setVisibility(View.VISIBLE);
+			lblPend.setVisibility(View.INVISIBLE);
+			imgPend.setVisibility(View.INVISIBLE);
+			imgCred.setVisibility(View.INVISIBLE);
+			lblCred.setVisibility(View.INVISIBLE);
+			imgMPago.setVisibility(View.VISIBLE);
+			lblMPago.setVisibility(View.VISIBLE);
+		}
+
 		fechae=fecha;
 		dweek=mu.dayofweek();
 		
@@ -754,7 +765,7 @@ public class FacturaRes extends PBase {
 				ins.add("RUTA",gl.ruta);
 				ins.add("CLIENTE",gl.cliente);
 				ins.add("FECHA",fecha);
-				ins.add("ANULADO","S");
+				ins.add("ANULADO","N");
 				ins.add("EMPRESA",gl.emp);
 				ins.add("TIPO", gl.dvestado);
 				ins.add("REFERENCIA",corel);
@@ -773,7 +784,7 @@ public class FacturaRes extends PBase {
 				ins.init("D_NOTACRED");
 
 				ins.add("COREL",gl.dvcorrelnc);
-				ins.add("ANULADO","S");
+				ins.add("ANULADO","N");
 				ins.add("FECHA",fecha);
 				ins.add("RUTA",gl.ruta);
 				ins.add("VENDEDOR",gl.vend);
@@ -866,6 +877,9 @@ public class FacturaRes extends PBase {
 				db.execSQL(sql);
 
 				Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();
+
+				sql="DELETE FROM T_CxCD";
+				db.execSQL(sql);
 
 			}
 

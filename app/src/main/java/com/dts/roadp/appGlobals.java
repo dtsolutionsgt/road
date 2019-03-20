@@ -26,10 +26,13 @@ public class appGlobals extends Application {
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo;
 	public int mpago;
 
+	//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true por defecto estará en false
+	public boolean debug=true;
+
 	//Devolución Cliente
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;
 	public double dvfactor,dvpeso,dvprec,dvpreclista,dvtotal;
-	public int dvbrowse=0;
+	public int dvbrowse=0,tienelote;
     public boolean dvporpeso;
     public double dvdispventa;
     public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc;

@@ -152,8 +152,8 @@ public class DateUtils {
 		vd=(long) f/10000;f=f % 10000;
 
 		if (vy>9) sy="20"+vy; else sy="200"+vy;
-		if (vm>9) sm="-"+vm; else sm="-0"+vm;
-		if (vd>9) sd="-"+vd; else sd="-0"+vd;
+		if (vm>9) sm=""+vm; else sm="0"+vm;
+		if (vd>9) sd=""+vd; else sd="0"+vd;
 
 		return sy+sm+sd;
 	}

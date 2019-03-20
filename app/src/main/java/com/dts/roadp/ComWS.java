@@ -158,10 +158,14 @@ public class ComWS extends PBase {
 
 		if (esvacio) txtWS.setEnabled(true);
 
-		if (mu.emptystr(txtRuta.getText().toString())) {
-			txtRuta.setText("8001-1");txtEmp.setText("03");
-			txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
+		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
+		if (gl.debug){
+			if (mu.emptystr(txtRuta.getText().toString())) {
+				txtRuta.setText("8001-1");txtEmp.setText("03");
+				txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
+			}
 		}
+
 
 		//txtRuta.setText("0005-1");
 		//txtWS.setText("http://192.168.1.112/wsAndr/wsandr.asmx");
@@ -844,6 +848,8 @@ public class ComWS extends PBase {
 			if (!AddTable("P_VENDEDOR")) return false;
 			if (!AddTable("P_MUNI")) return false;
 			if (!AddTable("P_VEHICULO"))return false;
+			if (!AddTable("P_HANDHELD"))return false;
+			if (!AddTable("P_IMPRESORA"))return false;
 			
 			if (!AddTable("P_REF1")) return false;
 			if (!AddTable("P_REF2")) return false;
@@ -1162,7 +1168,7 @@ public class ComWS extends PBase {
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') " +
+						"FROM P_STOCK WHERE RUTA='" + ActRuta + "'  AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";
 			} else if (gl.peModal.equalsIgnoreCase("APR")) {
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
@@ -1330,7 +1336,7 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_NIVELPRECIO")) {
-			SQL = "SELECT * FROM P_NIVELPRECIO ";
+			SQL = "SELECT CODIGO, NOMBRE, ISNULL(DECIMALES,0) AS DECIMALES FROM P_NIVELPRECIO ";
 			return SQL;
 		}
 
@@ -1427,6 +1433,21 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
+		//#CKFK_20190319 Agregué tabla P_HANDHELD
+		if (TN.equalsIgnoreCase("P_HANDHELD")) {
+			SQL = "SELECT NUMPLACA, NUMSERIE, TIPO, ISNULL(CREADA,'') AS CREADA, " +
+				  " ISNULL(MODIFICADA,'') AS MODIFICADA, ISNULL(FECHA_CREADA, GETDATE()) AS FECHA_CREADA," +
+				  "	ISNULL(FECHA_MODIFICADA, GETDATE()) AS FECHA_MODIFICADA FROM P_HANDHELD";
+			return SQL;
+		}
+
+		//#CKFK_20190319 Agregué tabla P_IMPRESORA
+		if (TN.equalsIgnoreCase("P_IMPRESORA")) {
+			SQL = " SELECT IDIMPRESORA, NUMSERIE, MARCA, ISNULL(CREADA,'') AS CREADA, " +
+				  " ISNULL(MODIFICADA,'') AS MODIFICADA, ISNULL(FECHA_CREADA, GETDATE()) AS FECHA_CREADA," +
+				  " ISNULL(FECHA_MODIFICADA, GETDATE()) AS FECHA_MODIFICADA FROM P_IMPRESORA";
+			return SQL;
+		}
 		if (TN.equalsIgnoreCase("P_MUNI")) {
 			SQL = "SELECT * FROM P_MUNI";
 			return SQL;

@@ -111,6 +111,7 @@ public class Venta extends PBase {
 		initValues();
 
 		browse=0;
+		gl.closeVenta = false;
 
 		showCredit();
 		setGPS();
@@ -1629,7 +1630,9 @@ public class Venta extends PBase {
 			super.onResume();
 			try {
 				txtBarra.requestFocus();
-			} catch (Exception e) {}
+			} catch (Exception e) {
+
+			}
 
 			if (gl.closeVenta) super.finish();
 

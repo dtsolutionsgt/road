@@ -1,15 +1,23 @@
 package com.dts.roadp;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.dts.roadp.clsClasses.clsCFDV;
 
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.app.Activity;
@@ -18,6 +26,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.widget.Toast;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -35,11 +44,14 @@ public class Cobro extends PBase {
 	private clsDocCobro fdoc;
 	private clsDocFactura fdocf;
 	
-	private String cliid,itemid,prodid,sefect,corel,fserie,dtipo;
-	private double ttot,tsel,tpag,tpend,vefect,plim;
+	private String cliid,cod,itemid,prodid,sefect,corel,fserie,dtipo,fechav;
+	private double ttot,tsel,tpag,tpagos,tpend,vefect,plim,cred,pg,sal,ssal,total;
 	private boolean peexit;
-	private int fflag=1,fcorel;
-	private String crrf;
+	private boolean porcentaje = false;
+	private int fflag=1,fcorel,fechaven,medPago,facturaVen;
+	private String crrf,docfact;
+	private CheckBox cbCheckAll;
+	private RadioButton chkFactura,chkContado;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,23 +62,28 @@ public class Cobro extends PBase {
 		addlog("Cobro",""+du.getActDateTime(),gl.vend);
 
 		listView = (ListView) findViewById(R.id.listView1);
-		lblSel = (TextView) findViewById(R.id.textView7);
-		lblPag = (TextView) findViewById(R.id.lblCEmit);
-		lblPend = (TextView) findViewById(R.id.TextView02);
-		
+		lblSel = (TextView) findViewById(R.id.lblSel);
+		lblPag = (TextView) findViewById(R.id.lblPag);
+		lblPend = (TextView) findViewById(R.id.lblPend);
+        cbCheckAll= (CheckBox) findViewById(R.id.cbCheckAll);
+
+		chkFactura = new RadioButton(this,null);
+		chkContado = new RadioButton(this,null);
+
 		cliid=gl.cliente;
-		
+
 		setHandlers();
 		
 		initSession();
 
-		listItems();
 		clearAll();
+		listItems();
 
 		showTotals();
 
 		gl.pagomodo=0;
-		
+		cod=gl.cliente;
+
 		printcallback= new Runnable() {
 		    public void run() {
 		    	askPrint();
@@ -131,41 +148,40 @@ public class Cobro extends PBase {
 		}
 
 	}
-	
-	public void doExit(View view){
 
-		try{
-			exit();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-	}
 
 	public void checkAll(View view) {
 
 	    try{
 
+			if(cbCheckAll.isChecked()){
+				for (int i = 0; i <items.size(); i++) {
+					items.get(i).flag=1;
+					dtipo=items.get(i).Tipo;
 
-	        if(items.size()>0){
-                for (int i = 0; i <items.size(); i++) {
-                    items.get(i).flag=1;
-                    dtipo=items.get(i).Tipo;
+					if (dtipo.equalsIgnoreCase("R")) {
+						for (int ii = 0; ii <i; ii++) {
+							items.get(i).flag=0;
+						}
+						break;
+					}
 
-                    if (dtipo.equalsIgnoreCase("R")) {
-                        for (int ii = 0; ii <i; ii++) {
-                            items.get(i).flag=0;
-                        }
-                        break;
-                    }
+				}
 
-                }
+				adapter.refreshItems();
 
-                adapter.refreshItems();
+				calcSelected();
+				showTotals();
+			}else{
+				for (int i = 0; i <items.size(); i++) {
+					items.get(i).flag=2;
+				}
 
-                calcSelected();
-                showTotals();
-            }
+				adapter.refreshItems();
 
+				calcSelected();
+				showTotals();
+			}
 
 	    }catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -218,6 +234,21 @@ public class Cobro extends PBase {
 
 		try{
 
+			chkFactura.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					if (chkFactura.isChecked()==true) chkContado.setChecked(false);
+				}
+			});
+
+			chkContado.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+					if (chkContado.isChecked()==true) chkFactura.setChecked(false);
+				}
+			});
+
 			listView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -254,13 +285,35 @@ public class Cobro extends PBase {
 
 	}
 
+	//Alert Dialog
+	private void  msgAskFactV() {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			//dialog.setMessage("La factura con el correlativo: "+docfact+" Expiro en la fecha: "+fechav);
+			dialog.setMessage("El cliente tiene "+facturaVen+" facturas  vencidas. Debe cancelarlas para continuar.");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setNegativeButton("Pagar ahora", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					closekeyb();
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
+
 
 	// Main
 
 	private void listItems(){
 		Cursor DT;
-		clsClasses.clsCobro vItem;	
-		double pg,sal,ssal;
+		clsClasses.clsCobro vItem;
 				
 		items.clear();ttot=0;tpag=0;
 
@@ -311,8 +364,127 @@ public class Cobro extends PBase {
 		   	mu.msgbox("listItems: "+ e.getMessage());
 	    }
 
-	}	
-	
+	}
+
+	public void doExit(View view){
+		Cursor DT;
+		String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+
+		try{
+			sql = "SELECT MEDIAPAGO, LIMITECREDITO FROM P_CLIENTE WHERE CODIGO ='"+cod+"'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			medPago=DT.getInt(0);
+			cred=DT.getInt(1);
+			facturaVen = 0;
+
+			if (medPago == 4) {
+
+				sql = "SELECT DOCUMENTO,TIPODOC,FECHAV, SALDO FROM P_COBRO WHERE CLIENTE ='"+cod+"' ORDER BY FECHAV";
+				DT = Con.OpenDT(sql);
+				DT.moveToFirst();
+
+				for (int i = 0; i != DT.getCount(); i++) {
+
+					docfact = DT.getString(0);
+					fechaven = DT.getInt(2);
+					fechav = sfecha(fechaven);
+
+					if (date.compareTo(fechav) < 0) {
+						facturaVen += 1;
+					}
+
+					DT.moveToPosition(i);
+				}
+
+
+			}
+
+			if(facturaVen > 0) {
+				msgAskFactV();
+			}else if(facturaVen <=0 & gl.media==4){
+				if (gl.credito<=0) {
+					msgAskFact();
+					return;
+				}
+			}else{
+				exit();
+			}
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
+
+	private void  msgAskFact() {
+		try{
+
+			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Road");
+
+			final LinearLayout layout   = new LinearLayout(this);
+			layout.setOrientation(LinearLayout.VERTICAL);
+
+			if(chkFactura.getParent()!= null){
+				((ViewGroup) chkFactura.getParent()).removeView(chkFactura);
+			}
+
+			if(chkContado.getParent()!= null){
+				((ViewGroup) chkFactura.getParent()).removeView(chkFactura);
+			}
+
+			alert.setMessage("Cliente no tiene credito actualmente.");
+
+			chkFactura.setText("Pagar Facturas");
+			chkContado.setText("Continuar la venta al contado");
+
+			layout.addView(chkFactura);
+			layout.addView(chkContado);
+
+			alert.setView(layout);
+
+			showkeyb();
+			alert.setCancelable(false);
+			alert.create();
+
+			alert.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					if(chkFactura.isChecked()){
+						closekeyb();
+						layout.removeAllViews();
+					} else if (chkContado.isChecked()){
+						initVenta();
+						layout.removeAllViews();
+					}else{
+						toast("Seleccione accion a realizar");
+					}
+				}
+			});
+
+
+
+			alert.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
+
+	private void initVenta(){
+		try{
+			if (gl.peModal.equalsIgnoreCase("APR")) {
+				startActivity(new Intent(this,Aprofam1.class));
+			} else {
+				browse=3;
+				onPause();
+				onResume();
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
+
 	private void createDoc(){
 
 	    try{
@@ -343,6 +515,22 @@ public class Cobro extends PBase {
 		    mu.msgbox("createDoc: " + e.getMessage());
 	    }
 
+	}
+
+	public String sfecha(int f) {
+		int vy,vm,vd;
+		String s;
+
+		vy=(int) f/100000000;f=f % 100000000;
+		vm=(int) f/1000000;f=f % 1000000;
+		vd=(int) f/10000;f=f % 10000;
+
+		s="";
+		if (vd>9) { s=s+String.valueOf(vd)+"-";} else {s=s+"0"+String.valueOf(vd)+"-";}
+		if (vm>9) { s=s+String.valueOf(vm)+"-20";} else {s=s+"0"+String.valueOf(vm)+"-20";}
+		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
+
+		return s;
 	}
 	
 	private boolean saveCobro(){
@@ -762,12 +950,13 @@ public class Cobro extends PBase {
 	private void showTotals(){
 
 		try{
+			total = tsel + tpagos;
 
-			lblSel.setText(mu.frmcur(tsel));
-			lblPag.setText(mu.frmcur(tpag));
+			lblSel.setText(mu.frmcur(total));
+			lblPag.setText(mu.frmcur(tpagos));
 
-			tpend=tsel-tpag;
-			plim=ttot-tpag;
+			tpend=total-tpagos;
+			plim=total-tpagos;
 
 			if (tpend>=0) {
 				lblPend.setText(mu.frmcur(tpend));
@@ -793,6 +982,7 @@ public class Cobro extends PBase {
 			double val;
 
 			tsel=0;
+			tpagos=0;
 
 			if (adapter!=null){
 
@@ -806,13 +996,21 @@ public class Cobro extends PBase {
 
 						flag=vItem.flag;
 						if (flag==1) {
-							val=vItem.Saldo;
-							tsel+=val;
+							if(vItem.Pago > 0){
+
+								val=vItem.Pago;
+								tpagos+=val;
+
+							} else{
+
+								val=vItem.Saldo;
+								tsel+=val;
+
+							}
 						}
 					}
 
 				}
-
 
 			}
 
@@ -1067,13 +1265,27 @@ public class Cobro extends PBase {
 
 	    try{
 
+		//	if(gl.closeCliDet)
 			super.onResume();
 
 			if (browse==1) {
 				browse=0;
-				//closekeyb();
 
 				if (gl.pagado) createDoc();
+			}
+
+			if (browse==2) {
+				browse=0;
+
+				finish();
+				gl.closeVenta=true;
+				if(gl.closeVenta) super.finish();
+			}
+
+			if (browse==3){
+				browse=0;
+
+				finish();
 			}
 
 	    }catch (Exception e){
@@ -1086,10 +1298,11 @@ public class Cobro extends PBase {
 	public void onBackPressed() {
 
 	    try{
-			exit();
+	    	browse=2;
+	    	onPause();
+	    	onResume();
 		}catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 	}
 

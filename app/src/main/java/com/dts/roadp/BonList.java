@@ -56,7 +56,7 @@ public class BonList extends PBase {
 		listView =  (ListView) findViewById(R.id.listView1);
 		relMonto =  (RelativeLayout) findViewById(R.id.relMonto);
 		lblMonto =  (TextView) findViewById(R.id.textView5);
-		lblFalta =  (TextView) findViewById(R.id.textView7);
+		lblFalta =  (TextView) findViewById(R.id.lblSel);
 		lblTipo =  (TextView) findViewById(R.id.textView2);
 		lblMarg =  (TextView) findViewById(R.id.textView8);
 		imgComp =  (ImageView) findViewById(R.id.imageView2);
@@ -288,7 +288,7 @@ public class BonList extends PBase {
 		Cursor DT;
 		int iidx;
 		double fact,peso;
-		
+
 		try {
 			sql="SELECT MAX(ITEM) FROM T_BONITEM";
 			DT=Con.OpenDT(sql);

@@ -146,7 +146,7 @@
             android:visibility="invisible" />
 
         <TextView
-            android:id="@+id/textView7"
+            android:id="@+id/lblSel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -161,7 +161,7 @@
             android:layout_width="130dp"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/lblCheq"
-            android:layout_alignTop="@+id/textView7"
+            android:layout_alignTop="@+id/lblSel"
             android:gravity="right"
             android:paddingBottom="10dp"
             android:text="999,999.99"

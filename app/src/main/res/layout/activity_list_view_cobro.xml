@@ -59,7 +59,7 @@
         android:id="@+id/lblCValor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/lblCEmit"
+        android:layout_alignBottom="@+id/lblPag"
         android:layout_alignLeft="@+id/lblCPago"
         android:layout_alignParentTop="true"
         android:layout_alignRight="@+id/lblCPago"
@@ -86,7 +86,7 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/lblCEmit"
+        android:id="@+id/lblPag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

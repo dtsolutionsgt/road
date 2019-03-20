@@ -3,8 +3,6 @@ package com.dts.roadp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import com.dts.roadp.clsClasses.clsCDB;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -67,7 +65,7 @@ public class ListAdaptCobro extends BaseAdapter {
 			holder.lblValor = (TextView) convertView.findViewById(R.id.lblCValor);
 			holder.lblSaldo  = (TextView) convertView.findViewById(R.id.lblETipo);
 			holder.lblPago = (TextView) convertView.findViewById(R.id.lblCPago);
-			holder.lblFIni  = (TextView) convertView.findViewById(R.id.lblCEmit);
+			holder.lblFIni  = (TextView) convertView.findViewById(R.id.lblPag);
 			holder.lblFFin = (TextView) convertView.findViewById(R.id.lblCVence);
 			
 			holder.imgBand = (ImageView) convertView.findViewById(R.id.imgImg);

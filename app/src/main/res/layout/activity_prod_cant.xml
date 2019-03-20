@@ -348,7 +348,7 @@
         android:id="@+id/lblPNum"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/TextView02"
+        android:layout_alignTop="@+id/lblPend"
         android:layout_toRightOf="@+id/textView6"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
@@ -359,7 +359,7 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/TextView02"
+        android:id="@+id/lblPend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/relbotpan"

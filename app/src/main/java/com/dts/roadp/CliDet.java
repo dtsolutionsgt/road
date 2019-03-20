@@ -52,8 +52,8 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 public class CliDet extends PBase {
 
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
-	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol;
-	private RelativeLayout relMain,relV,relP,relD,relCamara;//#HS_20181213 relCamara
+	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago;
+	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol,imgRoadTit;
 	private RadioButton chknc,chkncv;
 
@@ -67,7 +67,7 @@ public class CliDet extends PBase {
 	private double credito;
 	////
 	private double clim,cused,cdisp,cred;
-	private int nivel,browse,merc,fechaven,medPago;
+	private int nivel,browse,merc;
 	private boolean porcentaje = false;
 	private byte[] imagenBit;
 	
@@ -93,11 +93,13 @@ public class CliDet extends PBase {
 		lblCLim= (TextView) findViewById(R.id.lblCLim);
 		lblCUsed= (TextView) findViewById(R.id.lblCUsed);
 		lblCDisp= (TextView) findViewById(R.id.lblCDisp);
+		lblCantDias = (TextView) findViewById(R.id.lblCantDias);
+		lblClientePago = (TextView) findViewById(R.id.lblClientePago);
 
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
 
-		relMain=(RelativeLayout) findViewById(R.id.relclimain);
+	//	relMain=(RelativeLayout) findViewById(R.id.relclimain);
 		relV=(RelativeLayout) findViewById(R.id.relVenta);
 		relP=(RelativeLayout) findViewById(R.id.relPreventa);
 		relD=(RelativeLayout) findViewById(R.id.relDespacho);
@@ -262,17 +264,19 @@ public class CliDet extends PBase {
 		tel="";
 		
 		try {
+
 			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
 				"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO "+
-				 "FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
+				"FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
            	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 							  
 			lblNom.setText(DT.getString(0));
 			lblRep.setText(DT.getString(12));
 			lblDir.setText(DT.getString(2));
-			
+
 			tel=DT.getString(4);
+			lblTel.setText(DT.getString(4));
 			uvis=DT.getInt(3);
 			
 			nivel=DT.getInt(6);
@@ -287,13 +291,18 @@ public class CliDet extends PBase {
 			} else {	
 				lblAten.setText(du.sfecha(uvis));
 			}
-			
-			lblTel.setText("Tel : "+tel);
+
 			sgps=mu.frmgps(DT.getDouble(9))+" , "+mu.frmgps(DT.getDouble(10));
 			lblGPS.setText(sgps);
 			
 			gl.media=DT.getInt(11);
-					
+
+			if(gl.media != 4){
+				lblClientePago.setText("CONTADO");
+			}else if(gl.media == 4){
+				lblClientePago.setText("CREDITO");
+			}
+
 			clim=DT.getDouble(5);
 						
 			gl.fnombre=DT.getString(0);
@@ -303,6 +312,12 @@ public class CliDet extends PBase {
 			gl.vcheque = DT.getString(14).equalsIgnoreCase("S");
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
 			gl.clitipo = DT.getString(16);
+
+			/*sql="SELECT C.NOMBRE FROM P_CLIENTE P INNER JOIN P_MEDIAPAGO C ON (C.CODIGO = P.MEDIAPAGO AND P.CODIGO = "+cod+")";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			lblClientePago.setText(DT.getString(0));*/
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -494,22 +509,6 @@ public class CliDet extends PBase {
 
 	}
 
-	public String sfecha(int f) {
-		int vy,vm,vd;
-		String s;
-
-		vy=(int) f/100000000;f=f % 100000000;
-		vm=(int) f/1000000;f=f % 1000000;
-		vd=(int) f/10000;f=f % 10000;
-
-		s="";
-		if (vd>9) { s=s+String.valueOf(vd)+"-";} else {s=s+"0"+String.valueOf(vd)+"-";}
-		if (vm>9) { s=s+String.valueOf(vm)+"-20";} else {s=s+"0"+String.valueOf(vm)+"-20";}
-		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
-
-		return s;
-	}
-
 	public void inputFachada(){
 
 		try{
@@ -554,47 +553,10 @@ public class CliDet extends PBase {
 	//  Misc
 
 	public void showVenta(View view){
-		//Float cantidad;
-		//gl.rutatipo="V";
-		String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-		Cursor DT;
+
 		try{
 
 			if (!validaVenta()) return;//Se valida si hay correlativos de factura para la venta
-
-
-			sql = "SELECT MEDIAPAGO, LIMITECREDITO FROM P_CLIENTE WHERE CODIGO ='"+cod+"'";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-
-			medPago=DT.getInt(0);
-			cred=DT.getInt(1);
-
-			if (medPago == 4) {
-
-				sql = "SELECT FECHAV FROM P_COBRO WHERE CLIENTE ='"+cod+"'";
-
-				DT=Con.OpenDT(sql);
-				DT.moveToFirst();
-
-				for(int i = 0; i != DT.getCount(); i++){
-
-					fechaven=DT.getInt(0 );fechav=sfecha(fechaven);
-					DT.moveToPosition(i);
-
-					if(date.compareTo(fechav) < 0){
-						msgAskFactV();
-						return;
-					}
-
-				}
-
-				if (cred<=0) {
-					msgAskFact();
-					return;
-				}
-
-			}
 
 			if(porcentaje == false) {
 				VerificaCantidad();
@@ -715,7 +677,7 @@ public class CliDet extends PBase {
 		}
 	}
 
-	private void  msgAskFact() {
+	/*private void  msgAskFact() {
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -742,36 +704,7 @@ public class CliDet extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-	}
-
-	private void  msgAskFactV() {
-		try{
-			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-			dialog.setTitle("Road");
-			dialog.setMessage("La factura con el codigo: "+cod+" Expiro en la fecha: "+fechav);
-
-			dialog.setIcon(R.drawable.ic_quest);
-
-			dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					if(porcentaje == false) {
-						msgAskFact();
-					}
-				}
-			});
-
-			dialog.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					closekeyb();
-				}
-			});
-
-			dialog.show();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-	}
+	}*/
 
 	//#HS_20181207 Cuadro de dialogo para editar datos del cliente
 	private void inputCliente() {
@@ -1000,7 +933,7 @@ public class CliDet extends PBase {
 			alert.setView(layout);
 
 			showkeyb();
-
+            alert.setCancelable(false);
 			alert.create();
 
 			alert.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
@@ -1174,10 +1107,8 @@ public class CliDet extends PBase {
 
 	private void doExit(){
 		try{
+			gl.closeCliDet=true;
 			super.finish();
-            if(gl.dvbrowse!=0){
-                gl.dvbrowse =0;
-            }
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -1228,7 +1159,7 @@ public class CliDet extends PBase {
 	@Override
 	public void onBackPressed() {
 		try{
-			msgAskExit("Salir sin terminar");
+			msgAskExit("Salir");
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

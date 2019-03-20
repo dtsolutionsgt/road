@@ -367,7 +367,7 @@
             android:src="@drawable/inventario48" />
 
         <TextView
-            android:id="@+id/TextView02"
+            android:id="@+id/lblPend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/ImageView04"

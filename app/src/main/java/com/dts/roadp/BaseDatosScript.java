@@ -2040,6 +2040,15 @@ public class BaseDatosScript {
 					"[CANT] REAL NOT NULL,"+
 					"[PRECIO] REAL NOT NULL,"+
 					"[COSTO] REAL NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[UMVENTA] TEXT NOT NULL,"+
+					"[UMSTOCK] TEXT NOT NULL,"+
+					"[UMPESO] TEXT NOT NULL,"+
+					"[FACTOR] REAL NOT NULL,"+
+					"[POR_PESO] TEXT NOT NULL,"+
+
+
+
 					"PRIMARY KEY ([ITEM])"+
 					");";
 			database.execSQL(vSQL);

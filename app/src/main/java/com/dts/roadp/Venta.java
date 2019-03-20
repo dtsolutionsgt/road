@@ -534,35 +534,31 @@ public class Venta extends PBase {
 
 			// Descuento
 
-			if (!gl.peModal.equalsIgnoreCase("TOL")) {
-				clsDesc = new clsDescuento(this, prodid, cant);
-				desc = clsDesc.getDesc();
-				mdesc = clsDesc.monto;
+			clsDesc = new clsDescuento(this, prodid, cant);
+			desc = clsDesc.getDesc();
+			mdesc = clsDesc.monto;
 
-				if (desc + mdesc > 0) {
+			if (desc + mdesc > 0) {
 
-					browse = 3;
-					gl.promprod = prodid;
-					gl.promcant = cant;
+				browse = 3;
+				gl.promprod = prodid;
+				gl.promcant = cant;
 
-					if (desc > 0) {
-						gl.prommodo = 0;
-						gl.promdesc = desc;
-					} else {
-						gl.prommodo = 1;
-						gl.promdesc = mdesc;
-					}
-
-					startActivity(new Intent(this, DescBon.class));
-
+				if (desc > 0) {
+					gl.prommodo = 0;
+					gl.promdesc = desc;
 				} else {
-					if (gl.bonus.size() > 0) {
-						Intent intent = new Intent(this, BonList.class);
-						startActivity(intent);
-					}
+					gl.prommodo = 1;
+					gl.promdesc = mdesc;
 				}
-			} else {
 
+				startActivity(new Intent(this, DescBon.class));
+
+			} else {
+				if (gl.bonus.size() > 0) {
+					Intent intent = new Intent(this, BonList.class);
+					startActivity(intent);
+				}
 			}
 
 			//prodPrecio();
@@ -578,8 +574,6 @@ public class Venta extends PBase {
 					if (prc.precioespecial>0) prec=prc.precioespecial;
 				}
 			}
-
-
 
 			precsin = prc.precsin;
 			imp = prc.imp;

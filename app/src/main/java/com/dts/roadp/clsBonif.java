@@ -2,12 +2,10 @@ package com.dts.roadp;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.widget.Toast;
-
-import java.util.ArrayList;
 
 import com.dts.roadp.clsClasses.clsBonifItem;
+
+import java.util.ArrayList;
 
 public class clsBonif {
 		
@@ -202,8 +200,7 @@ public class clsBonif {
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 					
-				iid=DT.getString(0);
-				val=0;
+				iid=DT.getString(0);val=0;
 				
 				switch (DT.getInt(1)) {
 					case 0: 
@@ -217,32 +214,35 @@ public class clsBonif {
 				}
 				
 				if (val>0) {				
-					mcant=cant-DT.getDouble(2);
+					mcant=cant-DT.getDouble(2)+1;
 					mul=DT.getDouble(3);
 
 					if (mul>0) {
-						mcant=(int) (mcant/mul);mcant+=1;	
+						mcant=(int) (mcant/mul);//mcant+=1;
 						val=val*mcant;
 					} else {	
 						val=0;
 					}
 
+					if (val > 0) {
 
-					item=clsCls.new clsBonifItem();
+						item = clsCls.new clsBonifItem();
 
-					item.prodid=prodid;
-					item.lista=DT.getString(7);
-					item.cantexact=DT.getString(8);
-					item.globbon="N";
-					item.porcant=DT.getString(9);
+						item.prodid = prodid;
+						item.lista = DT.getString(7);
+						item.cantexact = DT.getString(8);
+						item.globbon = "N";
+						item.porcant = DT.getString(9);
 
-					item.tipolista=DT.getInt(5);
-					item.tipocant=DT.getString(6);
+						item.tipolista = DT.getInt(5);
+						item.tipocant = DT.getString(6);
 
-					item.valor=val;
-					item.mul=mcant;
+						item.valor = val;
+						item.mul = mcant;
 
-					items.add(item);
+						items.add(item);
+
+					}
 				}
 
 				DT.moveToNext();
@@ -286,32 +286,33 @@ public class clsBonif {
 				}
 				
 				if (val>0) {				
-					mcant=cant-DT.getDouble(2);
+					mcant=cant-DT.getDouble(2)+1;
 					mul=DT.getDouble(3);
 
 					if (mul>0) {
-						mcant=(int) (mcant/mul);mcant+=1;	
+						mcant=(int) (mcant/mul);//mcant+=1;
 						val=val*mcant;
 					} else {	
 						val=0;
 					}
 
+					if (val > 0) {
+						item = clsCls.new clsBonifItem();
 
-					item=clsCls.new clsBonifItem();
+						item.prodid = prodid;
+						item.lista = DT.getString(7);
+						item.cantexact = DT.getString(8);
+						item.globbon = "N";
+						item.porcant = DT.getString(9);
 
-					item.prodid=prodid;
-					item.lista=DT.getString(7);
-					item.cantexact=DT.getString(8);
-					item.globbon="N";
-					item.porcant=DT.getString(9);
+						item.tipolista = DT.getInt(5);
+						item.tipocant = DT.getString(6);
 
-					item.tipolista=DT.getInt(5);
-					item.tipocant=DT.getString(6);
+						item.valor = val;
+						item.mul = mcant;
 
-					item.valor=val;
-					item.mul=mcant;
-
-					items.add(item);
+						items.add(item);
+					}
 				}
 
 				DT.moveToNext();

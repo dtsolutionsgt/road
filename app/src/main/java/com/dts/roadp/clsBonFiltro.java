@@ -125,6 +125,9 @@ public class clsBonFiltro {
 						ins.add("LISTA",DT.getString(17));
 						ins.add("CANTEXACT",DT.getString(18));
 						ins.add("EMP",DT.getString(19));
+
+						ins.add("UMPRODUCTO",DT.getString(20));
+						ins.add("UMBONIFICACION",DT.getString(21));
 						
 				    	db.execSQL(ins.sql());
 				    	

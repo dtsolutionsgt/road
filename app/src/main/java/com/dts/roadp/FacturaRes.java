@@ -671,7 +671,7 @@ public class FacturaRes extends PBase {
 		String vprod,vumstock,vumventa;
 		double vcant,vpeso,vfactor,peso,factpres,vtot,vprec;
 		int mitem,bitem;
-		
+		int dev_ins=1;
 		corel=gl.ruta+"_"+mu.getCorelBase();
 
 		if (gl.peModal.equalsIgnoreCase("TOL")) {
@@ -758,6 +758,8 @@ public class FacturaRes extends PBase {
 				Cursor DT;
 				String pcod;
 				Double pcant;
+
+				if (dev_ins==1){
 
 				ins.init("D_CxC");
 
@@ -880,6 +882,10 @@ public class FacturaRes extends PBase {
 
 				sql="DELETE FROM T_CxCD";
 				db.execSQL(sql);
+
+				dev_ins = 0;
+
+                }
 
 			}
 
@@ -1055,38 +1061,42 @@ public class FacturaRes extends PBase {
 			sql="SELECT ITEM,PRODID,BONIID,CANT,PRECIO,COSTO,UMVENTA,UMSTOCK,UMPESO,FACTOR FROM T_BONITEM";
 			dt=Con.OpenDT(sql);
 
-			dt.moveToFirst();bitem=1;
-			while (!dt.isAfterLast()) {
+			if(dt.getCount()>0){
 
-				vcant= dt.getDouble(3);
-				vprec= dt.getDouble(4);
-				vtot= vcant*vprec;vtot=mu.roundr(vtot,2);
+				dt.moveToFirst();bitem=1;
+				while (!dt.isAfterLast()) {
 
-				ins.init("D_BONIF");
+					vcant= dt.getDouble(3);
+					vprec= dt.getDouble(4);
+					vtot= vcant*vprec;vtot=mu.roundr(vtot,2);
 
-				ins.add("COREL",corel);
-				ins.add("ITEM",bitem);
-				ins.add("FECHA",fecha);
-				ins.add("ANULADO","N");
-				ins.add("EMPRESA",gl.emp);
-				ins.add("RUTA",gl.ruta);
-				ins.add("CLIENTE",gl.cliente);
-				ins.add("PRODUCTO",dt.getString(2));
-				ins.add("CANT",vcant);
-				ins.add("VENPED","V");
-				ins.add("TIPO","");
-				ins.add("PRECIO",vprec);
-				ins.add("COSTO",dt.getDouble(5));
-				ins.add("TOTAL",vtot );
-				ins.add("STATCOM","N");
-				ins.add("UMVENTA",dt.getString(6));
-				ins.add("UMSTOCK",dt.getString(7) );
-				ins.add("UMPESO",dt.getString(8));
-				ins.add("FACTOR",dt.getString(9));
+					ins.init("D_BONIF");
 
-				db.execSQL(ins.sql());
+					ins.add("COREL",corel);
+					ins.add("ITEM",bitem);
+					ins.add("FECHA",fecha);
+					ins.add("ANULADO","N");
+					ins.add("EMPRESA",gl.emp);
+					ins.add("RUTA",gl.ruta);
+					ins.add("CLIENTE",gl.cliente);
+					ins.add("PRODUCTO",dt.getString(2));
+					ins.add("CANT",vcant);
+					ins.add("VENPED","V");
+					ins.add("TIPO","");
+					ins.add("PRECIO",vprec);
+					ins.add("COSTO",dt.getDouble(5));
+					ins.add("TOTAL",vtot );
+					ins.add("STATCOM","N");
+					ins.add("UMVENTA",dt.getString(6));
+					ins.add("UMSTOCK",dt.getString(7) );
+					ins.add("UMPESO",dt.getString(8));
+					ins.add("FACTOR",dt.getString(9));
 
-				dt.moveToNext();bitem++;
+					db.execSQL(ins.sql());
+
+					dt.moveToNext();bitem++;
+				}
+
 			}
 
 			//endregion

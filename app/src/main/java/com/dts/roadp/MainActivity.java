@@ -108,7 +108,12 @@ public class MainActivity extends PBase {
             initSession();
 
             supervisorRuta();
-            txtUser.setText("00100993");txtPass.setText("2613");
+
+            //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
+            if (gl.debug){
+                txtUser.setText("00100993");txtPass.setText("2613");
+            }
+
 
             gl.contlic=false;
         } catch (Exception e) {
@@ -684,7 +689,8 @@ public class MainActivity extends PBase {
 	private boolean validaLicencia() {
 		Cursor dt;
 		String mac, lickey, idkey, binkey;
-		int fval, ff, lkey;
+		int fval, lkey;
+		long ff;
 
 		try {
 			mac = lic.getMac();

@@ -14,8 +14,9 @@ public class appGlobals extends Application {
 	public String ruta,rutanom,sucur,rutatipo,rutatipog,vend,vendnom,gstr,gstr2,prod,um,umpres,umstock,cliente,clitipo;
 	public String ubas,emp, empnom,imgpath,umpeso,lotedf,impresora, tipoImpresora, codSupervisor, ayudante, ayudanteID, vehiculo, vehiculoID;
 	public String wsURL,bonprodid,pprodname,contrib,ateninistr,tcorel;
-	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,atentini,vnivel,vnivprec,media;
-	public int autocom,nuevaFecha,pagomodo,filtrocli;
+	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,vnivel,vnivprec,media;
+	public int autocom,pagomodo,filtrocli;
+	public long nuevaFecha,atentini;
 	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor,prectemp;
 	public boolean CellCom;
 	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra;
@@ -25,10 +26,13 @@ public class appGlobals extends Application {
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo;
 	public int mpago;
 
+	//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true por defecto estará en false
+	public boolean debug=true;
+
 	//Devolución Cliente
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;
 	public double dvfactor,dvpeso,dvprec,dvpreclista,dvtotal;
-	public int dvbrowse=0;
+	public int dvbrowse=0,tienelote;
     public boolean dvporpeso;
     public double dvdispventa;
     public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc;

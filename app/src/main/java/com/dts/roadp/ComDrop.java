@@ -1,30 +1,24 @@
 package com.dts.roadp;
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
-
-import com.dts.roadp.clsClasses.clsCFDV;
-
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.SystemClock;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Environment;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 
 public class ComDrop extends Activity {
 
@@ -43,7 +37,8 @@ public class ComDrop extends Activity {
 	private MiscUtils MU;
 	private DateUtils DU;
 	
-	private int isbusy,fecha,lin;
+	private int isbusy,lin;
+	private long fecha;
 	private String err;
 	private boolean fFlag;
 	

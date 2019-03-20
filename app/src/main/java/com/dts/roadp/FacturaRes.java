@@ -48,8 +48,9 @@ public class FacturaRes extends PBase {
 	private printer prn;
 	private clsDocFactura fdoc;
 	private AppMethods app;
-	
-	private int fecha,fechae,fcorel,clidia,media;
+
+	private long fecha,fechae;
+	private int fcorel,clidia,media;
 	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt;
 	private int cyear, cmonth, cday, dweek,stp=0;
 
@@ -181,7 +182,18 @@ public class FacturaRes extends PBase {
 		//	}
 
 		}
-		
+
+		if (gl.dvbrowse!=0){
+			lblCash.setVisibility(View.VISIBLE);
+			imgCash.setVisibility(View.VISIBLE);
+			lblPend.setVisibility(View.INVISIBLE);
+			imgPend.setVisibility(View.INVISIBLE);
+			imgCred.setVisibility(View.INVISIBLE);
+			lblCred.setVisibility(View.INVISIBLE);
+			imgMPago.setVisibility(View.VISIBLE);
+			lblMPago.setVisibility(View.VISIBLE);
+		}
+
 		fechae=fecha;
 		dweek=mu.dayofweek();
 		
@@ -666,8 +678,8 @@ public class FacturaRes extends PBase {
 	private boolean saveOrder(){
 		Cursor dt;
 		String vprod,vumstock,vumventa;
-		double vcant,vpeso,vfactor,peso,factpres;
-		int mitem;		
+		double vcant,vpeso,vfactor,peso,factpres,vtot,vprec;
+		int mitem,bitem;
 		
 		corel=gl.ruta+"_"+mu.getCorelBase();
 
@@ -691,15 +703,17 @@ public class FacturaRes extends PBase {
 		mitem++;
 		
 		try {
-			
+
+			db.beginTransaction();
+
+			//region D_FACTURA
+
 			sql="SELECT SUM(TOTAL),SUM(DESMON),SUM(IMP),SUM(PESO) FROM T_VENTA";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			
 			peso=dt.getDouble(3);
-			
-			db.beginTransaction();
-			    			
+
 			ins.init("D_FACTURA");
 			ins.add("COREL",corel);
 			ins.add("ANULADO","N");
@@ -744,9 +758,10 @@ public class FacturaRes extends PBase {
 			ins.add("RAZON_ANULACION","");
     		
 			db.execSQL(ins.sql());
-						
-			//INSERTA las tablas de devolución de  producto.
 
+			//endregion
+
+			//region Devolución de  producto.
 			if (gl.dvbrowse!=0){
 
 				Cursor DT;
@@ -759,7 +774,7 @@ public class FacturaRes extends PBase {
 				ins.add("RUTA",gl.ruta);
 				ins.add("CLIENTE",gl.cliente);
 				ins.add("FECHA",fecha);
-				ins.add("ANULADO","S");
+				ins.add("ANULADO","N");
 				ins.add("EMPRESA",gl.emp);
 				ins.add("TIPO", gl.dvestado);
 				ins.add("REFERENCIA",corel);
@@ -774,10 +789,11 @@ public class FacturaRes extends PBase {
 
 				db.execSQL(ins.sql());
 
+
 				ins.init("D_NOTACRED");
 
 				ins.add("COREL",gl.dvcorrelnc);
-				ins.add("ANULADO","S");
+				ins.add("ANULADO","N");
 				ins.add("FECHA",fecha);
 				ins.add("RUTA",gl.ruta);
 				ins.add("VENDEDOR",gl.vend);
@@ -794,6 +810,7 @@ public class FacturaRes extends PBase {
 				ins.add("IMPRES",0);
 
 				db.execSQL(ins.sql());
+
 
 				sql="SELECT Item,CODIGO,CANT,CODDEV,TOTAL,PRECIO,PRECLISTA,REF,PESO,LOTE,UMVENTA,UMSTOCK,UMPESO,FACTOR,POR_PESO FROM T_CxCD WHERE CANT>0";
 				DT=Con.OpenDT(sql);
@@ -870,9 +887,14 @@ public class FacturaRes extends PBase {
 
 				Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();
 
+				sql="DELETE FROM T_CxCD";
+				db.execSQL(sql);
+
 			}
 
-			//Termina insert de devolución
+			//endregion
+
+			//region D_FACTURAD
 
 			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK FROM T_VENTA";
 			dt=Con.OpenDT(sql);
@@ -920,7 +942,9 @@ public class FacturaRes extends PBase {
 			    dt.moveToNext();
 			}
 
-			// Pago
+			//endregion
+
+			//region D_FACTURAP
 
 			if(!gl.cobroPendiente) {
 
@@ -978,8 +1002,10 @@ public class FacturaRes extends PBase {
 				}
 
 			}
+
+			//endregion
 			
-			// Datos facturacion
+			//region D_FACTURAF
 
 			ins.init("D_FACTURAF");
 
@@ -990,7 +1016,9 @@ public class FacturaRes extends PBase {
 			
 			db.execSQL(ins.sql());
 
-			//  Barras
+			//endregion
+
+			//region D_STOCKB_DEV
 
 			sql="INSERT INTO D_FACTURA_BARRA SELECT * FROM P_STOCKB WHERE BARRA IN (SELECT BARRA FROM T_BARRA)";
 			db.execSQL(sql);
@@ -1029,7 +1057,50 @@ public class FacturaRes extends PBase {
 			sql="DELETE FROM P_STOCKB WHERE BARRA IN (SELECT BARRA FROM T_BARRA)";
 			db.execSQL(sql);
 
-			// Actualizacion de ultimo correlativo
+			//endregion
+
+			//region D_BONIF
+
+			sql="SELECT ITEM,PRODID,BONIID,CANT,PRECIO,COSTO,UMVENTA,UMSTOCK,UMPESO,FACTOR FROM T_BONITEM";
+			dt=Con.OpenDT(sql);
+
+			dt.moveToFirst();bitem=1;
+			while (!dt.isAfterLast()) {
+
+				vcant= dt.getDouble(3);
+				vprec= dt.getDouble(4);
+				vtot= vcant*vprec;vtot=mu.roundr(vtot,2);
+
+				ins.init("D_BONIF");
+
+				ins.add("COREL",corel);
+				ins.add("ITEM",bitem);
+				ins.add("FECHA",fecha);
+				ins.add("ANULADO","N");
+				ins.add("EMPRESA",gl.emp);
+				ins.add("RUTA",gl.ruta);
+				ins.add("CLIENTE",gl.cliente);
+				ins.add("PRODUCTO",dt.getString(2));
+				ins.add("CANT",vcant);
+				ins.add("VENPED","V");
+				ins.add("TIPO","");
+				ins.add("PRECIO",vprec);
+				ins.add("COSTO",dt.getDouble(5));
+				ins.add("TOTAL",vtot );
+				ins.add("STATCOM","N");
+				ins.add("UMVENTA",dt.getString(6));
+				ins.add("UMSTOCK",dt.getString(7) );
+				ins.add("UMPESO",dt.getString(8));
+				ins.add("FACTOR",dt.getString(9));
+
+				db.execSQL(ins.sql());
+
+				dt.moveToNext();bitem++;
+			}
+
+			//endregion
+
+			//region Actualizacion de ultimo correlativo
 			
 			sql="UPDATE P_COREL SET CORELULT="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";	
 			db.execSQL(sql);
@@ -1041,18 +1112,17 @@ public class FacturaRes extends PBase {
 			ins.add("FECHA",0);
 			ins.add("RUTA",gl.ruta);
 			db.execSQL(ins.sql());
-					
+
+			//endregion
+
 			db.setTransactionSuccessful();
-				
 			db.endTransaction();
 
 			saved=true;
 
 			upd.init("P_CLIRUTA");
 			upd.add("BANDERA",0);
-			//upd.Where("CLIENTE='"+cliid+"' AND DIA="+dweek);
 			upd.Where("CLIENTE='"+cliid+"'");
-	
 			db.execSQL(upd.SQL());
 
         } catch (Exception e) {
@@ -1247,7 +1317,7 @@ public class FacturaRes extends PBase {
 	}
 		
 	private void saveAtten(double tot) {
-		int ti,tf,td;
+		long ti,tf,td;
 		
 		ti=gl.atentini;tf=du.getActDateTime();
 		td=du.timeDiff(tf,ti);if (td<1) td=1;
@@ -2077,7 +2147,7 @@ public class FacturaRes extends PBase {
 
 	//endregion
 	
-	// Activity Events
+	//region Activity Events
 
 	@Override
 	protected void onResume() {
@@ -2109,5 +2179,6 @@ public class FacturaRes extends PBase {
 
 	}
 	
-	
+	//endregion
+
 }

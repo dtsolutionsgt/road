@@ -158,10 +158,14 @@ public class ComWS extends PBase {
 
 		if (esvacio) txtWS.setEnabled(true);
 
-		if (mu.emptystr(txtRuta.getText().toString())) {
-			txtRuta.setText("8001-1");txtEmp.setText("03");
-			txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
+		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
+		if (gl.debug){
+			if (mu.emptystr(txtRuta.getText().toString())) {
+				txtRuta.setText("8001-1");txtEmp.setText("03");
+				txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
+			}
 		}
+
 
 		//txtRuta.setText("0005-1");
 		//txtWS.setText("http://192.168.1.112/wsAndr/wsandr.asmx");
@@ -844,6 +848,8 @@ public class ComWS extends PBase {
 			if (!AddTable("P_VENDEDOR")) return false;
 			if (!AddTable("P_MUNI")) return false;
 			if (!AddTable("P_VEHICULO"))return false;
+			if (!AddTable("P_HANDHELD"))return false;
+			if (!AddTable("P_IMPRESORA"))return false;
 			
 			if (!AddTable("P_REF1")) return false;
 			if (!AddTable("P_REF2")) return false;
@@ -1056,7 +1062,7 @@ public class ComWS extends PBase {
 	//#EJC20181120: Inserta los documentos que bajaron a la HH
 	private boolean Actualiza_Documentos() {
         DateUtils DU = new DateUtils();
-        int Now=du.getFechaActual();
+        long Now=du.getFechaActual();
 
         String ruta = txtRuta.getText().toString().trim();
 
@@ -1151,18 +1157,18 @@ public class ComWS extends PBase {
 
 	private String getTableSQL(String TN) {
 		String SQL = "";
-		int fi, ff;
+		long fi, ff;
 
 		fi = du.ffecha00(du.getActDate());
 		ff = du.ffecha24(du.getActDate());
-		int ObjAno = du.getyear(du.getActDate());
-		int ObjMes = du.getmonth(du.getActDate());
+		long ObjAno = du.getyear(du.getActDate());
+		long ObjMes = du.getmonth(du.getActDate());
 
 		if (TN.equalsIgnoreCase("P_STOCK")) {
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') " +
+						"FROM P_STOCK WHERE RUTA='" + ActRuta + "'  AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";
 			} else if (gl.peModal.equalsIgnoreCase("APR")) {
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
@@ -1176,23 +1182,35 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
-			//CKFK 20190222 Agregué a la consulta el AND (ENVIADO = 0)
-			if (TN.equalsIgnoreCase("P_STOCKB")) {
-				SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, " +
-                        "STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
-						"FROM P_STOCKB WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
-						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
-				return SQL;
-			}
+        //CKFK 20190222 Agregué a la consulta el AND (ENVIADO = 0)
+        if (TN.equalsIgnoreCase("P_STOCKB")) {
+            SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, " +
+                    "STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
+                    "FROM P_STOCKB WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+                    "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
+            return SQL;
+        }
 
-            //CKFK 20190304 Agregué la consulta para obtener los datos de P_STOCK_PALLET
-            if (TN.equalsIgnoreCase("P_STOCK_PALLET")) {
-                SQL = "SELECT DOCUMENTO, RUTA, BARRAPALLET, CODIGO, BARRAPRODUCTO, LOTEPRODUCTO, CANT, COREL, PRECIO, PESO, " +
-                      "UNIDADMEDIDA,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, DOC_ENTREGA  " +
-                      "FROM P_STOCK_PALLET WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
-                      "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
-                return SQL;
-            }
+        //CKFK 20190304 Agregué la consulta para obtener los datos de P_STOCK_PALLET
+        if (TN.equalsIgnoreCase("P_STOCK_PALLET")) {
+            SQL = "SELECT DOCUMENTO, RUTA, BARRAPALLET, CODIGO, BARRAPRODUCTO, LOTEPRODUCTO, CANT, COREL, PRECIO, PESO, " +
+                    "UNIDADMEDIDA,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, DOC_ENTREGA  " +
+                    "FROM P_STOCK_PALLET WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+                    "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
+            return SQL;
+        }
+
+        if (TN.equalsIgnoreCase("P_BONIF")) {
+            //SQL = "SELECT  CLIENTE, CTIPO, PRODUCTO, PTIPO, TIPORUTA, TIPOBON, RANGOINI, RANGOFIN, TIPOLISTA, TIPOCANT, VALOR," +
+            //"LISTA, CANTEXACT, GLOBBON, PORCANT, dbo.AndrDate(FECHAINI), dbo.AndrDate(FECHAFIN), CODDESC, NOMBRE, EMP, UMPRODUCTO , UMBONIFICACION " +
+            //"FROM P_BONIF WHERE ((dbo.AndrDate(FECHAINI)<=" + ff + ") AND (dbo.AndrDate(FECHAFIN)>=" + fi + "))";
+
+            SQL = "SELECT  CLIENTE, CTIPO, PRODUCTO, PTIPO, TIPORUTA, TIPOBON, RANGOINI, RANGOFIN, TIPOLISTA, TIPOCANT, VALOR," +
+                  "LISTA, CANTEXACT, GLOBBON, PORCANT, dbo.AndrDate(FECHAINI), dbo.AndrDate(FECHAFIN), CODDESC, NOMBRE, EMP, UMPRODUCTO , UMBONIFICACION " +
+      			  "FROM P_BONIF WHERE ((FECHAINI<='" + fsqlf + "') AND (FECHAFIN>='" + fsqli + "'))";
+			esql = SQL;
+            return SQL;
+        }
 
 		if (TN.equalsIgnoreCase("P_CLIRUTA")) {
 			SQL = "SELECT RUTA,CLIENTE,SEMANA,DIA,SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'";
@@ -1318,7 +1336,7 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_NIVELPRECIO")) {
-			SQL = "SELECT * FROM P_NIVELPRECIO ";
+			SQL = "SELECT CODIGO, NOMBRE, ISNULL(DECIMALES,0) AS DECIMALES FROM P_NIVELPRECIO ";
 			return SQL;
 		}
 
@@ -1378,12 +1396,7 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
-		if (TN.equalsIgnoreCase("P_BONIF")) {
-			SQL = "SELECT  CLIENTE, CTIPO, PRODUCTO, PTIPO, TIPORUTA, TIPOBON, RANGOINI, RANGOFIN, TIPOLISTA, TIPOCANT, VALOR," +
-					"LISTA, CANTEXACT, GLOBBON, PORCANT, dbo.AndrDate(FECHAINI), dbo.AndrDate(FECHAFIN), CODDESC, NOMBRE, EMP, UMPRODUCTO , UMBONIFICACION " +
-					"FROM P_BONIF WHERE ((dbo.AndrDate(FECHAINI)<=" + ff + ") AND (dbo.AndrDate(FECHAFIN)>=" + fi + "))";
-			return SQL;
-		}
+
 
 		if (TN.equalsIgnoreCase("P_BONLIST")) {
 			SQL = "SELECT CODIGO,PRODUCTO,CANT,CANTMIN,NOMBRE FROM P_BONLIST";
@@ -1420,6 +1433,21 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
+		//#CKFK_20190319 Agregué tabla P_HANDHELD
+		if (TN.equalsIgnoreCase("P_HANDHELD")) {
+			SQL = "SELECT NUMPLACA, NUMSERIE, TIPO, ISNULL(CREADA,'') AS CREADA, " +
+				  " ISNULL(MODIFICADA,'') AS MODIFICADA, ISNULL(FECHA_CREADA, GETDATE()) AS FECHA_CREADA," +
+				  "	ISNULL(FECHA_MODIFICADA, GETDATE()) AS FECHA_MODIFICADA FROM P_HANDHELD";
+			return SQL;
+		}
+
+		//#CKFK_20190319 Agregué tabla P_IMPRESORA
+		if (TN.equalsIgnoreCase("P_IMPRESORA")) {
+			SQL = " SELECT IDIMPRESORA, NUMSERIE, MARCA, ISNULL(CREADA,'') AS CREADA, " +
+				  " ISNULL(MODIFICADA,'') AS MODIFICADA, ISNULL(FECHA_CREADA, GETDATE()) AS FECHA_CREADA," +
+				  " ISNULL(FECHA_MODIFICADA, GETDATE()) AS FECHA_MODIFICADA FROM P_IMPRESORA";
+			return SQL;
+		}
 		if (TN.equalsIgnoreCase("P_MUNI")) {
 			SQL = "SELECT * FROM P_MUNI";
 			return SQL;
@@ -2653,7 +2681,8 @@ public class ComWS extends PBase {
 	}
 
 	public void updateAcumulados() {
-		int ff,oyear,omonth,rslt;
+		long ff;
+		int oyear,omonth,rslt;
 		
 		ff=du.getActDate();
 		oyear=du.getyear(ff);
@@ -3149,7 +3178,8 @@ public class ComWS extends PBase {
 	private boolean validaLicencia() {
 		Cursor dt;
 		String mac,lickey,idkey,binkey;
-		int fval,ff,lkey;
+		int fval,lkey;
+		long ff;
 
 		try {
 			mac=lic.getMac();

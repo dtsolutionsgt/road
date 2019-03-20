@@ -345,12 +345,7 @@ public class AppMethods {
         String umm;
 
         try {
-            //String sql = "SELECT VENTA_POR_PESO FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
-            //DT = Con.OpenDT(sql);
-            //DT.moveToFirst();
-           	//return  DT.getInt(0)==1;
-
-			String sql = "SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE CODIGO='" + cod + "' AND NIVEL="+gl.nivel;
+     		String sql = "SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE CODIGO='" + cod + "' AND NIVEL="+gl.nivel;
 			DT = Con.OpenDT(sql);
 			DT.moveToFirst();
 
@@ -451,12 +446,9 @@ public class AppMethods {
 
 	}
 
-	public double getPeso()
-	{
-
+	public double getPeso() {
 		Cursor DT;
-		double sumaPesoB=0;
-		double sumaPeso=0;
+		double sumaPesoB=0,sumaPeso=0;
 
 		sql = "SELECT IFNULL(SUM(S.PESO),0) AS PESOTOT " +
 				" FROM P_STOCKB S, P_PRODUCTO P " +
@@ -515,12 +507,9 @@ public class AppMethods {
 		return sumaPeso;
 	}
 
-	public double getCantidad()
-	{
-
+	public double getCantidad() {
 		Cursor DT;
-		double sumaCantB=0;
-		double sumaCant=0;
+		double sumaCantB=0,sumaCant=0;
 
 		sql = "SELECT IFNULL(COUNT(S.CODIGO),0) AS CANTUNI " +
 				" FROM P_STOCKB S, P_PRODUCTO P " +
@@ -578,6 +567,62 @@ public class AppMethods {
 
 		return sumaCant;
 	}
+
+	public String umVenta(String cod) {
+		Cursor DT;
+		String umm;
+
+		try {
+			String sql = "SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE CODIGO='" + cod + "' AND NIVEL="+gl.nivel;
+			DT = Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			umm=DT.getString(0);
+			return  umm;
+		} catch (Exception e) {
+			toast(e.getMessage());
+			return "";
+		}
+	}
+
+	public String umStock(String cod) {
+		Cursor DT;
+		String umm,sql;
+
+		try {
+			sql = "SELECT UNIDADMEDIDA FROM P_STOCK WHERE CODIGO='"+cod+ "'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount()==0) {
+				sql = "SELECT UNIDADMEDIDA FROM P_STOCKB WHERE CODIGO='"+cod+ "'";
+				DT = Con.OpenDT(sql);
+			}
+
+			DT.moveToFirst();
+			umm=DT.getString(0);
+
+			return  umm;
+		} catch (Exception e) {
+			toast(e.getMessage());
+			return "";
+		}
+	}
+
+	public double factorPeso(String cod) {
+		Cursor DT;
+
+		try {
+			String sql = "SELECT PESO_PROMEDIO FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+			DT = Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			return  DT.getDouble(0);
+		} catch (Exception e) {
+			toast(e.getMessage());
+			return 0;
+		}
+	}
+
 
 	// Common
 	

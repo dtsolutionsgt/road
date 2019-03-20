@@ -1,9 +1,5 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
-import com.dts.roadp.clsClasses.clsCFDV;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,10 +9,12 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
+
+import java.util.ArrayList;
 
 public class MercProp extends PBase {
 	
@@ -361,7 +359,7 @@ public class MercProp extends PBase {
 	private void saveDevol(){
 		Cursor DT;
 		String corel,pcod;
-		int f=du.getActDate();
+		long f=du.getActDate();
 		Double pprec;
 		
 		corel=((appGlobals) vApp).ruta+"_"+mu.getCorelBase();

@@ -550,7 +550,7 @@
             android:adjustViewBounds="true"
             android:clickable="true"
             android:onClick="showDevol"
-            android:src="@drawable/devolucion_color"
+            android:src="@drawable/devolucion"
             android:visibility="visible" />
 
         <RelativeLayout

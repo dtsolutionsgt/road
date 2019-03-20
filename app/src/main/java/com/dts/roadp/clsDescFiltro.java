@@ -20,7 +20,7 @@ public class clsDescFiltro {
 	private DateUtils DU;
 	
 	private String cliid,rutaid;
-	private int fecha;
+	private long fecha;
 	
 	public clsDescFiltro(Context context,String ruta,String cliente) {
 		

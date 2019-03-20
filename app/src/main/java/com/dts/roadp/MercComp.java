@@ -1,24 +1,20 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
-import com.dts.roadp.clsClasses.clsCFDV;
-
-import android.os.Bundle;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.os.Bundle;
 import android.text.InputType;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
+
+import java.util.ArrayList;
 
 public class MercComp extends PBase {
 
@@ -311,7 +307,7 @@ private ListView listView;
 	private void saveDevol(){
 		Cursor DT;
 		String corel,pcod;
-		int f=du.getActDate();
+		long f=du.getActDate();
 		Double pprec;
 		
 		corel=((appGlobals) vApp).ruta+"_"+mu.getCorelBase();

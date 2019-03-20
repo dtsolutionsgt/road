@@ -66,7 +66,7 @@ public class DevolCli extends PBase {
 	
 	public void showProd(View view) {
 		try{
-			((appGlobals) vApp).gstr="";
+
 			browse=1;
 			itempos=-1;
 			Intent intent = new Intent(this,Producto.class);
@@ -100,7 +100,6 @@ public class DevolCli extends PBase {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
 
-
 						Object lvObj = listView.getItemAtPosition(position);
 						clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
 
@@ -110,6 +109,23 @@ public class DevolCli extends PBase {
 
 						updCant(vItem.id);
 
+				}
+			});
+
+			listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+					Object lvObj = listView.getItemAtPosition(position);
+					clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
+
+					adapter.setSelectedIndex(position);
+
+					prodid = vItem.Cod;
+
+					msgAskDel("Borrar producto");
+
+					return true;
 				}
 			});
 
@@ -167,7 +183,7 @@ public class DevolCli extends PBase {
             lblCantProds.setText(String.valueOf(cntprd));
             lblCantUnd.setText(String.valueOf(cntunis));
             lblCantKgs.setText(String.valueOf(cntkgs));
-            lblCantTotal.setText(String.valueOf(cntotl));
+            lblCantTotal.setText(mu.frmcur(cntotl));
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -181,8 +197,9 @@ public class DevolCli extends PBase {
 	private void processItem(){
 
 		try{
+
 			String pid;
-			pid=((appGlobals) vApp).gstr;
+			pid=gl.gstr;
 			if (mu.emptystr(pid)) {return;}
 
 			prodid=pid;
@@ -200,7 +217,6 @@ public class DevolCli extends PBase {
 
           	itempos=-1;
 			((appGlobals) vApp).prod=prodid;
-			((appGlobals) vApp).gstr="";
 			Intent intent = new Intent(this,DevCliCant.class);
 			startActivity(intent);
 		}catch (Exception e){
@@ -229,7 +245,7 @@ public class DevolCli extends PBase {
 		
 		itempos=item;
 		gl.prod=prid;
-		gl.gstr=rz;
+		gl.devrazon=rz;
 		//((appGlobals) vApp).dval=pcant;
 
 		Intent intent = new Intent(this,DevCliCant.class);
@@ -311,6 +327,7 @@ public class DevolCli extends PBase {
             ins.add("UMPESO",gl.dvumpeso);
             ins.add("FACTOR",gl.dvfactor);
             ins.add("POR_PESO",String.valueOf(gl.dvporpeso));
+			ins.add("TIENE_LOTE",gl.tienelote);
 
 	    	db.execSQL(ins.sql());
 	    	
@@ -465,6 +482,9 @@ public class DevolCli extends PBase {
 
                 Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();
 
+				sql="DELETE FROM T_CxCD";
+				db.execSQL(sql);
+
                 gl.closeCliDet = true;
                 gl.closeVenta = true;
 
@@ -493,6 +513,17 @@ public class DevolCli extends PBase {
 		}
 	}
 
+	private void delItem(){
+		try {
+			db.execSQL("DELETE FROM T_CxCD WHERE CODIGO='"+prodid+"'");
+			listItems();
+			adapter=new ListAdaptDevCli(this,items);
+			listView.setAdapter(adapter);
+		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox("Error : " + e.getMessage());
+		}
+	}
 
 	// Aux 
 
@@ -596,7 +627,33 @@ public class DevolCli extends PBase {
 		}
 
 			
-	}	
+	}
+
+	private void msgAskDel(String msg) {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿ " + msg  + " ?");
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					delItem();
+
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { }
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
 
 	private boolean hasProducts(){
 		Cursor DT;
@@ -617,6 +674,10 @@ public class DevolCli extends PBase {
             if(gl.dvbrowse!=0){
                 gl.dvbrowse =0;
             }
+
+            sql="DELETE FROM T_CxCD";
+            db.execSQL(sql);
+
 			super.finish();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -631,7 +692,7 @@ public class DevolCli extends PBase {
 		try{
 			super.onResume();
 
-			if (((appGlobals) vApp).closeVenta) super.finish();
+			if (gl.closeVenta) super.finish();
 
 			if (browse==1) {
 				browse=0;

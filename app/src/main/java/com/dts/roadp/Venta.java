@@ -218,7 +218,7 @@ public class Venta extends PBase {
 
 			if (gl.dvbrowse!=0){
 				if (tot<gl.dvdispventa){
-					mu.msgbox("Monto total menor al disponible!");return;
+					mu.msgbox("¡Monto de factura es menor a la de crédito!!");return;
 				}
 			}
 
@@ -534,35 +534,31 @@ public class Venta extends PBase {
 
 			// Descuento
 
-			if (!gl.peModal.equalsIgnoreCase("TOL")) {
-				clsDesc = new clsDescuento(this, prodid, cant);
-				desc = clsDesc.getDesc();
-				mdesc = clsDesc.monto;
+			clsDesc = new clsDescuento(this, prodid, cant);
+			desc = clsDesc.getDesc();
+			mdesc = clsDesc.monto;
 
-				if (desc + mdesc > 0) {
+			if (desc + mdesc > 0) {
 
-					browse = 3;
-					gl.promprod = prodid;
-					gl.promcant = cant;
+				browse = 3;
+				gl.promprod = prodid;
+				gl.promcant = cant;
 
-					if (desc > 0) {
-						gl.prommodo = 0;
-						gl.promdesc = desc;
-					} else {
-						gl.prommodo = 1;
-						gl.promdesc = mdesc;
-					}
-
-					startActivity(new Intent(this, DescBon.class));
-
+				if (desc > 0) {
+					gl.prommodo = 0;
+					gl.promdesc = desc;
 				} else {
-					if (gl.bonus.size() > 0) {
-						Intent intent = new Intent(this, BonList.class);
-						startActivity(intent);
-					}
+					gl.prommodo = 1;
+					gl.promdesc = mdesc;
 				}
-			} else {
 
+				startActivity(new Intent(this, DescBon.class));
+
+			} else {
+				if (gl.bonus.size() > 0) {
+					Intent intent = new Intent(this, BonList.class);
+					startActivity(intent);
+				}
 			}
 
 			//prodPrecio();
@@ -578,8 +574,6 @@ public class Venta extends PBase {
 					if (prc.precioespecial>0) prec=prc.precioespecial;
 				}
 			}
-
-
 
 			precsin = prc.precsin;
 			imp = prc.imp;
@@ -1034,7 +1028,7 @@ public class Venta extends PBase {
 	}
 
 	private void saveAtten(String codnoate) {
-		int ti,tf,td;
+		long ti,tf,td;
 
 		ti=gl.atentini;tf=du.getActDateTime();
 		td=du.timeDiff(tf,ti);if (td<1) td=1;
@@ -1284,7 +1278,6 @@ public class Venta extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 
 	}
 

@@ -1,11 +1,5 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
-import com.dts.roadp.clsClasses.clsBonifItem;
-import com.dts.roadp.clsClasses.clsBonifProd;
-import com.dts.roadp.clsClasses.clsCFDV;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,13 +12,17 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.dts.roadp.clsClasses.clsBonifItem;
+import com.dts.roadp.clsClasses.clsBonifProd;
+
+import java.util.ArrayList;
 
 public class BonList extends PBase {
 
@@ -289,6 +287,7 @@ public class BonList extends PBase {
 	private void addItem(clsBonifProd item) {
 		Cursor DT;
 		int iidx;
+		double fact,peso;
 		
 		try {
 			sql="SELECT MAX(ITEM) FROM T_BONITEM";
@@ -302,6 +301,10 @@ public class BonList extends PBase {
 		}
 		
 		try {
+
+			fact=app.factorPeso(item.id);
+			peso=fact*item.cant;
+
 			ins.init("T_BONITEM");
 
 			ins.add("ITEM",iidx);
@@ -310,6 +313,12 @@ public class BonList extends PBase {
 			ins.add("CANT",item.cant);
 			ins.add("PRECIO",item.precio);
 			ins.add("COSTO",item.costo);
+			ins.add("PESO",peso);
+			ins.add("UMVENTA",app.umVenta(item.id));
+			ins.add("UMSTOCK",app.umStock(item.id));
+			ins.add("UMPESO",gl.umpeso);
+			ins.add("FACTOR",fact);
+			ins.add("POR_PESO",app.ventaPeso(item.id)?1:0);
 
 	    	db.execSQL(ins.sql());
 		} catch (SQLException e) {

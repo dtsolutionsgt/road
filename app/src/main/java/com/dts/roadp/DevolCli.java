@@ -671,9 +671,8 @@ public class DevolCli extends PBase {
 	
 	private void doExit(){
 		try{
-            if(gl.dvbrowse!=0){
-                gl.dvbrowse =0;
-            }
+
+            limpiavariables_devol();
 
             sql="DELETE FROM T_CxCD";
             db.execSQL(sql);
@@ -684,7 +683,31 @@ public class DevolCli extends PBase {
 		}
 
 	}
-	
+
+	private void limpiavariables_devol(){
+
+		gl.devtipo ="";
+		gl.devrazon = "";
+		gl.dvumventa = "";
+		gl.dvumstock ="";
+		gl.dvumpeso = "";
+		gl.dvlote="";
+		gl.dvfactor=0.0;
+		gl.dvpeso=0.0;
+		gl.dvprec=0.0;
+		gl.dvpreclista=0.0;
+		gl.dvtotal=0.0;
+		gl.dvbrowse=0;
+		gl.tienelote=0;
+		gl.dvporpeso=false;
+		gl.dvdispventa=0.0;
+		gl.dvcorreld="";
+		gl.dvcorrelnc="";
+		gl.dvestado="";
+		gl.dvactuald="";
+		gl.dvactualnc="";
+	}
+
 	// Activity Events
 	
 	@Override
@@ -692,7 +715,10 @@ public class DevolCli extends PBase {
 		try{
 			super.onResume();
 
-			if (gl.closeVenta) super.finish();
+			if (gl.closeVenta==true){
+				limpiavariables_devol();
+				super.finish();
+			}
 
 			if (browse==1) {
 				browse=0;

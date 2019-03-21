@@ -712,7 +712,6 @@ public class FacturaRes extends PBase {
 			fecha=du.getActDateTime();
 		}
 
-
         sql="SELECT MAX(ITEM) FROM D_FACT_LOG";
         dt=Con.OpenDT(sql);
 

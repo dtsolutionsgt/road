@@ -1657,13 +1657,29 @@ public class FacturaRes extends PBase {
 
 				if (pg > 0) {
 
-					if (pg<tot) {
-						msgbox("Monto menor que total");
+					if (gl.dvbrowse!=0){
+						double totdv;
+						totdv = mu.round(tot-dispventa,gl.peDec);
+
+						if (pg<totdv) {
+							msgbox("Monto menor que total");
+						}
+
+						vuel=pg-tot;
+
+						lblVuelto.setText(String.format("    Vuelto: " + mu.frmcur(vuel)) );
+
+					}else{
+
+						if (pg<tot) {
+							msgbox("Monto menor que total");
+						}
+
+						vuel=pg-tot;
+
+						lblVuelto.setText(String.format("    Vuelto: " + mu.frmcur(vuel)) );
+
 					}
-
-					vuel=pg-tot;
-
-					lblVuelto.setText(String.format("    Vuelto: " + mu.frmcur(vuel)) );
 
 				}
 

@@ -31,7 +31,6 @@ public class Anulacion extends PBase {
 	public  clsRepBuilder rep;
 	private clsDocAnul doc;
 	private clsDocFactura fdoc;
-	private clsFinDia claseFindia;
 
 	private clsClasses.clsCFDV sitem;
 	
@@ -201,7 +200,8 @@ public class Anulacion extends PBase {
 			if (tipo==3) {
 				sql="SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO "+
 					 "FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO "+
-					 "WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC ";	
+					 "WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') " +
+					 "ORDER BY D_FACTURA.COREL DESC ";
 			}
 			
 			if (tipo==4) {
@@ -308,7 +308,11 @@ public class Anulacion extends PBase {
 			db.endTransaction();
 			
 			mu.msgbox("El documento ha sido anulado.");
-			
+
+			if(tipo==3){
+				ImpresionFactura();
+			}
+
 			sql="DELETE FROM P_STOCK WHERE CANT=0 AND CANTM=0";
 			db.execSQL(sql);
 
@@ -394,15 +398,15 @@ public class Anulacion extends PBase {
 			sql="DELETE FROM D_STOCKB_DEV WHERE Corel='"+itemid+"'";
 			db.execSQL(sql);
 
+            sql = "UPDATE D_NOTACRED SET ANULADO ='S' WHERE FACTURA ='" + itemid + "'";
+            db.execSQL(sql);
+
+            sql = "UPDATE D_CXC SET ANULADO ='S' WHERE REFERENCIA ='" + itemid + "' AND TIPO  = 'N' ";
+            db.execSQL(sql);
+
 			anulBonif(itemid);
 
-			ImpresionFactura();
-
-			sql = "UPDATE D_NOTACRED SET ANULADO ='S' WHERE FACTURA ='" + itemid + "'";
-			db.execSQL(sql);
-
-			sql = "UPDATE D_CXC SET ANULADO ='S' WHERE REFERENCIA ='" + itemid + "' AND TIPO  = 'N' ";
-			db.execSQL(sql);
+			//ImpresionFactura();
 
 			vAnulFactura=true;
 
@@ -545,6 +549,10 @@ public class Anulacion extends PBase {
 
 				DT.moveToNext();
 			}
+
+			sql="UPDATE FinDia SET val3 = 0, val4=0";
+			db.execSQL(sql);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
@@ -593,7 +601,7 @@ public class Anulacion extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 	}
-	
+
 	private void anulDevol(String itemid) {
 		Cursor DT;
 		String prod;
@@ -603,40 +611,22 @@ public class Anulacion extends PBase {
 			sql="UPDATE D_MOV SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
 
-			sql="SELECT PRODUCTO,CANT,CANTM FROM D_MOVD WHERE (COREL='"+itemid+"')";
+			sql="SELECT PRODUCTO,CANT,CANTM, UNIDADMEDIDA FROM D_MOVD WHERE (COREL='"+itemid+"')";
 			DT=Con.OpenDT(sql);
 
-			DT.moveToFirst();
-			while (!DT.isAfterLast()) {
-
-				prod=DT.getString(0);
-				cant=DT.getDouble(1);
-				cantm=DT.getDouble(2);
-
-				try {
-					sql="INSERT INTO P_STOCK VALUES ('"+prod+"',0,0,0,0, '"+prod+"','',0,'N', '','',0,0,'')";
-					db.execSQL(sql);
-				} catch (Exception e) {
-					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-					toast(e.getMessage());
-				}
-
-				try {
-					sql="UPDATE P_STOCK SET CANT=CANT+"+cant+", CANTM=CANTM+"+cantm+" WHERE CODIGO='"+prod+"'";
-					db.execSQL(sql);
-				} catch (Exception e) {
-					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-				}
-
-				DT.moveToNext();
+			if(DT.getCount()>0){
+				sql="INSERT INTO P_STOCK SELECT PRODUCTO, CANT, CANTM, PESO, 0, LOTE, '',0,'N', '','',0,0,'', UNIDADMEDIDA " +
+						"FROM D_MOVD";
+				db.execSQL(sql);
 			}
+
+			sql="UPDATE FinDia SET val5 = 0";
+			db.execSQL(sql);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-
-
 	}
-	
 	private void anulRecib(String itemid) {
 		try{
 			sql="UPDATE D_COBRO  SET Anulado='S' WHERE COREL='"+itemid+"'";
@@ -1199,7 +1189,6 @@ public class Anulacion extends PBase {
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					ImpresionFactura();
 					anulDocument();
 				}
 			});

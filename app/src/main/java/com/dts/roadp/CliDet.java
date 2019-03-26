@@ -415,7 +415,7 @@ public class CliDet extends PBase {
 			ca1=DT.getInt(1);
 			ci=DT.getInt(2);
 			cf=DT.getInt(3);
-			fecha_vigencia=DT.getInt(4);
+			fecha_vigencia=DT.getLong(4);
 			resguardo=DT.getInt(5)==1;
 
 			if(resguardo==false){

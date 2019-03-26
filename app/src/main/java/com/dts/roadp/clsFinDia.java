@@ -451,9 +451,9 @@ public class clsFinDia extends PBase{
             sql="DELETE FROM D_ATENCION";db.execSQL(sql);
             sql="DELETE FROM D_CLICOORD WHERE STATCOM='S'";db.execSQL(sql);
 
-
+            //#CKFK_20190325 Se modificó para que solo actualizara el CorelZ y no las demás banderas
             corelz++;
-            sql="UPDATE FinDia SET Corel="+corelz+", val1 = 0,val2= 0,val3= 0,val4= 0,val5= 0,val6= 0,val7= 0,val8= 0";
+            sql="UPDATE FinDia SET Corel="+corelz+"";
             db.execSQL(sql);
 
 			/*sql="UPDATE P_RUTA SET Email='0'";

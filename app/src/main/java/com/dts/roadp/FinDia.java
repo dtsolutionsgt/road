@@ -399,6 +399,8 @@ public class FinDia extends PBase {
             corelz++;
             sql = "UPDATE FinDia SET Corel=" + corelz;
             db.execSQL(sql);
+            sql = "UPDATE P_HANDHELD SET CorelZ=" + corelz;
+            db.execSQL(sql);
 
 			/*sql="UPDATE P_RUTA SET Email='0'";
 			db.execSQL(sql);*/
@@ -2230,7 +2232,7 @@ public class FinDia extends PBase {
 
                 while (!DT.isAfterLast()) {
 
-                    anulada = (DT.getString(3).equalsIgnoreCase("S"));
+                    anulada = (DT.getString(2).equalsIgnoreCase("S"));
 
                     vCadena = DT.getString(0);
 
@@ -2266,7 +2268,7 @@ public class FinDia extends PBase {
 
                 while (!DT.isAfterLast()) {
 
-                    anulada = (DT.getString(3).equalsIgnoreCase("S"));
+                    anulada = (DT.getString(2).equalsIgnoreCase("S"));
 
                     vCadena = DT.getString(0);
 

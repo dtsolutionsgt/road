@@ -1884,6 +1884,8 @@ public class BaseDatosScript {
 					"[MODIFICADA] TEXT NOT NULL,"+
 					"[FECHA_CREADA] INTEGER NOT NULL,"+
 					"[FECHA_MODIFICADA] INTEGER NOT NULL,"+
+					"[CORELZ] INT NOT NULL,"+
+					"[GRANDTOTAL] REAL NOT NULL,"+
 					"PRIMARY KEY ([NUMPLACA])"+
 					");";
 			database.execSQL(vSQL);

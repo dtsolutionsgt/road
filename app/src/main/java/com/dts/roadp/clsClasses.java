@@ -22,7 +22,13 @@ public class clsClasses {
 		public double cant,cantm;
 		public int id,flag,items;
 	}
-	
+
+	public class clsDevCan {
+		public String Cod,Desc,Fecha,Valor,ValorM,ValorT,Peso,PesoM,PesoT,Lote,Doc,Centro,Stat;
+		public double cant,cantm;
+		public int id,flag,items;
+	}
+
 	public class clsMenu {
 		public int ID,Icon;
 		public String Name;

@@ -405,6 +405,8 @@ public class Pago extends PBase {
 			mMenuDlg = new AlertDialog.Builder(this);
 			mMenuDlg.setTitle("Tipo Pago");
 
+			mMenuDlg.setCancelable(false);
+
 			mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
 					try {
@@ -483,6 +485,7 @@ public class Pago extends PBase {
 		try{
 			mMenuDlg = new AlertDialog.Builder(this);
 			mMenuDlg.setTitle("Banco");
+			mMenuDlg.setCancelable(false);
 
 			mMenuDlg.setSingleChoiceItems(selitems , -1,
 					new DialogInterface.OnClickListener() {
@@ -531,6 +534,7 @@ public class Pago extends PBase {
 
 			input.setInputType(InputType.TYPE_CLASS_NUMBER);
 			input.setText("");input.requestFocus();
+			alert.setCancelable(false);
 
 			alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
@@ -703,6 +707,7 @@ public class Pago extends PBase {
 			dialog.setMessage(msg  + " ?");
 
 			dialog.setIcon(R.drawable.ic_quest);
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -791,6 +796,7 @@ public class Pago extends PBase {
 			dialog.setMessage(msg  + " ?");
 
 			dialog.setIcon(R.drawable.ic_quest);
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -822,6 +828,7 @@ public class Pago extends PBase {
 			dialog.setMessage(msg  + " ?");
 
 			dialog.setIcon(R.drawable.ic_quest);
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -851,6 +858,7 @@ public class Pago extends PBase {
 			dialog.setMessage(msg  + " ?");
 
 			dialog.setIcon(R.drawable.ic_quest);
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {

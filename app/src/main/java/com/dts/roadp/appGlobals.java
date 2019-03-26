@@ -23,7 +23,7 @@ public class appGlobals extends Application {
 	public int tiponcredito;
     public boolean vcredito,vcheque,vchequepost;
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,contlic,devol,modoadmin;
-	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo;
+	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
 	public int mpago;
 
 	//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true por defecto estará en false
@@ -32,13 +32,13 @@ public class appGlobals extends Application {
 	//Devolución Cliente
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;
 	public double dvfactor,dvpeso,dvprec,dvpreclista,dvtotal;
-	public int dvbrowse=0,tienelote;
+	public int dvbrowse=0,tienelote,facturaVen;
     public boolean dvporpeso;
     public double dvdispventa;
     public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc;
 
 	// Parametros Extra
-	public String peModal,peMon,peFormatoFactura;
+	public String peModal,peMon,peFormatoFactura,CodDev;
 	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec;
 	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre,peImprFactCorrecta;
 	public int peDec,peDecCant,peDecImp;
@@ -67,5 +67,8 @@ public class appGlobals extends Application {
 	public Printer mPrinter=null;
 	public boolean mPrinterSet=false;
 	public String mPrinterIP;
+
+	//Cobros
+	public int escbro=0;
 
 }

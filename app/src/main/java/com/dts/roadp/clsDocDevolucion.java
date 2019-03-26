@@ -1,0 +1,238 @@
+package com.dts.roadp;
+
+import java.util.ArrayList;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.widget.Toast;
+
+public class clsDocDevolucion extends clsDocument {
+
+    private ArrayList<itemData> items= new ArrayList<itemData>();
+
+    private double tot,desc,imp,stot,percep;
+    private boolean sinimp;
+    private String 	contrib,recfact,estadoDev;
+
+    public clsDocDevolucion(Context context, int printwidth, String cursym, int decimpres) {
+        super(context, printwidth, cursym, decimpres);
+        docpedido=false;
+        docfactura=false;
+        docrecibo=false;
+        docdevolucion=true;
+    }
+
+    protected boolean buildDetail() {
+        itemData item;
+
+        rep.line();
+        //rep.empty();
+
+        for (int i = 0; i <items.size(); i++) {
+            item=items.get(i);
+            rep.addp("Mercancia "+ item.estado,"");
+        }
+
+        rep.line();
+
+        detailToledano();
+        return true;
+    }
+
+    protected boolean detailToledano() {
+        itemData item;
+        String ss;
+
+        rep.line();
+        rep.add("CODIGO   DESCRIPCION        UM  CANT");
+        rep.add("       KGS    PRECIO           VALOR");
+        rep.line();
+
+        for (int i = 0; i <items.size(); i++) {
+            item=items.get(i);
+
+            ss=rep.ltrim(item.cod+" "+item.nombre,prw-10);
+            ss=ss+rep.rtrim(item.um,4)+" "+rep.rtrim(frmdecimal(item.cant,2),5);
+            rep.add(ss);
+            ss=rep.rtrim(frmdecimal(item.peso,2),10)+" "+rep.rtrim(frmdecimal(item.prec,2),8);
+            ss=rep.ltrim(ss,prw-10);
+            ss=ss+" "+rep.rtrim(frmdecimal(item.tot,2),9);
+            rep.add(ss);
+
+        }
+
+        rep.line();
+
+        return true;
+    }
+
+    protected boolean buildFooter() {
+        rep.addtot("TOTAL PAGO", tot);
+        rep.add("");
+        rep.add("");
+        rep.add("");
+        rep.line();
+        rep.addc("Firma Cliente");
+        rep.add("");
+        rep.addc("EXIJA SU FACTURA ORIGINAL ");
+        rep.addc("PARA COMPROBAR  EL PAGO. ");
+        rep.add("");
+
+        rep.add("Serial : "+deviceid);
+        rep.add(resol);
+        rep.add(resfecha);
+        rep.add("");
+
+        return super.buildFooter();
+    }
+
+    protected boolean loadHeadData(String corel) {
+        Cursor DT;
+        String cli,vend,val;
+        int ff;
+
+        super.loadHeadData(corel);
+
+        nombre="NOTA DE CREDITO";
+
+        try {
+            sql="SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,FECHA,FACTURA FROM D_NOTACRED WHERE FACTURA='"+corel+"'";
+            DT=Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            serie=DT.getString(7);
+            //numero=""+DT.getInt(1);
+            ruta=DT.getString(2);
+
+            vend=DT.getString(3);
+            cli=DT.getString(4);
+
+            tot=DT.getDouble(5);
+            ffecha=DT.getInt(6);fsfecha=sfecha(ffecha);
+
+        } catch (Exception e) {
+            Toast.makeText(cont,"loadHeadData"+e.getMessage(), Toast.LENGTH_SHORT).show();return false;
+        }
+
+
+        try {
+            sql="SELECT NOMBRE FROM P_VENDEDOR  WHERE CODIGO='"+vend+"'";
+            DT=Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            val=DT.getString(0);
+        } catch (Exception e) {
+            val=vend;
+        }
+
+        vendedor=val;
+
+        try {
+            sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION FROM P_CLIENTE WHERE CODIGO='"+cli+"'";
+            DT=Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            val=DT.getString(0);
+            percep=DT.getDouble(1);
+
+            contrib=""+DT.getString(2);
+            if (contrib.equalsIgnoreCase("C")) sinimp=true;
+            if (contrib.equalsIgnoreCase("F")) sinimp=false;
+
+            clicod=cli;
+            clidir=DT.getString(3);
+
+        } catch (Exception e) {
+            val=cli;
+        }
+
+        try {
+            sql="SELECT RESOL,FECHARES,FECHAVIG,SERIE,CORELINI,CORELFIN FROM P_COREL";
+            DT=Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            resol="Resolucion No. : "+DT.getString(0);
+            ff=DT.getInt(1);resfecha="De Fecha: "+sfecha(ff);
+            ff=DT.getInt(2);resvence="Vigente hasta: "+sfecha(ff);
+            //#EJC20181130: Se cambió el mensaje por revisión de auditor de SAT.
+            //ff=DT.getInt(2);resvence="Resolucion vence : "+sfecha(ff);
+            //resrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
+
+        } catch (Exception e) {
+            Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
+        }
+
+        cliente=val;
+
+        return true;
+
+    }
+
+    protected boolean loadDocData(String corel) {
+        Cursor DT;
+        itemData item;
+
+        loadHeadData(corel);
+
+        items.clear();
+
+        try {
+            //sql="SELECT CODIGO,ESTADO,PESO,PRECIO,TOTAL,CANT,UMVENTA FROM D_CxCD WHERE COREL='"+corel+"'";
+            sql="SELECT C.CODIGO,P.DESCLARGA,C.ESTADO,C.PESO,C.PRECIO,C.TOTAL,C.CANT,C.UMVENTA " +
+                "FROM D_CxCD C INNER JOIN P_PRODUCTO P ON C.CODIGO = P.CODIGO " +
+                "WHERE (C.COREL='"+corel+"')";
+            DT=Con.OpenDT(sql);
+
+            DT.moveToFirst();
+
+            while (!DT.isAfterLast()) {
+
+                item =new itemData();
+                item.cod=DT.getString(0);
+                item.nombre=DT.getString(1);
+                item.estado=DT.getString(2);
+                item.peso=DT.getDouble(3);
+                item.prec=DT.getDouble(4);
+                item.tot=DT.getDouble(5);
+                item.cant=DT.getDouble(6);
+                item.um=DT.getString(7);
+
+                items.add(item);
+
+                if (item.estado.equals("B")){
+                    item.estado="En Buen Estado";
+                }else{
+                    item.estado="En Mal Estado";
+                }
+
+                DT.moveToNext();
+            }
+
+        } catch (Exception e) {
+
+        }
+
+        return true;
+    }
+
+
+    // Aux
+
+    public double round2(double val){
+        int ival;
+
+        val=(double) (100*val);
+        double rslt=Math.round(val);
+        rslt=Math.floor(rslt);
+
+        ival=(int) rslt;
+        rslt=(double) ival;
+
+        return (double) (rslt/100);
+    }
+
+    private class itemData {
+        public String cod,nombre,estado,um;
+        public double cant,prec,tot,peso;
+    }
+}

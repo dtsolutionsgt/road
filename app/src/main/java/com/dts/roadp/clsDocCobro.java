@@ -20,6 +20,8 @@ public class clsDocCobro extends clsDocument {
 		super(context, printwidth,cursymbol,decimpres);
 		docfactura=false;
 		docrecibo=true;
+		docpedido=false;
+		docdevolucion=false;
 	}
 	
 	protected boolean buildDetail() {
@@ -80,7 +82,7 @@ public class clsDocCobro extends clsDocument {
 			val=DT.getString(0);
 		} catch (Exception e) {
 			val=vend;
-	    }	
+	    }
 		
 		vendedor=val;
 		

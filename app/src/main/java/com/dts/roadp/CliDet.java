@@ -266,7 +266,7 @@ public class CliDet extends PBase {
 		try {
 
 			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
-				"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO "+
+				"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO "+
 				"FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
            	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
@@ -274,6 +274,7 @@ public class CliDet extends PBase {
 			lblNom.setText(DT.getString(0));
 			lblRep.setText(DT.getString(12));
 			lblDir.setText(DT.getString(2));
+			lblCantDias.setText(DT.getString(17));
 
 			tel=DT.getString(4);
 			lblTel.setText(DT.getString(4));
@@ -312,12 +313,6 @@ public class CliDet extends PBase {
 			gl.vcheque = DT.getString(14).equalsIgnoreCase("S");
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
 			gl.clitipo = DT.getString(16);
-
-			/*sql="SELECT C.NOMBRE FROM P_CLIENTE P INNER JOIN P_MEDIAPAGO C ON (C.CODIGO = P.MEDIAPAGO AND P.CODIGO = "+cod+")";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-
-			lblClientePago.setText(DT.getString(0));*/
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -555,6 +550,7 @@ public class CliDet extends PBase {
 	public void showVenta(View view){
 
 		try{
+			gl.banderaCobro = false;
 
 			if (!validaVenta()) return;//Se valida si hay correlativos de factura para la venta
 
@@ -786,6 +782,7 @@ public class CliDet extends PBase {
 
 	public void showCredit(View viev){
 		try{
+			gl.banderaCobro = true;
 			Intent intent = new Intent(this,Cobro.class);
 			startActivity(intent);
 		}catch (Exception e){
@@ -1085,6 +1082,7 @@ public class CliDet extends PBase {
 			dialog.setMessage("¿" + msg + "?");
 
 			dialog.setIcon(R.drawable.ic_quest);
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {

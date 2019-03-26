@@ -162,6 +162,7 @@ public class MiscUtils {
 
 				dialog.setTitle(R.string.app_name);
 				dialog.setMessage(msg);
+				dialog.setCancelable(false);
 
 				dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {

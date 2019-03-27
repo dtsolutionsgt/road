@@ -12,13 +12,10 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
 
 public class Anulacion extends PBase {
 
-	//El huevo.
 	private ListView listView;
 	private TextView lblTipo;
 	
@@ -410,7 +407,7 @@ public class Anulacion extends PBase {
 
 			vAnulFactura=true;
 
-		}catch (Exception e){
+		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			vAnulFactura=false;
 		}
@@ -421,43 +418,47 @@ public class Anulacion extends PBase {
 	
 	private void anulBonif(String itemid) {
 		Cursor DT;
-		String prod,lote;
-		double cant;
+		String prod,um;
 
 		try{
-		/*
-		sql="SELECT PRODUCTO,CANT,LOTE FROM D_BONIF_LOTES WHERE Corel='"+itemid+"'";
-		DT=Con.OpenDT(sql);
 
-		if (DT.getCount()>0) {
+			sql = "SELECT CODIGO,UNIDADMEDIDA FROM D_BONIF_STOCK WHERE Corel='" + itemid + "'";
+			DT = Con.OpenDT(sql);
 
-			DT.moveToFirst();
-			while (!DT.isAfterLast()) {
+			if (DT.getCount() > 0) {
 
-			 	prod=DT.getString(0);
-				cant=DT.getDouble(1);
-				lote=DT.getString(2);
+				DT.moveToFirst();
+				while (!DT.isAfterLast()) {
 
-				revertStock(itemid,prod,cant,lote);
+					prod = DT.getString(0);
+					um = DT.getString(1);
 
-				DT.moveToNext();
+					revertStockBonif(itemid, prod, um);
+
+					DT.moveToNext();
+				}
+
 			}
 
+			sql = "UPDATE D_BONIF SET Anulado='S' WHERE COREL='" + itemid + "'";
+			db.execSQL(sql);
+
+			sql = "UPDATE D_BONIFFALT SET Anulado='S' WHERE COREL='" + itemid + "'";
+			db.execSQL(sql);
+
+			sql="DELETE FROM D_BONIF_STOCK WHERE COREL='"+itemid+"'";
+			db.execSQL(sql);
+
+			sql="DELETE FROM D_BONIF_LOTES WHERE COREL='"+itemid+"'";
+			db.execSQL(sql);
+
+			//sql="DELETE FROM D_REL_PROD_BON WHERE COREL='"+itemid+"'";
+			//db.execSQL(sql);
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 		}
-
-		sql="UPDATE D_BONIF SET Anulado='S' WHERE COREL='"+itemid+"'";
-		db.execSQL(sql);
-
-		sql="UPDATE D_BONIFFALT SET Anulado='S' WHERE COREL='"+itemid+"'";
-		db.execSQL(sql);
-
-		sql="DELETE FROM D_REL_PROD_BON WHERE COREL='"+itemid+"'";
-		db.execSQL(sql);
-		*/
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}
-
 	}
 	
 	private void revertStock(String corel,String pcod,String um) {
@@ -469,6 +470,70 @@ public class Anulacion extends PBase {
 
 		try{
 			sql = "SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV FROM D_FACTURA_STOCK " +
+					"WHERE (COREL='" + corel + "') AND (CODIGO='" + pcod + "') AND (UNIDADMEDIDA='" + um + "')";
+			dt = Con.OpenDT(sql);
+
+			if (dt.getCount()==0) return;
+
+			dt.moveToFirst();
+
+			while (!dt.isAfterLast()) {
+
+				cant = dt.getInt(0);
+				ppeso = dt.getDouble(2);
+				lot = dt.getString(4);
+				doc = dt.getString(5);
+				stat = dt.getString(9);
+
+				try {
+
+					ins.init("P_STOCK");
+
+					ins.add("CODIGO", pcod);
+					ins.add("CANT", 0);
+					ins.add("CANTM", dt.getDouble(1));
+					ins.add("PESO", 0);
+					ins.add("plibra", dt.getDouble(3));
+					ins.add("LOTE", lot);
+					ins.add("DOCUMENTO", doc);
+
+					ins.add("FECHA", dt.getInt(6));
+					ins.add("ANULADO", dt.getInt(7));
+					ins.add("CENTRO", dt.getString(8));
+					ins.add("STATUS", stat);
+					ins.add("ENVIADO", dt.getInt(10));
+					ins.add("CODIGOLIQUIDACION", dt.getInt(11));
+					ins.add("COREL_D_MOV", dt.getString(12));
+					ins.add("UNIDADMEDIDA", um);
+
+					db.execSQL(ins.sql());
+
+				} catch (Exception e) {
+					//#CKFK 20190308 Este addlog lo quité porque da error porque el registro ya existe y en ese caso solo se va a hacer el update.
+					//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+					//mu.msgbox(e.getMessage());
+				}
+
+				sql = "UPDATE P_STOCK SET CANT=CANT+"+cant+",PESO=PESO+"+ppeso+"  WHERE (CODIGO='" + pcod + "') AND (UNIDADMEDIDA='" + um + "') AND (LOTE='" + lot + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
+				db.execSQL(sql);
+
+				dt.moveToNext();
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
+	}
+
+	private void revertStockBonif(String corel,String pcod,String um) {
+		Cursor dt;
+		String doc,stat,lot;
+		double cant,ppeso;
+
+		doc="";stat="";lot="";
+
+		try{
+			sql = "SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV FROM D_BONIF_STOCK " +
 					"WHERE (COREL='" + corel + "') AND (CODIGO='" + pcod + "') AND (UNIDADMEDIDA='" + um + "')";
 			dt = Con.OpenDT(sql);
 			if (dt.getCount()==0) return;
@@ -522,7 +587,7 @@ public class Anulacion extends PBase {
 		}
 
 	}
-			
+
 	private void anulDepos(String itemid) {
 		Cursor DT;
 		String tdoc;
@@ -711,7 +776,6 @@ public class Anulacion extends PBase {
 	private void ImpresionFactura() {
 		try{
 			if (fdoc.buildPrint(itemid,3,gl.peFormatoFactura)) prn.printask();
-
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

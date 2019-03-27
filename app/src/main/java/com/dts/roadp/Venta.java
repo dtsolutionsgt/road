@@ -231,7 +231,6 @@ public class Venta extends PBase {
 				startActivity(intent);
 			}
 
-
 			//Toast.makeText(this,"Bon global "+clsBonG.items.size(), Toast.LENGTH_SHORT).show();
 
 			if (gl.bonus.size()>0) {
@@ -241,8 +240,6 @@ public class Venta extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
 
 	}
 
@@ -261,7 +258,7 @@ public class Venta extends PBase {
 
 	public void doSoftScan(View view) {
 
-		if (softscanexist) {
+		//if (softscanexist) {
 			try{
 				browse=5;barcode="";
 
@@ -271,9 +268,9 @@ public class Venta extends PBase {
 			}catch (Exception e){
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			}
-		} else {
-			doFocus(view);
-		}
+		//} else {
+			//doFocus(view);
+		//}
 	}
 
 	private void setHandlers(){
@@ -489,7 +486,7 @@ public class Venta extends PBase {
 		clsDescuento clsDesc;
 		clsBonif clsBonif;
 		Cursor DT;
-		double cnt, vv;
+		double cnt,vv;
 		String s;
 
 		cnt = gl.dval;
@@ -632,6 +629,10 @@ public class Venta extends PBase {
 			//sql="DELETE FROM T_VENTA WHERE (PRODUCTO='"+prodid+"') AND (UM='"+um+"')";
 			sql="DELETE FROM T_VENTA WHERE (PRODUCTO='"+prodid+"')";
 			db.execSQL(sql);
+
+			sql="DELETE FROM T_BARRA_BONIF WHERE (PRODUCTO='"+prodid+"')";
+			db.execSQL(sql);
+
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
@@ -752,13 +753,22 @@ public class Venta extends PBase {
 
 	private void addBarcode() {
 		gl.barra=barcode;
+
+		if (barraBonif()) {
+			toastlong("¡La barra es parte de bonificacion!");
+			txtBarra.setText("");return;
+		}
+
 		if (barraBolsa()) {
 			txtBarra.setText("");
-			listItems();return;
+			listItems();
+			return;
 		}
+
 		if (barraProducto()) {
 			txtBarra.setText("");return;
 		}
+
 		toastlong("¡La barra "+barcode+" no existe!");
 		txtBarra.setText("");
 	}
@@ -767,6 +777,8 @@ public class Venta extends PBase {
 		Cursor dt;
 		double ppeso=0,pprecdoc=0;
 		String uum;
+		boolean isnew=true;
+
 		porpeso=true;
 
 		try {
@@ -811,11 +823,14 @@ public class Venta extends PBase {
 					ins.add("PESOORIG",ppeso);
 
 					db.execSQL(ins.sql());
+
+					toast(barcode);
 				} catch (Exception e) {
+					isnew=false;
 					if (chkBorrar.isChecked()) {
-						borraBarra();
+						borraBarra();return true;
 					} else {
-						msgAskBarra("Borrar la barra "+barcode);
+						msgAskBarra("Borrar la barra "+barcode);return true;
 					}
 				}
 
@@ -845,6 +860,8 @@ public class Venta extends PBase {
 			} catch (SQLException e) {
 				actualizaTotalesBarra();
 			}
+
+			if (isnew) validaBarraBon();
 
 			return true;
 		} catch (Exception e) {
@@ -912,13 +929,173 @@ public class Venta extends PBase {
 	}
 
 	private void borraBarra() {
+		clsBonif clsBonif;
+		int bcant,bontotal,boncant,bfaltcant,bon;
+		String bprod="";
+
 		try {
 			db.execSQL("DELETE FROM T_BARRA WHERE BARRA='"+gl.barra+"' AND CODIGO='"+prodid+"'");
 			actualizaTotalesBarra();
+
+			gl.bonbarprod=prodid;
+
+			bcant=cantBolsa();
+			boncant=cantBonif();
+			bfaltcant=cantFalt();
+
+			clsBonif = new clsBonif(this, prodid, bcant, 0);
+			if (clsBonif.tieneBonif()) {
+				bon=(int) clsBonif.items.get(0).valor;
+				bprod=clsBonif.items.get(0).lista;
+				gl.bonbarid=clsBonif.items.get(0).lista;
+			} else {
+				bon=0;gl.bonbarid="";
+			}
+
+			bontotal=boncant+bfaltcant;
+
+			//toast("Bolsas : "+bcant+" bon : "+bon+"  / "+bontotal);
+			if (bon<bontotal) {
+				removerBonif(bprod,(bontotal-bon));
+			}
 		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	}
 
+	private boolean barraBonif() {
+		Cursor dt;
+
+		try {
+			sql="SELECT PRODUCTO FROM T_BARRA_BONIF WHERE (BARRA='"+barcode+"')";
+			dt=Con.OpenDT(sql);
+			return dt.getCount()>0;
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+		return true;
+	}
+
+	private void validaBarraBon() {
+		clsBonif clsBonif;
+		int bcant,bontotal,boncant,bfaltcant,bon;
+
+		gl.bonbarprod=prodid;
+
+		bcant=cantBolsa();
+		boncant=cantBonif();
+		bfaltcant=cantFalt();
+
+		clsBonif = new clsBonif(this, prodid, bcant, 0);
+		if (clsBonif.tieneBonif()) {
+			bon=(int) clsBonif.items.get(0).valor;
+			gl.bonbarid=clsBonif.items.get(0).lista;
+		} else {
+			bon=0;gl.bonbarid="";
+		}
+
+		bontotal=boncant+bfaltcant;
+
+		//toast("Bolsas : "+bcant+" bon : "+bon+"  / "+bontotal);
+		if (bon>bontotal) startActivity(new Intent(this,BonBarra.class));
+
+	}
+
+	private int cantBolsa() {
+		try {
+			sql="SELECT BARRA FROM T_BARRA WHERE CODIGO='"+prodid+"'";
+			Cursor dt=Con.OpenDT(sql);
+			return dt.getCount();
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			return 0;
+		}
+	}
+
+	private int cantBonif() {
+		try {
+			sql="SELECT BARRA FROM T_BARRA_BONIF WHERE PRODUCTO='"+prodid+"'";
+			Cursor dt=Con.OpenDT(sql);
+			return dt.getCount();
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			return 0;
+		}
+	}
+
+	private int cantFalt() {
+		try {
+			sql="SELECT PRODID FROM T_BONIFFALT WHERE PRODUCTO='"+prodid+"'";
+			Cursor dt=Con.OpenDT(sql);
+			return dt.getCount();
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			return 0;
+		}
+	}
+
+	private void removerBonif(String bprod,int bcant) {
+		Cursor dt;
+		String barra,sbarra="";
+		int bc=0;
+
+		try {
+			for (int i = 1; i == bcant; i++) {
+
+				sql = "SELECT CANT FROM T_BONIFFALT WHERE (PRODID='"+prodid+"') ";
+				dt = Con.OpenDT(sql);
+
+				if (dt.getCount() > 0) {
+					dt.moveToFirst();
+
+					sql="UPDATE T_BONIFFALT SET CANT=CANT-1 WHERE (PRODID='"+prodid+"') ";
+					db.execSQL(sql);
+
+					sql="DELETE FROM T_BONIFFALT WHERE CANT=0";
+					db.execSQL(sql);
+
+				} else {
+
+					sql = "SELECT BARRA FROM T_BARRA_BONIF WHERE (PRODUCTO='"+prodid+"') ";
+					dt = Con.OpenDT(sql);
+
+					if (dt.getCount() > 0) {
+						dt.moveToLast();
+						barra=dt.getString(0);sbarra+=barra+"\n";bc++;
+
+						sql = "DELETE FROM T_BARRA_BONIF WHERE (PRODUCTO='"+prodid+"') AND (BARRA='"+barra+"') ";
+						db.execSQL(sql);
+					}
+				}
+			}
+
+			reportBonif();
+
+			if (bc>0) msgbox("Las barra devueltas : \n"+sbarra);
+
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+		}
+	}
+
+	private void reportBonif() {
+		int bont,bon,bonf;
+
+		bon=cantBonif();
+		bonf=cantFalt();
+		bont=bon+bonf;
+
+		if (bonf==0) {
+			toast("Bonificación actual : "+bon);
+		} else {
+			toast("Bonificación actual : "+bon+" / "+bont);
+		}
+
+	}
 
 	//endregion
 
@@ -1435,6 +1612,13 @@ public class Venta extends PBase {
 
 			sql="DELETE FROM T_BARRA";
 			db.execSQL(sql);
+
+			sql="DELETE FROM T_BARRA_BONIF";
+			db.execSQL(sql);
+
+			sql="DELETE FROM T_BONIFFALT";
+			db.execSQL(sql);
+
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());

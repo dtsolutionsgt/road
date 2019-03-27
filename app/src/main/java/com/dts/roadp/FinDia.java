@@ -154,8 +154,6 @@ public class FinDia extends PBase {
         fail = false;
 
         try{
-
-
             if (!gl.peModal.equalsIgnoreCase("TOL")) {
                 buildReports();
             }
@@ -1684,8 +1682,7 @@ public class FinDia extends PBase {
 
         Cursor DT;
 
-        try
-        {
+        try  {
 
             boolean vTieneInvDevol = false;
 

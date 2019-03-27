@@ -1,18 +1,16 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteException;
 import android.os.Environment;
-
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BaseDatos extends SQLiteOpenHelper {
 	

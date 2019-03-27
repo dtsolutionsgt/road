@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Base64;
 import android.util.Log;
@@ -27,7 +28,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,7 +37,6 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
-
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -70,8 +69,10 @@ public class ComWS extends PBase {
 	private clsDataBuilder dbld;
 	private clsLicence lic;
 	private clsFinDia claseFindia;
-	private DateUtils DU;
-	private String jsonWS;
+    private DateUtils DU;
+    private String jsonWS;
+
+	protected PowerManager.WakeLock wakeLock;
 
 	// Web Service -
 
@@ -171,12 +172,15 @@ public class ComWS extends PBase {
 			}
 		}
 
-
-		//txtRuta.setText("0005-1");
-		//txtWS.setText("http://192.168.1.112/wsAndr/wsandr.asmx");
-		//txtEmp.setText("03");
-
 		setHandlers();
+
+		try {
+			final PowerManager pm = (PowerManager) getSystemService(this.POWER_SERVICE);
+			this.wakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "myapp:mywakelocktag");
+			this.wakeLock.acquire();
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"wakeLock");
+		}
 
 	}
 
@@ -1917,9 +1921,8 @@ public class ComWS extends PBase {
 			//mu.msgbox("::"+esql);
 
 			if (ftflag) msgbox(ftmsg);
-		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+		} catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
 
@@ -2025,9 +2028,12 @@ public class ComWS extends PBase {
 
 			dbld.savelog();
 
-		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			ComWS.super.finish();
+
+			//listaFachada();
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
 		return true;
@@ -2123,6 +2129,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_STOCKB_DEV", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIF", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIF_LOTES", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_BONIF_BARRA", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_REL_PROD_BON", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIFFALT", "WHERE COREL='" + cor + "'");
 
@@ -3164,6 +3171,8 @@ public class ComWS extends PBase {
 
 			visibilidadBotones();
 
+			//if (!errflag) ComWS.super.finish();
+
 			isbusy=0;
 
 		}catch (Exception e){
@@ -4051,15 +4060,33 @@ public class ComWS extends PBase {
 			if (isbusy==0) {
 				if (gl.modoadmin) {
 					msgAskExitComplete();
-				}
-				else{
+				} else {
 					super.onBackPressed();
 				}
 			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		try {
+			this.wakeLock.acquire();
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"wakelock");
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		try {
+			this.wakeLock.release();
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"wakelock");
+		}
+		super.onPause();
 	}
 
 	//endregion

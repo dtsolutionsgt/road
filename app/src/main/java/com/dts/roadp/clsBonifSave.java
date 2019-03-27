@@ -42,7 +42,7 @@ public class clsBonifSave {
 
 		if (loadItems()) {
 
-			saveDBonif();
+			//saveDBonif();
 			saveDRelProdBon();
 			if (venped.equalsIgnoreCase("V")) saveDBonifLotes();
 	

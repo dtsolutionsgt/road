@@ -63,6 +63,7 @@ public class MainActivity extends PBase {
 				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
 						&& checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
 						&& checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
+                        && checkCallingOrSelfPermission(Manifest.permission.WAKE_LOCK)   == PackageManager.PERMISSION_GRANTED
 						&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
                         && checkSelfPermission(Manifest.permission.READ_PHONE_STATE)== PackageManager.PERMISSION_GRANTED)
 				{
@@ -73,6 +74,7 @@ public class MainActivity extends PBase {
 							Manifest.permission.ACCESS_FINE_LOCATION,
 							Manifest.permission.CALL_PHONE,
 							Manifest.permission.CAMERA,
+                            Manifest.permission.WAKE_LOCK,
                             Manifest.permission.READ_PHONE_STATE
                         }, 1);
 				}
@@ -126,26 +128,17 @@ public class MainActivity extends PBase {
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 	    try{
-            Toast.makeText(this,"req : "+requestCode, Toast.LENGTH_SHORT).show();
-
-            //switch (requestCode) {
-
-            //case 0:
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.READ_PHONE_STATE)== PackageManager.PERMISSION_GRANTED)
             {
-                Toast.makeText(this, "GRANTED : " + requestCode, Toast.LENGTH_SHORT).show();
                 startApplication();
             } else {
-                Toast.makeText(this, "failed " + requestCode, Toast.LENGTH_SHORT).show();
-                super.finish();
+                 super.finish();
             }
-            //break;
-            //}
-        }catch (Exception e){
+          }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }

@@ -52,7 +52,7 @@ public class FacturaRes extends PBase {
 	private long fecha,fechae;
 	private int fcorel,clidia,media;
 	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt;
-	private int cyear, cmonth, cday, dweek,stp=0,brw=0;
+	private int cyear, cmonth, cday, dweek,stp=0;
 
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
 	private double dispventa;
@@ -133,7 +133,7 @@ public class FacturaRes extends PBase {
 		}
 
 		if (media==4) {
-			/*contadoCheck.setVisibility(View.VISIBLE);
+			contadoCheck.setVisibility(View.VISIBLE);
 			if(contadoCheck.isChecked()){
 				lblCash.setVisibility(View.VISIBLE);
 				imgCash.setVisibility(View.VISIBLE);
@@ -154,7 +154,7 @@ public class FacturaRes extends PBase {
 				lblMPago.setVisibility(View.INVISIBLE);
 			}
 
-			if (gl.vcredito) {*/
+			if (gl.vcredito) {
 
 				if (credito<=0) {
 					contadoCheck.setVisibility(View.INVISIBLE);
@@ -168,18 +168,9 @@ public class FacturaRes extends PBase {
 					lblCred.setVisibility(View.INVISIBLE);
 					imgMPago.setVisibility(View.VISIBLE);
 					lblMPago.setVisibility(View.VISIBLE);
-				}else if(credito > 0){
-					contadoCheck.setVisibility(View.INVISIBLE);
-					lblCash.setVisibility(View.INVISIBLE);
-					imgCash.setVisibility(View.INVISIBLE);
-					lblPend.setVisibility(View.INVISIBLE);
-					imgPend.setVisibility(View.INVISIBLE);
-					imgCred.setVisibility(View.VISIBLE);
-					lblCred.setVisibility(View.VISIBLE);
-					imgMPago.setVisibility(View.INVISIBLE);
-					lblMPago.setVisibility(View.INVISIBLE);
 				}
-		//	}
+
+			}
 
 		}
 
@@ -541,22 +532,9 @@ public class FacturaRes extends PBase {
 				item.Cod="Descuento";item.Desc=mu.frmcur(-descmon);item.Bandera=0;
 				items.add(item);
 
-				if (gl.dvbrowse!=0){
-					item = clsCls.new clsCDB();
-					item.Cod="Nota Crédito";item.Desc=mu.frmcur(-dispventa);item.Bandera=0;
-					items.add(item);
-
-					item = clsCls.new clsCDB();
-					item.Cod="TOTAL";item.Desc=mu.frmcur(tot-dispventa);item.Bandera=1;
-					items.add(item);
-
-				}else{
-					item = clsCls.new clsCDB();
-					item.Cod="TOTAL";item.Desc=mu.frmcur(tot);item.Bandera=1;
-					items.add(item);
-				}
-
-
+				item = clsCls.new clsCDB();
+				item.Cod="TOTAL";item.Desc=mu.frmcur(tot);item.Bandera=1;
+				items.add(item);
 				
 			} else {
 								
@@ -573,23 +551,9 @@ public class FacturaRes extends PBase {
 				item.Cod="Descuento";item.Desc=mu.frmcur(-descmon);item.Bandera=0;
 				items.add(item);
 
-				if (gl.dvbrowse!=0){
-
-					item = clsCls.new clsCDB();
-					item.Cod="Nota Crédito";item.Desc=mu.frmcur(-dispventa);item.Bandera=0;
-					items.add(item);
-
-					item = clsCls.new clsCDB();
-					item.Cod="TOTAL";item.Desc=mu.frmcur(tot-dispventa);item.Bandera=1;
-					items.add(item);
-
-				}else{
-
-					item = clsCls.new clsCDB();
-					item.Cod="TOTAL";item.Desc=mu.frmcur(tot);item.Bandera=1;
-					items.add(item);
-
-				}
+				item = clsCls.new clsCDB();
+				item.Cod="TOTAL";item.Desc=mu.frmcur(tot);item.Bandera=1;
+				items.add(item);
 
 			}
 					
@@ -606,6 +570,10 @@ public class FacturaRes extends PBase {
 		try{
 			if (!saved) {
 				if (!saveOrder()) return;
+			}
+
+			if(gl.dvbrowse!=0){
+				gl.dvbrowse =0;
 			}
 
 			clsBonifSave bonsave=new clsBonifSave(this,corel,"V");
@@ -700,7 +668,7 @@ public class FacturaRes extends PBase {
 
 	private boolean saveOrder(){
 		Cursor dt;
-		String vprod,vumstock,vumventa;
+		String vprod,vumstock,vumventa,vbarra;
 		double vcant,vpeso,vfactor,peso,factpres,vtot,vprec;
 		int mitem,bitem;
 		int dev_ins=1;
@@ -1092,7 +1060,7 @@ public class FacturaRes extends PBase {
 			sql="SELECT ITEM,PRODID,BONIID,CANT,PRECIO,COSTO,UMVENTA,UMSTOCK,UMPESO,FACTOR FROM T_BONITEM";
 			dt=Con.OpenDT(sql);
 
-			if(dt.getCount()>0){
+			if (dt.getCount()>0) {
 
 				dt.moveToFirst();bitem=1;
 				while (!dt.isAfterLast()) {
@@ -1130,6 +1098,43 @@ public class FacturaRes extends PBase {
 
 			}
 
+
+			sql="SELECT BARRA,CODIGO,PESO FROM T_BARRA_BONIF";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0) {
+				dt.moveToFirst();
+				while (!dt.isAfterLast()) {
+
+					vbarra=dt.getString(0);
+					vprod=dt.getString(1);
+					vpeso=dt.getDouble(2);
+
+					vumstock=app.umStock(vprod);
+					vumventa=app.umVenta(vprod);
+					vfactor=app.factorPeso(vprod);
+
+					ins.init("D_BONIF_BARRA");
+
+					ins.add("COREL",corel);
+					ins.add("BARRA",vbarra);
+					ins.add("PESO",vpeso);
+					ins.add("PRODUCTO",vprod);
+					ins.add("UMVENTA",vumventa);
+					ins.add("UMSTOCK",vumstock);
+					ins.add("UMPESO",gl.umpeso);
+					ins.add("FACTOR",vfactor);
+
+					db.execSQL(ins.sql());
+
+					dt.moveToNext();
+				}
+			}
+
+			sql="DELETE FROM P_STOCKB WHERE BARRA IN (SELECT BARRA FROM T_BARRA_BONIF)";
+			db.execSQL(sql);
+
+
 			//endregion
 
 			//region Actualizacion de ultimo correlativo
@@ -1149,11 +1154,6 @@ public class FacturaRes extends PBase {
 
 			db.setTransactionSuccessful();
 			db.endTransaction();
-
-			if(gl.dvbrowse!=0){
-				gl.dvbrowse =0;
-				gl.tiponcredito=0;
-			}
 
 			saved=true;
 
@@ -1289,12 +1289,12 @@ public class FacturaRes extends PBase {
 			mu.msgbox("rebajaStockUM: "+e.getMessage());
 		}
 	}
-	
+
 	private void rebajaStock(String prid,double cant) {
 		Cursor DT;
 		double acant,val,disp,cantapl;
 		String lote,doc,stat;
-		
+
 		acant=cant;
 
 		try{
@@ -1352,7 +1352,7 @@ public class FacturaRes extends PBase {
 		}
 
 	}
-		
+
 	private void saveAtten(double tot) {
 		long ti,tf,td;
 		
@@ -1571,17 +1571,7 @@ public class FacturaRes extends PBase {
 
 			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-			if (gl.dvbrowse!=0){
-				double totdv;
-				if (tot>=dispventa){
-					totdv = mu.round(tot-dispventa,gl.peDec);
-					alert.setTitle("A pagar : "+mu.frmcur(totdv));
-				}
-			}else{
-				alert.setTitle("A pagar : "+mu.frmcur(tot));
-			}
-
-
+			alert.setTitle("A pagar : "+mu.frmcur(tot));
 			alert.setMessage("Pagado con billete : ");
 
 			final LinearLayout layout   = new LinearLayout(this);
@@ -1603,18 +1593,47 @@ public class FacturaRes extends PBase {
 			alert.setView(layout);
 
 			showkeyb();
-			alert.setCancelable(false);
 			alert.create();
+
+			/*alert.setPositiveButton("Vuelto", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					double pg,vuel;
+
+					peexit=false;
+					svuelt=input.getText().toString();
+					sefect=""+tot;
+
+					try {
+						pg=Double.parseDouble(svuelt);
+						if (pg<tot) {
+							msgbox("Monto menor que total");return;
+						}
+
+						vuel=pg-tot;
+					} catch (NumberFormatException e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						msgbox("Monto incorrecto");return;
+					}
+
+					applyCash();
+					if (vuel==0) {
+						checkPago();
+					} else {
+						vuelto("Vuelto : "+mu.frmcur(vuel));
+						//dialog.dismiss();
+					}
+
+				}
+			});*/
 
 			alert.setPositiveButton("Pagar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 
 					peexit=false;
 					svuelt= txtVuelto.getText().toString();
-                    brw = 1;
 
-                    svuelt=""+tot;
-                    sefect=""+tot;
+						svuelt=""+tot;
+						sefect=""+tot;
 
 
 					applyCash();
@@ -1734,13 +1753,6 @@ public class FacturaRes extends PBase {
 			ins.add("ITEM",1);
 			ins.add("CODPAGO",1);
 			ins.add("TIPO","E");
-
-			if(gl.dvbrowse!=0){
-				if (epago>=dispventa) {
-					epago=mu.round(epago-dispventa,gl.peDec);
-				}
-			}
-
 			ins.add("VALOR",epago);
 			ins.add("DESC1","");
 			ins.add("DESC2","");
@@ -1774,7 +1786,6 @@ public class FacturaRes extends PBase {
 			input.setText(""+tot);
 			input.requestFocus();
 
-			alert.setCancelable(false);
 			showkeyb();
 
 			alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
@@ -1946,24 +1957,14 @@ public class FacturaRes extends PBase {
 		
 		s=mu.frmcur(tpago);
 
-
-		if (gl.dvbrowse!=0){
-		    if (brw>0){
-                lblPago.setText("Pago COMPLETO.\n"+s);
-                pago=true;
-                //if (rutapos) askSavePos(); else askSave();
-                finishOrder();
-            }
-		}	else{
-			if (tpago<tot) {
-				lblPago.setText("Pago incompleto.\n"+s);
-				pago=false;
-			} else {
-				lblPago.setText("Pago COMPLETO.\n"+s);
-				pago=true;
-				//if (rutapos) askSavePos(); else askSave();
-				finishOrder();
-			}
+		if (tpago<tot) {
+			lblPago.setText("Pago incompleto.\n"+s);
+			pago=false;
+		} else {
+			lblPago.setText("Pago COMPLETO.\n"+s);
+			pago=true;
+			//if (rutapos) askSavePos(); else askSave();
+			finishOrder();
 		}
 
         } catch (Exception e) {
@@ -2082,7 +2083,7 @@ public class FacturaRes extends PBase {
 			});
 
 			dialog.setNegativeButton("Cancelar", null);
-			dialog.setCancelable(false);
+
 			dialog.show();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

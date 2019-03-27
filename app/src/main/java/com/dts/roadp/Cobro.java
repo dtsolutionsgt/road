@@ -1,34 +1,28 @@
 package com.dts.roadp;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
-import com.dts.roadp.clsClasses.clsCFDV;
-
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
-import android.database.SQLException;
-import android.widget.Toast;
 
 import org.apache.commons.lang.StringUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 public class Cobro extends PBase {
 
@@ -255,24 +249,21 @@ public class Cobro extends PBase {
 					int flag;
 
 						Object lvObj = listView.getItemAtPosition(position);
-						clsClasses.clsCobro vItem = (clsClasses.clsCobro) lvObj;
+					clsClasses.clsCobro vItem = (clsClasses.clsCobro) lvObj;
 
-						adapter.setSelectedIndex(position);
+					adapter.setSelectedIndex(position);
 
-						dtipo=vItem.Tipo;
-						if (dtipo.equalsIgnoreCase("R")) clearAll();
-							dtipo=vItem.Tipo;
-							if (dtipo.equalsIgnoreCase("R")) clearAll();
+					dtipo = vItem.Tipo;
+					if (dtipo.equalsIgnoreCase("R")) clearAll();
 
-							flag = vItem.flag;
-							if (flag == 0) flag = 1;
-							else flag = 0;
-							vItem.flag = flag;
+					flag = vItem.flag;
+					if (flag == 0) flag = 1;else flag = 0;
+					vItem.flag = flag;
 
-							adapter.refreshItems();
+					adapter.refreshItems();
 
-							calcSelected();
-							showTotals();
+					calcSelected();
+					showTotals();
 
 				}
 

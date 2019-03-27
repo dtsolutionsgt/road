@@ -1,12 +1,9 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
-import com.dts.roadp.clsClasses.clsCFDV;
-
 import android.content.Context;
 import android.database.Cursor;
-import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class clsDocFactura extends clsDocument {
 
@@ -26,7 +23,7 @@ public class clsDocFactura extends clsDocument {
 
 	protected boolean loadHeadData(String corel) {
 		Cursor DT;
-		String cli,vend,val,empp;
+		String cli="",vend="",val,empp="";
 		int ff;
 				
 		super.loadHeadData(corel);
@@ -57,7 +54,7 @@ public class clsDocFactura extends clsDocument {
 			add2=DT.getString(11);
 			
 		} catch (Exception e) {
-			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
+			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 	    }	
 		
 		try {
@@ -73,7 +70,7 @@ public class clsDocFactura extends clsDocument {
 			resrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
 			
 		} catch (Exception e) {
-			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
+			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 	    }	
 		
 		try {
@@ -203,8 +200,7 @@ public class clsDocFactura extends clsDocument {
 			}				
 			
 		} catch (Exception e) {
-			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();
-			
+			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();
 	    }		
 		
 		return true;

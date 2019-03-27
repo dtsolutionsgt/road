@@ -153,7 +153,7 @@ public class RepesajeLista extends PBase {
         items.clear();
 
         try {
-            sql = "SELECT BARRA,PESO,PRECIO FROM T_BARRA WHERE CODIGO='"+prodid+"' ";
+            sql = "SELECT BARRA,PESO,PRECIO FROM T_BARRA WHERE CODIGO='"+prodid+"' AND VENTA=1";
             dt = Con.OpenDT(sql);
             dt.moveToFirst();
 

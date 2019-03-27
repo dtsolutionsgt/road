@@ -369,7 +369,7 @@ public class AppMethods {
 
             return  DT.getInt(0)==1;
         } catch (Exception e) {
-            toast(e.getMessage());
+            //toast(e.getMessage());
             return false;
         }
     }
@@ -620,6 +620,29 @@ public class AppMethods {
 		} catch (Exception e) {
 			toast(e.getMessage());
 			return 0;
+		}
+	}
+
+	public double factorPres(String cod,String umventa,String umstock) {
+		Cursor DT;
+		String sql;
+
+		try {
+			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
+				"WHERE (UNIDADSUPERIOR='"+umventa+"') AND (UNIDADMINIMA='"+umstock+"')";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount()==0) {
+				sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
+					"WHERE (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+umventa+"')";
+				DT = Con.OpenDT(sql);
+			}
+
+			DT.moveToFirst();
+
+			return  DT.getDouble(0);
+		} catch (Exception e) {
+			return 1;
 		}
 	}
 

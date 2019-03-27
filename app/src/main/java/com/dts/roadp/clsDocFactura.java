@@ -1,5 +1,8 @@
 package com.dts.roadp;
 
+import java.util.ArrayList;
+
+
 import android.content.Context;
 import android.database.Cursor;
 
@@ -9,11 +12,12 @@ public class clsDocFactura extends clsDocument {
 
 	private ArrayList<itemData> items= new ArrayList<itemData>();
 	
-	private double tot,desc,imp,stot,percep;
+	private double tot,desc,imp,stot,percep,totNotaC;
 	private boolean sinimp;
 	private String 	contrib;
 	private int decimp,diacred,totitems;
-			
+	public CliDet cliDet;
+
 	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres) {
 		super(context, printwidth,cursymbol,decimpres);
 		docfactura=true;
@@ -21,6 +25,7 @@ public class clsDocFactura extends clsDocument {
 		docpedido=false;
 		docrecibo=false;
 		decimp=decimpres;
+		cliDet=new CliDet();
 	}
 
 
@@ -163,7 +168,9 @@ public class clsDocFactura extends clsDocument {
 	protected boolean loadDocData(String corel) {
 		Cursor DT;
 		itemData item;
-		
+		String serie,corNota;
+		int corrl;
+
 		loadHeadData(corel);
 		
 		items.clear();
@@ -178,30 +185,47 @@ public class clsDocFactura extends clsDocument {
 			totitems=DT.getCount();
 
 			while (!DT.isAfterLast()) {
-		
-				item =new itemData();
-		  	
-				item.cod=DT.getString(0);
-				item.nombre=DT.getString(1);
-				
-				item.cant=DT.getDouble(2);
-				item.prec=DT.getDouble(3);
-				item.imp=DT.getDouble(4);
-				item.descper=DT.getDouble(5);
-				item.desc=DT.getDouble(6);
-				item.tot=DT.getDouble(7);				
-				item.um=DT.getString(8);
-				item.ump=DT.getString(9);
-				item.peso=DT.getDouble(10);
 
-				if (sinimp) item.tot=item.tot-item.imp;
-				
+				item = new itemData();
+
+				item.cod = DT.getString(0);
+				item.nombre = DT.getString(1);
+
+				item.cant = DT.getDouble(2);
+				item.prec = DT.getDouble(3);
+				item.imp = DT.getDouble(4);
+				item.descper = DT.getDouble(5);
+				item.desc = DT.getDouble(6);
+				item.tot = DT.getDouble(7);
+				item.um = DT.getString(8);
+				item.ump = DT.getString(9);
+				item.peso = DT.getDouble(10);
+
+				if (sinimp) item.tot = item.tot - item.imp;
+
 				//Toast.makeText(cont,item.cod+" "+item.imp+"   "+item.tot, Toast.LENGTH_SHORT).show();
-				
-				items.add(item);	
-				DT.moveToNext();					
-			}				
-			
+
+				items.add(item);
+				DT.moveToNext();
+			}
+
+			sql="SELECT TOTAL FROM D_NOTACRED WHERE FACTURA = '"+corel+"'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			while (!DT.isAfterLast()) {
+
+				item =new itemData();
+
+				item.totNotaC = DT.getDouble(0);
+
+				items.add(item);
+				DT.moveToNext();
+			}
+
+
+
+
 		} catch (Exception e) {
 			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();
 	    }		
@@ -369,16 +393,27 @@ public class clsDocFactura extends clsDocument {
 	}
 
 	private boolean footerToledano() {
-		double totimp, totperc;
+		double totimp, totperc,totalNotaC;
+		int notaCventa;
+
+		notaCventa = cliDet.gl.tiponcredito ;
 
 		stot = stot - imp;
 		totperc = stot * (percep / 100);
 		totperc = round2(totperc);
 		totimp = imp - totperc;
+		totalNotaC =   tot - totNotaC;
 
 		rep.addtotsp("Subtotal", stot);
-		rep.addtotsp("ITBM", totimp);
-		rep.addtotsp("Total", tot);
+		if(notaCventa == 2){
+			rep.addtotsp("Nota de Credito", totNotaC);
+			rep.addtotsp("ITBM", totimp);
+			rep.addtotsp("Total", totalNotaC);
+		}else{
+			rep.addtotsp("ITBM", totimp);
+			rep.addtotsp("Total", tot);
+		}
+		rep.add("");
 		rep.add("");
 		rep.add("Total de items: "+totitems);
 		rep.add("");
@@ -417,7 +452,7 @@ public class clsDocFactura extends clsDocument {
 	
 	private class itemData {
 		public String cod,nombre,um,ump;
-		public double cant,peso,prec,imp,descper,desc,tot;
+		public double cant,peso,prec,imp,descper,desc,tot,totNotaC;
 	}
 	
 	

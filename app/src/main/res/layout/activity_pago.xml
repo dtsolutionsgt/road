@@ -214,7 +214,8 @@
         android:layout_height="48dp"
         android:layout_below="@+id/relativeLayout2"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="31dp"
         android:clickable="true"
         android:onClick="addPayment"
         android:src="@drawable/mas" />

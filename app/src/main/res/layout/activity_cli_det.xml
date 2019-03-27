@@ -308,7 +308,7 @@
             android:layout_width="132dp"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="4dp"
             android:layout_marginBottom="73dp"
             android:layout_toEndOf="@+id/lblDiasCredito"
             android:gravity="right"

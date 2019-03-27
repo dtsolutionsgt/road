@@ -17,6 +17,9 @@ public class clsDocFactura extends clsDocument {
 	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres) {
 		super(context, printwidth,cursymbol,decimpres);
 		docfactura=true;
+		docdevolucion=false;
+		docpedido=false;
+		docrecibo=false;
 		decimp=decimpres;
 	}
 

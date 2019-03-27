@@ -133,33 +133,11 @@ public class FacturaRes extends PBase {
 		}
 
 		if (media==4) {
-			contadoCheck.setVisibility(View.VISIBLE);
-			if(contadoCheck.isChecked()){
-				lblCash.setVisibility(View.VISIBLE);
-				imgCash.setVisibility(View.VISIBLE);
-				lblPend.setVisibility(View.INVISIBLE);
-				imgPend.setVisibility(View.INVISIBLE);
-				imgCred.setVisibility(View.INVISIBLE);
-				lblCred.setVisibility(View.INVISIBLE);
-				imgMPago.setVisibility(View.VISIBLE);
-				lblMPago.setVisibility(View.VISIBLE);
-			} else if(!contadoCheck.isChecked()) {
-				lblCash.setVisibility(View.INVISIBLE);
-				imgCash.setVisibility(View.INVISIBLE);
-				lblPend.setVisibility(View.INVISIBLE);
-				imgPend.setVisibility(View.INVISIBLE);
-				imgCred.setVisibility(View.VISIBLE);
-				lblCred.setVisibility(View.VISIBLE);
-				imgMPago.setVisibility(View.INVISIBLE);
-				lblMPago.setVisibility(View.INVISIBLE);
-			}
 
 			if (gl.vcredito) {
 
-				if (credito<=0) {
+				if (credito<=0 || gl.facturaVen != 0) {
 					contadoCheck.setVisibility(View.INVISIBLE);
-				//	contadoCheck.setEnabled(false);
-				//	contadoCheck.setText("Cliente si credito, habilitado para pagar al contado.");
 					lblCash.setVisibility(View.VISIBLE);
 					imgCash.setVisibility(View.VISIBLE);
 					lblPend.setVisibility(View.INVISIBLE);
@@ -168,8 +146,27 @@ public class FacturaRes extends PBase {
 					lblCred.setVisibility(View.INVISIBLE);
 					imgMPago.setVisibility(View.VISIBLE);
 					lblMPago.setVisibility(View.VISIBLE);
+				}else if(credito > 0){
+					contadoCheck.setVisibility(View.INVISIBLE);
+					lblCash.setVisibility(View.INVISIBLE);
+					imgCash.setVisibility(View.INVISIBLE);
+					lblPend.setVisibility(View.INVISIBLE);
+					imgPend.setVisibility(View.INVISIBLE);
+					imgCred.setVisibility(View.VISIBLE);
+					lblCred.setVisibility(View.VISIBLE);
+					imgMPago.setVisibility(View.INVISIBLE);
+					lblMPago.setVisibility(View.INVISIBLE);
 				}
-
+			}else{
+				contadoCheck.setVisibility(View.INVISIBLE);
+				lblCash.setVisibility(View.INVISIBLE);
+				imgCash.setVisibility(View.INVISIBLE);
+				lblPend.setVisibility(View.INVISIBLE);
+				imgPend.setVisibility(View.INVISIBLE);
+				imgCred.setVisibility(View.VISIBLE);
+				lblCred.setVisibility(View.VISIBLE);
+				imgMPago.setVisibility(View.INVISIBLE);
+				lblMPago.setVisibility(View.INVISIBLE);
 			}
 
 		}

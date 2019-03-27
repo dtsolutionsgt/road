@@ -21,7 +21,8 @@ public class clsDocPedido extends clsDocument {
 		super(context, printwidth,cursymbol,decimpres);
 		docpedido=true;
 		docfactura=false;
-		docrecibo=false;	
+		docrecibo=false;
+		docdevolucion=false;
 		decimp=decimpres;
 	}
 	

@@ -16,7 +16,7 @@ public class clsDocument {
 	public String resol,resfecha,resvence,resrango,fsfecha,modofact;
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;
-	public boolean docfactura,docrecibo=false,docanul=false,docpedido=false;
+	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion;
 	public int ffecha,pendiente,residx;
 	
 	protected android.database.sqlite.SQLiteDatabase db;
@@ -114,7 +114,6 @@ public class clsDocument {
 		
 		return true;
 	}
-
 	
 	// Methods Prototypes
 	
@@ -153,9 +152,12 @@ public class clsDocument {
             }
 
             if (docrecibo) {
-                s=s.replace("Factura","Recibo");
+				s=s.replace("Factura","Recibo");
             }
 
+            if(docdevolucion){
+				s=s.replace("Factura","Recibo");
+			}
             if (residx==1) {
                 if (docfactura) {
                     rep.add(resol);
@@ -217,13 +219,24 @@ public class clsDocument {
             l=l.replace("HH:mm:ss",s);return l;
         }
 
+		idx=lu.indexOf("SS");
+		if (idx>=0) {
+			if (emptystr(serie)) return "@@";
+			if (emptystr(numero)) return "@@";
+
+			s=lu.substring(0,idx);
+			s=s+serie+" numero : "+numero;
+			residx=1;
+			return s;
+		}
+
         idx=lu.indexOf("SS");
         if (idx>=0) {
             if (emptystr(serie)) return "@@";
-            if (emptystr(numero)) return "@@";
+            //if (emptystr(numero)) return "@@";
 
             s=lu.substring(0,idx);
-            s=s+serie+" numero : "+numero;
+            s=s+serie; /*+" numero : "+numero;*/
             residx=1;
             return s;
         }
@@ -264,17 +277,20 @@ public class clsDocument {
 				loadDocData(corel);
 				loadHeadData(corel);
 			}
+
 			loadHeadLines();
 			
 			try {
 				Con.close();   
-			} catch (Exception e1) { }
+			} catch (Exception e1) {
+
+			}
 			
 		} catch (Exception e) {
 			setAddlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
-		}		
-		
+			Toast.makeText(cont,"buildheader: "+e.getMessage(), Toast.LENGTH_SHORT).show();return false;
+		}
+
 		saveHeadLines(reimpres);
 		
 		return true;

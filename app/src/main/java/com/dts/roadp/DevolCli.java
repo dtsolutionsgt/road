@@ -28,6 +28,10 @@ public class DevolCli extends PBase {
 
 	private double cntprd=0.0,cntunis=0.0,cntkgs=0.0,cntotl=0.0;
 
+	private printer prn;
+	private clsDocDevolucion fdevol;
+	public Runnable printclose;
+
 	private String cliid,itemid,prodid;
 	private double cant;
 	private String emp,estado;
@@ -59,6 +63,16 @@ public class DevolCli extends PBase {
 		
 		clearData();
 
+		printclose= new Runnable() {
+			public void run() {
+				DevolCli.super.finish();
+			}
+		};
+
+
+		prn=new printer(this,printclose);
+		fdevol=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp);
+		fdevol.deviceid =gl.deviceId;
 	}
 
 
@@ -176,7 +190,8 @@ public class DevolCli extends PBase {
             cntotl = mu.round(cntotl + DT.getDouble(6),gl.peDec);
 
 			  items.add(vItem);	
-			 
+
+			  vItem.Cod = gl.CodDev;
 			  DT.moveToNext();
 			}
 
@@ -488,7 +503,9 @@ public class DevolCli extends PBase {
                 gl.closeCliDet = true;
                 gl.closeVenta = true;
 
-                super.finish();
+
+				createDoc();
+				//msgAskSave("Aplicar pago y crear un recibo");
 
             }else{
 
@@ -511,6 +528,55 @@ public class DevolCli extends PBase {
 			db.endTransaction();
 		   	mu.msgbox(e.getMessage());
 		}
+	}
+
+/*	private void msgAskSave(String msg) {
+
+		try{
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg + "?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setCancelable(false);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					createDoc();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					closekeyb();
+				}
+			});
+
+			dialog.show();
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}*/
+
+	private void createDoc(){
+
+		try{
+
+			if (prn.isEnabled()) {
+				fdevol.buildPrint(gl.dvcorreld,0);
+				prn.printask(printclose);
+			}
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("createDoc: " + e.getMessage());
+		}
+
 	}
 
 	private void delItem(){
@@ -640,7 +706,6 @@ public class DevolCli extends PBase {
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					delItem();
-
 				}
 			});
 

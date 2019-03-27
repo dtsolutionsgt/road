@@ -1002,6 +1002,8 @@ public class ComWS extends PBase {
 
 			Actualiza_FinDia();
 
+            SetStatusRecToTrans("1");
+
 			dbT.setTransactionSuccessful();
 			dbT.endTransaction();
 
@@ -1190,8 +1192,42 @@ public class ComWS extends PBase {
 				vCorelZ = DT1.getInt(0);
 				vGrandTotal = DT1.getFloat(1);
 
-				sql = "UPDATE FINDIA SET COREL = " + vCorelZ + ", VAL1=0, VAL2=0, VAL3=0, VAL4=0,VAL5=0, VAL6=0, VAL7=0";
+				sql = "UPDATE FINDIA SET COREL = " + vCorelZ + ", VAL1=0, VAL2=0, VAL3=0, VAL4=0,VAL5=0, VAL6=0, VAL7=0, VAL8 = " + vGrandTotal;
 				dbT.execSQL(sql);
+			}
+
+			DT1.close();
+
+		} catch (Exception ex) {
+			vActualizaFD = false;
+		}
+
+		return vActualizaFD;
+
+	}
+
+	private boolean update_Corel_GrandTotal() {
+
+		Cursor DT1;
+		int vCorelZ = 0;
+		float vGrandTotal = 0;
+
+		boolean vActualizaFD = true;
+
+		try {
+
+			sql = "SELECT CORELZ, GRANDTOTAL FROM P_HANDHELD";
+			DT1 = ConT.OpenDT(sql);
+
+			if (DT1.getCount() > 0) {
+
+				DT1.moveToFirst();
+
+				vCorelZ = DT1.getInt(0);
+				vGrandTotal = DT1.getFloat(1);
+
+				sql = "UPDATE P_HANDHELD SET CORELZ = " + vCorelZ + ", GRANDTOTAL = " + vGrandTotal;
+				dbld.add(sql);
 			}
 
 			DT1.close();
@@ -1362,8 +1398,15 @@ public class ComWS extends PBase {
 			SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN, ";
 			SQL += "VIDEO,VENTA_POR_PESO,ES_PROD_BARRA,UNID_INV,VENTA_POR_PAQUETE,VENTA_POR_FACTOR_CONV,ES_SERIALIZADO,PARAM_CADUCIDAD, ";
 			SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
-			SQL += "FROM P_PRODUCTO WHERE (CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "')) ";
-			SQL += "OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) ";
+			SQL += "FROM P_PRODUCTO WHERE ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
+			" OR CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "'))" +
+			" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "') AND EMPRESA = '" + gl.emp + "') OR UNIDMED='CAN' )" +
+			" AND CODIGO IN ( " +
+			" SELECT CODIGO FROM P_PRODPRECIO WHERE (NIVEL IN ( SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE " +
+			" WHERE (CODIGO IN ( SELECT DISTINCT CLIENTE FROM DS_PEDIDO WHERE (RUTA ='" + ActRuta + "') AND (BANDERA='D')))))OR " +
+			" NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE  " +
+			" WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "')))" +
+			" OR TIENE_VINETA_O_TUBO = 1 ";
 			return SQL;
 		}
 
@@ -1897,8 +1940,6 @@ public class ComWS extends PBase {
 				validaDatos(true);
 				if (stockflag == 1) sendConfirm();
 
-				SetStatusRecTo("1");
-
 				msgAskExit(s);
 
 			} else {
@@ -2004,9 +2045,11 @@ public class ComWS extends PBase {
 		dbld.clearlog();
 
 		try {
+
 			envioFacturas();
 			envioPedidos();
 			envioNotasCredito();
+			envioNotasDevolucion();
 
 			envioCobros();
 
@@ -2018,9 +2061,10 @@ public class ComWS extends PBase {
 			envioCoord();
 			envioSolicitud();
 
-			updateCorrelCXC();
 			updateAcumulados();
 			updateInventario();
+
+			update_Corel_GrandTotal();
 
 			//updateLicence();
 
@@ -2338,10 +2382,11 @@ public class ComWS extends PBase {
 		int i, pc = 0, pcc = 0, ccorel;
 
 		try {
+
 			sql = "SELECT COREL,RUTA,CORELATIVO FROM D_NOTACRED WHERE STATCOM='N' ORDER BY CORELATIVO";
 			DT = Con.OpenDT(sql);
 			if (DT.getCount() == 0) {
-				senv += "Notas credito : " + pc + "\n";
+				senv += "Notas crédito : " + pc + "\n";
 				return;
 			}
 
@@ -2365,6 +2410,7 @@ public class ComWS extends PBase {
 					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_NOTACRED", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_NOTACREDD", "WHERE COREL='" + cor + "'");
 
 					dbld.add("UPDATE P_CORELNC SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");
 					dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'NC'");
@@ -2402,6 +2448,90 @@ public class ComWS extends PBase {
 			} else {
 				senv += "Notas crédito : " + pc + "\n";
 			}
+		//}
+	}
+
+	public void envioNotasDevolucion() {
+		Cursor DT;
+		String cor, fruta = "", serie="";
+		int i, pc = 0, pcc = 0, ccorel=0;
+
+		try {
+
+			sql = "SELECT COREL,RUTA FROM D_CXC WHERE STATCOM='N' ORDER BY COREL";
+			DT = Con.OpenDT(sql);
+			if (DT.getCount() == 0) {
+				senv += "Notas de devolución : " + pc + "\n";
+				return;
+			}
+
+			pcc = DT.getCount();
+			pc = 0;
+			i = 0;
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				cor = DT.getString(0);
+				fruta = DT.getString(1);
+
+				try {
+
+					i += 1;
+					fprog = "Nota de devolución " + i;
+					wsStask.onProgressUpdate();
+
+					if (envioparcial) dbld.clear();
+
+					dbld.insert("D_CXC", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_CXCD", "WHERE COREL='" + cor + "'");
+
+					if (envioparcial) {
+						if (commitSQL() == 1) {
+							sql = "UPDATE D_CXC SET STATCOM='S' WHERE COREL='" + cor + "'";
+							db.execSQL(sql);
+							pc += 1;
+						} else {
+							fterr += "\n" + sstr;
+						}
+					}else pc += 1;
+
+				} catch (Exception e) {
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					fterr += "\n" + e.getMessage();
+				}
+
+				DT.moveToNext();
+			}
+
+			sql = "SELECT ACTUAL, SERIE FROM P_CORREL_OTROS WHERE TIPO = 'D'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
+				ccorel = DT.getInt(0);
+				serie = DT.getString(1);
+
+				dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND SERIE = '"+serie +"' AND TIPO = 'D' " +
+						" AND ACTUAL < "+ccorel);
+
+			}
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+		}
+
+		//#CKFK 20190325 Sea el envío parcial o no se deben mostrar las facturas comunicadas
+		//if (envioparcial) {
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Notas crédito : " + pc + " , NO ENVIADO : " + pf + "\n";
+		} else {
+			senv += "Notas crédito : " + pc + "\n";
+		}
 		//}
 	}
 
@@ -2949,34 +3079,6 @@ public class ComWS extends PBase {
 			fstr = "Tab:" + TN + ", " + e.getMessage();
 			idbg = idbg + e.getMessage();
 		}
-	}
-
-	private  void updateCorrelCXC(){
-
-	Cursor DT;
-	int maximo;
-	String serie;
-
-	try{
-
-			sql =" SELECT SERIE, ACTUAL FROM P_CORREL_OTROS WHERE TIPO = 'D'";
-        	DT=Con.OpenDT(sql);
-
-			if (DT.getCount()>0){
-					maximo = DT.getInt(1);
-					serie =DT.getString(0);
-
-					sql =" UPDATE P_CORREL_OTROS SET ACTUAL = "+maximo +
-						 " WHERE RUTA = '"+ gl.ruta +"' AND SERIE = '"+serie +"' AND TIPO = 'D' " +
-						 " AND ACTUAL < "+maximo;
-					dbld.add(sql);
-			}
-
-		}catch ( Exception ex){
-			msgbox("Ocurrió un error en ActCorrelDev " + ex.getMessage());
-
-		}
-
 	}
 
 	public void addItem(String nombre,int env,int pend) {
@@ -3649,8 +3751,8 @@ public class ComWS extends PBase {
                                             lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
 											if (StringUtils.equals(GetStatusRec(),"1"))
 												{
-													relExist.setVisibility(gl.peBotInv?View.VISIBLE:View.INVISIBLE);
-													relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+													relExist.setVisibility(gl.peBotInv && !TieneFact?View.VISIBLE:View.INVISIBLE);
+													relStock.setVisibility(gl.peBotStock && TieneFact?View.VISIBLE:View.INVISIBLE);
 													relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
 												}
 											else
@@ -3680,8 +3782,8 @@ public class ComWS extends PBase {
                                         lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
 										if (StringUtils.equals(GetStatusRec(),"1"))
 											{
-												relExist.setVisibility(gl.peBotInv?View.VISIBLE:View.INVISIBLE);
-												relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+												relExist.setVisibility(gl.peBotInv && !TieneFact?View.VISIBLE:View.INVISIBLE);
+												relStock.setVisibility(gl.peBotStock && TieneFact?View.VISIBLE:View.INVISIBLE);
 												relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
 											}
 										else
@@ -4025,7 +4127,20 @@ public class ComWS extends PBase {
 		}
 
 	}
+    public void SetStatusRecToTrans(String estado)
+    {
+        try
+        {
+            sql = "UPDATE P_RUTA SET PARAM2='" + StringUtils.trim(estado) + "'";
+            dbT.execSQL(sql);
+        }
+        catch (Exception ex)
+        {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+ " " + ex.getMessage());
+        }
 
+    }
 	public String GetStatusRec()
 	{
 		Cursor DT;

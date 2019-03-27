@@ -40,6 +40,8 @@ public class FinDia extends PBase {
     private boolean idle = true, fullfd, fail;
     private clsFinDia claseFinDia;
 
+    private double gSumados=0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -400,9 +402,9 @@ public class FinDia extends PBase {
 
 
             corelz++;
-            sql = "UPDATE FinDia SET Corel=" + corelz;
+            sql = "UPDATE FinDia SET Corel=" + corelz + ", GrandTotal = GrandTotal + " + gSumados;
             db.execSQL(sql);
-            sql = "UPDATE P_HANDHELD SET CorelZ=" + corelz;
+            sql = "UPDATE P_HANDHELD SET CorelZ=" + corelz + ", GrandTotal = GrandTotal + " + gSumados;
             db.execSQL(sql);
 
 			/*sql="UPDATE P_RUTA SET Email='0'";
@@ -1424,6 +1426,7 @@ public class FinDia extends PBase {
                 public void onClick(DialogInterface dialog, int which) {
                     buildReportsTOL();
                     imprimeCierreZ();
+                    claseFinDia.updateGrandTotal(gSumados);
                 }
             });
 
@@ -1787,6 +1790,8 @@ public class FinDia extends PBase {
 
         try {
 
+            gSumados=0;
+
             rep.empty();
             sql = " SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO " +
                   " FROM P_SUCURSAL WHERE CODIGO='" + gl.sucur + "'";
@@ -1852,7 +1857,7 @@ public class FinDia extends PBase {
         String s1, s2, s3;
         String vComunicacion = "";
         String vAuxCorel, vCadena;
-        double sumagrav, sumaimp, sumanograv, totporfila, totgrav, totnograv, TotItbm, sumados, i;
+        double sumagrav, sumaimp, sumanograv, totporfila, totgrav, totnograv, TotItbm, i, sumados;
         boolean anulada = false;
 
         rep.line();
@@ -1975,6 +1980,7 @@ public class FinDia extends PBase {
                 rep.line();
 
                 sumados = totgrav + totnograv + TotItbm;
+                gSumados+=sumados;
 
                 vCadena = "Total";
                 rep.add(vCadena);
@@ -2120,6 +2126,7 @@ public class FinDia extends PBase {
                 rep.line();
 
                 sumados = totgrav + totnograv + TotItbm;
+                gSumados+=sumados;
 
                 vCadena = "Total";
                 rep.add(vCadena);

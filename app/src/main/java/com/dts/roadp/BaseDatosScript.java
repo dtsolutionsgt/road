@@ -31,14 +31,14 @@ public class BaseDatosScript {
 			vSQL="CREATE TABLE [FinDia] ("+
 					"ID integer NOT NULL primary key,"+
 					"Corel INTEGER  NOT NULL,"+
-					"val1  INTEGER  NOT NULL,"+  // dia del cierre
+					"val1  INTEGER  NOT NULL,"+  // Día del cierre
 					"val2  INTEGER  NOT NULL,"+	 // Comunicacion
-					"val3  INTEGER  NOT NULL,"+	 // Cierre Z
-					"val4  INTEGER  NOT NULL,"+	 // Impresion Deposito
-					"val5  INTEGER  NOT NULL,"+	 // Deposito
-					"val6  INTEGER  NOT NULL,"+  // Devolucion Bodega
-					"val7  INTEGER  NOT NULL,"+
-					"val8  INTEGER  NOT NULL);"; 
+					"val3  INTEGER  NOT NULL,"+	 // Impresión Depósito
+					"val4  INTEGER  NOT NULL,"+	 // Depósito
+					"val5  INTEGER  NOT NULL,"+	 // Devolución bodega y canastas
+					"val6  INTEGER  NOT NULL,"+  // Generación Cierre Z
+					"val7  INTEGER  NOT NULL,"+  // Impresión de Cierre Z
+					"val8  REAL  NOT NULL);";    // GrandTotal
 			database.execSQL(vSQL);
 
 			vSQL="CREATE TABLE [LIC_CLIENTE] ("+

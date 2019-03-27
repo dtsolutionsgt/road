@@ -500,6 +500,16 @@ public class FacturaRes extends PBase {
 		try {
 			
 			if (gl.sinimp) {
+				
+				totimp=mu.round2(totimp);
+				stot=stot-totimp;
+				
+				totperc=stot*(gl.percepcion/100);
+				totperc=mu.round2(totperc);
+				
+				tot=stot+totimp-descmon+totperc;
+				tot=mu.round2(tot);
+
 
 				totimp = mu.round2(totimp);
 				stot = stot - totimp;

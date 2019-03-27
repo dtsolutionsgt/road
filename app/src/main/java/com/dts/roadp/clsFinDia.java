@@ -289,7 +289,17 @@ public class clsFinDia extends PBase{
             db.execSQL(sql);
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            msgbox("updateComunicacion: " + e.getMessage());
+            msgbox("updateImprimioCierreZ: " + e.getMessage());
+        }
+    }
+    //#CKFK 20190305 Creé esta función para actualizar el val7 en la tabla FinDia
+    public void updateGrandTotal(double valor){
+        try{
+            sql=" UPDATE FinDia SET val8 = " + String.valueOf(valor);
+            db.execSQL(sql);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            msgbox("updateGrandTotal: " + e.getMessage());
         }
     }
 

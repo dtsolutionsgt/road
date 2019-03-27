@@ -2,7 +2,6 @@ package com.dts.roadp;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 public class clsBonifSave {
@@ -48,7 +47,7 @@ public class clsBonifSave {
 	
 		}
 
-		saveDBonifFalt();
+		//saveDBonifFalt();
 		
 		try {
 			Con.close();
@@ -171,7 +170,7 @@ public class clsBonifSave {
 			dt.moveToFirst();
 			while (!dt.isAfterLast()) {
 				
-				rebajaStock(dt.getString(0),dt.getDouble(1));
+				//rebajaStock(dt.getString(0),dt.getDouble(1));
 				
 				dt.moveToNext();
 			}
@@ -217,7 +216,7 @@ public class clsBonifSave {
 	
 	// Aux
 	
-	private void rebajaStock(String prid,double cant) {
+	private void rrebajaStock(String prid,double cant) {
 		Cursor DT;
 		double acant,val,disp,cantapl;
 		String lote,doc,stat;
@@ -246,11 +245,11 @@ public class clsBonifSave {
 			
 			// Stock
 			
-			sql="UPDATE P_STOCK SET CANT="+disp+" WHERE CODIGO='"+prid+"' AND LOTE='"+lote+"' AND DOCUMENTO='"+doc+"' AND STATUS='"+stat+"'";
-			db.execSQL(sql);
+			//sql="UPDATE P_STOCK SET CANT="+disp+" WHERE CODIGO='"+prid+"' AND LOTE='"+lote+"' AND DOCUMENTO='"+doc+"' AND STATUS='"+stat+"'";
+			//db.execSQL(sql);
 			
 			// Factura lotes
-			
+			/*
 			try {
 				ins.init("D_BONIF_LOTES");
 				
@@ -271,6 +270,7 @@ public class clsBonifSave {
 			} catch (SQLException e) {
 				mu.msgbox(e.getMessage()+"\n"+ins.sql());
 			}
+			*/
 			
 			if (acant<=0) return;
 				

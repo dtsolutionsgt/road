@@ -422,7 +422,7 @@ public class FacturaRes extends PBase {
 
 	}
 	
-	public void showPromo(){
+	public void showPromo() {
 
 		try {
 
@@ -441,7 +441,7 @@ public class FacturaRes extends PBase {
 		
 	}
 	
-	private void updDesc(){
+	private void updDesc() {
 
 		try{
 
@@ -456,7 +456,7 @@ public class FacturaRes extends PBase {
 
 	}
 
-	private void totalOrder(){
+	private void totalOrder() {
 		double dmaxmon;
 		
 		cleandprod=false;
@@ -562,7 +562,7 @@ public class FacturaRes extends PBase {
 		listView.setAdapter(adapter);
 	}
 	
- 	private void finishOrder(){
+ 	private void finishOrder() {
 
 		try{
 			if (!saved) {
@@ -1052,7 +1052,10 @@ public class FacturaRes extends PBase {
 
 			//endregion
 
-			//region D_BONIF
+
+			//region Bonificaciones
+
+            //region D_BONIF
 
 			sql="SELECT ITEM,PRODID,BONIID,CANT,PRECIO,COSTO,UMVENTA,UMSTOCK,UMPESO,FACTOR FROM T_BONITEM";
 			dt=Con.OpenDT(sql);
@@ -1086,15 +1089,32 @@ public class FacturaRes extends PBase {
 					ins.add("UMVENTA",dt.getString(6));
 					ins.add("UMSTOCK",dt.getString(7) );
 					ins.add("UMPESO",dt.getString(8));
-					ins.add("FACTOR",dt.getString(9));
+					ins.add("FACTOR",dt.getDouble(9));
 
 					db.execSQL(ins.sql());
 
+					vprod=dt.getString(2);
+					vumstock=dt.getString(7);
+					vumventa=dt.getString(6);
+					vfactor=dt.getDouble(9);
+					peso=vcant*vfactor;
+					factpres=app.factorPres(vprod,vumventa,vumstock);
+
+					rebajaStockBonif(vprod, vumstock, vcant, vfactor, vumventa,factpres,peso);
+
 					dt.moveToNext();bitem++;
 				}
-
 			}
 
+            //endregion
+
+            //region T_BARRA_BONIF
+
+            sql="INSERT INTO D_FACTURA_BARRA SELECT * FROM P_STOCKB WHERE BARRA IN (SELECT BARRA FROM T_BARRA_BONIF)";
+            db.execSQL(sql);
+
+            sql="UPDATE D_FACTURA_BARRA SET Corel='"+corel+"' WHERE Corel=''";
+            db.execSQL(sql);
 
 			sql="SELECT BARRA,CODIGO,PESO FROM T_BARRA_BONIF";
 			dt=Con.OpenDT(sql);
@@ -1131,6 +1151,32 @@ public class FacturaRes extends PBase {
 			sql="DELETE FROM P_STOCKB WHERE BARRA IN (SELECT BARRA FROM T_BARRA_BONIF)";
 			db.execSQL(sql);
 
+            //endregion
+
+			//region T_BONIFFALT
+
+            sql = "SELECT PRODID,PRODUCTO,CANT FROM T_BONIFFALT";
+            dt = Con.OpenDT(sql);
+
+            if (dt.getCount() > 0) dt.moveToFirst();
+            while (!dt.isAfterLast()) {
+
+                ins.init("D_BONIFFALT");
+
+                ins.add("COREL", corel);
+                ins.add("FECHA", fecha);
+                ins.add("ANULADO", "N");
+                ins.add("RUTA", gl.ruta);
+                ins.add("CLIENTE", gl.cliente);
+                ins.add("PRODUCTO", dt.getString(1));
+                ins.add("CANT", dt.getDouble(2));
+
+                db.execSQL(ins.sql());
+
+                dt.moveToNext();
+            }
+
+            //endregion
 
 			//endregion
 
@@ -1287,67 +1333,119 @@ public class FacturaRes extends PBase {
 		}
 	}
 
-	private void rebajaStock(String prid,double cant) {
-		Cursor DT;
-		double acant,val,disp,cantapl;
+	private void rebajaStockBonif(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {
+		Cursor dt;
+		double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso;
 		String lote,doc,stat;
 
-		acant=cant;
+		if (porpeso) {
+			actcant=cant;
+			actpeso=ppeso;
+		} else {
+			actcant=cant*factpres;
+			actpeso=cant*factor;
+		}
 
-		try{
-			sql="SELECT CANT,LOTE,DOCUMENTO,STATUS FROM P_STOCK WHERE CODIGO='"+prid+"'";
-			DT=Con.OpenDT(sql);
+		try {
 
-			DT.moveToFirst();
-			while (!DT.isAfterLast()) {
+			sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
+					"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') ORDER BY CANT";
+			dt=Con.OpenDT(sql);
 
-				val=DT.getDouble(0);
-				lote=DT.getString(1);
-				doc=DT.getString(2);
-				stat=DT.getString(3);
+			if (dt.getCount()==0) return;
 
-				if (val>acant) {
-					cantapl=acant;
-					disp=val-acant;
+			dt.moveToFirst();
+			while (!dt.isAfterLast()) {
+
+				cant=dt.getDouble(0);
+				speso=dt.getDouble(2);
+				lote=dt.getString(4);
+				doc=dt.getString(5);
+				stat=dt.getString(9);
+
+				if (actcant>cant) cantapl=cant;else cantapl=actcant;
+				dispcant=cant-cantapl;if (dispcant<0) dispcant=0;
+				actcant=actcant-cantapl;
+
+				if (porpeso) {
+					if (actpeso>speso) pesoapl=speso;else pesoapl=actpeso;
+					actpeso=actpeso-pesoapl;
 				} else {
-					cantapl=val;
-					disp=0;
+					pesoapl=cantapl*factor;
 				}
-				acant=acant-val;
+				disppeso=speso-pesoapl;if (disppeso<0) disppeso=0;
 
 				// Stock
 
-				sql="UPDATE P_STOCK SET CANT="+disp+" WHERE CODIGO='"+prid+"' AND LOTE='"+lote+"' AND DOCUMENTO='"+doc+"' AND STATUS='"+stat+"'";
+				sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"') AND (UNIDADMEDIDA='"+umstock+"')";
 				db.execSQL(sql);
 
-				// Factura lotes
+				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0)";
+				db.execSQL(sql);
+
+
+				// Bonif Stock
+
+				ins.init("D_BONIF_STOCK");
+
+				ins.add("COREL",corel);
+				ins.add("CODIGO",prid );
+				ins.add("CANT",cantapl );
+				ins.add("CANTM",dt.getDouble(1));
+				ins.add("PESO",pesoapl);
+				ins.add("plibra",dt.getDouble(3));
+				ins.add("LOTE",lote );
+
+				ins.add("DOCUMENTO",doc);
+				ins.add("FECHA",dt.getInt(6));
+				ins.add("ANULADO",dt.getInt(7));
+				ins.add("CENTRO",dt.getString(8));
+				ins.add("STATUS",stat);
+				ins.add("ENVIADO",dt.getInt(10));
+				ins.add("CODIGOLIQUIDACION",dt.getInt(11));
+				ins.add("COREL_D_MOV",dt.getString(12));
+				ins.add("UNIDADMEDIDA",umstock);
+
+				db.execSQL(ins.sql());
+
+				// Bonif lotes
 
 				try {
-					ins.init("D_FACTURAD_LOTES");
+					ins.init("D_BONIF_LOTES");
 
 					ins.add("COREL",corel);
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
-					ins.add("CANTIDAD",cantapl);
-					ins.add("PESO",0);
+
+					if (porpeso) {
+						ins.add("CANT",cantapl);
+					} else {
+						ins.add("CANT",cantapl/factpres);
+					}
+
+					ins.add("PESO",pesoapl);
+					ins.add("UMSTOCK",umstock);
+					ins.add("UMPESO",gl.umpeso);
+					ins.add("UMVENTA",umventa);
+					ins.add("FACTOR",factor);
 
 					db.execSQL(ins.sql());
 
-					//Toast.makeText(this,ins.SQL(),Toast.LENGTH_LONG).show();
-
 				} catch (SQLException e) {
-					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-					mu.msgbox(e.getMessage()+"\n"+ins.sql());
+					sql="UPDATE D_BONIF_LOTES SET CANT=CANT+"+cantapl+",PESO=PESO+"+pesoapl+"  " +
+						"WHERE (COREL='"+corel+"') AND (PRODUCTO='"+prid+"') AND (LOTE='"+lote+"')";
+					db.execSQL(sql);
 				}
 
-				if (acant<=0) return;
+				//if (actcant<=0) return;
 
-				DT.moveToNext();
+				dt.moveToNext();
 			}
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}
 
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox("rebajaStockUM: "+e.getMessage());
+		}
 	}
 
 	private void saveAtten(double tot) {

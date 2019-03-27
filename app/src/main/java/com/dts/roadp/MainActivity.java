@@ -182,12 +182,11 @@ public class MainActivity extends PBase {
 	
 	public void doRegister(View view) {
 	    try{
-            startActivity(new Intent(this, LicRegis.class));
+            //startActivity(new Intent(this, LicRegis.class));
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
-
 	}
 
 	private void setHandlers() {

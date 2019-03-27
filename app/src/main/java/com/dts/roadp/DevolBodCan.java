@@ -3,7 +3,6 @@ package com.dts.roadp;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -422,7 +421,7 @@ public class DevolBodCan extends PBase {
 
     private boolean validaDevolucion() {
         Cursor dt;
-        int cantstock=0,cantcan=0;
+        int cantstock=0,cantbolsa=0,cantcan=0;
 
         try {
             sql="SELECT CANT FROM P_STOCK WHERE CANT+CANTM>0";
@@ -435,7 +434,18 @@ public class DevolBodCan extends PBase {
             return false;
         }
 
-        return (cantstock+cantcan>0);
+        try {
+            sql="SELECT BARRA FROM P_STOCKB";
+            dt=Con.OpenDT(sql);
+
+            cantbolsa=dt.getCount();
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+            return false;
+        }
+
+        return (cantstock+cantbolsa+cantcan>0);
     }
 
     private void msgAskSave(String msg) {

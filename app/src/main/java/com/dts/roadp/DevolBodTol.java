@@ -57,6 +57,11 @@ public class DevolBodTol extends PBase {
 
     //region Events
 
+    public void doNext(View view) {
+        browse=1;
+        startActivity(new Intent(DevolBodTol.this,DevolBodCan.class));
+    }
+
     private void setHandlers() {
 
         try{
@@ -74,13 +79,6 @@ public class DevolBodTol extends PBase {
                 }
             });
 
-            imgNext.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    browse=1;
-                    startActivity(new Intent(DevolBodTol.this,DevolBodCan.class));
-                }
-            });
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }

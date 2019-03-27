@@ -259,11 +259,15 @@ public class FinDia extends PBase {
                     db.execSQL(sql);
                     sql = "DELETE FROM D_STOCKB_DEV WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
-                    sql = "DELETE FROM D_BONIF";
+                    sql = "DELETE FROM D_BONIF WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
-                    sql = "DELETE FROM D_BONIF_LOTES";
+                    sql = "DELETE FROM D_BONIF_LOTES WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
-                    sql = "DELETE FROM D_REL_PROD_BON";
+                    sql = "DELETE FROM D_BONIF_STOCK WHERE COREL='" + corel + "'";
+                    db.execSQL(sql);
+                    sql = "DELETE FROM D_BONIF_BARRA WHERE COREL='" + corel + "'";
+                    db.execSQL(sql);
+                    sql = "DELETE FROM D_REL_PROD_BON WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
                     sql = "DELETE FROM D_BONIFFALT";
                     db.execSQL(sql);
@@ -343,10 +347,11 @@ public class FinDia extends PBase {
                 DT.moveToFirst();
                 while (!DT.isAfterLast()) {
                     corel = DT.getString(0);
-                    sql = "DELETE FROM D_MOV WHERE COREL='" + corel + "'";
-                    db.execSQL(sql);
-                    sql = "DELETE FROM D_MOVD WHERE COREL='" + corel + "'";
-                    db.execSQL(sql);
+                    sql="DELETE FROM D_MOV WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql="DELETE FROM D_MOVD WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql="DELETE FROM D_MOVDB WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_MOVDCAN WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_MOVDPALLET WHERE COREL='"+corel+"'";db.execSQL(sql);
 
                     DT.moveToNext();
                 }

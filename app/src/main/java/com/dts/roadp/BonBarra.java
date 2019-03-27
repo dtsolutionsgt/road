@@ -284,7 +284,7 @@ public class BonBarra extends PBase {
             toast("Bonificado : "+bon+" / "+bont);
         }
 
-        
+
     }
 
     //endregion

@@ -337,10 +337,13 @@ public class clsFinDia extends PBase{
                     sql="DELETE FROM D_FACTURAP WHERE COREL='"+corel+"'";db.execSQL(sql);
                     sql="DELETE FROM D_FACTURAD_LOTES WHERE COREL='"+corel+"'";db.execSQL(sql);
 
-                    sql="DELETE FROM D_BONIF";db.execSQL(sql);
-                    sql="DELETE FROM D_BONIF_LOTES";db.execSQL(sql);
-                    sql="DELETE FROM D_REL_PROD_BON";db.execSQL(sql);
-                    sql="DELETE FROM D_BONIFFALT";db.execSQL(sql);
+                    sql = "DELETE FROM D_STOCKB_DEV WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql = "DELETE FROM D_BONIF WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql = "DELETE FROM D_BONIF_LOTES WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql = "DELETE FROM D_BONIF_STOCK WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql = "DELETE FROM D_BONIF_BARRA WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql = "DELETE FROM D_REL_PROD_BON WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql = "DELETE FROM D_BONIFFALT";db.execSQL(sql);
 
                     DT.moveToNext();
                 }
@@ -411,6 +414,9 @@ public class clsFinDia extends PBase{
                     corel=DT.getString(0);
                     sql="DELETE FROM D_MOV WHERE COREL='"+corel+"'";db.execSQL(sql);
                     sql="DELETE FROM D_MOVD WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_MOVDB WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_MOVDCAN WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_MOVDPALLET WHERE COREL='"+corel+"'";db.execSQL(sql);
 
                     DT.moveToNext();
                 }

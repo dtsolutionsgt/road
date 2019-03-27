@@ -267,8 +267,6 @@ public class Cobro extends PBase {
 
 					Object lvObj = listView.getItemAtPosition(position);
 					clsClasses.clsCobro vItem = (clsClasses.clsCobro) lvObj;
-					Object lvObj = listView.getItemAtPosition(position);
-					clsClasses.clsCobro vItem = (clsClasses.clsCobro) lvObj;
 
 					adapter.setSelectedIndex(position);
 

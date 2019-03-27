@@ -2028,7 +2028,7 @@ public class ComWS extends PBase {
 
 			dbld.savelog();
 
-			ComWS.super.finish();
+			//ComWS.super.finish();
 
 			//listaFachada();
 
@@ -2130,8 +2130,8 @@ public class ComWS extends PBase {
 					dbld.insert("D_BONIF", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIF_LOTES", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIF_BARRA", "WHERE COREL='" + cor + "'");
-					dbld.insert("D_REL_PROD_BON", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIFFALT", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_REL_PROD_BON", "WHERE COREL='" + cor + "'");
 
 					dbld.add("UPDATE P_COREL SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");
 
@@ -2532,6 +2532,9 @@ public class ComWS extends PBase {
 
 					dbld.insert("D_MOV", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_MOVD", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVDB", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVDCAN", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVDPALLET", "WHERE COREL='" + cor + "'");
 
 					if (envioparcial) {
 						if (commitSQL() == 1) {
@@ -3149,7 +3152,6 @@ public class ComWS extends PBase {
 					}
 
 					msgResultEnvio(senv);
-
 				}
 
 			} else {

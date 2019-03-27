@@ -171,13 +171,17 @@ public class MainActivity extends PBase {
     }
 
 	public void doLogin(View view) {
+
+	    if (fecha>1904310000) {
+	        msgbox("¡Su licencia expiró!");return;
+        }
+
 	    try{
             processLogIn();
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
-
 	}
 	
 	public void doRegister(View view) {

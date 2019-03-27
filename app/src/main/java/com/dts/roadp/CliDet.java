@@ -935,8 +935,14 @@ public class CliDet extends PBase {
 
 			alert.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
-					msgAskTipoEstadoDev("Devolución de producto en estado...");
-					layout.removeAllViews();
+					if(chkncv.isChecked() || chknc.isChecked()){
+						msgAskTipoEstadoDev("Devolución de producto en estado...");
+						layout.removeAllViews();
+					}else{
+						toast("Seleccione accion a realizar");
+						closekeyb();
+						msgAskTipoDev();
+					}
 				}
 			});
 

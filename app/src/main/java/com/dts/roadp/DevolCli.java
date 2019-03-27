@@ -686,6 +686,7 @@ public class DevolCli extends PBase {
 				}
 			});
 
+			dialog.setCancelable(false);
 			dialog.show();
 
 		}catch (Exception e){

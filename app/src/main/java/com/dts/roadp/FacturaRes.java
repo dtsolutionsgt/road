@@ -492,7 +492,7 @@ public class FacturaRes extends PBase {
 		
 	}
 
-	
+
 	private void fillTotals() {
 		clsClasses.clsCDB item;	
 				
@@ -565,7 +565,6 @@ public class FacturaRes extends PBase {
 					items.add(item);
 
 				} else {
-
 
 					item = clsCls.new clsCDB();
 					item.Cod = "TOTAL";

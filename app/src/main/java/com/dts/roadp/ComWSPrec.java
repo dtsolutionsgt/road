@@ -138,7 +138,7 @@ public class ComWSPrec extends PBase {
             wsRtask = new AsyncCallRec();
             wsRtask.execute();
         }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+          //  addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
 
@@ -647,9 +647,9 @@ public class ComWSPrec extends PBase {
             } catch (Exception e) {
                 if (scon==0){
                     fstr="No se puede conectar al web service : "+sstr;
-                    lblInfo.setText(fstr);
+                   // lblInfo.setText(fstr);
                 }
-                msgbox(fstr);
+               // msgbox(fstr);
             }
 
             return null;

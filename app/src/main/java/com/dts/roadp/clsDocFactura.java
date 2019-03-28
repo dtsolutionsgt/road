@@ -14,20 +14,18 @@ public class clsDocFactura extends clsDocument {
 	
 	private double tot,desc,imp,stot,percep,totNotaC;
 	private boolean sinimp;
-	private String 	contrib;
+	private String 	contrib,corelNotaC,asignacion;
 	private int decimp,diacred,totitems;
-	public CliDet cliDet;
-	private int notaCventa;
+
 
 	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres) {
 		super(context, printwidth,cursymbol,decimpres);
+
 		docfactura=true;
 		docdevolucion=false;
 		docpedido=false;
 		docrecibo=false;
 		decimp=decimpres;
-		cliDet=new CliDet();
-		notaCventa = 0 ;
 	}
 
 
@@ -178,6 +176,28 @@ public class clsDocFactura extends clsDocument {
 		items.clear();
 		
 		try {
+
+            sql="SELECT N.COREL, N.TOTAL, F.ASIGNACION " +
+                "FROM D_FACTURA F INNER JOIN D_NOTACRED N ON F.ASIGNACION = N.COREL " +
+                "WHERE F.COREL = '"+corel+"'";
+
+            DT=Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            if(DT.getCount() != 0){
+
+				corelNotaC = DT.getString(0);
+				totNotaC = DT.getDouble(1);
+				asignacion = DT.getString(2);
+
+			}else{
+
+            	corelNotaC = "";
+            	asignacion = "*";
+            	totNotaC = 0;
+
+            }
+
 			sql="SELECT D_FACTURAD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_FACTURAD.CANT,D_FACTURAD.PRECIODOC,D_FACTURAD.IMP, D_FACTURAD.DES,D_FACTURAD.DESMON, D_FACTURAD.TOTAL, D_FACTURAD.UMVENTA, D_FACTURAD.UMPESO, D_FACTURAD.PESO " +
 				"FROM D_FACTURAD INNER JOIN P_PRODUCTO ON D_FACTURAD.PRODUCTO = P_PRODUCTO.CODIGO " +
 				"WHERE (D_FACTURAD.COREL='"+corel+"')";	
@@ -188,45 +208,26 @@ public class clsDocFactura extends clsDocument {
 
 			while (!DT.isAfterLast()) {
 
-				item = new itemData();
+                item = new itemData();
 
-				item.cod = DT.getString(0);
-				item.nombre = DT.getString(1);
+                item.cod = DT.getString(0);
+                item.nombre = DT.getString(1);
 
-				item.cant = DT.getDouble(2);
-				item.prec = DT.getDouble(3);
-				item.imp = DT.getDouble(4);
-				item.descper = DT.getDouble(5);
-				item.desc = DT.getDouble(6);
-				item.tot = DT.getDouble(7);
-				item.um = DT.getString(8);
-				item.ump = DT.getString(9);
-				item.peso = DT.getDouble(10);
+                item.cant = DT.getDouble(2);
+                item.prec = DT.getDouble(3);
+                item.imp = DT.getDouble(4);
+                item.descper = DT.getDouble(5);
+                item.desc = DT.getDouble(6);
+                item.tot = DT.getDouble(7);
+                item.um = DT.getString(8);
+                item.ump = DT.getString(9);
+                item.peso = DT.getDouble(10);
 
-				if (sinimp) item.tot = item.tot - item.imp;
+                if (sinimp) item.tot = item.tot - item.imp;
 
-				//Toast.makeText(cont,item.cod+" "+item.imp+"   "+item.tot, Toast.LENGTH_SHORT).show();
-
-				items.add(item);
-				DT.moveToNext();
-			}
-
-			sql="SELECT TOTAL FROM D_NOTACRED WHERE FACTURA = '"+corel+"'";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-
-			while (!DT.isAfterLast()) {
-
-				item =new itemData();
-
-				item.totNotaC = DT.getDouble(0);
-
-				items.add(item);
-				DT.moveToNext();
-			}
-
-
-
+                items.add(item);
+                DT.moveToNext();
+            }
 
 		} catch (Exception e) {
 			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -404,31 +405,57 @@ public class clsDocFactura extends clsDocument {
 		totalNotaC =   tot - totNotaC;
 
 		rep.addtotsp("Subtotal", stot);
-		if(notaCventa == 2){
+
+		if(corelNotaC.equals(asignacion)){
+
 			rep.addtotsp("Nota de Credito", totNotaC);
 			rep.addtotsp("ITBM", totimp);
 			rep.addtotsp("Total", totalNotaC);
+			rep.add("");
+			rep.add("");
+			rep.add("Total de items: "+totitems);
+			rep.add("");
+			rep.add("");
+			rep.add("");
+			rep.line();
+			rep.addc("Firma Cliente");
+			rep.add("");
+			rep.addc("Aplica a nota de credito: " +corelNotaC);
+			rep.add("");
+			rep.addc("DE SER UNA VENTA AL CREDITO, SOLAMEN");
+			rep.addc("TE NUESTRO CORRESPONDIENTE RECIBO SE");
+			rep.addc("CONSIDERARA COMO EVIDENCIA  DE  PAGO");
+			rep.add("");
+
+			rep.add("Serial : "+deviceid);
+			rep.add(resol);
+			rep.add(resfecha);
+			rep.add("");
+
 		}else{
+
 			rep.addtotsp("ITBM", totimp);
 			rep.addtotsp("Total", tot);
-		}
-		rep.add("");
-		rep.add("");
-		rep.add("Total de items: "+totitems);
-		rep.add("");
-		rep.add("");
-		rep.line();
-		rep.addc("Firma Cliente");
-		rep.add("");
-		rep.addc("DE SER UNA VENTA AL CREDITO, SOLAMEN");
-		rep.addc("TE NUESTRO CORRESPONDIENTE RECIBO SE");
-		rep.addc("CONSIDERARA COMO EVIDENCIA  DE  PAGO");
-		rep.add("");
+			rep.add("");
+			rep.add("");
+			rep.add("Total de items: "+totitems);
+			rep.add("");
+			rep.add("");
+			rep.add("");
+			rep.line();
+			rep.addc("Firma Cliente");
+			rep.add("");
+			rep.addc("DE SER UNA VENTA AL CREDITO, SOLAMEN");
+			rep.addc("TE NUESTRO CORRESPONDIENTE RECIBO SE");
+			rep.addc("CONSIDERARA COMO EVIDENCIA  DE  PAGO");
+			rep.add("");
 
-		rep.add("Serial : "+deviceid);
-		rep.add(resol);
-		rep.add(resfecha);
-		rep.add("");
+			rep.add("Serial : "+deviceid);
+			rep.add(resol);
+			rep.add(resfecha);
+			rep.add("");
+
+		}
 
 		return super.buildFooter();
 	}
@@ -451,7 +478,7 @@ public class clsDocFactura extends clsDocument {
 	
 	private class itemData {
 		public String cod,nombre,um,ump;
-		public double cant,peso,prec,imp,descper,desc,tot,totNotaC;
+		public double cant,peso,prec,imp,descper,desc,tot;
 	}
 	
 	

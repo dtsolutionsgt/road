@@ -191,7 +191,7 @@ public class DevolCli extends PBase {
 
 			  items.add(vItem);	
 
-			  vItem.Cod = gl.CodDev;
+			 // vItem.Cod = gl.CodDev;
 			  DT.moveToNext();
 			}
 
@@ -580,11 +580,22 @@ public class DevolCli extends PBase {
 	}
 
 	private void delItem(){
+
 		try {
+
 			db.execSQL("DELETE FROM T_CxCD WHERE CODIGO='"+prodid+"'");
+
 			listItems();
+
 			adapter=new ListAdaptDevCli(this,items);
 			listView.setAdapter(adapter);
+
+			//#CKFK_20190328 Mostrar Totales
+			lblCantProds.setText(String.valueOf(cntprd));
+			lblCantUnd.setText(String.valueOf(cntunis));
+			lblCantKgs.setText(String.valueOf(cntkgs));
+			lblCantTotal.setText(mu.frmcur(cntotl));
+
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());

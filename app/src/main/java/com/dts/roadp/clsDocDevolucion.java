@@ -12,7 +12,7 @@ public class clsDocDevolucion extends clsDocument {
 
     private double tot,desc,imp,stot,percep;
     private boolean sinimp;
-    private String 	contrib,recfact,estadoDev;
+    private String 	contrib,recfact,estadoDev,corelNC,corelF,asignacion;
 
     public clsDocDevolucion(Context context, int printwidth, String cursym, int decimpres) {
         super(context, printwidth, cursym, decimpres);
@@ -67,21 +67,48 @@ public class clsDocDevolucion extends clsDocument {
     }
 
     protected boolean buildFooter() {
-        rep.addtot("TOTAL PAGO", tot);
-        rep.add("");
-        rep.add("");
-        rep.add("");
-        rep.line();
-        rep.addc("Firma Cliente");
-        rep.add("");
-        rep.addc("EXIJA SU FACTURA ORIGINAL ");
-        rep.addc("PARA COMPROBAR  EL PAGO. ");
-        rep.add("");
 
-        rep.add("Serial : "+deviceid);
-        rep.add(resol);
-        rep.add(resfecha);
-        rep.add("");
+        if(corelNC.equals(asignacion)){
+
+            rep.addtot("TOTAL PAGO", tot);
+            rep.add("");
+            rep.add("");
+            rep.add("");
+            rep.line();
+            rep.addc("Firma Cliente");
+            rep.add("");
+            rep.addc("Aplica a factura: "+corelF);
+            rep.add("");
+            rep.addc("EXIJA SU FACTURA ORIGINAL ");
+            rep.addc("PARA COMPROBAR  EL PAGO. ");
+            rep.add("");
+
+            rep.add("Serial : "+deviceid);
+            rep.add(resol);
+            rep.add(resfecha);
+            rep.add("");
+
+        }else{
+
+            rep.addtot("TOTAL PAGO", tot);
+            rep.add("");
+            rep.add("");
+            rep.add("");
+            rep.line();
+            rep.addc("Firma Cliente");
+            rep.add("");
+            rep.addc("EXIJA SU FACTURA ORIGINAL ");
+            rep.addc("PARA COMPROBAR  EL PAGO. ");
+            rep.add("");
+
+            rep.add("Serial : "+deviceid);
+            rep.add(resol);
+            rep.add(resfecha);
+            rep.add("");
+
+        }
+
+
 
         return super.buildFooter();
     }
@@ -154,9 +181,6 @@ public class clsDocDevolucion extends clsDocument {
             resol="Resolucion No. : "+DT.getString(0);
             ff=DT.getInt(1);resfecha="De Fecha: "+sfecha(ff);
             ff=DT.getInt(2);resvence="Vigente hasta: "+sfecha(ff);
-            //#EJC20181130: Se cambió el mensaje por revisión de auditor de SAT.
-            //ff=DT.getInt(2);resvence="Resolucion vence : "+sfecha(ff);
-            //resrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
 
         } catch (Exception e) {
             Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
@@ -177,7 +201,28 @@ public class clsDocDevolucion extends clsDocument {
         items.clear();
 
         try {
-            //sql="SELECT CODIGO,ESTADO,PESO,PRECIO,TOTAL,CANT,UMVENTA FROM D_CxCD WHERE COREL='"+corel+"'";
+            sql="SELECT N.COREL,F.ASIGNACION, F.COREL "+
+                "FROM D_NOTACRED N INNER JOIN D_FACTURA F ON F.ASIGNACION = N.COREL "+
+                "WHERE N.FACTURA = '"+corel+"'";
+
+            DT=Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            if(DT.getCount() != 0){
+
+                corelNC = DT.getString(0);
+                asignacion = DT.getString(1);
+                corelF = DT.getString(2);
+
+
+            }else{
+
+                corelNC = "";
+                asignacion = "*";
+                corelF = "";
+
+            }
+
             sql="SELECT C.CODIGO,P.DESCLARGA,C.ESTADO,C.PESO,C.PRECIO,C.TOTAL,C.CANT,C.UMVENTA " +
                 "FROM D_CxCD C INNER JOIN P_PRODUCTO P ON C.CODIGO = P.CODIGO " +
                 "WHERE (C.COREL='"+corel+"')";
@@ -185,9 +230,10 @@ public class clsDocDevolucion extends clsDocument {
 
             DT.moveToFirst();
 
+            item =new itemData();
+
             while (!DT.isAfterLast()) {
 
-                item =new itemData();
                 item.cod=DT.getString(0);
                 item.nombre=DT.getString(1);
                 item.estado=DT.getString(2);
@@ -199,13 +245,13 @@ public class clsDocDevolucion extends clsDocument {
 
                 items.add(item);
 
-                if (item.estado.equals("B")){
-                    item.estado="En Buen Estado";
-                }else{
-                    item.estado="En Mal Estado";
-                }
-
                 DT.moveToNext();
+            }
+
+            if (item.estado.equals("B")){
+                item.estado="En Buen Estado";
+            }else{
+                item.estado="En Mal Estado";
             }
 
         } catch (Exception e) {

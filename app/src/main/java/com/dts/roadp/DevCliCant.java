@@ -7,8 +7,10 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -41,6 +43,8 @@ public class DevCliCant extends PBase {
 	private double cant,icant,factor=0.0,precioventa=0.0,pesoprom=0.0,clcpeso=0.0;
 	private  String um="", ummin="",umcambiar="";
 	private Precio prc;
+
+	private boolean vEditando=false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -164,113 +168,170 @@ public class DevCliCant extends PBase {
 	
 	private void setHandlers(){
 		
-		spin.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	TextView spinlabel;
-		    		
-		    	try {
-		    		spinlabel=(TextView)parentView.getChildAt(0);
-			    	spinlabel.setTextColor(Color.BLACK);
-			    	spinlabel.setPadding(5, 0, 0, 0);
-			    	spinlabel.setTextSize(18);
+		try{
+			spin.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+					TextView spinlabel;
 
-			    	razon=spincode.get(position);
+					try {
+						spinlabel=(TextView)parentView.getChildAt(0);
+						spinlabel.setTextColor(Color.BLACK);
+						spinlabel.setPadding(5, 0, 0, 0);
+						spinlabel.setTextSize(18);
 
-		    	} catch (Exception e) {
-		    		addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			   	    mu.msgbox( e.getMessage());
-		        }
-		
-		    }
+						razon=spincode.get(position);
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) {
-		        return;
-		    }
-
-		});
-
-		cmbum.setOnItemSelectedListener(new OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				TextView cmblabel;
-
-				try{
-
-					cmblabel=(TextView)parent.getChildAt(0);
-					cmblabel.setTextColor(Color.BLACK);
-					cmblabel.setPadding(5, 0, 0, 0);
-					cmblabel.setTextSize(18);
-
-					factor=cmbumfact.get(position);
-					umcambiar = cmbumlist.get(position);
-
-                    clcpeso=pesoprom*factor;
-
-                    if (gl.dvporpeso==false){
-						lblPrec.setText(String.valueOf(mu.round(getPrecio(),gl.peDec)));
-                        txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
-                    }else{
-                        lblPrec.setText(String.valueOf(precioventa));
-                        txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
-                    }
-
-				}catch (Exception e){
-					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					mu.msgbox( e.getMessage());
-				}
-
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-
-			}
-		});
-
-		chkTieneLote.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-				if (chkTieneLote.isChecked()==false){
-					txtLote.setEnabled(true);
-				}else{
-                    txtLote.setText(gl.lotedf);
-					txtLote.setEnabled(false);
-				}
-			}
-		});
-
-		txtCant.setOnKeyListener(new View.OnKeyListener() {
-			@Override
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-				if ((keyCode == KeyEvent.KEYCODE_ENTER)) {
-
-					if (gl.dvporpeso==false){
-						if (clcpeso!=0){
-							txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
-						}else{
-							txtkgs.setText(String.valueOf(mu.round(pesoprom*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
-						}
-
-					}else{
-						txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
 					}
 
-					return true;
 				}
-				return false;
-			}
-		});
 
-		
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) {
+					return;
+				}
+
+			});
+
+			cmbum.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+					TextView cmblabel;
+
+					try{
+
+						cmblabel=(TextView)parent.getChildAt(0);
+						cmblabel.setTextColor(Color.BLACK);
+						cmblabel.setPadding(5, 0, 0, 0);
+						cmblabel.setTextSize(18);
+
+						factor=cmbumfact.get(position);
+						umcambiar = cmbumlist.get(position);
+
+						clcpeso=pesoprom*factor;
+
+						if (gl.dvporpeso==false){
+							lblPrec.setText(String.valueOf(mu.round(getPrecio(),gl.peDec)));
+							txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+						}else{
+							if (!vEditando){
+								lblPrec.setText(String.valueOf(precioventa));
+								txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+							}
+							vEditando = false;
+
+						}
+
+						txtCant.requestFocus();
+
+					}catch (Exception e){
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox( e.getMessage());
+					}
+
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parent) {
+
+				}
+			});
+
+			chkTieneLote.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+					if (chkTieneLote.isChecked()==false){
+						txtLote.setEnabled(true);
+					}else{
+						txtLote.setText(gl.lotedf);
+						txtLote.setEnabled(false);
+					}
+				}
+			});
+
+			txtCant.addTextChangedListener(new TextWatcher() {
+
+				public void afterTextChanged(Editable s) {}
+
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+
+				public void onTextChanged(CharSequence s, int start,int before, int count) {
+
+					try{
+
+						if (!vEditando) {
+
+							if (!mu.emptystr(txtCant.getText().toString())&&
+									(!txtCant.getText().toString().equals("0"))){
+
+								if (gl.dvporpeso==false){
+									if (clcpeso!=0){
+										txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+									}else{
+										txtkgs.setText(String.valueOf(mu.round(pesoprom*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+									}
+
+								}else{
+									txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+								}
+							}
+
+						}
+
+					}catch (Exception ex){
+						msgbox(ex.getMessage());
+					}
+
+				}
+
+			});
+
+			txtCant.setOnKeyListener(new View.OnKeyListener() {
+				@Override
+				public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+					vEditando = false;
+
+					if ((keyCode == KeyEvent.KEYCODE_ENTER) &&
+							(event.getAction() == KeyEvent.ACTION_DOWN)) {
+
+						if (!mu.emptystr(txtCant.getText().toString())&&
+								(!txtCant.getText().toString().equals("0"))){
+
+							if (gl.dvporpeso==false){
+								if (clcpeso!=0){
+									txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+								}else{
+									txtkgs.setText(String.valueOf(mu.round(pesoprom*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+								}
+
+							}else{
+								txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+							}
+
+						}
+
+						return true;
+					}
+					return false;
+				}
+			});
+
+
+		}catch (Exception ex){
+			msgbox(ex.getMessage());
+		}
+
 	}
-	
+
 	private void showData() {
 		Cursor DT;
 		String ubas;
+
 		int ex=0;
 		
 		try {
@@ -336,6 +397,8 @@ public class DevCliCant extends PBase {
 				if (icant>0) parseCant(icant);
 
 				lblPrecVenta.setText(umcambiar);
+
+				vEditando = true;
 
 			}else{
 

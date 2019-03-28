@@ -157,7 +157,7 @@ public class FacturaRes extends PBase {
 					imgMPago.setVisibility(View.INVISIBLE);
 					lblMPago.setVisibility(View.INVISIBLE);
 				}
-			}else{
+			} else {
 				contadoCheck.setVisibility(View.INVISIBLE);
 				lblCash.setVisibility(View.INVISIBLE);
 				imgCash.setVisibility(View.INVISIBLE);

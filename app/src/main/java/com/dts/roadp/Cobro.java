@@ -155,7 +155,6 @@ public class Cobro extends PBase {
 
 	}
 
-
 	public void checkAll(View view) {
 
 	    try{
@@ -169,6 +168,8 @@ public class Cobro extends PBase {
 	}
 
 	public void check() {
+
+		if (items.size()==0) return;
 
 		try{
 
@@ -307,6 +308,7 @@ public class Cobro extends PBase {
 
 	}
 
+
 	// Main
 
 	private void listItems(){
@@ -320,7 +322,7 @@ public class Cobro extends PBase {
 				 "FROM P_COBRO WHERE CLIENTE='"+cliid+"' ORDER BY FECHAV";
 			
 			DT=Con.OpenDT(sql);
-			if (DT.getCount()==0) {return;}
+			if (DT.getCount()==0) return;
 			
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
@@ -358,8 +360,8 @@ public class Cobro extends PBase {
             showTotals();
 
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox("listItems: "+ e.getMessage());
+			//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		   	//mu.msgbox("listItems: "+ e.getMessage());
 	    }
 
 	}

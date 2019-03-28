@@ -492,7 +492,6 @@ public class FacturaRes extends PBase {
 		
 	}
 
-
 	private void fillTotals() {
 		clsClasses.clsCDB item;	
 				

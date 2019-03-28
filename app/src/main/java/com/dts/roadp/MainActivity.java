@@ -57,7 +57,7 @@ public class MainActivity extends PBase {
 	// Grant permissions
 
 	private void grantPermissions() {
-	    
+
 		try {
 			if (Build.VERSION.SDK_INT >= 20) {
 

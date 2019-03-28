@@ -1708,7 +1708,16 @@ public class FacturaRes extends PBase {
 
 			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-			alert.setTitle("A pagar : "+mu.frmcur(tot));
+            if (gl.dvbrowse!=0){
+                double totdv;
+                if (tot>=dispventa){
+                    totdv = mu.round(tot-dispventa,gl.peDec);
+                    alert.setTitle("A pagar : "+mu.frmcur(totdv));
+                }
+            }else{
+                alert.setTitle("A pagar : "+mu.frmcur(tot));
+            }
+
 			alert.setMessage("Pagado con billete : ");
 
 			final LinearLayout layout   = new LinearLayout(this);
@@ -1769,11 +1778,10 @@ public class FacturaRes extends PBase {
 
 					peexit=false;
 					svuelt= txtVuelto.getText().toString();
-                    brw = 1;
+                    brw=1;
 
                     svuelt=""+tot;
                     sefect=""+tot;
-
 
 					applyCash();
 					checkPago();
@@ -2104,15 +2112,24 @@ public class FacturaRes extends PBase {
 
 		s=mu.frmcur(tpago);
 
-		if (tpago<tot) {
-			lblPago.setText("Pago incompleto.\n"+s);
-			pago=false;
-		} else {
-			lblPago.setText("Pago COMPLETO.\n"+s);
-			pago=true;
-			//if (rutapos) askSavePos(); else askSave();
-			finishOrder();
-		}
+        if (gl.dvbrowse!=0){
+            if (brw>0){
+                lblPago.setText("Pago COMPLETO.\n"+s);
+                pago=true;
+                //if (rutapos) askSavePos(); else askSave();
+                finishOrder();
+            }
+        }	else{
+            if (tpago<tot) {
+                lblPago.setText("Pago incompleto.\n"+s);
+                pago=false;
+            } else {
+                lblPago.setText("Pago COMPLETO.\n"+s);
+                pago=true;
+                //if (rutapos) askSavePos(); else askSave();
+                finishOrder();
+            }
+        }
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

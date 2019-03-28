@@ -73,6 +73,7 @@ public class clsDocDevolucion extends clsDocument {
             rep.addtot("TOTAL PAGO", tot);
             rep.add("");
             rep.add("");
+            rep.add("");
             rep.line();
             rep.addc("Firma Cliente");
             rep.add("");
@@ -90,6 +91,7 @@ public class clsDocDevolucion extends clsDocument {
         }else{
 
             rep.addtot("TOTAL PAGO", tot);
+            rep.add("");
             rep.add("");
             rep.add("");
             rep.line();
@@ -228,9 +230,10 @@ public class clsDocDevolucion extends clsDocument {
 
             DT.moveToFirst();
 
+            item =new itemData();
+
             while (!DT.isAfterLast()) {
 
-                item =new itemData();
                 item.cod=DT.getString(0);
                 item.nombre=DT.getString(1);
                 item.estado=DT.getString(2);
@@ -242,13 +245,13 @@ public class clsDocDevolucion extends clsDocument {
 
                 items.add(item);
 
-                if (item.estado.equals("B")){
-                    item.estado="En Buen Estado";
-                }else{
-                    item.estado="En Mal Estado";
-                }
-
                 DT.moveToNext();
+            }
+
+            if (item.estado.equals("B")){
+                item.estado="En Buen Estado";
+            }else{
+                item.estado="En Mal Estado";
             }
 
         } catch (Exception e) {

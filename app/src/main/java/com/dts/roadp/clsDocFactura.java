@@ -416,6 +416,7 @@ public class clsDocFactura extends clsDocument {
 			rep.add("Total de items: "+totitems);
 			rep.add("");
 			rep.add("");
+			rep.add("");
 			rep.line();
 			rep.addc("Firma Cliente");
 			rep.add("");
@@ -438,6 +439,7 @@ public class clsDocFactura extends clsDocument {
 			rep.add("");
 			rep.add("");
 			rep.add("Total de items: "+totitems);
+			rep.add("");
 			rep.add("");
 			rep.add("");
 			rep.line();

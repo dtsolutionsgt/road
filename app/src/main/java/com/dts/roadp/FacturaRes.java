@@ -499,77 +499,82 @@ public class FacturaRes extends PBase {
 		items.clear();
 		
 		try {
-			
+
 			if (gl.sinimp) {
-				
+
 				totimp=mu.round2(totimp);
 				stot=stot-totimp;
-				
+
 				totperc=stot*(gl.percepcion/100);
 				totperc=mu.round2(totperc);
-				
+
 				tot=stot+totimp-descmon+totperc;
 				tot=mu.round2(tot);
 
-
-				totimp = mu.round2(totimp);
-				stot = stot - totimp;
-
-				totperc = stot * (gl.percepcion / 100);
-				totperc = mu.round2(totperc);
-
-				tot = stot + totimp - descmon + totperc;
-				tot = mu.round2(tot);
-
-
 				item = clsCls.new clsCDB();
-				item.Cod = "Subtotal";
-				item.Desc = mu.frmcur(stot);
-				item.Bandera = 0;
+				item.Cod="Subtotal";item.Desc=mu.frmcur(stot);item.Bandera=0;
 				items.add(item);
 
 				item = clsCls.new clsCDB();
-				item.Cod = "Impuesto";
-				item.Desc = mu.frmcur(totimp);
-				item.Bandera = 0;
+				item.Cod="Impuesto";item.Desc=mu.frmcur(totimp);item.Bandera=0;
 				items.add(item);
 
 				if (gl.contrib.equalsIgnoreCase("C")) {
 					item = clsCls.new clsCDB();
-					item.Cod = "Percepción";
-					item.Desc = mu.frmcur(totperc);
-					item.Bandera = 0;
+					item.Cod="Percepción";item.Desc=mu.frmcur(totperc);item.Bandera=0;
 					items.add(item);
 				}
 
 				item = clsCls.new clsCDB();
-				item.Cod = "Descuento";
-				item.Desc = mu.frmcur(-descmon);
-				item.Bandera = 0;
+				item.Cod="Descuento";item.Desc=mu.frmcur(-descmon);item.Bandera=0;
 				items.add(item);
 
-				//Validar si está la condición. 20190327 - problema con merge o update.
-
-				if (gl.dvbrowse != 0) {
-
+				if (gl.dvbrowse!=0){
 					item = clsCls.new clsCDB();
-					item.Cod = "Nota Crédito";
-					item.Desc = mu.frmcur(-dispventa);
-					item.Bandera = 0;
+					item.Cod="Nota Crédito";item.Desc=mu.frmcur(-dispventa);item.Bandera=0;
 					items.add(item);
 
 					item = clsCls.new clsCDB();
-					item.Cod = "TOTAL";
-					item.Desc = mu.frmcur(tot);
-					item.Bandera = 1;
+					item.Cod="TOTAL";item.Desc=mu.frmcur(tot-dispventa);item.Bandera=1;
 					items.add(item);
 
-				} else {
+				}else{
+					item = clsCls.new clsCDB();
+					item.Cod="TOTAL";item.Desc=mu.frmcur(tot);item.Bandera=1;
+					items.add(item);
+				}
+
+
+
+			} else {
+
+				totimp=mu.round2(totimp);
+				tot=stot-descmon;
+				tot=mu.round2(tot);
+
+
+				item = clsCls.new clsCDB();
+				item.Cod="Subtotal";item.Desc=mu.frmcur(stot);item.Bandera=0;
+				items.add(item);
+
+				item = clsCls.new clsCDB();
+				item.Cod="Descuento";item.Desc=mu.frmcur(-descmon);item.Bandera=0;
+				items.add(item);
+
+				if (gl.dvbrowse!=0){
 
 					item = clsCls.new clsCDB();
-					item.Cod = "TOTAL";
-					item.Desc = mu.frmcur(tot);
-					item.Bandera = 1;
+					item.Cod="Nota Crédito";item.Desc=mu.frmcur(-dispventa);item.Bandera=0;
+					items.add(item);
+
+					item = clsCls.new clsCDB();
+					item.Cod="TOTAL";item.Desc=mu.frmcur(tot-dispventa);item.Bandera=1;
+					items.add(item);
+
+				}else{
+
+					item = clsCls.new clsCDB();
+					item.Cod="TOTAL";item.Desc=mu.frmcur(tot);item.Bandera=1;
 					items.add(item);
 
 				}

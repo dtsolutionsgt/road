@@ -1,5 +1,6 @@
 package com.dts.roadp;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -87,6 +88,8 @@ public class ComWS extends PBase {
 
 	private final String NAMESPACE = "http://tempuri.org/";
 	private String METHOD_NAME, URL;
+
+	protected PowerManager.WakeLock wakelock;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -181,7 +184,6 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"wakeLock");
 		}
-
 	}
 
 
@@ -1217,7 +1219,7 @@ public class ComWS extends PBase {
 		try {
 
 			sql = "SELECT CORELZ, GRANDTOTAL FROM P_HANDHELD";
-			DT1 = ConT.OpenDT(sql);
+			DT1 = Con.OpenDT(sql);
 
 			if (DT1.getCount() > 0) {
 
@@ -4206,6 +4208,19 @@ public class ComWS extends PBase {
 		super.onPause();
 	}
 
+	/*Esto, junto con el onDestroy, hacen que la pantalla siga encendida hasta que la actividad termine*/
+	@Override
+	protected void onDestroy(){
+		super.onDestroy();
+
+		this.wakelock.release();
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle icicle) {
+		super.onSaveInstanceState(icicle);
+		this.wakelock.release();
+	}
 	//endregion
 
 }

@@ -85,7 +85,7 @@ public class Anulacion extends PBase {
 		listItems();
 				
 		doc=new clsDocAnul(this,prn.prw);
-		
+
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
 	}
 

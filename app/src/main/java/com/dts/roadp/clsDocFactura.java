@@ -17,6 +17,7 @@ public class clsDocFactura extends clsDocument {
 	private String 	contrib;
 	private int decimp,diacred,totitems;
 	public CliDet cliDet;
+	private int notaCventa;
 
 	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres) {
 		super(context, printwidth,cursymbol,decimpres);
@@ -26,6 +27,7 @@ public class clsDocFactura extends clsDocument {
 		docrecibo=false;
 		decimp=decimpres;
 		cliDet=new CliDet();
+		notaCventa = 0 ;
 	}
 
 
@@ -394,9 +396,6 @@ public class clsDocFactura extends clsDocument {
 
 	private boolean footerToledano() {
 		double totimp, totperc,totalNotaC;
-		int notaCventa;
-
-		notaCventa = cliDet.gl.tiponcredito ;
 
 		stot = stot - imp;
 		totperc = stot * (percep / 100);

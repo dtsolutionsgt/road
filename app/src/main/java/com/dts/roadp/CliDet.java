@@ -894,6 +894,7 @@ public class CliDet extends PBase {
 				}
 			});
 
+			dialog.setCancelable(false);
 			dialog.show();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -940,8 +941,9 @@ public class CliDet extends PBase {
 						msgAskTipoEstadoDev("Devolución de producto en estado...");
 						layout.removeAllViews();
 					}else{
-						toast("Seleccione accion a realizar");
+						//toast("Seleccione accion a realizar");
 						closekeyb();
+						layout.removeAllViews();
 						msgAskTipoDev();
 					}
 				}
@@ -950,7 +952,6 @@ public class CliDet extends PBase {
 			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					layout.removeAllViews();
-
 				}
 			});
 

@@ -239,6 +239,7 @@ public class Venta extends PBase {
 			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("finishOrder: "+e.getMessage());
 		}
 
 	}

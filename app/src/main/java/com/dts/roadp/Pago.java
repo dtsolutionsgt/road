@@ -64,8 +64,15 @@ public class Pago extends PBase {
 		txtMonto = (EditText) findViewById(R.id.txtMonto);
 		
 		setHandlers();
-		
+
 		saldo=gl.pagoval;saldo=mu.round2(saldo);
+
+		if(gl.dvbrowse!=0){
+			if (saldo>=gl.dvdispventa) {
+				saldo=mu.round2(saldo-gl.dvdispventa);
+			}
+		}
+
 		pagolim=mu.round2(gl.pagolim);
 		cobro=gl.pagocobro;
 		cliid=gl.cliente;
@@ -139,6 +146,9 @@ public class Pago extends PBase {
 				finalCheck();
 			} else {
 				gl.pagado=totalPago()>0;
+				if (gl.dvbrowse!=0){
+					gl.brw=1;
+				}
 				finish();
 			}
 		}catch (Exception e){
@@ -237,6 +247,7 @@ public class Pago extends PBase {
 			ins.add("ITEM",id);
 			ins.add("CODPAGO",cpago);
 			ins.add("TIPO",tpago);
+
 			ins.add("VALOR",pago);
 			ins.add("DESC1",desc1);
 			ins.add("DESC2",desc2);
@@ -771,6 +782,7 @@ public class Pago extends PBase {
 				public void onClick(DialogInterface dialog, int which) {
 					((appGlobals) vApp).pagado=false;
 					doExit();
+
 				}
 			});
 
@@ -802,6 +814,9 @@ public class Pago extends PBase {
 				public void onClick(DialogInterface dialog, int which) {
 					if (totalPago()>0){
 						gl.pagado = true;
+						if (gl.dvbrowse!=0){
+							gl.brw=1;
+						}
 						doExit();
 					}
 				}

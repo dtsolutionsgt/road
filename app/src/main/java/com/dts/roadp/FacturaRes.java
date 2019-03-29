@@ -53,7 +53,7 @@ public class FacturaRes extends PBase {
 	private long fecha,fechae;
 	private int fcorel,clidia,media;
 	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt;
-	private int cyear, cmonth, cday, dweek,stp=0,brw=0;
+	private int cyear, cmonth, cday, dweek,stp=0;
 
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
 	private double dispventa;
@@ -824,7 +824,7 @@ public class FacturaRes extends PBase {
 				ins.add("TOTAL",dispventa);
 				ins.add("FACTURA",corel);
 				ins.add("SERIE","0");
-				ins.add("CORELATIVO","0");
+				ins.add("CORELATIVO",gl.dvactualnc);
 				ins.add("STATCOM","N");
 				ins.add("CODIGOLIQUIDACION",0);
 				ins.add("RESOLNC","N");
@@ -1778,7 +1778,7 @@ public class FacturaRes extends PBase {
 
 					peexit=false;
 					svuelt= txtVuelto.getText().toString();
-                    brw=1;
+                    gl.brw=1;
 
                     svuelt=""+tot;
                     sefect=""+tot;
@@ -2113,7 +2113,7 @@ public class FacturaRes extends PBase {
 		s=mu.frmcur(tpago);
 
         if (gl.dvbrowse!=0){
-            if (brw>0){
+            if (gl.brw>0){
                 lblPago.setText("Pago COMPLETO.\n"+s);
                 pago=true;
                 //if (rutapos) askSavePos(); else askSave();

@@ -149,6 +149,18 @@ public class PBase extends Activity {
 		}
 	}
 
+	protected String iif(boolean condition,String valtrue,String valfalse) {
+		if (condition) return valtrue;else return valfalse;
+	}
+
+	protected double iif(boolean condition,double valtrue,double valfalse) {
+		if (condition) return valtrue;else return valfalse;
+	}
+
+	protected double iif(boolean condition,int valtrue,int valfalse) {
+		if (condition) return valtrue;else return valfalse;
+	}
+
 
 	// Activity Events
 	

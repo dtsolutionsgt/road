@@ -632,7 +632,7 @@ public class FacturaRes extends PBase {
 				if (gl.peImprFactCorrecta) {
                     singlePrint();
 				} else {
-					//prn.printask(printclose);
+					prn.printask(printclose);
 				}
 
 				if (notaC==2){

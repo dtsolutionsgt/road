@@ -307,10 +307,31 @@ public class Anulacion extends PBase {
 			mu.msgbox("El documento ha sido anulado.");
 
 			if(tipo==3) {
-				ImpresionFactura();
+
+				clsDocFactura fdoc;
+
+				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
+				fdoc.deviceid =gl.deviceId;
+
+				fdoc.buildPrint(itemid, 1, "TOL"); prn.printask(printclose);
+
 			}else if (tipo==6){
-				ImpresionFactura();
-				//impresionNotaCredito;
+
+				clsDocFactura fdoc;
+				clsDocDevolucion fdev;
+				String corelFactura=tieneFacturaNC(itemid);
+
+				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
+				fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp);
+				fdev.deviceid =gl.deviceId;
+				fdoc.deviceid =gl.deviceId;
+
+                if (!corelFactura.isEmpty()){
+					fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printask(printclose);
+                }
+
+				fdev.buildPrint(itemid, 1, "TOL"); prn.printask(printclose);
+
 			}
 
 			sql="DELETE FROM P_STOCK WHERE CANT=0 AND CANTM=0";
@@ -753,26 +774,48 @@ public class Anulacion extends PBase {
 		return vAnulNotaCredito;
 	}
 
-	private boolean ExisteFactura(String vCorel){
+	private String tieneFacturaNC(String vCorel){
 
 		Cursor DT;
-		boolean vExisteFactura = false;
+		String vtieneFacturaNC= "";
 
 		try{
 
-			sql = "SELECT COREL FROM D_FACTURA WHERE COREL = '" + vCorel + "'";
+			sql = "SELECT FACTURA FROM D_NOTACRED WHERE COREL = '" + vCorel + "' AND FACTURA IN (SELECT COREL FROM D_FACTURA)";
 			DT=Con.OpenDT(sql);
 
-			vExisteFactura = (DT.getCount()>0?true:false);
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				vtieneFacturaNC = DT.getString(0);
+			}
 
 		}catch (Exception ex){
-
+		    mu.msgbox("Ocurrió un error "+ex.getMessage());
 		}
 
-		return vExisteFactura;
+		return vtieneFacturaNC;
 	}
 
-	//endregion
+    private boolean ExisteFactura(String vCorel){
+
+        Cursor DT;
+        boolean vExisteFactura = false;
+
+        try{
+
+            sql = "SELECT COREL FROM D_FACTURA WHERE COREL = '" + vCorel + "'";
+            DT=Con.OpenDT(sql);
+
+            vExisteFactura = (DT.getCount()>0?true:false);
+
+        }catch (Exception ex){
+
+        }
+
+        return vExisteFactura;
+    }
+
+    //endregion
 	
 	//region Impresion
 	

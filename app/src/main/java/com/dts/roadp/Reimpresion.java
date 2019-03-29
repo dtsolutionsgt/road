@@ -74,7 +74,7 @@ public class Reimpresion extends PBase {
 		case 0:  
 			lblTipo.setText("Pedido");break;
 		case 1:  
-			cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp);
+			cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.deviceId);
 			lblTipo.setText("Recibo");break;	
 		case 2:  
 			ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp);

@@ -22,13 +22,14 @@ public class clsDocCobro extends clsDocument {
 	private boolean cobroSR=false;
 	protected MiscUtils mu;
 	
-	public clsDocCobro(Context context,int printwidth,String cursymbol,int decimpres) {
+	public clsDocCobro(Context context,int printwidth,String cursymbol,int decimpres, String deviceId) {
 		super(context, printwidth,cursymbol,decimpres);
 		docfactura=false;
 		docrecibo=true;
 		docpedido=false;
 		docdevolucion=false;
 		mu=new MiscUtils(context,cursymbol);
+		deviceid=deviceId;
 	}
 
 	private boolean esCobroSR(String corel){
@@ -57,13 +58,11 @@ public class clsDocCobro extends clsDocument {
 
 		rep.empty();
 
-		rep.line();
-
 		if (!cobroSR) {
+			rep.line();
 			rep.addp("DOCUMENTO","PAGO");
+			rep.line();
 		}
-
-		rep.line();
 
 		for (int i = 0; i <items.size(); i++) {
 			item=items.get(i);
@@ -71,12 +70,13 @@ public class clsDocCobro extends clsDocument {
 		}
 
 		if (!cobroSR) {
+			rep.line();
 			rep.addtot("TOTAL PAGO", tot);
 		}else{
 			rep.addtot("TOTAL DE COBROS", tot);
 		}
 
-		rep.line();
+		rep.empty();
 
 		rep.add("--------- DETALLE DE PAGO ------------");
 		rep.add("CHEQUES:");
@@ -84,7 +84,7 @@ public class clsDocCobro extends clsDocument {
 		for (int i = 0; i <itemspago.size(); i++) {
 			itempago=itemspago.get(i);
 
-			if(itempago.equals("E")){
+			if(itempago.tipo.equals("E")){
 				vTempEfectivo+=itempago.valor;
 			}else{
 				vTempCheque+=itempago.valor;
@@ -97,15 +97,25 @@ public class clsDocCobro extends clsDocument {
 		rep.add("EFECTIVO          :" + StringUtils.leftPad(mu.frmcur(vTempEfectivo), 13));
 		rep.add("CHEQUE            :" + StringUtils.leftPad(mu.frmcur(vTempCheque), 13));
 
-
-		rep.line();
+		rep.empty();
 		
 		return true;
 	}
 	
 	protected boolean buildFooter() {
-		//rep.addtot("TOTAL PAGO", tot);
-		
+
+		rep.empty();
+		rep.empty();
+		rep.line();
+		rep.addc("FIRMA CLIENTE");
+
+		rep.empty();
+		rep.add( "Serial PDA      : " + deviceid);
+		rep.empty();
+		rep.empty();
+		rep.empty();
+
+
 		return super.buildFooter();
 	}	
 		
@@ -115,7 +125,7 @@ public class clsDocCobro extends clsDocument {
 		int impres, cantimpres;
 				
 		super.loadHeadData(corel);
-		
+
 		nombre="RECIBO";
 		
 		try {
@@ -153,7 +163,7 @@ public class clsDocCobro extends clsDocument {
 					nombre = "COPIA DE RECIBO";
 				}else if (cantimpres==-1){
 					nombre = "RECIBO ANULADO";
-				}else if (cantimpres==-1){
+				}else if (cantimpres==0){
 					nombre = "RECIBO";
 				}
 			}
@@ -206,8 +216,9 @@ public class clsDocCobro extends clsDocument {
 		Cursor DT;
 		itemData item;
 		
-		loadHeadData(corel);
-		
+		//loadHeadData(corel);
+		loadDocDataPago(corel);
+
 		items.clear();
 		
 		try {
@@ -245,9 +256,7 @@ public class clsDocCobro extends clsDocument {
 		Cursor DT;
 		itemDataPago item;
 
-		loadHeadData(corel);
-
-		items.clear();
+		itemspago.clear();
 
 		try {
 			sql = "SELECT P.TIPO, P.VALOR, P.DESC1, P.DESC3 FROM D_COBROP AS P  WHERE P.COREL  ='" + corel + "' ORDER BY P.CODPAGO";

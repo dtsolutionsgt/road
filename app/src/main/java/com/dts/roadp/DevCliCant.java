@@ -3,6 +3,8 @@ package com.dts.roadp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
@@ -349,37 +351,37 @@ public class DevCliCant extends PBase {
 				lblDesc.setText(prodid + " " + DT.getString(7));
 			}
 
-		/*precioventa = prc.precio(prodid,1,gl.nivel,um,gl.umpeso,0);
-		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
-			if (prc.precioespecial>0) precioventa=prc.precioespecial;
-		}*/
-
-
-		if (prodPorPeso(prodid)) {
-			precioventa = prc.precio(prodid, 1, gl.nivel, um, gl.umpeso, gl.dpeso);
-			if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
-				if (prc.precioespecial>0) precioventa=prc.precioespecial;
+			if (prodPorPeso(prodid)) {
+				precioventa = prc.precio(prodid, 1, gl.nivel, um, gl.umpeso, gl.dpeso);
+				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
+					if (prc.precioespecial>0) precioventa=prc.precioespecial;
+				}
+			} else {
+				precioventa = prc.precio(prodid, 1, gl.nivel, um, gl.umpeso, 0);
+				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
+					if (prc.precioespecial>0) precioventa=prc.precioespecial;
+				}
 			}
-		} else {
-			precioventa = prc.precio(prodid, 1, gl.nivel, um, gl.umpeso, 0);
-			if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
-				if (prc.precioespecial>0) precioventa=prc.precioespecial;
-			}
-		}
 
-		precioventa = mu.round(precioventa,gl.peDec);
+			//#CKFK 20190329_08:37AM Agregué esta validación cuando el precio es 0.
+			if (precioventa==0) {
+				hidekeyb();
+				msgSinPrecio("El producto no tiene definido precio");return;
+			}
+
+			precioventa = mu.round(precioventa,gl.peDec);
 
 			sql="SELECT CANT,PESO,PRECIO,UMVENTA,LOTE,TIENE_LOTE FROM T_CxCD WHERE CODIGO='"+prodid+"'";
-           	DT=Con.OpenDT(sql);
+			DT=Con.OpenDT(sql);
 
-           	if (DT.getCount()>0){
+			if (DT.getCount()>0){
 
 				DT.moveToFirst();
 				icant=DT.getDouble(0);
 				razon=raz;
 				umcambiar = DT.getString(3);
 				txtPrecio.setText(String.valueOf(DT.getDouble(2)));
-                txtkgs.setText(String.valueOf(DT.getDouble(1)));
+				txtkgs.setText(String.valueOf(DT.getDouble(1)));
 				gl.tienelote = DT.getInt(5);
 				txtLote.setText(DT.getString(4));
 
@@ -424,7 +426,31 @@ public class DevCliCant extends PBase {
         }
 
 	}
-	
+
+	private void forceClose() {
+		super.finish();
+	}
+
+	private void msgSinPrecio(String msg) {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
+
+			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					forceClose();
+				}
+			});
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
+	}
+
 	private void setCant(){
 		try {
 			cant=Double.parseDouble(txtCant.getText().toString());

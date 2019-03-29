@@ -2174,7 +2174,7 @@ public class FinDia extends PBase {
 
         String vCadena;
         Cursor DT;
-        int TotalRecibos = 0;
+        float TotalRecibos = 0;
         boolean anulado;
 
         try{
@@ -2403,7 +2403,7 @@ public class FinDia extends PBase {
             double vTotalNC_Contado = TotNotaC_Contado();
             double vTotalCredito = TotalCredito2();
             double vTotalContado = TotalEfectivo2();
-            double TotalRecibos=0;
+            double TotalRecibos=TotalRecibos();
             int corelativoZ = 0;
 
             //Totales para liquidacion
@@ -2439,7 +2439,7 @@ public class FinDia extends PBase {
             rep.add(vCadena);
             vCadena = "Venta Total           :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
             rep.add(vCadena);
-            vCadena = "Gran Total           :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
+            vCadena = "Gran Total            :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
             rep.add(vCadena);
             vCadena = "Total Recibos         :" + StringUtils.leftPad(mu.frmcur_sm(TotalRecibos), 13);
             rep.add(vCadena);
@@ -2697,14 +2697,14 @@ public class FinDia extends PBase {
         return vTotNotasCredAnul;
     }
 
-    private int TotNotaC_Credito(){
+    private double TotNotaC_Credito(){
 
         Cursor DT;
-        int vTotNotaC_Credito = 0;
+        double vTotNotaC_Credito = 0;
 
         try{
 
-            sql =  " SELECT IFNULL(COUNT(NC.COREL),0) AS TOTAL " +
+            sql =  " SELECT IFNULL(SUM(NC.TOTAL),0) AS TOTAL " +
                    " FROM D_NOTACRED NC " +
                    " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='N' " +
                    " AND (FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO = 'K')" +
@@ -2714,7 +2714,7 @@ public class FinDia extends PBase {
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
 
-                vTotNotaC_Credito = DT.getInt(0);
+                vTotNotaC_Credito = DT.getDouble(0);
             }
         }catch (Exception ex){
             msgbox(new Object() {
@@ -2724,14 +2724,14 @@ public class FinDia extends PBase {
         return vTotNotaC_Credito;
     }
 
-    private int TotNotaC_Contado(){
+    private double TotNotaC_Contado(){
 
         Cursor DT;
-        int vTotNotaC_Contado = 0;
+        double vTotNotaC_Contado = 0;
 
         try{
 
-            sql =  " SELECT IFNULL(COUNT(NC.COREL),0) AS TOTAL " +
+            sql =  " SELECT IFNULL(SUM(NC.TOTAL),0) AS TOTAL " +
                     " FROM D_NOTACRED NC " +
                     " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='N' " +
                     " AND NC.FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO <> 'K')";
@@ -2740,7 +2740,7 @@ public class FinDia extends PBase {
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
 
-                vTotNotaC_Contado = DT.getInt(0);
+                vTotNotaC_Contado = DT.getDouble(0);
             }
         }catch (Exception ex){
             msgbox(new Object() {
@@ -2750,10 +2750,10 @@ public class FinDia extends PBase {
         return vTotNotaC_Contado;
     }
 
-    private int TotalCredito2(){
+    private double TotalCredito2(){
 
         Cursor DT;
-        int vTotCredito2 = 0;
+        double vTotCredito2 = 0;
 
         try{
 
@@ -2766,7 +2766,7 @@ public class FinDia extends PBase {
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
 
-                vTotCredito2 = DT.getInt(0);
+                vTotCredito2 = DT.getDouble(0);
             }
         }catch (Exception ex){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
@@ -2777,10 +2777,10 @@ public class FinDia extends PBase {
         return vTotCredito2;
     }
 
-    private int TotalEfectivo2(){
+    private double TotalEfectivo2(){
 
         Cursor DT;
-        int vTotEfectivo2 = 0;
+        double vTotEfectivo2 = 0;
 
         try{
 
@@ -2792,7 +2792,7 @@ public class FinDia extends PBase {
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
 
-                vTotEfectivo2 = DT.getInt(0);
+                vTotEfectivo2 = DT.getDouble(0);
             }
         }catch (Exception ex){
             msgbox(new Object() {
@@ -2800,6 +2800,30 @@ public class FinDia extends PBase {
         }
 
         return vTotEfectivo2;
+    }
+
+    private double TotalRecibos(){
+
+        Cursor DT;
+        double vTotalRecibos = 0;
+
+        try{
+
+            sql = " SELECT IFNULL(SUM(C.TOTAL),0) AS TOTAL FROM D_COBRO C " +
+                    " WHERE C.RUTA='" + gl.ruta + "' AND C.ANULADO='N' ";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vTotalRecibos = DT.getDouble(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vTotalRecibos;
     }
 
     //endregion

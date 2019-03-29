@@ -32,6 +32,7 @@ public class Reimpresion extends PBase {
 	private clsDocMov mdoc;
 	private clsDocDepos ddoc;
 	private clsDocCobro cdoc;
+	private clsDocDevolucion fdev;
 	
 	private int tipo;	
 	private String selid,itemid;
@@ -88,7 +89,8 @@ public class Reimpresion extends PBase {
 			mdoc=new clsDocMov(this,prn.prw,"Dvolucion a bodega",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp);
 			lblTipo.setText("Devolución a bodega");break;
 		case 6:  
-			fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
+			fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp);
+			fdev.deviceid =gl.deviceId;
 			lblTipo.setText("Nota Crédito");break;
 			
 		case 99:  
@@ -441,7 +443,8 @@ public class Reimpresion extends PBase {
 
 		try {
 
-			sql="SELECT COREL,IMPRES,SERIE,CORELATIVO FROM D_NOTACRED WHERE COREL='"+itemid+"'";
+			fdev.buildPrint(itemid, 1, "TOL"); prn.printask(printclose);
+			/*sql="SELECT COREL,IMPRES,SERIE,CORELATIVO FROM D_NOTACRED WHERE COREL='"+itemid+"'";
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()==0) {
@@ -467,7 +470,7 @@ public class Reimpresion extends PBase {
 			} catch (Exception e) {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			}			
-			
+			*/
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());

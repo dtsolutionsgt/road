@@ -183,15 +183,24 @@ public class clsDocument {
             rep.add("");
         }
 
-        if (docfactura && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
-        if (docfactura && (reimpres==2)) rep.add("------  C O P I A  ------");
-        if (docfactura && (reimpres==3)) rep.add("------       A N U L A D O      ------");
-        //#HS_20181212 condición para factura pendiente de pago
-        if(docfactura && (reimpres==4)) {
-            rep.add("- P E N D I E N T E  D E  P A G O -");
-            pendiente = reimpres;
-        }
-        if (docfactura && (reimpres==5)) rep.add("------  C O N T A B I L I T A D  ------");
+        if(docfactura){
+			if (docfactura && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
+			if (docfactura && (reimpres==2)) rep.add("------  C O P I A  ------");
+			if (docfactura && (reimpres==3)) rep.add("------       A N U L A D O      ------");
+			//#HS_20181212 condición para factura pendiente de pago
+			if(docfactura && (reimpres==4)) {
+				rep.add("- P E N D I E N T E  D E  P A G O -");
+				pendiente = reimpres;
+			}
+			if (docfactura && (reimpres==5)) rep.add("------  C O N T A B I L I T A D  ------");
+		}else if(docdevolucion){
+			rep.add("");
+			if (docdevolucion && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
+			if (docdevolucion && (reimpres==2)) rep.add("------  C O P I A  ------");
+			if (docdevolucion && (reimpres==3)) rep.add("------       A N U L A D O      ------");
+			rep.add("");
+		}
+
 
 
     }

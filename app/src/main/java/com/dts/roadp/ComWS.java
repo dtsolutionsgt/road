@@ -2975,8 +2975,12 @@ public class ComWS extends PBase {
 			dbld.insert("D_REPFINDIA", "WHERE (LINEA>=0)");
 
 			//if (envioparcial) commitSQL();
-
-			commitSQL();
+			if (commitSQL() == 1) {
+				errflag=false;
+			} else {
+				errflag=true;
+				fterr += "\n" + sstr;
+			}
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -3254,9 +3258,9 @@ public class ComWS extends PBase {
 						ActualizaStatcom();
 						claseFindia.eliminarTablasD();
 					}
-
-					msgResultEnvio(senv);
 				}
+
+				msgResultEnvio(senv);
 
 			} else {
 				lblInfo.setText(fstr);writeErrLog(fterr);

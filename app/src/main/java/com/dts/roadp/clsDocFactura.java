@@ -300,10 +300,8 @@ public class clsDocFactura extends clsDocument {
 
 	// Encabezado por empresa
 
-	@Override
+/*	@Override
 	protected void saveHeadLines(int reimpres) {
-
-
 		if (modofact.equalsIgnoreCase("*")) super.saveHeadLines(reimpres);
 		if (modofact.equalsIgnoreCase("TOL")) headerToledano(reimpres);
 	}
@@ -347,7 +345,7 @@ public class clsDocFactura extends clsDocument {
 			pendiente = reimpres;
 		}
 
-	}
+	}*/
 
 
 	// Pie por empresa

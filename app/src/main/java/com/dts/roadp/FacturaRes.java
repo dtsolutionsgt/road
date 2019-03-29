@@ -53,7 +53,7 @@ public class FacturaRes extends PBase {
 	private long fecha,fechae;
 	private int fcorel,clidia,media;
 	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt;
-	private int cyear, cmonth, cday, dweek,stp=0;
+	private int cyear, cmonth, cday, dweek,stp=0,brw=0,notaC;
 
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
 	private double dispventa;
@@ -94,6 +94,7 @@ public class FacturaRes extends PBase {
 		credito=gl.credito;
 		gl.cobroPendiente = false;
 		dispventa = gl.dvdispventa;
+		notaC = gl.tiponcredito;
 
 		app = new AppMethods(this, gl, Con, db);
 
@@ -159,7 +160,7 @@ public class FacturaRes extends PBase {
 					lblMPago.setVisibility(View.INVISIBLE);
 				}
 			} else {
-				contadoCheck.setVisibility(View.INVISIBLE);
+				contadoCheck.setVisibility(View.VISIBLE);
 				lblCash.setVisibility(View.INVISIBLE);
 				imgCash.setVisibility(View.INVISIBLE);
 				lblPend.setVisibility(View.INVISIBLE);
@@ -217,6 +218,7 @@ public class FacturaRes extends PBase {
 		fdoc.deviceid =gl.deviceId;
 
 		fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp);
+		fdev.deviceid =gl.deviceId;
 
 		saved=false;
 		assignCorel();
@@ -265,7 +267,7 @@ public class FacturaRes extends PBase {
 	public void checkedBox(View view){
 		contadoCheck.setVisibility(View.VISIBLE);
 		if(contadoCheck.isChecked()){
-			contadoCheck.setText("Pagar al Credito");
+			contadoCheck.setText("Pagar al Contado");
 			lblCash.setVisibility(View.VISIBLE);
 			imgCash.setVisibility(View.VISIBLE);
 			lblPend.setVisibility(View.INVISIBLE);
@@ -630,10 +632,10 @@ public class FacturaRes extends PBase {
 				if (gl.peImprFactCorrecta) {
                     singlePrint();
 				} else {
-					prn.printask(printclose);
+					//prn.printask(printclose);
 				}
 
-				if (gl.tiponcredito==2){
+				if (notaC==2){
 					fdev.buildPrint(gl.dvcorreld,0);
 					prn.printask(printclose);
 				}

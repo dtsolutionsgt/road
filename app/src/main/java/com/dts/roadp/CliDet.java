@@ -113,7 +113,6 @@ public class CliDet extends PBase {
 		credito=gl.credito;
 
 		cod=gl.cliente;
-		gl.tiponcredito = 0;
 
 		/*if (!gl.devol) {
 			lblDevol.setVisibility(View.INVISIBLE);

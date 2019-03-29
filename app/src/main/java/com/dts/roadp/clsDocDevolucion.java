@@ -24,16 +24,21 @@ public class clsDocDevolucion extends clsDocument {
 
     protected boolean buildDetail() {
         itemData item;
+        int onceMerc = 0;
 
-        rep.line();
-        //rep.empty();
+        rep.add("");
 
         for (int i = 0; i <items.size(); i++) {
             item=items.get(i);
-            rep.addp("Mercancia "+ item.estado,"");
+
+            if(onceMerc==0){
+                rep.addp("Mercancia "+ item.estado,"");
+                onceMerc = 1;
+            }
+
         }
 
-        rep.line();
+        rep.add("");
 
         detailToledano();
         return true;
@@ -43,7 +48,7 @@ public class clsDocDevolucion extends clsDocument {
         itemData item;
         String ss;
 
-        rep.line();
+        rep.add("");
         rep.add("CODIGO   DESCRIPCION        UM  CANT");
         rep.add("       KGS    PRECIO           VALOR");
         rep.line();
@@ -70,7 +75,8 @@ public class clsDocDevolucion extends clsDocument {
 
         if(corelNC.equals(asignacion)){
 
-            rep.addtot("TOTAL PAGO", tot);
+            rep.add("");
+            rep.addtot("TOTAL NOTA CREDITO ", tot);
             rep.add("");
             rep.add("");
             rep.add("");
@@ -90,7 +96,8 @@ public class clsDocDevolucion extends clsDocument {
 
         }else{
 
-            rep.addtot("TOTAL PAGO", tot);
+            rep.add("");
+            rep.addtot("TOTAL NOTA CREDITO ", tot);
             rep.add("");
             rep.add("");
             rep.add("");
@@ -123,19 +130,21 @@ public class clsDocDevolucion extends clsDocument {
         nombre="NOTA DE CREDITO";
 
         try {
-            sql="SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,FECHA,FACTURA FROM D_NOTACRED WHERE FACTURA='"+corel+"'";
+            sql="SELECT N.RUTA,N.VENDEDOR,N.CLIENTE,N.TOTAL,N.FECHA,N.FACTURA "+
+                "FROM D_NOTACRED N INNER JOIN D_CxC C ON C.TOTAL = N.TOTAL "+
+                "WHERE C.COREL = '"+corel+"'";
+
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
 
-            serie=DT.getString(7);
-            //numero=""+DT.getInt(1);
-            ruta=DT.getString(2);
+            serie=DT.getString(5);
+            ruta=DT.getString(0);
 
-            vend=DT.getString(3);
-            cli=DT.getString(4);
+            vend=DT.getString(1);
+            cli=DT.getString(2);
 
-            tot=DT.getDouble(5);
-            ffecha=DT.getInt(6);fsfecha=sfecha(ffecha);
+            tot=DT.getDouble(3);
+            ffecha=DT.getInt(4);fsfecha=sfecha(ffecha);
 
         } catch (Exception e) {
             Toast.makeText(cont,"loadHeadData"+e.getMessage(), Toast.LENGTH_SHORT).show();return false;
@@ -201,9 +210,10 @@ public class clsDocDevolucion extends clsDocument {
         items.clear();
 
         try {
-            sql="SELECT N.COREL,F.ASIGNACION, F.COREL "+
-                "FROM D_NOTACRED N INNER JOIN D_FACTURA F ON F.ASIGNACION = N.COREL "+
-                "WHERE N.FACTURA = '"+corel+"'";
+            sql="SELECT N.COREL,F.ASIGNACION, F.COREL " +
+                 "FROM D_NOTACRED N INNER JOIN D_FACTURA F ON F.ASIGNACION = N.COREL " +
+                 "INNER JOIN D_CxC C ON N.TOTAL = C.TOTAL " +
+                 "WHERE C.COREL = '"+corel+"'";
 
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
@@ -230,9 +240,10 @@ public class clsDocDevolucion extends clsDocument {
 
             DT.moveToFirst();
 
-            item =new itemData();
 
             while (!DT.isAfterLast()) {
+
+                item =new itemData();
 
                 item.cod=DT.getString(0);
                 item.nombre=DT.getString(1);
@@ -246,12 +257,12 @@ public class clsDocDevolucion extends clsDocument {
                 items.add(item);
 
                 DT.moveToNext();
-            }
 
-            if (item.estado.equals("B")){
-                item.estado="En Buen Estado";
-            }else{
-                item.estado="En Mal Estado";
+                if (item.estado.equals("B")){
+                    item.estado="En Buen Estado";
+                }else{
+                    item.estado="En Mal Estado";
+                }
             }
 
         } catch (Exception e) {
@@ -260,7 +271,6 @@ public class clsDocDevolucion extends clsDocument {
 
         return true;
     }
-
 
     // Aux
 

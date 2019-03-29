@@ -358,6 +358,37 @@ public class FinDia extends PBase {
                     DT.moveToNext();
                 }
             }
+
+            //Delete D_NOTACRED y D_NOTACRED
+            sql = "SELECT COREL FROM D_NOTACRED WHERE STATCOM='S'";
+            DT = Con.OpenDT(sql);
+            if (DT.getCount() > 0) {
+
+                DT.moveToFirst();
+                while (!DT.isAfterLast()) {
+                    corel = DT.getString(0);
+                    sql="DELETE FROM D_NOTACRED WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql="DELETE FROM D_NOTACREDD WHERE COREL='" + corel + "'";db.execSQL(sql);
+
+                    DT.moveToNext();
+                }
+            }
+
+            //Delete D_CXC y D_CXCD
+            sql = "SELECT COREL FROM D_CXC WHERE STATCOM='S'";
+            DT = Con.OpenDT(sql);
+            if (DT.getCount() > 0) {
+
+                DT.moveToFirst();
+                while (!DT.isAfterLast()) {
+                    corel = DT.getString(0);
+                    sql="DELETE FROM D_CXC WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql="DELETE FROM D_CXCD WHERE COREL='" + corel + "'";db.execSQL(sql);
+
+                    DT.moveToNext();
+                }
+            }
+
             //sql="DELETE FROM D_MOVD WHERE CODIGOLIQUIDACION=0";db.execSQL(sql);
 
 
@@ -398,13 +429,6 @@ public class FinDia extends PBase {
             sql = "DELETE FROM D_ATENCION";
             db.execSQL(sql);
             sql = "DELETE FROM D_CLICOORD WHERE STATCOM='S'";
-            db.execSQL(sql);
-
-
-            corelz++;
-            sql = "UPDATE FinDia SET Corel=" + corelz + ", GrandTotal = GrandTotal + " + gSumados;
-            db.execSQL(sql);
-            sql = "UPDATE P_HANDHELD SET CorelZ=" + corelz + ", GrandTotal = GrandTotal + " + gSumados;
             db.execSQL(sql);
 
 			/*sql="UPDATE P_RUTA SET Email='0'";
@@ -1426,7 +1450,7 @@ public class FinDia extends PBase {
                 public void onClick(DialogInterface dialog, int which) {
                     buildReportsTOL();
                     imprimeCierreZ();
-                    claseFinDia.updateGrandTotal(gSumados);
+                    claseFinDia.updateGrandTotalCorelZ(gSumados,corelz++);
                 }
             });
 

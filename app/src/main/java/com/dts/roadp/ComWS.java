@@ -4188,7 +4188,7 @@ public class ComWS extends PBase {
 		}
 	}
 
-	@Override
+	/*@Override
 	protected void onResume() {
 		super.onResume();
 		try {
@@ -4208,7 +4208,6 @@ public class ComWS extends PBase {
 		super.onPause();
 	}
 
-	/*Esto, junto con el onDestroy, hacen que la pantalla siga encendida hasta que la actividad termine*/
 	@Override
 	protected void onDestroy(){
 		super.onDestroy();
@@ -4221,6 +4220,8 @@ public class ComWS extends PBase {
 		super.onSaveInstanceState(icicle);
 		this.wakelock.release();
 	}
+	*/
+
 	//endregion
 
 }

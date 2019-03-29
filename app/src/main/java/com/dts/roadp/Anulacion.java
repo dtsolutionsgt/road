@@ -306,8 +306,11 @@ public class Anulacion extends PBase {
 			
 			mu.msgbox("El documento ha sido anulado.");
 
-			if(tipo==3){
+			if(tipo==3) {
 				ImpresionFactura();
+			}else if (tipo==6){
+				ImpresionFactura();
+				//impresionNotaCredito;
 			}
 
 			sql="DELETE FROM P_STOCK WHERE CANT=0 AND CANTM=0";

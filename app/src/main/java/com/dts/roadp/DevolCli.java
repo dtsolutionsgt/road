@@ -36,7 +36,7 @@ public class DevolCli extends PBase {
 	private double cant;
 	private String emp,estado;
 	private int itempos;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -341,7 +341,7 @@ public class DevolCli extends PBase {
             ins.add("UMSTOCK",gl.dvumstock);
             ins.add("UMPESO",gl.dvumpeso);
             ins.add("FACTOR",gl.dvfactor);
-            ins.add("POR_PESO",String.valueOf(gl.dvporpeso));
+            ins.add("POR_PESO",(gl.dvporpeso?"N":"S"));
 			ins.add("TIENE_LOTE",gl.tienelote);
 
 	    	db.execSQL(ins.sql());

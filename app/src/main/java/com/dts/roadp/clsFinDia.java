@@ -292,11 +292,17 @@ public class clsFinDia extends PBase{
             msgbox("updateImprimioCierreZ: " + e.getMessage());
         }
     }
-    //#CKFK 20190305 Creé esta función para actualizar el val7 en la tabla FinDia
-    public void updateGrandTotal(double valor){
+    //#CKFK 20190305 Creé esta función para actualizar el val8 en la tabla FinDia
+    public void updateGrandTotalCorelZ(double valor, int corel){
         try{
-            sql=" UPDATE FinDia SET val8 = " + String.valueOf(valor);
+
+            //#CKFK_20190328 Moví esto que estaba en ProcessComplete para acá porque de lo contrario no se actualizaban los valores.
+            corelz++;
+            sql = "UPDATE FinDia SET Corel=" + corel + ", val8 = val8 + " + valor;
             db.execSQL(sql);
+            sql = "UPDATE P_HANDHELD SET CorelZ=" + corelz + ", GrandTotal = GrandTotal + " + valor;
+            db.execSQL(sql);
+
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox("updateGrandTotal: " + e.getMessage());
@@ -443,6 +449,36 @@ public class clsFinDia extends PBase{
                     corel=DT.getString(0);
                     sql="DELETE FROM D_CLINUEVO WHERE CODIGO='"+corel+"'";db.execSQL(sql);
                     sql="DELETE FROM D_CLINUEVO_APR WHERE CODIGO='"+corel+"'";db.execSQL(sql);
+
+                    DT.moveToNext();
+                }
+            }
+
+            //Delete D_NOTACRED y D_NOTACRED
+            sql = "SELECT COREL FROM D_NOTACRED WHERE STATCOM='S'";
+            DT = Con.OpenDT(sql);
+            if (DT.getCount() > 0) {
+
+                DT.moveToFirst();
+                while (!DT.isAfterLast()) {
+                    corel = DT.getString(0);
+                    sql="DELETE FROM D_NOTACRED WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql="DELETE FROM D_NOTACREDD WHERE COREL='" + corel + "'";db.execSQL(sql);
+
+                    DT.moveToNext();
+                }
+            }
+
+            //Delete D_CXC y D_CXCD
+            sql = "SELECT COREL FROM D_CXC WHERE STATCOM='S'";
+            DT = Con.OpenDT(sql);
+            if (DT.getCount() > 0) {
+
+                DT.moveToFirst();
+                while (!DT.isAfterLast()) {
+                    corel = DT.getString(0);
+                    sql="DELETE FROM D_CXC WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql="DELETE FROM D_CXCD WHERE COREL='" + corel + "'";db.execSQL(sql);
 
                     DT.moveToNext();
                 }

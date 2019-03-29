@@ -1,20 +1,19 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
-
 import android.content.Context;
 import android.database.Cursor;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class clsDocFactura extends clsDocument {
 
 	private ArrayList<itemData> items= new ArrayList<itemData>();
-	
+	private ArrayList<itemData> bons= new ArrayList<itemData>();
+
 	private double tot,desc,imp,stot,percep,totNotaC;
 	private boolean sinimp;
-	private String 	contrib,corelNotaC,asignacion;
+	private String 	contrib,corelNotaC,asignacion,ccorel;
 	private int decimp,diacred,totitems;
 
 
@@ -27,7 +26,6 @@ public class clsDocFactura extends clsDocument {
 		docrecibo=false;
 		decimp=decimpres;
 	}
-
 
 	protected boolean loadHeadData(String corel) {
 		Cursor DT;
@@ -167,13 +165,15 @@ public class clsDocFactura extends clsDocument {
 	
 	protected boolean loadDocData(String corel) {
 		Cursor DT;
-		itemData item;
+		itemData item,bon;
 		String serie,corNota;
 		int corrl;
 
+		ccorel=corel;
+
 		loadHeadData(corel);
 		
-		items.clear();
+		items.clear();bons.clear();
 		
 		try {
 
@@ -229,6 +229,39 @@ public class clsDocFactura extends clsDocument {
                 DT.moveToNext();
             }
 
+
+			try {
+				sql = "SELECT D_BONIF.PRODUCTO,P_PRODUCTO.DESCLARGA AS NOMBRE,D_BONIF.CANT, D_BONIF.UMVENTA, D_BONIF.CANT*D_BONIF.FACTOR AS TPESO " +
+						"FROM D_BONIF INNER JOIN P_PRODUCTO ON D_BONIF.PRODUCTO = P_PRODUCTO.CODIGO " +
+						"WHERE (D_BONIF.COREL='" + ccorel + "')";
+				sql += "UNION ";
+				sql += "SELECT D_BONIF_BARRA.PRODUCTO,P_PRODUCTO.DESCLARGA AS NOMBRE,COUNT(D_BONIF_BARRA.BARRA) AS CANT, D_BONIF_BARRA.UMSTOCK, SUM(D_BONIF_BARRA.PESO) AS TPESO " +
+						"FROM D_BONIF_BARRA INNER JOIN P_PRODUCTO ON D_BONIF_BARRA.PRODUCTO = P_PRODUCTO.CODIGO " +
+						"WHERE (D_BONIF_BARRA.COREL='" + ccorel + "') " +
+						"GROUP BY D_BONIF_BARRA.PRODUCTO,P_PRODUCTO.DESCLARGA,D_BONIF_BARRA.UMVENTA ";
+				sql += "ORDER BY NOMBRE ";
+
+				DT=Con.OpenDT(sql);
+				if (DT.getCount()>0) DT.moveToFirst();
+
+				while (!DT.isAfterLast()) {
+
+					bon = new itemData();
+
+					bon.cod = DT.getString(0);
+					bon.nombre = DT.getString(1);
+					bon.cant = DT.getDouble(2);
+					bon.um = DT.getString(3);
+					bon.peso = DT.getDouble(4);
+
+					bons.add(bon);
+					DT.moveToNext();
+				}
+
+			} catch (Exception e) {
+				Toast.makeText(cont,"Impresion bonif : "+e.getMessage(), Toast.LENGTH_LONG).show();
+			}
+
 		} catch (Exception e) {
 			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();
 	    }		
@@ -269,6 +302,7 @@ public class clsDocFactura extends clsDocument {
 		}
 
 		rep.line();
+
 
 		return true;
 	}
@@ -348,6 +382,42 @@ public class clsDocFactura extends clsDocument {
 	}*/
 
 
+	// Bonificaciones
+
+	private void bonificaciones() {
+		itemData item;
+		String ss;
+
+		if (bons.size()==0) return;
+
+		rep.line();
+		rep.add("----   B O N I F I C A C I O N  ----");
+		rep.line();
+		rep.add("CODIGO   DESCRIPCION        UM  CANT");
+		rep.add("       KGS    ");
+		rep.line();
+
+		for (int i = 0; i <bons.size(); i++) {
+			
+			item=bons.get(i);
+
+			ss=rep.ltrim(item.cod+" "+item.nombre,prw-10);
+			ss=ss+rep.rtrim(item.um,4)+" "+rep.rtrim(frmdecimal(item.cant,2),5);
+			rep.add(ss);
+			ss=rep.rtrim(frmdecimal(item.peso,2),10);
+			ss=rep.ltrim(ss,prw-10);
+			rep.add(ss);
+
+		}
+
+		rep.line();
+
+		rep.add("");
+		rep.add("");
+		rep.add("");
+		rep.add("");
+	}
+
 	// Pie por empresa
 
 	protected boolean buildFooter() {
@@ -404,7 +474,7 @@ public class clsDocFactura extends clsDocument {
 
 		rep.addtotsp("Subtotal", stot);
 
-		if(corelNotaC.equals(asignacion)){
+		if (corelNotaC.equals(asignacion)) {
 
 			rep.addtotsp("Nota de Credito", totNotaC);
 			rep.addtotsp("ITBM", totimp);
@@ -413,7 +483,7 @@ public class clsDocFactura extends clsDocument {
 			rep.add("");
 			rep.add("Total de items: "+totitems);
 			rep.add("");
-			rep.add("");
+			bonificaciones();
 			rep.add("");
 			rep.line();
 			rep.addc("Firma Cliente");
@@ -430,7 +500,7 @@ public class clsDocFactura extends clsDocument {
 			rep.add(resfecha);
 			rep.add("");
 
-		}else{
+		} else {
 
 			rep.addtotsp("ITBM", totimp);
 			rep.addtotsp("Total", tot);
@@ -438,7 +508,7 @@ public class clsDocFactura extends clsDocument {
 			rep.add("");
 			rep.add("Total de items: "+totitems);
 			rep.add("");
-			rep.add("");
+			bonificaciones();
 			rep.add("");
 			rep.line();
 			rep.addc("Firma Cliente");

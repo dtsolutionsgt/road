@@ -1,26 +1,27 @@
 package com.dts.roadp;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import datamaxoneil.connection.Connection_Bluetooth;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+
+import datamaxoneil.connection.Connection_Bluetooth;
 
 // 00:17:AC:01:75:E9
 
 public class printDMax extends printBase
 {
 	
-	private String ss;
+	private String ss,ess;
 	private PrintDialog printDialog;
 	private appGlobals appG;
 	
@@ -41,8 +42,7 @@ public class printDMax extends printBase
 		msgAskPrint();
 	}
 	
-	public void printask()
-	{
+	public void printask() {
 		hasCallback=false;
 		
 		fname="print.txt";errmsg="";
@@ -50,7 +50,6 @@ public class printDMax extends printBase
 	}
 	
 	public boolean print() 	{
-
 		hasCallback=false;
 		
 		fname="print.txt";errmsg="";
@@ -196,8 +195,11 @@ public class printDMax extends printBase
                     } catch (Exception ee) {}
                 }
             }, 500);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        	ess=e.getMessage();
+		}
 
+		/*
         try {
             //#EJC201800: Llamar el close de la printer
             final Handler cbhandler1 = new Handler();
@@ -210,6 +212,7 @@ public class printDMax extends printBase
                 }
             }, 200);
         } catch (Exception e) {}
+        */
 	}
 	
 	public void processPrint() {

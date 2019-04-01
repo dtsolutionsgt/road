@@ -600,9 +600,7 @@ public class FacturaRes extends PBase {
 				if (!saveOrder()) return;
 			}
 
-			if(gl.dvbrowse!=0){
-				gl.dvbrowse =0;
-			}
+			if(gl.dvbrowse!=0) gl.dvbrowse =0;
 
 			clsBonifSave bonsave=new clsBonifSave(this,corel,"V");
 
@@ -625,14 +623,18 @@ public class FacturaRes extends PBase {
 
 					//#HS_20181212 Condicion para imprimir facturas pendientes de pago
 					if (!gl.cobroPendiente) {
-						fdoc.buildPrint(corel, 0,gl.peFormatoFactura);
+					    if (impres==0) {
+                            fdoc.buildPrint(corel, 0,gl.peFormatoFactura);
+                        } else {
+                            fdoc.buildPrint(corel, 10,gl.peFormatoFactura);
+                        }
 					}else{
 						fdoc.buildPrint(corel,4,gl.peFormatoFactura);
 					}
 				}
 
 				if (gl.peImprFactCorrecta) {
-					prn.printask(printclose);
+					prn.printask(printcallback);
 				} else {
 					singlePrint();
 				}
@@ -641,6 +643,7 @@ public class FacturaRes extends PBase {
 					fdev.buildPrint(gl.dvcorreld,0);
 					prn.printask(printclose);
 				}
+
 				/*
 				final Handler shandler = new Handler();
 				shandler.postDelayed(new Runnable() {
@@ -2267,18 +2270,28 @@ public class FacturaRes extends PBase {
 				public void onClick(DialogInterface dialog, int which) {
 					gl.closeCliDet = true;
 					gl.closeVenta = true;
-					FacturaRes.super.finish();
+
+					impres++;toast("Impres "+impres);
+
+					if (impres>1) {
+						FacturaRes.super.finish();
+					} else {
+						fdoc.buildPrint(corel, 10,gl.peFormatoFactura);
+						prn.printask(printcallback);
+					}
 				}
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					singlePrint();
+					//singlePrint();
+					prn.printask(printcallback);
 				}
 			});
+			
 
 			dialog.show();
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 

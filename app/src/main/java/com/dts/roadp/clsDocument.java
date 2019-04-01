@@ -59,6 +59,7 @@ public class clsDocument {
 	}
 
 	public boolean buildPrint(String corel,int reimpres,String modo) {
+		boolean flag;
 
         modofact=modo;
 		rep.clear();
@@ -67,7 +68,16 @@ public class clsDocument {
 		if (!buildDetail()) return false;
 		if (!buildFooter()) return false;
 
-		if (!rep.save()) return false;
+		flag=true;
+		if (modofact.equalsIgnoreCase("TOL")) {
+			if (docfactura && (reimpres==10)) flag=false;
+		}
+
+		if (flag) {
+			if (!rep.save(2)) return false;
+		} else {
+			if (!rep.save()) return false;
+		}
 
 		return true;
 	}
@@ -114,7 +124,8 @@ public class clsDocument {
 		
 		return true;
 	}
-	
+
+
 	// Methods Prototypes
 	
 	protected boolean buildDetail() {
@@ -188,10 +199,11 @@ public class clsDocument {
 
         }
 
-        if(docfactura){
+        if (docfactura){
 
 			rep.add("");
 			if (docfactura && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
+			if (docfactura && (reimpres==10)) rep.add("-------  R E I M P R E S I O N  -------");
 			if (docfactura && (reimpres==2)) rep.add("------  C O P I A  ------");
 			if (docfactura && (reimpres==3)) rep.add("------       A N U L A D O      ------");
 			//#HS_20181212 condición para factura pendiente de pago

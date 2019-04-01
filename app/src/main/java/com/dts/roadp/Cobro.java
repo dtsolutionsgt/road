@@ -273,16 +273,9 @@ public class Cobro extends PBase {
 
 					dtipo = vItem.Tipo;
 					if (dtipo.equalsIgnoreCase("R")) clearAll();
-					dtipo=vItem.Tipo;
-
-					if (dtipo.equalsIgnoreCase("R")) clearAll();
 
 					flag = vItem.flag;
 					if (flag == 0) flag = 1;else flag = 0;
-					vItem.flag = flag;
-					flag = vItem.flag;
-					if (flag == 0) flag = 1;
-					else flag = 0;
 					vItem.flag = flag;
 
 					adapter.refreshItems();

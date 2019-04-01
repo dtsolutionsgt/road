@@ -341,7 +341,7 @@ public class DevolCli extends PBase {
             ins.add("UMSTOCK",gl.dvumstock);
             ins.add("UMPESO",gl.dvumpeso);
             ins.add("FACTOR",gl.dvfactor);
-            ins.add("POR_PESO",(gl.dvporpeso?"N":"S"));
+            ins.add("POR_PESO",(gl.dvporpeso?"S":"N"));
 			ins.add("TIENE_LOTE",gl.tienelote);
 
 	    	db.execSQL(ins.sql());
@@ -409,7 +409,7 @@ public class DevolCli extends PBase {
                 ins.add("TOTAL",cntotl);
                 ins.add("FACTURA",gl.dvcorreld);
                 ins.add("SERIE","0");
-                ins.add("CORELATIVO","0");
+                ins.add("CORELATIVO",gl.dvactualnc);
                 ins.add("STATCOM","N");
                 ins.add("CODIGOLIQUIDACION",0);
                 ins.add("RESOLNC","N");

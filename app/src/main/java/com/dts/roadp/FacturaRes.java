@@ -641,7 +641,7 @@ public class FacturaRes extends PBase {
 
 				if (notaC==2){
 					fdev.buildPrint(gl.dvcorreld,0);
-					prn.printask(printclose);
+					prn.printask(printclose, "printnc.txt");
 				}
 
 				/*

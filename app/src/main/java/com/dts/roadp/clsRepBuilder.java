@@ -1,14 +1,16 @@
 package com.dts.roadp;
 
+import android.content.Context;
+import android.os.Environment;
+import android.widget.Toast;
+
+import org.apache.commons.lang.StringUtils;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.apache.commons.lang.StringUtils;
-import android.content.Context;
-import android.os.Environment;
-import android.widget.Toast;
 
 
 public class clsRepBuilder {
@@ -77,34 +79,77 @@ public class clsRepBuilder {
 	public boolean save(){
 		String s;
 		int lns=0;
-				
+
 		if (items.size()==0) return true;
-		
+
 		try {
-		 				
+
 			wfile=new FileWriter(fname,false);
 			writer = new BufferedWriter(wfile);
-			
-		    for (int i = 0; i < items.size(); i++) {
-			   	try {
+
+			for (int i = 0; i < items.size(); i++) {
+				try {
 					s=trim(items.get(i));
 				} catch (Exception e) {
 					s="";
-				}	
-			   	
-			   	writer.write(s);writer.write("\r\n");lns++;
+				}
+
+				writer.write(s);writer.write("\r\n");lns++;
 			}
-			
-		    writer.close();	    
-		    items.clear();
-		    
+
+			writer.close();
+			items.clear();
+
 		} catch(Exception e){
 			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_LONG).show();
 			return false;
 		}
-				
-		return true;		
-	}	
+
+		return true;
+	}
+
+	public boolean save(int cnt){
+		String s;
+		int lns=0;
+
+		if (items.size()==0) return true;
+
+		try {
+
+			wfile=new FileWriter(fname,false);
+			writer = new BufferedWriter(wfile);
+
+			for (int j = 0; j < cnt; j++) {
+
+				for (int i = 0; i < items.size(); i++) {
+					try {
+						s = trim(items.get(i));
+					} catch (Exception e) {
+						s = "";
+					}
+
+					writer.write(s);
+					writer.write("\r\n");
+					lns++;
+				}
+
+				writer.write("\r\n");
+				writer.write("\r\n");
+				writer.write("\r\n");
+				writer.write("\r\n");
+
+			}
+
+			writer.close();
+			items.clear();
+
+		} catch(Exception e){
+			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_LONG).show();
+			return false;
+		}
+
+		return true;
+	}
 
 	public void clear(){
 		items.clear();

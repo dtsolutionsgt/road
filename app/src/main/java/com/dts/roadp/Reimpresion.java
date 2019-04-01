@@ -366,7 +366,7 @@ public class Reimpresion extends PBase {
 	}
 	
 	private void imprFactura() {
-		fdoc.deviceid =androidid();
+		fdoc.deviceid =gl.deviceId;
 
 		try {
 			if (fdoc.buildPrint(itemid,1,gl.peFormatoFactura)) prn.printask();

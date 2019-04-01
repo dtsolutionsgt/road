@@ -158,21 +158,24 @@ public class clsDocument {
             if(docdevolucion){
 				s=s.replace("Factura","Recibo");
 			}
+
             if (residx==1) {
                 if (docfactura) {
                     rep.add(resol);
                     rep.add(resfecha);
                     rep.add(resvence);
                     rep.add(resrango);
-                    rep.add("Fecha de Emision : "+fsfecha);
+					rep.add("Fecha de Emision : "+fsfecha);
                 }
                 residx=0;
             }
+
             if (!s.equalsIgnoreCase("@@")) rep.add(s);
         }
 
         if (!emptystr(nit)) rep.add("NIT : "+nit);
         if (!emptystr(clidir)) rep.add("Dir : "+clidir);
+        if(docdevolucion) rep.add("Fecha de Emision : "+fsfecha);
         //if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
 
 
@@ -214,7 +217,7 @@ public class clsDocument {
     }
 
     protected String encabezado(String l) {
-        String s,lu;
+        String s,lu,a;
         int idx;
 
         residx=0;
@@ -293,6 +296,10 @@ public class clsDocument {
         idx=lu.indexOf("CC");
         if (idx>=0) {
             if (emptystr(cliente)) return "@@";
+            if(l.length()>14){
+				l=l.replace("CC",clicod+" - "+cliente);
+				return l;
+			}
             l=l.replace("CC",clicod+" - "+rep.ltrim(cliente, 14));return l;
         }
 

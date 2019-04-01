@@ -26,7 +26,7 @@ public class clsDocDevolucion extends clsDocument {
         itemData item;
         int onceMerc = 0;
 
-        rep.add("");
+        //rep.add("");
 
         for (int i = 0; i <items.size(); i++) {
             item=items.get(i);
@@ -157,6 +157,8 @@ public class clsDocDevolucion extends clsDocument {
             DT.moveToFirst();
 
             val=DT.getString(0);
+
+            vendcod=vend;
         } catch (Exception e) {
             val=vend;
         }

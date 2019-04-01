@@ -9,7 +9,6 @@ import android.database.SQLException;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputType;
@@ -54,7 +53,7 @@ public class FacturaRes extends PBase {
 	private long fecha,fechae;
 	private int fcorel,clidia,media;
 	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt;
-	private int cyear, cmonth, cday, dweek,stp=0,brw=0,notaC;
+	private int cyear, cmonth, cday, dweek,stp=0,brw=0,notaC,impres;
 
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
 	private double dispventa;
@@ -614,13 +613,15 @@ public class FacturaRes extends PBase {
 
 			bonsave.save();
 
+			impres=0;
+
 			if (prn.isEnabled()) {
 
 				if (gl.peModal.equalsIgnoreCase("APR")) {
 					fdoc.buildPrintExt(corel,2,"APR");
 				} else if (gl.peModal.equalsIgnoreCase("...")) {
 					//
-				} else {
+				} else if (gl.peModal.equalsIgnoreCase("TOL")) {
 
 					//#HS_20181212 Condicion para imprimir facturas pendientes de pago
 					if (!gl.cobroPendiente) {
@@ -631,35 +632,31 @@ public class FacturaRes extends PBase {
 				}
 
 				if (gl.peImprFactCorrecta) {
-                    singlePrint();
-				} else {
 					prn.printask(printclose);
+				} else {
+					singlePrint();
 				}
 
 				if (notaC==2){
 					fdev.buildPrint(gl.dvcorreld,0);
 					prn.printask(printclose);
 				}
-			/*
-			final Handler shandler = new Handler();
-			shandler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					//Intent intent = new Intent(FacturaRes.this,PrintDialog.class);
-					//startActivity(intent);
-				}
-			}, 500);
-			*/
+				/*
+				final Handler shandler = new Handler();
+				shandler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						//Intent intent = new Intent(FacturaRes.this,PrintDialog.class);
+						//startActivity(intent);
+					}
+				}, 500);
+				*/
 
 			}
 
 			gl.closeCliDet=true;
 			gl.closeVenta=true;
-
-			if (!prn.isEnabled()){
-				super.finish();
-			}
-
+			if (!prn.isEnabled()) super.finish();
 
 		/*
 		if (prn.isEnabled()) {
@@ -2268,9 +2265,8 @@ public class FacturaRes extends PBase {
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-
-					gl.closeCliDet=true;
-					gl.closeVenta=true;
+					gl.closeCliDet = true;
+					gl.closeVenta = true;
 					FacturaRes.super.finish();
 				}
 			});
@@ -2280,7 +2276,6 @@ public class FacturaRes extends PBase {
 					singlePrint();
 				}
 			});
-
 
 			dialog.show();
 		}catch (Exception e){

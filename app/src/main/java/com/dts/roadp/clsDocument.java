@@ -29,7 +29,7 @@ public class clsDocument {
 	protected DateUtils DU;
 	protected DecimalFormat decfrm;
 	
-	protected String clicod,clidir,pemodo;
+	protected String clicod,clidir,pemodo,vendcod;
 
 	protected int prw;
 	
@@ -173,17 +173,21 @@ public class clsDocument {
 
         if (!emptystr(nit)) rep.add("NIT : "+nit);
         if (!emptystr(clidir)) rep.add("Dir : "+clidir);
-        if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
+        //if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
 
 
         if (!emptystr(add1)) {
+
             rep.add("");
             rep.add(add1);
             if (!emptystr(add2)) rep.add(add2);
             rep.add("");
+
         }
 
         if(docfactura){
+
+			rep.add("");
 			if (docfactura && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
 			if (docfactura && (reimpres==2)) rep.add("------  C O P I A  ------");
 			if (docfactura && (reimpres==3)) rep.add("------       A N U L A D O      ------");
@@ -193,12 +197,16 @@ public class clsDocument {
 				pendiente = reimpres;
 			}
 			if (docfactura && (reimpres==5)) rep.add("------  C O N T A B I L I T A D  ------");
+			rep.add("");
+
 		}else if(docdevolucion){
+
 			rep.add("");
 			if (docdevolucion && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
 			if (docdevolucion && (reimpres==2)) rep.add("------  C O P I A  ------");
 			if (docdevolucion && (reimpres==3)) rep.add("------       A N U L A D O      ------");
 			rep.add("");
+
 		}
 
 
@@ -271,8 +279,9 @@ public class clsDocument {
 
         idx=lu.indexOf("VV");
         if (idx>=0) {
+        	rep.addc("");
             if (emptystr(vendedor)) return "@@";
-            l=l.replace("VV",vendedor);return l;
+            l=l.replace("VV",vendcod+" - "+vendedor);return l;
         }
 
         idx=lu.indexOf("RR");
@@ -284,7 +293,7 @@ public class clsDocument {
         idx=lu.indexOf("CC");
         if (idx>=0) {
             if (emptystr(cliente)) return "@@";
-            l=l.replace("CC",cliente);return l;
+            l=l.replace("CC",clicod+" - "+rep.ltrim(cliente, 14));return l;
         }
 
         return l;

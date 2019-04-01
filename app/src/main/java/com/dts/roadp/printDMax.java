@@ -22,9 +22,11 @@ public class printDMax extends printBase
 	
 	private String ss;
 	private PrintDialog printDialog;
+	private appGlobals appG;
 	
 	public printDMax(Context context,String printerMAC) {
 		super(context,printerMAC);
+		appG = new appGlobals();
 	}
 	
 	
@@ -142,6 +144,7 @@ public class printDMax extends printBase
 	}
 	
 	private void doStartPrint() {
+		appG.endPrint = true;
 		showmsg("Imprimiendo ..." );
 		//showmsg("MAC : "+printerAddress );
 		AsyncPrintCall wsRtask = new AsyncPrintCall();
@@ -253,6 +256,7 @@ public class printDMax extends printBase
 		dialog.setTitle(R.string.app_name);
 		dialog.setMessage("¿La impresora está lista?");
 
+		dialog.setCancelable(false);
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {
 		    	try {

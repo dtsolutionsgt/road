@@ -330,6 +330,7 @@ public class printZebraCPCL extends printBase {
 		dialog.setTitle(R.string.app_name);
 		dialog.setMessage("Impresora está lista ?");
 
+		dialog.setCancelable(false);
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {			      	
 				try {

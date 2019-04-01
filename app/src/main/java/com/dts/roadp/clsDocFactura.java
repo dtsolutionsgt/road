@@ -58,7 +58,9 @@ public class clsDocFactura extends clsDocument {
 			
 			add1=DT.getString(10);
 			add2=DT.getString(11);
-			
+
+			vendcod=vend;
+
 		} catch (Exception e) {
 			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 	    }	
@@ -283,7 +285,7 @@ public class clsDocFactura extends clsDocument {
 		itemData item;
 		String ss;
 
-		rep.line();
+
 		rep.add("CODIGO   DESCRIPCION        UM  CANT");
 		rep.add("       KGS    PRECIO           VALOR");
 		rep.line();
@@ -311,7 +313,7 @@ public class clsDocFactura extends clsDocument {
 		itemData item;
 		String cu,cp;
 
-		rep.line();
+
 		rep.add3fact("Cantidad      Peso","  Precio","Total");
 		rep.line();
 
@@ -331,57 +333,6 @@ public class clsDocFactura extends clsDocument {
 		return true;
 	}
 
-
-	// Encabezado por empresa
-
-/*	@Override
-	protected void saveHeadLines(int reimpres) {
-		if (modofact.equalsIgnoreCase("*")) super.saveHeadLines(reimpres);
-		if (modofact.equalsIgnoreCase("TOL")) headerToledano(reimpres);
-	}
-
-	private void headerToledano(int reimpres) {
-		String s,sc,ss;
-
-		rep.empty();rep.empty();
-
-		for (int i = 0; i <lines.size(); i++) 		{
-			s=lines.get(i);
-			s=encabezado(s);
-
-			ss=s.replace(" ","");
-			if (ss.equalsIgnoreCase("FACTURA")) {
-				if (reimpres==4) s="- FACTURA PENDIENTE  DE  PAGO -";
-			}
-
-			if (!s.equalsIgnoreCase("@@")) rep.add(s);
-		}
-
-		sc="CONDICIONES DE PAGO: ";
-		if (diacred==0) sc+="CONTADO"; else sc+="CREDITO "+diacred+" DIAS";
-		rep.add(sc);
-		rep.empty();
-		rep.add("Fecha: "+sfecha(ffecha)+" Hora: "+shora(ffecha));
-		rep.empty();
-
-		if (!emptystr(add1)) {
-			rep.add("");
-			rep.add(add1);
-			if (!emptystr(add2)) rep.add(add2);
-			rep.add("");
-		}
-
-		if (docfactura && (reimpres==1)) rep.add("------  R E I M P R E S I O N  ------");
-		if (docfactura && (reimpres==2)) rep.add("------       C O P I A         ------");
-		if (docfactura && (reimpres==3)) rep.add("------      A N U L A D O      ------");
-		if(docfactura && (reimpres==4)) {
-			rep.add("- FACTURA PENDIENTE  DE  PAGO -");
-			pendiente = reimpres;
-		}
-
-	}*/
-
-
 	// Bonificaciones
 
 	private void bonificaciones() {
@@ -398,7 +349,7 @@ public class clsDocFactura extends clsDocument {
 		rep.line();
 
 		for (int i = 0; i <bons.size(); i++) {
-			
+
 			item=bons.get(i);
 
 			ss=rep.ltrim(item.cod+" "+item.nombre,prw-10);

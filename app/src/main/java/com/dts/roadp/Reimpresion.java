@@ -224,7 +224,7 @@ public class Reimpresion extends PBase {
 			if (tipo==6) {
 				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.NOMBRE,D_NOTACRED.SERIE,D_NOTACRED.TOTAL,D_NOTACRED.CORELATIVO,D_NOTACRED.IMPRES "+
 					 "FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
-					 "WHERE (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC";
+					 "WHERE (D_NOTACRED.ANULADO='N') AND (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC";
 			}
 			
 			if (tipo<99) {
@@ -262,7 +262,7 @@ public class Reimpresion extends PBase {
 						}
 
 						if (tipo==3 || tipo==6) {
-							if (DT.getInt(5)<=1) items.add(vItem);	
+							if (DT.getInt(5)<=1) items.add(vItem);
 						} else {	
 							items.add(vItem);	
 						}
@@ -453,33 +453,8 @@ public class Reimpresion extends PBase {
 			}
 
 			fdev.buildPrint(itemid, 1, "TOL"); prn.printask(printclose, "printnc.txt");
-			/*sql="SELECT COREL,IMPRES,SERIE,CORELATIVO FROM D_NOTACRED WHERE COREL='"+itemid+"'";
-			dt=Con.OpenDT(sql);
 
-			if (dt.getCount()==0) {
-				msgbox("¡No existe ninguna nota de credito elegible para reimpresion!");return;
-			}
 
-			dt.moveToFirst();
-
-			id=dt.getString(0);
-			serie=dt.getString(2);
-			corel=dt.getInt(3);
-
-			if (dt.getInt(1)>1) {
-				msgbox("�La nota de credito "+serie+" - "+corel+" no se puede imprimir porque ya fue reimpresa anteriormente!");return;
-			}
-
-			aprNotePrn(itemid);
-			//if (fdoc.buildPrint(id,1)) prn.printask();
-
-			try {
-				sql="UPDATE D_NOTACRED SET IMPRES=2 WHERE COREL='"+itemid+"'";
-				//db.execSQL(sql);
-			} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			}
-			*/
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());

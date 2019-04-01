@@ -39,7 +39,7 @@ public class appGlobals extends Application {
 
 	// Parametros Extra
 	public String peModal,peMon,peFormatoFactura,CodDev;
-	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec;
+	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec,endPrint;
 	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre,peImprFactCorrecta;
 	public int peDec,peDecCant,peDecImp;
 	

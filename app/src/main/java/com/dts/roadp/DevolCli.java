@@ -569,7 +569,8 @@ public class DevolCli extends PBase {
 
 			if (prn.isEnabled()) {
 				fdevol.buildPrint(gl.dvcorreld,0);
-				prn.printask(printclose);
+				//#CKFK 20190401 09:47AM Agregué la funcionalidad de enviar el nombre del archivo a imprimir
+				prn.printask(printclose, "printnc.txt");
 			}
 
 		}catch (Exception e){

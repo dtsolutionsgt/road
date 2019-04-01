@@ -37,7 +37,13 @@ public class printBase {
 		hasCallback=true;
 		callback=callBackHook;
 	}
-	
+
+	public void printask(Runnable callBackHook, String fName) {
+		hasCallback=true;
+		callback=callBackHook;
+		fname=fName;
+	}
+
 	public void printask() {
 		hasCallback=false;
 	}

@@ -14,8 +14,8 @@ public class clsDocMov extends clsDocument {
 	private int modo,totitem;
 	private double totb,totm;
 	
-	public clsDocMov(Context context, int printwidth,String pnombre,String pruta,String pvend,String cursymbol,int decimpres) {
-		super(context, printwidth,cursymbol,decimpres);
+	public clsDocMov(Context context, int printwidth,String pnombre,String pruta,String pvend,String cursymbol,int decimpres, String archivo) {
+		super(context, printwidth,cursymbol,decimpres, archivo);
 		docfactura=false;
 		
 		modo=1;

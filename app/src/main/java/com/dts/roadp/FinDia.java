@@ -73,7 +73,7 @@ public class FinDia extends PBase {
             img1.setVisibility(View.INVISIBLE);
         }
 
-        rep = new clsRepBuilder(this, gl.prw, false, gl.peMon, gl.peDecImp);
+        rep = new clsRepBuilder(this, gl.prw, false, gl.peMon, gl.peDecImp, "");
         mw = 6 + gl.peDecImp + 7;
 
         printclose = new Runnable() {
@@ -2478,12 +2478,8 @@ public class FinDia extends PBase {
             }
             rep.add(vCadena);
 
-            if (StringUtils.isNotBlank(CorelZ)){
-                corelativoZ = corelz + 1;
-                vCadena = "Siguiente Informe Z   :" + StringUtils.leftPad(mu.frmint(corelativoZ), 13);
-            }else{
-                vCadena = "Siguiente Informe Z   :" + StringUtils.leftPad("0", 13);
-            }
+            corelativoZ = corelz + 1;
+            vCadena = "Siguiente Informe Z   :" + StringUtils.leftPad(mu.frmint(corelativoZ), 13);
 
             rep.add(vCadena);
 

@@ -17,8 +17,8 @@ public class clsDocFactura extends clsDocument {
 	private int decimp,diacred,totitems;
 
 
-	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres) {
-		super(context, printwidth,cursymbol,decimpres);
+	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres, String archivo) {
+		super(context, printwidth,cursymbol,decimpres, archivo);
 
 		docfactura=true;
 		docdevolucion=false;

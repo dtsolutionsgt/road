@@ -36,7 +36,7 @@ public class DevolBodCan extends PBase {
         lblReg = (TextView) findViewById(R.id.textView61);lblReg.setText("");
         imgNext = (ImageView) findViewById(R.id.imgTitLogo);
 
-        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp);
+        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp,"");
 
         lblTot = (TextView) findViewById(R.id.textView9);lblTot.setText("");
         setHandlers();

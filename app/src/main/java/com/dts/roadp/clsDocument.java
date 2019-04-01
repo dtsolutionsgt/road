@@ -33,11 +33,11 @@ public class clsDocument {
 
 	protected int prw;
 	
-	public clsDocument(Context context,int printwidth,String cursym,int decimpres) {
+	public clsDocument(Context context,int printwidth,String cursym,int decimpres, String archivo) {
 		cont=context;
 		prw=printwidth;
 		
-		rep=new clsRepBuilder(cont,prw,true,cursym,decimpres);
+		rep=new clsRepBuilder(cont,prw,true,cursym,decimpres, archivo);
 		DU=new DateUtils();
 		decfrm = new DecimalFormat("#,##0.00");
 
@@ -228,18 +228,37 @@ public class clsDocument {
             l=l.replace("HH:mm:ss",s);return l;
         }
 
-		idx=lu.indexOf("SS");
-		if (idx>=0) {
-			if (emptystr(serie)) return "@@";
-			if (emptystr(numero)) return "@@";
+		/*if (l.indexOf("##") >=0) {
+			int index = l.indexOf("##");
+			String temp = l.substring(index + 2, 2);
+			String temp1 = l.substring(index + 4, 1);
+			String str= new String(temp1, int.Parse(temp))
+			if (!serie.isEmpty()) {
+				numero = Strings.Right(str + numero, Integer.Parse(temp));
+			}
 
-			s=lu.substring(0,idx);
-			s=s+serie+" numero : "+numero;
-			residx=1;
-			return s;
+		}
+		if (linea.Length > index + numero.Length ){
+				linea = linea.Substring(0, index) + numero + linea.Substring(index + numero.Length)
+		}else{
+				linea = linea.Substring(0, index) + numero
+		}
 		}
 
-        idx=lu.indexOf("SS");
+		If (UCase(linea).IndexOf("S#") <> -1) {
+				index = UCase(linea).IndexOf("S#")
+		temp = linea.Substring(index + 2, 2)
+		temp1 = linea.Substring(index + 4, 1)
+		Dim str As New String(temp1, Integer.Parse(temp))
+		numero = Strings.Right(str + numero, Integer.Parse(temp))
+		If linea.Length > index + Serie.Length + numero.Length {
+				linea = linea.Substring(0, index) + Serie + numero + linea.Substring(index + Serie.Length + numero.Length)
+		}else{
+				linea = linea.Substring(0, index) + Serie + numero
+		}
+		}*/
+
+		idx=lu.indexOf("SS");
         if (idx>=0) {
             if (emptystr(serie)) return "@@";
             //if (emptystr(numero)) return "@@";
@@ -288,7 +307,7 @@ public class clsDocument {
 			}
 
 			loadHeadLines();
-			
+
 			try {
 				Con.close();   
 			} catch (Exception e1) {

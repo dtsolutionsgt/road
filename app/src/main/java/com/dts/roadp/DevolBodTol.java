@@ -48,7 +48,7 @@ public class DevolBodTol extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
         }
 
-        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp);
+        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "");
 
         listItems();
 

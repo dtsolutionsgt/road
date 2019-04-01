@@ -96,7 +96,7 @@ public class Deposito extends PBase {
 		};
 		
 		prn=new printer(this,printclose);
-		ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp);
+		ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 
 		boldep=gl.boldep;
 		depparc=gl.depparc;

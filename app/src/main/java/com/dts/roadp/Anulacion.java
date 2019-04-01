@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -84,9 +85,9 @@ public class Anulacion extends PBase {
 		setHandlers();
 		listItems();
 				
-		doc=new clsDocAnul(this,prn.prw);
+		doc=new clsDocAnul(this,prn.prw,"");
 
-		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
+		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"");
 	}
 
 	
@@ -310,7 +311,7 @@ public class Anulacion extends PBase {
 
 				clsDocFactura fdoc;
 
-				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
+				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"");
 				fdoc.deviceid =gl.deviceId;
 
 				fdoc.buildPrint(itemid, 1, "TOL"); prn.printask(printclose);
@@ -321,14 +322,17 @@ public class Anulacion extends PBase {
 				clsDocDevolucion fdev;
 				String corelFactura=tieneFacturaNC(itemid);
 
-				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
-				fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp);
-				fdev.deviceid =gl.deviceId;
+				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
 				fdoc.deviceid =gl.deviceId;
 
-                if (!corelFactura.isEmpty()){
+				if (!corelFactura.isEmpty()){
 					fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printask(printclose);
-                }
+				}
+
+				SystemClock.sleep(50);
+
+				fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+				fdev.deviceid =gl.deviceId;
 
 				fdev.buildPrint(itemid, 1, "TOL"); prn.printask(printclose);
 
@@ -838,8 +842,8 @@ public class Anulacion extends PBase {
 	
 	private class clsDocAnul extends clsDocument {
 
-		public clsDocAnul(Context context, int printwidth) {
-			super(context, printwidth ,gl.peMon,gl.peDecImp);
+		public clsDocAnul(Context context, int printwidth, String archivo) {
+			super(context, printwidth ,gl.peMon,gl.peDecImp, archivo);
 
 			nombre="Existencias";
 			numero="";
@@ -1019,7 +1023,7 @@ public class Anulacion extends PBase {
 		
 		try {
 			
-			rep=new clsRepBuilder(this,prn.prw,true,gl.peMon,gl.peDecImp);
+			rep=new clsRepBuilder(this,prn.prw,true,gl.peMon,gl.peDecImp, "");
 			
 			buildHeader(corel,0);
 			

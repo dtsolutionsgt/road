@@ -67,7 +67,7 @@ public class Exist extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 		
-		rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp);
+		rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "");
 		
 		listItems();	
 		
@@ -78,7 +78,7 @@ public class Exist extends PBase {
 		};
 		
 		prn=new printer(this,printclose);		
-		doc=new clsDocExist(this,prn.prw);
+		doc=new clsDocExist(this,prn.prw,"");
 
 		/*int cant = CantExistencias();
 		Toast.makeText(this, "Cantidad." + cant, Toast.LENGTH_SHORT).show();*/
@@ -486,8 +486,8 @@ public class Exist extends PBase {
 
 	private class clsDocExist extends clsDocument {
 
-		public clsDocExist(Context context, int printwidth) {
-			super(context, printwidth,gl.peMon,gl.peDecImp);
+		public clsDocExist(Context context, int printwidth, String archivo) {
+			super(context, printwidth,gl.peMon,gl.peDecImp, archivo);
 
 			nombre="REPORTE DE EXISTENCIAS";
 			numero="";

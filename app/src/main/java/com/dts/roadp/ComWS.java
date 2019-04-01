@@ -1839,6 +1839,7 @@ public class ComWS extends PBase {
 				db.execSQL("UPDATE D_FACTURA SET STATCOM='S'");
 				db.execSQL("UPDATE D_PEDIDO SET STATCOM='S'");
 				db.execSQL("UPDATE D_NOTACRED SET STATCOM='S'");
+				db.execSQL("UPDATE D_CXC SET STATCOM='S'");
 				db.execSQL("UPDATE D_COBRO SET STATCOM='S'");
 				db.execSQL("UPDATE D_DEPOS SET STATCOM='S'");
 				db.execSQL("UPDATE D_MOV SET STATCOM='S'");
@@ -1871,6 +1872,7 @@ public class ComWS extends PBase {
 			db.execSQL("UPDATE D_FACTURA SET STATCOM='S'");
 			db.execSQL("UPDATE D_PEDIDO SET STATCOM='S'");
 			db.execSQL("UPDATE D_NOTACRED SET STATCOM='S'");
+			db.execSQL("UPDATE D_CXC SET STATCOM='S'");
 			db.execSQL("UPDATE D_COBRO SET STATCOM='S'");
 			db.execSQL("UPDATE D_DEPOS SET STATCOM='S'");
 			db.execSQL("UPDATE D_MOV SET STATCOM='S'");
@@ -2082,7 +2084,7 @@ public class ComWS extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
-		return true;
+		return errflag;
 	}
 
 	private boolean validaLiquidacion() {
@@ -3223,9 +3225,9 @@ public class ComWS extends PBase {
 			}
 					
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			scon=0;
 			fstr="No se puede conectar al web service. "+e.getMessage();
+			Log.d("E", fstr + sstr);
 		}
 	}
 			
@@ -3241,6 +3243,11 @@ public class ComWS extends PBase {
             if (scon==0) {
                 lblInfo.setText(fstr);writeErrLog(fstr);
                 mu.msgbox(fstr);
+				lblInfo.setText(fstr);
+				isbusy = 0;
+				barInfo.setVisibility(View.INVISIBLE);
+				addlog("Envío", fterr + " " + fstr, esql);
+				return;
             }
 
 			if (!errflag) {
@@ -3263,8 +3270,12 @@ public class ComWS extends PBase {
 				msgResultEnvio(senv);
 
 			} else {
-				lblInfo.setText(fstr);writeErrLog(fterr);
-				mu.msgbox(fterr);
+				lblInfo.setText(fterr);
+                isbusy = 0;
+                barInfo.setVisibility(View.INVISIBLE);
+				mu.msgbox("Ocurrió error : \n" + fterr );
+				addlog("Envío", fterr, esql);
+				return;
 			}
 
 			if(envioparcial){
@@ -3300,7 +3311,12 @@ public class ComWS extends PBase {
 			try {
 				Looper.prepare();
 				wsSendExecute();
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				if (scon == 0) {
+					fstr = "No se puede conectar al web service : " + sstr;
+					//lblInfo.setText(fstr);
+				}
+			}
 
 	        return null;
 	    }
@@ -3310,7 +3326,9 @@ public class ComWS extends PBase {
 			try {
 				wsSendFinished();
 				Looper.loop();
-			}catch (Exception e) {}
+			}catch (Exception e) {
+				Log.d("onPostExecute", e.getMessage());
+			}
 		}
 	 
         @Override

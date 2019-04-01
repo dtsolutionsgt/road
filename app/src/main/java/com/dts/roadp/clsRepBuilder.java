@@ -26,7 +26,7 @@ public class clsRepBuilder {
 	private double aux;
 	private String frmstr,ts;
 	
-	public clsRepBuilder(Context context,int printwidth,boolean regular,String cursymbol,int decimpres) {
+	public clsRepBuilder(Context context,int printwidth,boolean regular,String cursymbol,int decimpres, String archivo) {
 		
 		cont=context; 
 		prw=printwidth;
@@ -41,8 +41,12 @@ public class clsRepBuilder {
 		
 		System.setProperty("line.separator","\r\n");
 		if (regular) {
-			fname = Environment.getExternalStorageDirectory()+"/print.txt";	
-		} else {	
+			if (!archivo.isEmpty()){
+				fname = Environment.getExternalStorageDirectory()+"/"+archivo;
+			}else{
+				fname = Environment.getExternalStorageDirectory()+"/print.txt";
+			}
+		} else {
 			fname = Environment.getExternalStorageDirectory()+"/SyncFold/findia.txt";	
 		}
 		
@@ -285,9 +289,9 @@ public class clsRepBuilder {
 	public void addp(String s1,String val) {
 		String ss,s3;
 		
-		s1=StringUtils.rightPad(s1,25);ss=s1+"\t";
+		s1=StringUtils.rightPad(s1,24);ss=s1+"\t";
 		s3=val;
-		s3=StringUtils.leftPad(s3,12);ss+=s3;
+		s3=StringUtils.leftPad(s3,11);ss+=s3;
 		
 		items.add(ss);
 		

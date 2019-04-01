@@ -104,8 +104,8 @@ public class Cobro extends PBase {
 		};
 		
 		prn=new printer(this,printclose);
-		fdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.deviceId);
-		fdocf = new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
+		fdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.deviceId, "");
+		fdocf = new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
 					
 	}
 

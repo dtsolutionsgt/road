@@ -74,22 +74,22 @@ public class Reimpresion extends PBase {
 		case 0:  
 			lblTipo.setText("Pedido");break;
 		case 1:  
-			cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.deviceId);
+			cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.deviceId, "");
 			lblTipo.setText("Recibo");break;	
 		case 2:  
-			ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp);
+			ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 			lblTipo.setText("Deposito");break;
 		case 3:  
-			fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
+			fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
 			lblTipo.setText("Factura");break;
 		case 4:  
-			mdoc=new clsDocMov(this,prn.prw,"Recarga",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp);
+			mdoc=new clsDocMov(this,prn.prw,"Recarga",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 			lblTipo.setText("Recarga");break;
 		case 5:  
-			mdoc=new clsDocMov(this,prn.prw,"Dvolucion a bodega",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp);
+			mdoc=new clsDocMov(this,prn.prw,"Dvolucion a bodega",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 			lblTipo.setText("Devolución a bodega");break;
 		case 6:  
-			fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp);
+			fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 			fdev.deviceid =gl.deviceId;
 			lblTipo.setText("Nota Crédito");break;
 			
@@ -224,7 +224,7 @@ public class Reimpresion extends PBase {
 			if (tipo==6) {
 				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.NOMBRE,D_NOTACRED.SERIE,D_NOTACRED.TOTAL,D_NOTACRED.CORELATIVO,D_NOTACRED.IMPRES "+
 					 "FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
-					 "WHERE (D_NOTACRED.ANULADO='N') AND (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC LIMIT 1";	
+					 "WHERE (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC";
 			}
 			
 			if (tipo<99) {
@@ -443,33 +443,42 @@ public class Reimpresion extends PBase {
 
 		try {
 
-			fdev.buildPrint(itemid, 1, "TOL"); prn.printask(printclose);
+			String corelFactura=tieneFacturaNC(itemid);
+
+			fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+			fdoc.deviceid =gl.deviceId;
+
+			if (!corelFactura.isEmpty()){
+				fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printask(printclose);
+			}
+
+			fdev.buildPrint(itemid, 1, "TOL"); prn.printask(printclose, "printnc.txt");
 			/*sql="SELECT COREL,IMPRES,SERIE,CORELATIVO FROM D_NOTACRED WHERE COREL='"+itemid+"'";
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()==0) {
 				msgbox("¡No existe ninguna nota de credito elegible para reimpresion!");return;
 			}
-			
+
 			dt.moveToFirst();
-			
+
 			id=dt.getString(0);
 			serie=dt.getString(2);
-			corel=dt.getInt(3);		
-			
+			corel=dt.getInt(3);
+
 			if (dt.getInt(1)>1) {
 				msgbox("�La nota de credito "+serie+" - "+corel+" no se puede imprimir porque ya fue reimpresa anteriormente!");return;
 			}
-				
+
 			aprNotePrn(itemid);
 			//if (fdoc.buildPrint(id,1)) prn.printask();
-		
+
 			try {
-				sql="UPDATE D_NOTACRED SET IMPRES=2 WHERE COREL='"+itemid+"'";		
+				sql="UPDATE D_NOTACRED SET IMPRES=2 WHERE COREL='"+itemid+"'";
 				//db.execSQL(sql);
 			} catch (Exception e) {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			}			
+			}
 			*/
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -478,7 +487,28 @@ public class Reimpresion extends PBase {
 
 	}
 
-	
+	private String tieneFacturaNC(String vCorel){
+
+		Cursor DT;
+		String vtieneFacturaNC= "";
+
+		try{
+
+			sql = "SELECT FACTURA FROM D_NOTACRED WHERE COREL = '" + vCorel + "' AND FACTURA IN (SELECT COREL FROM D_FACTURA)";
+			DT=Con.OpenDT(sql);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				vtieneFacturaNC = DT.getString(0);
+			}
+
+		}catch (Exception ex){
+			mu.msgbox("Ocurrió un error "+ex.getMessage());
+		}
+
+		return vtieneFacturaNC;
+	}
+
 	// Aprofam
 	
 	private void aprNotePrn(String corel) {
@@ -487,7 +517,7 @@ public class Reimpresion extends PBase {
 		
 		try {
 			
-			rep=new clsRepBuilder(this,prn.prw,true,gl.peMon,gl.peDecImp);
+			rep=new clsRepBuilder(this,prn.prw,true,gl.peMon,gl.peDecImp, "");
 			
 			buildHeader(corel,1);
 			

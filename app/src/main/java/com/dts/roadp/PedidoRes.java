@@ -104,7 +104,7 @@ public class PedidoRes extends PBase {
 		};
 		
 		prn=new printer(this,printclose);
-		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp);
+		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp, "");
 	}
 		
 	

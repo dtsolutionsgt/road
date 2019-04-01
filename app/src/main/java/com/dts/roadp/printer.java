@@ -76,7 +76,12 @@ public class printer {
 		if (emptyparam()) return;
 		if (prid>0) prn.printask();
 	}
-		
+
+	public void printask(Runnable callBackHook, String fName)    {
+		if (emptyparam()) return;
+		if (prid>0) prn.printask(callBackHook, fName);
+	}
+
 	public boolean print() {
 		if (emptyparam()) return false;
 		if (prid>0) return prn.print();else return true;

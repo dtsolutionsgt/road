@@ -22,8 +22,8 @@ public class clsDocCobro extends clsDocument {
 	private boolean cobroSR=false;
 	protected MiscUtils mu;
 	
-	public clsDocCobro(Context context,int printwidth,String cursymbol,int decimpres, String deviceId) {
-		super(context, printwidth,cursymbol,decimpres);
+	public clsDocCobro(Context context,int printwidth,String cursymbol,int decimpres, String deviceId, String archivo) {
+		super(context, printwidth,cursymbol,decimpres, archivo);
 		docfactura=false;
 		docrecibo=true;
 		docpedido=false;
@@ -39,7 +39,7 @@ public class clsDocCobro extends clsDocument {
 
 		try{
 
-			sql="SELECT COREL FROM D_COBRO WHERE COREL IN (SELECT COREL FROM D_COBROD_SR)";
+			sql="SELECT COREL FROM D_COBRO WHERE COREL IN (SELECT COREL FROM D_COBROD_SR) AND COREL='" + corel +"'";
 			DT=Con.OpenDT(sql);
 
 			result=(DT.getCount()>0?true:false);
@@ -51,8 +51,10 @@ public class clsDocCobro extends clsDocument {
 		return result;
 	}
 	protected boolean buildDetail() {
+
 		itemData item;
 		itemDataPago itempago;
+
 		double vTempEfectivo=0;
 		double vTempCheque=0;
 
@@ -129,6 +131,9 @@ public class clsDocCobro extends clsDocument {
 		nombre="RECIBO";
 		
 		try {
+
+			cobroSR=esCobroSR(corel);
+
 			sql="SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,FECHA, IMPRES, ANULADO FROM D_COBRO WHERE COREL='"+corel+"'";
 			DT=Con.OpenDT(sql);
 
@@ -146,8 +151,6 @@ public class clsDocCobro extends clsDocument {
 				tot=DT.getDouble(5);
 				ffecha=DT.getInt(6);
 				fsfecha=sfecha(ffecha);
-
-				cobroSR=esCobroSR(corel);
 
 				anulado=DT.getString(8);
 				impres=DT.getInt(7);
@@ -217,12 +220,13 @@ public class clsDocCobro extends clsDocument {
 		itemData item;
 		
 		//loadHeadData(corel);
+
 		loadDocDataPago(corel);
 
 		items.clear();
 		
 		try {
-			sql="SELECT DOCUMENTO, TOTAL FROM D_COBROD WHERE COREL='"+corel+"'";
+			sql="SELECT DOCUMENTO, MONTO FROM D_COBROD WHERE COREL='"+corel+"'";
 			DT=Con.OpenDT(sql);
 
 			if (DT.getCount()==0) {
@@ -244,8 +248,8 @@ public class clsDocCobro extends clsDocument {
 				items.add(item);	
 				
 				DT.moveToNext();					
-			}				
-			
+			}
+
 		} catch (Exception e) {
 	    }		
 		

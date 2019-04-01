@@ -60,7 +60,7 @@ public class Recarga extends PBase {
 		
 		prn=new printer(this,printclose);
 		
-		mdoc=new clsDocMov(this,prn.prw,"Recarga",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp);
+		mdoc=new clsDocMov(this,prn.prw,"Recarga",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 	}
 	
 	

@@ -13,8 +13,8 @@ public class clsDocDepos extends clsDocument {
 	private int numc;
 	private String banco,cuenta,ref;
 	
-	public clsDocDepos(Context context, int printwidth,String pruta,String pvend,String cursymbol,int decimpres) {
-		super(context, printwidth,cursymbol,decimpres);
+	public clsDocDepos(Context context, int printwidth,String pruta,String pvend,String cursymbol,int decimpres, String archivo) {
+		super(context, printwidth,cursymbol,decimpres, archivo);
 		docfactura=false;
 		
 		nombre="DEPOSITO";

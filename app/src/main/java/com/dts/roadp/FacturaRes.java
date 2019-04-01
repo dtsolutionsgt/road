@@ -9,6 +9,7 @@ import android.database.SQLException;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputType;
@@ -214,10 +215,10 @@ public class FacturaRes extends PBase {
 		};
 
 		prn=new printer(this,printclose);
-		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp);
+		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
 		fdoc.deviceid =gl.deviceId;
 
-		fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp);
+		fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 		fdev.deviceid =gl.deviceId;
 
 		saved=false;

@@ -172,11 +172,6 @@ public class MainActivity extends PBase {
     }
 
 	public void doLogin(View view) {
-
-	    if (fecha>1904310000) {
-	        msgbox("¡Su licencia expiró!");return;
-        }
-
 	    try{
             processLogIn();
         }catch (Exception e){
@@ -363,42 +358,43 @@ public class MainActivity extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		//Id de Dispositivo
-		gl.deviceId = androidid();
+        //Id de Dispositivo
+        gl.deviceId = androidid();
 
-		try {
-			AppMethods app = new AppMethods(this, gl, Con, db);
-			app.parametrosExtra();
-		} catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			msgbox(e.getMessage());
-		}
+        try {
+            AppMethods app = new AppMethods(this, gl, Con, db);
+            app.parametrosExtra();
+        } catch (Exception e) {
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(e.getMessage());
+        }
 
-	}
+    }
 
-	private void processLogIn() {
-		if (gl.contlic) {
-			if (!validaLicencia()) {
-				mu.msgbox("¡Licencia invalida!");
-				return;
-			}
-		}
+    private void processLogIn() {
+        if (gl.contlic) {
+            if (!validaLicencia()) {
+                mu.msgbox("¡Licencia invalida!");
+                return;
+            }
+        }
 
-		if (checkUser()) gotoMenu();
-	}
+        if (checkUser()) gotoMenu();
+    }
 
-	private boolean checkUser() {
-		Cursor DT;
-		String usr, pwd, dpwd;
+    private boolean checkUser() {
+        Cursor DT;
+        String usr, pwd, dpwd;
 
-		try {
+        try {
 
-		if (fecha>1903310000) {
-			msgAskLic("¡Su licencia expiró!");return false;
-		}
+            if (fecha > 1904310000) {
+                msgAskLic("¡Su licencia expiró!");
+                return false;
+            }
 
-		usr = txtUser.getText().toString().trim();
-		pwd = txtPass.getText().toString().trim();
+            usr = txtUser.getText().toString().trim();
+            pwd = txtPass.getText().toString().trim();
 
             if (mu.emptystr(usr)) {
                 mu.msgbox("Usuario incorrecto.");
@@ -424,37 +420,31 @@ public class MainActivity extends PBase {
                 return false;
             }
 
-            try {
+            sql = "SELECT NOMBRE,CLAVE,NIVEL,NIVELPRECIO FROM P_VENDEDOR WHERE CODIGO='" + usr + "'";
+            DT = Con.OpenDT(sql);
 
-                sql = "SELECT NOMBRE,CLAVE,NIVEL,NIVELPRECIO FROM P_VENDEDOR WHERE CODIGO='" + usr + "'";
-                DT = Con.OpenDT(sql);
-
-                if (DT.getCount() == 0) {
-                    mu.msgbox("Usuario incorrecto !");
-                    return false;
-                }
-
-                DT.moveToFirst();
-                dpwd = DT.getString(1);
-                if (!pwd.equalsIgnoreCase(dpwd)) {
-                    mu.msgbox("Contraseña incorrecta !");
-                    return false;
-                }
-
-                gl.vendnom = DT.getString(0);
-                gl.vend = usr;
-                gl.vnivel = DT.getInt(2);
-                gl.vnivprec = DT.getInt(3);
-
-                return true;
-
-            } catch (Exception e) {
-                addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-                mu.msgbox(e.getMessage());
+            if (DT.getCount() == 0) {
+                mu.msgbox("Usuario incorrecto !");
                 return false;
             }
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+
+            DT.moveToFirst();
+            dpwd = DT.getString(1);
+            if (!pwd.equalsIgnoreCase(dpwd)) {
+                mu.msgbox("Contraseña incorrecta !");
+                return false;
+            }
+
+            gl.vendnom = DT.getString(0);
+            gl.vend = usr;
+            gl.vnivel = DT.getInt(2);
+            gl.vnivprec = DT.getInt(3);
+
+            return true;
+
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             return false;
         }
 

@@ -210,7 +210,7 @@ public class FacturaRes extends PBase {
 
 		printclose= new Runnable() {
 		    public void run() {
-		    	FacturaRes.super.finish();
+		    	//FacturaRes.super.finish();
 		    }
 		};
 
@@ -646,7 +646,6 @@ public class FacturaRes extends PBase {
 					fdev.buildPrint(gl.dvcorreld,0);
 					prn_nc.printask(printclose, "printnc.txt");
 
-
 				}
 
 				/*
@@ -666,17 +665,7 @@ public class FacturaRes extends PBase {
 			gl.closeVenta=true;
 			if (!prn.isEnabled()) super.finish();
 
-		/*
-		if (prn.isEnabled()) {
-			fdoc.buildPrint(corel);
-			singlePrint();
-		} else {
-			gl.closeCliDet=true;
-			gl.closeVenta=true;
 
-			super.finish();
-		}
-		*/
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("finishOrder: "  + e.getMessage());

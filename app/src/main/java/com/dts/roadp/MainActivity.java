@@ -173,10 +173,6 @@ public class MainActivity extends PBase {
 
 	public void doLogin(View view) {
 
-	    if (fecha>1904310000) {
-	        msgbox("¡Su licencia expiró!");return;
-        }
-
 	    try{
             processLogIn();
         }catch (Exception e){

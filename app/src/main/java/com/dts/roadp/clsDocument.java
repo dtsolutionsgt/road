@@ -74,9 +74,9 @@ public class clsDocument {
 		}
 
 		if (flag) {
-			if (!rep.save(2)) return false;
-		} else {
 			if (!rep.save()) return false;
+		} else {
+			if (!rep.save(2)) return false;
 		}
 
 		return true;

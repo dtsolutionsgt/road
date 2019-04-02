@@ -163,19 +163,6 @@ public class clsDocDevolucion extends clsDocument {
             val=cli;
         }
 
-        try {
-            sql="SELECT RESOL,FECHARES,FECHAVIG,SERIE,CORELINI,CORELFIN FROM P_COREL";
-            DT=Con.OpenDT(sql);
-            DT.moveToFirst();
-
-            resol="Resolucion No. : "+DT.getString(0);
-            ff=DT.getInt(1);resfecha="De Fecha: "+sfecha(ff);
-            ff=DT.getInt(2);resvence="Vigente hasta: "+sfecha(ff);
-
-        } catch (Exception e) {
-            Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
-        }
-
         cliente=val;
 
         return true;

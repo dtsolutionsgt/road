@@ -18,6 +18,11 @@ public class DevolBodCan extends PBase {
     private ListView listView;
     private TextView lblReg,lblTot;
     private ImageView imgNext;
+    public String corel;
+
+    private printer prn_can;
+    private clsDocCanastaBod fcanastabod;
+    public Runnable printclose;
 
     private ArrayList<clsClasses.clsDevCan> items= new ArrayList<clsClasses.clsDevCan>();
     private list_view_dev_bod_can adapter;
@@ -40,6 +45,16 @@ public class DevolBodCan extends PBase {
 
         lblTot = (TextView) findViewById(R.id.textView9);lblTot.setText("");
         setHandlers();
+
+        printclose= new Runnable() {
+            public void run() {
+                DevolBodCan.super.finish();
+            }
+        };
+
+        prn_can=new printer(this,printclose);
+        fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+        fcanastabod.deviceid =gl.deviceId;
 
         listItems();
 
@@ -228,7 +243,7 @@ public class DevolBodCan extends PBase {
 
     private void save() {
         Cursor DT;
-        String corel,pcod,plote,um,barra,barrapallet;
+        String pcod,plote,um,barra,barrapallet;
         Double pcant,pcantm,ppeso;
 
         corel=gl.ruta+"_"+mu.getCorelBase();
@@ -405,12 +420,32 @@ public class DevolBodCan extends PBase {
             db.setTransactionSuccessful();
             db.endTransaction();
 
-            gl.closeVenta=true;
-            finish();
+            createDoc();
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             db.endTransaction();
             mu.msgbox( e.getMessage());
+        }
+
+    }
+
+    //endregion
+
+    //region createdoc
+
+    private void createDoc(){
+
+        try{
+
+            if (prn_can.isEnabled()) {
+                fcanastabod.buildPrint(corel,0, "*");
+                prn_can.printask(printclose, "printdevcan.txt");
+            }
+
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+            mu.msgbox("createDoc: " + e.getMessage());
         }
 
     }

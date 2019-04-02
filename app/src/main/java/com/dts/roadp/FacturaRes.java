@@ -2282,7 +2282,7 @@ public class FacturaRes extends PBase {
 					prn.printask(printcallback);
 				}
 			});
-			
+
 
 			dialog.show();
 		} catch (Exception e){

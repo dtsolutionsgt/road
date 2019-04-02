@@ -439,8 +439,7 @@ public class clsDocFactura extends clsDocument {
 			rep.line();
 			rep.addc("Firma Cliente");
 			rep.add("");
-			rep.addc(" Se le aplico la nota de credito");
-			rep.addc(" con el numero: " +corelNotaC);
+			rep.addc("Se aplico nota de credito: "+corelNotaC);
 			rep.add("");
 			rep.addc("DE SER UNA VENTA AL CREDITO, SOLAMEN");
 			rep.addc("TE NUESTRO CORRESPONDIENTE RECIBO SE");

@@ -14,11 +14,11 @@ import java.util.ArrayList;
 
 public class clsDocument {
 
-	public String nombre,numero,serie,ruta,vendedor,cliente,nit;	
+	public String nombre,numero,serie,ruta,vendedor,cliente,nit,tipo,ref;
 	public String resol,resfecha,resvence,resrango,fsfecha,modofact;
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;
-	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,docdevolcanasta=false;
+	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod;
 	public int ffecha,pendiente,residx;
 	
 	protected android.database.sqlite.SQLiteDatabase db;
@@ -73,7 +73,7 @@ public class clsDocument {
 		flag=0;
 		if (modofact.equalsIgnoreCase("TOL")) {
 			if (docfactura && (reimpres==10)) flag=1;
-			if (docdevolcanasta) flag=2;
+			if (doccanastabod) flag=2;
 		}
 
 		if (flag==0) {
@@ -175,6 +175,10 @@ public class clsDocument {
 				s=s.replace("Factura","Recibo");
 			}
 
+			if(doccanastabod){
+				s=s.replace("Factura","Recibo");
+			}
+
             if (residx==1) {
                 if (docfactura) {
                     rep.add(resol);
@@ -191,7 +195,7 @@ public class clsDocument {
 
         if (!emptystr(nit)) rep.add("NIT : "+nit);
         if (!emptystr(clidir)) rep.add("Dir : "+clidir);
-        if(docdevolucion) rep.add("Fecha de Emision : "+fsfecha);
+        if(docdevolucion || doccanastabod) rep.add("Fecha de Emision : "+fsfecha);
         //if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
 
 

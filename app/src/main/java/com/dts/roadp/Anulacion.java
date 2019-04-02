@@ -873,19 +873,19 @@ public class Anulacion extends PBase {
 				rep.add("");
 
 				//if (tipo==1) lblTipo.setText("Recibo");
-				if (tipo==2) {
+				if (gl.tipo==2) {
 					rep.add("Deposito");
 					rep.add("Fecha : "+sitem.Fecha);
 					rep.add("Cuenta : "+sitem.Desc);
 					rep.add("Total : "+sitem.Valor);
 				}
-				if (tipo==3) {
+				if (gl.tipo==3) {
 					rep.add("Factura");
 					rep.add("Numero : "+sitem.Fecha);
 					rep.add("Total : "+sitem.Valor);
 					rep.add("Cliente : "+sitem.Desc);
 				}
-				if (tipo==4) {
+				if (gl.tipo==4) {
 					rep.add("Recarga");
 					rep.add("Fecha : "+sitem.Fecha);
 				}

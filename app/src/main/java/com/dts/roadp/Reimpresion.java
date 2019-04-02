@@ -13,6 +13,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 
 public class Reimpresion extends PBase {
@@ -25,6 +27,7 @@ public class Reimpresion extends PBase {
 	private clsClasses.clsCFDV selitem;
 	
 	private printer prn;
+	private printer prn_nc;
 	private Runnable printclose;
 	public clsRepBuilder rep;
 	
@@ -69,6 +72,7 @@ public class Reimpresion extends PBase {
 		};
 		
 		prn=new printer(this,printclose);
+		prn_nc=new printer(this,printclose);
 			
 		switch (tipo) {
 		case 0:  
@@ -89,7 +93,7 @@ public class Reimpresion extends PBase {
 			mdoc=new clsDocMov(this,prn.prw,"Dvolucion a bodega",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 			lblTipo.setText("Devolución a bodega");break;
 		case 6:  
-			fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+			fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 			fdev.deviceid =gl.deviceId;
 			lblTipo.setText("Nota Crédito");break;
 			
@@ -244,10 +248,12 @@ public class Reimpresion extends PBase {
 						vItem.Desc=DT.getString(1);
 						if (tipo==2) vItem.Desc+=" - "+DT.getString(4);	
 
-						if (tipo==3 || tipo==6) {
+						if (tipo==3) {
 							sf=DT.getString(2)+"-"+DT.getInt(4);						
-						} else {	
-							f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);	
+						} else if (tipo==6){
+							sf=DT.getString(0);
+						}else {
+							f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);
 						}
 
 						vItem.Fecha=sf;
@@ -370,6 +376,18 @@ public class Reimpresion extends PBase {
 
 		try {
 			if (fdoc.buildPrint(itemid,1,gl.peFormatoFactura)) prn.printask();
+
+			//#CKFK_20190401 03:43 PM Agregué esto para imprimir la NC cuando la factura está asociada a una
+			String corelNC=tieneNCFactura(itemid);
+
+			if (!corelNC.isEmpty()){
+
+				fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+				fdev.deviceid =gl.deviceId;
+
+				fdev.buildPrint(corelNC, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+			}
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox(e.getMessage());
@@ -422,13 +440,25 @@ public class Reimpresion extends PBase {
 			}
 			
 			if (fdoc.buildPrint(id,1,gl.peFormatoFactura)) prn.printask();
-		
+
 			try {
 				sql="UPDATE D_FACTURA SET IMPRES=2 WHERE COREL='"+itemid+"'";		
 				db.execSQL(sql);
 			} catch (Exception e) {
-			}			
-			
+			}
+
+			//#CKFK_20190401 03:43 PM Agregué esto para imprimir la NC cuando la factura está asociada a una
+			String corelNC=tieneNCFactura(itemid);
+
+			if (!corelNC.isEmpty()){
+
+				fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+				fdev.deviceid =gl.deviceId;
+
+				fdev.buildPrint(corelNC, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+			}
+
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -445,14 +475,15 @@ public class Reimpresion extends PBase {
 
 			String corelFactura=tieneFacturaNC(itemid);
 
-			fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
-			fdoc.deviceid =gl.deviceId;
-
 			if (!corelFactura.isEmpty()){
-				fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printask(printclose);
+
+				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+				fdoc.deviceid =gl.deviceId;
+
+				fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printask();
 			}
 
-			fdev.buildPrint(itemid, 1, "TOL"); prn.printask(printclose, "printnc.txt");
+			fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
 
 
 		} catch (Exception e) {
@@ -482,6 +513,28 @@ public class Reimpresion extends PBase {
 		}
 
 		return vtieneFacturaNC;
+	}
+
+	private String tieneNCFactura(String vCorel){
+
+		Cursor DT;
+		String vtieneNCFactura= "";
+
+		try{
+
+			sql = "SELECT ASIGNACION FROM D_FACTURA WHERE COREL = '" + vCorel + "' AND ASIGNACION IN (SELECT COREL FROM D_CXC)";
+			DT=Con.OpenDT(sql);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				vtieneNCFactura = DT.getString(0);
+			}
+
+		}catch (Exception ex){
+			mu.msgbox("Ocurrió un error "+ex.getMessage());
+		}
+
+		return vtieneNCFactura;
 	}
 
 	// Aprofam

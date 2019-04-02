@@ -6,6 +6,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.widget.Toast;
 
+import org.apache.commons.lang.StringUtils;
+
 public class clsDocDevolucion extends clsDocument {
 
     private ArrayList<itemData> items= new ArrayList<itemData>();
@@ -73,49 +75,26 @@ public class clsDocDevolucion extends clsDocument {
 
     protected boolean buildFooter() {
 
-        if(corelNC.equals(asignacion)){
-
-            rep.add("");
-            rep.addtot("TOTAL NOTA CREDITO ", tot);
-            rep.add("");
-            rep.add("");
-            rep.add("");
-            rep.line();
-            rep.addc("Firma Cliente");
-            rep.add("");
-            rep.addc("Aplica a factura: "+corelF);
-            rep.add("");
-            rep.addc("EXIJA SU FACTURA ORIGINAL ");
-            rep.addc("PARA COMPROBAR  EL PAGO. ");
-            rep.add("");
-
-            rep.add("Serial : "+deviceid);
-            rep.add(resol);
-            rep.add(resfecha);
-            rep.add("");
-
-        }else{
-
-            rep.add("");
-            rep.addtot("TOTAL NOTA CREDITO ", tot);
-            rep.add("");
-            rep.add("");
-            rep.add("");
-            rep.line();
-            rep.addc("Firma Cliente");
-            rep.add("");
-            rep.addc("EXIJA SU FACTURA ORIGINAL ");
-            rep.addc("PARA COMPROBAR  EL PAGO. ");
-            rep.add("");
-
-            rep.add("Serial : "+deviceid);
-            rep.add(resol);
-            rep.add(resfecha);
-            rep.add("");
-
+        rep.add("");
+        rep.addtot("TOTAL NOTA CREDITO ", tot);
+        rep.add("");
+        rep.add("");
+        rep.add("");
+        rep.line();
+        rep.addc("Firma Cliente");
+        rep.add("");
+        if(corelNC.equals(asignacion)) {
+            rep.addc("Aplica a factura: " + corelF);
         }
+        rep.add("");
+        rep.addc("EXIJA SU FACTURA ORIGINAL ");
+        rep.addc("PARA COMPROBAR  EL PAGO. ");
+        rep.add("");
 
-
+        rep.add("Serial : "+deviceid);
+        rep.add(resol);
+        rep.add(resfecha);
+        rep.add("");
 
         return super.buildFooter();
     }
@@ -130,7 +109,7 @@ public class clsDocDevolucion extends clsDocument {
         nombre="NOTA DE CREDITO";
 
         try {
-            sql="SELECT N.RUTA,N.VENDEDOR,N.CLIENTE,N.TOTAL,N.FECHA,N.FACTURA "+
+            sql="SELECT N.RUTA,N.VENDEDOR,N.CLIENTE,N.TOTAL,N.FECHA,N.COREL "+
                 "FROM D_NOTACRED N INNER JOIN D_CxC C ON C.TOTAL = N.TOTAL "+
                 "WHERE C.COREL = '"+corel+"'";
 
@@ -212,20 +191,19 @@ public class clsDocDevolucion extends clsDocument {
         items.clear();
 
         try {
-            sql="SELECT N.COREL,F.ASIGNACION, F.COREL " +
+            sql="SELECT N.COREL,F.ASIGNACION, F.SERIE, F.CORELATIVO " +
                  "FROM D_NOTACRED N INNER JOIN D_FACTURA F ON F.ASIGNACION = N.COREL " +
                  "INNER JOIN D_CxC C ON N.TOTAL = C.TOTAL " +
                  "WHERE C.COREL = '"+corel+"'";
 
             DT=Con.OpenDT(sql);
-            DT.moveToFirst();
 
             if(DT.getCount() != 0){
 
+                DT.moveToFirst();
                 corelNC = DT.getString(0);
                 asignacion = DT.getString(1);
-                corelF = DT.getString(2);
-
+                corelF = DT.getString(2) + StringUtils.right("000000" + Integer.toString(DT.getInt(3)), 6);
 
             }else{
 
@@ -240,31 +218,34 @@ public class clsDocDevolucion extends clsDocument {
                 "WHERE (C.COREL='"+corel+"')";
             DT=Con.OpenDT(sql);
 
-            DT.moveToFirst();
+            if (DT.getCount()>0){
 
+                DT.moveToFirst();
 
-            while (!DT.isAfterLast()) {
+                while (!DT.isAfterLast()) {
 
-                item =new itemData();
+                    item =new itemData();
 
-                item.cod=DT.getString(0);
-                item.nombre=DT.getString(1);
-                item.estado=DT.getString(2);
-                item.peso=DT.getDouble(3);
-                item.prec=DT.getDouble(4);
-                item.tot=DT.getDouble(5);
-                item.cant=DT.getDouble(6);
-                item.um=DT.getString(7);
+                    item.cod=DT.getString(0);
+                    item.nombre=DT.getString(1);
+                    item.estado=DT.getString(2);
+                    item.peso=DT.getDouble(3);
+                    item.prec=DT.getDouble(4);
+                    item.tot=DT.getDouble(5);
+                    item.cant=DT.getDouble(6);
+                    item.um=DT.getString(7);
 
-                items.add(item);
+                    items.add(item);
 
-                DT.moveToNext();
+                    DT.moveToNext();
 
-                if (item.estado.equals("B")){
-                    item.estado="En Buen Estado";
-                }else{
-                    item.estado="En Mal Estado";
+                    if (item.estado.equals("B")){
+                        item.estado="En Buen Estado";
+                    }else{
+                        item.estado="En Mal Estado";
+                    }
                 }
+
             }
 
         } catch (Exception e) {

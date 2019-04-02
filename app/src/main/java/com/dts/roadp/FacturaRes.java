@@ -46,6 +46,7 @@ public class FacturaRes extends PBase {
 	
 	private clsDescGlob clsDesc;
 	private printer prn;
+	private printer prn_nc;
 	private clsDocFactura fdoc;
 	private clsDocDevolucion fdev;
 	private AppMethods app;
@@ -216,9 +217,6 @@ public class FacturaRes extends PBase {
 		prn=new printer(this,printclose);
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
 		fdoc.deviceid =gl.deviceId;
-
-		fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-		fdev.deviceid =gl.deviceId;
 
 		saved=false;
 		assignCorel();
@@ -640,8 +638,15 @@ public class FacturaRes extends PBase {
 				}
 
 				if (notaC==2){
+
+					prn_nc=new printer(this,printclose);
+					fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+					fdev.deviceid =gl.deviceId;
+
 					fdev.buildPrint(gl.dvcorreld,0);
-					prn.printask(printclose, "printnc.txt");
+					prn_nc.printask(printclose, "printnc.txt");
+
+
 				}
 
 				/*

@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.os.Environment;
 import android.widget.Toast;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
@@ -251,45 +253,71 @@ public class clsDocument {
             l=l.replace("HH:mm:ss",s);return l;
         }
 
-		/*if (l.indexOf("##") >=0) {
+		if (l.indexOf("##") >=0) {
+
 			int index = l.indexOf("##");
-			String temp = l.substring(index + 2, 2);
-			String temp1 = l.substring(index + 4, 1);
-			String str= new String(temp1, int.Parse(temp))
+
+			String temp = l.substring(index + 2, index + 4);
+			String temp1 = l.substring(index + 4, index + 5);
+
+			int ctemp= Integer.parseInt(temp);
+
+			String str=StringUtils.leftPad("", ctemp, temp1);
+
 			if (!serie.isEmpty()) {
-				numero = Strings.Right(str + numero, Integer.Parse(temp));
+
+				/*int ctemp1= Integer.parseInt(str);
+
+				if (ctemp1==0){
+					str="";
+				}*/
+
+				numero = StringUtils.right(str + numero, Integer.parseInt(temp));
+			}
+
+			if (l.length() > index + numero.length() ){
+				l = l.substring(0, index) + numero + l.substring(index + numero.length());
+			}else{
+					l = l.substring(0, index) + numero;
+			}
+		}
+
+		if (StringUtils.upperCase(l).indexOf("S#") != -1) {
+
+			int index = StringUtils.upperCase(l).indexOf("S#");
+
+			String temp = l.substring(index + 2, index + 4);
+			String temp1 = l.substring(index + 4, index + 5);
+
+			int ctemp= Integer.parseInt(temp);
+
+			String str=StringUtils.leftPad("", ctemp, temp1);
+
+			/*int ctemp1= Integer.parseInt(str);
+
+			if (ctemp1!=0){
+				str="";
+			}*/
+
+			numero = StringUtils.right(str + numero, Integer.parseInt(temp));
+
+			if ((l.length()) > index + serie.length() + numero.length()) {
+				l = l.substring(0, index) + serie + numero + l.substring(index + serie.length() + numero.length());
+			}else{
+				l = l.substring(0, index) + serie + numero;
 			}
 
 		}
-		if (linea.Length > index + numero.Length ){
-				linea = linea.Substring(0, index) + numero + linea.Substring(index + numero.Length)
-		}else{
-				linea = linea.Substring(0, index) + numero
-		}
-		}
 
-		If (UCase(linea).IndexOf("S#") <> -1) {
-				index = UCase(linea).IndexOf("S#")
-		temp = linea.Substring(index + 2, 2)
-		temp1 = linea.Substring(index + 4, 1)
-		Dim str As New String(temp1, Integer.Parse(temp))
-		numero = Strings.Right(str + numero, Integer.Parse(temp))
-		If linea.Length > index + Serie.Length + numero.Length {
-				linea = linea.Substring(0, index) + Serie + numero + linea.Substring(index + Serie.Length + numero.Length)
-		}else{
-				linea = linea.Substring(0, index) + Serie + numero
-		}
-		}*/
-
-		idx=lu.indexOf("SS");
+		idx=l.indexOf("SS");
         if (idx>=0) {
-            if (emptystr(serie)) return "@@";
-            //if (emptystr(numero)) return "@@";
 
-            s=lu.substring(0,idx);
-            s=s+serie; /*+" numero : "+numero;*/
-            residx=1;
-            return s;
+			if (l.length() > idx + serie.length()) {
+				l = l.substring(0, idx) + serie + l.substring(idx + 2, idx + l.length() - idx - 2);
+			}else{
+				l = l.substring(0, idx) + serie;
+			}
+
         }
 
         idx=lu.indexOf("VV");

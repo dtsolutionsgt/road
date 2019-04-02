@@ -18,7 +18,7 @@ public class clsDocument {
 	public String resol,resfecha,resvence,resrango,fsfecha,modofact;
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;
-	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion;
+	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,docdevolcanasta=false;
 	public int ffecha,pendiente,residx;
 	
 	protected android.database.sqlite.SQLiteDatabase db;
@@ -61,7 +61,7 @@ public class clsDocument {
 	}
 
 	public boolean buildPrint(String corel,int reimpres,String modo) {
-		boolean flag;
+		int flag;
 
         modofact=modo;
 		rep.clear();
@@ -70,15 +70,18 @@ public class clsDocument {
 		if (!buildDetail()) return false;
 		if (!buildFooter()) return false;
 
-		flag=true;
+		flag=0;
 		if (modofact.equalsIgnoreCase("TOL")) {
-			if (docfactura && (reimpres==10)) flag=false;
+			if (docfactura && (reimpres==10)) flag=1;
+			if (docdevolcanasta) flag=2;
 		}
 
-		if (flag) {
+		if (flag==0) {
 			if (!rep.save()) return false;
-		} else {
+		} else if (flag==1){
 			if (!rep.save(2)) return false;
+		} else if (flag==2){
+			if (!rep.save(3)) return false;
 		}
 
 		return true;

@@ -590,165 +590,166 @@ public class Cobro extends PBase {
 		corel=correlativo_factura();
 		
 		try {
-			
-			db.beginTransaction();
-			
-			// Encabezado
-			
-			sql="SELECT SUM(VALOR) FROM T_PAGO";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();		
-			tpago=DT.getDouble(0);
-			
-			ins.init("D_COBRO");
-			ins.add("COREL",corel);
-			ins.add("ANULADO","N");
-			ins.add("FECHA",du.getActDate());
-			ins.add("EMPRESA",gl.emp);
-			ins.add("RUTA",gl.ruta);
-			ins.add("VENDEDOR",gl.vend);
-			ins.add("CLIENTE",gl.cliente);
-			ins.add("KILOMETRAJE",0);	
-			ins.add("TOTAL",tpago);
-			ins.add("DEPOS","");
-			ins.add("CORELC","");
-			ins.add("BANDERA","");
-			ins.add("STATCOM","N");
-			ins.add("CALCOBJ","N");
-			ins.add("IMPRES",0);
-			ins.add("CODIGOLIQUIDACION",0);
-			ins.add("SERIE",fserie);
-			ins.add("CORELATIVO",fcorel);
-		
-			db.execSQL(ins.sql());
-
-			if (gl.pagomodo==0) {
-
-				// Cobro regular - Documentos
-
-				sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD";
-				DT=Con.OpenDT(sql);
-
-				DT.moveToFirst();
-				while (!DT.isAfterLast()) {
-
-					ins.init("D_COBROD");
-
-					ins.add("COREL",corel);
-					ins.add("ANULADO","N");
-					ins.add("EMPRESA",gl.emp);
-					ins.add("DOCUMENTO",DT.getString(0));doc=DT.getString(0);
-					ins.add("TIPODOC",DT.getString(1));
-					ins.add("MONTO",DT.getDouble(2));
-					ins.add("PAGO",DT.getDouble(3));
-					ins.add("CONTRASENA","");
-					ins.add("ID_TRANSACCION",0);
-					ins.add("REFERENCIA","");
-					ins.add("ASIGNACION","");
-
-					db.execSQL(ins.sql());
-
-					DT.moveToNext();
-				}
-
-			} else {
-
-				ins.init("D_COBROD_SR");
-
-				ins.add("COREL",corel);
-				ins.add("DOCUMENTO",gl.cliente);
-				ins.add("ANULADO","N");
-				ins.add("EMPRESA",gl.emp);
-				ins.add("TIPODOC","SR");
-				ins.add("MONTO",tpago);
-				ins.add("PAGO",tpago);
-				ins.add("CONTRASENA","1");
-
-				db.execSQL(ins.sql());
-
-			}
-
-			// Pagos
-				
-			sql="SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
-			DT=Con.OpenDT(sql);
-
-			if (DT.getCount()>0){
-
-                DT.moveToFirst();
-                while (!DT.isAfterLast()) {
-
-                    if (mu.emptystr(dtipo)) {
-                        ins.init("D_COBROP");
-                        ins.add("COREL",corel);
-                    } else {
-                        if (dtipo.equalsIgnoreCase("R")) {
-                            ins.init("D_FACTURAP");
-                            ins.add("COREL",doc);
-                        } else {
-                            ins.init("D_COBROP");
-                            ins.add("COREL",corel);
-                        }
-
-                    }
-
-
-
-                    ins.add("ITEM",DT.getInt(0));
-                    ins.add("ANULADO","N");
-                    ins.add("EMPRESA",gl.emp);
-                    ins.add("CODPAGO",DT.getInt(1));
-                    ins.add("TIPO",DT.getString(2));
-                    ins.add("VALOR",DT.getDouble(3));
-                    ins.add("DESC1",DT.getString(4));
-                    ins.add("DESC2",DT.getString(5));
-                    ins.add("DESC3",DT.getString(6));
-                    ins.add("DEPOS","N");
-
-                    db.execSQL(ins.sql());
-
-                    DT.moveToNext();
-                }
-
-                // Ultimo corel
-                sql="UPDATE P_CORRELREC SET ACTUAL="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";
-                db.execSQL(sql);
-
-            }
-
-			   
-			db.setTransactionSuccessful();
-			
-			db.endTransaction();
 
 			if (!mu.emptystr(dtipo)) {
 
-				if (dtipo.equalsIgnoreCase("R")) {
+				  if (!dtipo.equalsIgnoreCase("R")) {
+					  db.beginTransaction();
 
-					crrf = doc;
+					  // Encabezado
 
-					db.beginTransaction();
+					  sql="SELECT SUM(VALOR) FROM T_PAGO";
+					  DT=Con.OpenDT(sql);
+					  DT.moveToFirst();
+					  tpago=DT.getDouble(0);
 
-					sql = "DELETE FROM D_COBRO WHERE COREL='" + corel + "'";
-					db.execSQL(sql);
+					  ins.init("D_COBRO");
+					  ins.add("COREL",corel);
+					  ins.add("ANULADO","N");
+					  ins.add("FECHA",du.getActDate());
+					  ins.add("EMPRESA",gl.emp);
+					  ins.add("RUTA",gl.ruta);
+					  ins.add("VENDEDOR",gl.vend);
+					  ins.add("CLIENTE",gl.cliente);
+					  ins.add("KILOMETRAJE",0);
+					  ins.add("TOTAL",tpago);
+					  ins.add("DEPOS","");
+					  ins.add("CORELC","");
+					  ins.add("BANDERA","");
+					  ins.add("STATCOM","N");
+					  ins.add("CALCOBJ","N");
+					  ins.add("IMPRES",0);
+					  ins.add("CODIGOLIQUIDACION",0);
+					  ins.add("SERIE",fserie);
+					  ins.add("CORELATIVO",fcorel);
 
-					sql = "DELETE FROM D_COBROD WHERE COREL='" + corel + "'";
-					db.execSQL(sql);
+					  db.execSQL(ins.sql());
 
-					sql = "DELETE FROM D_COBROP WHERE COREL='" + corel + "'";
-					db.execSQL(sql);
+					  if (gl.pagomodo==0) {
 
-					sql = "DELETE FROM P_COBRO WHERE DOCUMENTO='" + doc + "'";
-					db.execSQL(sql);
+						  // Cobro regular - Documentos
 
-					db.setTransactionSuccessful();
+						  sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD";
+						  DT=Con.OpenDT(sql);
 
-					db.endTransaction();
+						  DT.moveToFirst();
+						  while (!DT.isAfterLast()) {
 
-				}
+							  ins.init("D_COBROD");
 
+							  ins.add("COREL",corel);
+							  ins.add("ANULADO","N");
+							  ins.add("EMPRESA",gl.emp);
+							  ins.add("DOCUMENTO",DT.getString(0));doc=DT.getString(0);
+							  ins.add("TIPODOC",DT.getString(1));
+							  ins.add("MONTO",DT.getDouble(2));
+							  ins.add("PAGO",DT.getDouble(3));
+							  ins.add("CONTRASENA","");
+							  ins.add("ID_TRANSACCION",0);
+							  ins.add("REFERENCIA","");
+							  ins.add("ASIGNACION","");
+
+							  db.execSQL(ins.sql());
+
+							  DT.moveToNext();
+						  }
+
+					  } else {
+
+						  ins.init("D_COBROD_SR");
+
+						  ins.add("COREL",corel);
+						  ins.add("DOCUMENTO",gl.cliente);
+						  ins.add("ANULADO","N");
+						  ins.add("EMPRESA",gl.emp);
+						  ins.add("TIPODOC","SR");
+						  ins.add("MONTO",tpago);
+						  ins.add("PAGO",tpago);
+						  ins.add("CONTRASENA","1");
+
+						  db.execSQL(ins.sql());
+
+					  }
+
+					  // Pagos
+
+					  sql="SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
+					  DT=Con.OpenDT(sql);
+
+					  if (DT.getCount()>0){
+
+						  DT.moveToFirst();
+						  while (!DT.isAfterLast()) {
+
+							  ins.init("D_COBROP");
+							  ins.add("COREL",corel);
+							  ins.add("ITEM",DT.getInt(0));
+							  ins.add("ANULADO","N");
+							  ins.add("EMPRESA",gl.emp);
+							  ins.add("CODPAGO",DT.getInt(1));
+							  ins.add("TIPO",DT.getString(2));
+							  ins.add("VALOR",DT.getDouble(3));
+							  ins.add("DESC1",DT.getString(4));
+							  ins.add("DESC2",DT.getString(5));
+							  ins.add("DESC3",DT.getString(6));
+							  ins.add("DEPOS","N");
+
+							  db.execSQL(ins.sql());
+
+							  DT.moveToNext();
+						  }
+
+						  // Ultimo corel
+						  sql="UPDATE P_CORRELREC SET ACTUAL="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";
+						  db.execSQL(sql);
+
+					  }
+
+					  db.setTransactionSuccessful();
+
+					  db.endTransaction();
+				  }else{
+
+					  crrf = doc;
+
+					  db.beginTransaction();
+
+					  sql="SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
+					  DT=Con.OpenDT(sql);
+
+					  if (DT.getCount()>0) {
+
+						  DT.moveToFirst();
+
+						  while (!DT.isAfterLast()) {
+
+							  ins.init("D_FACTURAP");
+							  ins.add("COREL",doc);
+							  ins.add("ITEM",DT.getInt(0));
+							  ins.add("ANULADO","N");
+							  ins.add("EMPRESA",gl.emp);
+							  ins.add("CODPAGO",DT.getInt(1));
+							  ins.add("TIPO",DT.getString(2));
+							  ins.add("VALOR",DT.getDouble(3));
+							  ins.add("DESC1",DT.getString(4));
+							  ins.add("DESC2",DT.getString(5));
+							  ins.add("DESC3",DT.getString(6));
+							  ins.add("DEPOS","N");
+
+							  db.execSQL(ins.sql());
+
+						  }
+
+					  }
+
+					  sql = "DELETE FROM P_COBRO WHERE DOCUMENTO='" + doc + "'";
+					  db.execSQL(sql);
+
+					  db.setTransactionSuccessful();
+
+					  db.endTransaction();
+				  }
 			}
-
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

@@ -272,20 +272,16 @@ public class clsDocument {
 			String str=StringUtils.leftPad("", ctemp, temp1);
 
 			if (!serie.isEmpty()) {
-
-				/*int ctemp1= Integer.parseInt(str);
-
-				if (ctemp1==0){
-					str="";
-				}*/
-
 				numero = StringUtils.right(str + numero, Integer.parseInt(temp));
 			}
+
+			int ctemp1= Integer.parseInt(numero);
+			if (ctemp1==0) numero = StringUtils.leftPad("", ctemp);
 
 			if (l.length() > index + numero.length() ){
 				l = l.substring(0, index) + numero + l.substring(index + numero.length());
 			}else{
-					l = l.substring(0, index) + numero;
+				l = l.substring(0, index) + numero;
 			}
 		}
 
@@ -300,13 +296,10 @@ public class clsDocument {
 
 			String str=StringUtils.leftPad("", ctemp, temp1);
 
-			/*int ctemp1= Integer.parseInt(str);
-
-			if (ctemp1!=0){
-				str="";
-			}*/
-
 			numero = StringUtils.right(str + numero, Integer.parseInt(temp));
+
+			int ctemp1= Integer.parseInt(numero);
+			if (ctemp1==0) numero = StringUtils.leftPad("", ctemp);
 
 			if ((l.length()) > index + serie.length() + numero.length()) {
 				l = l.substring(0, index) + serie + numero + l.substring(index + serie.length() + numero.length());

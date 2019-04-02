@@ -238,8 +238,6 @@ public class Cobro extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("Sin referencia: " + e.getMessage());
 	    }
-
-
 	}
 
 	private void setHandlers(){

@@ -13,8 +13,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
 
 public class Reimpresion extends PBase {
@@ -385,7 +383,8 @@ public class Reimpresion extends PBase {
 				fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 				fdev.deviceid =gl.deviceId;
 
-				fdev.buildPrint(corelNC, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+				fdev.buildPrint(corelNC, 1, "TOL");
+				prn_nc.printnoask(printclose, "printnc.txt");
 			}
 
 		} catch (Exception e) {

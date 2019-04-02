@@ -173,10 +173,8 @@ public class MiscUtils {
 
 			}
 
-		}catch (Exception ex)
-		{
-			pB = new PBase();
-			pB.addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"msgbox(String msg)");}
+		} catch (Exception ex) {
+		}
 	}   
 	
 	public void msgbox(int v) {

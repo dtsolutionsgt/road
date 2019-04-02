@@ -89,6 +89,7 @@ public class FacturaRes extends PBase {
 
 		lblVuelto = new TextView(this,null);
 		txtVuelto = new EditText(this,null);
+
 		cliid=gl.cliente;
 		rutapos=gl.rutapos;
 		media=gl.media;
@@ -215,8 +216,13 @@ public class FacturaRes extends PBase {
 		};
 
 		prn=new printer(this,printclose);
+		prn_nc=new printer(this,printclose);
+
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
 		fdoc.deviceid =gl.deviceId;
+
+		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+		fdev.deviceid =gl.deviceId;
 
 		saved=false;
 		assignCorel();
@@ -619,7 +625,6 @@ public class FacturaRes extends PBase {
 					//
 				} else if (gl.peModal.equalsIgnoreCase("TOL")) {
 
-					//#HS_20181212 Condicion para imprimir facturas pendientes de pago
 					if (!gl.cobroPendiente) {
 					    if (impres==0) {
                             fdoc.buildPrint(corel, 0,gl.peFormatoFactura);
@@ -637,16 +642,10 @@ public class FacturaRes extends PBase {
 					singlePrint();
 				}
 
-				if (notaC==2){
-
-					prn_nc=new printer(this,printclose);
-					fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-					fdev.deviceid =gl.deviceId;
-
-					fdev.buildPrint(gl.dvcorreld,0);
-					prn_nc.printask(printclose, "printnc.txt");
-
-				}
+                if (notaC==2){
+                   fdev.buildPrint(gl.dvcorreld,0);
+                    prn_nc.printnoask(printclose, "printnc.txt");
+                }
 
 				/*
 				final Handler shandler = new Handler();
@@ -2270,8 +2269,17 @@ public class FacturaRes extends PBase {
 					if (impres>1) {
 						FacturaRes.super.finish();
 					} else {
+
 						fdoc.buildPrint(corel, 10,gl.peFormatoFactura);
 						prn.printask(printcallback);
+
+						if (notaC==2){
+							fdev.buildPrint(gl.dvcorreld,0);
+
+							prn_nc.printnoask(printclose, "printnc.txt");
+							prn_nc.printnoask(printclose, "printnc.txt");
+						}
+
 					}
 				}
 			});

@@ -1,13 +1,13 @@
 package com.dts.roadp;
 
-import com.epson.eposdevice.Device;
-import com.epson.eposdevice.printer.Printer;
-
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 import android.widget.Toast;
-import android.app.Activity;
+
+import com.epson.eposdevice.Device;
+import com.epson.eposdevice.printer.Printer;
 
 public class printer {
 
@@ -80,6 +80,11 @@ public class printer {
 	public void printask(Runnable callBackHook, String fName)    {
 		if (emptyparam()) return;
 		if(prid>0) prn.printask(callBackHook,fName);
+	}
+
+	public void printnoask(Runnable callBackHook, String fName)    {
+		if (emptyparam()) return;
+		if(prid>0) prn.printnoask(callBackHook,fName);
 	}
 
 	public boolean print() {

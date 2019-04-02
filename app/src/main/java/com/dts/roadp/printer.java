@@ -79,7 +79,7 @@ public class printer {
 
 	public void printask(Runnable callBackHook, String fName)    {
 		if (emptyparam()) return;
-		if (prid>0) prn.printask(callBackHook, fName);
+		if(prid>0) prn.printask(callBackHook,fName);
 	}
 
 	public boolean print() {

@@ -48,6 +48,14 @@ public class printDMax extends printBase
 		fname="print.txt";errmsg="";
 		msgAskPrint();				
 	}
+
+	public void printask(Runnable callBackHook, String fileName){
+		hasCallback=true;
+		callback=callBackHook;
+
+		fname=fileName;errmsg="";
+		msgAskPrint();
+	}
 	
 	public boolean print() 	{
 		hasCallback=false;

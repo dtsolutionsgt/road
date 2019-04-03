@@ -18,11 +18,12 @@ public class DevolBodCan extends PBase {
     private ListView listView;
     private TextView lblReg,lblTot;
     private ImageView imgNext;
-    public String corel;
+    public String corel,existenciaC,existenciaP;
+    private int impres;
 
-    private printer prn_can;
+    private printer prn_can,prn_paseante;
     private clsDocCanastaBod fcanastabod;
-    public Runnable printclose;
+    public Runnable printclose, printcallback;
 
     private ArrayList<clsClasses.clsDevCan> items= new ArrayList<clsClasses.clsDevCan>();
     private list_view_dev_bod_can adapter;
@@ -48,12 +49,17 @@ public class DevolBodCan extends PBase {
 
         printclose= new Runnable() {
             public void run() {
-                DevolBodCan.super.finish();
+                //DevolBodCan.super.finish();
+            }
+        };
+        printcallback= new Runnable() {
+            public void run() {
+                askPrint();
             }
         };
 
         prn_can=new printer(this,printclose);
-        fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+        fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
         fcanastabod.deviceid =gl.deviceId;
 
         listItems();
@@ -430,6 +436,52 @@ public class DevolBodCan extends PBase {
 
     }
 
+    private void singlePrint() {
+        try{
+            prn_can.printask(printclose, "printdevcan.txt");
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+    private void askPrint() {
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle("Road");
+            dialog.setMessage("¿Impresión correcta?");
+
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    gl.closeCliDet = true;
+                    gl.closeVenta = true;
+
+                    impres++;toast("Impres "+impres);
+
+                    if (impres>1) {
+                        DevolBodCan.super.finish();
+                    } else {
+                        fcanastabod.buildPrint(corel, 10,gl.peFormatoFactura);
+                        prn_can.printask(printcallback, "printdevcan.txt");
+                    }
+                }
+            });
+
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    //singlePrint();
+                    prn_can.printask(printcallback, "printdevcan.txt");
+                }
+            });
+
+            dialog.show();
+        } catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+
+    }
     //endregion
 
     //region createdoc
@@ -438,16 +490,103 @@ public class DevolBodCan extends PBase {
 
         try{
 
+            impres=0;
             if (prn_can.isEnabled()) {
-                fcanastabod.buildPrint(corel,0, "*");
-                prn_can.printask(printclose, "printdevcan.txt");
+
+                existenciaC=tieneCanasta(corel);
+                existenciaP=tienePaseante(corel);
+
+                if(!existenciaC.isEmpty()){
+                    if(impres==0){
+                        fcanastabod.buildPrint(corel,0, "TOL");
+                    }else {
+                        fcanastabod.buildPrint(corel, 10, "TOL");
+                    }
+
+                    if (gl.peImprFactCorrecta) {
+                        prn_can.printask(printclose, "printdevcan.txt");
+                    } else {
+                        singlePrint();
+                    }
+
+                    if(!existenciaP.isEmpty()){
+
+                        prn_paseante=new printer(this,printclose);
+                        fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
+                        fcanastabod.deviceid =gl.deviceId;
+
+                        fcanastabod.buildPrint(corel,0,"*");
+                        prn_paseante.printask(printclose, "printpaseante.txt");
+
+                    }
+
+
+                }else if(!existenciaP.isEmpty()){
+
+                    prn_paseante=new printer(this,printclose);
+                    fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
+                    fcanastabod.deviceid =gl.deviceId;
+
+                    fcanastabod.buildPrint(corel,0,"*");
+                    prn_paseante.printask(printclose, "printpaseante.txt");
+
+                }
+
+
+
             }
+
+        if (!prn_can.isEnabled()) super.finish();
 
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             mu.msgbox("createDoc: " + e.getMessage());
         }
 
+    }
+
+    private String tieneCanasta(String vCorel){
+
+        Cursor DT;
+        String vtieneCanasta= "";
+
+        try{
+
+            sql = "SELECT COREL FROM D_MOVDCAN WHERE COREL = '" + vCorel + "' AND COREL IN (SELECT COREL FROM D_MOV)";
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()>0){
+                DT.moveToFirst();
+                vtieneCanasta = DT.getString(0);
+            }
+
+        }catch (Exception ex){
+            mu.msgbox("Ocurrió un error "+ex.getMessage());
+        }
+
+        return vtieneCanasta;
+    }
+
+    private String tienePaseante(String vCorel){
+
+        Cursor DT;
+        String vtienePaseante= "";
+
+        try{
+
+            sql = "SELECT COREL FROM D_MOVD WHERE COREL = '" + vCorel + "' AND COREL IN (SELECT COREL FROM D_MOV)";
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()>0){
+                DT.moveToFirst();
+                vtienePaseante = DT.getString(0);
+            }
+
+        }catch (Exception ex){
+            mu.msgbox("Ocurrió un error "+ex.getMessage());
+        }
+
+        return vtienePaseante;
     }
 
     //endregion

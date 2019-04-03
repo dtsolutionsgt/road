@@ -2,6 +2,7 @@ package com.dts.roadp;
 
 import android.content.Context;
 import android.os.Environment;
+import android.view.ViewDebug;
 import android.widget.Toast;
 
 import org.apache.commons.lang.StringUtils;
@@ -277,8 +278,16 @@ public class clsRepBuilder {
 		sval=cursym+decfrm.format(val);
 		ts=ltrim(s1,prw-13)+" "+rtrim(sval,12);
 		items.add(ts);
-	}	
-	
+	}
+
+	public void addtotpeso(String s1,double val) {
+		String sval;
+
+		sval = Double.toString(val);
+		ts=ltrim(s1,prw-13)+" "+rtrim(sval,12);
+		items.add(ts);
+	}
+
 	public void addtotsp(String s1,double val) {
 		String sval;
 		

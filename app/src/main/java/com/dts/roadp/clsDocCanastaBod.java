@@ -13,6 +13,7 @@ public class clsDocCanastaBod extends clsDocument {
     private double tot,desc,imp,stot,percep;
     private boolean sinimp;
     private String 	contrib,recfact,estadoDev,corelNC,corelF,asignacion;
+    private int totitems;
 
     public clsDocCanastaBod(Context context, int printwidth, String cursym, int decimpres, String archivo) {
         super(context, printwidth, cursym, decimpres, archivo);
@@ -29,7 +30,8 @@ public class clsDocCanastaBod extends clsDocument {
 
         super.loadHeadData(corel);
 
-        nombre="DEVOLUCION DE CANASTA";
+        if(modofact.equalsIgnoreCase("TOL")) nombre="DEVOLUCION DE CANASTA";
+        if(modofact.equalsIgnoreCase("*")) nombre="DEVOLUCION DE PASEANTE";
 
         try {
             sql="SELECT COREL, RUTA, TIPO, REFERENCIA, USUARIO, FECHA "+
@@ -82,12 +84,23 @@ public class clsDocCanastaBod extends clsDocument {
 
         try {
 
-            sql="SELECT M.PRODUCTO,P.DESCLARGA,M.CANT,M.PESO,M.LOTE,M.UNIDADMEDIDA "+
-                "FROM D_MOVDCAN M INNER JOIN P_PRODUCTO P ON M.PRODUCTO=P.CODIGO "+
-                "WHERE M.COREL='"+corel+"'";
+            if(modofact.equalsIgnoreCase("TOL")) {
+                sql="SELECT M.PRODUCTO,P.DESCLARGA,M.CANT,M.PESO,M.LOTE,M.UNIDADMEDIDA "+
+                    "FROM D_MOVDCAN M INNER JOIN P_PRODUCTO P ON M.PRODUCTO=P.CODIGO "+
+                    "WHERE M.COREL='"+corel+"'";
+            }
+
+            if(modofact.equalsIgnoreCase("*")) {
+                sql="SELECT M.PRODUCTO,P.DESCLARGA,M.CANT,M.PESO,M.LOTE,M.UNIDADMEDIDA "+
+                    "FROM D_MOVD M INNER JOIN P_PRODUCTO P ON M.PRODUCTO=P.CODIGO "+
+                    "WHERE M.COREL='"+corel+"'";
+            }
+
 
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
+
+            totitems = DT.getCount();
 
             while (!DT.isAfterLast()) {
 
@@ -115,7 +128,9 @@ public class clsDocCanastaBod extends clsDocument {
     protected boolean buildDetail() {
         rep.add("");
 
-        detailToledano();
+        if(modofact.equalsIgnoreCase("TOL")) detailToledano();
+        if(modofact.equalsIgnoreCase("*")) detailToledano();
+
         return true;
     }
 
@@ -124,21 +139,23 @@ public class clsDocCanastaBod extends clsDocument {
         String ss;
 
         rep.add("");
-        rep.add("CODIGO   DESCRIPCION        UM  VALOR");
-        rep.add("            CANTIDAD           PRECIO");
+        rep.add("CODIGO   DESCRIPCION        UM");
+        rep.add("          CANTIDAD             PESO");
         rep.line();
 
         for (int i = 0; i <items.size(); i++) {
             item=items.get(i);
 
             ss=rep.ltrim(item.cod+" "+item.nombre,prw-10);
-            ss=ss+rep.rtrim(item.um,4)+" "+rep.rtrim(frmdecimal(item.prec,2),5);
+            ss=ss+rep.rtrim(item.um,4);
             rep.add(ss);
-            ss=rep.rtrim("",2)+" "+rep.rtrim(frmdecimal(item.cant,2),8);
+            ss=rep.rtrim("", 6)+" "+rep.rtrim(frmdecimal(item.cant,2),8);
             ss=rep.ltrim(ss,prw-10);
-            ss=ss+" "+rep.rtrim(frmdecimal(item.tot,2),9);
+            ss=ss+" "+rep.rtrim(frmdecimal(item.peso,2),9);
             rep.add(ss);
 
+
+            tot += item.peso;
         }
 
         rep.line();
@@ -148,7 +165,10 @@ public class clsDocCanastaBod extends clsDocument {
 
     protected boolean buildFooter() {
 
-
+        rep.add("");
+        rep.add("Total items: ", totitems);
+        rep.add("");
+        rep.addtotpeso("TOTAL PESO ", tot);
         rep.add("");
         rep.addtot("TOTAL ", tot);
         rep.add("");
@@ -176,6 +196,6 @@ public class clsDocCanastaBod extends clsDocument {
 
     private class itemData {
         public String cod,nombre,estado,um,lote;
-        public double cant,prec,tot,peso;
+        public double cant,peso;
     }
 }

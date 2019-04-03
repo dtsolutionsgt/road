@@ -71,11 +71,14 @@ public class clsDocument {
 		if (!buildFooter()) return false;
 
 		flag=0;
+
 		if (modofact.equalsIgnoreCase("TOL")) {
 			if (docfactura && (reimpres==10)) flag=1;
 			if (doccanastabod) flag=2;
 			if (docrecibo && (reimpres==0)) flag=3;
-		}
+        } else if(modofact.equalsIgnoreCase("*")) {
+            if (doccanastabod) flag = 2;
+        }
 
 		if (flag==0) {
 			if (!rep.save()) return false;

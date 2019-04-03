@@ -2291,7 +2291,6 @@ public class FacturaRes extends PBase {
 				}
 			});
 
-
 			dialog.show();
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

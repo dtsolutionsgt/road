@@ -183,6 +183,7 @@ public class clsDocCobro extends clsDocument {
 	    }
 		
 		vendedor=val;
+		vendcod=vend;
 		
 		try {
 			sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION FROM P_CLIENTE WHERE CODIGO='"+cli+"'";

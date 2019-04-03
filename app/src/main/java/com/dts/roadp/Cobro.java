@@ -105,7 +105,10 @@ public class Cobro extends PBase {
 		
 		prn=new printer(this,printclose);
 		fdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.deviceId, "");
+		fdoc.deviceid=gl.deviceId;
+
 		fdocf = new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+		fdocf.deviceid=gl.deviceId;
 					
 	}
 
@@ -581,6 +584,7 @@ public class Cobro extends PBase {
 	
 	private boolean saveCobro(){
 		Cursor DT;
+		Cursor DT2;
 		double tpago;
 		String doc="";
 		
@@ -639,7 +643,7 @@ public class Cobro extends PBase {
 							  ins.add("COREL",corel);
 							  ins.add("ANULADO","N");
 							  ins.add("EMPRESA",gl.emp);
-							  ins.add("DOCUMENTO",DT.getString(0));doc=DT.getString(0);
+							  ins.add("DOCUMENTO",DT.getString(0));
 							  ins.add("TIPODOC",DT.getString(1));
 							  ins.add("MONTO",DT.getDouble(2));
 							  ins.add("PAGO",DT.getDouble(3));
@@ -709,9 +713,16 @@ public class Cobro extends PBase {
 					  db.endTransaction();
 				  }else{
 
-					  crrf = doc;
+				  	  db.beginTransaction();
 
-					  db.beginTransaction();
+					  sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD";
+					  DT2=Con.OpenDT(sql);
+
+					  if (DT2.getCount()>0){
+					  	DT2.moveToFirst();
+						  doc=DT2.getString(0);
+						  crrf = doc;
+					  }
 
 					  sql="SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
 					  DT=Con.OpenDT(sql);
@@ -737,6 +748,7 @@ public class Cobro extends PBase {
 
 							  db.execSQL(ins.sql());
 
+							  DT.moveToNext();
 						  }
 
 					  }

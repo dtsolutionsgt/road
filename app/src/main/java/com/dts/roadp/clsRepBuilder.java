@@ -343,9 +343,9 @@ public class clsRepBuilder {
 	public void addp(String s1,String val) {
 		String ss,s3;
 		
-		s1=StringUtils.rightPad(s1,24);ss=s1+"\t";
+		s1=StringUtils.rightPad(s1,24);ss=s1+"";
 		s3=val;
-		s3=StringUtils.leftPad(s3,11);ss+=s3;
+		s3=StringUtils.leftPad(s3,12);ss+=s3;
 		
 		items.add(ss);
 		

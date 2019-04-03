@@ -464,10 +464,13 @@ public class clsDocFactura extends clsDocument {
 			rep.line();
 			rep.addc("Firma Cliente");
 			rep.add("");
-			rep.addc("DE SER UNA VENTA AL CREDITO, SOLAMEN");
-			rep.addc("TE NUESTRO CORRESPONDIENTE RECIBO SE");
-			rep.addc("CONSIDERARA COMO EVIDENCIA  DE  PAGO");
-			rep.add("");
+
+			if (pendiente!=4){
+				rep.addc("DE SER UNA VENTA AL CREDITO, SOLAMEN");
+				rep.addc("TE NUESTRO CORRESPONDIENTE RECIBO SE");
+				rep.addc("CONSIDERARA COMO EVIDENCIA  DE  PAGO");
+				rep.add("");
+			}
 
 			rep.add("Serial : "+deviceid);
 			rep.add(resol);

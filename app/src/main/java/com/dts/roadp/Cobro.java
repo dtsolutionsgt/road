@@ -586,7 +586,7 @@ public class Cobro extends PBase {
 		
 		if (!assignCorel()) return false;
 
-		corel=correlativo_factura();
+		corel= correlativo_recibo();
 		
 		try {
 
@@ -759,7 +759,7 @@ public class Cobro extends PBase {
 		return true;
 	}
 
-	private String correlativo_factura(){
+	private String correlativo_recibo(){
 
 		Cursor DT;
         int cor=0;
@@ -888,7 +888,7 @@ public class Cobro extends PBase {
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox("ApplayPay: "+ e.getMessage());return false;
+		   	mu.msgbox("ApplyPay: "+ e.getMessage());return false;
 	    }
 		
 	}
@@ -1148,7 +1148,7 @@ public class Cobro extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			fcorel=0;fserie="";
-			mu.msgbox("No esta definido correlativo de recibos.");return false;
+			mu.msgbox("No está definido correlativo de recibos.");return false;
 		}	
 					
 		fcorel=ca+1;		

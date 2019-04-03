@@ -86,7 +86,7 @@ public class clsDocCobro extends clsDocument {
 				vTempEfectivo+=itempago.valor;
 			}else{
 				vTempCheque+=itempago.valor;
-				rep.addg("No. "+ itempago.desc1,getNombreBanco(itempago.desc3),mu.frmcur(itempago.valor));
+				rep.addg("No. "+ itempago.desc1,itempago.nombreBanco,mu.frmcur(itempago.valor));
 			}
 
 		}
@@ -259,7 +259,7 @@ public class clsDocCobro extends clsDocument {
 		itemspago.clear();
 
 		try {
-			sql = "SELECT P.TIPO, P.VALOR, P.DESC1, P.DESC3 FROM D_COBROP AS P  WHERE P.COREL  ='" + corel + "' ORDER BY P.CODPAGO";
+			sql = "SELECT P.TIPO, P.VALOR, P.DESC1, P.DESC2, P.DESC3 FROM D_COBROP AS P  WHERE P.COREL  ='" + corel + "' ORDER BY P.CODPAGO";
 			DT=Con.OpenDT(sql);
 
 			if(DT.getCount()>0){
@@ -272,13 +272,18 @@ public class clsDocCobro extends clsDocument {
 					item.tipo=DT.getString(0);
 					item.valor=DT.getDouble(1);
 					item.desc1=DT.getString(2);
-					item.desc3=DT.getString(3);
+					item.desc2=DT.getString(3);
+					item.desc3=DT.getString(4);
+
+					if (!item.desc2.isEmpty()){
+						item.nombreBanco = getNombreBanco(item.desc2);
+					}
+
 					itemspago.add(item);
 
 					DT.moveToNext();
 				}
 			}
-
 
 		} catch (Exception e) {
 			mu.msgbox("Ocurrió un error" + e.getMessage());
@@ -308,7 +313,7 @@ public class clsDocCobro extends clsDocument {
 	}
 
 	private class itemDataPago {
-		public String tipo,desc1, desc2, desc3;
+		public String tipo,desc1, desc2, desc3, nombreBanco;
 		public double valor;
 	}
 
@@ -325,7 +330,6 @@ public class clsDocCobro extends clsDocument {
 				DT.moveToFirst();
 				vNombre=DT.getString(0);
 			}
-
 
 		} catch (Exception e) {
 			mu.msgbox("Ocurrió un error" + e.getMessage());

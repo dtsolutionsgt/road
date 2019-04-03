@@ -508,7 +508,7 @@ public class Reimpresion extends PBase {
 			}
 
 		}catch (Exception ex){
-			mu.msgbox("Ocurrió un error "+ex.getMessage());
+			mu.msgbox("tieneFacturaNC ocurrió un error "+ex.getMessage());
 		}
 
 		return vtieneFacturaNC;
@@ -530,7 +530,7 @@ public class Reimpresion extends PBase {
 			}
 
 		}catch (Exception ex){
-			mu.msgbox("Ocurrió un error "+ex.getMessage());
+			mu.msgbox("tieneNCFactura ocurrió un error "+ex.getMessage());
 		}
 
 		return vtieneNCFactura;

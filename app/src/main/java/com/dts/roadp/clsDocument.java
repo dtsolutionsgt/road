@@ -44,7 +44,7 @@ public class clsDocument {
 		decfrm = new DecimalFormat("#,##0.00");
 
 	}
-	
+
 	public boolean buildPrint(String corel,int reimpres) {
 		setAddlog("Build print",""+DU.getActDateTime(),"");
 
@@ -74,6 +74,7 @@ public class clsDocument {
 		if (modofact.equalsIgnoreCase("TOL")) {
 			if (docfactura && (reimpres==10)) flag=1;
 			if (doccanastabod) flag=2;
+			if (docrecibo && (reimpres==0)) flag=3;
 		}
 
 		if (flag==0) {
@@ -81,6 +82,8 @@ public class clsDocument {
 		} else if (flag==1){
 			if (!rep.save(2)) return false;
 		} else if (flag==2){
+			if (!rep.save(3)) return false;
+		} else if (flag==3){
 			if (!rep.save(3)) return false;
 		}
 

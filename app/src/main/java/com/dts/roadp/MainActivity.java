@@ -31,7 +31,7 @@ import java.lang.reflect.Field;
 public class MainActivity extends PBase {
 
 	private EditText txtUser,txtPass;
-	private TextView lblRuta,lblRTit;
+	private TextView lblRuta,lblRTit,lblLogin;
 	private ImageView imgLogo;
 		
 	private clsLicence lic;
@@ -98,6 +98,7 @@ public class MainActivity extends PBase {
             txtPass= (EditText) findViewById(R.id.txtMonto);
             lblRuta= (TextView) findViewById(R.id.lblCDisp);
             lblRTit= (TextView) findViewById(R.id.lblCUsed);
+            lblLogin= (TextView) findViewById(R.id.lblDir);
             imgLogo= (ImageView) findViewById(R.id.imgNext);
 
             // DB VERSION
@@ -172,7 +173,6 @@ public class MainActivity extends PBase {
     }
 
 	public void doLogin(View view) {
-
 	    try{
             processLogIn();
         }catch (Exception e){
@@ -373,14 +373,17 @@ public class MainActivity extends PBase {
     }
 
     private void processLogIn() {
+        lblLogin.setVisibility(View.INVISIBLE);
+
         if (gl.contlic) {
             if (!validaLicencia()) {
+                lblLogin.setVisibility(View.VISIBLE);
                 mu.msgbox("¡Licencia invalida!");
                 return;
             }
         }
 
-        if (checkUser()) gotoMenu();
+        if (checkUser()) gotoMenu();else lblLogin.setVisibility(View.VISIBLE);
     }
 
     private boolean checkUser() {
@@ -444,11 +447,9 @@ public class MainActivity extends PBase {
             return true;
 
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             return false;
         }
-
 
 	}
 
@@ -752,6 +753,7 @@ public class MainActivity extends PBase {
             super.onResume();
             initSession();
             txtUser.requestFocus();
+            lblLogin.setVisibility(View.VISIBLE);
         }catch (Exception e){
            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }

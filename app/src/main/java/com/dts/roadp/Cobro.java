@@ -540,19 +540,18 @@ public class Cobro extends PBase {
 				if (!applyPay()) return;
 			}
 
-
 			if (saveCobro()) {
 				listItems();
 				if (dtipo.equalsIgnoreCase("R")) {
 					if (prn.isEnabled()) {
-						fdocf.buildPrint(crrf,0);
-						prn.printask(printclose);
+						fdocf.buildPrint(crrf,0,gl.peModal);
+						prn.printask(printcallback);
 					}
 				}else {
 					if (prn.isEnabled()) {
-						fdoc.buildPrint(corel,0);
+						fdoc.buildPrint(corel,0,gl.peModal);
 						browse = 4;
-						prn.printask(printclose);
+						prn.printask(printcallback);
 					}
 				}
 			}

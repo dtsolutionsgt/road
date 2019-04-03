@@ -1,15 +1,12 @@
 package com.dts.roadp;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-
-import com.dts.roadp.clsClasses.clsCFDV;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.widget.Toast;
 
 import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
 
 public class clsDocCobro extends clsDocument {
 
@@ -44,8 +41,7 @@ public class clsDocCobro extends clsDocument {
 
 			result=(DT.getCount()>0?true:false);
 
-		}catch (Exception ex){
-
+		} catch (Exception ex){
 		}
 
 		return result;

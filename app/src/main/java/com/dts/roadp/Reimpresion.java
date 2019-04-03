@@ -353,7 +353,7 @@ public class Reimpresion extends PBase {
 	
 	private void imprRecibo() {
 		try {
-			if (cdoc.buildPrint(itemid,1)) prn.printask();
+			if (cdoc.buildPrint(itemid,1,"")) prn.printask();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox(e.getMessage());

@@ -13,7 +13,7 @@ public class clsDocCanastaBod extends clsDocument {
     private double tot,desc,imp,stot,percep;
     private boolean sinimp;
     private String 	contrib,recfact,estadoDev,corelNC,corelF,asignacion;
-    private int totitems;
+    private int totitems, totcant;
 
     public clsDocCanastaBod(Context context, int printwidth, String cursym, int decimpres, String archivo) {
         super(context, printwidth, cursym, decimpres, archivo);
@@ -31,7 +31,7 @@ public class clsDocCanastaBod extends clsDocument {
         super.loadHeadData(corel);
 
         if(modofact.equalsIgnoreCase("TOL")) nombre="DEVOLUCION DE CANASTA";
-        if(modofact.equalsIgnoreCase("*")) nombre="DEVOLUCION DE PASEANTE";
+        if(modofact.equalsIgnoreCase("*")) nombre="DEVOLUCION DE BODEGA";
 
         try {
             sql="SELECT COREL, RUTA, TIPO, REFERENCIA, USUARIO, FECHA "+
@@ -140,7 +140,7 @@ public class clsDocCanastaBod extends clsDocument {
 
         rep.add("");
         rep.add("CODIGO   DESCRIPCION        UM");
-        rep.add("          CANTIDAD             PESO");
+        rep.add("          CANTIDAD              PESO");
         rep.line();
 
         for (int i = 0; i <items.size(); i++) {
@@ -151,14 +151,18 @@ public class clsDocCanastaBod extends clsDocument {
             rep.add(ss);
             ss=rep.rtrim("", 6)+" "+rep.rtrim(frmdecimal(item.cant,2),8);
             ss=rep.ltrim(ss,prw-10);
-            ss=ss+" "+rep.rtrim(frmdecimal(item.peso,2),9);
+            ss=ss+" "+rep.rtrim(frmdecimal(item.peso,3),9);
             rep.add(ss);
 
-
+            totcant += item.cant;
             tot += item.peso;
         }
 
         rep.line();
+        ss=rep.rtrim("", 6)+" "+rep.rtrim(frmdecimal(totcant,2),8);
+        ss=rep.ltrim(ss,prw-10);
+        ss=ss+" "+rep.rtrim(frmdecimal(tot,3),9);
+        rep.add(ss);
 
         return true;
     }
@@ -166,11 +170,7 @@ public class clsDocCanastaBod extends clsDocument {
     protected boolean buildFooter() {
 
         rep.add("");
-        rep.add("Total items: ", totitems);
-        rep.add("");
-        rep.addtotpeso("TOTAL PESO ", tot);
-        rep.add("");
-        rep.addtot("TOTAL ", tot);
+        rep.add("Total items: " + totitems);
         rep.add("");
         rep.add("Serial : "+deviceid);
         rep.add("");

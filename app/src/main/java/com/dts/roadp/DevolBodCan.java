@@ -19,10 +19,11 @@ public class DevolBodCan extends PBase {
     private TextView lblReg,lblTot;
     private ImageView imgNext;
     public String corel,existenciaC,existenciaP;
-    private int impres;
+    private int impres, close=0;
 
     private printer prn_can,prn_paseante;
     private clsDocCanastaBod fcanastabod;
+    private DevolBod DevBod;
     public Runnable printclose, printcallback;
 
     private ArrayList<clsClasses.clsDevCan> items= new ArrayList<clsClasses.clsDevCan>();
@@ -49,6 +50,19 @@ public class DevolBodCan extends PBase {
 
         printclose= new Runnable() {
             public void run() {
+                if(impres==1){
+                    gl.closeDevBod=true;
+                    DevolBodCan.super.finish();
+                }else if(impres==2){
+                    gl.closeDevBod=true;
+                    DevolBodCan.super.finish();
+                }else if(impres>2){
+                    if(impres==4){
+                        gl.closeDevBod=true;
+                        DevolBodCan.super.finish();
+                    }
+                    impres++;
+                }
                 //DevolBodCan.super.finish();
             }
         };
@@ -454,8 +468,6 @@ public class DevolBodCan extends PBase {
 
             dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    gl.closeCliDet = true;
-                    gl.closeVenta = true;
 
                     impres++;toast("Impres "+impres);
 
@@ -496,6 +508,9 @@ public class DevolBodCan extends PBase {
                 existenciaC=tieneCanasta(corel);
                 existenciaP=tienePaseante(corel);
 
+                if(existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=1;
+                if(!existenciaC.isEmpty() && existenciaP.isEmpty()) impres=2;
+
                 if(!existenciaC.isEmpty()){
                     if(impres==0){
                         fcanastabod.buildPrint(corel,0, "TOL");
@@ -511,6 +526,7 @@ public class DevolBodCan extends PBase {
 
                     if(!existenciaP.isEmpty()){
 
+                        if(!existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=3;
                         prn_paseante=new printer(this,printclose);
                         fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
                         fcanastabod.deviceid =gl.deviceId;
@@ -531,7 +547,6 @@ public class DevolBodCan extends PBase {
                     prn_paseante.printask(printclose, "printpaseante.txt");
 
                 }
-
 
 
             }

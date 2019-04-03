@@ -280,7 +280,7 @@ public class DevolBodTol extends PBase {
         try{
             super.onResume();
 
-            if (gl.closeVenta) super.finish();
+            if (gl.closeDevBod) super.finish();
 
             if (browse==1) {
                 browse=0;

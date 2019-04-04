@@ -279,15 +279,22 @@ public class clsDocument {
 
 			if (!serie.isEmpty()) {
 				numero = StringUtils.right(str + numero, Integer.parseInt(temp));
-			}
 
-			int ctemp1= Integer.parseInt(numero);
-			if (ctemp1==0) numero = StringUtils.leftPad("", ctemp);
+				if (!numero.isEmpty()){
+                    int ctemp1= Integer.parseInt(numero);
+                    if (ctemp1==0) numero = StringUtils.leftPad("", ctemp);
+                }
+
+            }
 
 			if (l.length() > index + numero.length() ){
 				l = l.substring(0, index) + numero + l.substring(index + numero.length());
 			}else{
 				l = l.substring(0, index) + numero;
+			}
+
+			if (l.indexOf("##")>=0) {
+				l = StringUtils.replace(l,"##","");
 			}
 		}
 
@@ -304,8 +311,10 @@ public class clsDocument {
 
 			numero = StringUtils.right(str + numero, Integer.parseInt(temp));
 
-			int ctemp1= Integer.parseInt(numero);
-			if (ctemp1==0) numero = StringUtils.leftPad("", ctemp);
+            if (!numero.isEmpty()){
+                int ctemp1= Integer.parseInt(numero);
+                if (ctemp1==0) numero = StringUtils.leftPad("", ctemp);
+            }
 
 			if ((l.length()) > index + serie.length() + numero.length()) {
 				l = l.substring(0, index) + serie + numero + l.substring(index + serie.length() + numero.length());
@@ -313,6 +322,9 @@ public class clsDocument {
 				l = l.substring(0, index) + serie + numero;
 			}
 
+			if (l.indexOf("S#")>=0) {
+				l = StringUtils.replace(l,"S#","");
+			}
 		}
 
 		idx=l.indexOf("SS");
@@ -322,6 +334,10 @@ public class clsDocument {
 				l = l.substring(0, idx) + serie + l.substring(idx + 2, idx + l.length() - idx - 2);
 			}else{
 				l = l.substring(0, idx) + serie;
+			}
+
+			if (l.indexOf("SS")>=0) {
+				l = StringUtils.replace(l,"SS","");
 			}
 
         }

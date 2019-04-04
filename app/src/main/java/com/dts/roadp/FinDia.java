@@ -1449,7 +1449,7 @@ public class FinDia extends PBase {
                 public void onClick(DialogInterface dialog, int which) {
                     buildReportsTOL();
                     imprimeCierreZ();
-                    claseFinDia.updateGrandTotalCorelZ(gSumados,corelz++);
+                    claseFinDia.updateGrandTotalCorelZ(gSumados,corelz);
                 }
             });
 

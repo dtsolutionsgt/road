@@ -47,6 +47,7 @@ public class clsDocDepos extends clsDocument {
 			tote=DT.getDouble(4);
 			totc=DT.getDouble(5);
 			numc=DT.getInt(6);
+			serie=corel;
 			
 		} catch (Exception e) {
 			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
@@ -140,7 +141,7 @@ public class clsDocDepos extends clsDocument {
 	// Aux
 	
 	private class itemData {
-		public String cod,nombre,tipo,num;
+		public String cod,nombre,tipo,num, serie;
 		public double monto;
 	}
 		

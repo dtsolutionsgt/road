@@ -681,7 +681,7 @@ public class Reimpresion extends PBase {
 			if (!mu.emptystr(pclidir)) rep.add(pclidir);
 
 			if (reimpres==1) rep.add("-------  R E I M P R E S I O N  -------");
-			if (reimpres==2) rep.add("------  C O N T A B I L I T A D  ------");
+			if (reimpres==2) rep.add("------  C O N T A B I L I D A D  ------");
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

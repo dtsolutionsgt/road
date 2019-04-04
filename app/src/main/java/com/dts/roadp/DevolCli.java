@@ -65,6 +65,7 @@ public class DevolCli extends PBase {
 
 		printclose= new Runnable() {
 			public void run() {
+				limpiavariables_devol();
 				DevolCli.super.finish();
 			}
 		};

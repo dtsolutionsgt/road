@@ -42,7 +42,7 @@ public class FacturaRes extends PBase {
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
 	private ListAdaptTotals adapter;
 	
-	private Runnable printcallback,printclose;
+	private Runnable printcallback,printclose,printexit;
 	
 	private clsDescGlob clsDesc;
 	private printer prn;
@@ -53,7 +53,7 @@ public class FacturaRes extends PBase {
 
 	private long fecha,fechae;
 	private int fcorel,clidia,media;
-	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt;
+	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt,corelNC;
 	private int cyear, cmonth, cday, dweek,stp=0,brw=0,notaC,impres;
 
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
@@ -215,7 +215,13 @@ public class FacturaRes extends PBase {
 		    }
 		};
 
-		prn=new printer(this,printclose);
+		printexit= new Runnable() {
+			public void run() {
+				FacturaRes.super.finish();
+			}
+		};
+
+		prn=new printer(this,printexit);
 		prn_nc=new printer(this,printclose);
 
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
@@ -644,19 +650,8 @@ public class FacturaRes extends PBase {
 
                 if (notaC==2){
                    fdev.buildPrint(gl.dvcorreld,0);
-                    prn_nc.printnoask(printclose, "printnc.txt");
+                   prn_nc.printnoask(printclose, "printnc.txt");
                 }
-
-				/*
-				final Handler shandler = new Handler();
-				shandler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						//Intent intent = new Intent(FacturaRes.this,PrintDialog.class);
-						//startActivity(intent);
-					}
-				}, 500);
-				*/
 
 			}
 
@@ -752,7 +747,7 @@ public class FacturaRes extends PBase {
 			ins.add("CALCOBJ","N");
 			ins.add("SERIE",fserie);
 			ins.add("CORELATIVO",fcorel);
-			ins.add("IMPRES",1);
+			ins.add("IMPRES",0);
 
 			ins.add("ADD1",gl.ref1);
 			ins.add("ADD2",gl.ref2);
@@ -811,7 +806,7 @@ public class FacturaRes extends PBase {
 
 				ins.init("D_NOTACRED");
 
-				ins.add("COREL",gl.dvcorrelnc);
+				ins.add("COREL",gl.dvcorrelnc);corelNC=gl.dvcorrelnc;
 				ins.add("ANULADO","N");
 				ins.add("FECHA",fecha);
 				ins.add("RUTA",gl.ruta);
@@ -1081,7 +1076,6 @@ public class FacturaRes extends PBase {
 			db.execSQL(sql);
 
 			//endregion
-
 
 			//region Bonificaciones
 
@@ -2266,10 +2260,38 @@ public class FacturaRes extends PBase {
 
 					impres++;toast("Impres "+impres);
 
+					try {
+						sql="UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
+						db.execSQL(sql);
+					} catch (Exception e) {
+						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+					}
+
+					try {
+						sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+corelNC+"'";
+						db.execSQL(sql);
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+
 					if (impres>1) {
+
+						try {
+							sql="UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
+							db.execSQL(sql);
+						} catch (Exception e) {
+							msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+						}
+
+						try {
+							sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+corelNC+"'";
+							db.execSQL(sql);
+						} catch (Exception e) {
+							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						}
+
 						FacturaRes.super.finish();
 					} else {
-
 						fdoc.buildPrint(corel, 10,gl.peFormatoFactura);
 						prn.printask(printcallback);
 
@@ -2296,7 +2318,6 @@ public class FacturaRes extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
 	}	
 	
 	private void clearGlobals() {

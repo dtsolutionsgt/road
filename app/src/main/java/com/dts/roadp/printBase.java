@@ -12,6 +12,7 @@ public class printBase {
 	public Runnable printclose;
 	public String errmsg;
 	public int prwidth;
+	public boolean exitprint=false;
 	
 	protected Context cont;
 	 

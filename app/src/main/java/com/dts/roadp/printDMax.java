@@ -18,8 +18,7 @@ import datamaxoneil.connection.Connection_Bluetooth;
 
 // 00:17:AC:01:75:E9
 
-public class printDMax extends printBase
-{
+public class printDMax extends printBase {
 	
 	private String ss,ess;
 	private PrintDialog printDialog;
@@ -38,14 +37,14 @@ public class printDMax extends printBase
 		hasCallback=true;
 		callback=callBackHook;
 		
-		fname="print.txt";errmsg="";
+		fname="print.txt";errmsg="";exitprint=false;
 		msgAskPrint();
 	}
 	
 	public void printask() {
 		hasCallback=false;
 		
-		fname="print.txt";errmsg="";
+		fname="print.txt";errmsg="";exitprint=false;
 		msgAskPrint();				
 	}
 
@@ -53,7 +52,7 @@ public class printDMax extends printBase
 		hasCallback=true;
 		callback=callBackHook;
 
-		fname=fileName;errmsg="";
+		fname=fileName;errmsg="";exitprint=false;
 		msgAskPrint();
 	}
 
@@ -75,10 +74,7 @@ public class printDMax extends printBase
 		fname="print.txt";errmsg="";
 
 		try	{
-			if (loadFile()){
-				doStartPrint();
-			}	else
-				return false;
+			if (loadFile())	doStartPrint();	else return false;
 		} catch (Exception e) {
 			showmsg("Error: " + e.getMessage());return false;
 		}			
@@ -90,6 +86,7 @@ public class printDMax extends printBase
 		hasCallback=false;
 		
 		fname=fileName;	errmsg="";
+		exitprint=false;
 		msgAskPrint();				
 	}
 		
@@ -134,8 +131,6 @@ public class printDMax extends printBase
 		}			
 		
 		try {
-				
-			
 			docLP.clear();
 			
 			while ((ss = dfile.readLine()) != null) {
@@ -199,10 +194,7 @@ public class printDMax extends printBase
     }	
 	
 	private void doCallBack() {
-		//showmsg("Impresión completa.");
-		
-		//showmsg("Imp : "+ss);
-		
+
 		if (!hasCallback) return;
 
         try {
@@ -219,20 +211,6 @@ public class printDMax extends printBase
         	ess=e.getMessage();
 		}
 
-		/*
-        try {
-            //#EJC201800: Llamar el close de la printer
-            final Handler cbhandler1 = new Handler();
-            cbhandler1.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        printclose.run();
-                    } catch (Exception ee) {}
-                }
-            }, 200);
-        } catch (Exception e) {}
-        */
 	}
 	
 	public void processPrint() {
@@ -254,7 +232,7 @@ public class printDMax extends printBase
 			prthread.sleep(1500);
 
 			prconn.clearWriteBuffer();
-			printclose.run();
+			//printclose.run();
 			prconn.close();
 
 		} catch (Exception e) {
@@ -292,20 +270,18 @@ public class printDMax extends printBase
 
 		});
 
-//#EJC20181130:Se comentarió por solicitud de auditor de SAT.
-//		dialog.setNegativeButton("No", new DialogInterface.OnClickListener()
-//		{
-//		    public void onClick(DialogInterface dialog, int which)
-//			{
-//		    	final Handler cbhandler = new Handler();
-//				cbhandler.postDelayed(new Runnable() {
-//					@Override
-//					public void run() {
-//						printclose.run();
-//					}
-//				}, 200);
-//		    }
-//		});
+		//#EJC20181130:Se comentarió por solicitud de auditor de SAT.
+		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int which) {
+		    	final Handler cbhandler = new Handler();
+				cbhandler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						printclose.run();
+					}
+				}, 200);
+		    }
+		});
 
 		dialog.show();
 			

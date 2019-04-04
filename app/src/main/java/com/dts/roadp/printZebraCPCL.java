@@ -1,11 +1,5 @@
 package com.dts.roadp;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,6 +18,12 @@ import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
 import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
 import com.zebra.sdk.printer.ZebraPrinterLinkOs;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 // Zebra "00:22:58:01:04:28"
 
@@ -49,14 +49,14 @@ public class printZebraCPCL extends printBase {
 		hasCallback=true;
 		callback=callBackHook;
 
-		fname="print.txt";errmsg="";
+		fname="print.txt";errmsg="";exitprint=false;
 		msgAskPrint();
 	}
 
 	public void printask() {
 		hasCallback=false;
 
-		fname="print.txt";errmsg="";
+		fname="print.txt";errmsg="";exitprint=false;
 		msgAskPrint();				
 	}
 
@@ -76,7 +76,7 @@ public class printZebraCPCL extends printBase {
 	public void printask(String fileName) {	
 		hasCallback=false;
 
-		fname=fileName;	errmsg="";
+		fname=fileName;	errmsg="";exitprint=false;
 		msgAskPrint();				
 	}
 
@@ -183,7 +183,6 @@ public class printZebraCPCL extends printBase {
 
 		return prdata;
 	}
-	
 
 	private void doStartPrint() {
 		showmsg("Imprimiendo ..." );
@@ -232,6 +231,7 @@ public class printZebraCPCL extends printBase {
             }, 500);
         } catch (Exception e) {}
 
+        /*
         try {
             //#EJC201800: Llamar el close de la printer
             final Handler cbhandler1 = new Handler();
@@ -244,7 +244,7 @@ public class printZebraCPCL extends printBase {
                 }
             }, 200);
         } catch (Exception e) {}
-
+		*/
 	}
 
 	

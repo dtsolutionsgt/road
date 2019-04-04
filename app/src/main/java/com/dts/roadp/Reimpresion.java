@@ -26,8 +26,8 @@ public class Reimpresion extends PBase {
 	
 	private printer prn;
 	private printer prn_nc;
-	private Runnable printclose;
-	public clsRepBuilder rep;
+	private Runnable printclose,printcallback,printvoid;
+	public  clsRepBuilder rep;
 	
 	private clsDocFactura fdoc;
 	private clsDocMov mdoc;
@@ -36,7 +36,7 @@ public class Reimpresion extends PBase {
 	private clsDocDevolucion fdev;
 	
 	private int tipo;	
-	private String selid,itemid;
+	private String selid,itemid,corelNC;
 	
 	// impresion nota credito
 
@@ -65,10 +65,21 @@ public class Reimpresion extends PBase {
 		
 		printclose= new Runnable() {
 		    public void run() {
-		    	Reimpresion.super.finish();
+		    	//Reimpresion.super.finish();
 		    }
 		};
-		
+
+		printvoid= new Runnable() {
+			public void run() {
+			}
+		};
+
+		printcallback= new Runnable() {
+			public void run() {
+				askPrint();
+			}
+		};
+
 		prn=new printer(this,printclose);
 		prn_nc=new printer(this,printclose);
 			
@@ -266,7 +277,11 @@ public class Reimpresion extends PBase {
 						}
 
 						if (tipo==3 || tipo==6) {
-							if (DT.getInt(5)<=1) items.add(vItem);
+							if (gl.peModal.equalsIgnoreCase("TOL")) {
+								items.add(vItem);
+							} else {
+								if (DT.getInt(5)<=1) items.add(vItem);
+							}
 						} else {	
 							items.add(vItem);	
 						}
@@ -353,7 +368,7 @@ public class Reimpresion extends PBase {
 	
 	private void imprRecibo() {
 		try {
-			if (cdoc.buildPrint(itemid,1,"")) prn.printask();
+			if (cdoc.buildPrint(itemid,1,"")) prn.printask(printcallback);
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox(e.getMessage());
@@ -370,13 +385,25 @@ public class Reimpresion extends PBase {
 	}
 	
 	private void imprFactura() {
+		Cursor dt;
+		int impr;
+
 		fdoc.deviceid =gl.deviceId;
 
 		try {
-			if (fdoc.buildPrint(itemid,1,gl.peFormatoFactura)) prn.printask();
+			sql="SELECT IMPRES FROM D_FACTURA WHERE COREL='"+itemid+"'";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			impr=dt.getInt(0);
+		} catch (Exception e) {
+			impr=1;
+		}
+
+		try {
+			if (fdoc.buildPrint(itemid,impr,gl.peFormatoFactura)) prn.printask(printcallback);
 
 			//#CKFK_20190401 03:43 PM Agregué esto para imprimir la NC cuando la factura está asociada a una
-			String corelNC=tieneNCFactura(itemid);
+			corelNC=tieneNCFactura(itemid);
 
 			if (!corelNC.isEmpty()){
 
@@ -384,7 +411,7 @@ public class Reimpresion extends PBase {
 				fdev.deviceid =gl.deviceId;
 
 				fdev.buildPrint(corelNC, 1, "TOL");
-				prn_nc.printnoask(printclose, "printnc.txt");
+				prn_nc.printnoask(printvoid, "printnc.txt");
 			}
 
 		} catch (Exception e) {
@@ -798,6 +825,49 @@ public class Reimpresion extends PBase {
 		}
 
 			
+	}
+
+	private void askPrint() {
+		try {
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("¿Impresión correcta?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+
+					try {
+
+						switch (tipo) {
+							case 1:
+								sql = "UPDATE D_COBRO SET IMPRES=IMPRES+3 WHERE COREL='" + itemid + "'";
+								db.execSQL(sql);
+								break;
+							case 3:
+								sql = "UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='" + itemid + "'";
+								db.execSQL(sql);
+								try {
+									sql = "UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='" + corelNC + "'";
+									db.execSQL(sql);
+								} catch (Exception e) {}
+								break;
+						}
+					} catch (Exception e) {
+						msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+					}
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
 	}
 
 	private String androidid() {

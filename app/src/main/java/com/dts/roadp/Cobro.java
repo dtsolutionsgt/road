@@ -1181,6 +1181,14 @@ public class Cobro extends PBase {
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
+
+					try {
+						sql="UPDATE D_COBRO SET IMPRES=IMPRES+3 WHERE COREL='"+corel+"'";
+						db.execSQL(sql);
+					} catch (Exception e) {
+						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+					}
+
 					Cobro.super.finish();
 				}
 			});

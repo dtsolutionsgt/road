@@ -2290,6 +2290,7 @@ public class FacturaRes extends PBase {
 							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 						}
 
+						gl.brw=0;
 						FacturaRes.super.finish();
 					} else {
 						fdoc.buildPrint(corel, 10,gl.peFormatoFactura);

@@ -658,15 +658,17 @@ public class DevolCli extends PBase {
 
 			dialog.setIcon(R.drawable.ic_quest);
 
+			dialog.setCancelable(false);
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					doExit();
+					closekeyb();
 				}
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					;
+					closekeyb();
 				}
 			});
 
@@ -756,7 +758,7 @@ public class DevolCli extends PBase {
             sql="DELETE FROM T_CxCD";
             db.execSQL(sql);
 
-			super.finish();
+			DevolCli.super.finish();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

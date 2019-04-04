@@ -9,7 +9,9 @@ import android.database.sqlite.SQLiteException;
 public class BaseDatosScript {
 	
 	private Context vcontext;
-	
+	private String sql;
+
+
 	public BaseDatosScript(Context context) {
 		vcontext=context;
 	}
@@ -73,11 +75,10 @@ public class BaseDatosScript {
 	}
 	
 	private int scriptTablasD(SQLiteDatabase database) {
-		String vSQL;
-		  
+
 		try {
 		  
-			vSQL="CREATE TABLE [D_PEDIDO] ("+
+			sql="CREATE TABLE [D_PEDIDO] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[ANULADO] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
@@ -108,20 +109,20 @@ public class BaseDatosScript {
 					"[ID_FACTURACION] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_PEDIDO_idx1 ON D_PEDIDO(COREL)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_PEDIDO_idx2 ON D_PEDIDO(ANULADO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_PEDIDO_idx3 ON D_PEDIDO(FECHA)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_PEDIDO_idx4 ON D_PEDIDO(STATCOM)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_PEDIDO_idx5 ON D_PEDIDO(CALCOBJ)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_PEDIDO_idx1 ON D_PEDIDO(COREL)";
+			database.execSQL(sql);
+			sql="CREATE INDEX D_PEDIDO_idx2 ON D_PEDIDO(ANULADO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX D_PEDIDO_idx3 ON D_PEDIDO(FECHA)";
+			database.execSQL(sql);
+			sql="CREATE INDEX D_PEDIDO_idx4 ON D_PEDIDO(STATCOM)";
+			database.execSQL(sql);
+			sql="CREATE INDEX D_PEDIDO_idx5 ON D_PEDIDO(CALCOBJ)";
+			database.execSQL(sql);
 			
-			vSQL="CREATE TABLE [D_PEDIDOD] ("+
+			sql="CREATE TABLE [D_PEDIDOD] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[EMPRESA] TEXT NOT NULL,"+
@@ -143,15 +144,15 @@ public class BaseDatosScript {
 					"[UMPESO] TEXT NOT NULL,"+										
 					"PRIMARY KEY ([COREL],[PRODUCTO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
-			vSQL="CREATE INDEX D_PEDIDOD_idx1 ON D_PEDIDOD(COREL)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_PEDIDOD_idx2 ON D_PEDIDOD(ANULADO)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_PEDIDOD_idx1 ON D_PEDIDOD(COREL)";
+			database.execSQL(sql);
+			sql="CREATE INDEX D_PEDIDOD_idx2 ON D_PEDIDOD(ANULADO)";
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [D_CxC] ("+
+			sql="CREATE TABLE [D_CxC] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
 					"[CLIENTE] TEXT NOT NULL,"+
@@ -170,13 +171,13 @@ public class BaseDatosScript {
 					"[ESTADO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_CxC_idx1 ON D_CxC(ANULADO)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_CxC_idx1 ON D_CxC(ANULADO)";
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [D_CxCD] ("+
+			sql="CREATE TABLE [D_CxCD] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[ITEM] INTEGER NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+
@@ -196,13 +197,13 @@ public class BaseDatosScript {
 					"[FACTOR] REAL NOT NULL,"+
 					"PRIMARY KEY ([COREL],[ITEM])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_CxCD_idx1 ON D_CxCD(COREL)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_CxCD_idx1 ON D_CxCD(COREL)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [D_DEVOL] ("+
+			sql="CREATE TABLE [D_DEVOL] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
 					"[CLIENTE] TEXT NOT NULL,"+
@@ -215,13 +216,13 @@ public class BaseDatosScript {
 					"[STATCOM] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_DEVOL_idx1 ON D_DEVOL(ANULADO)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_DEVOL_idx1 ON D_DEVOL(ANULADO)";
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [D_DEVOLD] ("+
+			sql="CREATE TABLE [D_DEVOLD] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[ITEM] INTEGER NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+
@@ -234,10 +235,10 @@ public class BaseDatosScript {
 					"[REF] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL],[ITEM])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [D_MERPROPIO] ("+
+			sql="CREATE TABLE [D_MERPROPIO] ("+
 					"[CLIENTE] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
@@ -245,10 +246,10 @@ public class BaseDatosScript {
 					"[PRECIO] REAL NOT NULL,"+
 					"PRIMARY KEY ([CLIENTE],[PRODUCTO],[FECHA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [D_MERCOMP] ("+
+			sql="CREATE TABLE [D_MERCOMP] ("+
 					"[CLIENTE] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
@@ -260,10 +261,10 @@ public class BaseDatosScript {
 					"[FRECUENCIA] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CLIENTE],[PRODUCTO],[FECHA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [D_MEREQUIPO] ("+
+			sql="CREATE TABLE [D_MEREQUIPO] ("+
 					"[CLIENTE] TEXT NOT NULL,"+
 					"[SERIAL] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
@@ -273,20 +274,20 @@ public class BaseDatosScript {
 					"[STATCOM] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CLIENTE],[SERIAL],[FECHA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [D_MERFALTA] ("+
+			sql="CREATE TABLE [D_MERFALTA] ("+
 					"[CLIENTE] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
 					"[STATCOM] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CLIENTE],[PRODUCTO],[FECHA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [D_MERPREGUNTA] ("+
+			sql="CREATE TABLE [D_MERPREGUNTA] ("+
 					"[CLIENTE] TEXT NOT NULL,"+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
@@ -297,10 +298,10 @@ public class BaseDatosScript {
 					"[STATCOMG] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CLIENTE],[CODIGO],[FECHA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [D_COBRO] ("+
+			sql="CREATE TABLE [D_COBRO] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[ANULADO] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
@@ -321,19 +322,19 @@ public class BaseDatosScript {
 					"[CORELATIVO] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_COBRO_idx1 ON D_COBRO(ANULADO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_COBRO_idx2 ON D_COBRO(CLIENTE)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_COBRO_idx3 ON D_COBRO(STATCOM)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_COBRO_idx4 ON D_COBRO(CALCOBJ)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_COBRO_idx1 ON D_COBRO(ANULADO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX D_COBRO_idx2 ON D_COBRO(CLIENTE)";
+			database.execSQL(sql);
+			sql="CREATE INDEX D_COBRO_idx3 ON D_COBRO(STATCOM)";
+			database.execSQL(sql);
+			sql="CREATE INDEX D_COBRO_idx4 ON D_COBRO(CALCOBJ)";
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [D_COBROD] ("+
+			sql="CREATE TABLE [D_COBROD] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[DOCUMENTO] TEXT NOT NULL,"+
 					"[ANULADO] TEXT NOT NULL,"+
@@ -347,13 +348,13 @@ public class BaseDatosScript {
 					"[ASIGNACION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL],[DOCUMENTO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_COBROD_idx1 ON D_COBROD(ANULADO)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_COBROD_idx1 ON D_COBROD(ANULADO)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [D_COBROD_SR] ("+
+			sql="CREATE TABLE [D_COBROD_SR] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[DOCUMENTO] TEXT NOT NULL,"+
 					"[ANULADO] TEXT NOT NULL,"+
@@ -364,10 +365,10 @@ public class BaseDatosScript {
 					"[CONTRASENA] TEXT NOT NULL,"+
                     "PRIMARY KEY ([COREL],[DOCUMENTO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 
-            vSQL="CREATE TABLE [D_COBROP] ("+
+            sql="CREATE TABLE [D_COBROP] ("+
                     "[COREL] TEXT NOT NULL,"+
                     "[ITEM] INTEGER NOT NULL,"+
                     "[ANULADO] TEXT NOT NULL,"+
@@ -381,12 +382,12 @@ public class BaseDatosScript {
                     "[DEPOS] TEXT NOT NULL,"+
                     "PRIMARY KEY ([COREL],[ITEM])"+
                     ");";
-            database.execSQL(vSQL);
+            database.execSQL(sql);
 
-            vSQL="CREATE INDEX D_COBROP_idx1 ON D_COBROP(ANULADO)";
-            database.execSQL(vSQL);
+            sql="CREATE INDEX D_COBROP_idx1 ON D_COBROP(ANULADO)";
+            database.execSQL(sql);
 
-			vSQL="CREATE TABLE [D_CLINUEVO] ("+
+			sql="CREATE TABLE [D_CLINUEVO] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
@@ -410,13 +411,13 @@ public class BaseDatosScript {
 					"[STATCOM] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO],[RUTA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_CLINUEVO_idx1 ON D_CLINUEVO(STATCOM)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_CLINUEVO_idx1 ON D_CLINUEVO(STATCOM)";
+			database.execSQL(sql);
 			
 			
-			vSQL="CREATE TABLE [D_CLINUEVO_APR] ("+
+			sql="CREATE TABLE [D_CLINUEVO_APR] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
 					"[FECHANAC] INTEGER NOT NULL,"+
@@ -432,10 +433,10 @@ public class BaseDatosScript {
 					"[STATCOM] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO],[RUTA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [D_DEPOS] ("+
+			sql="CREATE TABLE [D_DEPOS] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[EMPRESA] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
@@ -453,15 +454,15 @@ public class BaseDatosScript {
 					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_DEPOS_idx1 ON D_DEPOS(STATCOM)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_DEPOS_idx2 ON D_DEPOS(ANULADO)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_DEPOS_idx1 ON D_DEPOS(STATCOM)";
+			database.execSQL(sql);
+			sql="CREATE INDEX D_DEPOS_idx2 ON D_DEPOS(ANULADO)";
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [D_DEPOSD] ("+
+			sql="CREATE TABLE [D_DEPOSD] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[DOCCOREL] TEXT NOT NULL,"+
 					"[ITEM] INTEGER NOT NULL,"+
@@ -473,10 +474,10 @@ public class BaseDatosScript {
 					"[NUMERO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL],[DOCCOREL],[ITEM])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 			
-			vSQL="CREATE TABLE [D_DEPOSB] ("+
+			sql="CREATE TABLE [D_DEPOSB] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[DENOMINACION] REAL NOT NULL,"+
 					"[CANTIDAD] INTEGER NOT NULL,"+
@@ -484,10 +485,10 @@ public class BaseDatosScript {
 					"[MONEDA] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([COREL],[DENOMINACION],[TIPO],[MONEDA])"+
 					");";
-			database.execSQL(vSQL);		
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [D_FACT_LOG] ("+
+			sql="CREATE TABLE [D_FACT_LOG] ("+
 					"[ITEM] INTEGER NOT NULL,"+
 					"[SERIE] TEXT NOT NULL,"+
 					"[COREL] INTEGER NOT NULL,"+
@@ -495,10 +496,10 @@ public class BaseDatosScript {
 					"[RUTA] TEXT NOT NULL,"+
 					"PRIMARY KEY ([ITEM])"+
 					");";
-			database.execSQL(vSQL);   
+			database.execSQL(sql);
       
 
-			vSQL="CREATE TABLE [D_FACTURA] ("+
+			sql="CREATE TABLE [D_FACTURA] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[ANULADO] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
@@ -533,15 +534,15 @@ public class BaseDatosScript {
 					"[RAZON_ANULACION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_FACTURA_idx1 ON D_FACTURA(ANULADO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_FACTURA_idx2 ON D_FACTURA(FECHA)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_FACTURA_idx1 ON D_FACTURA(ANULADO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX D_FACTURA_idx2 ON D_FACTURA(FECHA)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [D_FACTURAD] ("+
+			sql="CREATE TABLE [D_FACTURAD] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[EMPRESA] TEXT NOT NULL,"+
@@ -562,10 +563,10 @@ public class BaseDatosScript {
 					"[UMPESO] TEXT NOT NULL,"+										
 					"PRIMARY KEY ([COREL],[PRODUCTO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [D_FACTURAP] ("+
+			sql="CREATE TABLE [D_FACTURAP] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[ITEM] INTEGER NOT NULL,"+
 					"[ANULADO] TEXT NOT NULL,"+
@@ -579,20 +580,20 @@ public class BaseDatosScript {
 					"[DEPOS] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL],[ITEM])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 			
-			vSQL="CREATE TABLE [D_FACTURAF] ("+
+			sql="CREATE TABLE [D_FACTURAF] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"[NIT] TEXT NOT NULL,"+
 					"[DIRECCION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 			
-			vSQL="CREATE TABLE [D_FACTURAD_LOTES] ("+
+			sql="CREATE TABLE [D_FACTURAD_LOTES] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[LOTE] TEXT NOT NULL,"+
@@ -603,10 +604,10 @@ public class BaseDatosScript {
 					"[UMVENTA] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO],[LOTE])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [D_FACTURA_STOCK] ("+
+			sql="CREATE TABLE [D_FACTURA_STOCK] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[CANT] REAL NOT NULL,"+
@@ -625,12 +626,12 @@ public class BaseDatosScript {
 					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL,"+
 					"PRIMARY KEY ([COREL],[CODIGO],[LOTE],[DOCUMENTO],[STATUS],[UNIDADMEDIDA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_FACTURA_STOCK_idx1 ON D_FACTURA_STOCK(COREL)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_FACTURA_STOCK_idx1 ON D_FACTURA_STOCK(COREL)";
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [D_FACTURA_BARRA] ("+
+			sql="CREATE TABLE [D_FACTURA_BARRA] ("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[BARRA] TEXT NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+
@@ -650,13 +651,13 @@ public class BaseDatosScript {
 					"[DOC_ENTREGA] TEXT NOT NULL,"+
 					"PRIMARY KEY ([RUTA],[BARRA],[DOCUMENTO],[STATUS])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_FACTURA_BARRA_idx1 ON D_FACTURA_BARRA(COREL)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_FACTURA_BARRA_idx1 ON D_FACTURA_BARRA(COREL)";
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [D_MOV] ("+
+			sql="CREATE TABLE [D_MOV] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
 					"[ANULADO] TEXT NOT NULL,"+
@@ -669,17 +670,17 @@ public class BaseDatosScript {
 					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_MOV_idx1 ON D_MOV(ANULADO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_MOV_idx2 ON D_MOV(TIPO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_MOV_idx3 ON D_MOV(STATCOM)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_MOV_idx1 ON D_MOV(ANULADO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX D_MOV_idx2 ON D_MOV(TIPO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX D_MOV_idx3 ON D_MOV(STATCOM)";
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [D_MOVD] ("+
+			sql="CREATE TABLE [D_MOVD] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[CANT] REAL NOT NULL,"+
@@ -691,9 +692,9 @@ public class BaseDatosScript {
 					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO],[LOTE],[UNIDADMEDIDA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [D_MOVDB] ("+
+			sql="CREATE TABLE [D_MOVDB] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[BARRA] TEXT NOT NULL,"+
@@ -702,9 +703,9 @@ public class BaseDatosScript {
 					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO],[BARRA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [D_MOVDPALLET] ("+
+			sql="CREATE TABLE [D_MOVDPALLET] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[BARRAPALLET] TEXT NOT NULL,"+
@@ -716,9 +717,9 @@ public class BaseDatosScript {
 					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO],[BARRAPALLET],[BARRAPRODUCTO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [D_MOVDCAN] ("+
+			sql="CREATE TABLE [D_MOVDCAN] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[CANT] REAL NOT NULL,"+
@@ -731,9 +732,9 @@ public class BaseDatosScript {
 					"[PASEANTE] INTEGER NOT NULL,"+
 					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [D_ATENCION] ("+
+			sql="CREATE TABLE [D_ATENCION] ("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
 					"[HORALLEG] TEXT NOT NULL,"+
@@ -763,10 +764,10 @@ public class BaseDatosScript {
 					"[Dist] REAL NOT NULL,"+
 					"PRIMARY KEY ([RUTA],[FECHA],[HORALLEG])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [D_BONIF] ("+
+			sql="CREATE TABLE [D_BONIF] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[ITEM] INTEGER NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
@@ -788,10 +789,10 @@ public class BaseDatosScript {
 					"[FACTOR] REAL NOT NULL,"+
 					"PRIMARY KEY ([COREL],[ITEM])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [D_BONIF_BARRA] ("+
+			sql="CREATE TABLE [D_BONIF_BARRA] ("+
 					"[COREL] TEXT NOT NULL," +
 					"[BARRA] TEXT NOT NULL," +
 					"[PESO] REAL NOT NULL," +
@@ -802,9 +803,9 @@ public class BaseDatosScript {
 					"[FACTOR] REAL NOT NULL," +
 					"PRIMARY KEY ([COREL],[BARRA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [D_BONIF_LOTES] ("+
+			sql="CREATE TABLE [D_BONIF_LOTES] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[LOTE] TEXT NOT NULL,"+
@@ -816,9 +817,9 @@ public class BaseDatosScript {
 					"[FACTOR] REAL NOT NULL,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO],[LOTE])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [D_BONIF_STOCK] ("+
+			sql="CREATE TABLE [D_BONIF_STOCK] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[CANT] REAL NOT NULL,"+
@@ -837,13 +838,13 @@ public class BaseDatosScript {
 					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL,"+
 					"PRIMARY KEY ([COREL],[CODIGO],[LOTE],[DOCUMENTO],[STATUS],[UNIDADMEDIDA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_BONIF_STOCK_idx1 ON D_BONIF_STOCK(COREL)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_BONIF_STOCK_idx1 ON D_BONIF_STOCK(COREL)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [D_BONIFFALT] ("+
+			sql="CREATE TABLE [D_BONIFFALT] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
 					"[ANULADO] TEXT NOT NULL,"+
@@ -853,10 +854,10 @@ public class BaseDatosScript {
 					"[CANT] REAL NOT NULL,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [D_REL_PROD_BON] ("+
+			sql="CREATE TABLE [D_REL_PROD_BON] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[BONIFICADO] TEXT NOT NULL,"+
@@ -865,10 +866,10 @@ public class BaseDatosScript {
 					"[PRECIO] REAL NOT NULL,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO],[BONIFICADO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 						
-			vSQL="CREATE TABLE [D_CLICOORD] ("+
+			sql="CREATE TABLE [D_CLICOORD] ("+
 					"[CODIGO]  TEXT NOT NULL,"+
 					"[STAMP]   REAL NOT NULL,"+
 					"[COORX]   REAL NOT NULL,"+
@@ -876,19 +877,19 @@ public class BaseDatosScript {
 					"[STATCOM] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO],[STAMP])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 			
-			vSQL="CREATE TABLE [D_REPFINDIA] ("+
+			sql="CREATE TABLE [D_REPFINDIA] ("+
 					"[RUTA]  TEXT NOT NULL,"+
 					"[LINEA] INTEGER NOT NULL,"+
 					"[TEXTO] TEXT NOT NULL,"+				
 					"PRIMARY KEY ([RUTA],[LINEA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 			
-			vSQL="CREATE TABLE [D_SOLICINV] ("+
+			sql="CREATE TABLE [D_SOLICINV] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[ANULADO] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
@@ -898,13 +899,13 @@ public class BaseDatosScript {
 					"[STATCOM] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_SOLICINV_idx1 ON D_SOLICINV(STATCOM)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_SOLICINV_idx1 ON D_SOLICINV(STATCOM)";
+			database.execSQL(sql);
 			
 			
-			vSQL="CREATE TABLE [D_SOLICINVD] ("+
+			sql="CREATE TABLE [D_SOLICINVD] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[COSTO] REAL NOT NULL,"+
@@ -913,10 +914,10 @@ public class BaseDatosScript {
 					"[UM] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
                 
 			
-			vSQL="CREATE TABLE [D_NOTACRED] ("+
+			sql="CREATE TABLE [D_NOTACRED] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[ANULADO] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
@@ -935,9 +936,9 @@ public class BaseDatosScript {
 					"[IMPRES] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [D_NOTACREDD] ("+
+			sql="CREATE TABLE [D_NOTACREDD] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[PRECIO_ORIG] REAL NOT NULL,"+
@@ -951,13 +952,13 @@ public class BaseDatosScript {
 					"[FACTOR] REAL NOT NULL,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX D_NOTACREDD_idx1 ON D_NOTACREDD(COREL)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX D_NOTACREDD_idx1 ON D_NOTACREDD(COREL)";
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [D_STOCKB_DEV] ("+
+			sql="CREATE TABLE [D_STOCKB_DEV] ("+
 					"[BARRA] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
 					"[VENDEDOR] TEXT NOT NULL,"+
@@ -968,7 +969,7 @@ public class BaseDatosScript {
 					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([BARRA],[RUTA],[VENDEDOR],[CODIGO],[COREL])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 			return 1;
 		} catch (SQLiteException e) {
@@ -978,11 +979,10 @@ public class BaseDatosScript {
 	}
 	
 	private int scriptTablasO(SQLiteDatabase database) {
-		String vSQL;
-		  
+
 		try {
 
-			vSQL="CREATE TABLE [O_RUTA] ("+
+			sql="CREATE TABLE [O_RUTA] ("+
 					"[OBJANO] INTEGER NOT NULL,"+
 					"[OBJMES] INTEGER NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
@@ -992,17 +992,17 @@ public class BaseDatosScript {
 					"[ACUMU] REAL NOT NULL,"+
 					"PRIMARY KEY ([OBJANO],[OBJMES],[RUTA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX O_RUTA_idx1 ON O_RUTA(OBJANO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX O_RUTA_idx2 ON O_RUTA(OBJMES)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX O_RUTA_idx3 ON O_RUTA(RUTA)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX O_RUTA_idx1 ON O_RUTA(OBJANO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX O_RUTA_idx2 ON O_RUTA(OBJMES)";
+			database.execSQL(sql);
+			sql="CREATE INDEX O_RUTA_idx3 ON O_RUTA(RUTA)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [O_COBRO] ("+
+			sql="CREATE TABLE [O_COBRO] ("+
 					"[OBJANO] INTEGER NOT NULL,"+
 					"[OBJMES] INTEGER NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
@@ -1013,17 +1013,17 @@ public class BaseDatosScript {
 					"[ACUMU] REAL NOT NULL,"+
 					"PRIMARY KEY ([OBJANO],[OBJMES],[RUTA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX O_COBRO_idx1 ON O_COBRO(OBJANO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX O_COBRO_idx2 ON O_COBRO(OBJMES)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX O_COBRO_idx3 ON O_COBRO(RUTA)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX O_COBRO_idx1 ON O_COBRO(OBJANO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX O_COBRO_idx2 ON O_COBRO(OBJMES)";
+			database.execSQL(sql);
+			sql="CREATE INDEX O_COBRO_idx3 ON O_COBRO(RUTA)";
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [O_PROD] ("+
+			sql="CREATE TABLE [O_PROD] ("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[METAV] REAL NOT NULL,"+
@@ -1032,15 +1032,15 @@ public class BaseDatosScript {
 					"[ACUMU] REAL NOT NULL,"+
 					"PRIMARY KEY ([RUTA],[CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX O_PROD_idx1 ON O_PROD(RUTA)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX O_PROD_idx2 ON O_PROD(CODIGO)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX O_PROD_idx1 ON O_PROD(RUTA)";
+			database.execSQL(sql);
+			sql="CREATE INDEX O_PROD_idx2 ON O_PROD(CODIGO)";
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [O_LINEA] ("+
+			sql="CREATE TABLE [O_LINEA] ("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[METAV] REAL NOT NULL,"+
@@ -1049,12 +1049,12 @@ public class BaseDatosScript {
 					"[ACUMU] REAL NOT NULL,"+
 					"PRIMARY KEY ([RUTA],[CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX O_LINEA_idx1 ON O_LINEA(RUTA)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX O_LINEA_idx2 ON O_LINEA(CODIGO)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX O_LINEA_idx1 ON O_LINEA(RUTA)";
+			database.execSQL(sql);
+			sql="CREATE INDEX O_LINEA_idx2 ON O_LINEA(CODIGO)";
+			database.execSQL(sql);
 
 
 			return 1;
@@ -1065,11 +1065,10 @@ public class BaseDatosScript {
 	}
 	
 	private int scriptTablasP(SQLiteDatabase database) {
-		String vSQL;
 
 		try {
 
-			vSQL="CREATE TABLE [P_BANCO] ("+
+			sql="CREATE TABLE [P_BANCO] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[TIPO] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
@@ -1077,13 +1076,13 @@ public class BaseDatosScript {
 					"[EMPRESA] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO],[TIPO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_BANCO_idx1 ON P_BANCO(NOMBRE)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_BANCO_idx1 ON P_BANCO(NOMBRE)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_CLIENTE] ("+
+			sql="CREATE TABLE [P_CLIENTE] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"[BLOQUEADO] TEXT NOT NULL,"+
@@ -1130,29 +1129,29 @@ public class BaseDatosScript {
 					"[MODIF_PRECIO] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_CLIENTE_idx1 ON P_CLIENTE(NOMBRE)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_CLIENTE_idx1 ON P_CLIENTE(NOMBRE)";
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [P_CLIENTE_FACHADA] ("+
+			sql="CREATE TABLE [P_CLIENTE_FACHADA] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[IMAGEN]  TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [P_CLIDIR] ("+
+			sql="CREATE TABLE [P_CLIDIR] ("+
 					"[CODIGO_CLIENTE] TEXT NOT NULL,"+
 					"[DIRECCION_ENTREGA] TEXT NOT NULL"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_CLIDIR_idx1 ON P_CLIDIR(CODIGO_CLIENTE)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_CLIDIR_idx1 ON P_CLIDIR(CODIGO_CLIENTE)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_CLIRUTA] ("+
+			sql="CREATE TABLE [P_CLIRUTA] ("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[CLIENTE] TEXT NOT NULL,"+
 					"[SEMANA] INTEGER NOT NULL,"+
@@ -1161,17 +1160,17 @@ public class BaseDatosScript {
 					"[BANDERA] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([RUTA],[CLIENTE],[SEMANA],[DIA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_CLIRUTA_idx1 ON P_CLIRUTA(SEMANA)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_CLIRUTA_idx2 ON P_CLIRUTA(DIA)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_CLIRUTA_idx3 ON P_CLIRUTA(SECUENCIA)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_CLIRUTA_idx1 ON P_CLIRUTA(SEMANA)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_CLIRUTA_idx2 ON P_CLIRUTA(DIA)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_CLIRUTA_idx3 ON P_CLIRUTA(SECUENCIA)";
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [P_COBRO] ("+
+			sql="CREATE TABLE [P_COBRO] ("+
 					"[DOCUMENTO] TEXT NOT NULL,"+
 					"[EMPRESA] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
@@ -1188,69 +1187,69 @@ public class BaseDatosScript {
 					"[ASIGNACION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([DOCUMENTO],[EMPRESA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_COBRO_idx1 ON P_COBRO(CLIENTE)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_COBRO_idx2 ON P_COBRO(SALDO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_COBRO_idx3 ON P_COBRO(FECHAEMIT)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_COBRO_idx4 ON P_COBRO(FECHAV)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_COBRO_idx1 ON P_COBRO(CLIENTE)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_COBRO_idx2 ON P_COBRO(SALDO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_COBRO_idx3 ON P_COBRO(FECHAEMIT)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_COBRO_idx4 ON P_COBRO(FECHAV)";
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [P_IMPUESTO] ("+
+			sql="CREATE TABLE [P_IMPUESTO] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[VALOR]  REAL NOT NULL,"+
 					"PRIMARY  KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_NIVELPRECIO] ("+
+			sql="CREATE TABLE [P_NIVELPRECIO] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"[DECIMALES] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_LINEA] ("+
+			sql="CREATE TABLE [P_LINEA] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[MARCA] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_LINEA_idx1 ON P_LINEA(NOMBRE)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_LINEA_idx1 ON P_LINEA(NOMBRE)";
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [P_LIQUIDACION] ("+
+			sql="CREATE TABLE [P_LIQUIDACION] ("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[ESTADO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([RUTA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [P_PRODPRECIO] ("+
+			sql="CREATE TABLE [P_PRODPRECIO] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[NIVEL] INTEGER NOT NULL,"+				
 					"[PRECIO] REAL NOT NULL,"+
 					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL,"+
 					"PRIMARY KEY ([CODIGO],[NIVEL],[UNIDADMEDIDA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_PRODPRECIO_idx1 ON P_PRODPRECIO(CODIGO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_PRODPRECIO_idx2 ON P_PRODPRECIO(NIVEL)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_PRODPRECIO_idx1 ON P_PRODPRECIO(CODIGO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_PRODPRECIO_idx2 ON P_PRODPRECIO(NIVEL)";
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [TMP_PRECESPEC] ("+
+			sql="CREATE TABLE [TMP_PRECESPEC] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[VALOR] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
@@ -1258,13 +1257,13 @@ public class BaseDatosScript {
 					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL,"+
 					"PRIMARY KEY ([CODIGO],[VALOR],[PRODUCTO],[UNIDADMEDIDA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX TMP_PRECESPEC_idx1 ON TMP_PRECESPEC(PRODUCTO)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX TMP_PRECESPEC_idx1 ON TMP_PRECESPEC(PRODUCTO)";
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [P_PRODUCTO] ("+
+			sql="CREATE TABLE [P_PRODUCTO] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[TIPO] TEXT NOT NULL,"+
 					"[LINEA] TEXT NOT NULL,"+
@@ -1312,17 +1311,17 @@ public class BaseDatosScript {
                     "[UM_SALIDA] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_PRODUCTO_idx1 ON P_PRODUCTO(LINEA)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_PRODUCTO_idx2 ON P_PRODUCTO(CODBARRA)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_PRODUCTO_idx3 ON P_PRODUCTO(DESCCORTA)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_PRODUCTO_idx1 ON P_PRODUCTO(LINEA)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_PRODUCTO_idx2 ON P_PRODUCTO(CODBARRA)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_PRODUCTO_idx3 ON P_PRODUCTO(DESCCORTA)";
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [P_DESCUENTO] ("+
+			sql="CREATE TABLE [P_DESCUENTO] ("+
 					"[CLIENTE] TEXT NOT NULL,"+
 					"[CTIPO] INTEGER NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
@@ -1340,19 +1339,19 @@ public class BaseDatosScript {
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CLIENTE],[CTIPO],[PRODUCTO],[PTIPO],[TIPORUTA],[RANGOINI])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_DESCUENTO_idx1 ON P_DESCUENTO(CLIENTE)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_DESCUENTO_idx2 ON P_DESCUENTO(CTIPO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_DESCUENTO_idx3 ON P_DESCUENTO(FECHAINI)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_DESCUENTO_idx4 ON P_DESCUENTO(FECHAFIN)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_DESCUENTO_idx1 ON P_DESCUENTO(CLIENTE)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_DESCUENTO_idx2 ON P_DESCUENTO(CTIPO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_DESCUENTO_idx3 ON P_DESCUENTO(FECHAINI)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_DESCUENTO_idx4 ON P_DESCUENTO(FECHAFIN)";
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [P_EMPRESA] ("+
+			sql="CREATE TABLE [P_EMPRESA] ("+
 					"[EMPRESA] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"[INITPATH] TEXT NOT NULL,"+
@@ -1385,9 +1384,9 @@ public class BaseDatosScript {
 					"[INCIDENCIA_NO_LECTURA] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [P_SUCURSAL] ("+
+			sql="CREATE TABLE [P_SUCURSAL] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[EMPRESA] TEXT NOT NULL,"+
 					"[DESCRIPCION] TEXT NOT NULL,"+
@@ -1398,9 +1397,9 @@ public class BaseDatosScript {
 					"[TEXTO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [P_STOCK] ("+
+			sql="CREATE TABLE [P_STOCK] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[CANT] REAL NOT NULL,"+
 					"[CANTM] REAL NOT NULL,"+
@@ -1418,9 +1417,9 @@ public class BaseDatosScript {
 					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL,"+
 					"PRIMARY KEY ([CODIGO],[LOTE],[DOCUMENTO],[STATUS],[UNIDADMEDIDA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [P_STOCKB] ("+
+			sql="CREATE TABLE [P_STOCKB] ("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[BARRA] TEXT NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+
@@ -1440,10 +1439,10 @@ public class BaseDatosScript {
 					"[DOC_ENTREGA] TEXT NOT NULL,"+
 					"PRIMARY KEY ([RUTA],[BARRA],[DOCUMENTO],[STATUS])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
             //#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
-			vSQL = "CREATE TABLE [P_STOCK_PALLET](" +
+			sql = "CREATE TABLE [P_STOCK_PALLET](" +
 					"[DOCUMENTO] TEXT NOT NULL," +
 					"[RUTA] TEXT NOT NULL," +
 					"[BARRAPALLET] TEXT NOT NULL, " +
@@ -1466,150 +1465,150 @@ public class BaseDatosScript {
 					"[DOC_ENTREGA] TEXT NOT NULL," +
 					" PRIMARY KEY ([DOCUMENTO],[RUTA],[BARRAPALLET],[CODIGO]," +
                     "[BARRAPRODUCTO],[LOTEPRODUCTO],[UNIDADMEDIDA]));";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [P_STOCK_APR] ("+
+			sql="CREATE TABLE [P_STOCK_APR] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[CANT] REAL NOT NULL,"+
 					"[PESO] REAL NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_STOCKINV] ("+
+			sql="CREATE TABLE [P_STOCKINV] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[CANT] REAL NOT NULL,"+
 					"[PESO] REAL NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_STOCKINV_idx1 ON P_STOCKINV(CANT)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_STOCKINV_idx1 ON P_STOCKINV(CANT)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_CODATEN] ("+
+			sql="CREATE TABLE [P_CODATEN] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_CODATEN_idx1 ON P_CODATEN(CODIGO)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_CODATEN_idx1 ON P_CODATEN(CODIGO)";
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [P_CODNOLEC] ("+
+			sql="CREATE TABLE [P_CODNOLEC] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [P_CODDEV] ("+
+			sql="CREATE TABLE [P_CODDEV] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[DESCRIPCION] TEXT NOT NULL,"+
 					"[ESTADO] TEXT NOT NULL,"+
 					"[PORCENTAJE] REAL NOT NULL,"+
 					"PRIMARY KEY ([CODIGO],[ESTADO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_CODDEV_idx1 ON P_CODDEV(CODIGO)";
-			database.execSQL(vSQL);      
+			sql="CREATE INDEX P_CODDEV_idx1 ON P_CODDEV(CODIGO)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_MERMARCACOMP] ("+
+			sql="CREATE TABLE [P_MERMARCACOMP] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_MERMARCACOMP_idx1 ON P_MERMARCACOMP(NOMBRE)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_MERMARCACOMP_idx1 ON P_MERMARCACOMP(NOMBRE)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_MERPRODCOMP] ("+
+			sql="CREATE TABLE [P_MERPRODCOMP] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[MARCA] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_MERPRODCOMP_idx1 ON P_MERPRODCOMP(MARCA)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_MERPRODCOMP_idx2 ON P_MERPRODCOMP(NOMBRE)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_MERPRODCOMP_idx1 ON P_MERPRODCOMP(MARCA)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_MERPRODCOMP_idx2 ON P_MERPRODCOMP(NOMBRE)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_MERPREGUNTA] ("+
+			sql="CREATE TABLE [P_MERPREGUNTA] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_MERPREGUNTA_idx1 ON P_MERPREGUNTA(NOMBRE)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_MERPREGUNTA_idx1 ON P_MERPREGUNTA(NOMBRE)";
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [P_MERRESP] ("+
+			sql="CREATE TABLE [P_MERRESP] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[PREGUNTA] INTEGER NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_MERRESP_idx1 ON P_MERRESP(PREGUNTA)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_MERRESP_idx2 ON P_MERRESP(NOMBRE)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_MERRESP_idx1 ON P_MERRESP(PREGUNTA)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_MERRESP_idx2 ON P_MERRESP(NOMBRE)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_MEREQTIPO] ("+
+			sql="CREATE TABLE [P_MEREQTIPO] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_MEREQTIPO_idx1 ON P_MEREQTIPO(NOMBRE)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_MEREQTIPO_idx1 ON P_MEREQTIPO(NOMBRE)";
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [P_MEREQUIPO] ("+
+			sql="CREATE TABLE [P_MEREQUIPO] ("+
 					"[CLIENTE] TEXT NOT NULL,"+
 					"[SERIAL] TEXT NOT NULL,"+
 					"[TIPO] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CLIENTE],[SERIAL])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_MERESTADO] ("+
+			sql="CREATE TABLE [P_MERESTADO] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_MERESTADO_idx1 ON P_MERESTADO(NOMBRE)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_MERESTADO_idx1 ON P_MERESTADO(NOMBRE)";
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [P_NIVELMEDIAPAGO] ("+
+			sql="CREATE TABLE [P_NIVELMEDIAPAGO] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[DESCRIPCION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 
-			vSQL="CREATE TABLE [P_MEDIAPAGO] ("+
+			sql="CREATE TABLE [P_MEDIAPAGO] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"[ACTIVO] TEXT NOT NULL,"+
@@ -1617,14 +1616,14 @@ public class BaseDatosScript {
 					"[PORCOBRO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_MEDIAPAGO_idx1 ON P_MEDIAPAGO(NIVEL)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_MEDIAPAGO_idx2 ON P_MEDIAPAGO(PORCOBRO)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_MEDIAPAGO_idx1 ON P_MEDIAPAGO(NIVEL)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_MEDIAPAGO_idx2 ON P_MEDIAPAGO(PORCOBRO)";
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [P_RUTA] ("+
+			sql="CREATE TABLE [P_RUTA] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"[ACTIVO] TEXT NOT NULL,"+
@@ -1679,32 +1678,32 @@ public class BaseDatosScript {
 					"[MODIFICAR_MEDIA_PAGO] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_CLIGRUPO] ("+
+			sql="CREATE TABLE [P_CLIGRUPO] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[CLIENTE] TEXT NOT NULL,"+
 					"PRIMARY KEY (CODIGO,CLIENTE)"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_CLIGRUPO_idx1 ON P_CLIGRUPO(CODIGO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_CLIGRUPO_idx2 ON P_CLIGRUPO(CLIENTE)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_CLIGRUPO_idx1 ON P_CLIGRUPO(CODIGO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX P_CLIGRUPO_idx2 ON P_CLIGRUPO(CLIENTE)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_PRODGRUP] ("+
+			sql="CREATE TABLE [P_PRODGRUP] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO],[PRODUCTO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 	
-			vSQL="CREATE TABLE [P_COREL] ("+
+			sql="CREATE TABLE [P_COREL] ("+
 					"[RESOL] TEXT NOT NULL,"+
 					"[SERIE] TEXT NOT NULL,"+
 					"[CORELINI] INTEGER NOT NULL,"+
@@ -1717,9 +1716,9 @@ public class BaseDatosScript {
 					"[VALOR1] INTEGER NOT NULL,"+
 					"PRIMARY KEY (RESOL,SERIE)"+
 					");";
-			database.execSQL(vSQL);		
+			database.execSQL(sql);
 			
-			vSQL="CREATE TABLE [P_CORELNC] ("+
+			sql="CREATE TABLE [P_CORELNC] ("+
 					"[RESOL] TEXT NOT NULL,"+
 					"[SERIE] TEXT NOT NULL,"+
 					"[CORELINI] INTEGER NOT NULL,"+
@@ -1732,9 +1731,9 @@ public class BaseDatosScript {
 					"[VALOR1] INTEGER NOT NULL,"+
 					"PRIMARY KEY (RESOL,SERIE)"+
 					");";
-			database.execSQL(vSQL);		
+			database.execSQL(sql);
 			
-			vSQL="CREATE TABLE [P_CORRELREC] ("+
+			sql="CREATE TABLE [P_CORRELREC] ("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[SERIE] TEXT NOT NULL,"+
 					"[INICIAL] INTEGER NOT NULL,"+
@@ -1743,9 +1742,9 @@ public class BaseDatosScript {
 					"[ENVIADO] TEXT NOT NULL,"+
 					"PRIMARY KEY (RUTA,SERIE)"+
 					");";
-			database.execSQL(vSQL);		
+			database.execSQL(sql);
 			
-			vSQL="CREATE TABLE [P_CORREL_OTROS] ("+
+			sql="CREATE TABLE [P_CORREL_OTROS] ("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[SERIE] TEXT NOT NULL,"+
 					"[TIPO] TEXT NOT NULL,"+
@@ -1755,9 +1754,9 @@ public class BaseDatosScript {
 					"[ENVIADO] TEXT NOT NULL,"+
 					"PRIMARY KEY (RUTA,SERIE,TIPO)"+
 					");";
-			database.execSQL(vSQL);			
+			database.execSQL(sql);
 			
-			vSQL="CREATE TABLE [P_ARCHIVOCONF] ("+
+			sql="CREATE TABLE [P_ARCHIVOCONF] ("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[TIPO_HH] TEXT NOT NULL,"+
 					"[IDIOMA] TEXT  NOT NULL,"+
@@ -1769,22 +1768,22 @@ public class BaseDatosScript {
 					"[NOTA_CREDITO] INTEGER  NOT NULL,"+
 					"PRIMARY KEY ([RUTA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_ENCABEZADO_REPORTESHH] ("+
+			sql="CREATE TABLE [P_ENCABEZADO_REPORTESHH] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[TEXTO] TEXT NOT NULL,"+
 					"[SUCURSAL] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX P_ENCABEZADO_REPORTESHH_idx1 ON P_ENCABEZADO_REPORTESHH(SUCURSAL)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX P_ENCABEZADO_REPORTESHH_idx1 ON P_ENCABEZADO_REPORTESHH(SUCURSAL)";
+			database.execSQL(sql);
 	
 
-			vSQL="CREATE TABLE [P_BONIF] ("+
+			sql="CREATE TABLE [P_BONIF] ("+
 					"[CLIENTE] TEXT NOT NULL,"+
 					"[CTIPO] INTEGER NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
@@ -1809,10 +1808,10 @@ public class BaseDatosScript {
 					"[UMBONIFICACION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CLIENTE],[CTIPO],[PRODUCTO],[PTIPO],[TIPORUTA],[TIPOBON],[RANGOINI])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [P_BONLIST] ("+
+			sql="CREATE TABLE [P_BONLIST] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[CANT] INTEGER NOT NULL,"+
@@ -1820,10 +1819,10 @@ public class BaseDatosScript {
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO],[PRODUCTO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 			
-			vSQL="CREATE TABLE [P_VENDEDOR] ("+
+			sql="CREATE TABLE [P_VENDEDOR] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"[CLAVE] TEXT NOT NULL,"+
@@ -1838,10 +1837,10 @@ public class BaseDatosScript {
 					"[DEVOLUCION_SAP] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
 			//#HS_20181207 AGREGUE TABLA P_VEHICULO.
-			vSQL="CREATE TABLE [P_VEHICULO] ("+
+			sql="CREATE TABLE [P_VEHICULO] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[MARCA]  TEXT NOT NULL,"+
 					"[PLACA] TEXT NOT NULL,"+
@@ -1850,48 +1849,48 @@ public class BaseDatosScript {
 					"[TIPO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 		
-			vSQL="CREATE TABLE [P_MUNI] ("+
+			sql="CREATE TABLE [P_MUNI] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[DEPAR]  TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 			
-			vSQL="CREATE TABLE [P_REF1] ("+
+			sql="CREATE TABLE [P_REF1] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
-			vSQL="CREATE TABLE [P_REF2] ("+
+			sql="CREATE TABLE [P_REF2] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
-			vSQL="CREATE TABLE [P_REF3] ("+
+			sql="CREATE TABLE [P_REF3] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
-			vSQL="CREATE TABLE [P_FACTORCONV] ("+
+			sql="CREATE TABLE [P_FACTORCONV] ("+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[UNIDADSUPERIOR] TEXT NOT NULL,"+
 					"[FACTORCONVERSION] REAL NOT NULL,"+
 					"[UNIDADMINIMA] TEXT NOT NULL,"+
 					"PRIMARY KEY ([PRODUCTO],[UNIDADSUPERIOR],[UNIDADMINIMA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [P_PORCMERMA] ("+
+			sql="CREATE TABLE [P_PORCMERMA] ("+
 					"[EMPRESA] TEXT NOT NULL,"+
 					"[SUCURSAL] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
@@ -1901,21 +1900,9 @@ public class BaseDatosScript {
 					"[PORCMAXIMO] REAL NOT NULL,"+
 					"PRIMARY KEY ([EMPRESA],[SUCURSAL],[RUTA],[PRODUCTO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [P_IMPRESORA]("+
-					"[IDIMPRESORA] TEXT NOT NULL,"+
-					"[NUMSERIE] TEXT NOT NULL,"+
-					"[MARCA] TEXT NOT NULL,"+
-					"[CREADA] TEXT NOT NULL,"+
-					"[MODIFICADA] TEXT NOT NULL,"+
-					"[FECHA_CREADA] INTEGER NOT NULL,"+
-					"[FECHA_MODIFICADA] INTEGER NOT NULL,"+
-					"PRIMARY KEY ([IDIMPRESORA])"+
-			        ");";
-			database.execSQL(vSQL);
-
-			vSQL= "CREATE TABLE [P_HANDHELD]("+
+			sql= "CREATE TABLE [P_HANDHELD]("+
 					"[NUMPLACA] TEXT NOT NULL,"+
 					"[NUMSERIE] TEXT NOT NULL,"+
 					"[MARCA] TEXT NOT NULL,"+
@@ -1927,7 +1914,14 @@ public class BaseDatosScript {
 					"[GRANDTOTAL] REAL NOT NULL,"+
 					"PRIMARY KEY ([NUMPLACA])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
+
+			sql= "CREATE TABLE [P_IMPRESORA]("+
+					"[IDIMPRESORA] TEXT NOT NULL,"+
+					"[NUMSERIE] TEXT NOT NULL,"+
+					"PRIMARY KEY ([IDIMPRESORA])"+
+					");";
+			database.execSQL(sql);
 
 			return 1;
 			 
@@ -1938,11 +1932,11 @@ public class BaseDatosScript {
 	}
 	
 	private int scriptTablasT(SQLiteDatabase database) {
-		String vSQL;
+		String sql;
 
 		try {
 
-			vSQL="CREATE TABLE [T_VENTA] ("+
+			sql="CREATE TABLE [T_VENTA] ("+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[EMPRESA] TEXT NOT NULL,"+
 					"[UM] TEXT NOT NULL,"+
@@ -1963,13 +1957,13 @@ public class BaseDatosScript {
 					"[PERCEP] REAL NOT NULL,"+
 					"PRIMARY KEY ([PRODUCTO],[UM])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX T_VENTA_idx1 ON T_VENTA(PRODUCTO)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX T_VENTA_idx1 ON T_VENTA(PRODUCTO)";
+			database.execSQL(sql);
 
 			
-			vSQL="CREATE TABLE [T_DESC] ("+
+			sql="CREATE TABLE [T_DESC] ("+
 					"[ID] INTEGER NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[PTIPO] INTEGER NOT NULL,"+
@@ -1982,18 +1976,18 @@ public class BaseDatosScript {
 					"[NOMBRE] TEXT NOT NULL,"+
 					"PRIMARY KEY ([ID])"+
 					");";
-			database.execSQL(vSQL);		
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX T_DESC_idx1 ON T_DESC(PRODUCTO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX T_DESC_idx2 ON T_DESC(PTIPO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX T_DESC_idx3 ON T_DESC(RANGOINI)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX T_DESC_idx4 ON T_DESC(RANGOFIN)";
-			database.execSQL(vSQL);		
+			sql="CREATE INDEX T_DESC_idx1 ON T_DESC(PRODUCTO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX T_DESC_idx2 ON T_DESC(PTIPO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX T_DESC_idx3 ON T_DESC(RANGOINI)";
+			database.execSQL(sql);
+			sql="CREATE INDEX T_DESC_idx4 ON T_DESC(RANGOFIN)";
+			database.execSQL(sql);
 			
-			vSQL="CREATE TABLE [T_BONIF] ("+
+			sql="CREATE TABLE [T_BONIF] ("+
 					"[ID] INTEGER NOT NULL,"+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[PTIPO] INTEGER NOT NULL,"+
@@ -2013,10 +2007,10 @@ public class BaseDatosScript {
 					"[UMBONIFICACION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([ID])"+
 					");";
-			database.execSQL(vSQL);			
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [T_CxCD] ("+
+			sql="CREATE TABLE [T_CxCD] ("+
 					"[Item] INTEGER NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[CANT] REAL NOT NULL,"+
@@ -2036,24 +2030,24 @@ public class BaseDatosScript {
 					"[TIENE_LOTE] INTEGER,"+
 					"PRIMARY KEY ([Item])"+
 					");";
-			database.execSQL(vSQL);	             
+			database.execSQL(sql);
 
-			vSQL="CREATE INDEX T_CxCD_idx1 ON T_CxCD(CODIGO)";
-			database.execSQL(vSQL);
-			vSQL="CREATE INDEX T_CxCD_idx2 ON T_CxCD(CANT)";
-			database.execSQL(vSQL);
+			sql="CREATE INDEX T_CxCD_idx1 ON T_CxCD(CODIGO)";
+			database.execSQL(sql);
+			sql="CREATE INDEX T_CxCD_idx2 ON T_CxCD(CANT)";
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [T_DEVOL] ("+
+			sql="CREATE TABLE [T_DEVOL] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[CANT] REAL NOT NULL,"+
 					"[CANTM] REAL NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
-			database.execSQL(vSQL);	   
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [T_PAGO] ("+
+			sql="CREATE TABLE [T_PAGO] ("+
 					"[ITEM] INTEGER NOT NULL,"+
 					"[CODPAGO] INTEGER NOT NULL,"+
 					"[TIPO] TEXT NOT NULL,"+
@@ -2063,10 +2057,10 @@ public class BaseDatosScript {
 					"[DESC3] TEXT NOT NULL,"+
 					"PRIMARY KEY ([ITEM])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 
-			vSQL="CREATE TABLE [T_PAGOD] ("+
+			sql="CREATE TABLE [T_PAGOD] ("+
 					"[ITEM] INTEGER NOT NULL,"+
 					"[DOCUMENTO] TEXT NOT NULL,"+
 					"[TIPODOC] TEXT NOT NULL,"+
@@ -2074,19 +2068,19 @@ public class BaseDatosScript {
 					"[PAGO] REAL NOT NULL,"+
 					"PRIMARY KEY ([ITEM])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 			
 		
-			vSQL="CREATE TABLE [T_LOTES] ("+
+			sql="CREATE TABLE [T_LOTES] ("+
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[LOTE] TEXT NOT NULL,"+
 					"[CANTIDAD] REAL NOT NULL,"+
 					"[PESO] REAL NOT NULL,"+
 					"PRIMARY KEY ([PRODUCTO],[LOTE])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [T_BONITEM] ("+
+			sql="CREATE TABLE [T_BONITEM] ("+
 					"[ITEM] INTEGER NOT NULL,"+
 					"[PRODID] TEXT NOT NULL,"+
 					"[BONIID] TEXT NOT NULL,"+
@@ -2101,9 +2095,9 @@ public class BaseDatosScript {
 					"[POR_PESO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([ITEM])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [T_BARRA] ("+
+			sql="CREATE TABLE [T_BARRA] ("+
 					"[BARRA] TEXT NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[PRECIO] REAL NOT NULL,"+
@@ -2111,9 +2105,9 @@ public class BaseDatosScript {
 					"[PESOORIG] REAL NOT NULL,"+
 					"PRIMARY KEY ([BARRA],[CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-			vSQL="CREATE TABLE [T_BARRA_BONIF] ("+
+			sql="CREATE TABLE [T_BARRA_BONIF] ("+
 					"[BARRA] TEXT NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[PRECIO] REAL NOT NULL,"+
@@ -2122,15 +2116,15 @@ public class BaseDatosScript {
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([BARRA],[CODIGO])"+
 					");";
-			database.execSQL(vSQL);
+			database.execSQL(sql);
 
-            vSQL="CREATE TABLE [T_BONIFFALT] ("+
+            sql="CREATE TABLE [T_BONIFFALT] ("+
                     "[PRODID]   TEXT NOT NULL,"+
                     "[PRODUCTO] TEXT NOT NULL,"+
                     "[CANT]     REAL NOT NULL,"+
                     "PRIMARY KEY ([PRODID],[PRODUCTO])"+
                     ");";
-            database.execSQL(vSQL);
+            database.execSQL(sql);
 
             return 1;
 
@@ -2145,12 +2139,7 @@ public class BaseDatosScript {
 			  db.execSQL("INSERT INTO Params VALUES (0,0,0,0,0,0);"); 
 			  
 			  db.execSQL("INSERT INTO FinDia VALUES (0,0, 0,0,0,0, 0,0,0,0);"); 
-			  
-				  
-			  //db.execSQL("INSERT INTO D_COBRO VALUES('1','N',14040112000,'1','1','1','1',0,'0','0','N',0,'N',1000,'N');");
-			  //db.execSQL("INSERT INTO D_COBRO VALUES('2','N',14040112000,'1','1','1','2',0,'0','0','N',0,'N',500,'N');");
-			  //db.execSQL("INSERT INTO D_COBRO VALUES('3','N',14040112000,'1','1','1','3',0,'0','0','N',0,'N',400,'N');");
-			    
+
     	      return 1;
 	    } catch (SQLiteException e) {
 	    	 msgbox(e.getMessage());

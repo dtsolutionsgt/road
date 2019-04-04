@@ -801,7 +801,6 @@ public class Reimpresion extends PBase {
 	}
 
 	
-	
 	// Aux
 	
 	private void msgAsk(String msg) {
@@ -823,8 +822,6 @@ public class Reimpresion extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-			
 	}
 
 	private void askPrint() {

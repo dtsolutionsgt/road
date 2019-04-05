@@ -1,5 +1,6 @@
 package com.dts.roadp;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -28,7 +29,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,7 +38,6 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
-
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -1597,8 +1596,8 @@ public class ComWS extends PBase {
 		//#CKFK_20190319 Agregué tabla P_IMPRESORA
 		if (TN.equalsIgnoreCase("P_IMPRESORA")) {
             SQL = " SELECT IDIMPRESORA, NUMSERIE, MARCA, ISNULL(CREADA,'') AS CREADA, " +
-                  " ISNULL(MODIFICADA,'') AS MODIFICADA, ISNULL(FECHA_CREADA, GETDATE()) AS FECHA_CREADA," +
-                  " ISNULL(FECHA_MODIFICADA, GETDATE()) AS FECHA_MODIFICADA FROM P_IMPRESORA";
+					" ISNULL(MODIFICADA,'') AS MODIFICADA, ISNULL(FECHA_CREADA, GETDATE()) AS FECHA_CREADA," +
+					" ISNULL(FECHA_MODIFICADA, GETDATE()) AS FECHA_MODIFICADA FROM P_IMPRESORA";
 			return SQL;
 		}
 		if (TN.equalsIgnoreCase("P_MUNI")) {

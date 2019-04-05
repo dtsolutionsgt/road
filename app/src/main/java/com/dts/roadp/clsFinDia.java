@@ -297,10 +297,9 @@ public class clsFinDia extends PBase{
         try{
 
             //#CKFK_20190328 Moví esto que estaba en ProcessComplete para acá porque de lo contrario no se actualizaban los valores.
-            corelz+=1;
-            sql = "UPDATE FinDia SET Corel=" + corelz + ", val8 = val8 + " + valor;
+            sql = "UPDATE FinDia SET Corel=" + corel + ", val8 = val8 + " + valor;
             db.execSQL(sql);
-            sql = "UPDATE P_HANDHELD SET CorelZ=" + corelz + ", GrandTotal = GrandTotal + " + valor;
+            sql = "UPDATE P_HANDHELD SET CorelZ=" + corel + ", GrandTotal = GrandTotal + " + valor;
             db.execSQL(sql);
 
         }catch (Exception e){

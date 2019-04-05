@@ -514,6 +514,10 @@ public class Venta extends PBase {
 
 			// Bonificacion
 
+			// Borra la anterior, si existe
+			sql="DELETE FROM T_BONITEM WHERE Prodid='"+prodid+"'";
+			db.execSQL(sql);
+
 			desc = 0;
 			prodPrecio();
 

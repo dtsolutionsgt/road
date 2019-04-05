@@ -72,7 +72,6 @@ public class ProdCant extends PBase {
 		
 	}
 
-	
 	//region Events
 	
 	public void sendCant(View view) {

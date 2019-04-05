@@ -405,6 +405,16 @@ public class FacturaRes extends PBase {
 		}
 	}
 
+	public void pendientePago(View view){
+		try{
+			askPendientePago();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+
 	//endregion
 
 	//region Main
@@ -676,16 +686,6 @@ public class FacturaRes extends PBase {
 		}
 
  	}
-
- 	//#HS_20181212 Funcion para proceso pendiente de pago.
-	public void pendientePago(View view){
-		try{
-			askPendientePago();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-	}
 
 	private boolean saveOrder(){
 		Cursor dt;

@@ -477,13 +477,10 @@ public class Reimpresion extends PBase {
 			String corelNC=tieneNCFactura(itemid);
 
 			if (!corelNC.isEmpty()){
-
 				fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 				fdev.deviceid =gl.deviceId;
-
 				fdev.buildPrint(corelNC, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
 			}
-
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

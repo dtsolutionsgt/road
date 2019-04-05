@@ -20,7 +20,7 @@ public class appGlobals extends Application {
 	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor,prectemp;
 	public boolean CellCom,closeDevBod;
 	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra;
-	public int tiponcredito;
+	public int tiponcredito,validarCred;
     public boolean vcredito,vcheque,vchequepost;
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,contlic,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;

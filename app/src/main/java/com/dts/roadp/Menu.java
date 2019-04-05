@@ -1856,6 +1856,7 @@ public class Menu extends PBase {
 
 			dialog.setIcon(R.drawable.ic_quest);
 
+			dialog.setCancelable(false);
 			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					menuConfImpres();

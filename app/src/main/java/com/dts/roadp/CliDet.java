@@ -782,6 +782,7 @@ public class CliDet extends PBase {
 
 	public void showCredit(View viev){
 		try{
+			gl.validarCred=2;
 			gl.banderaCobro = true;
 			Intent intent = new Intent(this,Cobro.class);
 			startActivity(intent);

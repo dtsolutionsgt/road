@@ -102,7 +102,7 @@ public class Reimpresion extends PBase {
 			mdoc=new clsDocMov(this,prn.prw,"Dvolucion a bodega",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 			lblTipo.setText("Devolución a bodega");break;
 		case 6:  
-			fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+			fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "print.txt");
 			fdev.deviceid =gl.deviceId;
 			lblTipo.setText("Nota Crédito");break;
 			
@@ -509,7 +509,7 @@ public class Reimpresion extends PBase {
 				fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printask();
 			}
 
-			fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+			fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printclose, "print.txt");
 
 
 		} catch (Exception e) {

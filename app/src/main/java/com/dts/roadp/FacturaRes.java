@@ -2310,7 +2310,8 @@ public class FacturaRes extends PBase {
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					//singlePrint();
-					prn.printask(printcallback);
+					//prn.printask(printcallback);
+					finish();
 				}
 			});
 

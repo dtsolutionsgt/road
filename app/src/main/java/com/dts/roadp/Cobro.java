@@ -92,11 +92,10 @@ public class Cobro extends PBase {
 		    	if(gl.banderaCobro){
 		    		Cobro.super.finish();
 				}else{
-		    		if(browse==4){
+					if(browse==4){
 						validaCredito();
 						browse = 0;
 					}
-
 				}
 		    	//Cobro.super.finish();
 
@@ -130,6 +129,7 @@ public class Cobro extends PBase {
 			gl.pagolim=tsel;
 			gl.pagocobro=true;
 			browse=1;
+			if(gl.validarCred!=2) gl.validarCred = 1;
 
 			Intent intent = new Intent(this,Pago.class);
 			startActivity(intent);
@@ -145,7 +145,10 @@ public class Cobro extends PBase {
 
 		try{
 
+			if(gl.validarCred!=2) gl.validarCred = 1;
+
 			calcSelected();
+
 			if (tsel==0) {
 				mu.msgbox("Total a pagar = 0, debe seleccionar un documento");return;
 			}
@@ -424,6 +427,7 @@ public class Cobro extends PBase {
 				}
 
 				if(gl.vcredito){
+					if(gl.facturaVen<0) gl.facturaVen=0;
                     if(gl.facturaVen > 0) {
                         vValida = false;
                         msgAskFact();
@@ -1189,7 +1193,13 @@ public class Cobro extends PBase {
 						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 					}
 
-					Cobro.super.finish();
+					if(gl.validarCred==1){
+						validaCredito();
+					}else if(gl.validarCred==2){
+						Cobro.super.finish();
+					}
+
+					gl.validarCred=0;
 				}
 			});
 
@@ -1216,7 +1226,7 @@ public class Cobro extends PBase {
 			if(tsel>0) {
 				msgAskExit("Tiene documentos pendientes de pago. Salir");
 			} else {
-				finish();
+				super.finish();
 			}
 
 	    }catch (Exception e){
@@ -1276,6 +1286,7 @@ public class Cobro extends PBase {
 				public void onClick(DialogInterface dialog, int which) {
 					createDoc();
 					check();
+					//validaCredito();
 				}
 			});
 
@@ -1343,16 +1354,13 @@ public class Cobro extends PBase {
 
 			if (browse==2) {
 				browse=0;
-
-				finish();
-				gl.closeVenta=true;
-				if(gl.closeVenta) super.finish();
+				super.finish();
 			}
 
 			if (browse==3){
 				browse=0;
 
-				finish();
+				super.finish();
 			}
 
 

@@ -263,7 +263,8 @@ public class Pago extends PBase {
 		listItems();
 		
 		actMonto();
-		
+		actMonto();
+
 	}
 	
 	private void delPago(){

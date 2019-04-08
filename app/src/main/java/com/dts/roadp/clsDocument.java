@@ -185,25 +185,31 @@ public class clsDocument {
 				s=s.replace("Factura","Recibo");
 			}
 
-            if (residx==1) {
-                if (docfactura) {
-                    rep.add(resol);
-                    rep.add(resfecha);
-                    rep.add(resvence);
-                    rep.add(resrango);
-					rep.add("Fecha de Emision : "+fsfecha);
-                }
-                residx=0;
-            }
+            //if (residx==1) {
 
-            if (!s.equalsIgnoreCase("@@")) rep.add(s);
+            /*    residx=0;
+            }*/
+
+			if (!s.equalsIgnoreCase("@@")) rep.add(s);
+
         }
+
+        rep.add("");
+
+        if (docfactura) {
+			rep.add(resol);
+			rep.add(resfecha);
+			rep.add(resvence);
+			rep.add(resrango);
+			rep.add("");
+			rep.add("Fecha : "+fsfecha);
+			rep.add("");
+		}
 
         if (!emptystr(nit)) rep.add("NIT : "+nit);
         if (!emptystr(clidir)) rep.add("Dir : "+clidir);
         if(docdevolucion || doccanastabod) rep.add("Fecha de Emision : "+fsfecha);
         //if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
-
 
         if (!emptystr(add1)) {
 

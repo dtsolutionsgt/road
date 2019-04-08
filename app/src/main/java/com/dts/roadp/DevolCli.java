@@ -767,6 +767,7 @@ public class DevolCli extends PBase {
 
 	private void limpiavariables_devol(){
 
+		gl.tiponcredito=0;
 		gl.devtipo ="";
 		gl.devrazon = "";
 		gl.dvumventa = "";

@@ -36,10 +36,14 @@ public class printZebraCPCL extends printBase {
 	private ArrayList<String> lines = new ArrayList<String>();
 		
 	private String ss,statstr,dbg;
-	private boolean status;
-	
-	public printZebraCPCL(Context context,String printerMAC) {
+	private boolean status,validprint;;
+
+	// ZQ320 AC:3F:A4:C8:5F:D9
+
+
+	public printZebraCPCL(Context context,String printerMAC,boolean validprinter) {
 		super(context,printerMAC);
+		validprint=validprinter;
 	}
 
 	// Main
@@ -185,9 +189,11 @@ public class printZebraCPCL extends printBase {
 	}
 
 	private void doStartPrint() {
+		if (!validprint) {
+			showmsg("¡La impresora no está autorizada!");return;
+		}
+
 		showmsg("Imprimiendo ..." );
-		//showmsg("MAC : "+printerAddress );
-		
 		status=true;
 		
 		new Thread(new Runnable() {

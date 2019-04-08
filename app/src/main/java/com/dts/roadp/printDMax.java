@@ -23,9 +23,11 @@ public class printDMax extends printBase {
 	private String ss,ess;
 	private PrintDialog printDialog;
 	private appGlobals appG;
+	private boolean validprint;
 	
-	public printDMax(Context context,String printerMAC) {
+	public printDMax(Context context,String printerMAC,boolean validprinter) {
 		super(context,printerMAC);
+		validprint=validprinter;
 		appG = new appGlobals();
 	}
 	
@@ -158,6 +160,10 @@ public class printDMax extends printBase {
 	}
 	
 	private void doStartPrint() {
+		if (!validprint) {
+			showmsg("¡La impresora no está autorizada!");return;
+		}
+
 		appG.endPrint = true;
 		showmsg("Imprimiendo ..." );
 		//showmsg("MAC : "+printerAddress );

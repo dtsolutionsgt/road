@@ -31,6 +31,7 @@ public class Anulacion extends PBase {
 	private clsDocFactura fdoc;
 
 	private clsClasses.clsCFDV sitem;
+	private AppMethods app;
 	
 	private int tipo,depparc,fcorel;	
 	private String selid,itemid,fserie,fres;
@@ -54,7 +55,11 @@ public class Anulacion extends PBase {
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		lblTipo= (TextView) findViewById(R.id.lblDescrip);
-				
+
+		app = new AppMethods(this, gl, Con, db);
+		gl.validimp=app.validaImpresora("*");
+		if (!gl.validimp) toast("¡La impresora no está autorizada!");
+
 		tipo=gl.tipo;
 		if (gl.peModal.equalsIgnoreCase("APR")) modoapr=true;
 		
@@ -76,11 +81,10 @@ public class Anulacion extends PBase {
 		
 		printclose= new Runnable() {
 		    public void run() {
-		    	
 		    }
 		};
 		
-		prn=new printer(this,printclose);
+		prn=new printer(this,printclose,gl.validimp);
 
 		setHandlers();
 		listItems();

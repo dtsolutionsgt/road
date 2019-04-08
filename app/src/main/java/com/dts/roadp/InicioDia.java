@@ -68,7 +68,7 @@ public class InicioDia extends PBase implements View.OnClickListener{
             }
         };
 
-        prn=new printer(this,printclose);
+        prn=new printer(this,printclose,gl.validimp);
         doc=new clsDocExist(this,prn.prw, "");
         rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "");
 

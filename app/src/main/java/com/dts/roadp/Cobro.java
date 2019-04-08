@@ -103,7 +103,7 @@ public class Cobro extends PBase {
 		    }
 		};
 		
-		prn=new printer(this,printclose);
+		prn=new printer(this,printclose,gl.validimp);
 		fdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.deviceId, "");
 		fdoc.deviceid=gl.deviceId;
 

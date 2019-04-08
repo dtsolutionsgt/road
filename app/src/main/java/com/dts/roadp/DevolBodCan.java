@@ -72,7 +72,7 @@ public class DevolBodCan extends PBase {
             }
         };
 
-        prn_can=new printer(this,printclose);
+        prn_can=new printer(this,printclose,gl.validimp);
         fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
         fcanastabod.deviceid =gl.deviceId;
 
@@ -527,7 +527,7 @@ public class DevolBodCan extends PBase {
                     if(!existenciaP.isEmpty()){
 
                         if(!existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=3;
-                        prn_paseante=new printer(this,printclose);
+                        prn_paseante=new printer(this,printclose,gl.validimp);
                         fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
                         fcanastabod.deviceid =gl.deviceId;
 
@@ -539,7 +539,7 @@ public class DevolBodCan extends PBase {
 
                 }else if(!existenciaP.isEmpty()){
 
-                    prn_paseante=new printer(this,printclose);
+                    prn_paseante=new printer(this,printclose,gl.validimp);
                     fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
                     fcanastabod.deviceid =gl.deviceId;
 

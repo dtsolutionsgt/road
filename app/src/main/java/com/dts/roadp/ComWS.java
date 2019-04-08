@@ -1596,14 +1596,12 @@ public class ComWS extends PBase {
 
 		//#CKFK_20190319 Agregué tabla P_IMPRESORA
 		if (TN.equalsIgnoreCase("P_IMPRESORA")) {
-            SQL = " SELECT IDIMPRESORA, NUMSERIE, MARCA, ISNULL(CREADA,'') AS CREADA, " +
-					" ISNULL(MODIFICADA,'') AS MODIFICADA, ISNULL(FECHA_CREADA, GETDATE()) AS FECHA_CREADA," +
-					" ISNULL(FECHA_MODIFICADA, GETDATE()) AS FECHA_MODIFICADA FROM P_IMPRESORA";
-            SQL = " SELECT IDIMPRESORA, NUMSERIE, MARCA, ISNULL(CREADA,'') AS CREADA, " +
+              SQL = " SELECT IDIMPRESORA, NUMSERIE, MARCA, ISNULL(CREADA,'') AS CREADA, " +
                     " ISNULL(MODIFICADA,'') AS MODIFICADA, " +
                     "0 AS FECHA_CREADA,0 AS FECHA_MODIFICADA FROM P_IMPRESORA";
 			return SQL;
 		}
+
 		if (TN.equalsIgnoreCase("P_MUNI")) {
 			SQL = "SELECT * FROM P_MUNI";
 			return SQL;
@@ -1866,7 +1864,6 @@ public class ComWS extends PBase {
 		return true;
 	}
 
-
 	//#CKFK_20190325 Agregué funcion ActualizaStatcom que es una copia de FinDia pero sin el CommitSQL
 	private boolean ActualizaStatcom() {
 
@@ -1897,6 +1894,45 @@ public class ComWS extends PBase {
 		}
 		return true;
 	}
+
+	private void encodeData() {
+		Handler mtimer = new Handler();
+		Runnable mrunner=new Runnable() {
+			@Override
+			public void run() {
+				encodePrinters();
+			}
+		};
+		mtimer.postDelayed(mrunner,200);
+	}
+
+	private void encodePrinters() {
+		CryptUtil cu=new CryptUtil();
+		Cursor dt;
+		String prid,ser,se;
+
+		try {
+			sql="SELECT IDIMPRESORA,NUMSERIE FROM P_IMPRESORA";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount() > 0) dt.moveToFirst();
+			while (!dt.isAfterLast()) {
+
+				prid=dt.getString(0);
+				ser=dt.getString(1);
+				se=cu.encrypt(ser);
+
+				sql="UPDATE P_IMPRESORA SET NUMSERIE='"+se+"' WHERE IDIMPRESORA='"+prid+"'";
+				db.execSQL(sql);
+
+				dt.moveToNext();
+			}
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+	}
+
 
 	//endregion
 
@@ -1946,6 +1982,8 @@ public class ComWS extends PBase {
 
 				clsAppM.estandartInventario();
 				validaDatos(true);
+				encodeData();
+
 				if (stockflag == 1) sendConfirm();
 
 				msgAskExit(s);

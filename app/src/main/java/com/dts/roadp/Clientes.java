@@ -44,6 +44,7 @@ public class Clientes extends PBase {
 
 	private ListAdaptCliList adapter;
 	private clsCDB selitem;
+	private AppMethods app;
 
 	private int selidx, fecha, dweek, browse;
 	private String selid,bbstr,bcode;
@@ -62,6 +63,10 @@ public class Clientes extends PBase {
 		spinFilt = (Spinner) findViewById(R.id.spinner8);
 		txtFiltro = (EditText) findViewById(R.id.txtMonto);
 		lblCant = (TextView) findViewById(R.id.lblCant);
+
+		app = new AppMethods(this, gl, Con, db);
+		gl.validimp=app.validaImpresora("*");
+		if (!gl.validimp) toast("¡La impresora no está autorizada!");
 
 		setHandlers();
 
@@ -419,7 +424,8 @@ public class Clientes extends PBase {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 	}
-	
+
+
 	// Aux
 
     private void showItemMenu() {

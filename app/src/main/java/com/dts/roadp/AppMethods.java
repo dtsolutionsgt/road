@@ -646,6 +646,44 @@ public class AppMethods {
 		}
 	}
 
+	public boolean validaImpresora(String prid) {
+		CryptUtil cu=new CryptUtil();
+		Cursor dt;
+		String se,sd;
+
+		if (prid.equalsIgnoreCase("*")) {
+			try {
+				sql = "SELECT PUERTO_IMPRESION FROM P_ARCHIVOCONF";
+				dt = Con.OpenDT(sql);
+				dt.moveToFirst();
+
+				prid = dt.getString(0);
+			} catch (Exception e) {
+				prid="..";
+			}
+		}
+
+		try {
+			sql="SELECT NUMSERIE FROM P_IMPRESORA";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0) dt.moveToFirst();
+			while (!dt.isAfterLast()) {
+				se=dt.getString(0);
+				sd=cu.decrypt(se);
+
+				if (sd.equalsIgnoreCase(prid)) return true;
+
+				dt.moveToNext();
+			}
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return false;
+	}
+
+
 
 	// Common
 	

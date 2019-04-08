@@ -221,8 +221,8 @@ public class FacturaRes extends PBase {
 			}
 		};
 
-		prn=new printer(this,printexit);
-		prn_nc=new printer(this,printclose);
+		prn=new printer(this,printexit,gl.validimp);
+		prn_nc=new printer(this,printclose,gl.validimp);
 
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
 		fdoc.deviceid =gl.deviceId;

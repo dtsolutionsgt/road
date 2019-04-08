@@ -77,7 +77,7 @@ public class Exist extends PBase {
 		    }
 		};
 		
-		prn=new printer(this,printclose);		
+		prn=new printer(this,printclose,gl.validimp);
 		doc=new clsDocExist(this,prn.prw,"");
 
 		/*int cant = CantExistencias();

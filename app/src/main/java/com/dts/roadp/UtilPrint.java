@@ -1,17 +1,5 @@
 package com.dts.roadp;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import com.epson.eposdevice.Device;
-import com.epson.eposdevice.EposException;
-import com.epson.eposdevice.printer.Printer;
-
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
@@ -20,12 +8,16 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Toast;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.ArrayList;
 
 public class UtilPrint extends PBase {
 	
@@ -36,15 +28,14 @@ public class UtilPrint extends PBase {
 	private ArrayList<String> spincode= new ArrayList<String>();
     private String prtipo,prpar;
     private int pridx;
-    
+
+	private AppMethods app;
     private printer prn;
     private Runnable printclose,printcallback;
    
     // Datamax "00:03:19:8E:76:7E"
     // Zebra "00:22:58:01:04:28"
     
-
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,7 +47,9 @@ public class UtilPrint extends PBase {
 		spinPrint = (Spinner) findViewById(R.id.spinner1);
 		txtPar = (EditText) findViewById(R.id.txtMonto);
 		txtBut1 = (TextView) findViewById(R.id.textView1);txtBut1.setVisibility(View.INVISIBLE);
-		
+
+		app = new AppMethods(this, gl, Con, db);
+
 		setHandlers();
 		
 		loadItem();
@@ -76,7 +69,7 @@ public class UtilPrint extends PBase {
 		    }
 		};
 		
-		prn=new printer(this,printclose);
+		prn=new printer(this,printclose,true);
 
 		
 	}
@@ -86,6 +79,10 @@ public class UtilPrint extends PBase {
 	
 	public void doApply(View view) {
 		try{
+			if (!app.validaImpresora(txtPar.getText().toString().trim())) {
+				msgbox("¡La impresora no está autorizada!");return;
+			}
+
 			updateItem();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -209,10 +206,10 @@ public class UtilPrint extends PBase {
 		
 	}
 
+
 	// Aux
 	
-	private void fillSpinner()
-	{
+	private void fillSpinner() 	{
 		int sp=0;
 	
 		try {
@@ -235,8 +232,7 @@ public class UtilPrint extends PBase {
 		}
 	}	
 	
-	private void buildFile()
-	{
+	private void buildFile() {
 
 		BufferedWriter writer = null;
 		FileWriter wfile;

@@ -30,6 +30,7 @@ public class FinDia extends PBase {
     private ImageView img1;
     private ProgressBar pBar;
 
+    private AppMethods app;
     private clsRepBuilder rep;
     private Runnable printclose;
     private printer prn;
@@ -55,7 +56,11 @@ public class FinDia extends PBase {
         pBar = (ProgressBar) findViewById(R.id.progressBar1);
         pBar.setVisibility(View.INVISIBLE);
 
-        rutatipo = ((appGlobals) vApp).rutatipog;
+        rutatipo = gl.rutatipog;
+
+        app = new AppMethods(this, gl, Con, db);
+        gl.validimp=app.validaImpresora("*");
+        if (!gl.validimp) toast("¡La impresora no está autorizada!");
 
         fullfd = false;
         if (rutatipo.equalsIgnoreCase("T")) {
@@ -82,7 +87,7 @@ public class FinDia extends PBase {
             }
         };
 
-        prn = new printer(this, printclose);
+        prn = new printer(this, printclose,gl.validimp);
 
     }
 

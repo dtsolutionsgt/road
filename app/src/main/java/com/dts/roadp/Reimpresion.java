@@ -23,7 +23,8 @@ public class Reimpresion extends PBase {
 	private ArrayList<clsClasses.clsCFDV> items= new ArrayList<clsClasses.clsCFDV>();
 	private ListAdaptCFDV adapter;
 	private clsClasses.clsCFDV selitem;
-	
+
+	private AppMethods app;
 	private printer prn;
 	private printer prn_nc;
 	private Runnable printclose,printcallback,printvoid;
@@ -56,8 +57,12 @@ public class Reimpresion extends PBase {
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		lblTipo= (TextView) findViewById(R.id.lblFecha);
-				
-		tipo=((appGlobals) vApp).tipo;
+
+		app = new AppMethods(this, gl, Con, db);
+		gl.validimp=app.validaImpresora("*");
+		if (!gl.validimp) toast("¡La impresora no está autorizada!");
+
+		tipo=gl.tipo;
 		itemid="*";
 		
 		setHandlers();
@@ -80,8 +85,8 @@ public class Reimpresion extends PBase {
 			}
 		};
 
-		prn=new printer(this,printclose);
-		prn_nc=new printer(this,printclose);
+		prn=new printer(this,printclose,gl.validimp);
+		prn_nc=new printer(this,printclose,gl.validimp);
 			
 		switch (tipo) {
 		case 0:  

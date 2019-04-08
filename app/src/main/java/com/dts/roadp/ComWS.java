@@ -54,7 +54,7 @@ public class ComWS extends PBase {
 	private RelativeLayout ralBack, relExist, relPrecio, relStock;
 
 	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant;
-	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant;
+	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,parImprID;
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag;
 
 	private SQLiteDatabase dbT;
@@ -152,6 +152,8 @@ public class ComWS extends PBase {
 		fsql = du.univfechasql(du.getActDate());
 		fsqli = du.univfechasql(du.ffecha00(du.getActDate())) + " 00:00:00";
 		fsqlf = du.univfechasql(du.ffecha24(du.getActDate())) + " 23:59:59";
+
+		parImprID="0";
 
 		lic = new clsLicence(this);
 
@@ -1459,7 +1461,14 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_RUTA")) {
-			SQL = "SELECT * FROM P_RUTA WHERE CODIGO = '" + ActRuta + "'";
+			SQL = "SELECT CODIGO, NOMBRE, ACTIVO, VENDEDOR, VENTA, FORANIA, SUCURSAL, TIPO, SUBTIPO, " +
+				  "BODEGA, SUBBODEGA, DESCUENTO, BONIF, KILOMETRAJE, IMPRESION, RECIBOPROPIO, CELULAR, RENTABIL, OFERTA, " +
+				  "PERCRENT, PASARCREDITO, TECLADO, EDITDEVPREC, EDITDESC, PARAMS, SEMANA, OBJANO, OBJMES, SYNCFOLD, WLFOLD, " +
+				  "FTPFOLD, EMAIL, LASTIMP, LASTCOM, LASTEXP, IMPSTAT, EXPSTAT, COMSTAT, PARAM1, " +
+			 	  "PARAM2, PESOLIM, INTERVALO_MAX, LECTURAS_VALID, INTENTOS_LECT, HORA_INI, HORA_FIN, " +
+				  "APLICACION_USA, PUERTO_GPS, ES_RUTA_OFICINA, DILUIR_BON, PREIMPRESION_FACTURA, MODIFICAR_MEDIA_PAGO, " +
+				  "IDIMPRESORA, NUMVERSION,0 AS FECHAVERSION, ARQUITECTURA " +
+				  "FROM P_RUTA WHERE CODIGO = '" + ActRuta + "'";
 			return SQL;
 		}
 
@@ -1598,7 +1607,7 @@ public class ComWS extends PBase {
 		if (TN.equalsIgnoreCase("P_IMPRESORA")) {
               SQL = " SELECT IDIMPRESORA, NUMSERIE, MARCA, ISNULL(CREADA,'') AS CREADA, " +
                     " ISNULL(MODIFICADA,'') AS MODIFICADA, " +
-                    "0 AS FECHA_CREADA,0 AS FECHA_MODIFICADA FROM P_IMPRESORA";
+                    "0 AS FECHA_CREADA,0 AS FECHA_MODIFICADA,MACADDRESS FROM P_IMPRESORA";
 			return SQL;
 		}
 
@@ -3015,7 +3024,10 @@ public class ComWS extends PBase {
 
 			if (envioparcial) dbld.clear();
 
-			dbld.add("DELETE FROM D_REPFINDIA WHERE RUTA='" + gl.ruta + "'");
+            ss = "UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parVer+"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'";
+            dbld.add(ss);
+
+            dbld.add("DELETE FROM D_REPFINDIA WHERE RUTA='" + gl.ruta + "'");
 			dbld.insert("D_REPFINDIA", "WHERE (LINEA>=0)");
 
 			//if (envioparcial) commitSQL();

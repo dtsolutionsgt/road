@@ -61,9 +61,8 @@ public class Recarga extends PBase {
 		
 		mdoc=new clsDocMov(this,prn.prw,"Recarga",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 	}
-	
 
-	
+
 	// Events
 	
 	public void showProd(View view) {

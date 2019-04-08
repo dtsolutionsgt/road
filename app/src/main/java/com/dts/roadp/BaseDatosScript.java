@@ -1677,6 +1677,10 @@ public class BaseDatosScript {
 					"[DILUIR_BON] INTEGER NOT NULL,"+
 					"[PREIMPRESION_FACTURA] INTEGER NOT NULL,"+
 					"[MODIFICAR_MEDIA_PAGO] INTEGER NOT NULL,"+
+					"[IDIMPRESORA] TEXT NOT NULL,"+
+					"[NUMVERSION] TEXT NOT NULL,"+
+					"[FECHAVERSION] INTEGER NOT NULL,"+
+					"[ARQUITECTURA] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);
@@ -1912,6 +1916,7 @@ public class BaseDatosScript {
 					"[MODIFICADA] TEXT NOT NULL,"+
 					"[FECHA_CREADA] INTEGER NOT NULL,"+
 					"[FECHA_MODIFICADA] INTEGER NOT NULL,"+
+					"[MACADDRESS] TEXT NOT NULL,"+
 					"PRIMARY KEY ([IDIMPRESORA])"+
 			        ");";
 			database.execSQL(vSQL);

@@ -31,7 +31,7 @@ import java.lang.reflect.Field;
 public class MainActivity extends PBase {
 
 	private EditText txtUser,txtPass;
-	private TextView lblRuta,lblRTit,lblLogin;
+	private TextView lblRuta,lblRTit,lblLogin,lblVer;
 	private ImageView imgLogo;
 		
 	private clsLicence lic;
@@ -40,6 +40,7 @@ public class MainActivity extends PBase {
 	private boolean rutapos,scanning=false;
 	private String cs1,cs2,cs3,barcode;
 
+	private String parVer="9.4.1 / 08-Apr-2019";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,8 @@ public class MainActivity extends PBase {
         } catch (Exception e) {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
+
+
 	}
 
 	// Grant permissions
@@ -93,13 +96,17 @@ public class MainActivity extends PBase {
             super.InitBase();
 
             this.setTitle("ROAD");
+            gl.parVer=parVer;
 
   			txtUser= (EditText) findViewById(R.id.txtUser);
             txtPass= (EditText) findViewById(R.id.txtMonto);
             lblRuta= (TextView) findViewById(R.id.lblCDisp);
             lblRTit= (TextView) findViewById(R.id.lblCUsed);
             lblLogin= (TextView) findViewById(R.id.lblDir);
+            lblVer= (TextView) findViewById(R.id.textView10);
             imgLogo= (ImageView) findViewById(R.id.imgNext);
+
+            lblVer.setText("Version "+gl.parVer);
 
             // DB VERSION
             dbVers=new BaseDatosVersion(this,db,Con);

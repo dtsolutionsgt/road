@@ -1214,22 +1214,24 @@ public class ComWS extends PBase {
 		Cursor DT1;
 		int vCorelZ = 0;
 		float vGrandTotal = 0;
+        String vNumPlaca;
 
 		boolean vActualizaFD = true;
 
 		try {
 
-			sql = "SELECT CORELZ, GRANDTOTAL FROM P_HANDHELD";
+			sql = "SELECT NUMPLACA, CORELZ, GRANDTOTAL FROM P_HANDHELD";
 			DT1 = Con.OpenDT(sql);
 
 			if (DT1.getCount() > 0) {
 
 				DT1.moveToFirst();
 
-				vCorelZ = DT1.getInt(0);
-				vGrandTotal = DT1.getFloat(1);
+                vNumPlaca = DT1.getString(0);
+				vCorelZ = DT1.getInt(1);
+				vGrandTotal = DT1.getFloat(2);
 
-				sql = "UPDATE P_HANDHELD SET CORELZ = " + vCorelZ + ", GRANDTOTAL = " + vGrandTotal;
+				sql = "UPDATE P_HANDHELD SET CORELZ = " + vCorelZ + ", GRANDTOTAL = " + vGrandTotal + " WHERE NUMPLACA = '" + vNumPlaca + "'";
 				dbld.add(sql);
 			}
 
@@ -2673,6 +2675,90 @@ public class ComWS extends PBase {
 		return cor;
 	}
 
+	public void envio_D_MOV_en_dev() {
+		Cursor DT;
+		String cor;
+		int i, pc = 0, pcc = 0;
+
+		try {
+
+			sql = "SELECT COREL FROM D_MOV WHERE STATCOM='N'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() == 0) {
+				senv += "Inventario : " + pc + "\n";
+				return;
+			}
+
+			pcc = DT.getCount();
+			pc = 0;
+			i = 0;
+
+			DT.moveToFirst();
+
+			while (!DT.isAfterLast()) {
+
+				cor = DT.getString(0);
+
+				try {
+
+					i += 1;
+					fprog = "Inventario " + i;
+					wsStask.onProgressUpdate();
+
+					dbld.clear();
+
+					dbld.insert("D_MOV", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVD", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVDB", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVDCAN", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVDPALLET", "WHERE COREL='" + cor + "'");
+
+					dbld.add("INSERT INTO P_DEVOLUCIONES_SAP " +
+							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO,'', D.LOTE, 'N', GETDATE(), D.CANT, 'N'" +
+							" FROM D_MOV E INNER JOIN D_MOVD D ON E.COREL = D.COREL" +
+							" WHERE E.COREL = " + cor + "'" +
+							" UNION" +
+							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO,D.BARRA, '', 'N', GETDATE(), 1, 'N'" +
+							" FROM D_MOV E INNER JOIN D_MOVDB D ON E.COREL = D.COREL" +
+							" WHERE E.COREL = '" + cor + "'");
+
+					if (commitSQL() == 1) {
+						sql = "UPDATE D_MOV SET STATCOM='S' WHERE COREL='" + cor + "'";
+						db.execSQL(sql);
+
+						sql = "UPDATE D_MOVD SET CODIGOLIQUIDACION=0 WHERE COREL='" + cor + "'";
+						db.execSQL(sql);
+
+						pc += 1;
+
+					} else {
+						fterr += "\n" + sstr;
+					}
+
+				} catch (Exception e) {
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					fterr += "\n" + e.getMessage();
+				}
+
+				DT.moveToNext();
+			}
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+		}
+
+		if (pc != pcc) {
+				int pf = pcc - pc;
+				senv += "Inventario : " + pc + " , NO ENVIADO : " + pf + " \n";
+		} else {
+			senv += "Inventario : " + pc + "\n";
+		}
+	}
+
 	public void envio_D_MOV() {
 		Cursor DT;
 		String cor;
@@ -2711,6 +2797,15 @@ public class ComWS extends PBase {
 					dbld.insert("D_MOVDB", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_MOVDCAN", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_MOVDPALLET", "WHERE COREL='" + cor + "'");
+
+					dbld.add("INSERT INTO P_DEVOLUCIONES_SAP " +
+							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO,'', D.LOTE, 'N', GETDATE(), D.CANT, 'N'" +
+							" FROM D_MOV E INNER JOIN D_MOVD D ON E.COREL = D.COREL" +
+							" WHERE E.COREL = " + cor + "'" +
+							" UNION" +
+							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO,D.BARRA, '', 'N', GETDATE(), 1, 'N'" +
+							" FROM D_MOV E INNER JOIN D_MOVDB D ON E.COREL = D.COREL" +
+							" WHERE E.COREL = '" + cor + "'");
 
 					if (envioparcial) {
 						if (commitSQL() == 1) {

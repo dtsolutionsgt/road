@@ -13,17 +13,17 @@ public class appGlobals extends Application {
 
 	public String ruta,rutanom,sucur,rutatipo,rutatipog,vend,vendnom,gstr,gstr2,prod,um,umpres,umstock,cliente,clitipo;
 	public String ubas,emp, empnom,imgpath,umpeso,lotedf,impresora, tipoImpresora, codSupervisor, ayudante, ayudanteID, vehiculo, vehiculoID;
-	public String wsURL,bonprodid,pprodname,contrib,ateninistr,tcorel;
+	public String wsURL,bonprodid,bonbarid,bonbarprod,pprodname,contrib,ateninistr,tcorel;
 	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,vnivel,vnivprec,media;
 	public int autocom,pagomodo,filtrocli;
 	public long nuevaFecha,atentini;
 	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor,prectemp;
-	public boolean CellCom;
+	public boolean CellCom,closeDevBod;
 	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra;
-	public int tiponcredito;
-    public boolean vcredito,vcheque,vchequepost;
+	public int tiponcredito,validarCred;
+    public boolean vcredito,vcheque,vchequepost,validimp;
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,contlic,devol,modoadmin;
-	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo;
+	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
 	public int mpago;
 
 	//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true por defecto estará en false
@@ -32,14 +32,14 @@ public class appGlobals extends Application {
 	//Devolución Cliente
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;
 	public double dvfactor,dvpeso,dvprec,dvpreclista,dvtotal;
-	public int dvbrowse=0,tienelote;
+	public int dvbrowse=0,tienelote,facturaVen,brw=0;
     public boolean dvporpeso;
     public double dvdispventa;
     public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc;
 
 	// Parametros Extra
-	public String peModal,peMon,peFormatoFactura;
-	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec;
+	public String peModal,peMon,peFormatoFactura,CodDev;
+	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec,endPrint;
 	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre,peImprFactCorrecta;
 	public int peDec,peDecCant,peDecImp;
 	
@@ -67,5 +67,8 @@ public class appGlobals extends Application {
 	public Printer mPrinter=null;
 	public boolean mPrinterSet=false;
 	public String mPrinterIP;
+
+	//Cobros
+	public int escbro=0;
 
 }

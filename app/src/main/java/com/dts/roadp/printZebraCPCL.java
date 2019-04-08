@@ -1,11 +1,5 @@
 package com.dts.roadp;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,6 +19,12 @@ import com.zebra.sdk.printer.ZebraPrinterFactory;
 import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
 import com.zebra.sdk.printer.ZebraPrinterLinkOs;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+
 // Zebra "00:22:58:01:04:28"
 
 public class printZebraCPCL extends printBase {
@@ -36,10 +36,14 @@ public class printZebraCPCL extends printBase {
 	private ArrayList<String> lines = new ArrayList<String>();
 		
 	private String ss,statstr,dbg;
-	private boolean status;
-	
-	public printZebraCPCL(Context context,String printerMAC) {
+	private boolean status,validprint;;
+
+	// ZQ320 AC:3F:A4:C8:5F:D9
+
+
+	public printZebraCPCL(Context context,String printerMAC,boolean validprinter) {
 		super(context,printerMAC);
+		validprint=validprinter;
 	}
 
 	// Main
@@ -49,14 +53,14 @@ public class printZebraCPCL extends printBase {
 		hasCallback=true;
 		callback=callBackHook;
 
-		fname="print.txt";errmsg="";
+		fname="print.txt";errmsg="";exitprint=false;
 		msgAskPrint();
 	}
 
 	public void printask() {
 		hasCallback=false;
 
-		fname="print.txt";errmsg="";
+		fname="print.txt";errmsg="";exitprint=false;
 		msgAskPrint();				
 	}
 
@@ -76,7 +80,7 @@ public class printZebraCPCL extends printBase {
 	public void printask(String fileName) {	
 		hasCallback=false;
 
-		fname=fileName;	errmsg="";
+		fname=fileName;	errmsg="";exitprint=false;
 		msgAskPrint();				
 	}
 
@@ -183,12 +187,13 @@ public class printZebraCPCL extends printBase {
 
 		return prdata;
 	}
-	
 
 	private void doStartPrint() {
+		if (!validprint) {
+			showmsg("¡La impresora no está autorizada!");return;
+		}
+
 		showmsg("Imprimiendo ..." );
-		//showmsg("MAC : "+printerAddress );
-		
 		status=true;
 		
 		new Thread(new Runnable() {
@@ -232,6 +237,7 @@ public class printZebraCPCL extends printBase {
             }, 500);
         } catch (Exception e) {}
 
+        /*
         try {
             //#EJC201800: Llamar el close de la printer
             final Handler cbhandler1 = new Handler();
@@ -244,7 +250,7 @@ public class printZebraCPCL extends printBase {
                 }
             }, 200);
         } catch (Exception e) {}
-
+		*/
 	}
 
 	
@@ -330,6 +336,7 @@ public class printZebraCPCL extends printBase {
 		dialog.setTitle(R.string.app_name);
 		dialog.setMessage("Impresora está lista ?");
 
+		dialog.setCancelable(false);
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {			      	
 				try {

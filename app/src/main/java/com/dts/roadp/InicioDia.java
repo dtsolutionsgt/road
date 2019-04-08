@@ -68,9 +68,9 @@ public class InicioDia extends PBase implements View.OnClickListener{
             }
         };
 
-        prn=new printer(this,printclose);
-        doc=new clsDocExist(this,prn.prw);
-        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp);
+        prn=new printer(this,printclose,gl.validimp);
+        doc=new clsDocExist(this,prn.prw, "");
+        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "");
 
         listItems();
 
@@ -198,8 +198,8 @@ public class InicioDia extends PBase implements View.OnClickListener{
 
     private class clsDocExist extends clsDocument {
 
-        public clsDocExist(Context context, int printwidth) {
-            super(context, printwidth,gl.peMon,gl.peDecImp);
+        public clsDocExist(Context context, int printwidth, String archivo) {
+            super(context, printwidth,gl.peMon,gl.peDecImp, archivo);
 
             nombre="Existencias";
             numero="";

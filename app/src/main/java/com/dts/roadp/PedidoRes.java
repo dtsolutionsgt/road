@@ -103,8 +103,8 @@ public class PedidoRes extends PBase {
 		    }
 		};
 		
-		prn=new printer(this,printclose);
-		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp);
+		prn=new printer(this,printclose,gl.validimp);
+		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp, "");
 	}
 		
 	

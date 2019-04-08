@@ -28,11 +28,15 @@ public class DevolCli extends PBase {
 
 	private double cntprd=0.0,cntunis=0.0,cntkgs=0.0,cntotl=0.0;
 
+	private printer prn;
+	private clsDocDevolucion fdevol;
+	public Runnable printclose;
+
 	private String cliid,itemid,prodid;
 	private double cant;
 	private String emp,estado;
 	private int itempos;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -59,6 +63,17 @@ public class DevolCli extends PBase {
 		
 		clearData();
 
+		printclose= new Runnable() {
+			public void run() {
+				limpiavariables_devol();
+				DevolCli.super.finish();
+			}
+		};
+
+
+		prn=new printer(this,printclose,gl.validimp);
+		fdevol=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+		fdevol.deviceid =gl.deviceId;
 	}
 
 
@@ -176,7 +191,8 @@ public class DevolCli extends PBase {
             cntotl = mu.round(cntotl + DT.getDouble(6),gl.peDec);
 
 			  items.add(vItem);	
-			 
+
+			 // vItem.Cod = gl.CodDev;
 			  DT.moveToNext();
 			}
 
@@ -326,7 +342,7 @@ public class DevolCli extends PBase {
             ins.add("UMSTOCK",gl.dvumstock);
             ins.add("UMPESO",gl.dvumpeso);
             ins.add("FACTOR",gl.dvfactor);
-            ins.add("POR_PESO",String.valueOf(gl.dvporpeso));
+            ins.add("POR_PESO",(gl.dvporpeso?"S":"N"));
 			ins.add("TIENE_LOTE",gl.tienelote);
 
 	    	db.execSQL(ins.sql());
@@ -394,7 +410,7 @@ public class DevolCli extends PBase {
                 ins.add("TOTAL",cntotl);
                 ins.add("FACTURA",gl.dvcorreld);
                 ins.add("SERIE","0");
-                ins.add("CORELATIVO","0");
+                ins.add("CORELATIVO",gl.dvactualnc);
                 ins.add("STATCOM","N");
                 ins.add("CODIGOLIQUIDACION",0);
                 ins.add("RESOLNC","N");
@@ -488,7 +504,9 @@ public class DevolCli extends PBase {
                 gl.closeCliDet = true;
                 gl.closeVenta = true;
 
-                super.finish();
+
+				createDoc();
+				//msgAskSave("Aplicar pago y crear un recibo");
 
             }else{
 
@@ -513,12 +531,73 @@ public class DevolCli extends PBase {
 		}
 	}
 
+/*	private void msgAskSave(String msg) {
+
+		try{
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg + "?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setCancelable(false);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					createDoc();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					closekeyb();
+				}
+			});
+
+			dialog.show();
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}*/
+
+	private void createDoc(){
+
+		try{
+
+			if (prn.isEnabled()) {
+				fdevol.buildPrint(gl.dvcorreld,0);
+				//#CKFK 20190401 09:47AM Agregué la funcionalidad de enviar el nombre del archivo a imprimir
+				prn.printask(printclose, "printnc.txt");
+			}
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox("createDoc: " + e.getMessage());
+		}
+
+	}
+
 	private void delItem(){
+
 		try {
+
 			db.execSQL("DELETE FROM T_CxCD WHERE CODIGO='"+prodid+"'");
+
 			listItems();
+
 			adapter=new ListAdaptDevCli(this,items);
 			listView.setAdapter(adapter);
+
+			//#CKFK_20190328 Mostrar Totales
+			lblCantProds.setText(String.valueOf(cntprd));
+			lblCantUnd.setText(String.valueOf(cntunis));
+			lblCantKgs.setText(String.valueOf(cntkgs));
+			lblCantTotal.setText(mu.frmcur(cntotl));
+
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
@@ -579,15 +658,17 @@ public class DevolCli extends PBase {
 
 			dialog.setIcon(R.drawable.ic_quest);
 
+			dialog.setCancelable(false);
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					doExit();
+					closekeyb();
 				}
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					;
+					closekeyb();
 				}
 			});
 
@@ -620,6 +701,7 @@ public class DevolCli extends PBase {
 				}
 			});
 
+			dialog.setCancelable(false);
 			dialog.show();
 
 		}catch (Exception e){
@@ -640,7 +722,6 @@ public class DevolCli extends PBase {
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					delItem();
-
 				}
 			});
 
@@ -677,7 +758,7 @@ public class DevolCli extends PBase {
             sql="DELETE FROM T_CxCD";
             db.execSQL(sql);
 
-			super.finish();
+			DevolCli.super.finish();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -686,6 +767,7 @@ public class DevolCli extends PBase {
 
 	private void limpiavariables_devol(){
 
+		gl.tiponcredito=0;
 		gl.devtipo ="";
 		gl.devrazon = "";
 		gl.dvumventa = "";

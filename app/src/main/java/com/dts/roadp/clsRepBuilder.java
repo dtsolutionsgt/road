@@ -1,14 +1,17 @@
 package com.dts.roadp;
 
+import android.content.Context;
+import android.os.Environment;
+import android.view.ViewDebug;
+import android.widget.Toast;
+
+import org.apache.commons.lang.StringUtils;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.apache.commons.lang.StringUtils;
-import android.content.Context;
-import android.os.Environment;
-import android.widget.Toast;
 
 
 public class clsRepBuilder {
@@ -26,7 +29,7 @@ public class clsRepBuilder {
 	private double aux;
 	private String frmstr,ts;
 	
-	public clsRepBuilder(Context context,int printwidth,boolean regular,String cursymbol,int decimpres) {
+	public clsRepBuilder(Context context,int printwidth,boolean regular,String cursymbol,int decimpres, String archivo) {
 		
 		cont=context; 
 		prw=printwidth;
@@ -41,8 +44,12 @@ public class clsRepBuilder {
 		
 		System.setProperty("line.separator","\r\n");
 		if (regular) {
-			fname = Environment.getExternalStorageDirectory()+"/print.txt";	
-		} else {	
+			if (!archivo.isEmpty()){
+				fname = Environment.getExternalStorageDirectory()+"/"+archivo;
+			}else{
+				fname = Environment.getExternalStorageDirectory()+"/print.txt";
+			}
+		} else {
 			fname = Environment.getExternalStorageDirectory()+"/SyncFold/findia.txt";	
 		}
 		
@@ -73,34 +80,77 @@ public class clsRepBuilder {
 	public boolean save(){
 		String s;
 		int lns=0;
-				
+
 		if (items.size()==0) return true;
-		
+
 		try {
-		 				
+
 			wfile=new FileWriter(fname,false);
 			writer = new BufferedWriter(wfile);
-			
-		    for (int i = 0; i < items.size(); i++) {
-			   	try {
+
+			for (int i = 0; i < items.size(); i++) {
+				try {
 					s=trim(items.get(i));
 				} catch (Exception e) {
 					s="";
-				}	
-			   	
-			   	writer.write(s);writer.write("\r\n");lns++;
+				}
+
+				writer.write(s);writer.write("\r\n");lns++;
 			}
-			
-		    writer.close();	    
-		    items.clear();
-		    
+
+			writer.close();
+			items.clear();
+
 		} catch(Exception e){
 			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_LONG).show();
 			return false;
 		}
-				
-		return true;		
-	}	
+
+		return true;
+	}
+
+	public boolean save(int cnt){
+		String s;
+		int lns=0;
+
+		if (items.size()==0) return true;
+
+		try {
+
+			wfile=new FileWriter(fname,false);
+			writer = new BufferedWriter(wfile);
+
+			for (int j = 0; j < cnt; j++) {
+
+				for (int i = 0; i < items.size(); i++) {
+					try {
+						s = trim(items.get(i));
+					} catch (Exception e) {
+						s = "";
+					}
+
+					writer.write(s);
+					writer.write("\r\n");
+					lns++;
+				}
+
+				writer.write("\r\n");
+				writer.write("\r\n");
+				writer.write("\r\n");
+				writer.write("\r\n");
+
+			}
+
+			writer.close();
+			items.clear();
+
+		} catch(Exception e){
+			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_LONG).show();
+			return false;
+		}
+
+		return true;
+	}
 
 	public void clear(){
 		items.clear();
@@ -228,8 +278,16 @@ public class clsRepBuilder {
 		sval=cursym+decfrm.format(val);
 		ts=ltrim(s1,prw-13)+" "+rtrim(sval,12);
 		items.add(ts);
-	}	
-	
+	}
+
+	public void addtotpeso(String s1,double val) {
+		String sval;
+
+		sval = Double.toString(val);
+		ts=ltrim(s1,prw-13)+" "+rtrim(sval,12);
+		items.add(ts);
+	}
+
 	public void addtotsp(String s1,double val) {
 		String sval;
 		
@@ -285,7 +343,7 @@ public class clsRepBuilder {
 	public void addp(String s1,String val) {
 		String ss,s3;
 		
-		s1=StringUtils.rightPad(s1,25);ss=s1+"\t";
+		s1=StringUtils.rightPad(s1,24);ss=s1+"";
 		s3=val;
 		s3=StringUtils.leftPad(s3,12);ss+=s3;
 		

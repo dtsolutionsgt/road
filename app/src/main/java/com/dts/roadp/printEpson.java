@@ -24,7 +24,7 @@ public class printEpson extends printBase{
 	private Device mDevice = null;
 	private Printer mPrinter = null;
 	private final int mRequestCode = 1001;
-    
+
 	
 	public printEpson(Context context,String printerMAC,Device device,Printer printer) {
 		super(context,printerMAC);
@@ -236,7 +236,8 @@ public class printEpson extends printBase{
 		    	
 		dialog.setTitle(R.string.app_name);
 		dialog.setMessage("Impresora está lista ?");
-						
+
+		dialog.setCancelable(false);
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {			      	
 		    	try {

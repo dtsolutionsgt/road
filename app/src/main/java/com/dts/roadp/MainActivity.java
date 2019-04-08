@@ -31,7 +31,7 @@ import java.lang.reflect.Field;
 public class MainActivity extends PBase {
 
 	private EditText txtUser,txtPass;
-	private TextView lblRuta,lblRTit;
+	private TextView lblRuta,lblRTit,lblLogin;
 	private ImageView imgLogo;
 		
 	private clsLicence lic;
@@ -57,12 +57,14 @@ public class MainActivity extends PBase {
 	// Grant permissions
 
 	private void grantPermissions() {
+
 		try {
 			if (Build.VERSION.SDK_INT >= 20) {
 
 				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
 						&& checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
 						&& checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
+                        && checkCallingOrSelfPermission(Manifest.permission.WAKE_LOCK)   == PackageManager.PERMISSION_GRANTED
 						&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
                         && checkSelfPermission(Manifest.permission.READ_PHONE_STATE)== PackageManager.PERMISSION_GRANTED)
 				{
@@ -73,6 +75,7 @@ public class MainActivity extends PBase {
 							Manifest.permission.ACCESS_FINE_LOCATION,
 							Manifest.permission.CALL_PHONE,
 							Manifest.permission.CAMERA,
+                            Manifest.permission.WAKE_LOCK,
                             Manifest.permission.READ_PHONE_STATE
                         }, 1);
 				}
@@ -95,6 +98,7 @@ public class MainActivity extends PBase {
             txtPass= (EditText) findViewById(R.id.txtMonto);
             lblRuta= (TextView) findViewById(R.id.lblCDisp);
             lblRTit= (TextView) findViewById(R.id.lblCUsed);
+            lblLogin= (TextView) findViewById(R.id.lblDir);
             imgLogo= (ImageView) findViewById(R.id.imgNext);
 
             // DB VERSION
@@ -126,26 +130,17 @@ public class MainActivity extends PBase {
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 	    try{
-            Toast.makeText(this,"req : "+requestCode, Toast.LENGTH_SHORT).show();
-
-            //switch (requestCode) {
-
-            //case 0:
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.READ_PHONE_STATE)== PackageManager.PERMISSION_GRANTED)
             {
-                Toast.makeText(this, "GRANTED : " + requestCode, Toast.LENGTH_SHORT).show();
                 startApplication();
             } else {
-                Toast.makeText(this, "failed " + requestCode, Toast.LENGTH_SHORT).show();
-                super.finish();
+                 super.finish();
             }
-            //break;
-            //}
-        }catch (Exception e){
+          }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
@@ -184,17 +179,15 @@ public class MainActivity extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
-
 	}
 	
 	public void doRegister(View view) {
 	    try{
-            startActivity(new Intent(this, LicRegis.class));
+            //startActivity(new Intent(this, LicRegis.class));
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
-
 	}
 
 	private void setHandlers() {
@@ -366,42 +359,46 @@ public class MainActivity extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		//Id de Dispositivo
-		gl.deviceId = androidid();
+        //Id de Dispositivo
+        gl.deviceId = androidid();
 
-		try {
-			AppMethods app = new AppMethods(this, gl, Con, db);
-			app.parametrosExtra();
-		} catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			msgbox(e.getMessage());
-		}
+        try {
+            AppMethods app = new AppMethods(this, gl, Con, db);
+            app.parametrosExtra();
+        } catch (Exception e) {
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(e.getMessage());
+        }
 
-	}
+    }
 
-	private void processLogIn() {
-		if (gl.contlic) {
-			if (!validaLicencia()) {
-				mu.msgbox("¡Licencia invalida!");
-				return;
-			}
-		}
+    private void processLogIn() {
+        lblLogin.setVisibility(View.INVISIBLE);
 
-		if (checkUser()) gotoMenu();
-	}
+        if (gl.contlic) {
+            if (!validaLicencia()) {
+                lblLogin.setVisibility(View.VISIBLE);
+                mu.msgbox("¡Licencia invalida!");
+                return;
+            }
+        }
 
-	private boolean checkUser() {
-		Cursor DT;
-		String usr, pwd, dpwd;
+        if (checkUser()) gotoMenu();else lblLogin.setVisibility(View.VISIBLE);
+    }
 
-		try {
+    private boolean checkUser() {
+        Cursor DT;
+        String usr, pwd, dpwd;
 
-		if (fecha>1903310000) {
-			msgAskLic("¡Su licencia expiró!");return false;
-		}
+        try {
 
-		usr = txtUser.getText().toString().trim();
-		pwd = txtPass.getText().toString().trim();
+            if (fecha > 1904310000) {
+                msgAskLic("¡Su licencia expiró!");
+                return false;
+            }
+
+            usr = txtUser.getText().toString().trim();
+            pwd = txtPass.getText().toString().trim();
 
             if (mu.emptystr(usr)) {
                 mu.msgbox("Usuario incorrecto.");
@@ -427,40 +424,32 @@ public class MainActivity extends PBase {
                 return false;
             }
 
-            try {
+            sql = "SELECT NOMBRE,CLAVE,NIVEL,NIVELPRECIO FROM P_VENDEDOR WHERE CODIGO='" + usr + "'";
+            DT = Con.OpenDT(sql);
 
-                sql = "SELECT NOMBRE,CLAVE,NIVEL,NIVELPRECIO FROM P_VENDEDOR WHERE CODIGO='" + usr + "'";
-                DT = Con.OpenDT(sql);
-
-                if (DT.getCount() == 0) {
-                    mu.msgbox("Usuario incorrecto !");
-                    return false;
-                }
-
-                DT.moveToFirst();
-                dpwd = DT.getString(1);
-                if (!pwd.equalsIgnoreCase(dpwd)) {
-                    mu.msgbox("Contraseña incorrecta !");
-                    return false;
-                }
-
-                gl.vendnom = DT.getString(0);
-                gl.vend = usr;
-                gl.vnivel = DT.getInt(2);
-                gl.vnivprec = DT.getInt(3);
-
-                return true;
-
-            } catch (Exception e) {
-                addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-                mu.msgbox(e.getMessage());
+            if (DT.getCount() == 0) {
+                mu.msgbox("Usuario incorrecto !");
                 return false;
             }
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+
+            DT.moveToFirst();
+            dpwd = DT.getString(1);
+            if (!pwd.equalsIgnoreCase(dpwd)) {
+                mu.msgbox("Contraseña incorrecta !");
+                return false;
+            }
+
+            gl.vendnom = DT.getString(0);
+            gl.vend = usr;
+            gl.vnivel = DT.getInt(2);
+            gl.vnivprec = DT.getInt(3);
+
+            return true;
+
+        } catch (Exception e) {
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             return false;
         }
-
 
 	}
 
@@ -764,6 +753,7 @@ public class MainActivity extends PBase {
             super.onResume();
             initSession();
             txtUser.requestFocus();
+            lblLogin.setVisibility(View.VISIBLE);
         }catch (Exception e){
            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }

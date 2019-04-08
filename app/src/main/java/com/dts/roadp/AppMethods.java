@@ -369,7 +369,7 @@ public class AppMethods {
 
             return  DT.getInt(0)==1;
         } catch (Exception e) {
-            toast(e.getMessage());
+            //toast(e.getMessage());
             return false;
         }
     }
@@ -622,6 +622,67 @@ public class AppMethods {
 			return 0;
 		}
 	}
+
+	public double factorPres(String cod,String umventa,String umstock) {
+		Cursor DT;
+		String sql;
+
+		try {
+			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
+				"WHERE (UNIDADSUPERIOR='"+umventa+"') AND (UNIDADMINIMA='"+umstock+"')";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount()==0) {
+				sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
+					"WHERE (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+umventa+"')";
+				DT = Con.OpenDT(sql);
+			}
+
+			DT.moveToFirst();
+
+			return  DT.getDouble(0);
+		} catch (Exception e) {
+			return 1;
+		}
+	}
+
+	public boolean validaImpresora(String prid) {
+		CryptUtil cu=new CryptUtil();
+		Cursor dt;
+		String se,sd;
+
+		if (prid.equalsIgnoreCase("*")) {
+			try {
+				sql = "SELECT PUERTO_IMPRESION FROM P_ARCHIVOCONF";
+				dt = Con.OpenDT(sql);
+				dt.moveToFirst();
+
+				prid = dt.getString(0);
+			} catch (Exception e) {
+				prid="..";
+			}
+		}
+
+		try {
+			sql="SELECT NUMSERIE FROM P_IMPRESORA";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0) dt.moveToFirst();
+			while (!dt.isAfterLast()) {
+				se=dt.getString(0);
+				sd=cu.decrypt(se);
+
+				if (sd.equalsIgnoreCase(prid)) return true;
+
+				dt.moveToNext();
+			}
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return false;
+	}
+
 
 
 	// Common

@@ -1,9 +1,10 @@
 package com.dts.roadp;
 
-import datamaxoneil.connection.ConnectionBase;
-import datamaxoneil.printer.DocumentLP;
 import android.content.Context;
 import android.os.Handler;
+
+import datamaxoneil.connection.ConnectionBase;
+import datamaxoneil.printer.DocumentLP;
 
 public class printBase {
 
@@ -11,6 +12,7 @@ public class printBase {
 	public Runnable printclose;
 	public String errmsg;
 	public int prwidth;
+	public boolean exitprint=false;
 	
 	protected Context cont;
 	 
@@ -37,7 +39,19 @@ public class printBase {
 		hasCallback=true;
 		callback=callBackHook;
 	}
-	
+
+	public void printask(Runnable callBackHook, String fName) {
+		hasCallback=true;
+		callback=callBackHook;
+		fname=fName;
+	}
+
+	public void printnoask(Runnable callBackHook, String fName) {
+		hasCallback=true;
+		callback=callBackHook;
+		fname=fName;
+	}
+
 	public void printask() {
 		hasCallback=false;
 	}

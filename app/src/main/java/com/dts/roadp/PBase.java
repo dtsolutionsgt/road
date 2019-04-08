@@ -149,26 +149,34 @@ public class PBase extends Activity {
 		}
 	}
 
+	protected String iif(boolean condition,String valtrue,String valfalse) {
+		if (condition) return valtrue;else return valfalse;
+	}
+
+	protected double iif(boolean condition,double valtrue,double valfalse) {
+		if (condition) return valtrue;else return valfalse;
+	}
+
+	protected double iif(boolean condition,int valtrue,int valfalse) {
+		if (condition) return valtrue;else return valfalse;
+	}
+
 
 	// Activity Events
 	
 	@Override
  	protected void onResume() {
-		try{
+		try {
 			opendb();
-
-		}catch(Exception ex){
-
-		}
-
+		} catch(Exception ex) {}
 		super.onResume();
 	}
 
 	@Override
 	protected void onPause() {
 		try {
-			Con.close();   } 
-		catch (Exception e) { }
+			Con.close();
+		} catch (Exception e) { }
 		active= 0;
 	    super.onPause();
 	}
@@ -181,16 +189,14 @@ public class PBase extends Activity {
 	public void opendb() {
 		try {
 			db = Con.getWritableDatabase();
-			if (db!= null)
-			{
-				Con.vDatabase =db;
+			if (db!= null) {
+				Con.vDatabase=db;
 				active=1;
-			}else{
+			} else {
 				active = 0;
 			}
 	    } catch (Exception e) {
-	    	mu.msgbox(e.getMessage());
-	    	active= 0;
+	    	mu.msgbox(e.getMessage());	active= 0;
 	    }
 	}			
 	

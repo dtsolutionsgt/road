@@ -1,32 +1,35 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
-import com.dts.roadp.clsClasses.clsCFDV;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class clsDocFactura extends clsDocument {
 
 	private ArrayList<itemData> items= new ArrayList<itemData>();
-	
-	private double tot,desc,imp,stot,percep;
+	private ArrayList<itemData> bons= new ArrayList<itemData>();
+
+	private double tot,desc,imp,stot,percep,totNotaC;
 	private boolean sinimp;
-	private String 	contrib;
+	private String 	contrib,corelNotaC,asignacion,ccorel;
 	private int decimp,diacred,totitems;
-			
-	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres) {
-		super(context, printwidth,cursymbol,decimpres);
+
+
+	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres, String archivo) {
+		super(context, printwidth,cursymbol,decimpres, archivo);
+
 		docfactura=true;
+		docdevolucion=false;
+		docpedido=false;
+		docrecibo=false;
 		decimp=decimpres;
 	}
 
-
 	protected boolean loadHeadData(String corel) {
 		Cursor DT;
-		String cli,vend,val,empp;
+		String cli="",vend="",val,empp="";
 		int ff;
 				
 		super.loadHeadData(corel);
@@ -55,9 +58,11 @@ public class clsDocFactura extends clsDocument {
 			
 			add1=DT.getString(10);
 			add2=DT.getString(11);
-			
+
+			vendcod=vend;
+
 		} catch (Exception e) {
-			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
+			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 	    }	
 		
 		try {
@@ -73,7 +78,7 @@ public class clsDocFactura extends clsDocument {
 			resrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
 			
 		} catch (Exception e) {
-			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
+			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 	    }	
 		
 		try {
@@ -162,13 +167,39 @@ public class clsDocFactura extends clsDocument {
 	
 	protected boolean loadDocData(String corel) {
 		Cursor DT;
-		itemData item;
-		
+		itemData item,bon;
+		String serie,corNota;
+		int corrl;
+
+		ccorel=corel;
+
 		loadHeadData(corel);
 		
-		items.clear();
+		items.clear();bons.clear();
 		
 		try {
+
+            sql="SELECT N.COREL, N.TOTAL, F.ASIGNACION " +
+                "FROM D_FACTURA F INNER JOIN D_NOTACRED N ON F.ASIGNACION = N.COREL " +
+                "WHERE F.COREL = '"+corel+"'";
+
+            DT=Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            if(DT.getCount() != 0){
+
+				corelNotaC = DT.getString(0);
+				totNotaC = DT.getDouble(1);
+				asignacion = DT.getString(2);
+
+			}else{
+
+            	corelNotaC = "";
+            	asignacion = "*";
+            	totNotaC = 0;
+
+            }
+
 			sql="SELECT D_FACTURAD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_FACTURAD.CANT,D_FACTURAD.PRECIODOC,D_FACTURAD.IMP, D_FACTURAD.DES,D_FACTURAD.DESMON, D_FACTURAD.TOTAL, D_FACTURAD.UMVENTA, D_FACTURAD.UMPESO, D_FACTURAD.PESO " +
 				"FROM D_FACTURAD INNER JOIN P_PRODUCTO ON D_FACTURAD.PRODUCTO = P_PRODUCTO.CODIGO " +
 				"WHERE (D_FACTURAD.COREL='"+corel+"')";	
@@ -178,33 +209,63 @@ public class clsDocFactura extends clsDocument {
 			totitems=DT.getCount();
 
 			while (!DT.isAfterLast()) {
-		
-				item =new itemData();
-		  	
-				item.cod=DT.getString(0);
-				item.nombre=DT.getString(1);
-				
-				item.cant=DT.getDouble(2);
-				item.prec=DT.getDouble(3);
-				item.imp=DT.getDouble(4);
-				item.descper=DT.getDouble(5);
-				item.desc=DT.getDouble(6);
-				item.tot=DT.getDouble(7);				
-				item.um=DT.getString(8);
-				item.ump=DT.getString(9);
-				item.peso=DT.getDouble(10);
 
-				if (sinimp) item.tot=item.tot-item.imp;
-				
-				//Toast.makeText(cont,item.cod+" "+item.imp+"   "+item.tot, Toast.LENGTH_SHORT).show();
-				
-				items.add(item);	
-				DT.moveToNext();					
-			}				
-			
+                item = new itemData();
+
+                item.cod = DT.getString(0);
+                item.nombre = DT.getString(1);
+
+                item.cant = DT.getDouble(2);
+                item.prec = DT.getDouble(3);
+                item.imp = DT.getDouble(4);
+                item.descper = DT.getDouble(5);
+                item.desc = DT.getDouble(6);
+                item.tot = DT.getDouble(7);
+                item.um = DT.getString(8);
+                item.ump = DT.getString(9);
+                item.peso = DT.getDouble(10);
+
+                if (sinimp) item.tot = item.tot - item.imp;
+
+                items.add(item);
+                DT.moveToNext();
+            }
+
+
+			try {
+				sql = "SELECT D_BONIF.PRODUCTO,P_PRODUCTO.DESCLARGA AS NOMBRE,D_BONIF.CANT, D_BONIF.UMVENTA, D_BONIF.CANT*D_BONIF.FACTOR AS TPESO " +
+						"FROM D_BONIF INNER JOIN P_PRODUCTO ON D_BONIF.PRODUCTO = P_PRODUCTO.CODIGO " +
+						"WHERE (D_BONIF.COREL='" + ccorel + "')";
+				sql += "UNION ";
+				sql += "SELECT D_BONIF_BARRA.PRODUCTO,P_PRODUCTO.DESCLARGA AS NOMBRE,COUNT(D_BONIF_BARRA.BARRA) AS CANT, D_BONIF_BARRA.UMSTOCK, SUM(D_BONIF_BARRA.PESO) AS TPESO " +
+						"FROM D_BONIF_BARRA INNER JOIN P_PRODUCTO ON D_BONIF_BARRA.PRODUCTO = P_PRODUCTO.CODIGO " +
+						"WHERE (D_BONIF_BARRA.COREL='" + ccorel + "') " +
+						"GROUP BY D_BONIF_BARRA.PRODUCTO,P_PRODUCTO.DESCLARGA,D_BONIF_BARRA.UMVENTA ";
+				sql += "ORDER BY NOMBRE ";
+
+				DT=Con.OpenDT(sql);
+				if (DT.getCount()>0) DT.moveToFirst();
+
+				while (!DT.isAfterLast()) {
+
+					bon = new itemData();
+
+					bon.cod = DT.getString(0);
+					bon.nombre = DT.getString(1);
+					bon.cant = DT.getDouble(2);
+					bon.um = DT.getString(3);
+					bon.peso = DT.getDouble(4);
+
+					bons.add(bon);
+					DT.moveToNext();
+				}
+
+			} catch (Exception e) {
+				Toast.makeText(cont,"Impresion bonif : "+e.getMessage(), Toast.LENGTH_LONG).show();
+			}
+
 		} catch (Exception e) {
-			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();
-			
+			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();
 	    }		
 		
 		return true;
@@ -224,7 +285,7 @@ public class clsDocFactura extends clsDocument {
 		itemData item;
 		String ss;
 
-		rep.line();
+
 		rep.add("CODIGO   DESCRIPCION        UM  CANT");
 		rep.add("       KGS    PRECIO           VALOR");
 		rep.line();
@@ -244,6 +305,7 @@ public class clsDocFactura extends clsDocument {
 
 		rep.line();
 
+
 		return true;
 	}
 
@@ -251,7 +313,7 @@ public class clsDocFactura extends clsDocument {
 		itemData item;
 		String cu,cp;
 
-		rep.line();
+
 		rep.add3fact("Cantidad      Peso","  Precio","Total");
 		rep.line();
 
@@ -271,58 +333,41 @@ public class clsDocFactura extends clsDocument {
 		return true;
 	}
 
+	// Bonificaciones
 
-	// Encabezado por empresa
+	private void bonificaciones() {
+		itemData item;
+		String ss;
 
-	@Override
-	protected void saveHeadLines(int reimpres) {
+		if (bons.size()==0) return;
 
+		rep.line();
+		rep.add("----   B O N I F I C A C I O N  ----");
+		rep.line();
+		rep.add("CODIGO   DESCRIPCION        UM  CANT");
+		rep.add("       KGS    ");
+		rep.line();
 
-		if (modofact.equalsIgnoreCase("*")) super.saveHeadLines(reimpres);
-		if (modofact.equalsIgnoreCase("TOL")) headerToledano(reimpres);
+		for (int i = 0; i <bons.size(); i++) {
+
+			item=bons.get(i);
+
+			ss=rep.ltrim(item.cod+" "+item.nombre,prw-10);
+			ss=ss+rep.rtrim(item.um,4)+" "+rep.rtrim(frmdecimal(item.cant,2),5);
+			rep.add(ss);
+			ss=rep.rtrim(frmdecimal(item.peso,2),10);
+			ss=rep.ltrim(ss,prw-10);
+			rep.add(ss);
+
+		}
+
+		rep.line();
+
+		rep.add("");
+		rep.add("");
+		rep.add("");
+		rep.add("");
 	}
-
-	private void headerToledano(int reimpres) {
-		String s,sc,ss;
-
-		rep.empty();rep.empty();
-
-		for (int i = 0; i <lines.size(); i++) 		{
-			s=lines.get(i);
-			s=encabezado(s);
-
-			ss=s.replace(" ","");
-			if (ss.equalsIgnoreCase("FACTURA")) {
-				if (reimpres==4) s="- FACTURA PENDIENTE  DE  PAGO -";
-			}
-
-			if (!s.equalsIgnoreCase("@@")) rep.add(s);
-		}
-
-		sc="CONDICIONES DE PAGO: ";
-		if (diacred==0) sc+="CONTADO"; else sc+="CREDITO "+diacred+" DIAS";
-		rep.add(sc);
-		rep.empty();
-		rep.add("Fecha: "+sfecha(ffecha)+" Hora: "+shora(ffecha));
-		rep.empty();
-
-		if (!emptystr(add1)) {
-			rep.add("");
-			rep.add(add1);
-			if (!emptystr(add2)) rep.add(add2);
-			rep.add("");
-		}
-
-		if (docfactura && (reimpres==1)) rep.add("------  R E I M P R E S I O N  ------");
-		if (docfactura && (reimpres==2)) rep.add("------       C O P I A         ------");
-		if (docfactura && (reimpres==3)) rep.add("------      A N U L A D O      ------");
-		if(docfactura && (reimpres==4)) {
-			rep.add("- FACTURA PENDIENTE  DE  PAGO -");
-			pendiente = reimpres;
-		}
-
-	}
-
 
 	// Pie por empresa
 
@@ -370,32 +415,69 @@ public class clsDocFactura extends clsDocument {
 	}
 
 	private boolean footerToledano() {
-		double totimp, totperc;
+		double totimp, totperc,totalNotaC;
 
 		stot = stot - imp;
 		totperc = stot * (percep / 100);
 		totperc = round2(totperc);
 		totimp = imp - totperc;
+		totalNotaC =   tot - totNotaC;
 
 		rep.addtotsp("Subtotal", stot);
-		rep.addtotsp("ITBM", totimp);
-		rep.addtotsp("Total", tot);
-		rep.add("");
-		rep.add("Total de items: "+totitems);
-		rep.add("");
-		rep.add("");
-		rep.line();
-		rep.addc("Firma Cliente");
-		rep.add("");
-		rep.addc("DE SER UNA VENTA AL CREDITO, SOLAMEN");
-		rep.addc("TE NUESTRO CORRESPONDIENTE RECIBO SE");
-		rep.addc("CONSIDERARA COMO EVIDENCIA  DE  PAGO");
-		rep.add("");
 
-		rep.add("Serial : "+deviceid);
-		rep.add(resol);
-		rep.add(resfecha);
-		rep.add("");
+		if (corelNotaC.equals(asignacion)) {
+
+			rep.addtotsp("Nota de Credito", totNotaC);
+			rep.addtotsp("ITBM", totimp);
+			rep.addtotsp("Total", totalNotaC);
+			rep.add("");
+			rep.add("");
+			rep.add("Total de items: "+totitems);
+			rep.add("");
+			bonificaciones();
+			rep.add("");
+			rep.line();
+			rep.addc("Firma Cliente");
+			rep.add("");
+			rep.addc("Se aplico nota de credito: "+corelNotaC);
+			rep.add("");
+			rep.addc("DE SER UNA VENTA AL CREDITO, SOLAMEN");
+			rep.addc("TE NUESTRO CORRESPONDIENTE RECIBO SE");
+			rep.addc("CONSIDERARA COMO EVIDENCIA  DE  PAGO");
+			rep.add("");
+
+			rep.add("Serial : "+deviceid);
+			rep.add(resol);
+			rep.add(resfecha);
+			rep.add("");
+
+		} else {
+
+			rep.addtotsp("ITBM", totimp);
+			rep.addtotsp("Total", tot);
+			rep.add("");
+			rep.add("");
+			rep.add("Total de items: "+totitems);
+			rep.add("");
+			bonificaciones();
+			rep.add("");
+			rep.line();
+			rep.addc("Firma Cliente");
+			rep.add("");
+
+			if (pendiente!=4){
+				rep.addc("DE SER UNA VENTA AL CREDITO, SOLAMEN");
+				rep.addc("TE NUESTRO CORRESPONDIENTE RECIBO SE");
+				rep.addc("CONSIDERARA COMO EVIDENCIA  DE  PAGO");
+				rep.add("");
+			}
+
+			rep.add("Serial : "+deviceid);
+			rep.add(resol);
+			rep.add(resfecha);
+			rep.add("");
+
+		}
 
 		return super.buildFooter();
 	}

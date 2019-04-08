@@ -48,7 +48,7 @@ public class DevolBodTol extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
         }
 
-        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp);
+        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "");
 
         listItems();
 
@@ -56,6 +56,11 @@ public class DevolBodTol extends PBase {
     }
 
     //region Events
+
+    public void doNext(View view) {
+        browse=1;
+        startActivity(new Intent(DevolBodTol.this,DevolBodCan.class));
+    }
 
     private void setHandlers() {
 
@@ -74,13 +79,6 @@ public class DevolBodTol extends PBase {
                 }
             });
 
-            imgNext.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    browse=1;
-                    startActivity(new Intent(DevolBodTol.this,DevolBodCan.class));
-                }
-            });
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
@@ -106,13 +104,18 @@ public class DevolBodTol extends PBase {
             sql =  "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA " +
                    "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
             sql += "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA ";
-            /*
+
             sql += "UNION ";
             sql += "SELECT P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA " +
                    "FROM P_STOCKB INNER JOIN P_PRODUCTO ON P_STOCKB.CODIGO=P_PRODUCTO.CODIGO ";
             sql += "GROUP BY P_STOCKB.CODIGO, P_PRODUCTO.DESCLARGA ";
+
+            sql += "UNION ";
+            sql += "SELECT P_STOCK_PALLET.CODIGO,P_PRODUCTO.DESCLARGA " +
+                    "FROM P_STOCK_PALLET INNER JOIN P_PRODUCTO ON P_STOCK_PALLET.CODIGO=P_PRODUCTO.CODIGO ";
+            sql += "GROUP BY P_STOCK_PALLET.CODIGO, P_PRODUCTO.DESCLARGA ";
             sql += "ORDER BY P_PRODUCTO.DESCLARGA";
-            */
+
             dp = Con.OpenDT(sql);
 
             if (dp.getCount() == 0) {
@@ -128,11 +131,36 @@ public class DevolBodTol extends PBase {
 
                 pcod=dp.getString(0);
 
+                sql="SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT) AS TOTAL,\n" +
+                        " SUM(P_STOCK.CANTM),P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,\n" +
+                        " P_STOCK.CENTRO,P_STOCK.STATUS,SUM(P_STOCK.PESO) \n" +
+                        " FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO \n" +
+                        " WHERE (P_PRODUCTO.CODIGO='"+pcod+"') \n" +
+                        " GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS \n" +
+                        " UNION\n" +
+                        " SELECT P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCKB.CANT) AS TOTAL,0 as CANTM,P_STOCKB.UNIDADMEDIDA,'' as LOTE,P_STOCKB.DOCUMENTO,P_STOCKB.CENTRO,P_STOCKB.STATUS,SUM(P_STOCKB.PESO) \n" +
+                        " FROM P_STOCKB INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCKB.CODIGO \n" +
+                        " WHERE (P_PRODUCTO.CODIGO='"+pcod+"')\n" +
+                        " GROUP BY P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCKB.UNIDADMEDIDA,P_STOCKB.DOCUMENTO,P_STOCKB.CENTRO,P_STOCKB.STATUS \n" +
+                        " UNION\n" +
+                        " SELECT P_STOCK_PALLET.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK_PALLET.CANT) AS TOTAL,0 as CANTM,P_STOCK_PALLET.UNIDADMEDIDA, P_STOCK_PALLET.LOTEPRODUCTO as LOTE,P_STOCK_PALLET.DOCUMENTO,P_STOCK_PALLET.CENTRO,P_STOCK_PALLET.STATUS,SUM(P_STOCK_PALLET.PESO) \n" +
+                        " FROM P_STOCK_PALLET INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK_PALLET.CODIGO \n" +
+                        " WHERE (P_PRODUCTO.CODIGO='"+pcod+"') AND P_PRODUCTO.ES_PROD_BARRA = 0\n" +
+                        " GROUP BY P_STOCK_PALLET.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK_PALLET.UNIDADMEDIDA,\n" +
+                        " P_STOCK_PALLET.DOCUMENTO,P_STOCK_PALLET.CENTRO,P_STOCK_PALLET.STATUS,P_STOCK_PALLET.LOTEPRODUCTO \n" +
+                        " UNION\n" +
+                        " SELECT P_STOCK_PALLET.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK_PALLET.CANT) AS TOTAL,0 as CANTM,P_STOCK_PALLET.UNIDADMEDIDA, P_STOCK_PALLET.LOTEPRODUCTO as LOTE,P_STOCK_PALLET.DOCUMENTO,P_STOCK_PALLET.CENTRO,P_STOCK_PALLET.STATUS,SUM(P_STOCK_PALLET.PESO) \n" +
+                        " FROM P_STOCK_PALLET INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK_PALLET.CODIGO \n" +
+                        " WHERE (P_PRODUCTO.CODIGO='"+pcod+"') AND P_PRODUCTO.ES_PROD_BARRA = 0 AND P_PRODUCTO.ES_VENDIBLE = 1\n" +
+                        " GROUP BY P_STOCK_PALLET.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK_PALLET.UNIDADMEDIDA,\n" +
+                        " P_STOCK_PALLET.DOCUMENTO,P_STOCK_PALLET.CENTRO,P_STOCK_PALLET.STATUS,P_STOCK_PALLET.LOTEPRODUCTO ";
+
+                /*
                 sql =  "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT) AS TOTAL,SUM(P_STOCK.CANTM),P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS,SUM(P_STOCK.PESO)  " +
                         "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  " +
                         "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
                         "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS ";
-                /*
+
                 sql+=  "UNION ";
                 sql+=  "SELECT P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCKB.CANT) AS TOTAL, 0 AS Expr2,P_STOCKB.UNIDADMEDIDA, '' AS Expr4, P_STOCKB.DOCUMENTO,P_STOCKB.CENTRO,P_STOCKB.STATUS, SUM(P_STOCKB.PESO)  "+
                         "FROM  P_STOCKB INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCKB.CODIGO "+
@@ -140,6 +168,7 @@ public class DevolBodTol extends PBase {
                         "GROUP BY P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCKB.UNIDADMEDIDA,P_STOCKB.DOCUMENTO,P_STOCKB.CENTRO,P_STOCKB.STATUS "+
                         "ORDER BY TOTAL ";
                 */
+
                 dt = Con.OpenDT(sql);
                 icnt=dt.getCount();
                 if (icnt==1) {
@@ -251,7 +280,7 @@ public class DevolBodTol extends PBase {
         try{
             super.onResume();
 
-            if (gl.closeVenta) super.finish();
+            if (gl.closeDevBod) super.finish();
 
             if (browse==1) {
                 browse=0;

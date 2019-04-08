@@ -72,7 +72,6 @@ public class ProdCant extends PBase {
 		
 	}
 
-	
 	//region Events
 	
 	public void sendCant(View view) {
@@ -450,8 +449,9 @@ public class ProdCant extends PBase {
 
 	private void delItem(){	
 		try {
-	    	db.execSQL("DELETE FROM T_VENTA WHERE PRODUCTO='"+prodid+"'");    	
-	    	gl.dval=0;
+	    	db.execSQL("DELETE FROM T_VENTA WHERE PRODUCTO='"+prodid+"'");
+			db.execSQL("DELETE FROM T_BONITEM WHERE Prodid='"+prodid+"'");
+			gl.dval=0;
 	    	super.finish();
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

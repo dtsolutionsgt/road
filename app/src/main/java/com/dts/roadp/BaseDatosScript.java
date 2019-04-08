@@ -31,14 +31,14 @@ public class BaseDatosScript {
 			vSQL="CREATE TABLE [FinDia] ("+
 					"ID integer NOT NULL primary key,"+
 					"Corel INTEGER  NOT NULL,"+
-					"val1  INTEGER  NOT NULL,"+  // dia del cierre
+					"val1  INTEGER  NOT NULL,"+  // Día del cierre
 					"val2  INTEGER  NOT NULL,"+	 // Comunicacion
-					"val3  INTEGER  NOT NULL,"+	 // Cierre Z
-					"val4  INTEGER  NOT NULL,"+	 // Impresion Deposito
-					"val5  INTEGER  NOT NULL,"+	 // Deposito
-					"val6  INTEGER  NOT NULL,"+  // Devolucion Bodega
-					"val7  INTEGER  NOT NULL,"+
-					"val8  INTEGER  NOT NULL);"; 
+					"val3  INTEGER  NOT NULL,"+	 // Impresión Depósito
+					"val4  INTEGER  NOT NULL,"+	 // Depósito
+					"val5  INTEGER  NOT NULL,"+	 // Devolución bodega y canastas
+					"val6  INTEGER  NOT NULL,"+  // Generación Cierre Z
+					"val7  INTEGER  NOT NULL,"+  // Impresión de Cierre Z
+					"val8  REAL  NOT NULL);";    // GrandTotal
 			database.execSQL(vSQL);
 
 			vSQL="CREATE TABLE [LIC_CLIENTE] ("+
@@ -693,7 +693,46 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-          
+			vSQL="CREATE TABLE [D_MOVDB] ("+
+					"[COREL] TEXT NOT NULL,"+
+					"[PRODUCTO] TEXT NOT NULL,"+
+					"[BARRA] TEXT NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
+					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL,"+
+					"PRIMARY KEY ([COREL],[PRODUCTO],[BARRA])"+
+					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE TABLE [D_MOVDPALLET] ("+
+					"[COREL] TEXT NOT NULL,"+
+					"[PRODUCTO] TEXT NOT NULL,"+
+					"[BARRAPALLET] TEXT NOT NULL,"+
+					"[BARRAPRODUCTO] TEXT NOT NULL,"+
+					"[LOTEPRODUCTO] TEXT NOT NULL,"+
+					"[CANT] REAL NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL,"+
+					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
+					"PRIMARY KEY ([COREL],[PRODUCTO],[BARRAPALLET],[BARRAPRODUCTO])"+
+					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE TABLE [D_MOVDCAN] ("+
+					"[COREL] TEXT NOT NULL,"+
+					"[PRODUCTO] TEXT NOT NULL,"+
+					"[CANT] REAL NOT NULL,"+
+					"[CANTM] REAL NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[PESOM] REAL NOT NULL,"+
+					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
+					"[BARRA] TEXT NOT NULL,"+
+					"[LOTE] TEXT NOT NULL,"+
+					"[PASEANTE] INTEGER NOT NULL,"+
+					"[UNIDADMEDIDA] TEXT DEFAULT 'UN' NOT NULL"+
+					");";
+			database.execSQL(vSQL);
+
 			vSQL="CREATE TABLE [D_ATENCION] ("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+
@@ -1864,6 +1903,7 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+			//Jaros modifico la tabla P_IMPRESORA
 			vSQL="CREATE TABLE [P_IMPRESORA]("+
 					"[IDIMPRESORA] TEXT NOT NULL,"+
 					"[NUMSERIE] TEXT NOT NULL,"+
@@ -1884,6 +1924,8 @@ public class BaseDatosScript {
 					"[MODIFICADA] TEXT NOT NULL,"+
 					"[FECHA_CREADA] INTEGER NOT NULL,"+
 					"[FECHA_MODIFICADA] INTEGER NOT NULL,"+
+					"[CORELZ] INT NOT NULL,"+
+					"[GRANDTOTAL] REAL NOT NULL,"+
 					"PRIMARY KEY ([NUMPLACA])"+
 					");";
 			database.execSQL(vSQL);
@@ -2044,17 +2086,7 @@ public class BaseDatosScript {
 					"PRIMARY KEY ([PRODUCTO],[LOTE])"+
 					");";
 			database.execSQL(vSQL);
-			
-			
-			vSQL="CREATE TABLE [T_BONIFFALT] ("+
-					"[PRODID]   TEXT NOT NULL,"+
-					"[PRODUCTO] TEXT NOT NULL,"+
-					"[CANT]     REAL NOT NULL,"+
-					"PRIMARY KEY ([PRODID],[PRODUCTO])"+
-					");";
-			database.execSQL(vSQL);	
-			
-			
+
 			vSQL="CREATE TABLE [T_BONITEM] ("+
 					"[ITEM] INTEGER NOT NULL,"+
 					"[PRODID] TEXT NOT NULL,"+
@@ -2068,9 +2100,6 @@ public class BaseDatosScript {
 					"[UMPESO] TEXT NOT NULL,"+
 					"[FACTOR] REAL NOT NULL,"+
 					"[POR_PESO] TEXT NOT NULL,"+
-
-
-
 					"PRIMARY KEY ([ITEM])"+
 					");";
 			database.execSQL(vSQL);
@@ -2084,8 +2113,27 @@ public class BaseDatosScript {
 					"PRIMARY KEY ([BARRA],[CODIGO])"+
 					");";
 			database.execSQL(vSQL);
-			
-			return 1;
+
+			vSQL="CREATE TABLE [T_BARRA_BONIF] ("+
+					"[BARRA] TEXT NOT NULL,"+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[PRECIO] REAL NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[PESOORIG] REAL NOT NULL,"+
+					"[PRODUCTO] TEXT NOT NULL,"+
+					"PRIMARY KEY ([BARRA],[CODIGO])"+
+					");";
+			database.execSQL(vSQL);
+
+            vSQL="CREATE TABLE [T_BONIFFALT] ("+
+                    "[PRODID]   TEXT NOT NULL,"+
+                    "[PRODUCTO] TEXT NOT NULL,"+
+                    "[CANT]     REAL NOT NULL,"+
+                    "PRIMARY KEY ([PRODID],[PRODUCTO])"+
+                    ");";
+            database.execSQL(vSQL);
+
+            return 1;
 
 		} catch (SQLiteException e) {
 			msgbox(e.getMessage());return 0;

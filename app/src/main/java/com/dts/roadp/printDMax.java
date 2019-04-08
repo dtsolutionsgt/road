@@ -1,30 +1,34 @@
 package com.dts.roadp;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import datamaxoneil.connection.Connection_Bluetooth;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+
+import datamaxoneil.connection.Connection_Bluetooth;
+
 // 00:17:AC:01:75:E9
 
-public class printDMax extends printBase
-{
+public class printDMax extends printBase {
 	
-	private String ss;
+	private String ss,ess;
 	private PrintDialog printDialog;
+	private appGlobals appG;
+	private boolean validprint;
 	
-	public printDMax(Context context,String printerMAC) {
+	public printDMax(Context context,String printerMAC,boolean validprinter) {
 		super(context,printerMAC);
+		validprint=validprinter;
+		appG = new appGlobals();
 	}
 	
 	
@@ -35,29 +39,44 @@ public class printDMax extends printBase
 		hasCallback=true;
 		callback=callBackHook;
 		
-		fname="print.txt";errmsg="";
+		fname="print.txt";errmsg="";exitprint=false;
 		msgAskPrint();
 	}
 	
-	public void printask()
-	{
+	public void printask() {
 		hasCallback=false;
 		
-		fname="print.txt";errmsg="";
+		fname="print.txt";errmsg="";exitprint=false;
 		msgAskPrint();				
+	}
+
+	public void printask(Runnable callBackHook, String fileName){
+		hasCallback=true;
+		callback=callBackHook;
+
+		fname=fileName;errmsg="";exitprint=false;
+		msgAskPrint();
+	}
+
+	public void printnoask(Runnable callBackHook, String fileName){
+		hasCallback=true;
+		callback=callBackHook;
+
+		fname=fileName;errmsg="";
+		try {
+			if (loadFile())  doStartPrint();
+		} catch (Exception e) {
+			showmsg("Error: " + e.getMessage());
+		}
 	}
 	
 	public boolean print() 	{
-
 		hasCallback=false;
 		
 		fname="print.txt";errmsg="";
 
 		try	{
-			if (loadFile()){
-				doStartPrint();
-			}	else
-				return false;
+			if (loadFile())	doStartPrint();	else return false;
 		} catch (Exception e) {
 			showmsg("Error: " + e.getMessage());return false;
 		}			
@@ -69,6 +88,7 @@ public class printDMax extends printBase
 		hasCallback=false;
 		
 		fname=fileName;	errmsg="";
+		exitprint=false;
 		msgAskPrint();				
 	}
 		
@@ -113,8 +133,6 @@ public class printDMax extends printBase
 		}			
 		
 		try {
-				
-			
 			docLP.clear();
 			
 			while ((ss = dfile.readLine()) != null) {
@@ -142,6 +160,11 @@ public class printDMax extends printBase
 	}
 	
 	private void doStartPrint() {
+		if (!validprint) {
+			showmsg("¡La impresora no está autorizada!");return;
+		}
+
+		appG.endPrint = true;
 		showmsg("Imprimiendo ..." );
 		//showmsg("MAC : "+printerAddress );
 		AsyncPrintCall wsRtask = new AsyncPrintCall();
@@ -177,10 +200,7 @@ public class printDMax extends printBase
     }	
 	
 	private void doCallBack() {
-		//showmsg("Impresión completa.");
-		
-		//showmsg("Imp : "+ss);
-		
+
 		if (!hasCallback) return;
 
         try {
@@ -193,20 +213,10 @@ public class printDMax extends printBase
                     } catch (Exception ee) {}
                 }
             }, 500);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        	ess=e.getMessage();
+		}
 
-        try {
-            //#EJC201800: Llamar el close de la printer
-            final Handler cbhandler1 = new Handler();
-            cbhandler1.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        printclose.run();
-                    } catch (Exception ee) {}
-                }
-            }, 200);
-        } catch (Exception e) {}
 	}
 	
 	public void processPrint() {
@@ -228,7 +238,7 @@ public class printDMax extends printBase
 			prthread.sleep(1500);
 
 			prconn.clearWriteBuffer();
-			printclose.run();
+			//printclose.run();
 			prconn.close();
 
 		} catch (Exception e) {
@@ -253,6 +263,7 @@ public class printDMax extends printBase
 		dialog.setTitle(R.string.app_name);
 		dialog.setMessage("¿La impresora está lista?");
 
+		dialog.setCancelable(false);
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which) {
 		    	try {
@@ -265,20 +276,18 @@ public class printDMax extends printBase
 
 		});
 
-//#EJC20181130:Se comentarió por solicitud de auditor de SAT.
-//		dialog.setNegativeButton("No", new DialogInterface.OnClickListener()
-//		{
-//		    public void onClick(DialogInterface dialog, int which)
-//			{
-//		    	final Handler cbhandler = new Handler();
-//				cbhandler.postDelayed(new Runnable() {
-//					@Override
-//					public void run() {
-//						printclose.run();
-//					}
-//				}, 200);
-//		    }
-//		});
+		//#EJC20181130:Se comentarió por solicitud de auditor de SAT.
+		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int which) {
+		    	final Handler cbhandler = new Handler();
+				cbhandler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						printclose.run();
+					}
+				}, 200);
+		    }
+		});
 
 		dialog.show();
 			

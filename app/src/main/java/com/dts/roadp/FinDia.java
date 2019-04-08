@@ -30,6 +30,7 @@ public class FinDia extends PBase {
     private ImageView img1;
     private ProgressBar pBar;
 
+    private AppMethods app;
     private clsRepBuilder rep;
     private Runnable printclose;
     private printer prn;
@@ -39,6 +40,8 @@ public class FinDia extends PBase {
     private double val, tot, tte, ttc, ttk, tto, tre, trc, tro, tote, totc, depe, depc, bale, balc;
     private boolean idle = true, fullfd, fail;
     private clsFinDia claseFinDia;
+
+    private double gSumados=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +56,11 @@ public class FinDia extends PBase {
         pBar = (ProgressBar) findViewById(R.id.progressBar1);
         pBar.setVisibility(View.INVISIBLE);
 
-        rutatipo = ((appGlobals) vApp).rutatipog;
+        rutatipo = gl.rutatipog;
+
+        app = new AppMethods(this, gl, Con, db);
+        gl.validimp=app.validaImpresora("*");
+        if (!gl.validimp) toast("¡La impresora no está autorizada!");
 
         fullfd = false;
         if (rutatipo.equalsIgnoreCase("T")) {
@@ -71,7 +78,7 @@ public class FinDia extends PBase {
             img1.setVisibility(View.INVISIBLE);
         }
 
-        rep = new clsRepBuilder(this, gl.prw, false, gl.peMon, gl.peDecImp);
+        rep = new clsRepBuilder(this, gl.prw, false, gl.peMon, gl.peDecImp, "");
         mw = 6 + gl.peDecImp + 7;
 
         printclose = new Runnable() {
@@ -80,7 +87,7 @@ public class FinDia extends PBase {
             }
         };
 
-        prn = new printer(this, printclose);
+        prn = new printer(this, printclose,gl.validimp);
 
     }
 
@@ -154,8 +161,6 @@ public class FinDia extends PBase {
         fail = false;
 
         try{
-
-
             if (!gl.peModal.equalsIgnoreCase("TOL")) {
                 buildReports();
             }
@@ -261,11 +266,15 @@ public class FinDia extends PBase {
                     db.execSQL(sql);
                     sql = "DELETE FROM D_STOCKB_DEV WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
-                    sql = "DELETE FROM D_BONIF";
+                    sql = "DELETE FROM D_BONIF WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
-                    sql = "DELETE FROM D_BONIF_LOTES";
+                    sql = "DELETE FROM D_BONIF_LOTES WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
-                    sql = "DELETE FROM D_REL_PROD_BON";
+                    sql = "DELETE FROM D_BONIF_STOCK WHERE COREL='" + corel + "'";
+                    db.execSQL(sql);
+                    sql = "DELETE FROM D_BONIF_BARRA WHERE COREL='" + corel + "'";
+                    db.execSQL(sql);
+                    sql = "DELETE FROM D_REL_PROD_BON WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
                     sql = "DELETE FROM D_BONIFFALT";
                     db.execSQL(sql);
@@ -345,14 +354,46 @@ public class FinDia extends PBase {
                 DT.moveToFirst();
                 while (!DT.isAfterLast()) {
                     corel = DT.getString(0);
-                    sql = "DELETE FROM D_MOV WHERE COREL='" + corel + "'";
-                    db.execSQL(sql);
-                    sql = "DELETE FROM D_MOVD WHERE COREL='" + corel + "'";
-                    db.execSQL(sql);
+                    sql="DELETE FROM D_MOV WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql="DELETE FROM D_MOVD WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql="DELETE FROM D_MOVDB WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_MOVDCAN WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_MOVDPALLET WHERE COREL='"+corel+"'";db.execSQL(sql);
 
                     DT.moveToNext();
                 }
             }
+
+            //Delete D_NOTACRED y D_NOTACRED
+            sql = "SELECT COREL FROM D_NOTACRED WHERE STATCOM='S'";
+            DT = Con.OpenDT(sql);
+            if (DT.getCount() > 0) {
+
+                DT.moveToFirst();
+                while (!DT.isAfterLast()) {
+                    corel = DT.getString(0);
+                    sql="DELETE FROM D_NOTACRED WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql="DELETE FROM D_NOTACREDD WHERE COREL='" + corel + "'";db.execSQL(sql);
+
+                    DT.moveToNext();
+                }
+            }
+
+            //Delete D_CXC y D_CXCD
+            sql = "SELECT COREL FROM D_CXC WHERE STATCOM='S'";
+            DT = Con.OpenDT(sql);
+            if (DT.getCount() > 0) {
+
+                DT.moveToFirst();
+                while (!DT.isAfterLast()) {
+                    corel = DT.getString(0);
+                    sql="DELETE FROM D_CXC WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql="DELETE FROM D_CXCD WHERE COREL='" + corel + "'";db.execSQL(sql);
+
+                    DT.moveToNext();
+                }
+            }
+
             //sql="DELETE FROM D_MOVD WHERE CODIGOLIQUIDACION=0";db.execSQL(sql);
 
 
@@ -393,11 +434,6 @@ public class FinDia extends PBase {
             sql = "DELETE FROM D_ATENCION";
             db.execSQL(sql);
             sql = "DELETE FROM D_CLICOORD WHERE STATCOM='S'";
-            db.execSQL(sql);
-
-
-            corelz++;
-            sql = "UPDATE FinDia SET Corel=" + corelz;
             db.execSQL(sql);
 
 			/*sql="UPDATE P_RUTA SET Email='0'";
@@ -973,8 +1009,7 @@ public class FinDia extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
-
+        
     }
 
     private void repDevolTotal() {
@@ -1419,6 +1454,8 @@ public class FinDia extends PBase {
                 public void onClick(DialogInterface dialog, int which) {
                     buildReportsTOL();
                     imprimeCierreZ();
+                    corelz+=1;
+                    claseFinDia.updateGrandTotalCorelZ(gSumados,corelz);
                 }
             });
 
@@ -1682,8 +1719,7 @@ public class FinDia extends PBase {
 
         Cursor DT;
 
-        try
-        {
+        try  {
 
             boolean vTieneInvDevol = false;
 
@@ -1783,6 +1819,8 @@ public class FinDia extends PBase {
 
         try {
 
+            gSumados=0;
+
             rep.empty();
             sql = " SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO " +
                   " FROM P_SUCURSAL WHERE CODIGO='" + gl.sucur + "'";
@@ -1848,7 +1886,7 @@ public class FinDia extends PBase {
         String s1, s2, s3;
         String vComunicacion = "";
         String vAuxCorel, vCadena;
-        double sumagrav, sumaimp, sumanograv, totporfila, totgrav, totnograv, TotItbm, sumados, i;
+        double sumagrav, sumaimp, sumanograv, totporfila, totgrav, totnograv, TotItbm, i, sumados;
         boolean anulada = false;
 
         rep.line();
@@ -1971,6 +2009,7 @@ public class FinDia extends PBase {
                 rep.line();
 
                 sumados = totgrav + totnograv + TotItbm;
+                gSumados+=sumados;
 
                 vCadena = "Total";
                 rep.add(vCadena);
@@ -2116,6 +2155,7 @@ public class FinDia extends PBase {
                 rep.line();
 
                 sumados = totgrav + totnograv + TotItbm;
+                gSumados+=sumados;
 
                 vCadena = "Total";
                 rep.add(vCadena);
@@ -2139,7 +2179,7 @@ public class FinDia extends PBase {
 
         String vCadena;
         Cursor DT;
-        int TotalRecibos = 0;
+        float TotalRecibos = 0;
         boolean anulado;
 
         try{
@@ -2230,7 +2270,7 @@ public class FinDia extends PBase {
 
                 while (!DT.isAfterLast()) {
 
-                    anulada = (DT.getString(3).equalsIgnoreCase("S"));
+                    anulada = (DT.getString(2).equalsIgnoreCase("S"));
 
                     vCadena = DT.getString(0);
 
@@ -2266,7 +2306,7 @@ public class FinDia extends PBase {
 
                 while (!DT.isAfterLast()) {
 
-                    anulada = (DT.getString(3).equalsIgnoreCase("S"));
+                    anulada = (DT.getString(2).equalsIgnoreCase("S"));
 
                     vCadena = DT.getString(0);
 
@@ -2368,7 +2408,7 @@ public class FinDia extends PBase {
             double vTotalNC_Contado = TotNotaC_Contado();
             double vTotalCredito = TotalCredito2();
             double vTotalContado = TotalEfectivo2();
-            double TotalRecibos=0;
+            double TotalRecibos=TotalRecibos();
             int corelativoZ = 0;
 
             //Totales para liquidacion
@@ -2404,7 +2444,7 @@ public class FinDia extends PBase {
             rep.add(vCadena);
             vCadena = "Venta Total           :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
             rep.add(vCadena);
-            vCadena = "Gran Total           :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
+            vCadena = "Gran Total            :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
             rep.add(vCadena);
             vCadena = "Total Recibos         :" + StringUtils.leftPad(mu.frmcur_sm(TotalRecibos), 13);
             rep.add(vCadena);
@@ -2443,12 +2483,8 @@ public class FinDia extends PBase {
             }
             rep.add(vCadena);
 
-            if (StringUtils.isNotBlank(CorelZ)){
-                corelativoZ = corelz + 1;
-                vCadena = "Siguiente Informe Z   :" + StringUtils.leftPad(mu.frmint(corelativoZ), 13);
-            }else{
-                vCadena = "Siguiente Informe Z   :" + StringUtils.leftPad("0", 13);
-            }
+            corelativoZ = corelz + 1;
+            vCadena = "Siguiente Informe Z   :" + StringUtils.leftPad(mu.frmint(corelativoZ), 13);
 
             rep.add(vCadena);
 
@@ -2662,14 +2698,14 @@ public class FinDia extends PBase {
         return vTotNotasCredAnul;
     }
 
-    private int TotNotaC_Credito(){
+    private double TotNotaC_Credito(){
 
         Cursor DT;
-        int vTotNotaC_Credito = 0;
+        double vTotNotaC_Credito = 0;
 
         try{
 
-            sql =  " SELECT IFNULL(COUNT(NC.COREL),0) AS TOTAL " +
+            sql =  " SELECT IFNULL(SUM(NC.TOTAL),0) AS TOTAL " +
                    " FROM D_NOTACRED NC " +
                    " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='N' " +
                    " AND (FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO = 'K')" +
@@ -2679,7 +2715,7 @@ public class FinDia extends PBase {
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
 
-                vTotNotaC_Credito = DT.getInt(0);
+                vTotNotaC_Credito = DT.getDouble(0);
             }
         }catch (Exception ex){
             msgbox(new Object() {
@@ -2689,14 +2725,14 @@ public class FinDia extends PBase {
         return vTotNotaC_Credito;
     }
 
-    private int TotNotaC_Contado(){
+    private double TotNotaC_Contado(){
 
         Cursor DT;
-        int vTotNotaC_Contado = 0;
+        double vTotNotaC_Contado = 0;
 
         try{
 
-            sql =  " SELECT IFNULL(COUNT(NC.COREL),0) AS TOTAL " +
+            sql =  " SELECT IFNULL(SUM(NC.TOTAL),0) AS TOTAL " +
                     " FROM D_NOTACRED NC " +
                     " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='N' " +
                     " AND NC.FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO <> 'K')";
@@ -2705,7 +2741,7 @@ public class FinDia extends PBase {
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
 
-                vTotNotaC_Contado = DT.getInt(0);
+                vTotNotaC_Contado = DT.getDouble(0);
             }
         }catch (Exception ex){
             msgbox(new Object() {
@@ -2715,10 +2751,10 @@ public class FinDia extends PBase {
         return vTotNotaC_Contado;
     }
 
-    private int TotalCredito2(){
+    private double TotalCredito2(){
 
         Cursor DT;
-        int vTotCredito2 = 0;
+        double vTotCredito2 = 0;
 
         try{
 
@@ -2731,7 +2767,7 @@ public class FinDia extends PBase {
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
 
-                vTotCredito2 = DT.getInt(0);
+                vTotCredito2 = DT.getDouble(0);
             }
         }catch (Exception ex){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
@@ -2742,10 +2778,10 @@ public class FinDia extends PBase {
         return vTotCredito2;
     }
 
-    private int TotalEfectivo2(){
+    private double TotalEfectivo2(){
 
         Cursor DT;
-        int vTotEfectivo2 = 0;
+        double vTotEfectivo2 = 0;
 
         try{
 
@@ -2757,7 +2793,7 @@ public class FinDia extends PBase {
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
 
-                vTotEfectivo2 = DT.getInt(0);
+                vTotEfectivo2 = DT.getDouble(0);
             }
         }catch (Exception ex){
             msgbox(new Object() {
@@ -2765,6 +2801,30 @@ public class FinDia extends PBase {
         }
 
         return vTotEfectivo2;
+    }
+
+    private double TotalRecibos(){
+
+        Cursor DT;
+        double vTotalRecibos = 0;
+
+        try{
+
+            sql = " SELECT IFNULL(SUM(C.TOTAL),0) AS TOTAL FROM D_COBRO C " +
+                    " WHERE C.RUTA='" + gl.ruta + "' AND C.ANULADO='N' ";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
+                vTotalRecibos = DT.getDouble(0);
+            }
+        }catch (Exception ex){
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+        }
+
+        return vTotalRecibos;
     }
 
     //endregion

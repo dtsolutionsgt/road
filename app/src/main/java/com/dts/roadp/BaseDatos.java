@@ -1,18 +1,16 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteException;
 import android.os.Environment;
-
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BaseDatos extends SQLiteOpenHelper {
 	
@@ -78,12 +76,14 @@ public class BaseDatos extends SQLiteOpenHelper {
 	  
 	  public Cursor OpenDT(String pSQL) {
 	  	Cursor vCursor = null;
+        String vError="";
 
 		  try {
 			  vCursor = vDatabase.rawQuery(pSQL, null);
 			  vCursor.moveToLast();
 		  }catch(Exception ex){
 		  	//msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
+			  vError = ex.getMessage();
 		  }
 
 		  return vCursor;

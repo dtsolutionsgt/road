@@ -1,27 +1,25 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 
 public class Deposito extends PBase {
@@ -95,8 +93,8 @@ public class Deposito extends PBase {
 		    }
 		};
 		
-		prn=new printer(this,printclose);
-		ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp);
+		prn=new printer(this,printclose,gl.validimp);
+		ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 
 		boldep=gl.boldep;
 		depparc=gl.depparc;

@@ -79,8 +79,9 @@ public class ComWSExist extends PBase {
 		
 		ruta=gl.ruta;
 	    gEmpresa=gl.emp;
-			
-		getWSURL();
+
+
+	    getWSURL();
 
 		dbld=new clsDataBuilder(this);
 
@@ -92,7 +93,7 @@ public class ComWSExist extends PBase {
 		    }
 	    };
 		mtimer.postDelayed(mrunner,1000); 	
-		
+
 	}
 
 	// Events
@@ -389,7 +390,7 @@ public class ComWSExist extends PBase {
 			}
 
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return false;
 		}
 		

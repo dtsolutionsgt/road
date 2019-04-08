@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -33,7 +34,6 @@ public class Clientes extends PBase {
 	private EditText txtFiltro;
 	private TextView lblCant;
 
-
 	private ArrayList<clsCDB> items= new ArrayList<clsCDB>();
 	private ArrayList<String> cobros= new ArrayList<String>();
 	private ArrayList<String> ppago= new ArrayList<String>();
@@ -44,117 +44,139 @@ public class Clientes extends PBase {
 
 	private ListAdaptCliList adapter;
 	private clsCDB selitem;
-	
-	private int selidx,fecha,dweek,browse;
-	private String selid;
-	
+	private AppMethods app;
+
+	private int selidx, fecha, dweek, browse;
+	private String selid,bbstr,bcode;
+	private boolean scanning=false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_clientes);
-		
+
 		super.InitBase();
-		addlog("Clientes",""+du.getActDateTime(),gl.vend);
-		
+		addlog("Clientes", "" + du.getActDateTime(), gl.vend);
+
 		listView = (ListView) findViewById(R.id.listView1);
 		spinList = (Spinner) findViewById(R.id.spinner1);
 		spinFilt = (Spinner) findViewById(R.id.spinner8);
 		txtFiltro = (EditText) findViewById(R.id.txtMonto);
-		lblCant= (TextView) findViewById(R.id.lblCant);
+		lblCant = (TextView) findViewById(R.id.lblCant);
+
+		app = new AppMethods(this, gl, Con, db);
+		gl.validimp=app.validaImpresora("*");
+		if (!gl.validimp) toast("¡La impresora no está autorizada!");
 
 		setHandlers();
 
-		selid="";selidx=-1;
-		
-		dweek=mu.dayofweek();
-		
+		selid = "";
+		selidx = -1;
+
+		dweek = mu.dayofweek();
+
 		fillSpinners();
 
 		listItems();
-				
+
 		closekeyb();
 
-		gl.escaneo="N";
+		gl.escaneo = "N";
 
 	}
 
-	
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent e) {
+		if (e.getAction()==KeyEvent.ACTION_DOWN && e.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+			bcode=txtFiltro.getText().toString().trim();
+			barcodeClient();
+		}
+		return super.dispatchKeyEvent(e);
+	}
+
+
 	// Events
-	
-	public void applyFilter(View view){
-		try{
+
+	public void applyFilter(View view) {
+		try {
 			//listItems();
 			//hidekeyb();
 			txtFiltro.setText("");
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
 	}
-	
+
 	public void showVenta(View view) {
 
-		try{
-			gl.tcorel=mu.getCorelBase();//gl.ruta/
+		try {
+			gl.tcorel = mu.getCorelBase();//gl.ruta/
 
 			//Intent intent = new Intent(this,CliNuevoApr.class);
-			Intent intent = new Intent(this,CliNuevo.class);
+			Intent intent = new Intent(this, CliNuevo.class);
 			startActivity(intent);
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
 	}
 
-	private void setHandlers(){
+	private void setHandlers() {
 
-		try{
+		try {
 
 			listView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
-				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
 					Object lvObj = listView.getItemAtPosition(position);
-					clsCDB sitem = (clsCDB)lvObj;
-					selitem=sitem;
+					clsCDB sitem = (clsCDB) lvObj;
+					selitem = sitem;
 
-					selid=sitem.Cod;selidx=position;
+					selid = sitem.Cod;
+					selidx = position;
 					adapter.setSelectedIndex(position);
 
 					//#HS_20181211 Carga la lista de incidencias por no lectura y muestra el dialogo
-					if(gl.incNoLectura == true) {
+					if (gl.incNoLectura == true) {
 						listNoLectura();
-					}else {
+					} else {
 						showCliente();
 					}
 
-				};
+				}
+
+				;
 			});
 
 			listView.setOnItemLongClickListener(new OnItemLongClickListener() {
 				@Override
 				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-					boolean pedit,pbor;
-				//	try {
+					boolean pedit, pbor;
+					try {
 						Object lvObj = listView.getItemAtPosition(position);
 						clsClasses.clsCDB item = (clsClasses.clsCDB) lvObj;
 
-						selid=item.Cod;selidx=position;
+						selid = item.Cod;
+						selidx = position;
 						adapter.setSelectedIndex(position);
 
-						pedit=puedeeditarse();
-						pbor=puedeborrarse();
+						pedit = puedeeditarse();
+						pbor = puedeborrarse();
 
 						if (pbor && pedit) {
 							showItemMenu();
 						} else {
-							if (pbor)  msgAskBor("Eliminar cliente nuevo");
+							if (pbor) msgAskBor("Eliminar cliente nuevo");
 							if (pedit) msgAskEdit("Cambiar datos de cliente nuevo");
 						}
-
-				/*	} catch (Exception e) {
-						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}*/
+					} catch (Exception e) {
+						addlog(new Object() {
+						}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+					}
 					return true;
 				}
 			});
@@ -214,15 +236,12 @@ public class Clientes extends PBase {
 
 				public void afterTextChanged(Editable s) {}
 
-				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+				public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
-				public void onTextChanged(CharSequence s, int start,int before, int count) {
-					int tl;
-
-					tl=txtFiltro.getText().toString().length();
-
-					if (tl>1) gl.escaneo="S";
-					if (tl==0 || tl>1) listItems();
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
+					int tl = txtFiltro.getText().toString().length();
+					if (tl > 1) gl.escaneo = "S";
+					if (tl == 0 || tl > 1) listItems();
 				}
 			});
 
@@ -382,8 +401,31 @@ public class Clientes extends PBase {
 		}
 
 	}
-	
-	
+
+	private void barcodeClient() {
+		Cursor dt;
+
+		try {
+			sql="SELECT Codigo FROM P_CLIENTE WHERE CODBARRA='"+bcode+"'";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()==0) {
+				msgbox("Cliente no existe "+bcode+" ");
+				txtFiltro.setText("");txtFiltro.requestFocus();
+				return;
+			}
+
+			dt.moveToFirst();
+			selid = dt.getString(0);
+			showCliente();
+
+			txtFiltro.setText("");txtFiltro.requestFocus();
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+	}
+
+
 	// Aux
 
     private void showItemMenu() {

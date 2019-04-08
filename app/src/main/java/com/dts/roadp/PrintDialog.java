@@ -34,7 +34,7 @@ public class PrintDialog extends PBase {
 				}
 			};
 
-			prn=new printer(this,printclose);
+			prn=new printer(this,printclose,gl.validimp);
 
 			final Handler shandler = new Handler();
 			shandler.postDelayed(new Runnable() {

@@ -17,11 +17,12 @@ public class clsDocPedido extends clsDocument {
 	private String 	contrib;
 	private int decimp;
 	
-	public clsDocPedido(Context context,int printwidth,String cursymbol,int decimpres) {
-		super(context, printwidth,cursymbol,decimpres);
+	public clsDocPedido(Context context,int printwidth,String cursymbol,int decimpres, String archivo) {
+		super(context, printwidth,cursymbol,decimpres,archivo);
 		docpedido=true;
 		docfactura=false;
-		docrecibo=false;	
+		docrecibo=false;
+		docdevolucion=false;
 		decimp=decimpres;
 	}
 	

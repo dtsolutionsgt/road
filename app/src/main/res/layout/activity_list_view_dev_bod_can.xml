@@ -2,10 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-     >
+    >
 
     <RelativeLayout
-        android:id="@+id/relexitit"
+        android:id="@+id/rltit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -15,7 +15,7 @@
         android:background="#BDE2F3">
 
         <TextView
-            android:id="@+id/lblPNum"
+            android:id="@+id/lblDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -30,10 +30,10 @@
             android:textStyle="normal|bold" />
 
         <TextView
-            android:id="@+id/textView18"
+            android:id="@+id/lblspace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/lblPNum"
+            android:layout_below="@+id/lblDesc"
             android:layout_alignParentStart="true"
             android:ellipsize="end"
             android:paddingLeft="5dp"
@@ -46,15 +46,15 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/relexist"
+        android:id="@+id/rlDet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/rltit"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/relexitit">
+        android:layout_alignParentRight="true">
 
         <TextView
-            android:id="@+id/lblETipo"
+            android:id="@+id/lblCodT"
             android:layout_width="133dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -70,11 +70,11 @@
             android:textStyle="normal" />
 
         <TextView
-            android:id="@+id/lblepeso"
+            android:id="@+id/lblPesoT"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/lblETipo"
-            android:layout_alignBottom="@+id/lblETipo"
+            android:layout_alignBaseline="@+id/lblCodT"
+            android:layout_alignBottom="@+id/lblCodT"
             android:layout_centerHorizontal="true"
             android:gravity="right"
             android:text="Medium Text"
@@ -83,14 +83,14 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/lblPValor"
+            android:id="@+id/lblValr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginRight="5dp"
             android:gravity="right"
-            android:paddingBottom="5dp"
             android:paddingRight="5dp"
+            android:paddingBottom="5dp"
             android:text="Código"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#000000"
@@ -99,51 +99,51 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/relexistm"
+        android:id="@+id/rlEstados"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/relexist">
+        android:layout_below="@+id/rlDet"
+        android:layout_alignParentStart="true">
 
         <TextView
-            android:id="@+id/textView19"
+            android:id="@+id/lblEstado"
             android:layout_width="133dp"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/lblTit"
             android:layout_alignParentStart="false"
-            android:layout_below="@+id/TextView01"
             android:layout_centerVertical="false"
             android:maxLines="2"
-            android:paddingBottom="5dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
+            android:paddingBottom="5dp"
             android:text="Est.malo"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#C02020"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/lblValorM"
+            android:id="@+id/lblCdEstado"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/lblTit"
             android:layout_alignParentEnd="true"
-            android:layout_below="@+id/TextView01"
             android:layout_centerVertical="true"
             android:layout_marginEnd="0dp"
             android:layout_marginRight="5dp"
             android:gravity="right"
-            android:paddingBottom="5dp"
             android:paddingRight="5dp"
+            android:paddingBottom="5dp"
             android:text="Código"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#C02020"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/lblepesom"
+            android:id="@+id/lblPesoEstado"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/lblTit"
             android:layout_alignParentTop="false"
-            android:layout_below="@+id/TextView01"
             android:layout_centerHorizontal="true"
             android:gravity="right"
             android:text="Medium Text"
@@ -152,14 +152,14 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/TextView01"
+            android:id="@+id/lblTit"
             android:layout_width="133dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:gravity="center_vertical"
-            android:paddingBottom="5dp"
             android:paddingLeft="5dp"
+            android:paddingBottom="5dp"
             android:text="Estado malo"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#C02020"
@@ -169,31 +169,29 @@
     </RelativeLayout>
 
 
-
     <RelativeLayout
-        android:id="@+id/relexistt"
+        android:id="@+id/rlTot"
         android:layout_width="match_parent"
         android:layout_height="28dp"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/relexistm"
-        >
+        android:layout_below="@+id/rlEstados"
+        android:layout_alignParentStart="true">
 
         <TextView
-            android:id="@+id/lblValorT"
+            android:id="@+id/lblVrlT"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginRight="5dp"
             android:gravity="right"
-            android:paddingBottom="5dp"
             android:paddingRight="5dp"
+            android:paddingBottom="5dp"
             android:text="Código"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#2020d0"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/lblepesoT"
+            android:id="@+id/lblPesott"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
@@ -205,15 +203,15 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/lblTl"
             android:layout_width="133dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginStart="0dp"
             android:gravity="center_vertical"
-            android:paddingBottom="5dp"
             android:paddingLeft="5dp"
+            android:paddingBottom="5dp"
             android:text="Total"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#2020d0"

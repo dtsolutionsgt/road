@@ -162,6 +162,7 @@ public class MiscUtils {
 
 				dialog.setTitle(R.string.app_name);
 				dialog.setMessage(msg);
+				dialog.setCancelable(false);
 
 				dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
@@ -172,10 +173,8 @@ public class MiscUtils {
 
 			}
 
-		}catch (Exception ex)
-		{
-			pB = new PBase();
-			pB.addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"msgbox(String msg)");}
+		} catch (Exception ex) {
+		}
 	}   
 	
 	public void msgbox(int v) {

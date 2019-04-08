@@ -1,13 +1,12 @@
 package com.dts.roadp;
 
-import com.epson.eposdevice.Device;
-import com.epson.eposdevice.printer.Printer;
-
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 import android.widget.Toast;
-import android.app.Activity;
+
+import com.epson.eposdevice.Device;
+import com.epson.eposdevice.printer.Printer;
 
 public class printer {
 
@@ -25,13 +24,14 @@ public class printer {
 	private printBase prn;
 	private int prid;
 	private String prpar;
+	private boolean validprint;
 
-
-	public printer(Context context, Runnable printclosecall) {
+	public printer(Context context, Runnable printclosecall,boolean validprinter) {
 
 		String prsid;
 
 		cont = context;
+		validprint=validprinter;
 
 		prid = 0;
 		prpar = "";
@@ -41,13 +41,6 @@ public class printer {
 
 		gl = ((appGlobals) (((Activity) cont).getApplication()));
 
-		try {
-
-			//if (gl.mPrinterSet) prsid="SET";else prsid="void";
-			//Toast.makeText(cont, "Printer : "+prsid, Toast.LENGTH_SHORT).show();
-		} catch (Exception e2) {
-			Log.d("Printer_Init_Err", e2.getMessage());
-		}
 
 		try {
 
@@ -76,7 +69,17 @@ public class printer {
 		if (emptyparam()) return;
 		if (prid>0) prn.printask();
 	}
-		
+
+	public void printask(Runnable callBackHook, String fName)    {
+		if (emptyparam()) return;
+		if(prid>0) prn.printask(callBackHook,fName);
+	}
+
+	public void printnoask(Runnable callBackHook, String fName)    {
+		if (emptyparam()) return;
+		if(prid>0) prn.printnoask(callBackHook,fName);
+	}
+
 	public boolean print() {
 		if (emptyparam()) return false;
 		if (prid>0) return prn.print();else return true;
@@ -152,13 +155,13 @@ public class printer {
 	private void setPrinterClass() {
 		switch (prid) {
 			case 1:  
-				prn=new printDMax(cont,prpar);
+				prn=new printDMax(cont,prpar,validprint);
 				prn.printclose=printclose;
 				break;	
 			case 2:
 				break;		
 			case 3:  
-				prn=new printZebraCPCL(cont,prpar);
+				prn=new printZebraCPCL(cont,prpar,validprint);
 				prn.printclose=printclose;
 				prn.prwidth=prw;
 				break;		

@@ -548,7 +548,6 @@ public class DevolBodCan extends PBase {
 
                 }
 
-
             }
 
         if (!prn_can.isEnabled()) super.finish();

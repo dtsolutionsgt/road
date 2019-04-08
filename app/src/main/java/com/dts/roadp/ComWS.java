@@ -3037,6 +3037,7 @@ public class ComWS extends PBase {
 				errflag=true;
 				fterr += "\n" + sstr;
 			}
+			
 
 		} catch (Exception e) {
 			addlog(new Object() {

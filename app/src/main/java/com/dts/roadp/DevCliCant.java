@@ -1,8 +1,5 @@
 package com.dts.roadp;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -16,6 +13,7 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -23,7 +21,9 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemSelectedListener;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class DevCliCant extends PBase {
 	
@@ -352,12 +352,12 @@ public class DevCliCant extends PBase {
 			}
 
 			if (prodPorPeso(prodid)) {
-				precioventa = prc.precio(prodid, 1, gl.nivel, um, gl.umpeso, gl.dpeso);
+				precioventa = prc.precio(prodid, 1, gl.nivel, um, gl.umpeso, gl.dpeso,um);
 				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
 					if (prc.precioespecial>0) precioventa=prc.precioespecial;
 				}
 			} else {
-				precioventa = prc.precio(prodid, 1, gl.nivel, um, gl.umpeso, 0);
+				precioventa = prc.precio(prodid, 1, gl.nivel, um, gl.umpeso, 0,um);
 				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
 					if (prc.precioespecial>0) precioventa=prc.precioespecial;
 				}

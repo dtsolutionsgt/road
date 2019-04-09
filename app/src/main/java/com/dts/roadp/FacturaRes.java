@@ -669,7 +669,6 @@ public class FacturaRes extends PBase {
 			gl.closeVenta=true;
 			if (!prn.isEnabled()) super.finish();
 
-
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("finishOrder: "  + e.getMessage());
@@ -2297,7 +2296,7 @@ public class FacturaRes extends PBase {
 						prn.printask(printcallback);
 
 						if (notaC==2){
-							fdev.buildPrint(gl.dvcorreld,0);
+							fdev.buildPrint(gl.dvcorreld,1);
 
 							prn_nc.printnoask(printclose, "printnc.txt");
 							prn_nc.printnoask(printclose, "printnc.txt");

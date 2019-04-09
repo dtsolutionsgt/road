@@ -33,7 +33,7 @@ public class Cobro extends PBase {
 	private ListAdaptCobro adapter;
 	private clsClasses.clsCobro selitem;	
 	
-	private Runnable printcallback,printclose,printValidate;
+	private Runnable printcallback,printclose,printValidate, printexit;
 	private printer prn;
 	private clsDocCobro fdoc;
 	private clsDocFactura fdocf;
@@ -42,7 +42,7 @@ public class Cobro extends PBase {
 	private double ttot,tsel,tpag,tpagos,tpend,vefect,plim,cred,pg,sal,ssal,total,monto,pago;
 	private boolean peexit;
 	private boolean porcentaje = false, validarCred = false;
-	private int fflag=1,fcorel,fechaven,medPago,checkCheck=0;
+	private int fflag=1,fcorel,fechaven,medPago,checkCheck=0, impres=0;
 	private String crrf,docfact,anulado;
 	private CheckBox cbCheckAll;
 	private RadioButton chkFactura,chkContado;
@@ -101,16 +101,20 @@ public class Cobro extends PBase {
 
 		    }
 		};
-		
-		prn=new printer(this,printclose,gl.validimp);
+
+		printexit= new Runnable() {
+			public void run() {
+				Cobro.super.finish();
+			}
+		};
+
+		prn=new printer(this,printexit,gl.validimp);
 		fdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.deviceId, "");
 		fdoc.deviceid=gl.deviceId;
 
 		fdocf = new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
 		fdocf.deviceid=gl.deviceId;
-					
 	}
-
 
 	// Events
 	
@@ -598,173 +602,170 @@ public class Cobro extends PBase {
 		
 		try {
 
-			if (!mu.emptystr(dtipo)) {
+          if (!dtipo.equalsIgnoreCase("R")) {
+                  db.beginTransaction();
 
-				  if (!dtipo.equalsIgnoreCase("R")) {
-					  db.beginTransaction();
+                  // Encabezado
 
-					  // Encabezado
+                  sql="SELECT SUM(VALOR) FROM T_PAGO";
+                  DT=Con.OpenDT(sql);
+                  DT.moveToFirst();
+                  tpago=DT.getDouble(0);
 
-					  sql="SELECT SUM(VALOR) FROM T_PAGO";
-					  DT=Con.OpenDT(sql);
-					  DT.moveToFirst();
-					  tpago=DT.getDouble(0);
+                  ins.init("D_COBRO");
+                  ins.add("COREL",corel);
+                  ins.add("ANULADO","N");
+                  ins.add("FECHA",du.getActDate());
+                  ins.add("EMPRESA",gl.emp);
+                  ins.add("RUTA",gl.ruta);
+                  ins.add("VENDEDOR",gl.vend);
+                  ins.add("CLIENTE",gl.cliente);
+                  ins.add("KILOMETRAJE",0);
+                  ins.add("TOTAL",tpago);
+                  ins.add("DEPOS","");
+                  ins.add("CORELC","");
+                  ins.add("BANDERA","");
+                  ins.add("STATCOM","N");
+                  ins.add("CALCOBJ","N");
+                  ins.add("IMPRES",0);
+                  ins.add("CODIGOLIQUIDACION",0);
+                  ins.add("SERIE",fserie);
+                  ins.add("CORELATIVO",fcorel);
 
-					  ins.init("D_COBRO");
-					  ins.add("COREL",corel);
-					  ins.add("ANULADO","N");
-					  ins.add("FECHA",du.getActDate());
-					  ins.add("EMPRESA",gl.emp);
-					  ins.add("RUTA",gl.ruta);
-					  ins.add("VENDEDOR",gl.vend);
-					  ins.add("CLIENTE",gl.cliente);
-					  ins.add("KILOMETRAJE",0);
-					  ins.add("TOTAL",tpago);
-					  ins.add("DEPOS","");
-					  ins.add("CORELC","");
-					  ins.add("BANDERA","");
-					  ins.add("STATCOM","N");
-					  ins.add("CALCOBJ","N");
-					  ins.add("IMPRES",0);
-					  ins.add("CODIGOLIQUIDACION",0);
-					  ins.add("SERIE",fserie);
-					  ins.add("CORELATIVO",fcorel);
+                  db.execSQL(ins.sql());
 
-					  db.execSQL(ins.sql());
+                  if (gl.pagomodo==0) {
 
-					  if (gl.pagomodo==0) {
+                      // Cobro regular - Documentos
 
-						  // Cobro regular - Documentos
+                      sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD";
+                      DT=Con.OpenDT(sql);
 
-						  sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD";
-						  DT=Con.OpenDT(sql);
+                      DT.moveToFirst();
+                      while (!DT.isAfterLast()) {
 
-						  DT.moveToFirst();
-						  while (!DT.isAfterLast()) {
+                          ins.init("D_COBROD");
 
-							  ins.init("D_COBROD");
+                          ins.add("COREL",corel);
+                          ins.add("ANULADO","N");
+                          ins.add("EMPRESA",gl.emp);
+                          ins.add("DOCUMENTO",DT.getString(0));
+                          ins.add("TIPODOC",DT.getString(1));
+                          ins.add("MONTO",DT.getDouble(2));
+                          ins.add("PAGO",DT.getDouble(3));
+                          ins.add("CONTRASENA","");
+                          ins.add("ID_TRANSACCION",0);
+                          ins.add("REFERENCIA","");
+                          ins.add("ASIGNACION","");
 
-							  ins.add("COREL",corel);
-							  ins.add("ANULADO","N");
-							  ins.add("EMPRESA",gl.emp);
-							  ins.add("DOCUMENTO",DT.getString(0));
-							  ins.add("TIPODOC",DT.getString(1));
-							  ins.add("MONTO",DT.getDouble(2));
-							  ins.add("PAGO",DT.getDouble(3));
-							  ins.add("CONTRASENA","");
-							  ins.add("ID_TRANSACCION",0);
-							  ins.add("REFERENCIA","");
-							  ins.add("ASIGNACION","");
+                          db.execSQL(ins.sql());
 
-							  db.execSQL(ins.sql());
+                          DT.moveToNext();
+                      }
 
-							  DT.moveToNext();
-						  }
+                  } else {
 
-					  } else {
+                      ins.init("D_COBROD_SR");
 
-						  ins.init("D_COBROD_SR");
+                      ins.add("COREL",corel);
+                      ins.add("DOCUMENTO",gl.cliente);
+                      ins.add("ANULADO","N");
+                      ins.add("EMPRESA",gl.emp);
+                      ins.add("TIPODOC","SR");
+                      ins.add("MONTO",tpago);
+                      ins.add("PAGO",tpago);
+                      ins.add("CONTRASENA","1");
 
-						  ins.add("COREL",corel);
-						  ins.add("DOCUMENTO",gl.cliente);
-						  ins.add("ANULADO","N");
-						  ins.add("EMPRESA",gl.emp);
-						  ins.add("TIPODOC","SR");
-						  ins.add("MONTO",tpago);
-						  ins.add("PAGO",tpago);
-						  ins.add("CONTRASENA","1");
+                      db.execSQL(ins.sql());
 
-						  db.execSQL(ins.sql());
+                  }
 
-					  }
+                  // Pagos
 
-					  // Pagos
+                  sql="SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
+                  DT=Con.OpenDT(sql);
 
-					  sql="SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
-					  DT=Con.OpenDT(sql);
+                  if (DT.getCount()>0){
 
-					  if (DT.getCount()>0){
+                      DT.moveToFirst();
+                      while (!DT.isAfterLast()) {
 
-						  DT.moveToFirst();
-						  while (!DT.isAfterLast()) {
+                          ins.init("D_COBROP");
+                          ins.add("COREL",corel);
+                          ins.add("ITEM",DT.getInt(0));
+                          ins.add("ANULADO","N");
+                          ins.add("EMPRESA",gl.emp);
+                          ins.add("CODPAGO",DT.getInt(1));
+                          ins.add("TIPO",DT.getString(2));
+                          ins.add("VALOR",DT.getDouble(3));
+                          ins.add("DESC1",DT.getString(4));
+                          ins.add("DESC2",DT.getString(5));
+                          ins.add("DESC3",DT.getString(6));
+                          ins.add("DEPOS","N");
 
-							  ins.init("D_COBROP");
-							  ins.add("COREL",corel);
-							  ins.add("ITEM",DT.getInt(0));
-							  ins.add("ANULADO","N");
-							  ins.add("EMPRESA",gl.emp);
-							  ins.add("CODPAGO",DT.getInt(1));
-							  ins.add("TIPO",DT.getString(2));
-							  ins.add("VALOR",DT.getDouble(3));
-							  ins.add("DESC1",DT.getString(4));
-							  ins.add("DESC2",DT.getString(5));
-							  ins.add("DESC3",DT.getString(6));
-							  ins.add("DEPOS","N");
+                          db.execSQL(ins.sql());
 
-							  db.execSQL(ins.sql());
+                          DT.moveToNext();
+                      }
 
-							  DT.moveToNext();
-						  }
+                      // Ultimo corel
+                      sql="UPDATE P_CORRELREC SET ACTUAL="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";
+                      db.execSQL(sql);
 
-						  // Ultimo corel
-						  sql="UPDATE P_CORRELREC SET ACTUAL="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";
-						  db.execSQL(sql);
+                  }
 
-					  }
+                  db.setTransactionSuccessful();
 
-					  db.setTransactionSuccessful();
+                  db.endTransaction();
+              }else{
 
-					  db.endTransaction();
-				  }else{
+                  db.beginTransaction();
 
-				  	  db.beginTransaction();
+                  sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD";
+                  DT2=Con.OpenDT(sql);
 
-					  sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD";
-					  DT2=Con.OpenDT(sql);
+                  if (DT2.getCount()>0){
+                    DT2.moveToFirst();
+                      doc=DT2.getString(0);
+                      crrf = doc;
+                  }
 
-					  if (DT2.getCount()>0){
-					  	DT2.moveToFirst();
-						  doc=DT2.getString(0);
-						  crrf = doc;
-					  }
+                  sql="SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
+                  DT=Con.OpenDT(sql);
 
-					  sql="SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
-					  DT=Con.OpenDT(sql);
+                  if (DT.getCount()>0) {
 
-					  if (DT.getCount()>0) {
+                      DT.moveToFirst();
 
-						  DT.moveToFirst();
+                      while (!DT.isAfterLast()) {
 
-						  while (!DT.isAfterLast()) {
+                          ins.init("D_FACTURAP");
+                          ins.add("COREL",doc);
+                          ins.add("ITEM",DT.getInt(0));
+                          ins.add("ANULADO","N");
+                          ins.add("EMPRESA",gl.emp);
+                          ins.add("CODPAGO",DT.getInt(1));
+                          ins.add("TIPO",DT.getString(2));
+                          ins.add("VALOR",DT.getDouble(3));
+                          ins.add("DESC1",DT.getString(4));
+                          ins.add("DESC2",DT.getString(5));
+                          ins.add("DESC3",DT.getString(6));
+                          ins.add("DEPOS","N");
 
-							  ins.init("D_FACTURAP");
-							  ins.add("COREL",doc);
-							  ins.add("ITEM",DT.getInt(0));
-							  ins.add("ANULADO","N");
-							  ins.add("EMPRESA",gl.emp);
-							  ins.add("CODPAGO",DT.getInt(1));
-							  ins.add("TIPO",DT.getString(2));
-							  ins.add("VALOR",DT.getDouble(3));
-							  ins.add("DESC1",DT.getString(4));
-							  ins.add("DESC2",DT.getString(5));
-							  ins.add("DESC3",DT.getString(6));
-							  ins.add("DEPOS","N");
+                          db.execSQL(ins.sql());
 
-							  db.execSQL(ins.sql());
+                          DT.moveToNext();
+                      }
 
-							  DT.moveToNext();
-						  }
+                  }
 
-					  }
+                  sql = "DELETE FROM P_COBRO WHERE DOCUMENTO='" + doc + "'";
+                  db.execSQL(sql);
 
-					  sql = "DELETE FROM P_COBRO WHERE DOCUMENTO='" + doc + "'";
-					  db.execSQL(sql);
+                  db.setTransactionSuccessful();
 
-					  db.setTransactionSuccessful();
-
-					  db.endTransaction();
-				  }
-			}
+                  db.endTransaction();
+              }
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1180,28 +1181,62 @@ public class Cobro extends PBase {
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-			dialog.setTitle("Road");
-			dialog.setMessage("Impresión correcta ?");
+            dialog.setTitle("Road");
+            dialog.setMessage("¿Impresión correcta?");
 
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
 
-					try {
+                    impres++;toast("Impres "+impres);
+
+                    try {
 						sql="UPDATE D_COBRO SET IMPRES=IMPRES+3 WHERE COREL='"+corel+"'";
 						db.execSQL(sql);
 					} catch (Exception e) {
 						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 					}
 
-					if(gl.validarCred==1){
-						validaCredito();
-					}else if(gl.validarCred==2){
-						Cobro.super.finish();
-					}
+                    if (impres>1) {
 
-					gl.validarCred=0;
-				}
-			});
+                        try {
+                            sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorreld+"'";
+                            db.execSQL(sql);
+                        } catch (Exception e) {
+                            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                        }
+
+                        gl.brw=0;
+
+                    } else {
+
+                        if (dtipo.equalsIgnoreCase("R")) {
+                            if (prn.isEnabled()) {
+                                fdocf.buildPrint(crrf,1,gl.peModal);
+                                prn.printnoask(printclose, "print.txt");
+                                prn.printnoask(printclose, "print.txt");
+                            }
+                        }else {
+                            if (prn.isEnabled()) {
+
+                                fdoc.buildPrint(corel,1,gl.peModal);
+                                browse = 4;
+                                prn.printnoask(printclose, "print.txt");
+                                prn.printnoask(printclose, "print.txt");
+                            }
+                        }
+
+                    }
+
+                    if(gl.validarCred==1){
+                        validaCredito();
+                    }else if(gl.validarCred==2){
+                        Cobro.super.finish();
+                    }
+
+                    gl.validarCred=0;
+
+                }
+            });
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {

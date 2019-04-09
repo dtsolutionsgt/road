@@ -990,6 +990,7 @@ public class ComWS extends PBase {
 				}
 
 				try {
+
 					if (i % 10 == 0) {
 						fprog = "Procesando: " + i + " de: " + (rc - 1);
 						wsRtask.onProgressUpdate();
@@ -3132,7 +3133,7 @@ public class ComWS extends PBase {
 				errflag=true;
 				fterr += "\n" + sstr;
 			}
-			
+
 
 		} catch (Exception e) {
 			addlog(new Object() {

@@ -629,12 +629,12 @@ public class AppMethods {
 
 		try {
 			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
-				"WHERE (UNIDADSUPERIOR='"+umventa+"') AND (UNIDADMINIMA='"+umstock+"')";
+				"WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+umventa+"') AND (UNIDADMINIMA='"+umstock+"')";
 			DT = Con.OpenDT(sql);
 
 			if (DT.getCount()==0) {
 				sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
-					"WHERE (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+umventa+"')";
+					"WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+umventa+"')";
 				DT = Con.OpenDT(sql);
 			}
 

@@ -75,7 +75,7 @@ public class clsDocument {
 		if (modofact.equalsIgnoreCase("TOL")) {
 			if (docfactura && (reimpres==10)) flag=1;
 			if (doccanastabod) flag=2;
-			if (docrecibo && (reimpres==0)) flag=3;
+			if (docrecibo && (reimpres==0)) flag=0;
         } else if(modofact.equalsIgnoreCase("*")) {
             if (doccanastabod) flag = 2;
         }
@@ -232,7 +232,7 @@ public class clsDocument {
 				rep.add("- P E N D I E N T E  D E  P A G O -");
 				pendiente = reimpres;
 			}
-			if (docfactura && (reimpres==5)) rep.add("------  C O N T A B I L I T A D  ------");
+			if (docfactura && (reimpres==5)) rep.add("------  C O N T A B I L I D A D  ------");
 			rep.add("");
 
 		}else if(docdevolucion){
@@ -244,9 +244,6 @@ public class clsDocument {
 			rep.add("");
 
 		}
-
-
-
     }
 
     protected String encabezado(String l) {

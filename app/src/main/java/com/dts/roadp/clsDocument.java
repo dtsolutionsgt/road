@@ -244,9 +244,6 @@ public class clsDocument {
 			rep.add("");
 
 		}
-
-
-
     }
 
     protected String encabezado(String l) {

@@ -318,7 +318,7 @@ public class Anulacion extends PBase {
 				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"");
 				fdoc.deviceid =gl.deviceId;
 
-				fdoc.buildPrint(itemid, 1, "TOL"); prn.printask(printclose);
+				fdoc.buildPrint(itemid, 3, "TOL"); prn.printask(printclose);
 
 			}else if (tipo==6){
 
@@ -1163,14 +1163,12 @@ public class Anulacion extends PBase {
 			if (!mu.emptystr(pclicod)) rep.add(pclicod);
 			if (!mu.emptystr(pclidir)) rep.add(pclidir);
 
-			//if (0==0) rep.add("-------  A N U L A C I O N  -------");
-			if (reimpres==1) rep.add("-------  R E I M P R E S I O N  -------");
-			if (reimpres==2) rep.add("------  C O N T A B I L I D A D  ------");
+			if (reimpres==3) rep.add("--------  A N U L A C I O N  --------");
+			if (reimpres==1) rep.add("------  R E I M P R E S I O N  ------");
+			if (reimpres==2) rep.add("-----  C O N T A B I L I D A D  -----");
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
 	}
 
 	private String encabezado(String l) {

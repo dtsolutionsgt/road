@@ -400,7 +400,12 @@ public class Venta extends PBase {
 					item.sdesc=mu.frmdec(item.Desc)+" %";
 					item.imp=DT.getDouble(6);
 					item.percep=DT.getDouble(7);
-					if (prodPorPeso(item.Cod)) 	item.um=DT.getString(10);else item.um=DT.getString(8);
+					if (prodPorPeso(item.Cod)) 	{
+						item.um=DT.getString(10);
+					} else {
+						//item.um=DT.getString(8);
+						item.um=app.umVenta(item.Cod);
+					}
 					item.Peso=DT.getDouble(9);
 
 					item.val=mu.frmdecimal(item.Cant,gl.peDecImp)+" "+ltrim(item.um,6);
@@ -567,12 +572,12 @@ public class Venta extends PBase {
 			//prodPrecio();
 
 			if (prodPorPeso(prodid)) {
-				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, gl.dpeso);
+				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, gl.dpeso,um);
 				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
 					if (prc.precioespecial>0) prec=prc.precioespecial;
 				}
 			} else {
-				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0);
+				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0,um);
 				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
 					if (prc.precioespecial>0) prec=prc.precioespecial;
 				}
@@ -612,7 +617,7 @@ public class Venta extends PBase {
 
 	private void prodPrecio() {
 		try{
-			prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,gl.dpeso);
+			prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,gl.dpeso,um);
 
             if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
                 if (prc.precioespecial>0) prec=prc.precioespecial;
@@ -780,8 +785,8 @@ public class Venta extends PBase {
 
 	private boolean barraBolsa() {
 		Cursor dt;
-		double ppeso=0,pprecdoc=0;
-		String uum;
+		double ppeso=0,pprecdoc=0,factbolsa;
+		String uum,umven;
 		boolean isnew=true;
 
 		porpeso=true;
@@ -800,16 +805,20 @@ public class Venta extends PBase {
 				cant = dt.getInt(1);
 				ppeso = dt.getDouble(2);
 				uum = dt.getString(3);
+				um=uum;
+				umven=app.umVenta(prodid);
+				factbolsa=app.factorPres(prodid,umven,um);
+				cant=cant*factbolsa;
 
 				//if (sinimp) precdoc=precsin; else precdoc=prec;
 
 				if (prodPorPeso(prodid)) {
-					prec = prc.precio(prodid, cant, nivel, uum, gl.umpeso, ppeso);
+					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, ppeso,umven);
 					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,ppeso)) {
 						if (prc.precioespecial>0) prec=prc.precioespecial;
 					}
 				} else {
-					prec = prc.precio(prodid, cant, nivel, uum, gl.umpeso, 0);
+					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0,umven);
 					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,0)) {
 						if (prc.precioespecial>0) prec=prc.precioespecial;
 					}
@@ -819,6 +828,7 @@ public class Venta extends PBase {
 				pprecdoc = prec;
 
 				prodtot = prec;
+				if (factbolsa>1) prodtot = cant*prec;
 				if (prodPorPeso(prodid)) prodtot=mu.round2(prec*ppeso);
 
 				try {
@@ -846,11 +856,15 @@ public class Venta extends PBase {
 
 				ins.add("PRODUCTO",prodid);
 				ins.add("EMPRESA",emp);
-				if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",uum);
+				if (prodPorPeso(prodid)) {
+					ins.add("UM",gl.umpeso);
+				} else {
+					if (factbolsa==1) ins.add("UM",uum);else ins.add("UM",umven);
+				}
 				ins.add("CANT",cant);
 				ins.add("UMSTOCK",uum);
 				ins.add("FACTOR",gl.umfactor);
-				if (porpeso) {
+				if (prodPorPeso(prodid)) {
 					//ins.add("PRECIO",gl.prectemp);
 					ins.add("PRECIO",prec);
 				} else {
@@ -860,7 +874,7 @@ public class Venta extends PBase {
 				ins.add("DES",0);
 				ins.add("DESMON",0);
 				ins.add("TOTAL",prodtot);
-				if (porpeso) {
+				if (prodPorPeso(prodid)) {
 					//ins.add("PRECIODOC",gl.prectemp);
 					ins.add("PRECIODOC",pprecdoc);
 				} else {

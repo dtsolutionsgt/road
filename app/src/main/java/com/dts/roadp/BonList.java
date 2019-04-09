@@ -224,7 +224,7 @@ public class BonList extends PBase {
 			  item.cant=bcant;
 			  item.cantmin=DT.getDouble(3)*mul;
 			  
-			  item.precio=prc.precio( item.id,bcant,nivel,um,gl.umpeso,0);
+			  item.precio=prc.precio(item.id,bcant,nivel,um,gl.umpeso,0,um);
 			  item.prstr=mu.frmdec(item.precio);
 			  item.costo=prc.costo;
 			  
@@ -426,7 +426,7 @@ public class BonList extends PBase {
 			item.cant=bcant;
 			item.cantmin=0;
 
-			item.precio=prc.precio( item.id,1,nivel,um,gl.umpeso,0);
+			item.precio=prc.precio( item.id,1,nivel,um,gl.umpeso,0,um);
 			item.prstr=mu.frmdec(item.precio);
 			item.costo=prc.costo;
 

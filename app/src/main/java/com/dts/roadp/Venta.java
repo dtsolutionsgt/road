@@ -804,26 +804,29 @@ public class Venta extends PBase {
 				//if (sinimp) precdoc=precsin; else precdoc=prec;
 
 				if (prodPorPeso(prodid)) {
-					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, ppeso);
-					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,ppeso)) {
+					prec = prc.precio(prodid, cant, nivel, uum, gl.umpeso, ppeso);
+					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,ppeso)) {
 						if (prc.precioespecial>0) prec=prc.precioespecial;
 					}
 				} else {
-					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0);
-					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
+					prec = prc.precio(prodid, cant, nivel, uum, gl.umpeso, 0);
+					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,0)) {
 						if (prc.precioespecial>0) prec=prc.precioespecial;
 					}
 				}
 
+				if (prodPorPeso(prodid)) prec=mu.round2(prec/ppeso);
 				pprecdoc = prec;
+
 				prodtot = prec;
+				if (prodPorPeso(prodid)) prodtot=mu.round2(prec*ppeso);
 
 				try {
 					ins.init("T_BARRA");
 
 					ins.add("BARRA",barcode);
 					ins.add("CODIGO",prodid);
-					ins.add("PRECIO",prec);
+					ins.add("PRECIO",prodtot);
 					ins.add("PESO",ppeso);
 					ins.add("PESOORIG",ppeso);
 
@@ -847,12 +850,22 @@ public class Venta extends PBase {
 				ins.add("CANT",cant);
 				ins.add("UMSTOCK",uum);
 				ins.add("FACTOR",gl.umfactor);
-				if (porpeso) ins.add("PRECIO",gl.prectemp); else ins.add("PRECIO",prec);
+				if (porpeso) {
+					//ins.add("PRECIO",gl.prectemp);
+					ins.add("PRECIO",prec);
+				} else {
+					ins.add("PRECIO",prec);
+				}
 				ins.add("IMP",0);
 				ins.add("DES",0);
 				ins.add("DESMON",0);
 				ins.add("TOTAL",prodtot);
-				if (porpeso) ins.add("PRECIODOC",gl.prectemp); else ins.add("PRECIODOC",pprecdoc);
+				if (porpeso) {
+					//ins.add("PRECIODOC",gl.prectemp);
+					ins.add("PRECIODOC",pprecdoc);
+				} else {
+					ins.add("PRECIODOC",pprecdoc);
+				}
 				ins.add("PESO",ppeso);
 				ins.add("VAL1",0);
 				ins.add("VAL2","");

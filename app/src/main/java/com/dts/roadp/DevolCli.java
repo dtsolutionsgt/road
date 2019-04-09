@@ -30,7 +30,7 @@ public class DevolCli extends PBase {
 
 	private printer prn;
 	private clsDocDevolucion fdevol;
-	public Runnable printclose;
+	public Runnable printcallback,printclose,printexit;
 
 	private String cliid,itemid,prodid;
 	private double cant;
@@ -63,6 +63,18 @@ public class DevolCli extends PBase {
 		
 		clearData();
 
+		printcallback= new Runnable() {
+			public void run() {
+				askPrint();
+			}
+		};
+
+		printexit= new Runnable() {
+			public void run() {
+				DevolCli.super.finish();
+			}
+		};
+
 		printclose= new Runnable() {
 			public void run() {
 				limpiavariables_devol();
@@ -71,7 +83,8 @@ public class DevolCli extends PBase {
 		};
 
 
-		prn=new printer(this,printclose,gl.validimp);
+		prn=new printer(this,printexit,gl.validimp);
+
 		fdevol=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 		fdevol.deviceid =gl.deviceId;
 	}
@@ -576,9 +589,7 @@ public class DevolCli extends PBase {
 			if (prn.isEnabled()) {
 				fdevol.buildPrint(gl.dvcorreld,0);
 				//#CKFK 20190401 09:47AM Agregué la funcionalidad de enviar el nombre del archivo a imprimir
-				prn.printask(printclose, "printnc.txt");
-
-				askPrint();
+				prn.printask(printcallback, "printnc.txt");
 			}
 
 		}catch (Exception e){

@@ -1607,7 +1607,7 @@ public class ComWS extends PBase {
 
 		//#CKFK_20190319 Agregué tabla P_IMPRESORA
 		if (TN.equalsIgnoreCase("P_IMPRESORA")) {
-              SQL = " SELECT IDIMPRESORA, NUMSERIE, MARCA, ISNULL(CREADA,'') AS CREADA, " +
+              SQL = " SELECT IDIMPRESORA, NUMSERIE, MARCA, MACADDRESS, ISNULL(CREADA,'') AS CREADA, " +
                     " ISNULL(MODIFICADA,'') AS MODIFICADA, " +
                     "0 AS FECHA_CREADA,0 AS FECHA_MODIFICADA,MACADDRESS FROM P_IMPRESORA";
 			return SQL;

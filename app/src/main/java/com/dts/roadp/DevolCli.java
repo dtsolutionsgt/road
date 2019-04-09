@@ -374,6 +374,12 @@ public class DevolCli extends PBase {
 
 		try {
 
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				fecha=du.getActDate();
+			} else {
+				fecha=du.getActDateTime();
+			}
+
 		    if (gl.tiponcredito==1){
 
                 db.beginTransaction();

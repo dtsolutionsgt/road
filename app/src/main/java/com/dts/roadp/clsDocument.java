@@ -232,7 +232,7 @@ public class clsDocument {
 				rep.add("- P E N D I E N T E  D E  P A G O -");
 				pendiente = reimpres;
 			}
-			if (docfactura && (reimpres==5)) rep.add("------  C O N T A B I L I T A D  ------");
+			if (docfactura && (reimpres==5)) rep.add("------  C O N T A B I L I D A D  ------");
 			rep.add("");
 
 		}else if(docdevolucion){

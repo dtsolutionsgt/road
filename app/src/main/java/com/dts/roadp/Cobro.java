@@ -557,12 +557,32 @@ public class Cobro extends PBase {
 					if (prn.isEnabled()) {
 						fdocf.buildPrint(crrf,0,gl.peModal);
 						prn.printask(printcallback);
+					}else if(!prn.isEnabled()){
+						fdocf.buildPrint(crrf,0,gl.peModal);
+
+						if(gl.validarCred==1){
+							validaCredito();
+						}else if(gl.validarCred==2){
+							Cobro.super.finish();
+						}
+
+						gl.validarCred=0;
 					}
 				}else {
 					if (prn.isEnabled()) {
 						fdoc.buildPrint(corel,0,gl.peModal);
 						browse = 4;
 						prn.printask(printcallback);
+					}else if(!prn.isEnabled()){
+						fdoc.buildPrint(corel,0,gl.peModal);
+
+						if(gl.validarCred==1){
+							validaCredito();
+						}else if(gl.validarCred==2){
+							Cobro.super.finish();
+						}
+
+						gl.validarCred=0;
 					}
 				}
 			}

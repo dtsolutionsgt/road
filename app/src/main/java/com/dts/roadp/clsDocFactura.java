@@ -13,7 +13,7 @@ public class clsDocFactura extends clsDocument {
 
 	private double tot,desc,imp,stot,percep,totNotaC;
 	private boolean sinimp;
-	private String 	contrib,corelNotaC,asignacion,ccorel;
+	private String 	contrib,corelNotaC,asignacion,ccorel,corelF;
 	private int decimp,diacred,totitems;
 
 
@@ -179,8 +179,8 @@ public class clsDocFactura extends clsDocument {
 		
 		try {
 
-            sql="SELECT N.COREL, N.TOTAL, F.ASIGNACION " +
-                "FROM D_FACTURA F INNER JOIN D_NOTACRED N ON F.ASIGNACION = N.COREL " +
+            sql="SELECT N.COREL, F.COREL, N.TOTAL, N.FACTURA " +
+                "FROM D_FACTURA F INNER JOIN D_NOTACRED N ON F.COREL = N.FACTURA " +
                 "WHERE F.COREL = '"+corel+"'";
 
             DT=Con.OpenDT(sql);
@@ -189,8 +189,9 @@ public class clsDocFactura extends clsDocument {
             if(DT.getCount() != 0){
 
 				corelNotaC = DT.getString(0);
-				totNotaC = DT.getDouble(1);
-				asignacion = DT.getString(2);
+				corelF = DT.getString(1);
+				totNotaC = DT.getDouble(2);
+				asignacion = DT.getString(3);
 
 			}else{
 
@@ -425,7 +426,7 @@ public class clsDocFactura extends clsDocument {
 
 		rep.addtotsp("Subtotal", stot);
 
-		if (corelNotaC.equals(asignacion)) {
+		if (corelF.equals(asignacion)) {
 
 			rep.addtotsp("Nota de Credito", totNotaC);
 			rep.addtotsp("ITBM", totimp);

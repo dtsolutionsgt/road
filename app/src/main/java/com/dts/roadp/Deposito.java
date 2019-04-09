@@ -534,9 +534,11 @@ public class Deposito extends PBase {
 			if (!saveDoc()) return;
 
 			if (prn.isEnabled()) {
-				if (ddoc.buildPrint(corel,0)) prn.printask(printcallback);
+				ddoc.buildPrint(corel,0);
+				prn.printask(printcallback);
 				claseFinDia.updateImpDeposito(3);
-			} else {
+			} else if(!prn.isEnabled()){
+				ddoc.buildPrint(corel, 0);
 				Toast.makeText(this,"Depósito guardado", Toast.LENGTH_SHORT).show();
 				super.finish();
 			}

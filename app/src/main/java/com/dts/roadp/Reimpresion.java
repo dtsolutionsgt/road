@@ -426,7 +426,7 @@ public class Reimpresion extends PBase {
 				if (fdoc.buildPrint(itemid,impr,gl.peFormatoFactura)) prn.printask(printcallback);
 
 				//#CKFK_20190401 03:43 PM Agregué esto para imprimir la NC cuando la factura está asociada a una
-				corelNC=tieneNCFactura(itemid);
+				corelNC=getCorelNotaCred(itemid);
 
 				if (!corelNC.isEmpty()){
 
@@ -439,17 +439,18 @@ public class Reimpresion extends PBase {
 			}else if(!prn.isEnabled()){
 				fdoc.buildPrint(itemid,impr,gl.peFormatoFactura);
 
-				corelNC=tieneNCFactura(itemid);
+				corelNC=getCorelNotaCred(itemid);
 
 				if (!corelNC.isEmpty()){
+					fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+					fdev.deviceid =gl.deviceId;
+
 					fdev.buildPrint(corelNC, 1, "TOL");
 					toast("Reimpresion de factura y nota de credito generada");
 				}else{
 					toast("Reimpresion de factura generada");
 				}
 			}
-
-
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -523,7 +524,7 @@ public class Reimpresion extends PBase {
 				}
 
 				//#CKFK_20190401 03:43 PM Agregué esto para imprimir la NC cuando la factura está asociada a una
-				String corelNC=tieneNCFactura(itemid);
+				String corelNC=getCorelNotaCred(itemid);
 
 				if (!corelNC.isEmpty()){
 					fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
@@ -541,7 +542,7 @@ public class Reimpresion extends PBase {
 				} catch (Exception e) {
 				}
 
-				String corelNC=tieneNCFactura(itemid);
+				String corelNC=getCorelNotaCred(itemid);
 
 				if (!corelNC.isEmpty()){
 					fdev.buildPrint(corelNC, 1, "TOL");
@@ -564,7 +565,7 @@ public class Reimpresion extends PBase {
 		int corel;
 
 		try {
-			String corelFactura=tieneFacturaNC(itemid);
+			String corelFactura=getCorelFact(itemid);
 
 			if(prn.isEnabled()){
 
@@ -604,7 +605,7 @@ public class Reimpresion extends PBase {
 
 	}
 
-	private String tieneFacturaNC(String vCorel){
+	private String getCorelFact(String vCorel){
 
 		Cursor DT;
 		String vtieneFacturaNC= "";
@@ -645,26 +646,27 @@ public class Reimpresion extends PBase {
 		return vtieneFacturaNC;
 	}
 
-	private String tieneNCFactura(String vCorel){
+	private String getCorelNotaCred(String vCorel){
 
 		Cursor DT;
-		String vtieneNCFactura= "";
+		String vCorelNC= "";
 
 		try{
 
-			sql = "SELECT ASIGNACION FROM D_FACTURA WHERE COREL = '" + vCorel + "' AND ASIGNACION IN (SELECT COREL FROM D_CXC)";
+			sql = "SELECT N.COREL FROM D_FACTURA F  INNER JOIN D_NOTACRED N ON F.COREL = N.FACTURA "+
+				  "WHERE F.COREL = '" + vCorel + "'";
 			DT=Con.OpenDT(sql);
 
-			if (DT.getCount()>=0){
+			if (DT.getCount()>0){
 				DT.moveToFirst();
-				vtieneNCFactura = DT.getString(0);
+				vCorelNC = DT.getString(0);
 			}
 
 		}catch (Exception ex){
 			mu.msgbox("tieneNCFactura ocurrió un error "+ex.getMessage());
 		}
 
-		return vtieneNCFactura;
+		return vCorelNC;
 	}
 
 	// Aprofam

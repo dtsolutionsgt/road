@@ -839,6 +839,7 @@ public class Venta extends PBase {
 					ins.add("PRECIO",prodtot);
 					ins.add("PESO",ppeso);
 					ins.add("PESOORIG",ppeso);
+					ins.add("CANTIDAD",cant);
 
 					db.execSQL(ins.sql());
 
@@ -890,8 +891,10 @@ public class Venta extends PBase {
 				db.execSQL(ins.sql());
 
 			} catch (SQLException e) {
-				actualizaTotalesBarra();
+
 			}
+
+			actualizaTotalesBarra();
 
 			if (isnew) validaBarraBon();
 
@@ -910,7 +913,9 @@ public class Venta extends PBase {
 
 		try {
 
-			sql="SELECT COUNT(BARRA),SUM(PESO),SUM(PRECIO) FROM T_BARRA WHERE CODIGO='"+prodid+"'";
+			//sql="SELECT COUNT(BARRA),SUM(PESO),SUM(PRECIO) FROM T_BARRA WHERE CODIGO='"+prodid+"'";
+			//#CKFK 20190410 se modificó esta consulta para sumar la cantidad y no contar las barras
+			sql="SELECT SUM(CANTIDAD),SUM(PESO),SUM(PRECIO) FROM T_BARRA WHERE CODIGO='"+prodid+"'";
 			dt=Con.OpenDT(sql);
 
 			ccant=0;ppeso=0;pprecio=0;

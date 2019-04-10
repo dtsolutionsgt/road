@@ -2115,6 +2115,7 @@ public class BaseDatosScript {
 					"[PRECIO] REAL NOT NULL,"+
 					"[PESO] REAL NOT NULL,"+
 					"[PESOORIG] REAL NOT NULL,"+
+					"[CANTIDAD] REAL NOT NULL,"+
 					"PRIMARY KEY ([BARRA],[CODIGO])"+
 					");";
 			database.execSQL(vSQL);

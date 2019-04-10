@@ -198,6 +198,7 @@ public class clsDocFactura extends clsDocument {
             	corelNotaC = "";
             	asignacion = "*";
             	totNotaC = 0;
+				corelF = "";
 
             }
 

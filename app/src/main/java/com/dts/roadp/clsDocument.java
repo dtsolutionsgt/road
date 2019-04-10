@@ -74,6 +74,7 @@ public class clsDocument {
 
 		if (modofact.equalsIgnoreCase("TOL")) {
 			if (docfactura && (reimpres==10)) flag=1;
+			if (docfactura && (reimpres==4)) flag=0;
 			if (doccanastabod) flag=2;
 			if (docrecibo && (reimpres==0)) flag=0;
         } else if(modofact.equalsIgnoreCase("*")) {

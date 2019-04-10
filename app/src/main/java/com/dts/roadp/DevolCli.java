@@ -771,7 +771,7 @@ public class DevolCli extends PBase {
 					impres++;toast("Impres "+impres);
 
 					try {
-						sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorreld+"'";
+						sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorrelnc+"'";
 						db.execSQL(sql);
 					} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -780,7 +780,7 @@ public class DevolCli extends PBase {
 					if (impres>1) {
 
 						try {
-							sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorreld+"'";
+							sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorrelnc+"'";
 							db.execSQL(sql);
 						} catch (Exception e) {
 							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -790,7 +790,7 @@ public class DevolCli extends PBase {
 
 					} else {
 
-						fdevol.buildPrint(gl.dvcorreld,1);
+						fdevol.buildPrint(gl.dvcorrelnc,1,"*");
 
 						prn.printnoask(printclose, "printnc.txt");
 						prn.printnoask(printclose, "printnc.txt");

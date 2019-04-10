@@ -14,7 +14,7 @@ public class clsDocFactura extends clsDocument {
 	private double tot,desc,imp,stot,percep,totNotaC;
 	private boolean sinimp;
 	private String 	contrib,corelNotaC,asignacion,ccorel,corelF;
-	private int decimp,diacred,totitems;
+	private int decimp,totitems;
 
 
 	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres, String archivo) {
@@ -106,7 +106,7 @@ public class clsDocFactura extends clsDocument {
 		vendedor=val;
 		
 		try {
-			sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION,NIT,DIACREDITO FROM P_CLIENTE WHERE CODIGO='"+cli+"'";
+			sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION,NIT,MEDIAPAGO,DIACREDITO FROM P_CLIENTE WHERE CODIGO='"+cli+"'";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
 			
@@ -120,7 +120,8 @@ public class clsDocFactura extends clsDocument {
 			clicod=cli;
 			clidir=DT.getString(3);
 			nit=DT.getString(4);
-			diacred=DT.getInt(5);
+			condicionPago=DT.getInt(5);
+			diacred=DT.getInt(6);
 			
 		} catch (Exception e) {
 			val=cli;

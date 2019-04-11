@@ -166,7 +166,6 @@ public class printDMax extends printBase {
 
 		appG.endPrint = true;
 		showmsg("Imprimiendo ..." );
-		//showmsg("MAC : "+printerAddress );
 		AsyncPrintCall wsRtask = new AsyncPrintCall();
 		wsRtask.execute();
 	}

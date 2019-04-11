@@ -2313,7 +2313,13 @@ public class FacturaRes extends PBase {
 						gl.brw=0;
 						FacturaRes.super.finish();
 					} else {
-						fdoc.buildPrint(corel, 10,gl.peFormatoFactura);
+
+						if (!gl.cobroPendiente) {
+							fdoc.buildPrint(corel, 10,gl.peFormatoFactura);
+						}else{
+							fdoc.buildPrint(corel,4,gl.peFormatoFactura);
+						}
+
 						prn.printask(printcallback);
 
 						if (notaC==2){

@@ -142,9 +142,9 @@ public class Pago extends PBase {
 	
 	public void savePago(View view){
 		try{
-			if (pagomodo==0) {
-				finalCheck();
-			} else {
+			if ((pagomodo==0) ) {
+				finalCheck(cobro);
+			}else {
 				gl.pagado=totalPago()>0;
 				if (gl.dvbrowse!=0){
 					gl.brw=1;
@@ -299,13 +299,23 @@ public class Pago extends PBase {
 		actMonto();
 	}
 	
-	private void finalCheck() {
+	private void finalCheck(boolean vPagoCobro) {
 		try{
-			if (totalPago()< saldo) {
-				msgAskSaveEmpty("El saldo es mayor que el monto . Salir");
-			} else {
-				msgAskSave("Aplicar pagos y continuar?");
+
+			if (!vPagoCobro){
+				if (totalPago()<saldo) {
+					msgAskSaveEmpty("Pago no está completo. Salir");
+					return;
+				}
+			}else if (vPagoCobro){
+				if (saldo < totalPago()) {
+					msgAskSaveEmpty("Total a pagar mayor que saldo. Salir");
+					return;
+				}
 			}
+
+			msgAskSave("Aplicar pagos y continuar?");
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -690,13 +700,11 @@ public class Pago extends PBase {
 			lblTotal.setText(mu.frmdec(tp));
 
 			if (pagomodo==0) {
-				if (monto==0) finalCheck();
+				if (monto==0) finalCheck(cobro);
 			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
 	}
 	
 	private void doExit(){

@@ -946,7 +946,7 @@ public class Cobro extends PBase {
 			alert.setView(input);
 
 			input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-			input.setText(""+mu.round2(tsel));
+			input.setText(""+tsel);
 			input.requestFocus();
 
 			alert.setCancelable(false);
@@ -956,6 +956,7 @@ public class Cobro extends PBase {
 			alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					peexit=false;
+                    sefect=input.getText().toString();
 					//closekeyb();
 					checkCash();
 				}
@@ -981,13 +982,15 @@ public class Cobro extends PBase {
 		
 		try {
 
-			epago=tsel;
+		    //#CKFK 2019-04-10 Quité epago=tsel; porque aquí se debe asignar el valor ingresado por el usuario
+            epago=Double.parseDouble(sefect);
+
 			if (epago==0) return;
 			
 			if (epago<0) throw new Exception();
 			
 			if (epago>tsel) {
-				mu.msgbox("Total de pago mayor que total de saldo.");return;
+				mu.msgbox("Total a pagar mayor que total de monto seleccionado");return;
 			}
 
 			sql="DELETE FROM T_PAGO";
@@ -1100,8 +1103,6 @@ public class Cobro extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		    msgbox("calcSelected: "+ e.getMessage());
 		}
-
-		
 	}
 
 	private void clearAll() {

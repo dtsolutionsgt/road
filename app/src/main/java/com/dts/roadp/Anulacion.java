@@ -217,7 +217,7 @@ public class Anulacion extends PBase {
 			}
 
 			if (tipo==6) {
-				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.CODIGO, P_CLIENTE.NOMBRE,D_NOTACRED.TOTAL,FECHA "+
+				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.CODIGO || ' - ' || P_CLIENTE.NOMBRE AS DESC,FECHA,D_NOTACRED.TOTAL "+
 					"FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
 					"WHERE (D_NOTACRED.ANULADO='N') AND (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC ";
 			}
@@ -238,9 +238,11 @@ public class Anulacion extends PBase {
 					if (tipo==2) vItem.Desc+=" - "+DT.getString(4);	
 					
 					if (tipo==3) {
-						sf=DT.getString(2)+"-"+DT.getInt(4);						
-					} else {	
-						f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);	
+						sf=DT.getString(2)+"-"+DT.getInt(4);
+					}else if(tipo==6){
+						sf=DT.getString(0);
+					}else{
+						f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);
 					}
 					
 					vItem.Fecha=sf;
@@ -330,7 +332,7 @@ public class Anulacion extends PBase {
 				fdoc.deviceid =gl.deviceId;
 
 				if (!corelFactura.isEmpty()){
-					fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printask(printclose);
+					fdoc.buildPrint(corelFactura, 3, "TOL"); prn.printask(printclose);
 				}
 
 				SystemClock.sleep(50);
@@ -338,7 +340,7 @@ public class Anulacion extends PBase {
 				fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 				fdev.deviceid =gl.deviceId;
 
-				fdev.buildPrint(itemid, 1, "TOL"); prn.printask(printclose);
+				fdev.buildPrint(itemid, 3, "TOL"); prn.printask(printclose);
 
 			}
 

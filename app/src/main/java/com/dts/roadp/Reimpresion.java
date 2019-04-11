@@ -228,11 +228,11 @@ public class Reimpresion extends PBase {
 				if (gl.peModal.equalsIgnoreCase("TOL")) {
 					sql = "SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO,D_FACTURA.IMPRES " +
 							"FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO " +
-							"WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC";
+							"WHERE (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC";
 				} else {
 					sql = "SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO,D_FACTURA.IMPRES " +
 							"FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO " +
-							"WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC LIMIT 1";
+							"WHERE AND (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC LIMIT 1";
 				}
 			}
 				
@@ -245,7 +245,7 @@ public class Reimpresion extends PBase {
 			if (tipo==6) {
 				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.NOMBRE,D_NOTACRED.SERIE,D_NOTACRED.TOTAL,D_NOTACRED.CORELATIVO,D_NOTACRED.IMPRES "+
 					 "FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
-					 "WHERE (D_NOTACRED.ANULADO='N') AND (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC";
+					 "WHERE (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC";
 			}
 			
 			if (tipo<99) {
@@ -267,7 +267,7 @@ public class Reimpresion extends PBase {
 
 						if (tipo==3) {
 							sf=DT.getString(2)+"-"+DT.getInt(4);						
-						} else if (tipo==6){
+						} else if (tipo==1||tipo==6){
 							sf=DT.getString(0);
 						}else {
 							f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);
@@ -570,14 +570,29 @@ public class Reimpresion extends PBase {
 			if(prn.isEnabled()){
 
 				if(ncFact==1){
-					fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
-					fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printask();
+					if(tipo==6){
+						fdev.buildPrint(itemid, 3, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+						fdoc.buildPrint(corelFactura, 3, "TOL"); prn.printask();
 
-					toast("Reimpresion de nota de credito y factura generada");
+						toast("Reimpresion de nota de credito y factura generada");
+					}else {
+						fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+						fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printask();
+
+						toast("Reimpresion de nota de credito y factura generada");
+					}
+
 				}else if(ncFact==2){
-					fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+					if(tipo==6){
+						fdev.buildPrint(itemid, 3, "TOL"); prn_nc.printask(printclose, "printnc.txt");
 
-					toast("Reimpresion de nota de credito generada");
+						toast("Reimpresion de nota de credito generada");
+					}else{
+						fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+
+						toast("Reimpresion de nota de credito generada");
+					}
+
 				}
 
 

@@ -3,6 +3,7 @@ package com.dts.roadp;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,7 +32,7 @@ import java.lang.reflect.Field;
 public class MainActivity extends PBase {
 
 	private EditText txtUser,txtPass;
-	private TextView lblRuta,lblRTit,lblLogin,lblVer;
+	private TextView lblRuta,lblRTit,lblLogin,lblVer,lblID;
 	private ImageView imgLogo;
 		
 	private clsLicence lic;
@@ -104,6 +105,7 @@ public class MainActivity extends PBase {
             lblRTit= (TextView) findViewById(R.id.lblCUsed);
             lblLogin= (TextView) findViewById(R.id.lblDir);
             lblVer= (TextView) findViewById(R.id.textView10);
+            lblID= (TextView) findViewById(R.id.textView81);
             imgLogo= (ImageView) findViewById(R.id.imgNext);
 
             lblVer.setText("Version "+gl.parVer);
@@ -190,7 +192,7 @@ public class MainActivity extends PBase {
 	
 	public void doRegister(View view) {
 	    try{
-            //startActivity(new Intent(this, LicRegis.class));
+            startActivity(new Intent(this, comWSLic.class));
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -368,6 +370,7 @@ public class MainActivity extends PBase {
 
         //Id de Dispositivo
         gl.deviceId = androidid();
+		gl.devicename =getLocalBluetoothName();lblID.setText(gl.devicename);
 
         try {
             AppMethods app = new AppMethods(this, gl, Con, db);
@@ -751,6 +754,17 @@ public class MainActivity extends PBase {
 
 		return uniqueID;
 	}
+
+    public String getLocalBluetoothName() {
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (mBluetoothAdapter==null) {
+            return "";
+        } else {
+            return mBluetoothAdapter.getName();
+        }
+    }
+
 	//endregion
 
 	//region Activity Events

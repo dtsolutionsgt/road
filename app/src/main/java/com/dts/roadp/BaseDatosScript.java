@@ -21,11 +21,15 @@ public class BaseDatosScript {
 
 			vSQL="CREATE TABLE [Params] ("+
 					"ID integer NOT NULL primary key,"+
-					"EmpID INTEGER  NOT NULL,"+
-					"dbver INTEGER  NOT NULL,"+
-					"param1 INTEGER  NOT NULL,"+
-					"param2 INTEGER  NOT NULL,"+
-					"Lic INTEGER  NOT NULL);"; 
+					"EmpID     INTEGER  NOT NULL,"+
+					"dbver     INTEGER  NOT NULL,"+
+					"param1    INTEGER  NOT NULL,"+
+					"param2    INTEGER  NOT NULL,"+
+					"prn       TEXT     NOT NULL,"+
+					"prnparam  TEXT     NOT NULL,"+
+					"prnserie  TEXT     NOT NULL,"+
+					"lic       TEXT     NOT NULL,"+
+					"licparam  TEXT     NOT NULL);";
 			database.execSQL(vSQL);
 
 			vSQL="CREATE TABLE [FinDia] ("+
@@ -1912,7 +1916,7 @@ public class BaseDatosScript {
 					"[IDIMPRESORA] TEXT NOT NULL,"+
 					"[NUMSERIE] TEXT NOT NULL,"+
 					"[MARCA] TEXT NOT NULL,"+
-					"[MACADDRESS] TEXT NOT NULL,"+
+					"[MODELO] TEXT NOT NULL,"+
 					"[CREADA] TEXT NOT NULL,"+
 					"[MODIFICADA] TEXT NOT NULL,"+
 					"[FECHA_CREADA] INTEGER NOT NULL,"+
@@ -2149,21 +2153,13 @@ public class BaseDatosScript {
 	public int scriptData(SQLiteDatabase db) {
 				
 		try {
-			  db.execSQL("INSERT INTO Params VALUES (0,0,0,0,0,0);"); 
-			  
-			  db.execSQL("INSERT INTO FinDia VALUES (0,0, 0,0,0,0, 0,0,0,0);"); 
-			  
-				  
-			  //db.execSQL("INSERT INTO D_COBRO VALUES('1','N',14040112000,'1','1','1','1',0,'0','0','N',0,'N',1000,'N');");
-			  //db.execSQL("INSERT INTO D_COBRO VALUES('2','N',14040112000,'1','1','1','2',0,'0','0','N',0,'N',500,'N');");
-			  //db.execSQL("INSERT INTO D_COBRO VALUES('3','N',14040112000,'1','1','1','3',0,'0','0','N',0,'N',400,'N');");
-			    
+			  db.execSQL("INSERT INTO Params VALUES (0,0,0,0,0,'','','','','');");
+			  db.execSQL("INSERT INTO FinDia VALUES (0,0, 0,0,0,0, 0,0,0,0);");
     	      return 1;
 	    } catch (SQLiteException e) {
 	    	 msgbox(e.getMessage());
 	    	 return 0;
-	    } 
-		  
+	    }
 	}
 	
 	private void msgbox(String msg) {

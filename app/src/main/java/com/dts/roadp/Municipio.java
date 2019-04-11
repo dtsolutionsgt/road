@@ -1,38 +1,26 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
-import com.dts.roadp.clsClasses.clsCD;
-
-import android.app.Activity;
-import android.app.Application;
 import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.EditText;
+import android.widget.ListView;
+
+import com.dts.roadp.clsClasses.clsCD;
+
+import java.util.ArrayList;
 
 public class Municipio extends PBase {
 
 	private ListView listView;
 	private EditText txtFilter;
 	
-	private ArrayList<clsCD> items;
+	private ArrayList<clsCD> items = new ArrayList<clsCD>();
 	private ListAdaptCD adapter;
 
 	private String itemid,prname;
@@ -47,8 +35,6 @@ public class Municipio extends PBase {
 
 		listView = (ListView) findViewById(R.id.listView1);
 		txtFilter = (EditText) findViewById(R.id.txtMonto);
-	
-		items = new ArrayList<clsCD>();
 
 		setHandlers();
 

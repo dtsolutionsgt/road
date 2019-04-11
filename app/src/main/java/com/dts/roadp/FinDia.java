@@ -59,8 +59,8 @@ public class FinDia extends PBase {
         rutatipo = gl.rutatipog;
 
         app = new AppMethods(this, gl, Con, db);
-        gl.validimp=app.validaImpresora("*");
-        if (!gl.validimp) toast("¡La impresora no está autorizada!");
+        gl.validimp=app.validaImpresora();
+        if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
         fullfd = false;
         if (rutatipo.equalsIgnoreCase("T")) {

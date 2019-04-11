@@ -40,7 +40,7 @@ public class Exist extends PBase {
 	private printer prn;
 	private Runnable printclose;
 
-	private AppMethods clsAppM;
+	private AppMethods app;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +52,9 @@ public class Exist extends PBase {
 		
 		tipo=((appGlobals) vApp).tipo;
 
-		clsAppM = new AppMethods(this, gl, Con, db);
+		app = new AppMethods(this, gl, Con, db);
+		gl.validimp=app.validaImpresora();
+		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
 		listView = (ListView) findViewById(R.id.listView1);
 		txtFilter = (EditText) findViewById(R.id.txtMonto);
@@ -558,8 +560,8 @@ public class Exist extends PBase {
 
 			try {
 
-				SumaPeso = clsAppM.getPeso();
-				SumaCant = clsAppM.getCantidad();
+				SumaPeso = app.getPeso();
+				SumaCant = app.getCantidad();
 
 				rep.empty();
 				rep.add("Total unidades:" + StringUtils.leftPad(mu.frmdecimal(SumaCant,gl.peDecImp), 10));

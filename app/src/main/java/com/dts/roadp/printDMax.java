@@ -16,7 +16,7 @@ import java.io.InputStreamReader;
 
 import datamaxoneil.connection.Connection_Bluetooth;
 
-// 00:17:AC:01:75:E9
+// 00:17:AC:15:EC:C3
 
 public class printDMax extends printBase {
 	

@@ -146,6 +146,16 @@
             android:maxWidth="610dp"
             android:onClick="showMenu"
             android:src="@drawable/logo" />
+
+        <TextView
+            android:id="@+id/textView81"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:text="TextView"
+            android:textSize="20sp"
+            android:textStyle="normal|bold" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -174,8 +184,8 @@
             android:id="@+id/imageView1"
             android:layout_width="24dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
             android:clickable="true"
             android:onClick="doRegister"
             android:paddingLeft="3dp"
@@ -186,8 +196,8 @@
             android:id="@+id/textView9"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@+id/imageView1"
             android:clickable="true"
             android:gravity="center_vertical"

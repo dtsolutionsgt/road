@@ -79,12 +79,12 @@ public class UtilPrint extends PBase {
 	
 	public void doApply(View view) {
 		try{
-			if (!app.validaImpresora(txtPar.getText().toString().trim())) {
-				msgbox("¡La impresora no está autorizada!");return;
-			}
+			//if (!app.validaImpresora(txtPar.getText().toString().trim())) {
+			//	msgbox("¡La impresora no está autorizada!");return;
+			//}
 
 			updateItem();
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 

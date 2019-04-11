@@ -1271,12 +1271,11 @@ public class Menu extends PBase {
 	
 	private void menuConfImpres() {
 		try{
-			Intent intent = new Intent(this,UtilPrint.class);
+			Intent intent = new Intent(this,UtilPrint2.class);
 			startActivity(intent);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 	
 	private void menuCorelZ() {

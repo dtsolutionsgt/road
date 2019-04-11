@@ -646,21 +646,19 @@ public class AppMethods {
 		}
 	}
 
-	public boolean validaImpresora(String prid) {
+	public boolean validaImpresora() {
 		CryptUtil cu=new CryptUtil();
 		Cursor dt;
-		String se,sd;
+		String se,sd,prid;
 
-		if (prid.equalsIgnoreCase("*")) {
-			try {
-				sql = "SELECT PUERTO_IMPRESION FROM P_ARCHIVOCONF";
-				dt = Con.OpenDT(sql);
-				dt.moveToFirst();
+		try {
+			sql = "SELECT prnserie FROM Params";
+			dt = Con.OpenDT(sql);
+			dt.moveToFirst();
 
-				prid = dt.getString(0);
-			} catch (Exception e) {
-				prid="..";
-			}
+			prid = dt.getString(0);
+		} catch (Exception e) {
+			return false;
 		}
 
 		try {
@@ -670,7 +668,8 @@ public class AppMethods {
 			if (dt.getCount()>0) dt.moveToFirst();
 			while (!dt.isAfterLast()) {
 				se=dt.getString(0);
-				sd=cu.decrypt(se);
+				//sd=cu.decrypt(se);
+				sd=se;
 
 				if (sd.equalsIgnoreCase(prid)) return true;
 
@@ -681,8 +680,57 @@ public class AppMethods {
 		}
 
 		return false;
+
 	}
 
+	public String impresTipo() {
+		Cursor dt;
+		String prnid;
+
+		try {
+
+			sql="SELECT prn FROM Params";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			prnid=dt.getString(0);
+
+			sql="SELECT MARCA FROM P_IMPRESORA WHERE IDIMPRESORA='"+prnid+"'";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return "SIN IMPRESORA";
+			dt.moveToFirst();
+
+			return dt.getString(0);
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			return "SIN IMPRESORA";
+		}
+	}
+
+	public String impresParam() {
+		CryptUtil cu=new CryptUtil();
+		Cursor dt;
+		String prnid;
+
+		try {
+
+			sql="SELECT prn FROM Params";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			prnid=dt.getString(0);
+
+			sql="SELECT MACADDRESS FROM P_IMPRESORA WHERE IDIMPRESORA='"+prnid+"'";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return " #### ";
+			dt.moveToFirst();
+
+			return cu.decrypt(dt.getString(0));
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			return " #### ";
+		}
+	}
 
 
 	// Common

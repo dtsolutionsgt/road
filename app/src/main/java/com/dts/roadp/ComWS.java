@@ -620,6 +620,88 @@ public class ComWS extends PBase {
 		}
 	}
 
+	public int fillTableImpresora() {
+
+		int rc;
+		String s, ss, delcmd="DELETE FROM P_IMPRESORA";
+
+		METHOD_NAME = "getInsImpresora";
+
+		sstr = "OK";
+
+		try {
+
+			idbg = idbg + " filltableImpresora ";
+
+			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+			envelope.dotNet = true;
+
+			/*
+			PropertyInfo param = new PropertyInfo();
+			param.setType(String.class);
+			param.setName("SQL");
+			param.setValue(value);
+			request.addProperty(param);
+			*/
+			envelope.setOutputSoapObject(request);
+
+			HttpTransportSE transport = new HttpTransportSE(URL);
+			transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+			SoapObject resSoap = (SoapObject) envelope.getResponse();
+			SoapObject result = (SoapObject) envelope.bodyIn;
+
+			rc = resSoap.getPropertyCount() - 1;
+			idbg = idbg + " rec " + rc + "  ";
+
+			s = "";
+
+			for (int i = 0; i < rc; i++) {
+				String str = "";
+				try {
+					str = ((SoapObject) result.getProperty(0)).getPropertyAsString(i);
+					//s=s+str+"\n";
+				} catch (Exception e) {
+					mu.msgbox("error: " + e.getMessage());
+				}
+
+				if (i == 0) {
+
+					idbg = idbg + " ret " + str + "  ";
+
+					if (str.equalsIgnoreCase("#")) {
+						listItems.add(delcmd);
+					} else {
+						idbg = idbg + str;
+						ftmsg = ftmsg + "\n" + str;
+						ftflag = true;
+						sstr = str;
+						return 0;
+					}
+				} else {
+					try {
+						sql = str;
+						listItems.add(sql);
+						sstr = str;
+					} catch (Exception e) {
+						addlog(new Object() {
+						}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+						sstr = e.getMessage();
+					}
+				}
+			}
+
+			return 1;
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			sstr = e.getMessage();
+			idbg = idbg + " ERR " + e.getMessage();
+			return 0;
+		}
+	}
+
 	public int commitSQL() {
 		int rc;
 		String s, ss;
@@ -816,7 +898,6 @@ public class ComWS extends PBase {
 		int rc, scomp, prn, jj;
 		String s, val = "";
 
-
 		try {
 
 			String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
@@ -829,11 +910,8 @@ public class ComWS extends PBase {
 			DT = Con.OpenDT(sql);
 
 			if (DT.getCount() > 0) {
-
 				DT.moveToFirst();
-
 				val = DT.getString(0);
-
 			} else {
 				val = "N";
 			}
@@ -849,12 +927,7 @@ public class ComWS extends PBase {
 
 
 		listItems.clear();
-		scomp = 0;
-		idbg = "";
-		stockflag = 0;
-
-		ftmsg = "";
-		ftflag = false;
+		scomp = 0;idbg = "";stockflag = 0;ftmsg = "";ftflag = false;
 
 		try {
 
@@ -903,7 +976,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MUNI")) return false;
 			if (!AddTable("P_VEHICULO")) return false;
 			if (!AddTable("P_HANDHELD")) return false;
-			if (!AddTable("P_IMPRESORA")) return false;
+			fillTableImpresora();
 
 			if (!AddTable("P_REF1")) return false;
 			if (!AddTable("P_REF2")) return false;
@@ -913,14 +986,12 @@ public class ComWS extends PBase {
 			if (!AddTable("P_ENCABEZADO_REPORTESHH")) return false;
 			if (!AddTable("P_PORCMERMA")) return false;
 
-
 			// Objetivos
 
 			if (!AddTable("O_RUTA")) return false;
 			if (!AddTable("O_COBRO")) return false;
 			if (!AddTable("O_PROD")) return false;
 			if (!AddTable("O_LINEA")) return false;
-
 
 			// Mercadeo
 
@@ -931,10 +1002,6 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MERRESP")) return false;
 			if (!AddTable("P_MERMARCACOMP")) return false;
 			if (!AddTable("P_MERPRODCOMP")) return false;
-
-			//if (gl.contlic) {
-			//	if (!AddTable("LIC_CLIENTE")) return false;
-			//}
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -958,26 +1025,21 @@ public class ComWS extends PBase {
 			ConT.vDatabase = dbT;
 			insT = ConT.Ins;
 
-			prn = 0;
-			jj = 0;
-
-			Log.d("M", "So far we are good");
+			prn = 0;jj = 0;
+			Log.d("M", "So far so good");
 
 			dbT.beginTransaction();
 
 			for (int i = 0; i < rc; i++) {
 
-				sql = listItems.get(i);
-				esql = sql;
+				sql = listItems.get(i);esql = sql;
 				sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
 				sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
 
 				try {
-					writer.write(sql);
-					writer.write("\r\n");
+					writer.write(sql);writer.write("\r\n");
 				} catch (Exception e) {
-					Log.d("M", "Something happend here " + e.getMessage());
-				}
+					}
 
 				try {
 					dbT = ConT.getWritableDatabase();
@@ -1006,13 +1068,12 @@ public class ComWS extends PBase {
 			wsRtask.onProgressUpdate();
 
 			Actualiza_FinDia();
+			encodePrinters();
 
             SetStatusRecToTrans("1");
 
 			dbT.setTransactionSuccessful();
 			dbT.endTransaction();
-
-			Log.d("M", "We are ok");
 
 			fprog = "Documento de inventario recibido en BOF...";
 			wsRtask.onProgressUpdate();
@@ -1027,17 +1088,14 @@ public class ComWS extends PBase {
 			try {
 				ConT.close();
 			} catch (Exception e) {
-				addlog(new Object() {
-				}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+				//addlog(new Object() {	}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			}
 
 			try {
 				writer.close();
 			} catch (Exception e) {
-				addlog(new Object() {
-				}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-				msgbox(new Object() {
-				}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+				//addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+				//msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
 			}
 
 			return true;
@@ -1059,6 +1117,7 @@ public class ComWS extends PBase {
 			sstr = e.getMessage();
 			ferr = sstr + "\n" + sql;
 			esql = sql;
+
 			return false;
 		}
 
@@ -1252,8 +1311,7 @@ public class ComWS extends PBase {
 
 		try {
 
-			fprog = TN;
-			idbg = TN;
+			fprog = TN;idbg = TN;
 			wsRtask.onProgressUpdate();
 			SQL = getTableSQL(TN);
 
@@ -1906,35 +1964,27 @@ public class ComWS extends PBase {
 		return true;
 	}
 
-	private void encodeData() {
-		Handler mtimer = new Handler();
-		Runnable mrunner=new Runnable() {
-			@Override
-			public void run() {
-				encodePrinters();
-			}
-		};
-		mtimer.postDelayed(mrunner,200);
-	}
-
 	private void encodePrinters() {
 		CryptUtil cu=new CryptUtil();
 		Cursor dt;
-		String prid,ser,se;
+		String prid,ser,mac,se,sm;
 
 		try {
-			sql="SELECT IDIMPRESORA,NUMSERIE FROM P_IMPRESORA";
-			dt=Con.OpenDT(sql);
+			sql="SELECT IDIMPRESORA,NUMSERIE,MACADDRESS FROM P_IMPRESORA";
+			dt=ConT.OpenDT(sql);
 
 			if (dt.getCount() > 0) dt.moveToFirst();
 			while (!dt.isAfterLast()) {
 
 				prid=dt.getString(0);
 				ser=dt.getString(1);
-				se=cu.encrypt(ser);
+				mac=dt.getString(2);
 
-				sql="UPDATE P_IMPRESORA SET NUMSERIE='"+se+"' WHERE IDIMPRESORA='"+prid+"'";
-				db.execSQL(sql);
+				se=cu.encrypt(ser);
+				sm=cu.encrypt(mac);
+
+				sql="UPDATE P_IMPRESORA SET NUMSERIE='"+se+"',MACADDRESS='"+sm+"' WHERE IDIMPRESORA='"+prid+"'";
+				dbT.execSQL(sql);
 
 				dt.moveToNext();
 			}
@@ -1981,19 +2031,16 @@ public class ComWS extends PBase {
 		barInfo.setVisibility(View.INVISIBLE);
 		lblParam.setVisibility(View.INVISIBLE);
 		running = 0;
+
 		try {
 			if (fstr.equalsIgnoreCase("Sync OK")) {
 
 				lblInfo.setText(" ");
 				s = "Recepción completa.";
-
-				if (stockflag == 1) {
-					s = s + "\nSe actualizó inventario.";
-				}
+				if (stockflag == 1) s = s + "\nSe actualizó inventario.";
 
 				clsAppM.estandartInventario();
 				validaDatos(true);
-				encodeData();
 
 				if (stockflag == 1) sendConfirm();
 
@@ -2002,7 +2049,7 @@ public class ComWS extends PBase {
 			} else {
 				lblInfo.setText(fstr);
 				mu.msgbox("Ocurrió error : \n" + fstr + " (" + reccnt + ") ");
-				mu.msgbox("::" + esql);
+				//mu.msgbox("::" + esql);
 				isbusy = 0;
 				barInfo.setVisibility(View.INVISIBLE);
 				addlog("Recepcion", fstr, esql);
@@ -2122,8 +2169,6 @@ public class ComWS extends PBase {
 			updateInventario();
 
 			update_Corel_GrandTotal();
-
-			//updateLicence();
 
 			envioFinDia();
 

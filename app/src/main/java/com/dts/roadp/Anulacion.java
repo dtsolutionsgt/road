@@ -57,8 +57,8 @@ public class Anulacion extends PBase {
 		lblTipo= (TextView) findViewById(R.id.lblDescrip);
 
 		app = new AppMethods(this, gl, Con, db);
-		gl.validimp=app.validaImpresora("*");
-		if (!gl.validimp) toast("¡La impresora no está autorizada!");
+		gl.validimp=app.validaImpresora();
+		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
 		tipo=gl.tipo;
 		if (gl.peModal.equalsIgnoreCase("APR")) modoapr=true;

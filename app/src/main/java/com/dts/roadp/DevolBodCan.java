@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -73,6 +74,8 @@ public class DevolBodCan extends PBase {
         };
 
         prn_can=new printer(this,printclose,gl.validimp);
+        prn_paseante=new printer(this,printclose,gl.validimp);
+
         fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
         fcanastabod.deviceid =gl.deviceId;
 
@@ -503,13 +506,14 @@ public class DevolBodCan extends PBase {
         try{
 
             impres=0;
+
+            existenciaC=tieneCanasta(corel);
+            existenciaP=tienePaseante(corel);
+
+            if(existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=1;
+            if(!existenciaC.isEmpty() && existenciaP.isEmpty()) impres=2;
+
             if (prn_can.isEnabled()) {
-
-                existenciaC=tieneCanasta(corel);
-                existenciaP=tienePaseante(corel);
-
-                if(existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=1;
-                if(!existenciaC.isEmpty() && existenciaP.isEmpty()) impres=2;
 
                 if(!existenciaC.isEmpty()){
                     if(impres==0){
@@ -527,9 +531,9 @@ public class DevolBodCan extends PBase {
                     if(!existenciaP.isEmpty()){
 
                         if(!existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=3;
-                        prn_paseante=new printer(this,printclose,gl.validimp);
+                        /*prn_paseante=new printer(this,printclose,gl.validimp);
                         fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
-                        fcanastabod.deviceid =gl.deviceId;
+                        fcanastabod.deviceid =gl.deviceId;*/
 
                         fcanastabod.buildPrint(corel,0,"*");
                         prn_paseante.printask(printclose, "printpaseante.txt");
@@ -539,18 +543,46 @@ public class DevolBodCan extends PBase {
 
                 }else if(!existenciaP.isEmpty()){
 
-                    prn_paseante=new printer(this,printclose,gl.validimp);
+                    /*prn_paseante=new printer(this,printclose,gl.validimp);
                     fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
-                    fcanastabod.deviceid =gl.deviceId;
+                    fcanastabod.deviceid =gl.deviceId;*/
 
                     fcanastabod.buildPrint(corel,0,"*");
                     prn_paseante.printask(printclose, "printpaseante.txt");
 
                 }
 
+
+            }else if(!prn_can.isEnabled()){
+
+                if(!existenciaC.isEmpty()){
+
+                    if(impres==0){
+                        fcanastabod.buildPrint(corel,0, "TOL");
+                    }else {
+                        fcanastabod.buildPrint(corel, 10, "TOL");
+                    }
+
+                    if(!existenciaP.isEmpty()){
+
+                        if(!existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=3;
+
+                        fcanastabod.buildPrint(corel,0,"*");
+
+                    }
+
+                }else if(!existenciaP.isEmpty()){
+
+                    fcanastabod.buildPrint(corel,0,"*");
+
+                }
             }
 
-        if (!prn_can.isEnabled()) super.finish();
+        if (!prn_can.isEnabled()) {
+            Toast.makeText(this, "Devolucion completada y guardada.",Toast.LENGTH_SHORT);
+            gl.closeDevBod=true;
+            super.finish();
+        }
 
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

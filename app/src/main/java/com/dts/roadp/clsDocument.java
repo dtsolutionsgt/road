@@ -19,7 +19,7 @@ public class clsDocument {
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;
 	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod;
-	public int ffecha,pendiente,residx;
+	public int ffecha,pendiente,diacred,condicionPago;
 	
 	protected android.database.sqlite.SQLiteDatabase db;
 	protected BaseDatos Con;
@@ -74,10 +74,12 @@ public class clsDocument {
 
 		if (modofact.equalsIgnoreCase("TOL")) {
 			if (docfactura && (reimpres==10)) flag=1;
+			if (docfactura && (reimpres==4)) flag=0;
 			if (doccanastabod) flag=2;
-			if (docrecibo && (reimpres==0)) flag=3;
+			if (docrecibo && (reimpres==0)) flag=0;
         } else if(modofact.equalsIgnoreCase("*")) {
             if (doccanastabod) flag = 2;
+			if (docdevolucion) flag = 1;
         }
 
 		if (flag==0) {
@@ -192,23 +194,45 @@ public class clsDocument {
 
 			if (!s.equalsIgnoreCase("@@")) rep.add(s);
 
+			if(i==7){
+				rep.add("");
+
+				if (docfactura) {
+					rep.add(resol);
+					rep.add(resfecha);
+					rep.add(resvence);
+					rep.add(resrango);
+				}
+
+			}else if(i==10){
+
+				String mPago,dPago;
+
+				if(condicionPago==4){
+
+					mPago= "Credito";
+
+					if(diacred==1){
+						dPago="dia";
+					}else{
+						dPago="dias";
+					}
+					rep.add("Condiciones de pago: "+mPago+" "+diacred+" "+dPago);
+
+				}else{
+					mPago= "Contado";
+					rep.add("Condiciones de pago: "+mPago);
+				}
+			}
+
         }
 
-        rep.add("");
-
-        if (docfactura) {
-			rep.add(resol);
-			rep.add(resfecha);
-			rep.add(resvence);
-			rep.add(resrango);
-			rep.add("");
-			rep.add("Fecha : "+fsfecha);
-			rep.add("");
-		}
-
-        if (!emptystr(nit)) rep.add("NIT : "+nit);
+        if (!emptystr(nit)) rep.add("RUC : "+nit);
         if (!emptystr(clidir)) rep.add("Dir : "+clidir);
-        if(docdevolucion || doccanastabod) rep.add("Fecha de Emision : "+fsfecha);
+		rep.add("");
+		rep.add("Fecha : "+fsfecha);
+		rep.add("");
+
         //if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
 
         if (!emptystr(add1)) {
@@ -244,16 +268,13 @@ public class clsDocument {
 			rep.add("");
 
 		}
-
-
-
     }
 
     protected String encabezado(String l) {
         String s,lu,a;
         int idx;
 
-        residx=0;
+        //residx=0;
 
         //lu=l.toUpperCase().trim();
         lu=l.trim();

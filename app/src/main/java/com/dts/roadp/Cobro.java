@@ -33,7 +33,7 @@ public class Cobro extends PBase {
 	private ListAdaptCobro adapter;
 	private clsClasses.clsCobro selitem;	
 	
-	private Runnable printcallback,printclose,printValidate;
+	private Runnable printcallback,printclose,printValidate, printexit;
 	private printer prn;
 	private clsDocCobro fdoc;
 	private clsDocFactura fdocf;
@@ -42,7 +42,7 @@ public class Cobro extends PBase {
 	private double ttot,tsel,tpag,tpagos,tpend,vefect,plim,cred,pg,sal,ssal,total,monto,pago;
 	private boolean peexit;
 	private boolean porcentaje = false, validarCred = false;
-	private int fflag=1,fcorel,fechaven,medPago,checkCheck=0;
+	private int fflag=1,fcorel,fechaven,medPago,checkCheck=0, impres=0;
 	private String crrf,docfact,anulado;
 	private CheckBox cbCheckAll;
 	private RadioButton chkFactura,chkContado;
@@ -101,16 +101,20 @@ public class Cobro extends PBase {
 
 		    }
 		};
-		
-		prn=new printer(this,printclose,gl.validimp);
+
+		printexit= new Runnable() {
+			public void run() {
+				Cobro.super.finish();
+			}
+		};
+
+		prn=new printer(this,printexit,gl.validimp);
 		fdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.deviceId, "");
 		fdoc.deviceid=gl.deviceId;
 
 		fdocf = new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
 		fdocf.deviceid=gl.deviceId;
-					
 	}
-
 
 	// Events
 	
@@ -553,12 +557,32 @@ public class Cobro extends PBase {
 					if (prn.isEnabled()) {
 						fdocf.buildPrint(crrf,0,gl.peModal);
 						prn.printask(printcallback);
+					}else if(!prn.isEnabled()){
+						fdocf.buildPrint(crrf,0,gl.peModal);
+
+						if(gl.validarCred==1){
+							validaCredito();
+						}else if(gl.validarCred==2){
+							Cobro.super.finish();
+						}
+
+						gl.validarCred=0;
 					}
 				}else {
 					if (prn.isEnabled()) {
 						fdoc.buildPrint(corel,0,gl.peModal);
 						browse = 4;
 						prn.printask(printcallback);
+					}else if(!prn.isEnabled()){
+						fdoc.buildPrint(corel,0,gl.peModal);
+
+						if(gl.validarCred==1){
+							validaCredito();
+						}else if(gl.validarCred==2){
+							Cobro.super.finish();
+						}
+
+						gl.validarCred=0;
 					}
 				}
 			}
@@ -1177,28 +1201,62 @@ public class Cobro extends PBase {
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-			dialog.setTitle("Road");
-			dialog.setMessage("Impresión correcta ?");
+            dialog.setTitle("Road");
+            dialog.setMessage("¿Impresión correcta?");
 
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
 
-					try {
+                    impres++;toast("Impres "+impres);
+
+                    try {
 						sql="UPDATE D_COBRO SET IMPRES=IMPRES+3 WHERE COREL='"+corel+"'";
 						db.execSQL(sql);
 					} catch (Exception e) {
 						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 					}
 
-					if(gl.validarCred==1){
-						validaCredito();
-					}else if(gl.validarCred==2){
-						Cobro.super.finish();
-					}
+                    if (impres>1) {
 
-					gl.validarCred=0;
-				}
-			});
+                        try {
+                            sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorreld+"'";
+                            db.execSQL(sql);
+                        } catch (Exception e) {
+                            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                        }
+
+                        gl.brw=0;
+
+                    } else {
+
+                        if (dtipo.equalsIgnoreCase("R")) {
+                            if (prn.isEnabled()) {
+                                fdocf.buildPrint(crrf,1,gl.peModal);
+                                prn.printnoask(printclose, "print.txt");
+                                prn.printnoask(printclose, "print.txt");
+                            }
+                        }else {
+                            if (prn.isEnabled()) {
+
+                                fdoc.buildPrint(corel,1,gl.peModal);
+                                browse = 4;
+                                prn.printnoask(printclose, "print.txt");
+                                prn.printnoask(printclose, "print.txt");
+                            }
+                        }
+
+                    }
+
+                    if(gl.validarCred==1){
+                        validaCredito();
+                    }else if(gl.validarCred==2){
+                        Cobro.super.finish();
+                    }
+
+                    gl.validarCred=0;
+
+                }
+            });
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {

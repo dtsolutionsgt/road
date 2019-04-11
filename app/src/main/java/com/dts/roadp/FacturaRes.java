@@ -151,7 +151,7 @@ public class FacturaRes extends PBase {
 					imgMPago.setVisibility(View.VISIBLE);
 					lblMPago.setVisibility(View.VISIBLE);
 				}else if(credito > 0){
-					contadoCheck.setVisibility(View.INVISIBLE);
+					contadoCheck.setVisibility(View.VISIBLE);
 					lblCash.setVisibility(View.INVISIBLE);
 					imgCash.setVisibility(View.INVISIBLE);
 					lblPend.setVisibility(View.INVISIBLE);
@@ -659,16 +659,36 @@ public class FacturaRes extends PBase {
 				}
 
                 if (notaC==2){
-                   fdev.buildPrint(gl.dvcorreld,0);
+                   fdev.buildPrint(gl.dvcorrelnc,0);
                    prn_nc.printnoask(printclose, "printnc.txt");
                 }
 
+			}else if(!prn.isEnabled()){
+				if (gl.peModal.equalsIgnoreCase("APR")) {
+					fdoc.buildPrintExt(corel,2,"APR");
+				} else if (gl.peModal.equalsIgnoreCase("...")) {
+					//
+				} else if (gl.peModal.equalsIgnoreCase("TOL")) {
+
+					if (!gl.cobroPendiente) {
+						if (impres==0) {
+							fdoc.buildPrint(corel, 0,gl.peFormatoFactura);
+						} else {
+							fdoc.buildPrint(corel, 10,gl.peFormatoFactura);
+						}
+					}else{
+						fdoc.buildPrint(corel,4,gl.peFormatoFactura);
+					}
+				}
+
+				if (notaC==2){
+					fdev.buildPrint(gl.dvcorrelnc,0);
+				}
 			}
 
 			gl.closeCliDet=true;
 			gl.closeVenta=true;
 			if (!prn.isEnabled()) super.finish();
-
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -758,7 +778,7 @@ public class FacturaRes extends PBase {
 			ins.add("REFERENCIA","");
 
 			if (gl.dvbrowse!=0){
-				ins.add("ASIGNACION",gl.dvcorrelnc);
+				ins.add("ASIGNACION",gl.dvcorreld);
 			}else{
 				ins.add("ASIGNACION","");
 			}
@@ -2297,7 +2317,7 @@ public class FacturaRes extends PBase {
 						prn.printask(printcallback);
 
 						if (notaC==2){
-							fdev.buildPrint(gl.dvcorreld,0);
+							fdev.buildPrint(gl.dvcorrelnc,1, "*");
 
 							prn_nc.printnoask(printclose, "printnc.txt");
 							prn_nc.printnoask(printclose, "printnc.txt");

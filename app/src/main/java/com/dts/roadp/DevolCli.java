@@ -30,12 +30,12 @@ public class DevolCli extends PBase {
 
 	private printer prn;
 	private clsDocDevolucion fdevol;
-	public Runnable printclose;
+	public Runnable printcallback,printclose,printexit;
 
 	private String cliid,itemid,prodid;
 	private double cant;
 	private String emp,estado;
-	private int itempos;
+	private int itempos,impres;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +63,18 @@ public class DevolCli extends PBase {
 		
 		clearData();
 
+		printcallback= new Runnable() {
+			public void run() {
+				askPrint();
+			}
+		};
+
+		printexit= new Runnable() {
+			public void run() {
+				DevolCli.super.finish();
+			}
+		};
+
 		printclose= new Runnable() {
 			public void run() {
 				limpiavariables_devol();
@@ -71,7 +83,8 @@ public class DevolCli extends PBase {
 		};
 
 
-		prn=new printer(this,printclose,gl.validimp);
+		prn=new printer(this,printexit,gl.validimp);
+
 		fdevol=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 		fdevol.deviceid =gl.deviceId;
 	}
@@ -510,7 +523,6 @@ public class DevolCli extends PBase {
                 gl.closeCliDet = true;
                 gl.closeVenta = true;
 
-
 				createDoc();
 				//msgAskSave("Aplicar pago y crear un recibo");
 
@@ -575,10 +587,14 @@ public class DevolCli extends PBase {
 		try{
 
 			if (prn.isEnabled()) {
-				fdevol.buildPrint(gl.dvcorreld,0);
+				fdevol.buildPrint(gl.dvcorrelnc,0);
 				//#CKFK 20190401 09:47AM Agregué la funcionalidad de enviar el nombre del archivo a imprimir
-				prn.printask(printclose, "printnc.txt");
-			}
+				prn.printask(printcallback, "printnc.txt");
+            }else if(!prn.isEnabled()){
+                fdevol.buildPrint(gl.dvcorrelnc,0);
+                limpiavariables_devol();
+                DevolCli.super.finish();
+            }
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -737,6 +753,62 @@ public class DevolCli extends PBase {
 
 			dialog.show();
 		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	private void askPrint() {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("¿Impresión correcta?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+
+					impres++;toast("Impres "+impres);
+
+					try {
+						sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorrelnc+"'";
+						db.execSQL(sql);
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+
+					if (impres>1) {
+
+						try {
+							sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorrelnc+"'";
+							db.execSQL(sql);
+						} catch (Exception e) {
+							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						}
+
+						gl.brw=0;
+
+					} else {
+
+						fdevol.buildPrint(gl.dvcorrelnc,1,"*");
+
+						prn.printnoask(printclose, "printnc.txt");
+						prn.printnoask(printclose, "printnc.txt");
+
+					}
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					//singlePrint();
+					//prn.printask(printcallback);
+					finish();
+				}
+			});
+
+			dialog.show();
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 

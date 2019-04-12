@@ -39,7 +39,7 @@ public class Cobro extends PBase {
 	private clsDocFactura fdocf;
 
 	private String cliid,cod,itemid,prodid,sefect,corel,fserie,dtipo="",fechav;
-	private double ttot,tsel,tpag,tpagos,tpend,vefect,plim,cred,pg,sal,ssal,total,monto,pago,vtotal;
+	private double ttot,tsel,tpag,tpagos,tpend,vefect,plim,cred,pg,sal,ssal,total,monto,pago;
 	private boolean peexit;
 	private boolean porcentaje = false, validarCred = false;
 	private int fflag=1,fcorel,fechaven,medPago,checkCheck=0, impres=0;
@@ -1030,30 +1030,24 @@ public class Cobro extends PBase {
  	}
 	
 	// Aux
-	
+
 	private void showTotals(){
 
 		try{
-			//total = es lo seleccionado
-			//tsel = es lo pendiente
-			//tpagos = es lo pagado
-
+			total = tsel + tpagos;
 
 			lblSel.setText(mu.frmcur(total));
-			lblPag.setText(mu.frmcur(tsel));
+			lblPag.setText(mu.frmcur(tpagos));
 
 			/*tpend=total-tpagos;
 			plim=total-tpagos;*/
 
 			if (tsel>=0) {
-				lblPend.setText(mu.frmcur(vtotal));
+				lblPend.setText(mu.frmcur(tsel));
 			} else {
 				lblPend.setText(mu.frmcur(0));
 			}
 
-			total=0;
-			tpagos=0;
-			tsel=0;
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			msgbox("No es posible mostrar los totales "+e.getMessage());
@@ -1061,7 +1055,7 @@ public class Cobro extends PBase {
 
 
 	}
-	
+
 	private void calcSelected() {
 
 		try{
@@ -1073,7 +1067,6 @@ public class Cobro extends PBase {
 
 			tsel=0;
 			tpagos=0;
-			vtotal=0;
 
 			if (adapter!=null){
 
@@ -1087,15 +1080,7 @@ public class Cobro extends PBase {
 
 						flag=vItem.flag;
 						if (flag==1) {
-							//total = es lo seleccionado
-							//tsel = es lo pendiente
-							//tpagos = es lo pagado
 
-							/*total+=vItem.Valor;
-							tsel+= vItem.Pago;
-
-							//tpagos+=total-tsel;
-							vtotal+=total-tsel;*/
 							if(vItem.Pago > 0){
 
 								val=vItem.Pago;

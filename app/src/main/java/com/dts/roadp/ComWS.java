@@ -2769,6 +2769,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_MOVDCAN", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_MOVDPALLET", "WHERE COREL='" + cor + "'");
 
+					//#CKFK 20190415 Corrección del envío
 					dbld.add("INSERT INTO P_DEVOLUCIONES_SAP " +
 							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO,'', D.LOTE, 'N', GETDATE(), D.CANT, 'N'" +
 							" FROM D_MOV E INNER JOIN D_MOVD D ON E.COREL = D.COREL" +

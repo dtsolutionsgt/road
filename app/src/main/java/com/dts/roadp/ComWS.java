@@ -2772,7 +2772,7 @@ public class ComWS extends PBase {
 					dbld.add("INSERT INTO P_DEVOLUCIONES_SAP " +
 							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO,'', D.LOTE, 'N', GETDATE(), D.CANT, 'N'" +
 							" FROM D_MOV E INNER JOIN D_MOVD D ON E.COREL = D.COREL" +
-							" WHERE E.COREL = " + cor + "'" +
+							" WHERE E.COREL = '" + cor + "'" +
 							" UNION" +
 							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO,D.BARRA, '', 'N', GETDATE(), 1, 'N'" +
 							" FROM D_MOV E INNER JOIN D_MOVDB D ON E.COREL = D.COREL" +

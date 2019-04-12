@@ -106,7 +106,7 @@ public class clsDocFactura extends clsDocument {
 		vendedor=val;
 		
 		try {
-			sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION,NIT,MEDIAPAGO,DIACREDITO FROM P_CLIENTE WHERE CODIGO='"+cli+"'";
+			sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION,NIT,DIACREDITO FROM P_CLIENTE WHERE CODIGO='"+cli+"'";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
 			
@@ -120,13 +120,22 @@ public class clsDocFactura extends clsDocument {
 			clicod=cli;
 			clidir=DT.getString(3);
 			nit=DT.getString(4);
-			condicionPago=DT.getInt(5);
-			diacred=DT.getInt(6);
+			diacred=DT.getInt(5);
 			
 		} catch (Exception e) {
 			val=cli;
-	    }	
-		
+	    }
+
+		try {
+			sql="SELECT CODPAGO FROM D_FACTURAP WHERE COREL='"+corel+"'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			condicionPago=DT.getInt(0);
+
+		} catch (Exception e) {
+		}
+
 		try {
 			sql="SELECT NOMBRE,NIT,DIRECCION FROM D_FACTURAF WHERE COREL='"+corel+"'";
 			DT=Con.OpenDT(sql);	

@@ -162,6 +162,7 @@ public class clsDocument {
 
     protected void saveHeadLines(int reimpres) {
         String s;
+		String mPago,dPago;
 
         rep.empty();rep.empty();
 
@@ -204,31 +205,30 @@ public class clsDocument {
 					rep.add(resrango);
 				}
 
-			}else if(i==10){
-
-				String mPago,dPago;
-
-				if(condicionPago==4){
-
-					mPago= "Credito";
-
-					if(diacred==1){
-						dPago="dia";
-					}else{
-						dPago="dias";
-					}
-					rep.add("Condiciones de pago: "+mPago+" "+diacred+" "+dPago);
-
-				}else{
-					mPago= "Contado";
-					rep.add("Condiciones de pago: "+mPago);
-				}
 			}
 
         }
 
+
         if (!emptystr(nit)) rep.add("RUC : "+nit);
         if (!emptystr(clidir)) rep.add("Dir : "+clidir);
+        if(docfactura){
+			if(condicionPago==4){
+
+				mPago= "Credito";
+
+				if(diacred==1){
+					dPago="dia";
+				}else{
+					dPago="dias";
+				}
+				rep.add("Condiciones de pago: "+mPago+" "+diacred+" "+dPago);
+
+			}else{
+				mPago= "Contado";
+				rep.add("Condiciones de pago: "+mPago);
+			}
+		}
 		rep.add("");
 		rep.add("Fecha : "+fsfecha);
 		rep.add("");

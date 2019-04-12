@@ -13,6 +13,8 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 
 public class Anulacion extends PBase {
@@ -235,11 +237,11 @@ public class Anulacion extends PBase {
 			  	
 					vItem.Cod=DT.getString(0);
 					vItem.Desc=DT.getString(1);
-					if (tipo==2) vItem.Desc+=" - "+DT.getString(4);	
+					if (tipo==2) vItem.Desc+=" - "+DT.getString(4);
 					
 					if (tipo==3) {
-						sf=DT.getString(2)+"-"+DT.getInt(4);
-					}else if(tipo==6){
+						sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);;
+					}else if(tipo==1||tipo==6){
 						sf=DT.getString(0);
 					}else{
 						f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);

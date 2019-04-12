@@ -24,6 +24,7 @@ public class DevolBodCan extends PBase {
 
     private printer prn_can,prn_paseante;
     private clsDocCanastaBod fcanastabod;
+    private clsDocCanastaBod fpaseantebod;
     private DevolBod DevBod;
     public Runnable printclose, printcallback;
 
@@ -78,6 +79,9 @@ public class DevolBodCan extends PBase {
 
         fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
         fcanastabod.deviceid =gl.deviceId;
+
+        fpaseantebod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
+        fpaseantebod.deviceid =gl.deviceId;
 
         listItems();
 
@@ -535,7 +539,7 @@ public class DevolBodCan extends PBase {
                         fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
                         fcanastabod.deviceid =gl.deviceId;*/
 
-                        fcanastabod.buildPrint(corel,0,"*");
+                        fpaseantebod.buildPrint(corel,0,"*");
                         prn_paseante.printask(printclose, "printpaseante.txt");
 
                     }
@@ -547,7 +551,7 @@ public class DevolBodCan extends PBase {
                     fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
                     fcanastabod.deviceid =gl.deviceId;*/
 
-                    fcanastabod.buildPrint(corel,0,"*");
+                    fpaseantebod.buildPrint(corel,0,"*");
                     prn_paseante.printask(printclose, "printpaseante.txt");
 
                 }
@@ -567,13 +571,13 @@ public class DevolBodCan extends PBase {
 
                         if(!existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=3;
 
-                        fcanastabod.buildPrint(corel,0,"*");
+                        fpaseantebod.buildPrint(corel,0,"*");
 
                     }
 
                 }else if(!existenciaP.isEmpty()){
 
-                    fcanastabod.buildPrint(corel,0,"*");
+                    fpaseantebod.buildPrint(corel,0,"*");
 
                 }
             }

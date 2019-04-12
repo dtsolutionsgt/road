@@ -13,6 +13,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 
 public class Reimpresion extends PBase {
@@ -266,7 +268,7 @@ public class Reimpresion extends PBase {
 						if (tipo==2) vItem.Desc+=" - "+DT.getString(4);	
 
 						if (tipo==3) {
-							sf=DT.getString(2)+"-"+DT.getInt(4);						
+							sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);;
 						} else if (tipo==1||tipo==6){
 							sf=DT.getString(0);
 						}else {

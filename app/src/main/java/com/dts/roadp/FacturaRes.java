@@ -688,6 +688,10 @@ public class FacturaRes extends PBase {
 
 			gl.closeCliDet=true;
 			gl.closeVenta=true;
+
+			//#CKFK 20190412 Se inicializó variable cobroPendiente
+			gl.cobroPendiente=false;
+
 			if (!prn.isEnabled()) super.finish();
 
 		}catch (Exception e){

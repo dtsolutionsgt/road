@@ -271,7 +271,7 @@ public class CliDet extends PBase {
            	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 							  
-			lblNom.setText(DT.getString(0));
+			lblNom.setText(cod + " - " + DT.getString(0));
 			lblRep.setText(DT.getString(12));
 			lblDir.setText(DT.getString(2));
 			lblCantDias.setText(DT.getString(17));
@@ -301,7 +301,7 @@ public class CliDet extends PBase {
 			if(gl.media != 4){
 				lblClientePago.setText("CONTADO");
 			}else if(gl.media == 4){
-				lblClientePago.setText("CREDITO");
+				lblClientePago.setText("CRÉDITO");
 			}
 
 			clim=DT.getDouble(5);

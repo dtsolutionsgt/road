@@ -1086,7 +1086,7 @@ public class Cobro extends PBase {
 								val=vItem.Pago;
 								tpagos+=val;
 
-								//#CKFK 20190411 Agregué esto para que se sumara el dato de lo pagado
+								//#CKFK 20190412 Agregué esto para que se sumara el dato de lo  para que llegue
 								val=vItem.Saldo;
 								tsel+=val;
 

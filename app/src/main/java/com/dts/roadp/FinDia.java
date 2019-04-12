@@ -624,8 +624,15 @@ public class FinDia extends PBase {
                 }
                 else {
                     if (claseFinDia.getImpresionDeposito() != 3) {
-                        msgAskImpresionDeposito();
-                        return false;
+
+                        totDeposito();
+                         if ((depe+depc)>0){
+                             msgAskImpresionDeposito();
+                             return false;
+                         }else{
+                             claseFinDia.updateImpDeposito(3);
+                         }
+
                     }
                 }
 

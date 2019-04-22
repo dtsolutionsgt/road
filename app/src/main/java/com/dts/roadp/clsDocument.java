@@ -79,7 +79,7 @@ public class clsDocument {
 			if (docrecibo && (reimpres==0)) flag=0;
         } else if(modofact.equalsIgnoreCase("*")) {
             if (doccanastabod) flag = 2;
-			if (docdevolucion) flag = 1;
+			if (docdevolucion || docpedido) flag = 1;
         }
 
 		if (flag==0) {
@@ -259,13 +259,13 @@ public class clsDocument {
 			if (docfactura && (reimpres==5)) rep.add("------  C O N T A B I L I D A D  ------");
 			rep.add("");
 
-		}else if(docdevolucion){
+		}else if(docdevolucion || docpedido){
 
-			rep.add("");
-			if (docdevolucion && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
-			if (docdevolucion && (reimpres==2)) rep.add("------  C O P I A  ------");
-			if (docdevolucion && (reimpres==3)) rep.add("------       A N U L A D O      ------");
-			rep.add("");
+			if((docpedido && (reimpres==1)) || docdevolucion) rep.add("");
+			if ((docdevolucion && (reimpres==1)) || (docpedido && (reimpres==1))) rep.add("-------  R E I M P R E S I O N  -------");
+			if ((docdevolucion && (reimpres==1)) || (docpedido && (reimpres==2))) rep.add("------  C O P I A  ------");
+			if ((docdevolucion && (reimpres==1)) || (docpedido && (reimpres==3))) rep.add("------       A N U L A D O      ------");
+			if((docpedido && (reimpres==1)) || docdevolucion) rep.add("");
 
 		}
     }

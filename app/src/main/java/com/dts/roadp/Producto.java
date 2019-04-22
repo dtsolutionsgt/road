@@ -284,7 +284,13 @@ public class Producto extends PBase {
 					}
 					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
 
-					if (ordPorNombre) sql += "ORDER BY P_PRODUCTO.DESCCORTA";else sql += "ORDER BY P_PRODUCTO.CODIGO";
+					if (ordPorNombre) {
+						sql += "ORDER BY P_PRODUCTO.DESCCORTA";
+					} else {
+						sql += "ORDER BY P_PRODUCTO.CODIGO";
+					}
+
+					sql=sql+"";
 
 					break;	
 					

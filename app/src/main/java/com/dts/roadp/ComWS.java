@@ -39,9 +39,11 @@ import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
 
@@ -53,8 +55,9 @@ public class ComWS extends PBase {
 	private ImageView imgRec, imgEnv, imgExis;
 	private RelativeLayout ralBack, relExist, relPrecio, relStock;
 
-	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant;
-	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,parImprID;
+	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult;
+	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs;
+	private String licSerial,licSerialEnc,parImprID;
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag;
 
 	private SQLiteDatabase dbT;
@@ -73,6 +76,7 @@ public class ComWS extends PBase {
 	private clsFinDia claseFindia;
     private DateUtils DU;
     private String jsonWS;
+	private CryptUtil cu=new CryptUtil();
 
 	protected PowerManager.WakeLock wakeLock;
 
@@ -84,7 +88,8 @@ public class ComWS extends PBase {
 
 	private static String sstr, fstr, fprog, finf, ferr, fterr, idbg, dbg, ftmsg, esql, ffpos;
 	private int scon, running, pflag, stockflag, conflag;
-	private String ftext, slsync, senv, gEmpresa, ActRuta, mac, fsql, fsqli, fsqlf, strliqid;
+	private String ftext, slsync, senv, gEmpresa, ActRuta, mac,rootdir;
+	private String fsql, fsqli, fsqlf, strliqid;
 	private boolean rutapos, ftflag, esvacio, liqid;
 
 	private final String NAMESPACE = "http://tempuri.org/";
@@ -102,6 +107,7 @@ public class ComWS extends PBase {
 		addlog("ComWS", "" + du.getActDateTime(), gl.vend);
 
 		System.setProperty("line.separator", "\r\n");
+        rootdir=Environment.getExternalStorageDirectory()+"/";
 
 		dbld = new clsDataBuilder(this);
 		claseFindia = new clsFinDia(this);
@@ -144,6 +150,12 @@ public class ComWS extends PBase {
 			this.setTitle("Comunicación");
 		} else {
 			this.setTitle("Comunicación Local");
+		}
+		licSerial=gl.deviceId;
+		try {
+			licSerialEnc=cu.encrypt(licSerial);
+		} catch (Exception e) {
+			licSerialEnc="";
 		}
 
 		getWSURL();
@@ -188,7 +200,6 @@ public class ComWS extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"wakeLock");
 		}
 	}
-
 
 	//region Events
 
@@ -377,6 +388,11 @@ public class ComWS extends PBase {
 
 	}
 
+	public void doFotos(View view) {
+		startActivity(new Intent(this,ComWSFotos.class));
+	}
+
+
 	private void setHandlers() {
 		ralBack.setOnTouchListener(new SwipeListener(this) {
 			public void onSwipeRight() {
@@ -524,7 +540,7 @@ public class ComWS extends PBase {
 
 	//endregion
 
-	//region Web Service Methods
+	//region Common Web Service Methods
 
 	public int fillTable(String value, String delcmd) {
 
@@ -887,6 +903,97 @@ public class ComWS extends PBase {
 
 	}
 
+	public int checkLicence(String serial) {
+		int rc;
+		String s, ss;
+
+		METHOD_NAME = "checkLicence";
+		sstr = "OK";
+
+		try {
+
+			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+			envelope.dotNet = true;
+
+			PropertyInfo param = new PropertyInfo();
+			param.setType(String.class);
+			param.setName("Serial");
+			param.setValue(serial);
+			request.addProperty(param);
+
+			envelope.setOutputSoapObject(request);
+
+			HttpTransportSE transport = new HttpTransportSE(URL);
+			transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+			s = response.toString();
+			if (s.equalsIgnoreCase("1")) return 1;
+
+			sstr = s;
+			return 0;
+		} catch (Exception e) {
+			sstr = e.getMessage();
+		}
+
+		return 0;
+	}
+
+	public int guardaImagen(String idprod) {
+		int rc;
+		String s, ss,resstr;
+
+		METHOD_NAME = "getImage";
+		sstr = "OK";
+
+		try {
+
+			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+			envelope.dotNet = true;
+
+			PropertyInfo param = new PropertyInfo();
+			param.setType(String.class);
+			param.setName("idprod");
+			param.setValue(idprod);
+			request.addProperty(param);
+
+			envelope.setOutputSoapObject(request);
+
+			HttpTransportSE transport = new HttpTransportSE(URL);
+			transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+			resstr = response.toString();
+
+			try {
+				//byte[] imgbytes = resstr.getBytes();
+
+				byte[] imgbytes=Base64.decode(resstr, Base64.DEFAULT);
+
+				int bs=imgbytes.length;
+
+				FileOutputStream fos = new FileOutputStream(rootdir+"0006.jpg");
+                BufferedOutputStream outputStream = new BufferedOutputStream(fos);
+                outputStream.write(imgbytes);
+                outputStream.close();
+
+			} catch (Exception ee) {
+				sstr = ee.getMessage();return 0;
+			}
+
+			sstr =""+resstr.length();
+			return resstr.length();
+		} catch (Exception e) {
+			sstr = e.getMessage();
+		}
+
+		return 0;
+	}
+
 	//endregion
 
 	//region WS Recepcion Methods
@@ -925,9 +1032,8 @@ public class ComWS extends PBase {
 		if (val.equalsIgnoreCase("S")) gl.peStockItf = true;
 		else gl.peStockItf = false;
 
-
 		listItems.clear();
-		scomp = 0;idbg = "";stockflag = 0;ftmsg = "";ftflag = false;
+		scomp = 0;idbg = "";stockflag = 0;ftmsg = "";ftflag = false;rrs="...";
 
 		try {
 
@@ -937,6 +1043,9 @@ public class ComWS extends PBase {
 			if (!AddTable("P_NIVELPRECIO")) return false;
 
 			if (!AddTable("P_RUTA")) return false;
+
+			//rrs="resbits "+guardaImagen("0006");
+
 			if (!AddTable("P_CLIENTE")) return false;
 			if (!AddTable("P_CLIENTE_FACHADA")) return false;
 			if (!AddTable("P_CLIRUTA")) return false;
@@ -976,6 +1085,8 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MUNI")) return false;
 			if (!AddTable("P_VEHICULO")) return false;
 			if (!AddTable("P_HANDHELD")) return false;
+
+			licResult=checkLicence(licSerial);
 			fillTableImpresora();
 
 			if (!AddTable("P_REF1")) return false;
@@ -1002,6 +1113,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MERRESP")) return false;
 			if (!AddTable("P_MERMARCACOMP")) return false;
 			if (!AddTable("P_MERPRODCOMP")) return false;
+
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -1039,7 +1151,7 @@ public class ComWS extends PBase {
 				try {
 					writer.write(sql);writer.write("\r\n");
 				} catch (Exception e) {
-					}
+				}
 
 				try {
 					dbT = ConT.getWritableDatabase();
@@ -1070,6 +1182,7 @@ public class ComWS extends PBase {
 
 			Actualiza_FinDia();
 			encodePrinters();
+			encodeLicence();
 
             SetStatusRecToTrans("1");
 
@@ -1081,7 +1194,7 @@ public class ComWS extends PBase {
 
 			Actualiza_Documentos();
 
-			fprog = "Fin de la actualización";
+			fprog = "Fin de actualización";
 			wsRtask.onProgressUpdate();
 
 			scomp = 1;
@@ -1966,7 +2079,6 @@ public class ComWS extends PBase {
 	}
 
 	private void encodePrinters() {
-		CryptUtil cu=new CryptUtil();
 		Cursor dt;
 		String prid,ser,mac,se,sm;
 
@@ -1993,6 +2105,19 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
+	}
+
+	private void encodeLicence() {
+		String lic;
+
+		try {
+			if (licResult==1) lic=licSerialEnc; else lic="";
+			sql = "UPDATE Params SET lic='" + lic + "'";
+			dbT.execSQL(sql);
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+		}
+
 	}
 
 
@@ -2066,11 +2191,14 @@ public class ComWS extends PBase {
 			paramsExtra();
 			//mu.msgbox("::"+esql);
 
+			//mu.msgbox(rrs+" \nsstr : "+sstr);
+
 			if (ftflag) msgbox(ftmsg);
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
+		//if (licResult==0) msgAskSinLicencia();
 
 	}
 
@@ -4118,7 +4246,7 @@ public class ComWS extends PBase {
 
 	}
 
-	private void restarApp(){
+	private void restartApp(){
 		try{
 			PackageManager packageManager = this.getPackageManager();
 			Intent intent = packageManager.getLaunchIntentForPackage(this.getPackageName());
@@ -4239,7 +4367,7 @@ public class ComWS extends PBase {
 				public void onClick(DialogInterface dialog, int which) {
 
 					if (gl.modoadmin) {
-						restarApp();
+						restartApp();
 					} else {
 						finish();
 					};
@@ -4335,8 +4463,30 @@ public class ComWS extends PBase {
 
 	}
 
-	public void SetStatusRecTo(String estado)
-	{
+	private void msgAskSinLicencia(){
+
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Licencia");
+			dialog.setMessage("El dispositivo no tiene licencia válida");
+
+			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					restartApp();
+				}
+			});
+
+			dialog.show();
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
+	}
+
+	public void SetStatusRecTo(String estado) 	{
 		try
 		{
 			sql = "UPDATE P_RUTA SET PARAM2='" + StringUtils.trim(estado) + "'";
@@ -4349,41 +4499,35 @@ public class ComWS extends PBase {
 		}
 
 	}
-    public void SetStatusRecToTrans(String estado)
-    {
-        try
-        {
+
+    public void SetStatusRecToTrans(String estado)    {
+        try         {
             sql = "UPDATE P_RUTA SET PARAM2='" + StringUtils.trim(estado) + "'";
             dbT.execSQL(sql);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex)  {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+ " " + ex.getMessage());
         }
-
     }
-	public String GetStatusRec()
-	{
+
+	public String GetStatusRec() 	{
 		Cursor DT;
 		String vGetStatusRec = "";
-		try
-			{
+
+		try 			{
 				sql = "SELECT PARAM2 FROM P_RUTA ";
 				DT = Con.OpenDT(sql);
 
-				if (DT.getCount()> 0)
-				{
+				if (DT.getCount()> 0) 				{
 					DT.moveToFirst();
 					vGetStatusRec = DT.getString(0);
 				}
 			}
 
-		catch (Exception ex)
-			{
+		catch (Exception ex) {
 				Log.d("GetStatusRec","Something happend here " + ex.getMessage());
 				msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+ " " + ex.getMessage());
-			}
+		}
 
 		return  vGetStatusRec;
 	}

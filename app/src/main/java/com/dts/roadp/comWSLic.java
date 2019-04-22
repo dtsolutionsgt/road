@@ -57,10 +57,11 @@ public class comWSLic extends PBase {
     private clsDataBuilder dbld;
     private DateUtils DU;
 
+    // 355030097127235
 
     // Web Service -
 
-     public AsyncCallSend wsStask;
+    public AsyncCallSend wsStask;
 
     private static String sstr, fstr, fprog, finf, ferr, fterr, idbg, dbg, ftmsg, esql, ffpos;
     private int scon, running, pflag, stockflag, conflag;

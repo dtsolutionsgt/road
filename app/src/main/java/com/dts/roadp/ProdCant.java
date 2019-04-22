@@ -210,7 +210,6 @@ public class ProdCant extends PBase {
 		Cursor dt;
 		double ippeso=0;
 
-
 		try {
 			sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
 			dt=Con.OpenDT(sql);
@@ -386,29 +385,29 @@ public class ProdCant extends PBase {
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()>0){
-
 				dt.moveToFirst();
 				umstock=dt.getString(0);
-
 			}
 
 			dt.close();
 
-			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+um+"') AND (UNIDADMINIMA='"+ubas+"')";	
+			//sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+um+"') AND (UNIDADMINIMA='"+ubas+"')";
+			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+um+"') ";
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()>0) {
 				dt.moveToFirst();			
 				umf1=dt.getDouble(0);
 			} else 	{
-					umf1=1;
-					//#EJC20181127: No mostrar mensaje por versión de aprofam.
-				//msgFactor("No existe factor de conversión para "+um);return 0;
+				umf1=1;
+				//#EJC20181127: No mostrar mensaje por versión de aprofam.
+				msgFactor("No existe factor de conversión para "+um);return 0;
 			}	
 
 			dt.close();
 
-			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+ubas+"')";	
+			//sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+ubas+"')";
+			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+umstock+"')";
 			dt=Con.OpenDT(sql);
 			if (dt.getCount()>0) {
 				dt.moveToFirst();			
@@ -416,11 +415,15 @@ public class ProdCant extends PBase {
 			} else {
 				umf2=1;
 				//#EJC20181127: No mostrar mensaje por versión de aprofam.
-				//msgFactor("No existe factor de conversión para "+um);return 0;
+				msgFactor("No existe factor de conversión para "+um);return 0;
 			}
 			dt.close();
 
-			umfactor=umf1/umf2;			
+			if (umf1>=umf2) {
+				umfactor=umf1/umf2;
+			} else {
+				umfactor=umf2/umf1;
+			}
 			
 			sql="SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO FROM P_STOCK " +
 				" WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
@@ -431,7 +434,9 @@ public class ProdCant extends PBase {
 				dt.moveToFirst();
 
 				disp=dt.getDouble(0);
-				if (!porpeso) disp=disp/umfactor;
+				if (!porpeso) {
+					disp=disp/umfactor;
+				}
 				ipeso=dt.getDouble(1);
 				pesostock = ipeso/disp;
 			}

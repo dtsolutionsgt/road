@@ -120,13 +120,17 @@ public class MainActivity extends PBase {
 
             initSession();
 
-            supervisorRuta();
+            if (!validaLicencia()) {
+                startActivity(new Intent(this, comWSLic.class));
+                return;
+            } else {
+                supervisorRuta();
+            }
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
             if (gl.debug){
                 txtUser.setText("00100993");txtPass.setText("2613");
             }
-
 
             gl.contlic=false;
         } catch (Exception e) {
@@ -182,9 +186,14 @@ public class MainActivity extends PBase {
     }
 
 	public void doLogin(View view) {
+
+	    if (!validaLicencia()) {
+            startActivity(new Intent(this, comWSLic.class));return;
+        }
+
 	    try{
             processLogIn();
-        }catch (Exception e){
+        } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
@@ -276,7 +285,6 @@ public class MainActivity extends PBase {
 			toastcent("¡La base de datos está vacia!");
 			startActivity( new Intent(MainActivity.this,ComWS.class));
 		}
-
 
 		try {
 			//#HS_20181122_1505 Se agrego el campo Impresion.
@@ -489,7 +497,7 @@ public class MainActivity extends PBase {
 	
 	public void showDemoMenu() {
 
-	    try{
+	    try {
             final AlertDialog Dialog;
             final String[] selitems = {"Datos de cliente","Base de datos original","Borrar datos de venta"};
 
@@ -686,42 +694,28 @@ public class MainActivity extends PBase {
 	}
 
 	private boolean validaLicencia() {
+        CryptUtil cu=new CryptUtil();
 		Cursor dt;
-		String mac, lickey, idkey, binkey;
-		int fval, lkey;
-		long ff;
+		String lic,lickey;
 
 		try {
-			mac = lic.getMac();
-			lkey = lic.getLicKey(mac);
-			lickey = lic.encodeLicence(lkey);
+            lickey=cu.encrypt(gl.deviceId);
 
-			sql = "SELECT IDKEY,BINKEY FROM LIC_CLIENTE WHERE ID='" + mac + "'";
-			dt=Con.OpenDT(sql);
-			if (dt.getCount()==0) return false;
+            sql="SELECT lic FROM Params";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+            lic=dt.getString(0);
 
-			dt.moveToFirst();
-			idkey=dt.getString(0);
-			binkey=dt.getString(1);
-
-			if (!idkey.equalsIgnoreCase(lickey)) return false;
-
-			ff=du.getActDate();
-			fval=lic.decodeValue(binkey);
-			fval=fval-lkey;
-
-			//Toast.makeText(this,""+fval, Toast.LENGTH_SHORT).show();
-
-			if (fval==999999) return true;
-			fval=fval*10000;
-
-			if (fval>=ff) return true; else return false;
-
+            if (lic.equalsIgnoreCase(lickey)) return true;
 		} catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			mu.msgbox(e.getMessage());return false;
+			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" : "+e.getMessage());
 		}
 
+		//toastlong("El dispositivo no tiene licencia válida");
+
+        //return false;
+        return true;
 	}
 
 	private void msgAskLic(String msg) {

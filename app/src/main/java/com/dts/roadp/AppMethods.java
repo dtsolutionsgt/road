@@ -392,7 +392,7 @@ public class AppMethods {
 	public void estandartInventario()  {
 		Cursor dt,df;
 		String cod,ub,us,lote,doc,stat;
-		double cant,cantm,fact;
+		double cant,cantm,fact,fact1,fact2;
 
 		try {
 
@@ -417,24 +417,43 @@ public class AppMethods {
 
 				if (!ub.equalsIgnoreCase(us)) {
 
-					sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+us+"') AND (UNIDADMINIMA='"+ub+"')";
+					sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+us+"') ";
 					df=Con.OpenDT(sql);
-
-					if (df.getCount()>0) {
-
-						df.moveToFirst();
-						fact=df.getDouble(0);
-						cant=cant*fact;
-						cantm=cantm*fact;
-
-						sql="UPDATE P_STOCK SET CANT="+cant+",CANTM="+cantm+",UNIDADMEDIDA='"+ub+"'  " +
-								"WHERE (CODIGO='"+cod+"') AND (UNIDADMEDIDA='"+us+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
+					if (df.getCount()==0) {
+						msgbox("No existe factor conversion para el producto : " + cod);
+						sql = "DELETE FROM P_STOCK WHERE CODIGO='" + cod + "'";
 						db.execSQL(sql);
+						fact1=1;
 					} else {
+						df.moveToFirst();
+						fact1=df.getDouble(0);
+					}
+
+					sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+ub+"') ";
+					df=Con.OpenDT(sql);
+					if (df.getCount()==0) {
 						msgbox("No existe factor conversion para el producto : "+cod);
 						sql="DELETE FROM P_STOCK WHERE CODIGO='"+cod+"'";
 						db.execSQL(sql);
+						fact2=1;
+					} else {
+						df.moveToFirst();
+						fact2=df.getDouble(0);
 					}
+
+					if (fact1>=fact2) {
+						fact=fact1/fact2;
+					} else {
+						fact=fact2/fact1;
+					}
+
+					cant = cant * fact;
+					cantm = cantm * fact;
+
+					sql="UPDATE P_STOCK SET CANT=" + cant + ",CANTM=" + cantm + ",UNIDADMEDIDA='" + ub + "'  " +
+						"WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + us + "') AND (LOTE='" + lote + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
+					db.execSQL(sql);
+
 				}
 
 				dt.moveToNext();
@@ -662,6 +681,7 @@ public class AppMethods {
 		}
 
 		try {
+
 			sql="SELECT NUMSERIE FROM P_IMPRESORA";
 			dt=Con.OpenDT(sql);
 

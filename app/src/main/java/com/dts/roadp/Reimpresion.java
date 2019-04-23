@@ -961,7 +961,7 @@ public class Reimpresion extends PBase {
 
 						switch (tipo) {
 							case 1:
-								sql = "UPDATE D_COBRO SET IMPRES=IMPRES+3 WHERE COREL='" + itemid + "'";
+								sql = "UPDATE D_COBRO SET IMPRES=IMPRES+1 WHERE COREL='" + itemid + "'";
 								db.execSQL(sql);
 								break;
 							case 3:

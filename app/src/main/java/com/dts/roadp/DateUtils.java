@@ -8,12 +8,12 @@ public class DateUtils {
 	}
 	
 	public String sfecha(long f) {
-		int vy,vm,vd;
+		long vy,vm,vd;
 		String s;
 		
-		vy=(int) f/100000000;f=f % 100000000;
-		vm=(int) f/1000000;f=f % 1000000;
-		vd=(int) f/10000;f=f % 10000;
+		vy=(long) f/100000000;f=f % 100000000;
+		vm=(long) f/1000000;f=f % 1000000;
+		vd=(long) f/10000;f=f % 10000;
 		
 		s="";
 		if (vd>9) { s=s+String.valueOf(vd)+"/";} else {s=s+"0"+String.valueOf(vd)+"/";}  

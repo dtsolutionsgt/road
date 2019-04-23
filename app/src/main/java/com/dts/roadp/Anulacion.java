@@ -721,6 +721,18 @@ public class Anulacion extends PBase {
 				db.execSQL(sql);
 			}
 
+			sql="SELECT PRODUCTO,CANT,CANTM, UNIDADMEDIDA FROM D_MOVDB WHERE (COREL='"+itemid+"')";
+			DT=Con.OpenDT(sql);
+
+			if(DT.getCount()>0){
+				sql="INSERT INTO P_STOCKB " +
+					"SELECT M.RUTA, D.BARRA, D.PRODUCTO, 1, '' AS COREL, 0 AS PRECIO, D.PESO, '' AS DOCUMENTO, " +
+					" M.FECHA, 0 AS ANULADO, '' AS CENTRO, 'A' AS ESTATUS, " +
+					"0 AS ENVIADO, 0 AS CODIGOLIQUIDACION, '' AS COREL_D_MOV, M.FECHA, D.UNIDADMEDIDA, '' AS DOCENTREGA " +
+					"FROM D_MOV M INNER JOIN D_MOVDB D ON M.COREL = D.COREL WHERE (COREL='"+itemid+"')";
+				db.execSQL(sql);
+			}
+
 			sql="UPDATE FinDia SET val5 = 0";
 			db.execSQL(sql);
 

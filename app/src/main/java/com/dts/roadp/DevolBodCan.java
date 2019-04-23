@@ -33,6 +33,8 @@ public class DevolBodCan extends PBase {
 
     private clsRepBuilder rep;
 
+    private ComWS cComWS;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +51,8 @@ public class DevolBodCan extends PBase {
 
         lblTot = (TextView) findViewById(R.id.textView9);lblTot.setText("");
         setHandlers();
+
+        cComWS  = new ComWS();
 
         printclose= new Runnable() {
             public void run() {
@@ -448,6 +452,8 @@ public class DevolBodCan extends PBase {
             db.endTransaction();
 
             createDoc();
+
+            cComWS.envio_D_MOV_en_dev();
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

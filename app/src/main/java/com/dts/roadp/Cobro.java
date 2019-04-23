@@ -342,8 +342,8 @@ public class Cobro extends PBase {
 				vItem.Saldo=ssal;
 				vItem.Pago=pg;
 				vItem.flag=fflag;
-				vItem.fini=du.sfecha(DT.getInt(4));
-				vItem.ffin=du.sfecha(DT.getInt(5));
+				vItem.fini=du.sfecha(DT.getLong(4));
+				vItem.ffin=du.sfecha(DT.getLong(5));
 			 
 				ttot=ttot+DT.getDouble(3);
 				tpag+=pg;

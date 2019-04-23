@@ -101,15 +101,15 @@ public class clsDocDevolucion extends clsDocument {
 
     protected boolean loadHeadData(String corel) {
         Cursor DT;
-        String cli,vend,val;
-        int ff;
+        String cli,vend,val, anulado;
+        int ff, impres, cantimpres;
 
         super.loadHeadData(corel);
 
         nombre="NOTA DE CREDITO";
 
         try {
-            sql="SELECT N.RUTA,N.VENDEDOR,N.CLIENTE,N.TOTAL,N.FECHA,N.COREL "+
+            sql="SELECT N.RUTA,N.VENDEDOR,N.CLIENTE,N.TOTAL,N.FECHA,N.COREL, N.ANULADO, N.IMPRES "+
                 "FROM D_NOTACRED N "+
                 "WHERE N.COREL = '"+corel+"'";
 
@@ -124,6 +124,24 @@ public class clsDocDevolucion extends clsDocument {
 
             tot=DT.getDouble(3);
             ffecha=DT.getInt(4);fsfecha=sfecha(ffecha);
+
+            anulado=DT.getString(6);
+            impres=DT.getInt(7);
+            cantimpres=0;
+
+            if (anulado.equals("S")?true:false){
+                cantimpres = -1;
+            }else if (cantimpres == 0 && impres > 0){
+                cantimpres = 1;
+            }
+
+            if (cantimpres>0){
+                nombre = "COPIA DE NOTA DE CREDITO";
+            }else if (cantimpres==-1){
+                nombre = "NOTA DE CREDITO ANULADA";
+            }else if (cantimpres==0){
+                nombre = "NOTA DE CREDITO";
+            }
 
         } catch (Exception e) {
             Toast.makeText(cont,"loadHeadData"+e.getMessage(), Toast.LENGTH_SHORT).show();return false;

@@ -2865,6 +2865,7 @@ public class ComWS extends PBase {
 
 		try {
 
+			
 			sql = "SELECT COREL FROM D_MOV WHERE STATCOM='N'";
 			DT = Con.OpenDT(sql);
 

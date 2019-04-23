@@ -497,6 +497,8 @@ public class Exist extends PBase {
 			ruta=gl.ruta;
 			vendedor=gl.vendnom;
 			cliente="";
+			vendcod=gl.vend;
+			fsfecha=du.getActDateStr();
 
 		}
 

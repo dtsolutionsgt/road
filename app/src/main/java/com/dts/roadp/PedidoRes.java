@@ -51,7 +51,7 @@ public class PedidoRes extends PBase {
 	
 	private long fecha,fechae;
 	private String itemid,cliid,corel;
-	private int cyear, cmonth, cday,dweek;
+	private int cyear, cmonth, cday,dweek,impres;
 	
 	private double dmax,dfinmon,descpmon,descg,descgmon,tot,stot0,stot,descmon,totimp,totperc;
 	private boolean acum,cleandprod;
@@ -288,7 +288,7 @@ public class PedidoRes extends PBase {
 
 			if (prn.isEnabled()) {
 				pdoc.buildPrint(corel,0);
-				prn.printask(printclose);
+				prn.printask(printcallback);
 			}
 
 			gl.closeCliDet=true;
@@ -666,15 +666,41 @@ public class PedidoRes extends PBase {
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 
-					gl.closeCliDet=true;
-					gl.closeVenta=true;
-					PedidoRes.super.finish();
+					impres++;toast("Impres "+impres);
+
+					try {
+						sql="UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorrelnc+"'";
+						db.execSQL(sql);
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					}
+
+					if (impres>1) {
+
+						try {
+							sql="UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorrelnc+"'";
+							db.execSQL(sql);
+						} catch (Exception e) {
+							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						}
+
+						gl.brw=0;
+
+					} else {
+
+						pdoc.buildPrint(corel,1,"*");
+
+						prn.printask(printclose);
+
+					}
 				}
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					singlePrint();
+					//singlePrint();
+					//prn.printask(printcallback);
+					finish();
 				}
 			});
 

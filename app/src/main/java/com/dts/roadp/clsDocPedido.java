@@ -144,7 +144,8 @@ public class clsDocPedido extends clsDocument {
 		} catch (Exception e) {
 			val=vend;
 	    }	
-		
+
+	    vendcod=vend;
 		vendedor=val;
 		
 		try {

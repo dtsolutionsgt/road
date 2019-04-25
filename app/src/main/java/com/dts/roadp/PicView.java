@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import uk.co.senab.photoview.PhotoViewAttacher;
+
 public class PicView extends PBase {
 
 	private ImageView imgImg;
@@ -28,6 +30,11 @@ public class PicView extends PBase {
 		try {
 			Bitmap bmImg = BitmapFactory.decodeFile(imgpath);
 			imgImg.setImageBitmap(bmImg);
+
+			PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(imgImg);
+			photoViewAttacher.setZoomable(true);
+			photoViewAttacher.update();
+
 	    } catch (Exception e) {
 	    	mu.msgbox(e.getMessage());
 	    	imgImg.setVisibility(View.INVISIBLE);

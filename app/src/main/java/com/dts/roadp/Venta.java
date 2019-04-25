@@ -188,12 +188,9 @@ public class Venta extends PBase {
 
 				for (int i = 0; i <clsDeG.items.size(); i++) {
 					s=clsDeG.items.get(i).valor+" , "+clsDeG.items.get(i).lista;
-
 					ss=ss+s+"\n";
-					//Toast.makeText(this,"Desc    "+s, Toast.LENGTH_SHORT).show();
 				}
 			}
-
 
 			ss=ss+"acum : "+clsDeG.acum+" , limit "+clsDeG.maxlimit+"\n";
 			ss=ss+"Valor : "+clsDeG.valor+"\n";

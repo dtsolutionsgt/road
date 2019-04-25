@@ -170,8 +170,7 @@
         <activity
             android:name=".PicView"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_pic_view"
-            android:screenOrientation="portrait" />
+            android:label="@string/title_activity_pic_view"/>
         <activity
             android:name=".ComWS"
             android:configChanges="keyboardHidden|orientation|screenSize"

@@ -107,7 +107,7 @@ public class ComWS extends PBase {
 		addlog("ComWS", "" + du.getActDateTime(), gl.vend);
 
 		System.setProperty("line.separator", "\r\n");
-        rootdir=Environment.getExternalStorageDirectory()+"/";
+        rootdir=Environment.getExternalStorageDirectory()+"/RoadFotos/";
 
 		dbld = new clsDataBuilder(this);
 		claseFindia = new clsFinDia(this);
@@ -1044,7 +1044,7 @@ public class ComWS extends PBase {
 
 			if (!AddTable("P_RUTA")) return false;
 
-			//rrs="resbits "+guardaImagen("0006");
+			rrs="resbits "+guardaImagen("0006");
 
 			if (!AddTable("P_CLIENTE")) return false;
 			if (!AddTable("P_CLIENTE_FACHADA")) return false;

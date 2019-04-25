@@ -71,4 +71,7 @@ public class appGlobals extends Application {
 	//Cobros
 	public int escbro=0;
 
+	//Desglose de efectivo
+	public double totDep;
+
 }

@@ -3,6 +3,7 @@ package com.dts.roadp;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -124,7 +125,17 @@ public class Deposito extends PBase {
 		}
 
 	}
-	
+
+	public void OpenDesglose(View view){
+		try{
+			gl.totDep = tef;
+			startActivity(new Intent(this,desglose.class));
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
 	// Main
 	
 	private void setHandlers(){
@@ -517,7 +528,42 @@ public class Deposito extends PBase {
 				} // Bandera==1
 				
 			}	
-			
+
+			//Inserta y válida Desglose de depósito.
+
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+
+				sql="SELECT * FROM T_DEPOSB";
+
+				DT=Con.OpenDT(sql);
+
+				if (DT.getCount()==0){
+					msgbox("Por favor realice el desglose antes de continuar.");
+					db.endTransaction();
+					return false;
+				}else{
+
+					DT.moveToFirst();
+					while (!DT.isAfterLast()) {
+
+						ins.init("D_DEPOSB");
+						ins.add("COREL",corel);
+						ins.add("DENOMINACION",DT.getDouble(0));
+						ins.add("CANTIDAD",DT.getInt(1));
+						ins.add("TIPO",DT.getString(2));
+						ins.add("MONEDA",DT.getString(3));
+
+						db.execSQL(ins.sql());
+
+						DT.moveToNext();
+					}
+
+					sql="Delete from T_DEPOSB";
+					db.execSQL(sql);
+				}
+
+			}
+
 			db.setTransactionSuccessful();
 			db.endTransaction();
 			
@@ -551,6 +597,8 @@ public class Deposito extends PBase {
 		}
 
 	}
+
+
 
 
 	// Aux

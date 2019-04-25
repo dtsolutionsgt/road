@@ -479,7 +479,7 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 			
-			
+
 			vSQL="CREATE TABLE [D_DEPOSB] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[DENOMINACION] REAL NOT NULL,"+
@@ -488,8 +488,17 @@ public class BaseDatosScript {
 					"[MONEDA] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([COREL],[DENOMINACION],[TIPO],[MONEDA])"+
 					");";
-			database.execSQL(vSQL);		
-			
+			database.execSQL(vSQL);
+
+			vSQL="CREATE TABLE [T_DEPOSB] ("+
+					"[DENOMINACION] REAL NOT NULL,"+
+					"[CANTIDAD] INTEGER NOT NULL,"+
+					"[TIPO] TEXT NOT NULL,"+
+					"[MONxEDA] INTEGER NOT NULL,"+
+					"PRIMARY KEY ([DENOMINACION],[TIPO],[MONEDA])"+
+					");";
+			database.execSQL(vSQL);
+
 
 			vSQL="CREATE TABLE [D_FACT_LOG] ("+
 					"[ITEM] INTEGER NOT NULL,"+

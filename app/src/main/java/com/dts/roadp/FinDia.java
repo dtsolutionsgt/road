@@ -678,7 +678,9 @@ public class FinDia extends PBase {
     }
 
     //Impresion Cierre Z
-    private void imprimeCierreZ(){
+    private boolean imprimeCierreZ(){
+
+        boolean vImprime=false;
 
         try {
 
@@ -701,10 +703,14 @@ public class FinDia extends PBase {
 
             claseFinDia.updateImprimioCierreZ(7);
 
+            vImprime=true;
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
+
+        return vImprime;
 
     }
 
@@ -1081,14 +1087,15 @@ public class FinDia extends PBase {
                 DT.moveToNext();
             }
 
+            rep.line();
+            rep.empty();
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox("Devolucion a bodega : " + e.getMessage());
             fail = true;
         }
 
-        rep.line();
-        rep.empty();
     }
 
     private void repEstadoMalo() {
@@ -1459,15 +1466,53 @@ public class FinDia extends PBase {
 
             dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    buildReportsTOL();
-                    imprimeCierreZ();
-                    corelz+=1;
-                    claseFinDia.updateGrandTotalCorelZ(gSumados,corelz);
+
+                   if ( buildReportsTOL()){
+
+                      if(imprimeCierreZ()){
+                           corelz+=1;
+                           claseFinDia.updateGrandTotalCorelZ(gSumados,corelz);
+                       }
+                   }else{
+                       msgAskCierreIncompleto("No se pudo generar el reporte Z");
+                   }
+
                 }
             });
 
             dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    msgAskCierreIncompleto("Proceso de fin de día incompleto");
+                }
+            });
+
+            dialog1.show();
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+        }
+    }
+
+    private void msgAskCierreIncompleto(String mensaje) {
+
+        try {
+            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
+
+            dialog1.setTitle("Road");
+            dialog1.setMessage(mensaje + "¿Quiere volver a intentarlo?");
+
+            dialog1.setIcon(R.drawable.ic_quest);
+
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
+                   msgAskGeneraCierreZ();
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which)
+                {
                 }
             });
 
@@ -1819,10 +1864,12 @@ public class FinDia extends PBase {
     //region "Funciones y procedimientos creados para generar el reporte Cierre Z de Toledano"
 
     //CKFK 20190226 Modifiqué este procedimiento a como debe ser el fin de día en Toledano
-    private void buildReportsTOL() {
+    private boolean buildReportsTOL() {
 
         Cursor DT;
         String vCadena;
+
+        boolean vGeneroReportes=false;
 
         try {
 
@@ -1862,7 +1909,6 @@ public class FinDia extends PBase {
             repCobrosTol();
             repNotasCreditoTol();
             repProductos();
-            //repEstadoMalo();
             repTotalesTol();
 
             sql = "DELETE FROM D_REPFINDIA";
@@ -1875,14 +1921,18 @@ public class FinDia extends PBase {
                 db.execSQL(sql);
             }
 
+            if (rep.save()){
+                claseFinDia.updateGeneroCierreZ(6);
+            }
+
+            vGeneroReportes=true;
+
         } catch (Exception e) {
             msgbox(new Object() {
             }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
-        if (rep.save()){
-            claseFinDia.updateGeneroCierreZ(6);
-        }
+        return vGeneroReportes;
 
     }
 

@@ -32,7 +32,7 @@ public class clsDocCanastaBod extends clsDocument {
         super.loadHeadData(corel);
 
         if(vTipo.equals("CANASTA"))  nombre="DEVOLUCION DE CANASTA";
-        if(vTipo.equals("CANASTA"))  nombre="DEVOLUCION DE BODEGA";
+        if(vTipo.equals("PASEANTE"))  nombre="DEVOLUCION DE BODEGA";
 
         try {
             sql="SELECT COREL, RUTA, TIPO, REFERENCIA, USUARIO, FECHA "+

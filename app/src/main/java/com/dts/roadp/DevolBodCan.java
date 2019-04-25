@@ -33,7 +33,7 @@ public class DevolBodCan extends PBase {
 
     private clsRepBuilder rep;
 
-    private ComWS cComWS;
+    private clsWSEnvio vWSEnvio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -440,8 +440,8 @@ public class DevolBodCan extends PBase {
 
             createDoc();
 
-           // cComWS  = new ComWS();
-           // cComWS.envio_D_MOV_en_dev();
+           // vWSEnvio = new clsWSEnvio(this, gl.ruta, gl.emp, 1);
+           // vWSEnvio.wsExecuteEnvio();
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

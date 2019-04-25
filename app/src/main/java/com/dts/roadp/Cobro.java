@@ -131,7 +131,9 @@ public class Cobro extends PBase {
 			gl.pagomodo=0;
 			gl.pagoval=tsel;
 			gl.pagolim=tsel;
-			gl.pagocobro=true;
+
+            if (dtipo.equalsIgnoreCase("R")) gl.pagocobro=false; else gl.pagocobro=true;
+
 			browse=1;
 			if(gl.validarCred!=2) gl.validarCred = 1;
 
@@ -190,6 +192,7 @@ public class Cobro extends PBase {
 				if (dtipo.equalsIgnoreCase("R")) {
 					clearAll();
 					items.get(0).flag=1;
+
 				}else{
 					for (int i = 0; i <items.size(); i++) {
 						dtipo=items.get(0).Tipo;
@@ -993,6 +996,14 @@ public class Cobro extends PBase {
 				mu.msgbox("Total a pagar mayor que total de monto seleccionado");return;
 			}
 
+			if (!gl.pagocobro){
+				if (epago<tsel) {
+					mu.msgbox("Pago no está completo, no se puede aplicar el pago");
+					return;
+				}
+			}
+
+
 			sql="DELETE FROM T_PAGO";
 			db.execSQL(sql);
 			
@@ -1008,7 +1019,7 @@ public class Cobro extends PBase {
 				
 		    db.execSQL(ins.sql());
 			
-			msgAskSave("Aplicar pago y crear un recibo");
+			msgAskSave("Aplicar pago?");
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1216,20 +1227,25 @@ public class Cobro extends PBase {
                     impres++;toast("Impres "+impres);
 
                     try {
-						sql="UPDATE D_COBRO SET IMPRES=IMPRES+3 WHERE COREL='"+corel+"'";
+						sql="UPDATE D_COBRO SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
 						db.execSQL(sql);
 					} catch (Exception e) {
 						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 					}
 
+					if (dtipo.equalsIgnoreCase("R")) {
+						sql="UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='"+crrf+"'";
+						db.execSQL(sql);
+					}
+
                     if (impres>1) {
 
-                        try {
+                       /* try {
                             sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorreld+"'";
                             db.execSQL(sql);
                         } catch (Exception e) {
                             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-                        }
+                        }*/
 
                         gl.brw=0;
 

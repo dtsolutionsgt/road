@@ -369,13 +369,14 @@ public class clsDocument {
 
 			if (l.indexOf("SS")>=0) {
 				l = StringUtils.replace(l,"SS","");
-
-				if (l.indexOf("No.:")>=0) {
-					l = StringUtils.replace(l,"No.:","");
-				}
 			}
 
         }
+
+		if ((l.indexOf("No.:")>=0) && (l.trim().length()==4)) {
+			l = StringUtils.replace(l,"No.:","@@");
+			l=l.trim();
+		}
 
         idx=lu.indexOf("VV");
         if (idx>=0) {

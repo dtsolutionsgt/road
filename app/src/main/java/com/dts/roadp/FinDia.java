@@ -1862,8 +1862,7 @@ public class FinDia extends PBase {
             repCobrosTol();
             repNotasCreditoTol();
             repProductos();
-            repDevolTotal();
-            repEstadoMalo();
+            //repEstadoMalo();
             repTotalesTol();
 
             sql = "DELETE FROM D_REPFINDIA";
@@ -2268,10 +2267,6 @@ public class FinDia extends PBase {
 
             DT = Con.OpenDT(sql);
 
-            TotalNotaCred = 0;
-            TotalNotaCredCred = 0;
-            TotalNotaCredCont = 0;
-
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
 
@@ -2282,8 +2277,8 @@ public class FinDia extends PBase {
                     vCadena = DT.getString(0);
 
                     if (!anulada) {
-                        TotalNotaCred = TotalNotaCred + DT.getDouble(1);
-                        TotalNotaCredCred = TotalNotaCredCred + DT.getDouble(1);
+                        TotalNotaCred += DT.getDouble(1);
+                        TotalNotaCredCred += DT.getDouble(1);
                     }
 
                     vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 25);
@@ -2303,10 +2298,6 @@ public class FinDia extends PBase {
                   " WHERE N.STATCOM='N' AND N.FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO <> 'K')";
 
             DT = Con.OpenDT(sql);
-
-            TotalNotaCred = 0;
-            TotalNotaCredCred = 0;
-            TotalNotaCredCont = 0;
 
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
@@ -2332,11 +2323,11 @@ public class FinDia extends PBase {
             }
 
             rep.line();
-            vCadena = "Total NC Credito:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCredCred), 27);
+            vCadena = "Total NC Credito:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCredCred), 16);
             rep.add(vCadena);
-            vCadena = "Total NC Contado:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCredCont), 27);
+            vCadena = "Total NC Contado:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCredCont), 16);
             rep.add(vCadena);
-            vCadena = "Total:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCred), 27);
+            vCadena = "Total:             " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCred), 16);
             rep.add(vCadena);
            rep.empty();
 

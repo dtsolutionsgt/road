@@ -72,7 +72,11 @@ public class clsDocFactura extends clsDocument {
 				if (anulado.equals("S")?true:false){
 					cantimpres = -1;
 				}else if (cantimpres == 0 && impres > 0){
-					cantimpres = 1;
+                    if (esPendientePago(corel)){
+                        cantimpres = -2;
+                    }else{
+                        cantimpres = 1;
+                    }
 				}else if (esPendientePago(corel)){
 					cantimpres = -2;
 				}

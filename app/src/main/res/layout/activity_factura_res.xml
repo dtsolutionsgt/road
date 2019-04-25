@@ -1,20 +1,21 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rl_facturares"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@layout/back"
-    tools:context=".PedidoRes" >
+    tools:context=".PedidoRes">
 
     <ImageView
         android:id="@+id/imgPFoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
         android:clickable="true"
         android:onClick="askSave"
-        android:paddingRight="10dp"
         android:paddingTop="10dp"
+        android:paddingRight="10dp"
         android:src="@drawable/next48"
         android:visibility="invisible" />
 
@@ -25,7 +26,7 @@
         android:layout_above="@+id/lblFact"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:paddingBottom="5dp" >
+        android:paddingBottom="5dp">
 
         <ImageView
             android:id="@+id/imageView12"
@@ -110,9 +111,9 @@
             android:id="@+id/imageView3"
             android:layout_width="128dp"
             android:layout_height="48dp"
+            android:layout_below="@+id/textView4"
             android:layout_alignLeft="@+id/textView4"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/textView4"
             android:layout_marginTop="20dp"
             android:clickable="true"
             android:onClick="payCred"
@@ -155,9 +156,9 @@
             android:id="@+id/imageView6"
             android:layout_width="128dp"
             android:layout_height="48dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignRight="@+id/lblCVence"
             android:layout_alignTop="@+id/imageView3"
+            android:layout_alignRight="@+id/lblCVence"
+            android:layout_alignParentLeft="true"
             android:clickable="true"
             android:onClick="showBon"
             android:src="@drawable/regalo" />
@@ -186,8 +187,8 @@
         android:layout_toLeftOf="@+id/imgPFoto"
         android:layout_toRightOf="@+id/imageView5"
         android:gravity="center"
-        android:paddingBottom="3dp"
         android:paddingLeft="10dp"
+        android:paddingBottom="3dp"
         android:text="Pago incompleto"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="18sp" />
@@ -195,11 +196,11 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/imageView4"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/imageView4"
-        android:background="@layout/blue_strip" >
+        android:layout_alignParentBottom="true"
+        android:background="@layout/blue_strip">
 
     </RelativeLayout>
 
@@ -207,12 +208,12 @@
         android:id="@+id/lblTalon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:gravity="center_horizontal"
-        android:paddingBottom="5dp"
         android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:text="Medium Text"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#FFFFFF" />
@@ -225,8 +226,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:gravity="center_horizontal"
-        android:paddingBottom="5dp"
         android:paddingTop="10dp"
+        android:paddingBottom="5dp"
         android:text="Medium Text"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#FFFFFF" />
@@ -235,9 +236,9 @@
         android:id="@+id/imageView4"
         android:layout_width="wrap_content"
         android:layout_height="2dp"
+        android:layout_alignTop="@+id/lblFact"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/lblFact"
         android:scaleType="fitXY"
         android:src="@drawable/sepgray" />
 
@@ -258,13 +259,13 @@
         android:layout_width="260dp"
         android:layout_height="wrap_content"
         android:layout_above="@+id/relativeLayout1"
-        android:layout_alignParentLeft="false"
         android:layout_below="@+id/imgPFoto"
+        android:layout_alignParentLeft="false"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="5dp"
         android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="5dp" >
+        android:layout_marginBottom="5dp">
 
     </ListView>
 

@@ -113,6 +113,7 @@ public class printer {
 			if (ptipo.equalsIgnoreCase("DATAMAX")) prid=1;
 			if (ptipo.equalsIgnoreCase("EPSON")) prid=2;
 			if (ptipo.equalsIgnoreCase("ZEBRA CPCL")) prid=3;
+			if (ptipo.equalsIgnoreCase("ZPL")) prid=4;
 		}
 			
 		setPrinterClass();
@@ -151,7 +152,8 @@ public class printer {
 			if (prtipo.equalsIgnoreCase("DATAMAX")) prid=1;
 			if (prtipo.equalsIgnoreCase("EPSON")) prid=2;
 			if (prtipo.equalsIgnoreCase("ZEBRA CPCL")) prid=3;
-				
+			if (prtipo.equalsIgnoreCase("ZPL")) prid=4;
+
 			setPrinterClass();
 				
 		} catch (Exception e) {
@@ -174,7 +176,12 @@ public class printer {
 				prn=new printZebraCPCL(cont,prpar,validprint);
 				prn.printclose=printclose;
 				prn.prwidth=prw;
-				break;		
+				break;
+			case 4:
+				prn=new printZebraZPL(cont,prpar,validprint);
+				prn.printclose=printclose;
+				prn.prwidth=prw;
+				break;
 		}	
 	}
 	

@@ -584,13 +584,25 @@ public class DevolCli extends PBase {
 
 	private void createDoc(){
 
+		String vModo="";
+
 		try{
 
+			vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
+
 			if (prn.isEnabled()) {
-				fdevol.buildPrint(gl.dvcorreld,0);
+
+				fdevol.buildPrint(gl.dvcorrelnc,0,vModo);
 				//#CKFK 20190401 09:47AM Agregué la funcionalidad de enviar el nombre del archivo a imprimir
 				prn.printask(printcallback, "printnc.txt");
-			}
+
+            }else if(!prn.isEnabled()){
+
+                fdevol.buildPrint(gl.dvcorrelnc,0,vModo);
+                limpiavariables_devol();
+                DevolCli.super.finish();
+
+            }
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -636,7 +648,7 @@ public class DevolCli extends PBase {
 
                 DT.moveToFirst();
 
-                correl=DT.getString(0) + StringUtils.right("00000" + Integer.toString(DT.getInt(1)), 5);
+                correl=DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)), 6);
 
                 if (tipo.equals("D")){
                     gl.dvactuald = String.valueOf(DT.getInt(1));
@@ -767,7 +779,7 @@ public class DevolCli extends PBase {
 					impres++;toast("Impres "+impres);
 
 					try {
-						sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorreld+"'";
+						sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorrelnc+"'";
 						db.execSQL(sql);
 					} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -776,7 +788,7 @@ public class DevolCli extends PBase {
 					if (impres>1) {
 
 						try {
-							sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorreld+"'";
+							sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorrelnc+"'";
 							db.execSQL(sql);
 						} catch (Exception e) {
 							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -786,8 +798,8 @@ public class DevolCli extends PBase {
 
 					} else {
 
-						fdevol.buildPrint(gl.dvcorreld,1);
-
+						String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
+						fdevol.buildPrint(gl.dvcorrelnc,1,vModo);
 						prn.printnoask(printclose, "printnc.txt");
 						prn.printnoask(printclose, "printnc.txt");
 

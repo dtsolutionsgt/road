@@ -1,28 +1,27 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
-import com.dts.roadp.clsClasses.clsCD;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.dts.roadp.clsClasses.clsCD;
+
+import java.util.ArrayList;
 
 public class ListAdaptCD extends BaseAdapter {
 	
-	private static ArrayList<clsCD> itemDetailsrrayList;
+	private static ArrayList<clsCD> items;
 		
 	private int selectedIndex;
 	
 	private LayoutInflater l_Inflater;
 
 	public ListAdaptCD(Context context, ArrayList<clsCD> results) {
-		itemDetailsrrayList = results;
+		items = results;
 		l_Inflater = LayoutInflater.from(context);
 		selectedIndex = -1;
 	}
@@ -37,11 +36,11 @@ public class ListAdaptCD extends BaseAdapter {
 	}	
 	
 	public int getCount() {
-		return itemDetailsrrayList.size();
+		return items.size();
 	}
 
 	public Object getItem(int position) {
-		return itemDetailsrrayList.get(position);
+		return items.get(position);
 	}
 
 	public long getItemId(int position) {
@@ -58,14 +57,16 @@ public class ListAdaptCD extends BaseAdapter {
 			
 			holder.lblCod  = (TextView) convertView.findViewById(R.id.lblETipo);
 			holder.lblDesc = (TextView) convertView.findViewById(R.id.lblPNum);
-			
+			holder.lblAdd = (TextView) convertView.findViewById(R.id.textView1);
+
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
 					
-		holder.lblCod.setText(itemDetailsrrayList.get(position).Cod);
-		holder.lblDesc.setText(itemDetailsrrayList.get(position).Desc);
+		holder.lblCod.setText(items.get(position).Cod);
+		holder.lblDesc.setText(items.get(position).Desc);
+		holder.lblAdd.setText(items.get(position).Text);
 		
 		if(selectedIndex!= -1 && position == selectedIndex) {
 			convertView.setBackgroundColor(Color.rgb(26,138,198));
@@ -78,7 +79,7 @@ public class ListAdaptCD extends BaseAdapter {
 	
 	
 	static class ViewHolder {
-		TextView  lblCod,lblDesc;
+		TextView  lblCod,lblDesc,lblAdd;
 	}
 	
 }

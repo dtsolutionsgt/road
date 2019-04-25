@@ -269,10 +269,6 @@ public class DevolBodTol extends PBase {
 
     //endregion
 
-    //region Aux
-
-    //endregion
-
     //region Activity Events
 
     @Override

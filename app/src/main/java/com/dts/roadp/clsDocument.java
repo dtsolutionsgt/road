@@ -19,7 +19,7 @@ public class clsDocument {
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;
 	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod;
-	public int ffecha,pendiente,residx;
+	public int ffecha,pendiente,diacred,condicionPago;
 	
 	protected android.database.sqlite.SQLiteDatabase db;
 	protected BaseDatos Con;
@@ -74,10 +74,12 @@ public class clsDocument {
 
 		if (modofact.equalsIgnoreCase("TOL")) {
 			if (docfactura && (reimpres==10)) flag=1;
+			if (docfactura && (reimpres==4)) flag=0;
 			if (doccanastabod) flag=2;
 			if (docrecibo && (reimpres==0)) flag=0;
         } else if(modofact.equalsIgnoreCase("*")) {
             if (doccanastabod) flag = 2;
+			if (docdevolucion || docpedido) flag = 1;
         }
 
 		if (flag==0) {
@@ -160,6 +162,7 @@ public class clsDocument {
 
     protected void saveHeadLines(int reimpres) {
         String s;
+		String mPago,dPago;
 
         rep.empty();rep.empty();
 
@@ -192,23 +195,44 @@ public class clsDocument {
 
 			if (!s.equalsIgnoreCase("@@")) rep.add(s);
 
+			if(i==7){
+				rep.add("");
+
+				if (docfactura) {
+					rep.add(resol);
+					rep.add(resfecha);
+					rep.add(resvence);
+					rep.add(resrango);
+				}
+
+			}
+
         }
 
-        rep.add("");
 
-        if (docfactura) {
-			rep.add(resol);
-			rep.add(resfecha);
-			rep.add(resvence);
-			rep.add(resrango);
-			rep.add("");
-			rep.add("Fecha : "+fsfecha);
-			rep.add("");
-		}
-
-        if (!emptystr(nit)) rep.add("NIT : "+nit);
+        if (!emptystr(nit)) rep.add("RUC : "+nit);
         if (!emptystr(clidir)) rep.add("Dir : "+clidir);
-        if(docdevolucion || doccanastabod) rep.add("Fecha de Emision : "+fsfecha);
+        if(docfactura){
+			if(condicionPago==4){
+
+				mPago= "Credito";
+
+				if(diacred==1){
+					dPago="dia";
+				}else{
+					dPago="dias";
+				}
+				rep.add("Condiciones de pago: "+mPago+" "+diacred+" "+dPago);
+
+			}else{
+				mPago= "Contado";
+				rep.add("Condiciones de pago: "+mPago);
+			}
+		}
+		rep.add("");
+		rep.add("Fecha : "+fsfecha);
+		rep.add("");
+
         //if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
 
         if (!emptystr(add1)) {
@@ -220,7 +244,7 @@ public class clsDocument {
 
         }
 
-        if (docfactura){
+        if (docfactura && !(modofact.equalsIgnoreCase("TOL"))){
 
 			rep.add("");
 			if (docfactura && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
@@ -235,12 +259,13 @@ public class clsDocument {
 			if (docfactura && (reimpres==5)) rep.add("------  C O N T A B I L I D A D  ------");
 			rep.add("");
 
-		}else if(docdevolucion){
+		}else if ((docdevolucion || docpedido) && !(modofact.equalsIgnoreCase("TOL"))){
 
+            //CKFK 2019-04-23 Consultar con Aaron
 			rep.add("");
-			if (docdevolucion && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
-			if (docdevolucion && (reimpres==2)) rep.add("------  C O P I A  ------");
-			if (docdevolucion && (reimpres==3)) rep.add("------       A N U L A D O      ------");
+			if ((docdevolucion && (reimpres==1)) || (docpedido && (reimpres==1))) rep.add("-------  R E I M P R E S I O N  -------");
+			if ((docdevolucion && (reimpres==2)) || (docpedido && (reimpres==2))) rep.add("------  C O P I A  ------");
+			if ((docdevolucion && (reimpres==3)) || (docpedido && (reimpres==3))) rep.add("------       A N U L A D O      ------");
 			rep.add("");
 
 		}
@@ -250,7 +275,7 @@ public class clsDocument {
         String s,lu,a;
         int idx;
 
-        residx=0;
+        //residx=0;
 
         //lu=l.toUpperCase().trim();
         lu=l.trim();
@@ -298,6 +323,9 @@ public class clsDocument {
 
 			if (l.indexOf("##")>=0) {
 				l = StringUtils.replace(l,"##","");
+				if (temp.length()>0 && temp1.length()>0){
+					l=StringUtils.replace(l,temp+temp1,"");
+				}
 			}
 		}
 
@@ -344,6 +372,11 @@ public class clsDocument {
 			}
 
         }
+
+		if ((l.indexOf("No.:")>=0) && (l.trim().length()==4)) {
+			l = StringUtils.replace(l,"No.:","@@");
+			l=l.trim();
+		}
 
         idx=lu.indexOf("VV");
         if (idx>=0) {
@@ -484,6 +517,22 @@ public class clsDocument {
 		if (vm>9) { s=s+String.valueOf(vm)+"-20";} else {s=s+"0"+String.valueOf(vm)+"-20";}  
 		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);} 
 		
+		return s;
+	}
+
+	public String sfecha_dos(long f) {
+		long vy,vm,vd;
+		String s;
+
+		vy=(long) f/100000000;f=f % 100000000;
+		vm=(long) f/1000000;f=f % 1000000;
+		vd=(long) f/10000;f=f % 10000;
+
+		s="";
+		if (vd>9) { s=s+String.valueOf(vd)+"-";} else {s=s+"0"+String.valueOf(vd)+"-";}
+		if (vm>9) { s=s+String.valueOf(vm)+"-";} else {s=s+"0"+String.valueOf(vm)+"-";}
+		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
+
 		return s;
 	}
 

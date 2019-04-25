@@ -55,8 +55,7 @@ public class ComWSExist extends PBase {
 
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_com_wsexist);
 		
@@ -80,7 +79,6 @@ public class ComWSExist extends PBase {
 		ruta=gl.ruta;
 	    gEmpresa=gl.emp;
 
-
 	    getWSURL();
 
 		dbld=new clsDataBuilder(this);
@@ -98,8 +96,7 @@ public class ComWSExist extends PBase {
 
 	// Events
 	
-	public void askRec(View view)
-	{
+	public void askRec(View view) {
 
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -311,8 +308,7 @@ public class ComWSExist extends PBase {
 	
 	// WEB SERVICE - RECEPCION
 
-	private boolean getData()
-	{
+	private boolean getData() 	{
 		Cursor DT;
 		int rc,prn,jj;
 		String s,val="";
@@ -483,8 +479,7 @@ public class ComWSExist extends PBase {
 	private String fterr;
 
 	//#EJC20181120: Inserta los documentos que bajaron a la HH
-	private boolean Actualiza_Documentos()
-	{
+	private boolean Actualiza_Documentos() 	{
 
 		DateUtils DU = new DateUtils();
 		long Now=du.getFechaActual();

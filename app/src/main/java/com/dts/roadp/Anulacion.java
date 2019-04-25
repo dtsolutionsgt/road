@@ -13,6 +13,8 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 
 public class Anulacion extends PBase {
@@ -26,6 +28,7 @@ public class Anulacion extends PBase {
 	
 	private Runnable printcallback,printclose;
 	private printer prn;
+    private printer prn_nc;
 	public  clsRepBuilder rep;
 	private clsDocAnul doc;
 	private clsDocFactura fdoc;
@@ -57,8 +60,8 @@ public class Anulacion extends PBase {
 		lblTipo= (TextView) findViewById(R.id.lblDescrip);
 
 		app = new AppMethods(this, gl, Con, db);
-		gl.validimp=app.validaImpresora("*");
-		if (!gl.validimp) toast("¡La impresora no está autorizada!");
+		gl.validimp=app.validaImpresora();
+		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
 		tipo=gl.tipo;
 		if (gl.peModal.equalsIgnoreCase("APR")) modoapr=true;
@@ -85,6 +88,7 @@ public class Anulacion extends PBase {
 		};
 		
 		prn=new printer(this,printclose,gl.validimp);
+        prn_nc=new printer(this,printclose,gl.validimp);
 
 		setHandlers();
 		listItems();
@@ -217,7 +221,7 @@ public class Anulacion extends PBase {
 			}
 
 			if (tipo==6) {
-				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.CODIGO, P_CLIENTE.NOMBRE,D_NOTACRED.TOTAL,FECHA "+
+				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.CODIGO || ' - ' || P_CLIENTE.NOMBRE AS DESC,FECHA,D_NOTACRED.TOTAL "+
 					"FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
 					"WHERE (D_NOTACRED.ANULADO='N') AND (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC ";
 			}
@@ -235,12 +239,14 @@ public class Anulacion extends PBase {
 			  	
 					vItem.Cod=DT.getString(0);
 					vItem.Desc=DT.getString(1);
-					if (tipo==2) vItem.Desc+=" - "+DT.getString(4);	
+					if (tipo==2) vItem.Desc+=" - "+DT.getString(4);
 					
 					if (tipo==3) {
-						sf=DT.getString(2)+"-"+DT.getInt(4);						
-					} else {	
-						f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);	
+						sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);;
+					}else if(tipo==1||tipo==6){
+						sf=DT.getString(0);
+					}else{
+						f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);
 					}
 					
 					vItem.Fecha=sf;
@@ -302,7 +308,7 @@ public class Anulacion extends PBase {
 			
 			if (tipo==4) anulRecarga(itemid);
 			
-			if (tipo==5) anulDevol(itemid);
+			if (tipo==5) if (!anulDevol(itemid)) return;
 
 			if (tipo==6) anulNotaCredito(itemid);
 
@@ -330,15 +336,15 @@ public class Anulacion extends PBase {
 				fdoc.deviceid =gl.deviceId;
 
 				if (!corelFactura.isEmpty()){
-					fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printask(printclose);
+					fdoc.buildPrint(corelFactura, 3, "TOL"); prn.printask(printclose);
 				}
 
 				SystemClock.sleep(50);
 
-				fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+				fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 				fdev.deviceid =gl.deviceId;
 
-				fdev.buildPrint(itemid, 1, "TOL"); prn.printask(printclose);
+				fdev.buildPrint(itemid, 3, "TOL"); prn_nc.printask(printclose, "printnc.txt");
 
 			}
 
@@ -699,12 +705,17 @@ public class Anulacion extends PBase {
 		}
 	}
 
-	private void anulDevol(String itemid) {
+	private boolean anulDevol(String itemid) {
 		Cursor DT;
 		String prod;
 		double cant,cantm;
 
+		boolean vAnulDevol=false;
+
 		try{
+
+			db.beginTransaction();
+
 			sql="UPDATE D_MOV SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
 
@@ -713,16 +724,38 @@ public class Anulacion extends PBase {
 
 			if(DT.getCount()>0){
 				sql="INSERT INTO P_STOCK SELECT PRODUCTO, CANT, CANTM, PESO, 0, LOTE, '',0,'N', '','',0,0,'', UNIDADMEDIDA " +
-						"FROM D_MOVD";
+						"FROM D_MOVD WHERE (COREL='"+itemid+"')";
+				db.execSQL(sql);
+			}
+
+			sql="SELECT PRODUCTO,UNIDADMEDIDA FROM D_MOVDB WHERE (COREL='"+itemid+"')";
+			DT=Con.OpenDT(sql);
+
+			if(DT.getCount()>0){
+				sql="INSERT INTO P_STOCKB " +
+					"SELECT M.RUTA, D.BARRA, D.PRODUCTO, 1, '' AS COREL, 0 AS PRECIO, D.PESO, '' AS DOCUMENTO, " +
+					" M.FECHA, 0 AS ANULADO, '' AS CENTRO, 'A' AS ESTATUS, " +
+					"0 AS ENVIADO, 0 AS CODIGOLIQUIDACION, '' AS COREL_D_MOV, D.UNIDADMEDIDA, '' AS DOCENTREGA " +
+					"FROM D_MOV M INNER JOIN D_MOVDB D ON M.COREL = D.COREL WHERE (M.COREL='"+itemid+"')";
 				db.execSQL(sql);
 			}
 
 			sql="UPDATE FinDia SET val5 = 0";
 			db.execSQL(sql);
 
+			db.setTransactionSuccessful();
+			db.endTransaction();
+
+			vAnulDevol=true;
+
 		}catch (Exception e){
+
+			db.endTransaction();
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
+
+		return vAnulDevol;
+
 	}
 	private void anulRecib(String itemid) {
 		try{

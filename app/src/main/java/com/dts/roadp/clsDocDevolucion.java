@@ -83,7 +83,7 @@ public class clsDocDevolucion extends clsDocument {
         rep.line();
         rep.addc("Firma Cliente");
         rep.add("");
-        if(corelNC.equals(asignacion)) {
+        if(!corelF.isEmpty()) {
             rep.addc("Aplica a factura: " + corelF);
         }
         rep.add("");
@@ -101,17 +101,17 @@ public class clsDocDevolucion extends clsDocument {
 
     protected boolean loadHeadData(String corel) {
         Cursor DT;
-        String cli,vend,val;
-        int ff;
+        String cli,vend,val, anulado;
+        int ff, impres, cantimpres;
 
         super.loadHeadData(corel);
 
         nombre="NOTA DE CREDITO";
 
         try {
-            sql="SELECT N.RUTA,N.VENDEDOR,N.CLIENTE,N.TOTAL,N.FECHA,N.COREL "+
-                "FROM D_NOTACRED N INNER JOIN D_CxC C ON C.TOTAL = N.TOTAL "+
-                "WHERE C.COREL = '"+corel+"'";
+            sql="SELECT N.RUTA,N.VENDEDOR,N.CLIENTE,N.TOTAL,N.FECHA,N.COREL, N.ANULADO, N.IMPRES "+
+                "FROM D_NOTACRED N "+
+                "WHERE N.COREL = '"+corel+"'";
 
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
@@ -124,6 +124,24 @@ public class clsDocDevolucion extends clsDocument {
 
             tot=DT.getDouble(3);
             ffecha=DT.getInt(4);fsfecha=sfecha(ffecha);
+
+            anulado=DT.getString(6);
+            impres=DT.getInt(7);
+            cantimpres=0;
+
+            if (anulado.equals("S")?true:false){
+                cantimpres = -1;
+            }else if (cantimpres == 0 && impres > 0){
+                cantimpres = 1;
+            }
+
+            if (cantimpres>0){
+                nombre = "COPIA DE NOTA DE CREDITO";
+            }else if (cantimpres==-1){
+                nombre = "NOTA DE CREDITO ANULADA";
+            }else if (cantimpres==0){
+                nombre = "NOTA DE CREDITO";
+            }
 
         } catch (Exception e) {
             Toast.makeText(cont,"loadHeadData"+e.getMessage(), Toast.LENGTH_SHORT).show();return false;
@@ -178,10 +196,11 @@ public class clsDocDevolucion extends clsDocument {
         items.clear();
 
         try {
+            corelF="";
+
             sql="SELECT N.COREL,F.ASIGNACION, F.SERIE, F.CORELATIVO " +
-                 "FROM D_NOTACRED N INNER JOIN D_FACTURA F ON F.ASIGNACION = N.COREL " +
-                 "INNER JOIN D_CxC C ON N.TOTAL = C.TOTAL " +
-                 "WHERE C.COREL = '"+corel+"'";
+                 "FROM D_NOTACRED N INNER JOIN D_FACTURA F ON F.COREL = N.FACTURA " +
+                 "WHERE N.COREL = '"+corel+"'";
 
             DT=Con.OpenDT(sql);
 
@@ -189,20 +208,29 @@ public class clsDocDevolucion extends clsDocument {
 
                 DT.moveToFirst();
                 corelNC = DT.getString(0);
-                asignacion = DT.getString(1);
+                asignacion = DT.getString(1); //Tengo el campo corel de la tabla D_CxC
                 corelF = DT.getString(2) + StringUtils.right("000000" + Integer.toString(DT.getInt(3)), 6);
 
             }else{
 
-                corelNC = "";
-                asignacion = "*";
-                corelF = "";
+                sql="SELECT N.COREL, N.FACTURA " +
+                        "FROM D_NOTACRED N " +
+                        "WHERE N.COREL = '"+corel+"'";
 
+                DT=Con.OpenDT(sql);
+
+                if(DT.getCount() >0){
+
+                    DT.moveToFirst();
+                    corelNC = DT.getString(0);
+                    asignacion = DT.getString(1); //Tengo el campo corel de la tabla D_CxC
+                    corelF = "";
+                }
             }
 
             sql="SELECT C.CODIGO,P.DESCLARGA,C.ESTADO,C.PESO,C.PRECIO,C.TOTAL,C.CANT,C.UMVENTA " +
                 "FROM D_CxCD C INNER JOIN P_PRODUCTO P ON C.CODIGO = P.CODIGO " +
-                "WHERE (C.COREL='"+corel+"')";
+                "WHERE (C.COREL='"+asignacion+"')";
             DT=Con.OpenDT(sql);
 
             if (DT.getCount()>0){

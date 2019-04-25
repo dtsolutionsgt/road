@@ -13,6 +13,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 
 public class Reimpresion extends PBase {
@@ -37,7 +39,7 @@ public class Reimpresion extends PBase {
 	private clsDocDevolucion fdev;
 	
 	private int tipo;	
-	private String selid,itemid,corelNC;
+	private String selid,itemid,corelNC,asignFact;
 	
 	// impresion nota credito
 
@@ -45,7 +47,7 @@ public class Reimpresion extends PBase {
 	private String pserie,pnumero,pruta,pvend,pcli,presol,presfecha,pfser,pfcor;
 	private String presvence,presrango,pvendedor,pcliente,pclicod,pclidir;
 	private double ptot;
-	private int residx;
+	private int residx,ncFact;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,19 +61,32 @@ public class Reimpresion extends PBase {
 		lblTipo= (TextView) findViewById(R.id.lblFecha);
 
 		app = new AppMethods(this, gl, Con, db);
-		gl.validimp=app.validaImpresora("*");
-		if (!gl.validimp) toast("¡La impresora no está autorizada!");
+		gl.validimp=app.validaImpresora();
+		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
 		tipo=gl.tipo;
 		itemid="*";
 		
 		setHandlers();
 		listItems();
-		
+
+		prn=new printer(this,printclose,gl.validimp);
+		prn_nc=new printer(this,printclose,gl.validimp);
+
+		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+		fdoc.deviceid =gl.deviceId;
+
+		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+		fdev.deviceid =gl.deviceId;
+
 		printclose= new Runnable() {
-		    public void run() {
-		    	//Reimpresion.super.finish();
-		    }
+			public void run() {
+
+				String corelFactura=getCorelFact(itemid);
+				if(ncFact==1){
+					fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printnoask(printvoid,"print.txt");
+				}
+			}
 		};
 
 		printvoid= new Runnable() {
@@ -81,13 +96,18 @@ public class Reimpresion extends PBase {
 
 		printcallback= new Runnable() {
 			public void run() {
+
+				//#CKFK_20190401 03:43 PM Agregué esto para imprimir la NC cuando la factura está asociada a una
+				corelNC=getCorelNotaCred(itemid);
+
+				if (!corelNC.isEmpty()){
+
+					fdev.buildPrint(corelNC, 1, "TOL");
+					prn_nc.printnoask(printvoid, "printnc.txt");
+				}
 				askPrint();
 			}
 		};
-
-		prn=new printer(this,printclose,gl.validimp);
-		prn_nc=new printer(this,printclose,gl.validimp);
-			
 		switch (tipo) {
 		case 0:  
 			lblTipo.setText("Pedido");break;
@@ -107,7 +127,7 @@ public class Reimpresion extends PBase {
 			mdoc=new clsDocMov(this,prn.prw,"Dvolucion a bodega",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 			lblTipo.setText("Devolución a bodega");break;
 		case 6:  
-			fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "print.txt");
+			fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 			fdev.deviceid =gl.deviceId;
 			lblTipo.setText("Nota Crédito");break;
 			
@@ -225,11 +245,11 @@ public class Reimpresion extends PBase {
 				if (gl.peModal.equalsIgnoreCase("TOL")) {
 					sql = "SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO,D_FACTURA.IMPRES " +
 							"FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO " +
-							"WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC";
+							"WHERE (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC";
 				} else {
 					sql = "SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO,D_FACTURA.IMPRES " +
 							"FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO " +
-							"WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC LIMIT 1";
+							"WHERE AND (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC LIMIT 1";
 				}
 			}
 				
@@ -242,7 +262,7 @@ public class Reimpresion extends PBase {
 			if (tipo==6) {
 				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.NOMBRE,D_NOTACRED.SERIE,D_NOTACRED.TOTAL,D_NOTACRED.CORELATIVO,D_NOTACRED.IMPRES "+
 					 "FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
-					 "WHERE (D_NOTACRED.ANULADO='N') AND (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC";
+					 "WHERE (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC";
 			}
 			
 			if (tipo<99) {
@@ -263,8 +283,8 @@ public class Reimpresion extends PBase {
 						if (tipo==2) vItem.Desc+=" - "+DT.getString(4);	
 
 						if (tipo==3) {
-							sf=DT.getString(2)+"-"+DT.getInt(4);						
-						} else if (tipo==6){
+							sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);;
+						} else if (tipo==1||tipo==6){
 							sf=DT.getString(0);
 						}else {
 							f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);
@@ -316,7 +336,7 @@ public class Reimpresion extends PBase {
 			
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox( e.getMessage());
+		   	mu.msgbox("listItems: "+ e.getMessage());
 	    }
 			 
 		adapter=new ListAdaptCFDV(this, items);
@@ -373,16 +393,29 @@ public class Reimpresion extends PBase {
 	
 	private void imprRecibo() {
 		try {
-			if (cdoc.buildPrint(itemid,1,"")) prn.printask(printcallback);
+			if(prn.isEnabled()){
+				cdoc.buildPrint(itemid,1,"");
+				prn.printask(printcallback);
+			}else if(!prn.isEnabled()){
+				cdoc.buildPrint(itemid,1,"");
+				toast("Reimpresion de recibo generada");
+			}
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox(e.getMessage());
 		}
 	}
-	
+
 	private void imprDeposito() {
 		try {
-			if (ddoc.buildPrint(itemid,1)) prn.printask();
+			if (prn.isEnabled()){
+				ddoc.buildPrint(itemid, 1);
+				prn.printask();
+			}else if(!prn.isEnabled()){
+				ddoc.buildPrint(itemid, 1);
+				toast("Reimpresion de deposito generada");
+			}
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox(e.getMessage());
@@ -405,18 +438,26 @@ public class Reimpresion extends PBase {
 		}
 
 		try {
-			if (fdoc.buildPrint(itemid,impr,gl.peFormatoFactura)) prn.printask(printcallback);
 
-			//#CKFK_20190401 03:43 PM Agregué esto para imprimir la NC cuando la factura está asociada a una
-			corelNC=tieneNCFactura(itemid);
+			if(prn.isEnabled()){
+				if (fdoc.buildPrint(itemid,impr,gl.peFormatoFactura))
 
-			if (!corelNC.isEmpty()){
+				    prn.printask(printcallback);
 
-				fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-				fdev.deviceid =gl.deviceId;
+			}else if(!prn.isEnabled()){
+				fdoc.buildPrint(itemid,impr,gl.peFormatoFactura);
 
-				fdev.buildPrint(corelNC, 1, "TOL");
-				prn_nc.printnoask(printvoid, "printnc.txt");
+				corelNC=getCorelNotaCred(itemid);
+
+				if (!corelNC.isEmpty()){
+					/*fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+					fdev.deviceid =gl.deviceId;*/
+
+					fdev.buildPrint(corelNC, 1, "TOL");
+					toast("Reimpresion de factura y nota de credito generada");
+				}else{
+					toast("Reimpresion de factura generada");
+				}
 			}
 
 		} catch (Exception e) {
@@ -427,7 +468,13 @@ public class Reimpresion extends PBase {
 	
 	private void imprRecarga() {
 		try {
-			if (mdoc.buildPrint(itemid,1)) prn.printask();
+			if(prn.isEnabled()){
+				mdoc.buildPrint(itemid,1);
+				prn.printask();
+			}else if(!prn.isEnabled()){
+				mdoc.buildPrint(itemid,1);
+				toast("Reimpresion de recarga generada");
+			}
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox(e.getMessage());
@@ -436,7 +483,12 @@ public class Reimpresion extends PBase {
 	
 	private void imprFindia() {
 		try {
-			prn.printask("SyncFold/findia.txt");
+			if(prn.isEnabled()){
+				prn.printask("SyncFold/findia.txt");
+			}else if(!prn.isEnabled()){
+				toast("No hay impresora configurada");
+			}
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox(e.getMessage());
@@ -469,23 +521,44 @@ public class Reimpresion extends PBase {
 			if (dt.getInt(1)>1) {
 				msgbox("¡La factura "+serie+" - "+corel+" no se puede imprimir porque ya fue reimpresa anteriormente!");return;
 			}
-			
-			if (fdoc.buildPrint(id,1,gl.peFormatoFactura)) prn.printask();
 
-			try {
-				sql="UPDATE D_FACTURA SET IMPRES=2 WHERE COREL='"+itemid+"'";		
-				db.execSQL(sql);
-			} catch (Exception e) {
+			if(prn.isEnabled()){
+				if (fdoc.buildPrint(id,1,gl.peFormatoFactura)) prn.printask();
+
+				try {
+					sql="UPDATE D_FACTURA SET IMPRES=2 WHERE COREL='"+itemid+"'";
+					db.execSQL(sql);
+				} catch (Exception e) {
+				}
+
+				//#CKFK_20190401 03:43 PM Agregué esto para imprimir la NC cuando la factura está asociada a una
+				String corelNC=getCorelNotaCred(itemid);
+
+				if (!corelNC.isEmpty()){
+					fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+					fdev.deviceid =gl.deviceId;
+					fdev.buildPrint(corelNC, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+				}
+
+			}else if(!prn.isEnabled()){
+
+				fdoc.buildPrint(id,1,gl.peFormatoFactura);
+
+				try {
+					sql="UPDATE D_FACTURA SET IMPRES=2 WHERE COREL='"+itemid+"'";
+					db.execSQL(sql);
+				} catch (Exception e) {
+				}
+
+				String corelNC=getCorelNotaCred(itemid);
+
+				if (!corelNC.isEmpty()){
+					fdev.buildPrint(corelNC, 1, "TOL");
+					toast("Reimpresion de UltFactura generada");
+				}
 			}
 
-			//#CKFK_20190401 03:43 PM Agregué esto para imprimir la NC cuando la factura está asociada a una
-			String corelNC=tieneNCFactura(itemid);
 
-			if (!corelNC.isEmpty()){
-				fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-				fdev.deviceid =gl.deviceId;
-				fdev.buildPrint(corelNC, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
-			}
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -498,71 +571,124 @@ public class Reimpresion extends PBase {
 		Cursor dt;
 		String id,serie;
 		int corel;
+		String corelFactura=getCorelFact(itemid);
 
 		try {
 
-			String corelFactura=tieneFacturaNC(itemid);
+			if(prn.isEnabled()){
 
-			if (!corelFactura.isEmpty()){
+				if(ncFact==1){
+					if(tipo==6){
+						fdev.buildPrint(itemid, 3, "TOL");
+						prn_nc.printask(printclose, "printnc.txt");
 
-				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
-				fdoc.deviceid =gl.deviceId;
+						toast("Reimpresión de nota de crédito y factura generada");
+					}else {
+						fdev.buildPrint(itemid, 1, "TOL");
+						prn_nc.printask(printclose, "printnc.txt");
+						toast("Reimpresión de nota de crédito y factura generada");
+					}
 
-				fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printask();
+				}else if(ncFact==2){
+					if(tipo==6){
+						fdev.buildPrint(itemid, 3, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+
+						toast("Reimpresion de nota de credito generada");
+					}else{
+						fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+
+						toast("Reimpresion de nota de credito generada");
+					}
+
+				}
+
+
+			}else if(!prn.isEnabled()){
+
+				if(ncFact==1){
+					fdev.buildPrint(itemid, 1, "TOL");
+					fdoc.buildPrint(corelFactura, 1, "TOL");
+
+					toast("Reimpresion de nota de credito y factura generada");
+
+				}else if(ncFact==2){
+					fdev.buildPrint(itemid, 1, "TOL");
+
+					toast("Reimpresion de nota de credito generada");
+				}
+
 			}
-
-			fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printclose, "print.txt");
 
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			msgbox("imprUltNotaCredito: "+new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 
 	}
 
-	private String tieneFacturaNC(String vCorel){
+	private String getCorelFact(String vCorel){
 
 		Cursor DT;
 		String vtieneFacturaNC= "";
+		ncFact=0;
 
 		try{
 
-			sql = "SELECT FACTURA FROM D_NOTACRED WHERE COREL = '" + vCorel + "' AND FACTURA IN (SELECT COREL FROM D_FACTURA)";
+			sql = "SELECT F.COREL, F.ASIGNACION, N.COREL "+
+				  "FROM D_FACTURA F INNER JOIN D_NOTACRED N ON F.COREL = N.FACTURA "+
+				  "WHERE N.COREL = '"+vCorel+"'";
+
 			DT=Con.OpenDT(sql);
 
-			if (DT.getCount()>0){
+			if(DT.getCount()==0){
+				sql = "SELECT FACTURA FROM D_NOTACRED WHERE COREL = '"+ vCorel +"'";
+				DT=Con.OpenDT(sql);
+
+				if(DT.getCount()>0){
+					DT.moveToFirst();
+					vtieneFacturaNC = DT.getString(0);
+					ncFact=2;
+
+					return vtieneFacturaNC;
+				}
+
+			}else if(DT.getCount()>0){
 				DT.moveToFirst();
 				vtieneFacturaNC = DT.getString(0);
+				asignFact = DT.getString(2);
+				ncFact=1;
 			}
 
+
 		}catch (Exception ex){
-			mu.msgbox("tieneFacturaNC ocurrió un error "+ex.getMessage());
+			mu.msgbox("tieneFacturaNC ocurrió un error: "+ex.getMessage());
 		}
 
 		return vtieneFacturaNC;
 	}
 
-	private String tieneNCFactura(String vCorel){
+	private String getCorelNotaCred(String vCorel){
 
 		Cursor DT;
-		String vtieneNCFactura= "";
+		String vCorelNC= "";
 
 		try{
 
-			sql = "SELECT ASIGNACION FROM D_FACTURA WHERE COREL = '" + vCorel + "' AND ASIGNACION IN (SELECT COREL FROM D_CXC)";
+			sql = "SELECT N.COREL FROM D_FACTURA F  INNER JOIN D_NOTACRED N ON F.COREL = N.FACTURA "+
+				  "WHERE F.COREL = '" + vCorel + "'";
 			DT=Con.OpenDT(sql);
 
 			if (DT.getCount()>0){
 				DT.moveToFirst();
-				vtieneNCFactura = DT.getString(0);
+				vCorelNC = DT.getString(0);
 			}
 
 		}catch (Exception ex){
 			mu.msgbox("tieneNCFactura ocurrió un error "+ex.getMessage());
 		}
 
-		return vtieneNCFactura;
+		return vCorelNC;
 	}
 
 	// Aprofam
@@ -840,7 +966,7 @@ public class Reimpresion extends PBase {
 
 						switch (tipo) {
 							case 1:
-								sql = "UPDATE D_COBRO SET IMPRES=IMPRES+3 WHERE COREL='" + itemid + "'";
+								sql = "UPDATE D_COBRO SET IMPRES=IMPRES+1 WHERE COREL='" + itemid + "'";
 								db.execSQL(sql);
 								break;
 							case 3:

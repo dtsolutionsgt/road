@@ -8,11 +8,10 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -34,10 +33,10 @@ import java.util.ArrayList;
 
 public class comWSLic extends PBase {
 
-    private TextView lblInfo, lblParam, lblRec, lblEnv;
+    private TextView lblInfo, lblParam, lblEnv,lblDev;
     private ProgressBar barInfo;
     private EditText txtRuta, txtWS, txtEmp;
-    private ImageView imgRec, imgEnv, imgExis;
+    private ImageView imgEnv;
     private RelativeLayout ralBack;
 
     private int isbusy, fecha, lin, reccnt;
@@ -47,7 +46,7 @@ public class comWSLic extends PBase {
     private SQLiteDatabase dbT;
     private BaseDatos ConT;
     private BaseDatos.Insert insT;
-    private AppMethods clsAppM;
+    private AppMethods app;
 
     private ArrayList<String> listItems = new ArrayList<String>();
     private ArrayList<String> results = new ArrayList<String>();
@@ -58,15 +57,15 @@ public class comWSLic extends PBase {
     private clsDataBuilder dbld;
     private DateUtils DU;
 
+    // 355030097127235
 
     // Web Service -
 
-    public AsyncCallRec wsRtask;
     public AsyncCallSend wsStask;
 
     private static String sstr, fstr, fprog, finf, ferr, fterr, idbg, dbg, ftmsg, esql, ffpos;
     private int scon, running, pflag, stockflag, conflag;
-    private String ftext, slsync, senv, gEmpresa, ActRuta,  strliqid;
+    private String ftext, slsync, senv, gEmpresa, ActRuta,  strliqid, devinfo ;
     private boolean  ftflag;
 
     private final String NAMESPACE = "http://tempuri.org/";
@@ -84,24 +83,17 @@ public class comWSLic extends PBase {
         System.setProperty("line.separator", "\r\n");
 
         dbld = new clsDataBuilder(this);
-        clsAppM = new AppMethods(this, gl, Con, db);
+        app = new AppMethods(this, gl, Con, db);
 
         lblInfo = (TextView) findViewById(R.id.lblETipo);
         lblParam = (TextView) findViewById(R.id.lblProd);
         barInfo = (ProgressBar) findViewById(R.id.progressBar2);
-        txtRuta = (EditText) findViewById(R.id.txtRuta);
-        txtRuta.setEnabled(false);
-        txtWS = (EditText) findViewById(R.id.txtWS);
-        txtWS.setEnabled(false);
-        txtEmp = (EditText) findViewById(R.id.txtEmp);
-        txtEmp.setEnabled(false);
-
-        lblRec = (TextView) findViewById(R.id.btnRec);
+        txtRuta = (EditText) findViewById(R.id.txtRuta);txtRuta.setEnabled(false);
+        txtWS = (EditText) findViewById(R.id.txtWS);txtWS.setEnabled(false);
+        txtEmp = (EditText) findViewById(R.id.txtEmp);txtEmp.setEnabled(false);
         lblEnv = (TextView) findViewById(R.id.btnSend);
-
         imgEnv = (ImageView) findViewById(R.id.imageView6);
-        imgRec = (ImageView) findViewById(R.id.imageView5);
-
+        lblDev = (TextView) findViewById(R.id.textView87);
         ralBack = (RelativeLayout) findViewById(R.id.relwsmail);
 
         isbusy = 0;
@@ -117,14 +109,8 @@ public class comWSLic extends PBase {
 
         getWSURL();
 
-        //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
-        if (gl.debug) {
-            if (mu.emptystr(txtRuta.getText().toString())) {
-                txtRuta.setText("8001-1");
-                txtEmp.setText("03");
-                txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
-            }
-        }
+        devinfo=gl.devicename+" / "+Build.MODEL;
+        lblDev.setText(devinfo+"\n"+gl.deviceId);
 
         setHandlers();
 
@@ -132,17 +118,6 @@ public class comWSLic extends PBase {
 
 
     //region Events
-
-    public void askRec(View view) {
-
-        if (isbusy == 1) {
-            toastcent("Por favor, espere que se termine la tarea actual.");
-            return;
-        }
-
-        msgAskConfirmaRecibido();
-
-    }
 
     public void askSend(View view) {
 
@@ -152,21 +127,10 @@ public class comWSLic extends PBase {
                 return;
             }
 
-            if (gl.contlic) {
-
-            }
-
-            if (gl.banderafindia) {
-                if (!puedeComunicar()) {
-                    mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
-                    return;
-                }
-            }
-
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
             dialog.setTitle("Envio");
-            dialog.setMessage("¿Enviar datos?");
+            dialog.setMessage("¿Enviar requerimiento de licencia?");
 
             dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
@@ -178,31 +142,10 @@ public class comWSLic extends PBase {
 
             dialog.show();
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
         }
 
 
-    }
-
-    private boolean puedeComunicar() {
-
-        boolean vPuedeCom = false;
-
-        try {
-
-            //#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
-            if (gl.banderafindia) {
-           } else {
-                return true;
-            }
-
-        } catch (Exception ex) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), ex.getMessage(), "");
-        }
-
-        return vPuedeCom;
     }
 
     private void setHandlers() {
@@ -219,38 +162,6 @@ public class comWSLic extends PBase {
     //endregion
 
     //region Main
-
-    private void runRecep() {
-
-        try {
-            if (isbusy == 1) return;
-
-            if (!setComParams()) return;
-
-            //#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
-            View view = this.getCurrentFocus();
-            view.clearFocus();
-            if (view != null) {
-                keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
-            }
-
-            isbusy = 1;
-
-            barInfo.setVisibility(View.VISIBLE);
-            barInfo.invalidate();
-            lblInfo.setText("Iniciando proceso de carga..");
-
-            lblInfo.setText("Conectando ...");
-
-            wsRtask = new AsyncCallRec();
-            wsRtask.execute();
-
-        } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-        }
-
-    }
 
     private void runSend() {
 
@@ -275,22 +186,6 @@ public class comWSLic extends PBase {
 
 
     }
-
-    public void writeData(View view) {
-
-        try {
-            dbld.clear();
-            dbld.insert("D_PEDIDO", "WHERE 1=1");
-            dbld.insert("D_PEDIDOD", "WHERE 1=1");
-            dbld.save();
-        } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-        }
-
-
-    }
-
 
     //endregion
 
@@ -444,6 +339,52 @@ public class comWSLic extends PBase {
         return 0;
     }
 
+    public int requestLicence(String serial, String devname) {
+        int rc;
+        String s, ss;
+
+        METHOD_NAME = "requestLicence";
+        sstr = "OK";
+
+        try {
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            PropertyInfo param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("Serial");
+            param.setValue(serial);
+            request.addProperty(param);
+
+            PropertyInfo param2 = new PropertyInfo();
+            param2.setType(String.class);
+            param2.setName("Name");
+            param2.setValue(devname);
+            request.addProperty(param2);
+
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+            s = response.toString();
+
+            sstr = "#";
+            if (s.equalsIgnoreCase("#")) return 1;
+
+            sstr = s;
+            return 0;
+        } catch (Exception e) {
+             sstr = e.getMessage();
+        }
+
+        return 0;
+    }
+
     public int OpenDTt(String sql) {
         int rc;
 
@@ -534,643 +475,6 @@ public class comWSLic extends PBase {
 
     //endregion
 
-    //region WS Recepcion Methods
-
-    private boolean getData() {
-        Cursor DT;
-        BufferedWriter writer = null;
-        FileWriter wfile;
-        int rc, scomp, prn, jj;
-        String s, val = "";
-
-
-        try {
-
-            String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
-            wfile = new FileWriter(fname, false);
-            writer = new BufferedWriter(wfile);
-
-            db.execSQL("DELETE FROM P_LIQUIDACION");
-
-            sql = "SELECT VALOR FROM P_PARAMEXT WHERE ID=2";
-            DT = Con.OpenDT(sql);
-
-            if (DT.getCount() > 0) {
-
-                DT.moveToFirst();
-
-                val = DT.getString(0);
-
-            } else {
-                val = "N";
-            }
-
-        } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            val = "N";
-        }
-
-        if (val.equalsIgnoreCase("S")) gl.peStockItf = true;
-        else gl.peStockItf = false;
-
-
-        listItems.clear();
-        scomp = 0;
-        idbg = "";
-        stockflag = 0;
-
-        ftmsg = "";
-        ftflag = false;
-
-        try {
-
-            if (!AddTable("P_PARAMEXT")) return false;
-            procesaParamsExt();
-
-            if (!AddTable("P_NIVELPRECIO")) return false;
-
-            if (!AddTable("P_RUTA")) return false;
-            if (!AddTable("P_CLIENTE")) return false;
-            if (!AddTable("P_CLIENTE_FACHADA")) return false;
-            if (!AddTable("P_CLIRUTA")) return false;
-            if (!AddTable("P_CLIDIR")) return false;
-            if (!AddTable("P_PRODUCTO")) return false;
-            if (!AddTable("P_FACTORCONV")) return false;
-            if (!AddTable("P_LINEA")) return false;
-            if (!AddTable("P_PRODPRECIO")) return false;
-            if (!AddTable("TMP_PRECESPEC")) return false;
-            if (!AddTable("P_DESCUENTO")) return false;
-            if (!AddTable("P_EMPRESA")) return false;
-            if (!AddTable("P_SUCURSAL")) return false;
-            if (!AddTable("P_BANCO")) return false;
-            if (!AddTable("P_STOCKINV")) return false;
-
-            if (!AddTable("P_CODATEN")) return false;
-            if (!AddTable("P_CODDEV")) return false;
-            if (!AddTable("P_CODNOLEC")) return false;
-            if (!AddTable("P_NIVELPRECIO")) return false;
-            if (!AddTable("P_COREL")) return false;
-            if (!AddTable("P_CORELNC")) return false;
-            if (!AddTable("P_CORRELREC")) return false;
-            if (!AddTable("P_CORREL_OTROS")) return false;
-            if (!AddTable("P_STOCK_APR")) return false;
-            if (!AddTable("P_STOCK")) return false;
-            if (!AddTable("P_STOCKB")) return false;
-            if (!AddTable("P_STOCK_PALLET"))
-                return false;//#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
-            if (!AddTable("P_COBRO")) return false;
-            if (!AddTable("P_CLIGRUPO")) return false;
-            if (!AddTable("P_MEDIAPAGO")) return false;
-            if (!AddTable("P_BONIF")) return false;
-            if (!AddTable("P_BONLIST")) return false;
-            if (!AddTable("P_PRODGRUP")) return false;
-            if (!AddTable("P_IMPUESTO")) return false;
-            if (!AddTable("P_VENDEDOR")) return false;
-            if (!AddTable("P_MUNI")) return false;
-            if (!AddTable("P_VEHICULO")) return false;
-            if (!AddTable("P_HANDHELD")) return false;
-            if (!AddTable("P_IMPRESORA")) return false;
-
-            if (!AddTable("P_REF1")) return false;
-            if (!AddTable("P_REF2")) return false;
-            if (!AddTable("P_REF3")) return false;
-
-            if (!AddTable("P_ARCHIVOCONF")) return false;
-            if (!AddTable("P_ENCABEZADO_REPORTESHH")) return false;
-            if (!AddTable("P_PORCMERMA")) return false;
-
-
-            // Objetivos
-
-            if (!AddTable("O_RUTA")) return false;
-            if (!AddTable("O_COBRO")) return false;
-            if (!AddTable("O_PROD")) return false;
-            if (!AddTable("O_LINEA")) return false;
-
-
-            // Mercadeo
-
-            if (!AddTable("P_MEREQTIPO")) return false;
-            if (!AddTable("P_MEREQUIPO")) return false;
-            if (!AddTable("P_MERESTADO")) return false;
-            if (!AddTable("P_MERPREGUNTA")) return false;
-            if (!AddTable("P_MERRESP")) return false;
-            if (!AddTable("P_MERMARCACOMP")) return false;
-            if (!AddTable("P_MERPRODCOMP")) return false;
-
-            //if (gl.contlic) {
-            //	if (!AddTable("LIC_CLIENTE")) return false;
-            //}
-
-        } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            return false;
-        }
-
-        ferr = "";
-
-        try {
-
-            rc = listItems.size();
-            reccnt = rc;
-            if (rc == 0) return true;
-
-            fprog = "Procesando ...";
-            wsRtask.onProgressUpdate();
-
-            ConT = new BaseDatos(this);
-            dbT = ConT.getWritableDatabase();
-            ConT.vDatabase = dbT;
-            insT = ConT.Ins;
-
-            prn = 0;
-            jj = 0;
-
-            Log.d("M", "So far we are good");
-
-            dbT.beginTransaction();
-
-            for (int i = 0; i < rc; i++) {
-
-                sql = listItems.get(i);
-                esql = sql;
-                sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
-                sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
-
-                try {
-                    writer.write(sql);
-                    writer.write("\r\n");
-                } catch (Exception e) {
-                    Log.d("M", "Something happend here " + e.getMessage());
-                }
-
-                try {
-                    dbT = ConT.getWritableDatabase();
-                    dbT.execSQL(sql);
-                } catch (Exception e) {
-                    Log.d("M", "Something happend there " + e.getMessage());
-                    addlog(new Object() {
-                    }.getClass().getEnclosingMethod().getName(), e.getMessage() + "EJC", "Yo fui " + sql);
-                    Log.e("z", e.getMessage());
-                }
-
-                try {
-                    if (i % 10 == 0) {
-                        fprog = "Procesando: " + i + " de: " + (rc - 1);
-                        wsRtask.onProgressUpdate();
-                        SystemClock.sleep(20);
-                    }
-                } catch (Exception e) {
-                    addlog(new Object() {
-                    }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-                    Log.e("z", e.getMessage());
-                }
-            }
-
-            fprog = "Procesando: " + (rc - 1) + " de: " + (rc - 1);
-            wsRtask.onProgressUpdate();
-
-            dbT.setTransactionSuccessful();
-            dbT.endTransaction();
-
-            Log.d("M", "We are ok");
-
-            fprog = "Documento de inventario recibido en BOF...";
-            wsRtask.onProgressUpdate();
-
-            fprog = "Fin de la actualización";
-            wsRtask.onProgressUpdate();
-
-            scomp = 1;
-
-            try {
-                ConT.close();
-            } catch (Exception e) {
-                addlog(new Object() {
-                }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            }
-
-            try {
-                writer.close();
-            } catch (Exception e) {
-                addlog(new Object() {
-                }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-                msgbox(new Object() {
-                }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
-            }
-
-            return true;
-
-        } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            fprog = "Actualización incompleta";
-            wsRtask.onProgressUpdate();
-
-            Log.e("Error", e.getMessage());
-            try {
-                ConT.close();
-            } catch (Exception ee) {
-                addlog(new Object() {
-                }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            }
-
-            sstr = e.getMessage();
-            ferr = sstr + "\n" + sql;
-            esql = sql;
-            return false;
-        }
-
-    }
-
-    private void procesaParamsExt() {
-        Cursor dt;
-        String sql, val = "";
-        int ival, rc;
-
-        try {
-
-            rc = listItems.size();
-            reccnt = rc;
-            if (rc == 0) return;
-
-            ConT = new BaseDatos(this);
-            dbT = ConT.getWritableDatabase();
-            ConT.vDatabase = dbT;
-            insT = ConT.Ins;
-
-            dbT.beginTransaction();
-
-            for (int i = 0; i < rc; i++) {
-
-                sql = listItems.get(i);
-                esql = sql;
-                dbT.execSQL(sql);
-
-                try {
-                    if (i % 10 == 0) {
-
-                        SystemClock.sleep(20);
-                    }
-                } catch (Exception e) {
-                    Log.e("z", e.getMessage());
-                }
-            }
-
-            dbT.setTransactionSuccessful();
-            dbT.endTransaction();
-
-            try {
-                sql = "SELECT VALOR FROM P_PARAMEXT WHERE ID=2";
-                dt = Con.OpenDT(sql);
-                dt.moveToFirst();
-                val = dt.getString(0);
-            } catch (Exception e) {
-                val = "N";
-            }
-            if (val.equalsIgnoreCase("S")) gl.peStockItf = true;
-            else gl.peStockItf = false;
-
-            try {
-                sql = "SELECT VALOR FROM P_PARAMEXT WHERE ID=3";
-                dt = Con.OpenDT(sql);
-                dt.moveToFirst();
-                gl.peModal = dt.getString(0).toUpperCase();
-            } catch (Exception e) {
-                gl.peModal = "-";
-            }
-
-            try {
-                ConT.close();
-            } catch (Exception e) {
-            }
-
-        } catch (Exception e) {
-            try {
-                ConT.close();
-            } catch (Exception ee) {
-            }
-        }
-
-    }
-
-    private boolean AddTable(String TN) {
-        String SQL;
-
-        try {
-
-            fprog = TN;
-            idbg = TN;
-            wsRtask.onProgressUpdate();
-            SQL = getTableSQL(TN);
-
-            if (fillTable(SQL, "DELETE FROM " + TN) == 1) {
-                if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " ok ";
-                idbg = idbg + SQL + "#" + "PASS OK";
-                return true;
-            } else {
-                if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " fail " + sstr;
-                idbg = idbg + SQL + "#" + " PASS FAIL  ";
-                fstr = "Tab:" + TN + " " + sstr;
-                return false;
-            }
-
-        } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            fstr = "Tab:" + TN + ", " + e.getMessage();
-            idbg = idbg + e.getMessage();
-            return false;
-        }
-    }
-
-    private String getTableSQL(String TN) {
-        String SQL = "";
-
-
-        if (TN.equalsIgnoreCase("P_CLIRUTA")) {
-            SQL = "SELECT RUTA,CLIENTE,SEMANA,DIA,SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'";
-            return SQL;
-        }
-
-        if (TN.equalsIgnoreCase("P_SUCURSAL")) {
-            SQL = " SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO " +
-                    " FROM P_SUCURSAL WHERE CODIGO IN (SELECT SUCURSAL FROM P_RUTA WHERE CODIGO = '" + ActRuta + "')";
-            return SQL;
-        }
-
-        return SQL;
-    }
-
-    private boolean validaDatos(boolean completo) {
-
-        Cursor dt;
-
-        try {
-
-            if (!rutatipo.equalsIgnoreCase("P")) {
-                sql = "SELECT RESOL FROM P_COREL";
-                dt = Con.OpenDT(sql);
-                if (dt.getCount() == 0) {
-                    msgbox("No está definido correlativo de facturas");
-                    return false;
-                }
-            }
-
-            sql = "SELECT Codigo FROM P_CLIENTE";
-            dt = Con.OpenDT(sql);
-            if (dt.getCount() == 0) {
-                msgbox("Lista de clientes está vacia");
-                return false;
-            }
-
-            sql = "SELECT Ruta FROM P_CLIRUTA";
-            dt = Con.OpenDT(sql);
-            if (dt.getCount() == 0) {
-                msgbox("Lista de clientes por ruta está vacia");
-                return false;
-            }
-
-            sql = "SELECT Codigo FROM P_PRODUCTO";
-            dt = Con.OpenDT(sql);
-            if (dt.getCount() == 0) {
-                msgbox("Lista de productos está vacia");
-                return false;
-            }
-
-            if (completo) {
-
-                sql = "SELECT Nivel FROM P_PRODPRECIO ";
-                dt = Con.OpenDT(sql);
-                if (dt.getCount() == 0) {
-                    msgbox("Lista de precios está vacia");
-                    return false;
-                }
-
-                sql = "SELECT Producto FROM P_FACTORCONV ";
-                dt = Con.OpenDT(sql);
-                if (dt.getCount() == 0) {
-                    msgbox("Lista de conversiones está vacia");
-                    return false;
-                }
-
-                if (gl.peStockItf) {
-                    sql = "SELECT Codigo FROM P_STOCK ";
-                    dt = Con.OpenDT(sql);
-                    if (dt.getCount() == 0) {
-                        msgbox("La carga de productos está vacia");
-                        return false;
-                    }
-                }
-
-            }
-
-        } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            Log.d("ValidaDatos", e.getMessage());
-        }
-
-        return true;
-    }
-
-    //#CKFK_20190325 Agregué funcion ActualizaStatcom que es una copia de FinDia pero sin el CommitSQL
-    private boolean ActualizaStatcom() {
-
-        try {
-
-            db.beginTransaction();
-            db.execSQL("UPDATE D_FACTURA SET STATCOM='S'");
-            db.execSQL("UPDATE D_PEDIDO SET STATCOM='S'");
-            db.execSQL("UPDATE D_NOTACRED SET STATCOM='S'");
-            db.execSQL("UPDATE D_CXC SET STATCOM='S'");
-            db.execSQL("UPDATE D_COBRO SET STATCOM='S'");
-            db.execSQL("UPDATE D_DEPOS SET STATCOM='S'");
-            db.execSQL("UPDATE D_MOV SET STATCOM='S'");
-            db.execSQL("UPDATE D_CLINUEVO SET STATCOM='S'");
-            db.execSQL("UPDATE D_ATENCION SET STATCOM='S'");
-            db.execSQL("UPDATE D_CLICOORD SET STATCOM='S'");
-            db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
-            db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
-            db.execSQL("UPDATE P_RUTA SET PARAM2 = ''");
-            db.setTransactionSuccessful();
-            db.endTransaction();
-
-        } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            msgbox("ActualizaStatcom(): " + e.getMessage());
-            return false;
-        }
-        return true;
-    }
-
-    private void encodeData() {
-        Handler mtimer = new Handler();
-        Runnable mrunner=new Runnable() {
-            @Override
-            public void run() {
-                encodePrinters();
-            }
-        };
-        mtimer.postDelayed(mrunner,200);
-    }
-
-    private void encodePrinters() {
-        CryptUtil cu=new CryptUtil();
-        Cursor dt;
-        String prid,ser,se;
-
-        try {
-            sql="SELECT IDIMPRESORA,NUMSERIE FROM P_IMPRESORA";
-            dt=Con.OpenDT(sql);
-
-            if (dt.getCount() > 0) dt.moveToFirst();
-            while (!dt.isAfterLast()) {
-
-                prid=dt.getString(0);
-                ser=dt.getString(1);
-                se=cu.encrypt(ser);
-
-                sql="UPDATE P_IMPRESORA SET NUMSERIE='"+se+"' WHERE IDIMPRESORA='"+prid+"'";
-                db.execSQL(sql);
-
-                dt.moveToNext();
-            }
-
-        } catch (Exception e) {
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-        }
-    }
-
-
-    //endregion
-
-    //region WS Recepcion Handling Methods
-
-    public void wsExecute() {
-
-        running = 1;
-        fstr = "No connect";
-        scon = 0;
-
-        try {
-
-            if (getTest() == 1) scon = 1;
-
-            idbg = idbg + sstr;
-
-            if (scon == 1) {
-                fstr = "Sync OK";
-                if (!getData()) fstr = "Recepcion incompleta : " + fstr;
-            } else {
-                fstr = "No se puede conectar al web service : " + sstr;
-            }
-
-        } catch (Exception e) {
-            scon = 0;
-            fstr = "No se puede conectar al web service. " + e.getMessage();
-            Log.d("E", fstr + sstr);
-        }
-
-    }
-
-    public void wsFinished() {
-
-        barInfo.setVisibility(View.INVISIBLE);
-        lblParam.setVisibility(View.INVISIBLE);
-        running = 0;
-        try {
-            if (fstr.equalsIgnoreCase("Sync OK")) {
-
-                lblInfo.setText(" ");
-                s = "Recepción completa.";
-
-                if (stockflag == 1) {
-                    s = s + "\nSe actualizó inventario.";
-                }
-
-                clsAppM.estandartInventario();
-                validaDatos(true);
-                encodeData();
-
-                msgAskExit(s);
-
-            } else {
-                lblInfo.setText(fstr);
-                mu.msgbox("Ocurrió error : \n" + fstr + " (" + reccnt + ") ");
-                mu.msgbox("::" + esql);
-                isbusy = 0;
-                barInfo.setVisibility(View.INVISIBLE);
-                addlog("Recepcion", fstr, esql);
-                return;
-            }
-
-
-            isbusy = 0;
-
-            paramsExtra();
-            //mu.msgbox("::"+esql);
-
-            if (ftflag) msgbox(ftmsg);
-        } catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-        }
-
-
-    }
-
-    private class AsyncCallRec extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected Void doInBackground(String... params) {
-
-            try {
-                wsExecute();
-            } catch (Exception e) {
-                if (scon == 0) {
-                    fstr = "No se puede conectar al web service : " + sstr;
-                    //lblInfo.setText(fstr);
-                }
-                //msgbox(fstr);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            try {
-                wsFinished();
-            } catch (Exception e) {
-                Log.d("onPostExecute", e.getMessage());
-            }
-
-        }
-
-        @Override
-        protected void onPreExecute() {
-            try {
-            } catch (Exception e) {}
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            try {
-                synchronized (this) {
-                    if (!lblInfo.getText().toString().matches("")) lblInfo.setText(fprog);
-                }
-            } catch (Exception e) {
-                Log.d("onProgressUpdate", e.getMessage());
-            }
-        }
-
-    }
-
-    //endregion
-
     //region WS Envio Methods
 
     private boolean sendData() {
@@ -1183,7 +487,7 @@ public class comWSLic extends PBase {
         dbld.clearlog();
 
         try {
-            envioCoord();
+            envioLic();
             dbld.savelog();
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1192,55 +496,29 @@ public class comWSLic extends PBase {
         return errflag;
     }
 
-    public void envioCoord() {
+    public void envioLic() {
         Cursor DT;
         String cod, ss;
         int stp;
         double px, py;
+
         fprog = " ";
         wsStask.onProgressUpdate();
 
         try {
-            sql = "SELECT CODIGO,COORX,COORY,STAMP FROM D_CLICOORD WHERE STATCOM='N'";
-            DT = Con.OpenDT(sql);
-            if (DT.getCount() == 0) return;
 
-            DT.moveToFirst();
-            while (!DT.isAfterLast()) {
-
-                cod = DT.getString(0);
-                px = DT.getDouble(1);
-                py = DT.getDouble(2);
-                stp = DT.getInt(3);
-
-                try {
-
-                   dbld.clear();
-
-                    ss = "UPDATE P_CLIENTE SET COORX=" + px + ",COORY=" + py + " WHERE (CODIGO='" + cod + "')";
-                    dbld.add(ss);
-
-                         if (commitSQL() == 1) {
-                            sql = "UPDATE D_CLICOORD SET STATCOM='S' WHERE (CODIGO='" + cod + "') AND (STAMP=" + stp + ") ";
-                            db.execSQL(sql);
-                        } else {
-                            fterr += "\n" + sstr;
-                        }
-
-
-                } catch (Exception e) {
-                    addlog(new Object() {
-                    }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-                    fterr += "\n" + e.getMessage();
-                }
-
-                DT.moveToNext();
+            if (requestLicence(gl.deviceId,devinfo)==1) {
+                errflag=false;
+            } else {
+                fterr = sstr;
+                errflag=true;
             }
 
         } catch (Exception e) {
             addlog(new Object() {
             }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
             fstr = e.getMessage();
+            errflag=true;
         }
 
     }
@@ -1614,30 +892,7 @@ public class comWSLic extends PBase {
 
     }
 
-    private void msgAskConfirmaRecibido(){
 
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle("Licencia");
-            dialog.setMessage("¿Recibir la licencia?");
-
-            dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    runRecep();
-                }
-            });
-
-            dialog.setNegativeButton("Cancelar", null);
-
-            dialog.show();
-
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-
-    }
 
     //endregion
 

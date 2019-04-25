@@ -20,6 +20,7 @@ public class printer {
 
 	private Runnable printclose;
 	private appGlobals gl;
+	private AppMethods app;
 	
 	private printBase prn;
 	private int prid;
@@ -41,11 +42,12 @@ public class printer {
 
 		gl = ((appGlobals) (((Activity) cont).getApplication()));
 
-
 		try {
 
 			Con = new BaseDatos(cont);
 			opendb();
+
+			app = new AppMethods(cont,gl,Con,db);
 
 			setPrinterType();
 
@@ -103,10 +105,16 @@ public class printer {
 		
 		prpar=pparam;
 		
-		prid=0;	
-		if (ptipo.equalsIgnoreCase("DATAMAX")) prid=1;
-		if (ptipo.equalsIgnoreCase("EPSON")) prid=2;
-		if (ptipo.equalsIgnoreCase("ZEBRA CPCL")) prid=3;
+		prid=0;
+
+		if (ptipo==null || ptipo.isEmpty()) {
+			prid=0;
+		} else {
+			if (ptipo.equalsIgnoreCase("DATAMAX")) prid=1;
+			if (ptipo.equalsIgnoreCase("EPSON")) prid=2;
+			if (ptipo.equalsIgnoreCase("ZEBRA CPCL")) prid=3;
+			if (ptipo.equalsIgnoreCase("ZPL")) prid=4;
+		}
 			
 		setPrinterClass();
 			
@@ -135,13 +143,17 @@ public class printer {
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			
-			prtipo=DT.getString(0);
-			prpar=DT.getString(1);
+			//prtipo=DT.getString(0);
+			//prpar=DT.getString(1);
+
+			prtipo=app.impresTipo();
+			prpar=app.impresParam();
 			
 			if (prtipo.equalsIgnoreCase("DATAMAX")) prid=1;
 			if (prtipo.equalsIgnoreCase("EPSON")) prid=2;
 			if (prtipo.equalsIgnoreCase("ZEBRA CPCL")) prid=3;
-				
+			if (prtipo.equalsIgnoreCase("ZPL")) prid=4;
+
 			setPrinterClass();
 				
 		} catch (Exception e) {
@@ -164,7 +176,12 @@ public class printer {
 				prn=new printZebraCPCL(cont,prpar,validprint);
 				prn.printclose=printclose;
 				prn.prwidth=prw;
-				break;		
+				break;
+			case 4:
+				prn=new printZebraZPL(cont,prpar,validprint);
+				prn.printclose=printclose;
+				prn.prwidth=prw;
+				break;
 		}	
 	}
 	

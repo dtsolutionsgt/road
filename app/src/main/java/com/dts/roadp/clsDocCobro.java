@@ -223,7 +223,7 @@ public class clsDocCobro extends clsDocument {
 		items.clear();
 		
 		try {
-			sql="SELECT DOCUMENTO, MONTO FROM D_COBROD WHERE COREL='"+corel+"'";
+			sql="SELECT DOCUMENTO, PAGO FROM D_COBROD WHERE COREL='"+corel+"'";
 			DT=Con.OpenDT(sql);
 
 			if (DT.getCount()==0) {

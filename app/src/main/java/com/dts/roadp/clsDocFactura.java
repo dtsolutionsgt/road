@@ -13,8 +13,8 @@ public class clsDocFactura extends clsDocument {
 
 	private double tot,desc,imp,stot,percep,totNotaC;
 	private boolean sinimp;
-	private String 	contrib,corelNotaC,asignacion,ccorel;
-	private int decimp,diacred,totitems;
+	private String 	contrib,corelNotaC,asignacion,ccorel,corelF;
+	private int decimp,totitems;
 
 
 	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres, String archivo) {
@@ -29,37 +29,69 @@ public class clsDocFactura extends clsDocument {
 
 	protected boolean loadHeadData(String corel) {
 		Cursor DT;
-		String cli="",vend="",val,empp="";
-		int ff;
+		String cli="",vend="",val,empp="", anulado;
+		long ff;
+		int impres, cantimpres;
 				
 		super.loadHeadData(corel);
 		
 		nombre="FACTURA";
 		
 		try {
-			sql="SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2 FROM D_FACTURA WHERE COREL='"+corel+"'";
-			DT=Con.OpenDT(sql);	
-			DT.moveToFirst();
-			
-			serie=DT.getString(0);
-			numero=""+DT.getInt(1);
-			ruta=DT.getString(2);
-			
-			vend=DT.getString(3);
-			cli=DT.getString(4);
-			
-			tot=DT.getDouble(5);
-			desc=DT.getDouble(6);
-			imp=DT.getDouble(7);
-			stot=tot+desc;
-			
-			empp=DT.getString(8);
-			ffecha=DT.getInt(9);fsfecha=sfecha(ffecha);
-			
-			add1=DT.getString(10);
-			add2=DT.getString(11);
+			sql=" SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2,IMPRES, ANULADO " +
+				" FROM D_FACTURA WHERE COREL='"+corel+"'";
+			DT=Con.OpenDT(sql);
 
-			vendcod=vend;
+			if(DT.getCount()>0){
+				DT.moveToFirst();
+
+				serie=DT.getString(0);
+				numero=""+DT.getInt(1);
+				ruta=DT.getString(2);
+
+				vend=DT.getString(3);
+				cli=DT.getString(4);
+
+				tot=DT.getDouble(5);
+				desc=DT.getDouble(6);
+				imp=DT.getDouble(7);
+				stot=tot+desc;
+
+				empp=DT.getString(8);
+				ffecha=DT.getInt(9);fsfecha=sfecha(ffecha);
+
+				add1=DT.getString(10);
+				add2=DT.getString(11);
+
+				vendcod=vend;
+
+				anulado=DT.getString(13);
+				impres=DT.getInt(12);
+				cantimpres=0;
+
+				if (anulado.equals("S")?true:false){
+					cantimpres = -1;
+				}else if (cantimpres == 0 && impres > 0){
+                    if (esPendientePago(corel)){
+                        cantimpres = -2;
+                    }else{
+                        cantimpres = 1;
+                    }
+				}else if (esPendientePago(corel)){
+					cantimpres = -2;
+				}
+
+				if (cantimpres>0){
+					nombre = "COPIA DE FACTURA";
+				}else if (cantimpres==-1){
+					nombre = "FACTURA ANULADA";
+				}else if (cantimpres==-2){
+					nombre = "FACTURA PENDIENTE DE PAGO";
+				}else if (cantimpres==0){
+					nombre = "FACTURA";
+				}
+
+			}
 
 		} catch (Exception e) {
 			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
@@ -71,8 +103,8 @@ public class clsDocFactura extends clsDocument {
 			DT.moveToFirst();
 			
 			resol="Resolucion No. : "+DT.getString(0);
-			ff=DT.getInt(1);resfecha="De Fecha: "+sfecha(ff);
-			ff=DT.getInt(2);resvence="Vigente hasta: "+sfecha(ff);
+			ff=DT.getLong(1);resfecha="De Fecha: "+sfecha_dos(ff);
+			ff=DT.getLong(2);resvence="Vigente hasta: "+sfecha_dos(ff);
 			//#EJC20181130: Se cambió el mensaje por revisión de auditor de SAT.
 //			ff=DT.getInt(2);resvence="Resolucion vence : "+sfecha(ff);
 			resrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
@@ -124,8 +156,18 @@ public class clsDocFactura extends clsDocument {
 			
 		} catch (Exception e) {
 			val=cli;
-	    }	
-		
+	    }
+
+		try {
+			sql="SELECT CODPAGO FROM D_FACTURAP WHERE COREL='"+corel+"'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			condicionPago=DT.getInt(0);
+
+		} catch (Exception e) {
+		}
+
 		try {
 			sql="SELECT NOMBRE,NIT,DIRECCION FROM D_FACTURAF WHERE COREL='"+corel+"'";
 			DT=Con.OpenDT(sql);	
@@ -164,6 +206,27 @@ public class clsDocFactura extends clsDocument {
 		return true;
 		
 	}
+
+	private boolean esPendientePago(String corel){
+
+		boolean vPendiente=false;
+		Cursor DT;
+
+		try{
+
+			sql = "SELECT DOCUMENTO FROM P_COBRO WHERE DOCUMENTO = '"+ corel + "'";
+			DT=Con.OpenDT(sql);
+
+			if(DT.getCount() > 0){
+				vPendiente=true;
+			}
+
+		}catch(Exception ex){
+			Toast.makeText(cont,"esPendientePago : "+ex.getMessage(), Toast.LENGTH_LONG).show();
+		}
+
+		return vPendiente;
+	}
 	
 	protected boolean loadDocData(String corel) {
 		Cursor DT;
@@ -179,8 +242,8 @@ public class clsDocFactura extends clsDocument {
 		
 		try {
 
-            sql="SELECT N.COREL, N.TOTAL, F.ASIGNACION " +
-                "FROM D_FACTURA F INNER JOIN D_NOTACRED N ON F.ASIGNACION = N.COREL " +
+            sql="SELECT N.COREL, F.COREL, N.TOTAL, N.FACTURA " +
+                "FROM D_FACTURA F INNER JOIN D_NOTACRED N ON F.COREL = N.FACTURA " +
                 "WHERE F.COREL = '"+corel+"'";
 
             DT=Con.OpenDT(sql);
@@ -189,14 +252,16 @@ public class clsDocFactura extends clsDocument {
             if(DT.getCount() != 0){
 
 				corelNotaC = DT.getString(0);
-				totNotaC = DT.getDouble(1);
-				asignacion = DT.getString(2);
+				corelF = DT.getString(1);
+				totNotaC = DT.getDouble(2);
+				asignacion = DT.getString(3);
 
 			}else{
 
             	corelNotaC = "";
             	asignacion = "*";
             	totNotaC = 0;
+				corelF = "";
 
             }
 
@@ -425,7 +490,7 @@ public class clsDocFactura extends clsDocument {
 
 		rep.addtotsp("Subtotal", stot);
 
-		if (corelNotaC.equals(asignacion)) {
+		if (corelF.equals(asignacion)) {
 
 			rep.addtotsp("Nota de Credito", totNotaC);
 			rep.addtotsp("ITBM", totimp);

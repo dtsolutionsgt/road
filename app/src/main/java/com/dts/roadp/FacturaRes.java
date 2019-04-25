@@ -23,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ public class FacturaRes extends PBase {
 	private CheckBox contadoCheck;
 	private TextView lblVuelto;
 	private EditText txtVuelto;
+	private RelativeLayout rl_facturares;
 
 	private List<String> spname = new ArrayList<String>();
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
@@ -86,6 +88,8 @@ public class FacturaRes extends PBase {
 		imgPend = (ImageView) findViewById(R.id.imageView12);
 		imgCash = (ImageView) findViewById(R.id.imageView2);
 
+		rl_facturares=(RelativeLayout)findViewById(R.id.relativeLayout1);
+		rl_facturares.setVisibility(View.VISIBLE);
 
 		lblVuelto = new TextView(this,null);
 		txtVuelto = new EditText(this,null);
@@ -151,7 +155,7 @@ public class FacturaRes extends PBase {
 					imgMPago.setVisibility(View.VISIBLE);
 					lblMPago.setVisibility(View.VISIBLE);
 				}else if(credito > 0){
-					contadoCheck.setVisibility(View.INVISIBLE);
+					contadoCheck.setVisibility(View.VISIBLE);
 					lblCash.setVisibility(View.INVISIBLE);
 					imgCash.setVisibility(View.INVISIBLE);
 					lblPend.setVisibility(View.INVISIBLE);
@@ -205,7 +209,17 @@ public class FacturaRes extends PBase {
 
 		printcallback= new Runnable() {
 		    public void run() {
-		    	askPrint();
+
+				if (notaC==2){
+
+					String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
+					fdev.buildPrint(gl.dvcorrelnc,0, vModo);
+
+					prn_nc.printnoask(printclose, "printnc.txt");
+					if (impres>0) prn_nc.printnoask(printclose, "printnc.txt");
+				}
+
+				askPrint();
 		    }
 		};
 
@@ -620,6 +634,8 @@ public class FacturaRes extends PBase {
 				if (!saveOrder()) return;
 			}
 
+			rl_facturares.setVisibility(View.INVISIBLE);
+
 			if(gl.dvbrowse!=0) gl.dvbrowse =0;
 
 			clsBonifSave bonsave=new clsBonifSave(this,corel,"V");
@@ -658,15 +674,36 @@ public class FacturaRes extends PBase {
 					singlePrint();
 				}
 
-                if (notaC==2){
-                   fdev.buildPrint(gl.dvcorreld,0);
-                   prn_nc.printnoask(printclose, "printnc.txt");
-                }
 
+			}else if(!prn.isEnabled()){
+				if (gl.peModal.equalsIgnoreCase("APR")) {
+					fdoc.buildPrintExt(corel,2,"APR");
+				} else if (gl.peModal.equalsIgnoreCase("...")) {
+					//
+				} else if (gl.peModal.equalsIgnoreCase("TOL")) {
+
+					if (!gl.cobroPendiente) {
+						if (impres==0) {
+							fdoc.buildPrint(corel, 0,gl.peFormatoFactura);
+						} else {
+							fdoc.buildPrint(corel, 10,gl.peFormatoFactura);
+						}
+					}else{
+						fdoc.buildPrint(corel,4,gl.peFormatoFactura);
+					}
+				}
+
+				if (notaC==2){
+					fdev.buildPrint(gl.dvcorrelnc,0);
+				}
 			}
 
 			gl.closeCliDet=true;
 			gl.closeVenta=true;
+
+			//#CKFK 20190412 Se inicializó variable cobroPendiente
+			//gl.cobroPendiente=false;
+
 			if (!prn.isEnabled()) super.finish();
 
 		}catch (Exception e){
@@ -680,6 +717,7 @@ public class FacturaRes extends PBase {
  	private void singlePrint() {
 		try{
 			prn.printask(printcallback);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -757,7 +795,7 @@ public class FacturaRes extends PBase {
 			ins.add("REFERENCIA","");
 
 			if (gl.dvbrowse!=0){
-				ins.add("ASIGNACION",gl.dvcorrelnc);
+				ins.add("ASIGNACION",gl.dvcorreld);
 			}else{
 				ins.add("ASIGNACION","");
 			}
@@ -2260,8 +2298,10 @@ public class FacturaRes extends PBase {
 					impres++;toast("Impres "+impres);
 
 					try {
-						sql="UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
-						db.execSQL(sql);
+						if (!gl.cobroPendiente){
+							sql="UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
+							db.execSQL(sql);
+						}
 					} catch (Exception e) {
 						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 					}
@@ -2276,8 +2316,10 @@ public class FacturaRes extends PBase {
 					if (impres>1) {
 
 						try {
-							sql="UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
-							db.execSQL(sql);
+							if (!gl.cobroPendiente){
+								sql="UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
+								db.execSQL(sql);
+							}
 						} catch (Exception e) {
 							msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 						}
@@ -2292,15 +2334,14 @@ public class FacturaRes extends PBase {
 						gl.brw=0;
 						FacturaRes.super.finish();
 					} else {
-						fdoc.buildPrint(corel, 10,gl.peFormatoFactura);
-						prn.printask(printcallback);
 
-						if (notaC==2){
-							fdev.buildPrint(gl.dvcorreld,1);
-
-							prn_nc.printnoask(printclose, "printnc.txt");
-							prn_nc.printnoask(printclose, "printnc.txt");
+						if (!gl.cobroPendiente) {
+							fdoc.buildPrint(corel, 10,gl.peFormatoFactura);
+						}else{
+							fdoc.buildPrint(corel,4,gl.peFormatoFactura);
 						}
+
+						prn.printask(printcallback);
 
 					}
 				}

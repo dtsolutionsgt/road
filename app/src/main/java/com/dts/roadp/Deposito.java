@@ -26,7 +26,7 @@ public class Deposito extends PBase {
 	
 	private Spinner  spinBanco;
 	private EditText txtBol;
-	private TextView lblEf,lblCheq,lblTot;
+	private TextView lblEf,lblCheq,lblTot,lblBol;
 	
 	private ListView listView;
 	private ImageView btnSave,btnCancel,btnSelAll,btnSelNone;
@@ -63,7 +63,8 @@ public class Deposito extends PBase {
 		lblEf = (TextView) findViewById(R.id.lblpSaldo);lblEf.setText(mu.frmcur(0));
 		lblCheq = (TextView) findViewById(R.id.lblCheq);lblCheq.setText(mu.frmcur(0));
 		lblTot = (TextView) findViewById(R.id.lblTot);lblTot.setText(mu.frmcur(0));
-			
+		lblBol = (TextView) findViewById(R.id.textView2);
+
 		setHandlers();
 		
 		fillSpinner();		
@@ -72,10 +73,12 @@ public class Deposito extends PBase {
 		if (gl.boldep==0) {
 			//txtBol.setText(du.sfecha(fecha)+" "+du.shora(fecha)+":"+du.sSecond());
 			txtBol.setText("");
-			txtBol.setEnabled(false);
+			lblBol.setVisibility(View.INVISIBLE);
+			txtBol.setVisibility(View.INVISIBLE);
 		} else {	
 			txtBol.setText("");
-			txtBol.setEnabled(true);
+			lblBol.setVisibility(View.VISIBLE);
+			txtBol.setVisibility(View.VISIBLE);
 		}
 		
 		tef=0;tcheq=0;ttot=0;
@@ -534,9 +537,11 @@ public class Deposito extends PBase {
 			if (!saveDoc()) return;
 
 			if (prn.isEnabled()) {
-				if (ddoc.buildPrint(corel,0)) prn.printask(printcallback);
+				ddoc.buildPrint(corel,0);
+				prn.printask(printcallback);
 				claseFinDia.updateImpDeposito(3);
-			} else {
+			} else if(!prn.isEnabled()){
+				ddoc.buildPrint(corel, 0);
 				Toast.makeText(this,"Depósito guardado", Toast.LENGTH_SHORT).show();
 				super.finish();
 			}

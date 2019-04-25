@@ -1,13 +1,5 @@
 package com.dts.roadp;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.text.NumberFormat;
-import java.util.Date;
-import java.text.*;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -44,8 +36,6 @@ import java.io.FileOutputStream;
 import java.text.NumberFormat;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
-import android.database.Cursor;
-import com.dts.roadp.clsDocument;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -205,7 +195,7 @@ public class CliDet extends PBase {
 				imgDB = true;
 			}
 
-			if(archivo.exists()){
+			if (archivo.exists()) {
 				imgPath = true;
 				inputFachada();
 			}else if(imgDB == true){
@@ -271,7 +261,7 @@ public class CliDet extends PBase {
            	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 							  
-			lblNom.setText(DT.getString(0));
+			lblNom.setText(cod + " - " + DT.getString(0));
 			lblRep.setText(DT.getString(12));
 			lblDir.setText(DT.getString(2));
 			lblCantDias.setText(DT.getString(17));
@@ -301,7 +291,7 @@ public class CliDet extends PBase {
 			if(gl.media != 4){
 				lblClientePago.setText("CONTADO");
 			}else if(gl.media == 4){
-				lblClientePago.setText("CREDITO");
+				lblClientePago.setText("CRÉDITO");
 			}
 
 			clim=DT.getDouble(5);

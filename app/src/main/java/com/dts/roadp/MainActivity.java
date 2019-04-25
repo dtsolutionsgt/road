@@ -3,6 +3,7 @@ package com.dts.roadp;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,7 +32,7 @@ import java.lang.reflect.Field;
 public class MainActivity extends PBase {
 
 	private EditText txtUser,txtPass;
-	private TextView lblRuta,lblRTit,lblLogin,lblVer;
+	private TextView lblRuta,lblRTit,lblLogin,lblVer,lblID;
 	private ImageView imgLogo;
 		
 	private clsLicence lic;
@@ -40,7 +41,7 @@ public class MainActivity extends PBase {
 	private boolean rutapos,scanning=false;
 	private String cs1,cs2,cs3,barcode;
 
-	private String parVer="9.4.1 / 08-Apr-2019";
+	private String parVer="9.4.1 / 12-Abr-2019";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +105,7 @@ public class MainActivity extends PBase {
             lblRTit= (TextView) findViewById(R.id.lblCUsed);
             lblLogin= (TextView) findViewById(R.id.lblDir);
             lblVer= (TextView) findViewById(R.id.textView10);
+            lblID= (TextView) findViewById(R.id.textView81);
             imgLogo= (ImageView) findViewById(R.id.imgNext);
 
             lblVer.setText("Version "+gl.parVer);
@@ -118,13 +120,17 @@ public class MainActivity extends PBase {
 
             initSession();
 
-            supervisorRuta();
+            if (!validaLicencia()) {
+                startActivity(new Intent(this, comWSLic.class));
+                return;
+            } else {
+                supervisorRuta();
+            }
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
             if (gl.debug){
                 txtUser.setText("00100993");txtPass.setText("2613");
             }
-
 
             gl.contlic=false;
         } catch (Exception e) {
@@ -180,9 +186,14 @@ public class MainActivity extends PBase {
     }
 
 	public void doLogin(View view) {
+
+	    if (!validaLicencia()) {
+            startActivity(new Intent(this, comWSLic.class));return;
+        }
+
 	    try{
             processLogIn();
-        }catch (Exception e){
+        } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
@@ -190,7 +201,7 @@ public class MainActivity extends PBase {
 	
 	public void doRegister(View view) {
 	    try{
-            //startActivity(new Intent(this, LicRegis.class));
+            startActivity(new Intent(this, comWSLic.class));
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -275,7 +286,6 @@ public class MainActivity extends PBase {
 			startActivity( new Intent(MainActivity.this,ComWS.class));
 		}
 
-
 		try {
 			//#HS_20181122_1505 Se agrego el campo Impresion.
 			sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR FROM P_RUTA";
@@ -356,18 +366,17 @@ public class MainActivity extends PBase {
 			File directory = new File(Environment.getExternalStorageDirectory() + "/SyncFold");
 			directory.mkdirs();
 		} catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
+ 		}
 
 		try {
 			File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos");
 			directory.mkdirs();
 		} catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
+  		}
 
         //Id de Dispositivo
         gl.deviceId = androidid();
+		gl.devicename =getLocalBluetoothName();lblID.setText(gl.devicename);
 
         try {
             AppMethods app = new AppMethods(this, gl, Con, db);
@@ -486,7 +495,7 @@ public class MainActivity extends PBase {
 	
 	public void showDemoMenu() {
 
-	    try{
+	    try {
             final AlertDialog Dialog;
             final String[] selitems = {"Datos de cliente","Base de datos original","Borrar datos de venta"};
 
@@ -683,42 +692,28 @@ public class MainActivity extends PBase {
 	}
 
 	private boolean validaLicencia() {
+        CryptUtil cu=new CryptUtil();
 		Cursor dt;
-		String mac, lickey, idkey, binkey;
-		int fval, lkey;
-		long ff;
+		String lic,lickey;
 
 		try {
-			mac = lic.getMac();
-			lkey = lic.getLicKey(mac);
-			lickey = lic.encodeLicence(lkey);
+            lickey=cu.encrypt(gl.deviceId);
 
-			sql = "SELECT IDKEY,BINKEY FROM LIC_CLIENTE WHERE ID='" + mac + "'";
-			dt=Con.OpenDT(sql);
-			if (dt.getCount()==0) return false;
+            sql="SELECT lic FROM Params";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+            lic=dt.getString(0);
 
-			dt.moveToFirst();
-			idkey=dt.getString(0);
-			binkey=dt.getString(1);
-
-			if (!idkey.equalsIgnoreCase(lickey)) return false;
-
-			ff=du.getActDate();
-			fval=lic.decodeValue(binkey);
-			fval=fval-lkey;
-
-			//Toast.makeText(this,""+fval, Toast.LENGTH_SHORT).show();
-
-			if (fval==999999) return true;
-			fval=fval*10000;
-
-			if (fval>=ff) return true; else return false;
-
+            if (lic.equalsIgnoreCase(lickey)) return true;
 		} catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			mu.msgbox(e.getMessage());return false;
+			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" : "+e.getMessage());
 		}
 
+		//toastlong("El dispositivo no tiene licencia válida");
+
+        //return false;
+        return true;
 	}
 
 	private void msgAskLic(String msg) {
@@ -751,6 +746,17 @@ public class MainActivity extends PBase {
 
 		return uniqueID;
 	}
+
+    public String getLocalBluetoothName() {
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (mBluetoothAdapter==null) {
+            return "";
+        } else {
+            return mBluetoothAdapter.getName();
+        }
+    }
+
 	//endregion
 
 	//region Activity Events

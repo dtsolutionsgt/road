@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -23,6 +24,7 @@ public class DevolBodCan extends PBase {
 
     private printer prn_can,prn_paseante;
     private clsDocCanastaBod fcanastabod;
+    private clsDocCanastaBod fpaseantebod;
     private DevolBod DevBod;
     public Runnable printclose, printcallback;
 
@@ -30,6 +32,8 @@ public class DevolBodCan extends PBase {
     private list_view_dev_bod_can adapter;
 
     private clsRepBuilder rep;
+
+    private ComWS cComWS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,22 +54,10 @@ public class DevolBodCan extends PBase {
 
         printclose= new Runnable() {
             public void run() {
-                if(impres==1){
-                    gl.closeDevBod=true;
-                    DevolBodCan.super.finish();
-                }else if(impres==2){
-                    gl.closeDevBod=true;
-                    DevolBodCan.super.finish();
-                }else if(impres>2){
-                    if(impres==4){
-                        gl.closeDevBod=true;
-                        DevolBodCan.super.finish();
-                    }
-                    impres++;
-                }
-                //DevolBodCan.super.finish();
+
             }
         };
+
         printcallback= new Runnable() {
             public void run() {
                 askPrint();
@@ -73,13 +65,19 @@ public class DevolBodCan extends PBase {
         };
 
         prn_can=new printer(this,printclose,gl.validimp);
+        prn_paseante=new printer(this,printclose,gl.validimp);
+
         fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
         fcanastabod.deviceid =gl.deviceId;
+        fcanastabod.vTipo="CANASTA";
+
+        fpaseantebod=new clsDocCanastaBod(this,prn_paseante.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
+        fpaseantebod.deviceid =gl.deviceId;
+        fpaseantebod.vTipo="PASEANTE";
 
         listItems();
 
     }
-
 
     //region Events
 
@@ -442,6 +440,9 @@ public class DevolBodCan extends PBase {
 
             createDoc();
 
+           // cComWS  = new ComWS();
+           // cComWS.envio_D_MOV_en_dev();
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             db.endTransaction();
@@ -469,21 +470,18 @@ public class DevolBodCan extends PBase {
             dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
 
-                    impres++;toast("Impres "+impres);
-
-                    if (impres>1) {
-                        DevolBodCan.super.finish();
-                    } else {
-                        fcanastabod.buildPrint(corel, 10,gl.peFormatoFactura);
-                        prn_can.printask(printcallback, "printdevcan.txt");
+                    if (impres==0) {
+                        prn_can.printnoask(printclose, "printdevcan.txt");
                     }
+                    gl.closeDevBod=true;
+                    DevolBodCan.super.finish();
+
                 }
             });
 
             dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     //singlePrint();
-                    prn_can.printask(printcallback, "printdevcan.txt");
                 }
             });
 
@@ -503,54 +501,64 @@ public class DevolBodCan extends PBase {
         try{
 
             impres=0;
+
+            existenciaC=tieneCanasta(corel);
+            existenciaP=tienePaseante(corel);
+
+            if(existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=1;
+            if(!existenciaC.isEmpty() && existenciaP.isEmpty()) impres=2;
+            if(existenciaC.isEmpty() && existenciaP.isEmpty()) impres=3;
+
             if (prn_can.isEnabled()) {
 
-                existenciaC=tieneCanasta(corel);
-                existenciaP=tienePaseante(corel);
+                String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 
-                if(existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=1;
-                if(!existenciaC.isEmpty() && existenciaP.isEmpty()) impres=2;
+                if(impres==0 || impres==1){
+                    fpaseantebod.buildPrint(corel,0,vModo);
+                }
+
+                if(impres==0 || impres==2){
+                    fcanastabod.buildPrint(corel,0, vModo);
+                }
+
+                if(impres==0) {
+                    prn_paseante.printask(printcallback, "printpaseante.txt");
+                }else if(impres==1) {
+                    prn_paseante.printask(printcallback, "printpaseante.txt");
+                }else if(impres==2) {
+                    prn_can.printask(printcallback, "printdevcan.txt");
+                }
+
+            }else if(!prn_can.isEnabled()){
 
                 if(!existenciaC.isEmpty()){
+
                     if(impres==0){
                         fcanastabod.buildPrint(corel,0, "TOL");
                     }else {
                         fcanastabod.buildPrint(corel, 10, "TOL");
                     }
 
-                    if (gl.peImprFactCorrecta) {
-                        prn_can.printask(printclose, "printdevcan.txt");
-                    } else {
-                        singlePrint();
-                    }
-
                     if(!existenciaP.isEmpty()){
 
                         if(!existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=3;
-                        prn_paseante=new printer(this,printclose,gl.validimp);
-                        fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
-                        fcanastabod.deviceid =gl.deviceId;
 
-                        fcanastabod.buildPrint(corel,0,"*");
-                        prn_paseante.printask(printclose, "printpaseante.txt");
+                        fpaseantebod.buildPrint(corel,0,"*");
 
                     }
 
-
                 }else if(!existenciaP.isEmpty()){
 
-                    prn_paseante=new printer(this,printclose,gl.validimp);
-                    fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
-                    fcanastabod.deviceid =gl.deviceId;
-
-                    fcanastabod.buildPrint(corel,0,"*");
-                    prn_paseante.printask(printclose, "printpaseante.txt");
+                    fpaseantebod.buildPrint(corel,0,"*");
 
                 }
-
             }
 
-        if (!prn_can.isEnabled()) super.finish();
+        if (!prn_can.isEnabled()) {
+            Toast.makeText(this, "Devolucion completada y guardada.",Toast.LENGTH_SHORT);
+            gl.closeDevBod=true;
+            super.finish();
+        }
 
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

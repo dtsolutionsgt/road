@@ -31,8 +31,6 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".comWSLic"></activity>
-        <activity android:name=".list_view_dev_bod_can" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -172,8 +170,7 @@
         <activity
             android:name=".PicView"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_pic_view"
-            android:screenOrientation="portrait" />
+            android:label="@string/title_activity_pic_view"/>
         <activity
             android:name=".ComWS"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -423,6 +420,21 @@
             android:name=".BonBarra"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".UtilPrint2"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".comWSLic"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".ComWSFotos"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
     </application>
 

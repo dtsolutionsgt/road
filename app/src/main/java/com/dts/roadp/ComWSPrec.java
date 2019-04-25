@@ -1,27 +1,28 @@
 package com.dts.roadp;
 
-        import java.util.ArrayList;
-
-        import org.ksoap2.SoapEnvelope;
-        import org.ksoap2.serialization.PropertyInfo;
-        import org.ksoap2.serialization.SoapObject;
-        import org.ksoap2.serialization.SoapPrimitive;
-        import org.ksoap2.serialization.SoapSerializationEnvelope;
-        import org.ksoap2.transport.HttpTransportSE;
         import android.app.AlertDialog;
-        import android.content.DialogInterface;
-        import android.content.Intent;
-        import android.database.Cursor;
-        import android.database.sqlite.SQLiteDatabase;
-        import android.os.AsyncTask;
-        import android.os.Bundle;
-        import android.os.Handler;
-        import android.os.SystemClock;
-        import android.util.Log;
-        import android.view.View;
-        import android.widget.EditText;
-        import android.widget.ProgressBar;
-        import android.widget.TextView;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+
+import java.util.ArrayList;
 
 public class ComWSPrec extends PBase {
 
@@ -306,8 +307,7 @@ public class ComWSPrec extends PBase {
 
     // WEB SERVICE - RECEPCION
 
-    private boolean getData()
-    {
+    private boolean getData() {
         Cursor DT;
         int rc,prn,jj;
         String s,val="";
@@ -404,8 +404,7 @@ public class ComWSPrec extends PBase {
 
             prn=0;jj=0;
 
-            for (int i = 0; i < rc; i++)
-            {
+            for (int i = 0; i < rc; i++) {
                 sql=listItems.get(i);
 
                 try

@@ -131,7 +131,9 @@ public class Cobro extends PBase {
 			gl.pagomodo=0;
 			gl.pagoval=tsel;
 			gl.pagolim=tsel;
-			gl.pagocobro=true;
+
+            if (dtipo.equalsIgnoreCase("R")) gl.pagocobro=false; else gl.pagocobro=true;
+
 			browse=1;
 			if(gl.validarCred!=2) gl.validarCred = 1;
 
@@ -190,6 +192,7 @@ public class Cobro extends PBase {
 				if (dtipo.equalsIgnoreCase("R")) {
 					clearAll();
 					items.get(0).flag=1;
+
 				}else{
 					for (int i = 0; i <items.size(); i++) {
 						dtipo=items.get(0).Tipo;
@@ -342,8 +345,8 @@ public class Cobro extends PBase {
 				vItem.Saldo=ssal;
 				vItem.Pago=pg;
 				vItem.flag=fflag;
-				vItem.fini=du.sfecha(DT.getInt(4));
-				vItem.ffin=du.sfecha(DT.getInt(5));
+				vItem.fini=du.sfecha(DT.getLong(4));
+				vItem.ffin=du.sfecha(DT.getLong(5));
 			 
 				ttot=ttot+DT.getDouble(3);
 				tpag+=pg;
@@ -557,12 +560,32 @@ public class Cobro extends PBase {
 					if (prn.isEnabled()) {
 						fdocf.buildPrint(crrf,0,gl.peModal);
 						prn.printask(printcallback);
+					}else if(!prn.isEnabled()){
+						fdocf.buildPrint(crrf,0,gl.peModal);
+
+						if(gl.validarCred==1){
+							validaCredito();
+						}else if(gl.validarCred==2){
+							Cobro.super.finish();
+						}
+
+						gl.validarCred=0;
 					}
 				}else {
 					if (prn.isEnabled()) {
 						fdoc.buildPrint(corel,0,gl.peModal);
 						browse = 4;
 						prn.printask(printcallback);
+					}else if(!prn.isEnabled()){
+						fdoc.buildPrint(corel,0,gl.peModal);
+
+						if(gl.validarCred==1){
+							validaCredito();
+						}else if(gl.validarCred==2){
+							Cobro.super.finish();
+						}
+
+						gl.validarCred=0;
 					}
 				}
 			}
@@ -926,7 +949,7 @@ public class Cobro extends PBase {
 			alert.setView(input);
 
 			input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-			input.setText(""+mu.round2(tsel));
+			input.setText(""+tsel);
 			input.requestFocus();
 
 			alert.setCancelable(false);
@@ -936,6 +959,7 @@ public class Cobro extends PBase {
 			alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					peexit=false;
+                    sefect=input.getText().toString();
 					//closekeyb();
 					checkCash();
 				}
@@ -961,14 +985,24 @@ public class Cobro extends PBase {
 		
 		try {
 
-			epago=tsel;
+		    //#CKFK 2019-04-10 Quité epago=tsel; porque aquí se debe asignar el valor ingresado por el usuario
+            epago=Double.parseDouble(sefect);
+
 			if (epago==0) return;
 			
 			if (epago<0) throw new Exception();
 			
 			if (epago>tsel) {
-				mu.msgbox("Total de pago mayor que total de saldo.");return;
+				mu.msgbox("Total a pagar mayor que total de monto seleccionado");return;
 			}
+
+			if (!gl.pagocobro){
+				if (epago<tsel) {
+					mu.msgbox("Pago no está completo, no se puede aplicar el pago");
+					return;
+				}
+			}
+
 
 			sql="DELETE FROM T_PAGO";
 			db.execSQL(sql);
@@ -985,7 +1019,7 @@ public class Cobro extends PBase {
 				
 		    db.execSQL(ins.sql());
 			
-			msgAskSave("Aplicar pago y crear un recibo");
+			msgAskSave("Aplicar pago?");
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1007,7 +1041,7 @@ public class Cobro extends PBase {
  	}
 	
 	// Aux
-	
+
 	private void showTotals(){
 
 		try{
@@ -1032,7 +1066,7 @@ public class Cobro extends PBase {
 
 
 	}
-	
+
 	private void calcSelected() {
 
 		try{
@@ -1040,7 +1074,7 @@ public class Cobro extends PBase {
 			clsClasses.clsCobro vItem;
 			Object lvObj;
 			int flag,dc;
-			double val;
+            double val;
 
 			tsel=0;
 			tpagos=0;
@@ -1057,10 +1091,15 @@ public class Cobro extends PBase {
 
 						flag=vItem.flag;
 						if (flag==1) {
+
 							if(vItem.Pago > 0){
 
 								val=vItem.Pago;
 								tpagos+=val;
+
+								//#CKFK 20190412 Agregué esto para que se sumara el dato de lo  para que llegue
+								val=vItem.Saldo;
+								tsel+=val;
 
 							} else{
 
@@ -1080,8 +1119,6 @@ public class Cobro extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		    msgbox("calcSelected: "+ e.getMessage());
 		}
-
-		
 	}
 
 	private void clearAll() {
@@ -1190,20 +1227,25 @@ public class Cobro extends PBase {
                     impres++;toast("Impres "+impres);
 
                     try {
-						sql="UPDATE D_COBRO SET IMPRES=IMPRES+3 WHERE COREL='"+corel+"'";
+						sql="UPDATE D_COBRO SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
 						db.execSQL(sql);
 					} catch (Exception e) {
 						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 					}
 
+					if (dtipo.equalsIgnoreCase("R")) {
+						sql="UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='"+crrf+"'";
+						db.execSQL(sql);
+					}
+
                     if (impres>1) {
 
-                        try {
+                       /* try {
                             sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorreld+"'";
                             db.execSQL(sql);
                         } catch (Exception e) {
                             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-                        }
+                        }*/
 
                         gl.brw=0;
 

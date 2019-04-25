@@ -3,22 +3,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@layout/back"
-    tools:context=".ProdCant" >
+    tools:context=".ProdCant">
 
     <RelativeLayout
         android:id="@+id/relRoad"
         android:layout_width="match_parent"
-        android:layout_height="48dp" >
+        android:layout_height="48dp">
 
         <RelativeLayout
             android:id="@+id/relRoadbar"
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:layout_centerVertical="true"
-            android:background="#9A999E" >
+            android:background="#9A999E">
 
         </RelativeLayout>
 
@@ -26,8 +26,8 @@
             android:id="@+id/imgTitLogo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:layout_marginBottom="5dp"
             android:adjustViewBounds="true"
             android:src="@drawable/logo_panel" />
@@ -37,9 +37,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/relRoadbar"
-            android:layout_alignParentBottom="false"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="false"
             android:adjustViewBounds="true"
             android:padding="5dp"
             android:src="@drawable/cantidad" />
@@ -61,9 +61,9 @@
         android:id="@+id/lblFecha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/relRoad"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="false"
-        android:layout_below="@+id/relRoad"
         android:layout_toLeftOf="@+id/imgNext"
         android:paddingLeft="10dp"
         android:paddingTop="3dp"
@@ -74,8 +74,8 @@
         android:id="@+id/layPres"
         android:layout_width="wrap_content"
         android:layout_height="90dp"
-        android:layout_alignParentRight="false"
         android:layout_below="@+id/lblPNum"
+        android:layout_alignParentRight="false"
         android:layout_centerHorizontal="false"
         android:layout_marginLeft="10dp"
         android:background="@layout/frame_rect"
@@ -92,8 +92,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
                 android:gravity="center_horizontal"
                 android:paddingTop="3dp"
                 android:text="UNI"
@@ -125,11 +125,11 @@
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_below="@+id/layPres"
+        android:layout_alignParentLeft="true"
         android:paddingLeft="10dp"
-        android:paddingRight="5dp"
         android:paddingTop="5dp"
+        android:paddingRight="5dp"
         android:text="Total  :"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="20sp"
@@ -150,11 +150,11 @@
         android:id="@+id/textView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_below="@+id/textView6"
-        android:paddingBottom="5dp"
+        android:layout_alignParentLeft="true"
         android:paddingLeft="10dp"
         android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:text="Disponible : "
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="20sp" />
@@ -163,11 +163,11 @@
         android:id="@+id/relativeLayout1"
         android:layout_width="wrap_content"
         android:layout_height="64dp"
-        android:layout_alignParentBottom="false"
-        android:layout_alignParentEnd="false"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="false"
         android:layout_below="@+id/textView24"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentBottom="false"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:background="@layout/frame_rect"
@@ -179,10 +179,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:paddingBottom="5dp"
             android:paddingLeft="5dp"
-            android:paddingRight="5dp"
             android:paddingTop="5dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="5dp"
             android:text="Ultimo :"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -190,11 +190,11 @@
             android:id="@+id/textView10"
             android:layout_width="110dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_below="@+id/textView9"
-            android:paddingBottom="5dp"
+            android:layout_alignParentLeft="true"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
+            android:paddingBottom="5dp"
             android:text="Promedio :"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -206,9 +206,9 @@
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/textView9"
             android:gravity="right"
-            android:paddingBottom="5dp"
-            android:paddingRight="10dp"
             android:paddingTop="5dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="5dp"
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -219,8 +219,8 @@
             android:layout_below="@+id/textView11"
             android:layout_toRightOf="@+id/textView10"
             android:gravity="right"
-            android:paddingBottom="5dp"
             android:paddingRight="10dp"
+            android:paddingBottom="5dp"
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -230,8 +230,8 @@
         android:id="@+id/lblDisp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/textView8"
         android:layout_alignTop="@+id/textView8"
+        android:layout_alignBottom="@+id/textView8"
         android:layout_toRightOf="@+id/textView8"
         android:gravity="center_vertical"
         android:paddingLeft="10dp"
@@ -245,12 +245,12 @@
         android:id="@+id/imgImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/relativeLayout1"
         android:layout_alignLeft="@+id/imgNext"
+        android:layout_alignBottom="@+id/relativeLayout1"
         android:clickable="true"
         android:onClick="showPromo"
-        android:paddingBottom="5dp"
         android:paddingRight="5dp"
+        android:paddingBottom="5dp"
         android:src="@drawable/bonus"
         android:visibility="invisible" />
 
@@ -272,12 +272,12 @@
         android:id="@+id/relbotpan"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:layout_margin="1dp"
-        android:background="@layout/blue_strip" >
+        android:background="@layout/blue_strip">
 
         <TextView
             android:id="@+id/TextView01"
@@ -296,15 +296,21 @@
 
     <ImageView
         android:id="@+id/imgPFoto"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_alignParentRight="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/relbotpan"
         android:layout_below="@+id/imgImg"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginEnd="12dp"
         android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
         android:clickable="true"
         android:focusable="true"
         android:onClick="showPic"
-        android:src="@drawable/camara" />
+        android:src="@drawable/fotos_neg" />
 
     <ImageView
         android:id="@+id/imageView1"
@@ -312,8 +318,8 @@
         android:layout_height="48dp"
         android:layout_above="@+id/imgPFoto"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="30dp"
         android:layout_marginRight="5dp"
+        android:layout_marginBottom="30dp"
         android:clickable="true"
         android:onClick="askExist"
         android:src="@drawable/act_stock" />
@@ -322,8 +328,8 @@
         android:id="@+id/imageView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_below="@+id/imgNext"
+        android:layout_alignParentRight="true"
         android:layout_marginTop="30dp"
         android:layout_toRightOf="@+id/lblFecha"
         android:clickable="true"
@@ -350,9 +356,9 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/lblPend"
         android:layout_toRightOf="@+id/textView6"
-        android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingTop="5dp"
+        android:paddingBottom="10dp"
         android:text="Precio"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="20sp"
@@ -362,11 +368,11 @@
         android:id="@+id/lblPend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/relbotpan"
         android:layout_below="@+id/lblFecha"
+        android:layout_alignLeft="@+id/relbotpan"
         android:paddingLeft="10dp"
-        android:paddingRight="5dp"
         android:paddingTop="5dp"
+        android:paddingRight="5dp"
         android:text="Precio  :"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="20sp"
@@ -388,12 +394,12 @@
         android:id="@+id/textView24"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:layout_below="@+id/textView8"
+        android:layout_alignParentStart="true"
         android:layout_centerVertical="false"
-        android:paddingBottom="5dp"
         android:paddingLeft="10dp"
         android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:text="Peso :"
         android:textSize="20sp" />
 
@@ -425,8 +431,8 @@
         android:id="@+id/textView25"
         android:layout_width="111dp"
         android:layout_height="37dp"
-        android:layout_alignEnd="@+id/textView22"
         android:layout_below="@+id/textView8"
+        android:layout_alignEnd="@+id/textView22"
         android:layout_marginEnd="-65dp"
         android:layout_toRightOf="@+id/txtPeso"
         android:gravity="left|center_vertical"

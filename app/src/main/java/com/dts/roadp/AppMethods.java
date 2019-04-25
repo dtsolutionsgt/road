@@ -392,7 +392,7 @@ public class AppMethods {
 	public void estandartInventario()  {
 		Cursor dt,df;
 		String cod,ub,us,lote,doc,stat;
-		double cant,cantm,fact;
+		double cant,cantm,fact,fact1,fact2;
 
 		try {
 
@@ -417,24 +417,43 @@ public class AppMethods {
 
 				if (!ub.equalsIgnoreCase(us)) {
 
-					sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+us+"') AND (UNIDADMINIMA='"+ub+"')";
+					sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+us+"') ";
 					df=Con.OpenDT(sql);
-
-					if (df.getCount()>0) {
-
-						df.moveToFirst();
-						fact=df.getDouble(0);
-						cant=cant*fact;
-						cantm=cantm*fact;
-
-						sql="UPDATE P_STOCK SET CANT="+cant+",CANTM="+cantm+",UNIDADMEDIDA='"+ub+"'  " +
-								"WHERE (CODIGO='"+cod+"') AND (UNIDADMEDIDA='"+us+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
+					if (df.getCount()==0) {
+						msgbox("No existe factor conversion para el producto : " + cod);
+						sql = "DELETE FROM P_STOCK WHERE CODIGO='" + cod + "'";
 						db.execSQL(sql);
+						fact1=1;
 					} else {
+						df.moveToFirst();
+						fact1=df.getDouble(0);
+					}
+
+					sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+ub+"') ";
+					df=Con.OpenDT(sql);
+					if (df.getCount()==0) {
 						msgbox("No existe factor conversion para el producto : "+cod);
 						sql="DELETE FROM P_STOCK WHERE CODIGO='"+cod+"'";
 						db.execSQL(sql);
+						fact2=1;
+					} else {
+						df.moveToFirst();
+						fact2=df.getDouble(0);
 					}
+
+					if (fact1>=fact2) {
+						fact=fact1/fact2;
+					} else {
+						fact=fact2/fact1;
+					}
+
+					cant = cant * fact;
+					cantm = cantm * fact;
+
+					sql="UPDATE P_STOCK SET CANT=" + cant + ",CANTM=" + cantm + ",UNIDADMEDIDA='" + ub + "'  " +
+						"WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + us + "') AND (LOTE='" + lote + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
+					db.execSQL(sql);
+
 				}
 
 				dt.moveToNext();
@@ -646,31 +665,31 @@ public class AppMethods {
 		}
 	}
 
-	public boolean validaImpresora(String prid) {
+	public boolean validaImpresora() {
 		CryptUtil cu=new CryptUtil();
 		Cursor dt;
-		String se,sd;
+		String se,sd,prid;
 
-		if (prid.equalsIgnoreCase("*")) {
-			try {
-				sql = "SELECT PUERTO_IMPRESION FROM P_ARCHIVOCONF";
-				dt = Con.OpenDT(sql);
-				dt.moveToFirst();
+		try {
+			sql = "SELECT prnserie FROM Params";
+			dt = Con.OpenDT(sql);
+			dt.moveToFirst();
 
-				prid = dt.getString(0);
-			} catch (Exception e) {
-				prid="..";
-			}
+			prid = dt.getString(0);
+		} catch (Exception e) {
+			return false;
 		}
 
 		try {
+
 			sql="SELECT NUMSERIE FROM P_IMPRESORA";
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()>0) dt.moveToFirst();
 			while (!dt.isAfterLast()) {
 				se=dt.getString(0);
-				sd=cu.decrypt(se);
+				//sd=cu.decrypt(se);
+				sd=se;
 
 				if (sd.equalsIgnoreCase(prid)) return true;
 
@@ -681,8 +700,57 @@ public class AppMethods {
 		}
 
 		return false;
+
 	}
 
+	public String impresTipo() {
+		Cursor dt;
+		String prnid;
+
+		try {
+
+			sql="SELECT prn FROM Params";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			prnid=dt.getString(0);
+
+			sql="SELECT MARCA FROM P_IMPRESORA WHERE IDIMPRESORA='"+prnid+"'";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return "SIN IMPRESORA";
+			dt.moveToFirst();
+
+			return dt.getString(0);
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			return "SIN IMPRESORA";
+		}
+	}
+
+	public String impresParam() {
+		CryptUtil cu=new CryptUtil();
+		Cursor dt;
+		String prnid;
+
+		try {
+
+			sql="SELECT prn FROM Params";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			prnid=dt.getString(0);
+
+			sql="SELECT MACADDRESS FROM P_IMPRESORA WHERE IDIMPRESORA='"+prnid+"'";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return " #### ";
+			dt.moveToFirst();
+
+			return cu.decrypt(dt.getString(0));
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			return " #### ";
+		}
+	}
 
 
 	// Common

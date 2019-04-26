@@ -1,12 +1,11 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.database.Cursor;
-import android.widget.Toast;
 
 import com.dts.roadp.clsClasses.clsBonifItem;
+
+import java.util.ArrayList;
 
 public class clsDeGlob {
 
@@ -43,9 +42,7 @@ public class clsDeGlob {
 	    opendb();
 	    
 	    mu=new MiscUtils(context);
-	    
-	    bontipo=new clsDeGlobTipo(context); 
-		
+	    bontipo=new clsDeGlobTipo(context);
 		lineaid="";slineaid="";marcaid="";grupoid="";		
 		
 		configuracion();

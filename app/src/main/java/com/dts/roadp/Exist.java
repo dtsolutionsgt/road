@@ -92,6 +92,10 @@ public class Exist extends PBase {
 	
 	public void printDoc(View view) {
 		try{
+			if(items.size()==0){
+				msgbox("No hay inventario disponible");
+				return;
+			}
 			if (doc.buildPrint("0",0)) prn.printask();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

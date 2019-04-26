@@ -216,7 +216,7 @@ public class Venta extends PBase {
 
 			if (gl.dvbrowse!=0){
 				if (tot<gl.dvdispventa){
-					mu.msgbox("¡Monto de factura es menor a la de crédito!!");return;
+					mu.msgbox("No puede totalizar la factura, es menor al monto permitido para la nota de crédito: " + gl.dvdispventa);return;
 				}
 			}
 

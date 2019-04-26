@@ -224,7 +224,7 @@ public class ProdCant extends PBase {
 	
 		try {
 							
-			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO,PESO_PROMEDIO "+
+			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO,PESO_PROMEDIO,FACTORCONV "+
 				 "FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	dt=Con.OpenDT(sql);
 			dt.moveToFirst();
@@ -235,7 +235,9 @@ public class ProdCant extends PBase {
 			//prodimg=DT.getString(6);
 			prodimg=prodid;
 			proddesc=dt.getString(7);
-			pesoprom = dt.getDouble(9);
+
+			pesoprom = dt.getDouble(10);
+			if (pesoprom==0) pesoprom = dt.getDouble(9);
 
 			if (dt.getString(7).equalsIgnoreCase("P")) pexist=true; else pexist=false;
 			

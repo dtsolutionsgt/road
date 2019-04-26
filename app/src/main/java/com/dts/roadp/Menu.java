@@ -122,7 +122,8 @@ public class Menu extends PBase {
 				gl.ayudanteID="";gl.vehiculoID="";
 			}
 
-			ConfImpresora();
+			//#CKFK 20190423 Quité esta validación de configuración de impresora
+			//ConfImpresora();
 
 		}catch (Exception e)
 		{
@@ -1805,69 +1806,6 @@ public class Menu extends PBase {
 		
 		return prid;
 				
-	}
-
-	//#HS_20181122_1527 Se agrego la funcion GetTipoImpresora().
-	public String GetTipoImpresora() {
-		Cursor DT;
-		String Tipo = "";
-
-		try{
-
-			sql="SELECT TIPO_IMPRESORA FROM P_ARCHIVOCONF";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-
-			if(DT.getCount()> 0)
-			{
-				Tipo = DT.getString(0);
-				gl.tipoImpresora = Tipo;
-			}
-
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			msgbox("GetTipoImpresora: " + e.getMessage());
-		}
-
-		return Tipo;
-	}
-
-	//#HS_20181122_1513 Se agrego la funcion ConfImpresora()
-	public void ConfImpresora(){
-		try{
-			if(GetTipoImpresora().equalsIgnoreCase("SIN IMPRESORA") || GetTipoImpresora().equalsIgnoreCase("BLUETOOTH")){
-				msgAskImpresora();
-			}
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-
-	}
-
-	//#HS_20181122_1517 Se agrego el mensaje de configuracion de impresora.
-	private void msgAskImpresora() 	{
-		try{
-			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-			dialog.setTitle("Road");
-			dialog.setMessage("Debe configurar la impresora");
-
-			dialog.setIcon(R.drawable.ic_quest);
-
-			dialog.setCancelable(false);
-			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					menuConfImpres();
-				}
-			});
-
-			dialog.show();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-
 	}
 
 	//endregion

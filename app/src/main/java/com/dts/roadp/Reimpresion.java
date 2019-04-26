@@ -69,11 +69,24 @@ public class Reimpresion extends PBase {
 		
 		setHandlers();
 		listItems();
-		
+
+		prn=new printer(this,printclose,gl.validimp);
+		prn_nc=new printer(this,printclose,gl.validimp);
+
+		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+		fdoc.deviceid =gl.deviceId;
+
+		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+		fdev.deviceid =gl.deviceId;
+
 		printclose= new Runnable() {
-		    public void run() {
-		    	//Reimpresion.super.finish();
-		    }
+			public void run() {
+
+				String corelFactura=getCorelFact(itemid);
+				if(ncFact==1){
+					fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printnoask(printvoid,"print.txt");
+				}
+			}
 		};
 
 		printvoid= new Runnable() {
@@ -83,16 +96,18 @@ public class Reimpresion extends PBase {
 
 		printcallback= new Runnable() {
 			public void run() {
+
+				//#CKFK_20190401 03:43 PM Agregué esto para imprimir la NC cuando la factura está asociada a una
+				corelNC=getCorelNotaCred(itemid);
+
+				if (!corelNC.isEmpty()){
+
+					fdev.buildPrint(corelNC, 1, "TOL");
+					prn_nc.printnoask(printvoid, "printnc.txt");
+				}
 				askPrint();
 			}
 		};
-
-		prn=new printer(this,printclose,gl.validimp);
-		prn_nc=new printer(this,printclose,gl.validimp);
-
-		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
-		fdoc.deviceid =gl.deviceId;
-			
 		switch (tipo) {
 		case 0:  
 			lblTipo.setText("Pedido");break;
@@ -425,27 +440,18 @@ public class Reimpresion extends PBase {
 		try {
 
 			if(prn.isEnabled()){
-				if (fdoc.buildPrint(itemid,impr,gl.peFormatoFactura)) prn.printask(printcallback);
+				if (fdoc.buildPrint(itemid,impr,gl.peFormatoFactura))
 
-				//#CKFK_20190401 03:43 PM Agregué esto para imprimir la NC cuando la factura está asociada a una
-				corelNC=getCorelNotaCred(itemid);
+				    prn.printask(printcallback);
 
-				if (!corelNC.isEmpty()){
-
-					fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-					fdev.deviceid =gl.deviceId;
-
-					fdev.buildPrint(corelNC, 1, "TOL");
-					prn_nc.printnoask(printvoid, "printnc.txt");
-				}
 			}else if(!prn.isEnabled()){
 				fdoc.buildPrint(itemid,impr,gl.peFormatoFactura);
 
 				corelNC=getCorelNotaCred(itemid);
 
 				if (!corelNC.isEmpty()){
-					fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-					fdev.deviceid =gl.deviceId;
+					/*fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+					fdev.deviceid =gl.deviceId;*/
 
 					fdev.buildPrint(corelNC, 1, "TOL");
 					toast("Reimpresion de factura y nota de credito generada");
@@ -565,23 +571,22 @@ public class Reimpresion extends PBase {
 		Cursor dt;
 		String id,serie;
 		int corel;
+		String corelFactura=getCorelFact(itemid);
 
 		try {
-			String corelFactura=getCorelFact(itemid);
 
 			if(prn.isEnabled()){
 
 				if(ncFact==1){
 					if(tipo==6){
-						fdev.buildPrint(itemid, 3, "TOL"); prn_nc.printask(printclose, "printnc.txt");
-						fdoc.buildPrint(corelFactura, 3, "TOL"); prn.printask();
+						fdev.buildPrint(itemid, 3, "TOL");
+						prn_nc.printask(printclose, "printnc.txt");
 
-						toast("Reimpresion de nota de credito y factura generada");
+						toast("Reimpresión de nota de crédito y factura generada");
 					}else {
-						fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
-						fdoc.buildPrint(corelFactura, 1, "TOL"); prn.printask();
-
-						toast("Reimpresion de nota de credito y factura generada");
+						fdev.buildPrint(itemid, 1, "TOL");
+						prn_nc.printask(printclose, "printnc.txt");
+						toast("Reimpresión de nota de crédito y factura generada");
 					}
 
 				}else if(ncFact==2){

@@ -15,6 +15,7 @@ public class clsDocCanastaBod extends clsDocument {
     private String 	contrib,recfact,estadoDev,corelNC,corelF,asignacion;
     private int totitems, totcant;
 
+    public String vTipo;
     public clsDocCanastaBod(Context context, int printwidth, String cursym, int decimpres, String archivo) {
         super(context, printwidth, cursym, decimpres, archivo);
         docpedido=false;
@@ -30,8 +31,8 @@ public class clsDocCanastaBod extends clsDocument {
 
         super.loadHeadData(corel);
 
-        if(modofact.equalsIgnoreCase("TOL")) nombre="DEVOLUCION DE CANASTA";
-        if(modofact.equalsIgnoreCase("*")) nombre="DEVOLUCION DE BODEGA";
+        if(vTipo.equals("CANASTA"))  nombre="DEVOLUCION DE CANASTA";
+        if(vTipo.equals("PASEANTE"))  nombre="DEVOLUCION DE BODEGA";
 
         try {
             sql="SELECT COREL, RUTA, TIPO, REFERENCIA, USUARIO, FECHA "+
@@ -84,16 +85,17 @@ public class clsDocCanastaBod extends clsDocument {
 
         try {
 
-            if(modofact.equalsIgnoreCase("TOL")) {
+            if(vTipo.equals("CANASTA")) {
                 sql="SELECT M.PRODUCTO,P.DESCLARGA,M.CANT,M.PESO,M.LOTE,M.UNIDADMEDIDA "+
                     "FROM D_MOVDCAN M INNER JOIN P_PRODUCTO P ON M.PRODUCTO=P.CODIGO "+
                     "WHERE M.COREL='"+corel+"'";
-            }
-
-            if(modofact.equalsIgnoreCase("*")) {
-                sql="SELECT M.PRODUCTO,P.DESCLARGA,M.CANT,M.PESO,M.LOTE,M.UNIDADMEDIDA "+
-                    "FROM D_MOVD M INNER JOIN P_PRODUCTO P ON M.PRODUCTO=P.CODIGO "+
-                    "WHERE M.COREL='"+corel+"'";
+            }else if(vTipo.equals("PASEANTE")) {
+                sql=" SELECT M.PRODUCTO,P.DESCLARGA,M.CANT,M.PESO,M.LOTE,M.UNIDADMEDIDA "+
+                    " FROM D_MOVD M INNER JOIN P_PRODUCTO P ON M.PRODUCTO=P.CODIGO "+
+                    " WHERE M.COREL='"+corel+"'"+
+                    " UNION SELECT M.PRODUCTO,P.DESCLARGA,COUNT(M.BARRA) AS CANT,M.PESO,'' AS LOTE,M.UNIDADMEDIDA " +
+                    " FROM D_MOVDB M INNER JOIN P_PRODUCTO P ON M.PRODUCTO=P.CODIGO " +
+                    " WHERE M.COREL='"+corel+"'";
             }
 
 

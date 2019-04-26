@@ -33,7 +33,7 @@ public class DevolBodCan extends PBase {
 
     private clsRepBuilder rep;
 
-    private ComWS cComWS;
+    private clsWSEnvio vWSEnvio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,26 +52,12 @@ public class DevolBodCan extends PBase {
         lblTot = (TextView) findViewById(R.id.textView9);lblTot.setText("");
         setHandlers();
 
-        cComWS  = new ComWS();
-
         printclose= new Runnable() {
             public void run() {
-                if(impres==1){
-                    gl.closeDevBod=true;
-                    DevolBodCan.super.finish();
-                }else if(impres==2){
-                    gl.closeDevBod=true;
-                    DevolBodCan.super.finish();
-                }else if(impres>2){
-                    if(impres==4){
-                        gl.closeDevBod=true;
-                        DevolBodCan.super.finish();
-                    }
-                    impres++;
-                }
-                //DevolBodCan.super.finish();
+
             }
         };
+
         printcallback= new Runnable() {
             public void run() {
                 askPrint();
@@ -83,14 +69,15 @@ public class DevolBodCan extends PBase {
 
         fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
         fcanastabod.deviceid =gl.deviceId;
+        fcanastabod.vTipo="CANASTA";
 
-        fpaseantebod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
+        fpaseantebod=new clsDocCanastaBod(this,prn_paseante.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
         fpaseantebod.deviceid =gl.deviceId;
+        fpaseantebod.vTipo="PASEANTE";
 
         listItems();
 
     }
-
 
     //region Events
 
@@ -453,7 +440,8 @@ public class DevolBodCan extends PBase {
 
             createDoc();
 
-            cComWS.envio_D_MOV_en_dev();
+           // vWSEnvio = new clsWSEnvio(this, gl.ruta, gl.emp, 1);
+           // vWSEnvio.wsExecuteEnvio();
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -482,21 +470,18 @@ public class DevolBodCan extends PBase {
             dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
 
-                    impres++;toast("Impres "+impres);
-
-                    if (impres>1) {
-                        DevolBodCan.super.finish();
-                    } else {
-                        fcanastabod.buildPrint(corel, 10,gl.peFormatoFactura);
-                        prn_can.printask(printcallback, "printdevcan.txt");
+                    if (impres==0) {
+                        prn_can.printnoask(printclose, "printdevcan.txt");
                     }
+                    gl.closeDevBod=true;
+                    DevolBodCan.super.finish();
+
                 }
             });
 
             dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     //singlePrint();
-                    prn_can.printask(printcallback, "printdevcan.txt");
                 }
             });
 
@@ -522,46 +507,27 @@ public class DevolBodCan extends PBase {
 
             if(existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=1;
             if(!existenciaC.isEmpty() && existenciaP.isEmpty()) impres=2;
+            if(existenciaC.isEmpty() && existenciaP.isEmpty()) impres=3;
 
             if (prn_can.isEnabled()) {
 
-                if(!existenciaC.isEmpty()){
-                    if(impres==0){
-                        fcanastabod.buildPrint(corel,0, "TOL");
-                    }else {
-                        fcanastabod.buildPrint(corel, 10, "TOL");
-                    }
+                String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 
-                    if (gl.peImprFactCorrecta) {
-                        prn_can.printask(printclose, "printdevcan.txt");
-                    } else {
-                        singlePrint();
-                    }
-
-                    if(!existenciaP.isEmpty()){
-
-                        if(!existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=3;
-                        /*prn_paseante=new printer(this,printclose,gl.validimp);
-                        fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
-                        fcanastabod.deviceid =gl.deviceId;*/
-
-                        fpaseantebod.buildPrint(corel,0,"*");
-                        prn_paseante.printask(printclose, "printpaseante.txt");
-
-                    }
-
-
-                }else if(!existenciaP.isEmpty()){
-
-                    /*prn_paseante=new printer(this,printclose,gl.validimp);
-                    fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
-                    fcanastabod.deviceid =gl.deviceId;*/
-
-                    fpaseantebod.buildPrint(corel,0,"*");
-                    prn_paseante.printask(printclose, "printpaseante.txt");
-
+                if(impres==0 || impres==1){
+                    fpaseantebod.buildPrint(corel,0,vModo);
                 }
 
+                if(impres==0 || impres==2){
+                    fcanastabod.buildPrint(corel,0, vModo);
+                }
+
+                if(impres==0) {
+                    prn_paseante.printask(printcallback, "printpaseante.txt");
+                }else if(impres==1) {
+                    prn_paseante.printask(printcallback, "printpaseante.txt");
+                }else if(impres==2) {
+                    prn_can.printask(printcallback, "printdevcan.txt");
+                }
 
             }else if(!prn_can.isEnabled()){
 

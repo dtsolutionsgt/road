@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -57,13 +58,14 @@
 
     <Spinner
         android:id="@+id/spinner1"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_width="334dp"
+        android:layout_height="45dp"
         android:layout_below="@+id/relRoad"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="false"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
         android:background="@layout/spinner_style" />
@@ -100,7 +102,8 @@
             android:layout_width="130dp"
             android:layout_height="48dp"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="64dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="62dp"
             android:layout_toRightOf="@+id/lblCFact"
             android:gravity="right|center_vertical"
             android:text="999,999.99"
@@ -265,5 +268,16 @@
         android:paddingRight="10dp"
         android:paddingBottom="10dp"
         android:src="@drawable/next48" />
+
+    <ImageView
+        android:id="@+id/imgCalc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/relativeLayout1"
+        android:layout_alignStart="@+id/relbotpan"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="31dp"
+        android:onClick="OpenDesglose"
+        android:src="@drawable/calc" />
 
 </RelativeLayout>

@@ -28,6 +28,7 @@ public class Anulacion extends PBase {
 	
 	private Runnable printcallback,printclose;
 	private printer prn;
+    private printer prn_nc;
 	public  clsRepBuilder rep;
 	private clsDocAnul doc;
 	private clsDocFactura fdoc;
@@ -87,6 +88,7 @@ public class Anulacion extends PBase {
 		};
 		
 		prn=new printer(this,printclose,gl.validimp);
+        prn_nc=new printer(this,printclose,gl.validimp);
 
 		setHandlers();
 		listItems();
@@ -306,7 +308,7 @@ public class Anulacion extends PBase {
 			
 			if (tipo==4) anulRecarga(itemid);
 			
-			if (tipo==5) anulDevol(itemid);
+			if (tipo==5) if (!anulDevol(itemid)) return;
 
 			if (tipo==6) anulNotaCredito(itemid);
 
@@ -339,10 +341,10 @@ public class Anulacion extends PBase {
 
 				SystemClock.sleep(50);
 
-				fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+				fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 				fdev.deviceid =gl.deviceId;
 
-				fdev.buildPrint(itemid, 3, "TOL"); prn.printask(printclose);
+				fdev.buildPrint(itemid, 3, "TOL"); prn_nc.printask(printclose, "printnc.txt");
 
 			}
 
@@ -703,12 +705,17 @@ public class Anulacion extends PBase {
 		}
 	}
 
-	private void anulDevol(String itemid) {
+	private boolean anulDevol(String itemid) {
 		Cursor DT;
 		String prod;
 		double cant,cantm;
 
+		boolean vAnulDevol=false;
+
 		try{
+
+			db.beginTransaction();
+
 			sql="UPDATE D_MOV SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
 
@@ -717,28 +724,38 @@ public class Anulacion extends PBase {
 
 			if(DT.getCount()>0){
 				sql="INSERT INTO P_STOCK SELECT PRODUCTO, CANT, CANTM, PESO, 0, LOTE, '',0,'N', '','',0,0,'', UNIDADMEDIDA " +
-						"FROM D_MOVD";
+						"FROM D_MOVD WHERE (COREL='"+itemid+"')";
 				db.execSQL(sql);
 			}
 
-			sql="SELECT PRODUCTO,CANT,CANTM, UNIDADMEDIDA FROM D_MOVDB WHERE (COREL='"+itemid+"')";
+			sql="SELECT PRODUCTO,UNIDADMEDIDA FROM D_MOVDB WHERE (COREL='"+itemid+"')";
 			DT=Con.OpenDT(sql);
 
 			if(DT.getCount()>0){
 				sql="INSERT INTO P_STOCKB " +
 					"SELECT M.RUTA, D.BARRA, D.PRODUCTO, 1, '' AS COREL, 0 AS PRECIO, D.PESO, '' AS DOCUMENTO, " +
 					" M.FECHA, 0 AS ANULADO, '' AS CENTRO, 'A' AS ESTATUS, " +
-					"0 AS ENVIADO, 0 AS CODIGOLIQUIDACION, '' AS COREL_D_MOV, M.FECHA, D.UNIDADMEDIDA, '' AS DOCENTREGA " +
-					"FROM D_MOV M INNER JOIN D_MOVDB D ON M.COREL = D.COREL WHERE (COREL='"+itemid+"')";
+					"0 AS ENVIADO, 0 AS CODIGOLIQUIDACION, '' AS COREL_D_MOV, D.UNIDADMEDIDA, '' AS DOCENTREGA " +
+					"FROM D_MOV M INNER JOIN D_MOVDB D ON M.COREL = D.COREL WHERE (M.COREL='"+itemid+"')";
 				db.execSQL(sql);
 			}
 
 			sql="UPDATE FinDia SET val5 = 0";
 			db.execSQL(sql);
 
+			db.setTransactionSuccessful();
+			db.endTransaction();
+
+			vAnulDevol=true;
+
 		}catch (Exception e){
+
+			db.endTransaction();
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
+
+		return vAnulDevol;
+
 	}
 	private void anulRecib(String itemid) {
 		try{

@@ -697,7 +697,7 @@ public class MainActivity extends PBase {
 		String lic,lickey;
 
 		try {
-            lickey=cu.encrypt(gl.deviceId);
+            lickey=cu.encrypt(gl.deviceId);// gl.ruta
 
             sql="SELECT lic FROM Params";
             dt=Con.OpenDT(sql);

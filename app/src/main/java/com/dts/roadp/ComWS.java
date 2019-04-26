@@ -1041,11 +1041,7 @@ public class ComWS extends PBase {
 			procesaParamsExt();
 
 			if (!AddTable("P_NIVELPRECIO")) return false;
-
 			if (!AddTable("P_RUTA")) return false;
-
-			rrs="resbits "+guardaImagen("0006");
-
 			if (!AddTable("P_CLIENTE")) return false;
 			if (!AddTable("P_CLIENTE_FACHADA")) return false;
 			if (!AddTable("P_CLIRUTA")) return false;

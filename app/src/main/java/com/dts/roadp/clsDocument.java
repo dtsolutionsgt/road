@@ -204,11 +204,8 @@ public class clsDocument {
 					rep.add(resvence);
 					rep.add(resrango);
 				}
-
 			}
-
         }
-
 
         if (!emptystr(nit)) rep.add("RUC : "+nit);
         if (!emptystr(clidir)) rep.add("Dir : "+clidir);

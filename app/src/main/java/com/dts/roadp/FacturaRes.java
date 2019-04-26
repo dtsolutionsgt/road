@@ -1810,6 +1810,12 @@ public class FacturaRes extends PBase {
 					svuelt= txtVuelto.getText().toString();
                     gl.brw=1;
 
+                    if (!svuelt.equalsIgnoreCase("")){
+                        if (Double.parseDouble(svuelt)<0.0){
+                            toast("Monto ingresado no genera vuelto");
+                        }
+                    }
+
                     svuelt=""+tot;
                     sefect=""+tot;
 

@@ -76,7 +76,7 @@ public class printZebraZPL extends printBase {
         return true;
     }
 
-    public void printask(String fileName) {
+    public void printask(Runnable callBackHook,String fileName) {
         hasCallback=false;
 
         fname=fileName;	errmsg="";exitprint=false;
@@ -362,7 +362,43 @@ public class printZebraZPL extends printBase {
                 cbhandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        printclose.run();
+                        msgAskRePrint();
+                        //printclose.run();
+                    }
+                }, 200);
+            }
+        });
+
+        dialog.show();
+
+    }
+
+    private void msgAskRePrint() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(cont);
+
+        dialog.setTitle(R.string.app_name);
+        dialog.setMessage("Desea repetir la impresión ?");
+
+        dialog.setCancelable(false);
+        dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                msgAskPrint();
+            }
+
+        });
+
+        dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                final Handler cbhandler = new Handler();
+                cbhandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            printclose.run();
+                        } catch (Exception e) {
+                            //showmsg(e.getMessage());
+                        }
+
                     }
                 }, 200);
             }

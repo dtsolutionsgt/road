@@ -408,7 +408,7 @@ public class MainActivity extends PBase {
 
         try {
 
-            if (fecha > 1904310000) {
+            if (fecha > 1905310000) {
                 msgAskLic("¡Su licencia expiró!");
                 return false;
             }

@@ -64,7 +64,7 @@ public class DevCliCant extends PBase {
 		raz=gl.devrazon;
 		gl.tienelote = 0;
 
-		prc=new Precio(this,mu,gl.peDec);
+		prc=new Precio(this,mu,2);
 
 		gl.dval=-1;
 		
@@ -91,7 +91,7 @@ public class DevCliCant extends PBase {
 		txtPrecio.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
 		//Limita cantidad de decimales para los EditText.
-        txtPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(gl.peDec)});
+        txtPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(2)});
        //txtCant.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(gl.peDec)});
         txtkgs.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(gl.peDec)});
 
@@ -156,6 +156,10 @@ public class DevCliCant extends PBase {
 				gl.tienelote = 1;
 			}
 
+
+			gl.dvprec = mu.round(gl.dvprec,2);
+			gl.dvtotal= mu.round(gl.dvtotal,2);
+			gl.dvpreclista = mu.round(gl.dvpreclista,2);
 			//hidekeyb();
 			super.finish();
 			
@@ -216,7 +220,7 @@ public class DevCliCant extends PBase {
 						clcpeso=pesoprom*factor;
 
 						if (gl.dvporpeso==false){
-							lblPrec.setText(String.valueOf(mu.round(getPrecio(),gl.peDec)));
+							lblPrec.setText(String.valueOf(mu.round(getPrecio(),2)));
 							txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
 						}else{
 							if (!vEditando){
@@ -369,7 +373,7 @@ public class DevCliCant extends PBase {
 				msgSinPrecio("El producto no tiene definido precio");return;
 			}
 
-			precioventa = mu.round(precioventa,gl.peDec);
+			precioventa = mu.round(precioventa,2);
 
 			sql="SELECT CANT,PESO,PRECIO,UMVENTA,LOTE,TIENE_LOTE FROM T_CxCD WHERE CODIGO='"+prodid+"'";
 			DT=Con.OpenDT(sql);
@@ -629,7 +633,7 @@ public class DevCliCant extends PBase {
 			spin = (Spinner) findViewById(R.id.spinner1);
 			cmbum = (Spinner) findViewById(R.id.cmbUM);
 
-			prc=new Precio(this,mu,gl.peDec);
+			prc=new Precio(this,mu,2);
 
 			chkTieneLote = (CheckBox) findViewById(R.id.chkTieneLote);
 
@@ -704,13 +708,13 @@ public class DevCliCant extends PBase {
 
 		try{
 
-			if (umcambiar!=um){
+			if (!umcambiar.equalsIgnoreCase(um)){
 				fact1 = getFactor(umcambiar);
 				fact2 = getFactor(um);
 
 				if (fact2>0)proprecio=fact1/fact2;
 
-			} proprecio = (umcambiar==um?1:proprecio);
+			} proprecio = (umcambiar.equals(um)?1:proprecio);
 
 			prec = precioventa * proprecio;
 

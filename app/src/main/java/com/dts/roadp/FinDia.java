@@ -574,6 +574,7 @@ public class FinDia extends PBase {
                     return false;
                 }
 
+
                 if (gl.peModal.equalsIgnoreCase("APR")) {
                     setFactCor();
                     if (fcorel == 0) {

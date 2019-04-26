@@ -260,6 +260,9 @@ public class FacturaRes extends PBase {
 	public void prevScreen(View view) {
 		try{
 			clearGlobals();
+			if(gl.dvbrowse!=0){
+				gl.dvbrowse =0;
+			}
 			super.finish();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -1738,7 +1741,7 @@ public class FacturaRes extends PBase {
             if (gl.dvbrowse!=0){
                 double totdv;
                 if (tot>=dispventa){
-                    totdv = mu.round(tot-dispventa,gl.peDec);
+                    totdv = mu.round(tot-dispventa,2);
                     alert.setTitle("A pagar : "+mu.frmcur(totdv));
                 }
             }else{
@@ -1851,7 +1854,7 @@ public class FacturaRes extends PBase {
 
 					if (gl.dvbrowse!=0){
 						double totdv;
-						totdv = mu.round(tot-dispventa,gl.peDec);
+						totdv = mu.round(tot-dispventa,2);
 
 						if (pg<totdv) {
 							msgbox("Monto menor que total");
@@ -1930,7 +1933,7 @@ public class FacturaRes extends PBase {
 
 			if(gl.dvbrowse!=0){
 				if (epago>=dispventa) {
-					epago=mu.round(epago-dispventa,gl.peDec);
+					epago=mu.round(epago-dispventa,2);
 				}
 			}
 
@@ -2369,10 +2372,6 @@ public class FacturaRes extends PBase {
 			db.execSQL("DELETE FROM T_PAGO");
 
 			db.execSQL("DELETE FROM T_BONITEM WHERE PRODID='*'");
-
-			if(gl.dvbrowse!=0){
-				gl.dvbrowse =0;
-			}
 
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

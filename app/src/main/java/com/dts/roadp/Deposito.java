@@ -430,8 +430,12 @@ public class Deposito extends PBase {
 					nchec+=item.NChec;	
 				}
 				
-			}	
-			
+			}
+
+			tot=mu.round(tot,2);
+			efect=mu.round(efect,2);
+			chec=mu.round(chec,2);
+
 			corel=((appGlobals) vApp).ruta+"_"+mu.getCorelBase();
 			
 			db.beginTransaction();
@@ -469,6 +473,7 @@ public class Deposito extends PBase {
 					if (item.Efect>0) {
 						
 						it+=1;
+						item.Efect=mu.round(item.Efect,2);
 						
 						ins.init("D_DEPOSD");
 						ins.add("COREL",corel);
@@ -531,6 +536,7 @@ public class Deposito extends PBase {
 
 			//Inserta y válida Desglose de depósito.
 
+
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
 
 				sql="SELECT * FROM T_DEPOSB";
@@ -541,7 +547,7 @@ public class Deposito extends PBase {
 					msgbox("Por favor realice el desglose antes de continuar.");
 					db.endTransaction();
 					return false;
-				}else{
+				} else {
 
 					DT.moveToFirst();
 					while (!DT.isAfterLast()) {
@@ -563,6 +569,7 @@ public class Deposito extends PBase {
 				}
 
 			}
+
 
 			db.setTransactionSuccessful();
 			db.endTransaction();

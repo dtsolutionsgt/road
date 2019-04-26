@@ -104,7 +104,7 @@ public class Venta extends PBase {
 		}
 		if (rutapos) imgroad.setImageResource(R.drawable.pedidos_3_gray);
 
-		prc=new Precio(this,mu,gl.peDec);
+		prc=new Precio(this,mu,2);
 
 		setHandlers();
 
@@ -439,10 +439,10 @@ public class Venta extends PBase {
 
 		if (sinimp) {
 			ttsin=tot-ttimp-ttperc;
-			ttsin=mu.round(ttsin,gl.peDec);
+			ttsin=mu.round(ttsin,2);
 			lblTot.setText(mu.frmcur(ttsin));
 		} else {
-			tot=mu.round(tot,gl.peDec);
+			tot=mu.round(tot,2);
 			lblTot.setText(mu.frmcur(tot));
 		}
 
@@ -523,12 +523,11 @@ public class Venta extends PBase {
 			desc = 0;
 			prodPrecio();
 
-			prec = mu.round(prec, gl.peDec);
-			gl.bonprodid = prodid;
+			prec = mu.round(prec, 2);
 			gl.bonprodcant = cant;
 			gl.bonus.clear();
 
-			vv = cant * prec;vv = mu.round(vv, gl.peDec);
+			vv = cant * prec;vv = mu.round(vv, 2);
 
 			clsBonif = new clsBonif(this, prodid, cant, vv);
 			if (clsBonif.tieneBonif()) {
@@ -620,7 +619,7 @@ public class Venta extends PBase {
                 if (prc.precioespecial>0) prec=prc.precioespecial;
             }
 
-			prec=mu.round(prec,gl.peDec);
+			prec=mu.round(prec,2);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
@@ -668,9 +667,9 @@ public class Venta extends PBase {
 		}
 
 		if (porpeso) {
-			prodtot=mu.round(gl.prectemp*peso,gl.peDec);
+			prodtot=mu.round(gl.prectemp*peso,2);
 		} else {
-			prodtot=mu.round(prec*cant,gl.peDec);
+			prodtot=mu.round(prec*cant,2);
 		}
 
 		try {
@@ -850,6 +849,9 @@ public class Venta extends PBase {
 					}
 				}
 
+				prec=mu.round(prec,2);
+				prodtot=mu.round(prodtot,2);
+
 				ins.init("T_VENTA");
 
 				ins.add("PRODUCTO",prodid);
@@ -857,10 +859,10 @@ public class Venta extends PBase {
 				if (prodPorPeso(prodid)) {
 					ins.add("UM",gl.umpeso);
 				} else {
-					if (factbolsa==1) ins.add("UM",uum);else ins.add("UM",umven);
+					if (factbolsa==1) ins.add("UM",umven);else ins.add("UM",umven);
 				}
 				ins.add("CANT",cant);
-				ins.add("UMSTOCK",uum);
+				ins.add("UMSTOCK",umven);
 				ins.add("FACTOR",gl.umfactor);
 				if (prodPorPeso(prodid)) {
 					//ins.add("PRECIO",gl.prectemp);

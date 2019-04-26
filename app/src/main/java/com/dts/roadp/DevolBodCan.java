@@ -440,8 +440,8 @@ public class DevolBodCan extends PBase {
 
             createDoc();
 
-           // vWSEnvio = new clsWSEnvio(this, gl.ruta, gl.emp, 1);
-           // vWSEnvio.wsExecuteEnvio();
+            vWSEnvio = new clsWSEnvio(this, gl.ruta, gl.emp, 1);
+            vWSEnvio.wsExecuteEnvio();
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -481,7 +481,7 @@ public class DevolBodCan extends PBase {
 
             dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    //singlePrint();
+                    DevolBodCan.super.finish();
                 }
             });
 

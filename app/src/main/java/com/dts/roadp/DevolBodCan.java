@@ -440,9 +440,6 @@ public class DevolBodCan extends PBase {
 
             createDoc();
 
-            vWSEnvio = new clsWSEnvio(this, gl.ruta, gl.emp, 1);
-            vWSEnvio.wsExecuteEnvio();
-
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             db.endTransaction();
@@ -531,27 +528,18 @@ public class DevolBodCan extends PBase {
 
             }else if(!prn_can.isEnabled()){
 
-                if(!existenciaC.isEmpty()){
+                String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 
-                    if(impres==0){
-                        fcanastabod.buildPrint(corel,0, "TOL");
-                    }else {
-                        fcanastabod.buildPrint(corel, 10, "TOL");
-                    }
-
-                    if(!existenciaP.isEmpty()){
-
-                        if(!existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=3;
-
-                        fpaseantebod.buildPrint(corel,0,"*");
-
-                    }
-
-                }else if(!existenciaP.isEmpty()){
-
-                    fpaseantebod.buildPrint(corel,0,"*");
-
+                if(impres==0 || impres==1){
+                    fpaseantebod.buildPrint(corel,0,vModo);
                 }
+
+                if(impres==0 || impres==2){
+                    fcanastabod.buildPrint(corel,0, vModo);
+                }
+
+                vWSEnvio = new clsWSEnvio(this, gl.ruta, gl.emp, 1);
+                vWSEnvio.wsExecuteEnvio();
             }
 
         if (!prn_can.isEnabled()) {

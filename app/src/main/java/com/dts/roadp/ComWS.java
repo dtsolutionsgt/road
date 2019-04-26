@@ -3812,7 +3812,32 @@ public class ComWS extends PBase {
 
     }
 
-	private boolean validaLicencia() {
+    private boolean validaLicencia() {
+        CryptUtil cu=new CryptUtil();
+        Cursor dt;
+        String lic,lickey;
+
+        try {
+            lickey=cu.encrypt(gl.deviceId);
+
+            sql="SELECT lic FROM Params";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+            lic=dt.getString(0);
+
+            if (lic.equalsIgnoreCase(lickey)) return true;
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" : "+e.getMessage());
+        }
+
+        //toastlong("El dispositivo no tiene licencia válida");
+
+        return false;
+        //return true;
+    }
+
+	/*private boolean validaLicencia() {
 		Cursor dt;
 		String mac,lickey,idkey,binkey;
 		int fval,lkey;
@@ -3849,7 +3874,7 @@ public class ComWS extends PBase {
 			mu.msgbox(e.getMessage());return false;
 		}
 
-	}
+	}*/
 
 	private String getMac() {
 		WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);

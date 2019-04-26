@@ -3830,11 +3830,7 @@ public class ComWS extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" : "+e.getMessage());
         }
-
-        //toastlong("El dispositivo no tiene licencia válida");
-
         return false;
-        //return true;
     }
 
 	/*private boolean validaLicencia() {

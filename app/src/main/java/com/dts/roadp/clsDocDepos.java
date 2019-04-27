@@ -12,17 +12,26 @@ public class clsDocDepos extends clsDocument {
 	private double tot,tote,totc;
 	private int numc;
 	private String banco,cuenta,ref;
-	
+	protected appGlobals gl;
+	protected MiscUtils mu;
+	protected DateUtils du;
+
 	public clsDocDepos(Context context, int printwidth,String pruta,String pvend,String cursymbol,int decimpres, String archivo) {
 		super(context, printwidth,cursymbol,decimpres, archivo);
 		docfactura=false;
-		
+
+		gl=((appGlobals) context.getApplicationContext());
+		du=new DateUtils();
+
 		nombre="DEPOSITO";
 		numero="";
 		serie="";
 		cliente="";	
 		ruta=pruta;
 		vendedor=pvend;
+		vendcod=gl.vend;
+		fsfecha=du.getActDateStr();
+
 		
 	}
 

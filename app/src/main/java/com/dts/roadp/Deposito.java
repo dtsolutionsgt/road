@@ -119,6 +119,21 @@ public class Deposito extends PBase {
 	
 	public void saveDepos(View view){
 		try{
+
+			Cursor DT;
+
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+
+				sql="SELECT * FROM T_DEPOSB";
+
+				DT=Con.OpenDT(sql);
+
+				if (DT.getCount()==0) {
+					msgbox("Por favor realice el desglose antes de continuar.");
+					return;
+				}
+			}
+
 			msgAskSave("Guardar depósito");
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -535,8 +550,6 @@ public class Deposito extends PBase {
 			}	
 
 			//Inserta y válida Desglose de depósito.
-
-
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
 
 				sql="SELECT * FROM T_DEPOSB";

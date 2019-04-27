@@ -1373,7 +1373,7 @@ public class desglose extends PBase {
 
                 CalculaTotales();
 
-            if (falta!=0.0){
+            if (mu.round(falta,2)!=0){
                 msgbox("Cantidad faltante distinta a 0");
                 return;
             }

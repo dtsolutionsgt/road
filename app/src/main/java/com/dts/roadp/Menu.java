@@ -1142,6 +1142,9 @@ public class Menu extends PBase {
 	
 	private void menuDevBod() {
 		try{
+
+			gl.closeDevBod=false;
+
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
 				startActivity(new Intent(this,DevolBodTol.class));
 			} else {

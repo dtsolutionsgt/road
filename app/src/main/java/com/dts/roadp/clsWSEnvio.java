@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -21,12 +22,15 @@ import java.util.ArrayList;
 
 public class clsWSEnvio {
 
+    protected int active;
+
     private int isbusy,reccnt,rec;
     private String ruta,rootdir, senv;
 
     private SQLiteDatabase db;
     private BaseDatos Con;
     private BaseDatos.Insert ins;
+    private BaseDatos.Update upd;
 
     private ArrayList<String> listItems=new ArrayList<String>();
 
@@ -35,7 +39,9 @@ public class clsWSEnvio {
 
     public AsyncCallEnv wsEtask;
 
-    private static String sstr,fstr,fprog,ferr,idbg,dbg, fterr;
+    private static String fprog,idbg,dbg, fterr;
+    public static String sstr, ferr,fstr;
+
     private int scon;
     private String gEmpresa, sql, proceso;
 
@@ -52,6 +58,10 @@ public class clsWSEnvio {
         ruta=gRuta;
         gEmpresa=gEmp;
 
+        Con = new BaseDatos(cont);
+        opendb();
+        ins=Con.Ins;upd=Con.Upd;
+
         getWSURL();
 
         dbld=new clsDataBuilder(cont);
@@ -59,6 +69,19 @@ public class clsWSEnvio {
         tipoEnvio=vTipoEnvio;
     }
 
+    public void opendb() {
+        try {
+            db = Con.getWritableDatabase();
+            if (db!= null) {
+                Con.vDatabase=db;
+                active=1;
+            } else {
+                active = 0;
+            }
+        } catch (Exception e) {
+            ferr=e.getMessage();	active= 0;
+        }
+    }
 
     public void getWSURL() {
         Cursor DT;
@@ -74,10 +97,8 @@ public class clsWSEnvio {
 
             URL=wsurl;
         } catch (Exception e) {
-            //addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            //MU.msgbox(e.getMessage());
+            ferr=e.getMessage();
             URL="*";
-            //txtWS.setText("");
             return;
         }
 
@@ -143,7 +164,7 @@ public class clsWSEnvio {
 
         } catch (Exception e) {
             scon=0;
-            fstr="No se puede conectar al web service. "+e.getMessage();
+            fstr="No se puede conectar al web service. "+e.getMessage() + " " + sstr;
             Log.d("E",fstr+sstr);
         }
 

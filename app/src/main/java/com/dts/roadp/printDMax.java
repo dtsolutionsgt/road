@@ -251,8 +251,43 @@ public class printDMax extends printBase {
 		}	
 		
 	}
-	
-	
+
+
+	private void msgAskRePrint() {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(cont);
+
+		dialog.setTitle(R.string.app_name);
+		dialog.setMessage("Desea repetir la impresión ?");
+
+		dialog.setCancelable(false);
+		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				msgAskPrint();
+			}
+
+		});
+
+		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				final Handler cbhandler = new Handler();
+				cbhandler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							printclose.run();
+						} catch (Exception e) {
+							//showmsg(e.getMessage());
+						}
+
+					}
+				}, 200);
+			}
+		});
+
+		dialog.show();
+
+	}
+
 	// Aux
 	
 	private void msgAskPrint() {
@@ -282,7 +317,9 @@ public class printDMax extends printBase {
 				cbhandler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						printclose.run();
+
+						//printclose.run();
+						msgAskRePrint();
 					}
 				}, 200);
 		    }

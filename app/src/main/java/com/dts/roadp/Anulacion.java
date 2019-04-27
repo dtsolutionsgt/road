@@ -631,8 +631,13 @@ public class Anulacion extends PBase {
 		String tdoc;
 
 		try{
-			sql="UPDATE D_DEPOS SET Anulado='S' WHERE COREL='"+itemid+"'";
-			db.execSQL(sql);
+
+			db.beginTransaction();
+
+			if (gl.depparc){
+				sql="UPDATE D_DEPOS SET Anulado='S' WHERE COREL='"+itemid+"'";
+				db.execSQL(sql);
+			}
 
 			sql="SELECT DISTINCT DOCCOREL,TIPODOC FROM D_DEPOSD WHERE (COREL='"+itemid+"')";
 			DT=Con.OpenDT(sql);
@@ -653,10 +658,24 @@ public class Anulacion extends PBase {
 				DT.moveToNext();
 			}
 
+			if (!gl.depparc){
+				sql="DELETE FROM D_DEPOS WHERE COREL='"+itemid+"'";
+				db.execSQL(sql);
+				sql="DELETE FROM D_DEPOSD WHERE COREL='"+itemid+"'";
+				db.execSQL(sql);
+				sql="DELETE FROM D_DEPOSB WHERE COREL='"+itemid+"'";
+				db.execSQL(sql);
+			}
+
 			sql="UPDATE FinDia SET val3 = 0, val4=0";
 			db.execSQL(sql);
 
+			db.setTransactionSuccessful();
+			db.endTransaction();
+
 		}catch (Exception e){
+
+			db.endTransaction();
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 	}

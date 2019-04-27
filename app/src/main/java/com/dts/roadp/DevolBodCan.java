@@ -470,6 +470,11 @@ public class DevolBodCan extends PBase {
                     if (impres==0) {
                         prn_can.printnoask(printclose, "printdevcan.txt");
                     }
+
+                   /* if (!EnviaDev()){
+                      mu.msgbox("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                    }*/
+
                     gl.closeDevBod=true;
                     DevolBodCan.super.finish();
 
@@ -478,7 +483,13 @@ public class DevolBodCan extends PBase {
 
             dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                   // DevolBodCan.super.finish();
+
+                    /*if (!EnviaDev()){
+                        mu.msgbox("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                    }*/
+
+                    gl.closeDevBod=true;
+                   DevolBodCan.super.finish();
                 }
             });
 
@@ -488,6 +499,27 @@ public class DevolBodCan extends PBase {
         }
 
 
+    }
+
+    private boolean EnviaDev(){
+
+        String resultado="";
+        boolean vEnvia=false;
+
+        try{
+
+            vWSEnvio = new clsWSEnvio(this, gl.ruta, gl.emp, 1);
+            vWSEnvio.wsExecuteEnvio();
+
+            resultado=vWSEnvio.fstr;
+
+            if (resultado.equals("")) vEnvia=true;
+
+        }catch (Exception e){
+            mu.msgbox("Ocurrió un error enviando los datos " + resultado);
+        }
+
+        return vEnvia;
     }
     //endregion
 
@@ -538,8 +570,8 @@ public class DevolBodCan extends PBase {
                     fcanastabod.buildPrint(corel,0, vModo);
                 }
 
-                vWSEnvio = new clsWSEnvio(this, gl.ruta, gl.emp, 1);
-                vWSEnvio.wsExecuteEnvio();
+               /* vWSEnvio = new clsWSEnvio(this, gl.ruta, gl.emp, 1);
+                vWSEnvio.wsExecuteEnvio();*/
             }
 
         if (!prn_can.isEnabled()) {
@@ -654,6 +686,19 @@ public class DevolBodCan extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
+
+    }
+
+    @Override
+    protected void onResume() {
+        try{
+            super.onResume();
+
+            if (gl.closeDevBod) super.finish();
+
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
 
     }
 

@@ -369,6 +369,8 @@
                     android:layout_alignParentTop="true"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="16dp"
+                    android:layout_marginEnd="155dp"
+                    android:layout_toStartOf="@+id/imageView21"
                     android:layout_toEndOf="@+id/txtcien"
                     android:text="00.00"
                     android:textColor="@android:color/holo_blue_dark" />
@@ -380,6 +382,8 @@
                     android:layout_below="@+id/Totcien"
                     android:layout_marginStart="6dp"
                     android:layout_marginTop="45dp"
+                    android:layout_marginEnd="45dp"
+                    android:layout_toStartOf="@+id/lblCntCvs"
                     android:layout_toEndOf="@+id/txtcint"
                     android:text="00.00"
                     android:textColor="@android:color/holo_blue_dark" />
@@ -391,6 +395,8 @@
                     android:layout_below="@+id/Totcnt"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="35dp"
+                    android:layout_marginEnd="46dp"
+                    android:layout_toStartOf="@+id/lblveintcincocvs"
                     android:layout_toEndOf="@+id/txtveint"
                     android:text="00.00"
                     android:textColor="@android:color/holo_blue_dark" />
@@ -402,6 +408,8 @@
                     android:layout_below="@+id/Totvein"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="40dp"
+                    android:layout_marginEnd="47dp"
+                    android:layout_toStartOf="@+id/lbldiezcvs"
                     android:layout_toEndOf="@+id/txtdies"
                     android:text="00.00"
                     android:textColor="@android:color/holo_blue_dark" />
@@ -413,6 +421,8 @@
                     android:layout_below="@+id/Totdies"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="40dp"
+                    android:layout_marginEnd="47dp"
+                    android:layout_toStartOf="@+id/lblCincoCvs"
                     android:layout_toEndOf="@+id/txtcinco"
                     android:text="00.00"
                     android:textColor="@android:color/holo_blue_dark" />
@@ -424,6 +434,8 @@
                     android:layout_below="@+id/Totcinco"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="40dp"
+                    android:layout_marginEnd="47dp"
+                    android:layout_toStartOf="@+id/lblUnCv"
                     android:layout_toEndOf="@+id/txtdos"
                     android:text="00.00"
                     android:textColor="@android:color/holo_blue_dark" />
@@ -433,8 +445,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/Totdos"
+                    android:layout_alignParentEnd="true"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="40dp"
+                    android:layout_marginEnd="228dp"
                     android:layout_toEndOf="@+id/txtuno"
                     android:text="00.00"
                     android:textColor="@android:color/holo_blue_dark" />
@@ -477,10 +491,12 @@
                 <TextView
                     android:id="@+id/lblTotC1"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="21dp"
                     android:layout_below="@+id/Totuno"
                     android:layout_marginStart="21dp"
                     android:layout_marginTop="43dp"
+                    android:layout_marginEnd="166dp"
+                    android:layout_toStartOf="@+id/lblTotC2"
                     android:layout_toEndOf="@+id/lblGrnTot "
                     android:text="00.00"
                     android:textColor="@android:color/holo_blue_dark"

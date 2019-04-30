@@ -60,7 +60,7 @@ public class FacturaRes extends PBase {
 
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
 	private double dispventa;
-	private boolean acum,cleandprod,peexit,pago,saved,rutapos,porpeso;
+	private boolean acum,cleandprod,peexit,pago,saved,rutapos,porpeso,pagocompleto=false;
 
 
 	@SuppressLint("MissingPermission")
@@ -99,7 +99,7 @@ public class FacturaRes extends PBase {
 		media=gl.media;
 		credito=gl.credito;
 		gl.cobroPendiente = false;
-		dispventa = gl.dvdispventa;
+		dispventa = gl.dvdispventa;dispventa=mu.round(dispventa,2);
 		notaC = gl.tiponcredito;
 
 		app = new AppMethods(this, gl, Con, db);
@@ -671,6 +671,7 @@ public class FacturaRes extends PBase {
 					}
 				}
 
+
 				if (gl.peImprFactCorrecta) {
 					prn.printask(printcallback);
 				} else {
@@ -963,6 +964,7 @@ public class FacturaRes extends PBase {
 				porpeso=prodPorPeso(dt.getString(0));
 				factpres=dt.getDouble(12);
 				peso=dt.getDouble(8);
+				vumstock=app.umStock(dt.getString(0));
 
 			  	ins.init("D_FACTURAD");
 				ins.add("COREL",corel);
@@ -981,13 +983,13 @@ public class FacturaRes extends PBase {
 				ins.add("VAL2",dt.getString(10));
 				ins.add("UMVENTA",dt.getString(11));
 				ins.add("FACTOR",dt.getDouble(12));
-				ins.add("UMSTOCK",dt.getString(13));
+				ins.add("UMSTOCK",vumstock);
 				ins.add("UMPESO",gl.umpeso); //#HS_20181120_1625 Se agrego el valor gl.umpeso anteriormente estaba ""
 
 			    db.execSQL(ins.sql());
 
 			    vprod=dt.getString(0);
-				vumstock=dt.getString(13);
+				//vumstock=dt.getString(13);
 				vcant=dt.getDouble(1);
 				vpeso=dt.getDouble(8);
 				vfactor=vpeso/(vcant*factpres);
@@ -1287,7 +1289,7 @@ public class FacturaRes extends PBase {
 
 	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {
 		Cursor dt;
-		double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso;
+		double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso,factlote;
 		String lote,doc,stat;
 
 		if (porpeso) {
@@ -1301,7 +1303,11 @@ public class FacturaRes extends PBase {
 		try {
 
 			sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
-					"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') ORDER BY CANT";
+				"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') ORDER BY CANT";
+			//sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
+			//		"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') ORDER BY CANT";
+
+
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()==0) return;
@@ -1330,6 +1336,7 @@ public class FacturaRes extends PBase {
 				// Stock
 
 				sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"') AND (UNIDADMEDIDA='"+umstock+"')";
+				//sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
 				db.execSQL(sql);
 
 				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0)";
@@ -1362,18 +1369,21 @@ public class FacturaRes extends PBase {
 
 				// Factura lotes
 
+				factlote=factpres;if (factlote<1) factlote=1/factlote;
+
 				try {
+
 					ins.init("D_FACTURAD_LOTES");
 
 					ins.add("COREL",corel);
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
 
-					if (porpeso) {
+					//if (porpeso) {
 						ins.add("CANTIDAD",cantapl);
-					} else {
-						ins.add("CANTIDAD",cantapl/factpres);
-					}
+					//} else {
+						//ins.add("CANTIDAD",cantapl*factpres);
+					//}
 
 					ins.add("PESO",pesoapl);
 					ins.add("UMSTOCK",umstock);
@@ -1395,6 +1405,8 @@ public class FacturaRes extends PBase {
 
 				dt.moveToNext();
 			}
+
+            db.execSQL("DELETE FROM D_FACTURAD_LOTES WHERE CANTIDAD<=0");
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -2131,6 +2143,8 @@ public class FacturaRes extends PBase {
 		Cursor DT;
 		double tpago;
 
+		if (pagocompleto) return;
+
 		try {
 
 			sql="SELECT SUM(VALOR) FROM T_PAGO";
@@ -2152,6 +2166,7 @@ public class FacturaRes extends PBase {
             if (gl.brw>0){
                 lblPago.setText("Pago COMPLETO.\n"+s);
                 pago=true;
+				pagocompleto=true;
                 //if (rutapos) askSavePos(); else askSave();
                 finishOrder();
             }
@@ -2162,6 +2177,7 @@ public class FacturaRes extends PBase {
             } else {
                 lblPago.setText("Pago COMPLETO.\n"+s);
                 pago=true;
+				pagocompleto=true;
                 //if (rutapos) askSavePos(); else askSave();
                 finishOrder();
             }
@@ -2452,7 +2468,6 @@ public class FacturaRes extends PBase {
 			super.onResume();
 
 			checkPromo();
-
 			checkPago();
 
 			if (browse==1) {
@@ -2460,6 +2475,7 @@ public class FacturaRes extends PBase {
 				if (gl.promapl) updDesc();
 				return;
 			}
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

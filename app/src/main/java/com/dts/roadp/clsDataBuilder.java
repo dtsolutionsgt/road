@@ -13,7 +13,7 @@ public class clsDataBuilder {
 
 	public ArrayList<String> items=new ArrayList<String>();
 
-	public String err;
+	public String err="";
 	
 	private Context cCont;
 	
@@ -76,6 +76,11 @@ public class clsDataBuilder {
 
 		try {
 
+			if (!db.isOpen()){
+				db = Con.getWritableDatabase();
+				Con.vDatabase =db;
+			}
+
 			String vSQL = "PRAGMA table_info('"+tn+"')"; 
 			PRG=db.rawQuery(vSQL, null);
 			cc=PRG.getCount();
@@ -98,7 +103,8 @@ public class clsDataBuilder {
 			}
 			
 		} catch (Exception e) {
-			err=e.getMessage();return false;	
+			err=e.getMessage();//return false;
+			throw new RuntimeException(err);
 		}
 		
 		SS=SS+" FROM "+tn+" "+ws;
@@ -135,10 +141,11 @@ public class clsDataBuilder {
 			    DT.moveToNext();
 			}
 		} catch (Exception e) {
-			err=e.getMessage();return false;	
+			err=e.getMessage();//return false;
+			throw new RuntimeException(err);
 		}
 		
-		return true;
+		return (!err.isEmpty()?false:true);
 	}
 
 	public void clear(){

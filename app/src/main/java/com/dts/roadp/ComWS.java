@@ -721,11 +721,14 @@ public class ComWS extends PBase {
 	public int commitSQL() {
 		int rc;
 		String s, ss;
+		//#CKFK 20190429 Creé esta variable para retornar si la comunicación fue correcta o no
+		//e hice modificaciones en la función para garantizar esta funcionalidad
+		int vCommit=0;
 
 		METHOD_NAME = "Commit";
 		sstr = "OK";
 
-		if (dbld.size() == 0) return 1;
+		if (dbld.size() == 0) vCommit =1;//return 1
 
 		s = "";
 		for (int i = 0; i < dbld.size(); i++) {
@@ -759,17 +762,19 @@ public class ComWS extends PBase {
 			s = response.toString();
 
 			sstr = "#";
-			if (s.equalsIgnoreCase("#")) return 1;
+			if (s.equalsIgnoreCase("#")) vCommit =1;// return 1;
 
 			sstr = s;
-			return 0;
+			//return 0;
+
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			sstr = e.getMessage();
+			vCommit=0;
 		}
 
-		return 0;
+		return vCommit;
 	}
 
 	public int OpenDTt(String sql) {
@@ -1410,6 +1415,7 @@ public class ComWS extends PBase {
 
 		} catch (Exception ex) {
 			vActualizaFD = false;
+			fstr=ex.getMessage();
 		}
 
 		return vActualizaFD;
@@ -2276,32 +2282,98 @@ public class ComWS extends PBase {
 		try {
 
 			envioFacturas();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			envioPedidos();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			envioNotasCredito();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			envioNotasDevolucion();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 
 			envioCobros();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 
 			envioDepositos();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
+
 			envio_D_MOV();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			envioCli();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 
 			envioAtten();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			envioCoord();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			envioSolicitud();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 
 			updateAcumulados();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			updateInventario();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 
-			update_Corel_GrandTotal();
+			if (!update_Corel_GrandTotal()){
+				dbld.savelog();
+				return true;
+			}
 
 			envioFinDia();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 
 			dbld.savelog();
 
-			//ComWS.super.finish();
-
-			//listaFachada();
+			//#CKFK 20190429 Saqué esto de envioFinDia para que se guarde bien el log y luego se realice el envío.
+			if (!envioparcial){
+				if (commitSQL() == 1) {
+					errflag=false;
+				} else {
+					errflag=true;
+					fterr += "\n" + sstr;
+				}
+			}
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -2356,6 +2428,7 @@ public class ComWS extends PBase {
 		int i, pc = 0, pcc = 0, ccorel;
 
 		fterr = "";
+		err="";
 
 		try {
 
@@ -2428,10 +2501,14 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
-			sql = "DELETE FROM D_FACTURA_BARRA";
-			db.execSQL(sql);
-			sql = "DELETE FROM D_STOCKB_DEV";
-			db.execSQL(sql);
+			DT.close();
+
+			if (envioparcial && (fterr.isEmpty())) {
+				sql = "DELETE FROM D_FACTURA_BARRA";
+				db.execSQL(sql);
+				sql = "DELETE FROM D_STOCKB_DEV";
+				db.execSQL(sql);
+			}
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -3199,10 +3276,14 @@ public class ComWS extends PBase {
 
 	public void envioFinDia() {
 
+		int pc = 0, pcc=3;
+
 		fprog = " ";
 		wsStask.onProgressUpdate();
 
 		try {
+
+			pc = 0;
 
 			if (envioparcial) dbld.clear();
 
@@ -3212,19 +3293,27 @@ public class ComWS extends PBase {
             dbld.add("DELETE FROM D_REPFINDIA WHERE RUTA='" + gl.ruta + "'");
 			dbld.insert("D_REPFINDIA", "WHERE (LINEA>=0)");
 
-			//if (envioparcial) commitSQL();
-			if (commitSQL() == 1) {
-				errflag=false;
-			} else {
-				errflag=true;
-				fterr += "\n" + sstr;
-			}
-
+			if (envioparcial) {
+				if (commitSQL() == 1) {
+					pc = 3;
+				} else {
+					errflag = true;
+					fterr += "\nFinDia : " + sstr;
+					dbg = sstr;
+				}
+			}else pc = 3;
 
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
+		}
+
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Envío Fin día : " + pc + " , NO ENVIADO : " + pf + "\n";
+		} else {
+			senv += "Envío Fin día : " + pc + "\n";
 		}
 	}
 
@@ -3456,6 +3545,7 @@ public class ComWS extends PBase {
 				if (!sendData()) {
 					fstr="Envio incompleto : "+sstr;
 				} else {
+
 				}
 			} else {
 				fstr="No se puede conectar al web service : "+sstr;

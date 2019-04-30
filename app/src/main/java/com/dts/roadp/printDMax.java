@@ -252,12 +252,11 @@ public class printDMax extends printBase {
 		
 	}
 
-
 	private void msgAskRePrint() {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(cont);
 
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("Desea repetir la impresión ?");
+		dialog.setMessage("¿Quiere volver a intentar la impresión?");
 
 		dialog.setCancelable(false);
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {

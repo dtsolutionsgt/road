@@ -351,6 +351,8 @@ public class clsFinDia extends PBase{
                     sql="DELETE FROM D_FACTURAD WHERE COREL='"+corel+"'";db.execSQL(sql);
                     sql="DELETE FROM D_FACTURAP WHERE COREL='"+corel+"'";db.execSQL(sql);
                     sql="DELETE FROM D_FACTURAD_LOTES WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_FACTURA_BARRA WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_STOCKB_DEV WHERE COREL='"+corel+"'";db.execSQL(sql);
 
                     sql = "DELETE FROM D_STOCKB_DEV WHERE COREL='" + corel + "'";db.execSQL(sql);
                     sql = "DELETE FROM D_BONIF WHERE COREL='" + corel + "'";db.execSQL(sql);
@@ -363,9 +365,6 @@ public class clsFinDia extends PBase{
                     DT.moveToNext();
                 }
             }
-
-            sql="DELETE FROM D_FACTURA_BARRA";db.execSQL(sql);
-            sql="DELETE FROM D_STOCKB_DEV";db.execSQL(sql);
 
             sql="SELECT COREL FROM D_PEDIDO WHERE STATCOM='S'";
             DT=Con.OpenDT(sql);

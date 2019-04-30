@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -24,8 +25,7 @@ public class clsWSEnvio {
 
     protected int active;
 
-    private int isbusy,reccnt,rec;
-    private String ruta,rootdir, senv;
+    private String ruta;
 
     private SQLiteDatabase db;
     private BaseDatos Con;
@@ -34,13 +34,12 @@ public class clsWSEnvio {
 
     private ArrayList<String> listItems=new ArrayList<String>();
 
-
     // Web Service
 
     public AsyncCallEnv wsEtask;
 
     private static String fprog,idbg,dbg, fterr;
-    public static String sstr, ferr,fstr;
+    public static String sstr, ferr,fstr, senv;
 
     private int scon;
     private String gEmpresa, sql, proceso;
@@ -50,21 +49,23 @@ public class clsWSEnvio {
 
     private clsDataBuilder dbld;
 
-    private boolean showprogress;
     private int tipoEnvio;
+    private Context Cont;
 
     public clsWSEnvio(Context cont,String gRuta, String gEmp,int vTipoEnvio) {
 
         ruta=gRuta;
         gEmpresa=gEmp;
 
-        Con = new BaseDatos(cont);
+        Cont =cont;
+
+        Con = new BaseDatos(Cont);
         opendb();
         ins=Con.Ins;upd=Con.Upd;
 
         getWSURL();
 
-        dbld=new clsDataBuilder(cont);
+        dbld=new clsDataBuilder(Cont);
 
         tipoEnvio=vTipoEnvio;
     }
@@ -137,13 +138,19 @@ public class clsWSEnvio {
         return 0;
     }
 
-    public void wsExecuteEnvio(){
+    public  void runExecuteEnvio(){
+        wsEtask=new AsyncCallEnv();
+        wsEtask.execute();
+    }
+
+    private void wsExecuteEnvio(){
 
         fstr="No connect";scon=0;
 
         try {
 
-            if (getTest()==1) scon=1;
+            if (getTest()==1)
+            scon=1;
 
             idbg=idbg + sstr;
 
@@ -174,13 +181,10 @@ public class clsWSEnvio {
 
         try{
             if (fstr.equalsIgnoreCase("Envío OK")) {
-                proceso="Enviando";
+                Toast.makeText(Cont, "Envio correcto", Toast.LENGTH_SHORT).show();
             } else {
-                proceso="Ocurrió error : \n"+fstr+" ("+reccnt+") " + ferr;
+                Toast.makeText(Cont, "Ocurrió error : \n"+fstr, Toast.LENGTH_SHORT).show();
             }
-
-            isbusy=0;
-
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
         }
@@ -372,10 +376,6 @@ public class clsWSEnvio {
         for (int i = 0; i < dbld.size(); i++) {
             ss = dbld.items.get(i);
             s = s + ss + "\n";
-        }
-        if (showprogress) {
-            fprog = "Enviando ...";
-            wsEtask.onProgressUpdate();
         }
 
         try {

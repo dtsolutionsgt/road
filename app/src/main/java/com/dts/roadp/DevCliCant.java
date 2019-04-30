@@ -207,7 +207,7 @@ public class DevCliCant extends PBase {
 				public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 					TextView cmblabel;
 
-					try{
+					try {
 
 						cmblabel=(TextView)parent.getChildAt(0);
 						cmblabel.setTextColor(Color.BLACK);
@@ -219,21 +219,22 @@ public class DevCliCant extends PBase {
 
 						clcpeso=pesoprom*factor;
 
+						if (mu.emptystr(txtCant.getText().toString())) txtCant.setText("0");
+
 						if (gl.dvporpeso==false){
 							lblPrec.setText(String.valueOf(mu.round(getPrecio(),2)));
 							txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
-						}else{
+						} else {
 							if (!vEditando){
 								lblPrec.setText(String.valueOf(precioventa));
 								txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
 							}
 							vEditando = false;
-
 						}
 
 						txtCant.requestFocus();
 
-					}catch (Exception e){
+					} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 						mu.msgbox( e.getMessage());
 					}
@@ -249,7 +250,6 @@ public class DevCliCant extends PBase {
 			chkTieneLote.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
 					if (chkTieneLote.isChecked()==false){
 						txtLote.setEnabled(true);
 					}else{

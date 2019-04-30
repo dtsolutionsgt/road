@@ -57,6 +57,7 @@ public class FinDia extends PBase {
         pBar.setVisibility(View.INVISIBLE);
 
         rutatipo = gl.rutatipog;
+        gl.devfindia=true;
 
         app = new AppMethods(this, gl, Con, db);
         gl.validimp=app.validaImpresora();

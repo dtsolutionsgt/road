@@ -52,9 +52,14 @@ public class DevolBodCan extends PBase {
         lblTot = (TextView) findViewById(R.id.textView9);lblTot.setText("");
         setHandlers();
 
+        gl.devprncierre=false;
+
         printclose= new Runnable() {
             public void run() {
-
+                //if (gl.devprncierre) {
+                    gl.closeDevBod=true;
+                    DevolBodCan.super.finish();
+                //}
             }
         };
 
@@ -471,8 +476,10 @@ public class DevolBodCan extends PBase {
                         prn_can.printnoask(printclose, "printdevcan.txt");
                     }
 
-                   if (!EnviaDev()){
-                      mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                    if (!gl.devfindia) {
+                        if (!EnviaDev()){
+                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                        }
                     }
 
                     gl.closeDevBod=true;
@@ -484,11 +491,13 @@ public class DevolBodCan extends PBase {
             dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
 
-                    if (!EnviaDev()){
-                        mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                    if (!gl.devfindia) {
+                        if (!EnviaDev()){
+                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                        }
                     }
 
-                    gl.closeDevBod=true;
+                   gl.closeDevBod=true;
                    DevolBodCan.super.finish();
                 }
             });
@@ -536,13 +545,18 @@ public class DevolBodCan extends PBase {
             if (prn_can.isEnabled()) {
 
                 String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
-
-                if(impres==0 || impres==1){
-                    fpaseantebod.buildPrint(corel,0,vModo);
+                try {
+                    if(impres==0 || impres==1){
+                        fpaseantebod.buildPrint(corel,0,vModo);
+                    }
+                } catch (Exception e) {
                 }
 
-                if(impres==0 || impres==2){
-                    fcanastabod.buildPrint(corel,0, vModo);
+                try {
+                    if(impres==0 || impres==2){
+                        fcanastabod.buildPrint(corel,0, vModo);
+                    }
+                } catch (Exception e) {
                 }
 
                 if(impres==0) {

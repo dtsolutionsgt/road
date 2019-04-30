@@ -273,7 +273,7 @@ public class clsDocument {
         int idx;
 
         //residx=0;
-
+		if (emptystr(l)) return "";
         //lu=l.toUpperCase().trim();
         lu=l.trim();
 

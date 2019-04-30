@@ -671,13 +671,11 @@ public class FacturaRes extends PBase {
 					}
 				}
 
-
 				if (gl.peImprFactCorrecta) {
 					prn.printask(printcallback);
 				} else {
 					singlePrint();
 				}
-
 
 			}else if(!prn.isEnabled()){
 				if (gl.peModal.equalsIgnoreCase("APR")) {

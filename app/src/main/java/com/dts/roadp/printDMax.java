@@ -273,7 +273,8 @@ public class printDMax extends printBase {
 					@Override
 					public void run() {
 						try {
-							printclose.run();
+                            appG.devprncierre=true;
+  							printclose.run();
 						} catch (Exception e) {
 							//showmsg(e.getMessage());
 						}
@@ -316,8 +317,6 @@ public class printDMax extends printBase {
 				cbhandler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-
-						//printclose.run();
 						msgAskRePrint();
 					}
 				}, 200);

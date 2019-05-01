@@ -321,6 +321,7 @@ public class BonList extends PBase {
 			ins.add("POR_PESO",app.ventaPeso(item.id)?1:0);
 
 	    	db.execSQL(ins.sql());
+
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());

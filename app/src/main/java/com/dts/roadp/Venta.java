@@ -463,6 +463,7 @@ public class Venta extends PBase {
 			if (mu.emptystr(pid)) {return;}
 
 			prodid=pid;
+			gl.bonprodid=prodid;
 			um=gl.um;
 
 			setCant();

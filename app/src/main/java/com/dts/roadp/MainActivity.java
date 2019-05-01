@@ -35,7 +35,6 @@ public class MainActivity extends PBase {
 	private TextView lblRuta,lblRTit,lblLogin,lblVer,lblID;
 	private ImageView imgLogo;
 		
-	private clsLicence lic;
 	private BaseDatosVersion dbVers;
 	
 	private boolean rutapos,scanning=false;
@@ -312,11 +311,13 @@ public class MainActivity extends PBase {
                 rutapos = s.equalsIgnoreCase("R");
 
             }else{
+
                 gl.ruta = "";
                 gl.rutanom = "";
                 gl.vend = "0";
                 gl.rutatipog = "V";
                 gl.wsURL = "http://192.168.1.1/wsAndr/wsAndr.asmx";
+
             }
 
 		} catch (Exception e) {
@@ -328,7 +329,6 @@ public class MainActivity extends PBase {
 			imgLogo.setImageResource(R.drawable.retail_logo);
 		} else {
 			lblRTit.setText("Ruta No. " + gl.ruta);
-
 		}
 
 		try {
@@ -697,7 +697,7 @@ public class MainActivity extends PBase {
 		String lic,lickey;
 
 		try {
-            lickey=cu.encrypt(gl.deviceId);// gl.ruta
+            lickey=cu.encrypt(gl.deviceId);
 
             sql="SELECT lic FROM Params";
             dt=Con.OpenDT(sql);

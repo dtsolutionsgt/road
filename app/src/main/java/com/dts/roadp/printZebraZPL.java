@@ -18,7 +18,6 @@ import com.zebra.sdk.printer.SGD;
 import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
 import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
-import com.zebra.sdk.printer.ZebraPrinterLinkOs;
 
 import java.io.BufferedReader;
 import java.io.File;

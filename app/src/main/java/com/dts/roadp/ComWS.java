@@ -55,9 +55,9 @@ public class ComWS extends PBase {
 	private ImageView imgRec, imgEnv, imgExis;
 	private RelativeLayout ralBack, relExist, relPrecio, relStock;
 
-	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult;
+	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
 	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs;
-	private String licSerial,licSerialEnc,parImprID;
+	private String licSerial,licRuta,licSerialEnc,parImprID;
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag;
 
 	private SQLiteDatabase dbT;
@@ -151,7 +151,10 @@ public class ComWS extends PBase {
 		} else {
 			this.setTitle("Comunicación Local");
 		}
+
 		licSerial=gl.deviceId;
+		licRuta=gl.ruta;
+
 		try {
 			licSerialEnc=cu.encrypt(licSerial);
 		} catch (Exception e) {
@@ -946,6 +949,44 @@ public class ComWS extends PBase {
 		return 0;
 	}
 
+	public int checkLicenceRuta(String ruta) {
+		int rc;
+		String s, ss;
+
+		METHOD_NAME = "checkLicenceRuta";
+		sstr = "OK";
+
+		try {
+
+			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+			envelope.dotNet = true;
+
+			PropertyInfo param = new PropertyInfo();
+			param.setType(String.class);
+			param.setName("Ruta");
+			param.setValue(ruta);
+			request.addProperty(param);
+
+			envelope.setOutputSoapObject(request);
+
+			HttpTransportSE transport = new HttpTransportSE(URL);
+			transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+			s = response.toString();
+			if (s.equalsIgnoreCase("1")) return 1;
+
+			sstr = s;
+			return 0;
+		} catch (Exception e) {
+			sstr = e.getMessage();
+		}
+
+		return 0;
+	}
+
 	public int guardaImagen(String idprod) {
 		int rc;
 		String s, ss,resstr;
@@ -1088,6 +1129,8 @@ public class ComWS extends PBase {
 			if (!AddTable("P_HANDHELD")) return false;
 
 			licResult=checkLicence(licSerial);
+			licResultRuta=checkLicenceRuta(licRuta);
+
 			fillTableImpresora();
 
 			if (!AddTable("P_REF1")) return false;
@@ -1183,6 +1226,7 @@ public class ComWS extends PBase {
 
 			Actualiza_FinDia();
 			encodePrinters();
+
 			encodeLicence();
 
             SetStatusRecToTrans("1");

@@ -18,7 +18,7 @@ public class clsDocument {
 	public String resol,resfecha,resvence,resrango,fsfecha,modofact;
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;
-	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod;
+	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod,docdesglose;
 	public int ffecha,pendiente,diacred,condicionPago;
 	
 	protected android.database.sqlite.SQLiteDatabase db;
@@ -74,7 +74,7 @@ public class clsDocument {
 
 		if (modofact.equalsIgnoreCase("TOL")) {
 			if (docfactura && (reimpres==10)) flag=1;
-			if (docfactura && (reimpres==4)) flag=0;
+			if (docfactura && (reimpres==4) || docdesglose) flag=0;
 			if (doccanastabod) flag=2;
 			if (docrecibo && (reimpres==0)) flag=0;
         } else if(modofact.equalsIgnoreCase("*")) {

@@ -385,6 +385,46 @@ public class comWSLic extends PBase {
         return 0;
     }
 
+    public int requestLicenceRuta(String ruta) {
+        int rc;
+        String s, ss;
+
+        METHOD_NAME = "requestLicenceRuta";
+        sstr = "OK";
+
+        try {
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            PropertyInfo param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("Ruta");
+            param.setValue(ruta);
+            request.addProperty(param);
+
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+            s = response.toString();
+
+            sstr = "#";
+            if (s.equalsIgnoreCase("#")) return 1;
+
+            sstr = s;
+            return 0;
+        } catch (Exception e) {
+            sstr = e.getMessage();
+        }
+
+        return 0;
+    }
+
     public int OpenDTt(String sql) {
         int rc;
 
@@ -508,6 +548,13 @@ public class comWSLic extends PBase {
         try {
 
             if (requestLicence(gl.deviceId,devinfo)==1) {
+                errflag=false;
+            } else {
+                fterr = sstr;
+                errflag=true;
+            }
+
+            if (requestLicenceRuta(gl.ruta)==1) {
                 errflag=false;
             } else {
                 fterr = sstr;

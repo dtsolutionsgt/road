@@ -57,7 +57,7 @@ public class ComWS extends PBase {
 
 	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
 	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs;
-	private String licSerial,licRuta,licSerialEnc,parImprID;
+	private String licSerial,licRuta,licSerialEnc,licRutaEnc,parImprID;
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag;
 
 	private SQLiteDatabase dbT;
@@ -157,8 +157,10 @@ public class ComWS extends PBase {
 
 		try {
 			licSerialEnc=cu.encrypt(licSerial);
+			licRutaEnc=cu.encrypt(gl.ruta);
 		} catch (Exception e) {
 			licSerialEnc="";
+			licRutaEnc="";
 		}
 
 		getWSURL();
@@ -1228,6 +1230,7 @@ public class ComWS extends PBase {
 			encodePrinters();
 
 			encodeLicence();
+			encodeLicenceRuta();
 
             SetStatusRecToTrans("1");
 
@@ -2166,6 +2169,51 @@ public class ComWS extends PBase {
 
 	}
 
+	private void encodeLicenceRuta() {
+		String lic;
+
+		try {
+			if (licResultRuta==1) lic=licRutaEnc; else lic="";
+			sql = "UPDATE Params SET licparam='" + lic + "'";
+			dbT.execSQL(sql);
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+		}
+
+	}
+
+
+	private boolean validaLicencia() {
+		CryptUtil cu=new CryptUtil();
+		Cursor dt;
+		String lic,lickey,licruta,rutaencrypt;
+		Integer msgLic=0;
+
+		try {
+			lickey=cu.encrypt(gl.deviceId);
+			rutaencrypt=cu.encrypt(gl.ruta);
+
+			sql="SELECT lic, licparam FROM Params";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			lic=dt.getString(0);
+			licruta=dt.getString(1);
+
+			if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) return true;
+			else if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)){msgLic=1;}
+			else if(!lic.equalsIgnoreCase(lickey)){msgLic=2;}
+			else if(!licruta.equalsIgnoreCase(rutaencrypt)){msgLic=3;}
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" : "+e.getMessage());
+		}
+
+		if(msgLic==1)toastlong("El dispositivo no tiene licencia válida de handheld, ni de ruta");
+		else if(msgLic==2){toastlong("El dispositivo no tiene licencia valida de handheld");}
+		else if(msgLic==3){toastlong("El dispositivo no tiene licencia valida de ruta");}
+
+		return false;
+	}
 
 	//endregion
 
@@ -2244,7 +2292,7 @@ public class ComWS extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
-		//if (licResult==0) msgAskSinLicencia();
+		if (!validaLicencia()) restartApp();
 
 	}
 
@@ -3946,65 +3994,6 @@ public class ComWS extends PBase {
 
     }
 
-    private boolean validaLicencia() {
-        CryptUtil cu=new CryptUtil();
-        Cursor dt;
-        String lic,lickey;
-
-        try {
-            lickey=cu.encrypt(gl.deviceId);
-
-            sql="SELECT lic FROM Params";
-            dt=Con.OpenDT(sql);
-            dt.moveToFirst();
-            lic=dt.getString(0);
-
-            if (lic.equalsIgnoreCase(lickey)) return true;
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" : "+e.getMessage());
-        }
-        return false;
-    }
-
-	/*private boolean validaLicencia() {
-		Cursor dt;
-		String mac,lickey,idkey,binkey;
-		int fval,lkey;
-		long ff;
-
-		try {
-			mac=lic.getMac();
-			lkey=lic.getLicKey(mac);
-			lickey=lic.encodeLicence(lkey);
-
-			sql="SELECT IDKEY,BINKEY FROM LIC_CLIENTE WHERE ID='"+mac+"'";
-			dt=Con.OpenDT(sql);
-			if (dt.getCount()==0) return false;
-
-			dt.moveToFirst();
-			idkey=dt.getString(0);
-			binkey=dt.getString(1);
-
-			if (!idkey.equalsIgnoreCase(lickey)) return false;
-
-			ff=du.getActDate();
-			fval=lic.decodeValue(binkey);
-			fval=fval-lkey;
-
-			//Toast.makeText(this,""+fval, Toast.LENGTH_SHORT).show();
-
-			if (fval==999999) return true;
-			fval=fval*10000;
-
-			if (fval>=ff) return true; else return false;
-
-		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			mu.msgbox(e.getMessage());return false;
-		}
-
-	}*/
 
 	private String getMac() {
 		WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);

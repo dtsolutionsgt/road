@@ -694,26 +694,33 @@ public class MainActivity extends PBase {
 	private boolean validaLicencia() {
         CryptUtil cu=new CryptUtil();
 		Cursor dt;
-		String lic,lickey;
+		String lic,lickey,licruta,rutaencrypt;
+		Integer msgLic=0;
 
 		try {
             lickey=cu.encrypt(gl.deviceId);
+            rutaencrypt=cu.encrypt(gl.ruta);
 
-            sql="SELECT lic FROM Params";
+            sql="SELECT lic, licparam FROM Params";
             dt=Con.OpenDT(sql);
             dt.moveToFirst();
             lic=dt.getString(0);
+            licruta=dt.getString(1);
 
-            if (lic.equalsIgnoreCase(lickey)) return true;
+            if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) return true;
+            else if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)){msgLic=1;}
+            else if(!lic.equalsIgnoreCase(lickey)){msgLic=2;}
+            else if(!licruta.equalsIgnoreCase(rutaencrypt)){msgLic=3;}
 		} catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" : "+e.getMessage());
 		}
 
-		//toastlong("El dispositivo no tiene licencia válida");
+		if(msgLic==1)toastlong("El dispositivo no tiene licencia válida de handheld, ni de ruta");
+		else if(msgLic==2){toastlong("El dispositivo no tiene licencia valida de handheld");}
+        else if(msgLic==3){toastlong("El dispositivo no tiene licencia valida de ruta");}
 
-        //return false;
-        return true;
+        return false;
 	}
 
 	private void msgAskLic(String msg) {

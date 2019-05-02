@@ -1,11 +1,11 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.database.Cursor;
 
 import com.dts.roadp.clsClasses.clsBonifItem;
+
+import java.util.ArrayList;
 
 public class clsDeGlobTipo {
 
@@ -27,15 +27,12 @@ public class clsDeGlobTipo {
 	
 	
 	public clsDeGlobTipo(Context context) {
-		
-	cont=context;
-		
+		cont=context;
 		active=0;
 		Con = new BaseDatos(context);
 	    opendb();
 	    
-	    MU=new MiscUtils(context);		
-		
+	    MU=new MiscUtils(context);
 	}
 	
 	// Main
@@ -68,8 +65,7 @@ public class clsDeGlobTipo {
 				 "FROM T_DESC WHERE  ("+cant+">=RANGOINI) AND ("+cant+"<=RANGOFIN) "+
 				 "AND (PTIPO="+tipo+") AND (DESCTIPO='R') AND (GLOBDESC='S') AND (PORCANT='S')";
 			DT=Con.OpenDT(vSQL);
-		
-			
+
 			if (DT.getCount()==0) return;
 			
 			DT.moveToFirst();
@@ -77,9 +73,7 @@ public class clsDeGlobTipo {
 				  
 				iid=DT.getString(0);
 				val=0;
-				
-				//Toast.makeText(cont,""+iid, Toast.LENGTH_LONG).show();
-				
+
 				switch (DT.getInt(1)) {
 					case 1: 
 						if (iid.equalsIgnoreCase(idid)) val=DT.getDouble(2);break;
@@ -102,24 +96,18 @@ public class clsDeGlobTipo {
 					item.cantexact="";
 					item.globbon="S";
 					item.porcant=DT.getString(3);
-					
 					item.tipolista=tipo;
 					item.tipocant="";
-					
 					item.valor=val;
 					
 					items.add(item);
-					
-					//Toast.makeText(cont,tipo+" )) "+item.tipolista+ "   "+item.lista+"  // "+item.valor, Toast.LENGTH_SHORT).show();
 				}
 				
 				DT.moveToNext();
-			}	
-			
+			}
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }
-		
 	}
 	
 	private void listaDescRangoMonto() {
@@ -133,20 +121,14 @@ public class clsDeGlobTipo {
 				 "FROM T_DESC WHERE  ("+monto+">=RANGOINI) AND ("+monto+"<=RANGOFIN) "+
 				 "AND (PTIPO="+tipo+") AND (DESCTIPO='R') AND (GLOBDESC='S') AND (PORCANT='N')";
 			DT=Con.OpenDT(vSQL);
-				
 			if (DT.getCount()==0) return;
 			
 			DT.moveToFirst();
-			
-			//MU.msgbox(vSQL+"\n"+DT.getDouble(4)+"  -  "+DT.getDouble(5));
-			
+
 			while (!DT.isAfterLast()) {
-				  
 				iid=DT.getString(0);
 				val=0;
-				
-				//Toast.makeText(cont,""+iid, Toast.LENGTH_LONG).show();
-				
+
 				switch (DT.getInt(1)) {
 					case 1: 
 						if (iid.equalsIgnoreCase(idid)) val=DT.getDouble(2);break;
@@ -176,17 +158,13 @@ public class clsDeGlobTipo {
 					item.valor=val;
 					
 					items.add(item);
-					
-					//Toast.makeText(cont,tipo+" )) "+item.tipolista+ "   "+item.lista+"  // "+item.valor, Toast.LENGTH_SHORT).show();
 				}
 				
 				DT.moveToNext();
-			}	
-			
+			}
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }
-			
 	}
 	
 	private void listaDescMult() {
@@ -232,7 +210,6 @@ public class clsDeGlobTipo {
 						val=0;
 					}
 
-
 					item=clsCls.new clsBonifItem();
 
 					item.prodid=idid;
@@ -250,12 +227,10 @@ public class clsDeGlobTipo {
 				}
 
 				DT.moveToNext();
-			}	
-			
+			}
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }
-		
 	}
 	
 	private void listaDescMultMonto() {
@@ -308,18 +283,14 @@ public class clsDeGlobTipo {
 					item.cantexact="";
 					item.globbon="S";
 					item.porcant=DT.getString(5);
-
 					item.tipolista=tipo;
 					item.tipocant="";
-
 					item.valor=val;
 
 					items.add(item);
 				}
-
 				DT.moveToNext();
-			}	
-			
+			}
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }
@@ -338,9 +309,6 @@ public class clsDeGlobTipo {
 	    	active= 0;
 	    }
 	}		
-		
-	
-	
-	
+
 
 }

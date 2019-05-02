@@ -35,23 +35,21 @@ public class clsDeGlob {
 		
 		cont=context;
 		
-		total=tot;
-		
-		active=0;
+		total=tot;active=0;
+		lineaid="";slineaid="";marcaid="";grupoid="";
+
 		Con = new BaseDatos(context);
 	    opendb();
 	    
 	    mu=new MiscUtils(context);
 	    bontipo=new clsDeGlobTipo(context);
-		lineaid="";slineaid="";marcaid="";grupoid="";		
-		
+
 		configuracion();
 	}
 	
 	// Main
 	
 	public boolean tieneDesc(){
-		
 		items.clear();
 		
 		listBonTipo(1);	// Sublinea 
@@ -63,7 +61,6 @@ public class clsDeGlob {
 		calcValores();
 		
 		return items.size()>0;
-		
 	}
 	
 	private void calcValores() {
@@ -79,8 +76,7 @@ public class clsDeGlob {
 			if (val>valmax) valmax=val;
 		}
 
-		valor=valmax;
-		if (acum) valor=valacum;
+		valor=valmax;if (acum) valor=valacum;
 		
 		if (maxlimit>0) {
 			if (valor>maxlimit) valor=maxlimit;
@@ -102,22 +98,15 @@ public class clsDeGlob {
 
 			ccod=codes.get(i);
 			cnt=cantVenta(ptipo,ccod);
-			//Toast.makeText(cont,ptipo+"    "+ccod+"  // cant "+cnt, Toast.LENGTH_SHORT).show();
-			
+
 			if (cnt>0) {
 		
 				cbon=bontipo.cantBonif(ptipo,ccod,vcnt,vmonto);
-				
-				//Toast.makeText(cont,"PTipo  "+ptipo+"    "+ccod+"  // cant "+cnt +"  ,  res "+cbon, Toast.LENGTH_SHORT).show();
-				
 				if (cbon==0) return;
 
 				for (int n = 0; n<cbon; n++) {
 					item=bontipo.items.get(n);
-
 					s=item.valor+"  "+item.lista+"   "+item.prodid;
-					//Toast.makeText(cont,s, Toast.LENGTH_SHORT).show();
-
 					items.add(item);
 				}			
 			}
@@ -133,7 +122,6 @@ public class clsDeGlob {
 		codes.clear();
 		
 		try {
-			
 			//vSQL="SELECT PRODUCTO FROM T_BONIF WHERE (PTIPO="+ptipo+") AND (GLOBBON='S') AND (PORCANT='S')";
 			sql="SELECT DISTINCT PRODUCTO FROM T_DESC WHERE (PTIPO="+ptipo+") AND (GLOBDESC='S')";
 			DT=Con.OpenDT(sql);
@@ -145,12 +133,10 @@ public class clsDeGlob {
 				iid=DT.getString(0);
 				codes.add(iid);
 				DT.moveToNext();
-			}	
-			
+			}
 		} catch (Exception e) {
 		   	mu.msgbox(e.getMessage());
-	    }			
-		
+	    }
 	}
 	
 	private double cantVenta(int ptipo, String codigo) {
@@ -158,7 +144,6 @@ public class clsDeGlob {
 		double cnt=0,monto=0;
 	
 		try {
-			
 			switch (ptipo) {
 			case 1: // Sublinea 
 				sql="SELECT SUM(CANT),SUM(TOTAL) FROM T_VENTA WHERE PRODUCTO IN (SELECT CODIGO FROM P_PRODUCTO WHERE SUBLINEA='"+codigo+"') ";
@@ -189,12 +174,8 @@ public class clsDeGlob {
 		vcnt=cnt;
 		vmonto=monto;
 		
-		if (ptipo==5) {
-			return monto;	
-		} else {	
-			return cnt;	
-		}
-		
+		if (ptipo==5) return monto;else return cnt;
+
 	}
 	
 	
@@ -210,7 +191,6 @@ public class clsDeGlob {
 			
 			if (DT.getString(0).equalsIgnoreCase("N")) acum=false;
 			maxlimit=DT.getDouble(1);
-			
 		} catch (Exception e) {
 			maxlimit=0;acum=true;
 	    }

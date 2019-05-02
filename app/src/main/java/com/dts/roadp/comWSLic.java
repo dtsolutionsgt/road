@@ -546,12 +546,10 @@ public class comWSLic extends PBase {
         wsStask.onProgressUpdate();
 
         try {
-
             if (requestLicence(gl.deviceId,devinfo)==1) {
                 errflag=false;
             } else {
-                fterr = sstr;
-                errflag=true;
+                fterr = sstr;errflag=true;
             }
 
             if (requestLicenceRuta(gl.ruta)==1) {
@@ -562,10 +560,8 @@ public class comWSLic extends PBase {
             }
 
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            fstr = e.getMessage();
-            errflag=true;
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            fstr = e.getMessage();errflag=true;
         }
 
     }

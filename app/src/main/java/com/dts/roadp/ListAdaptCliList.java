@@ -68,7 +68,7 @@ public class ListAdaptCliList extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 					
-		holder.lblCod.setText(items.get(position).Cod);
+		holder.lblCod.setText(items.get(position).Cod+" "+items.get(position).Adds);
 		holder.lblDesc.setText(items.get(position).Desc);
 		
 		val= items.get(position).Bandera;

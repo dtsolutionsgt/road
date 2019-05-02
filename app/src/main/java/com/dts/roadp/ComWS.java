@@ -2235,16 +2235,11 @@ public class ComWS extends PBase {
 			comparaCorrel();
 
 			paramsExtra();
-			//mu.msgbox("::"+esql);
-
-			//mu.msgbox(rrs+" \nsstr : "+sstr);
 
 			if (ftflag) msgbox(ftmsg);
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-
-		//if (licResult==0) msgAskSinLicencia();
 
 	}
 

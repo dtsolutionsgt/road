@@ -1,11 +1,17 @@
 package com.dts.roadp;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -24,19 +30,21 @@ import android.widget.TextView;
 import com.dts.roadp.clsClasses.clsCDB;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
 public class Clientes extends PBase {
 
 	private ListView listView;
-	private Spinner spinList,spinFilt;
+	private Spinner spinList, spinFilt;
 	private EditText txtFiltro;
 	private TextView lblCant;
 
-	private ArrayList<clsCDB> items= new ArrayList<clsCDB>();
-	private ArrayList<String> cobros= new ArrayList<String>();
-	private ArrayList<String> ppago= new ArrayList<String>();
+	private ArrayList<clsCDB> items = new ArrayList<clsCDB>();
+	private ArrayList<String> cobros = new ArrayList<String>();
+	private ArrayList<String> ppago = new ArrayList<String>();
 
 	private AlertDialog.Builder mMenuDlg;
 	private ArrayList<String> listcode = new ArrayList<String>();
@@ -47,8 +55,21 @@ public class Clientes extends PBase {
 	private AppMethods app;
 
 	private int selidx, fecha, dweek, browse;
-	private String selid,bbstr,bcode;
-	private boolean scanning=false;
+	private String selid, bbstr, bcode;
+	private boolean scanning = false;
+
+	// Location
+	private LocationManager locationManager;
+	private Location location;
+
+	private LocationListener locationListener;
+
+	private boolean isGPSEnabled, isNetworkEnabled, canGetLocation;
+	private double latitude, longitude;
+	private String cod;
+
+	private static final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
+	private static final long MIN_TIME_BW_UPDATES = 1000; // in Milliseconds
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +86,7 @@ public class Clientes extends PBase {
 		lblCant = (TextView) findViewById(R.id.lblCant);
 
 		app = new AppMethods(this, gl, Con, db);
-		gl.validimp=app.validaImpresora();
+		gl.validimp = app.validaImpresora();
 		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
 		setHandlers();
@@ -87,8 +108,8 @@ public class Clientes extends PBase {
 
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
-		if (e.getAction()==KeyEvent.ACTION_DOWN && e.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-			bcode=txtFiltro.getText().toString().trim();
+		if (e.getAction() == KeyEvent.ACTION_DOWN && e.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+			bcode = txtFiltro.getText().toString().trim();
 			barcodeClient();
 		}
 		return super.dispatchKeyEvent(e);
@@ -122,6 +143,10 @@ public class Clientes extends PBase {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
+	}
+
+	public void orderDist(View view) {
+		msgAskDist("Ordenar los clientes por distancia aérea");
 	}
 
 	private void setHandlers() {
@@ -185,6 +210,7 @@ public class Clientes extends PBase {
 				public void onSwipeRight() {
 					finish();
 				}
+
 				public void onSwipeLeft() {
 				}
 			});
@@ -195,15 +221,15 @@ public class Clientes extends PBase {
 					TextView spinlabel;
 					String scod;
 
-				//	try {
-						spinlabel=(TextView)parentView.getChildAt(0);
-						spinlabel.setTextColor(Color.BLACK);
-						spinlabel.setPadding(5, 0, 0, 0);
-						spinlabel.setTextSize(18);
+					//	try {
+					spinlabel = (TextView) parentView.getChildAt(0);
+					spinlabel.setTextColor(Color.BLACK);
+					spinlabel.setPadding(5, 0, 0, 0);
+					spinlabel.setTextSize(18);
 
-						dweek=position;
+					dweek = position;
 
-						listItems();
+					listItems();
 
 				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -234,9 +260,11 @@ public class Clientes extends PBase {
 
 			txtFiltro.addTextChangedListener(new TextWatcher() {
 
-				public void afterTextChanged(Editable s) {}
+				public void afterTextChanged(Editable s) {
+				}
 
-				public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+				public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				}
 
 				public void onTextChanged(CharSequence s, int start, int before, int count) {
 					int tl = txtFiltro.getText().toString().length();
@@ -245,9 +273,28 @@ public class Clientes extends PBase {
 				}
 			});
 
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			mu.msgbox( e.getMessage());
+			locationListener = new LocationListener() {
+				@Override
+				public void onLocationChanged(Location arg0) {
+				}
+
+				@Override
+				public void onProviderDisabled(String arg0) {
+				}
+
+				@Override
+				public void onProviderEnabled(String arg0) {
+				}
+
+				@Override
+				public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+				}
+			};
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			mu.msgbox(e.getMessage());
 		}
 
 	}
@@ -257,27 +304,28 @@ public class Clientes extends PBase {
 
 	public void listItems() {
 		Cursor DT;
-		clsCDB vItem;	
+		clsCDB vItem;
 		int vP;
-		String id,filt,ss;
-			
+		String id, filt, ss;
+
 		items.clear();
-		
-		selidx=-1;vP=0;
-		filt=txtFiltro.getText().toString().replace("'","");
-		
+
+		selidx = -1;
+		vP = 0;
+		filt = txtFiltro.getText().toString().replace("'", "");
+
 		try {
 
 			cobros.clear();
-			sql="SELECT DISTINCT CLIENTE FROM P_COBRO ";
-			DT=Con.OpenDT(sql);
+			sql = "SELECT DISTINCT CLIENTE FROM P_COBRO ";
+			DT = Con.OpenDT(sql);
 
-			if (DT.getCount()>0) {
+			if (DT.getCount() > 0) {
 				DT.moveToFirst();
-				for (int i = 0; i <DT.getCount(); i++) {
-				//	try {
-						cobros.add(DT.getString(0));
-						DT.moveToNext();
+				for (int i = 0; i < DT.getCount(); i++) {
+					//	try {
+					cobros.add(DT.getString(0));
+					DT.moveToNext();
 				/*	} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 					}*/
@@ -285,119 +333,131 @@ public class Clientes extends PBase {
 			}
 
 			ppago.clear();
-			sql="SELECT D_FACTURA.CLIENTE " +
+			sql = "SELECT D_FACTURA.CLIENTE " +
 					"FROM D_FACTURA INNER JOIN  D_FACTURAP ON  D_FACTURA.COREL = D_FACTURAP.COREL " +
 					"GROUP BY  D_FACTURA.CLIENTE, D_FACTURA.COREL, D_FACTURA.ANULADO " +
 					"HAVING  (D_FACTURA.ANULADO='N') AND (SUM(D_FACTURAP.VALOR=0))";
 
-			sql="SELECT DISTINCT CLIENTE FROM D_FACTURA WHERE (ANULADO='N') AND (COREL NOT IN " +
+			sql = "SELECT DISTINCT CLIENTE FROM D_FACTURA WHERE (ANULADO='N') AND (COREL NOT IN " +
 					"  (SELECT DISTINCT D_FACTURA_1.COREL " +
 					"   FROM D_FACTURA AS D_FACTURA_1 INNER JOIN " +
 					"   D_FACTURAP ON D_FACTURA_1.COREL=D_FACTURAP.COREL))";
 
 
-			DT=Con.OpenDT(sql);
+			DT = Con.OpenDT(sql);
 
-			if (DT.getCount()>0) {
+			if (DT.getCount() > 0) {
 				DT.moveToFirst();
-				for (int i = 0; i <DT.getCount(); i++) {
-				//	try {
-						ss=DT.getString(0);
-						if (!ppago.contains(ss)) ppago.add(ss);
-						DT.moveToNext();
+				for (int i = 0; i < DT.getCount(); i++) {
+					//	try {
+					ss = DT.getString(0);
+					if (!ppago.contains(ss)) ppago.add(ss);
+					DT.moveToNext();
 				/*	} catch (Exception e) {
 					}*/
 				}
 			}
 
-			sql="SELECT DISTINCT P_CLIRUTA.CLIENTE,P_CLIENTE.NOMBRE,P_CLIRUTA.BANDERA "+
-				 "FROM P_CLIRUTA INNER JOIN P_CLIENTE ON P_CLIRUTA.CLIENTE=P_CLIENTE.CODIGO "+
-				 "WHERE (1=1) ";
-			
+			sql = "SELECT DISTINCT P_CLIRUTA.CLIENTE,P_CLIENTE.NOMBRE,P_CLIRUTA.BANDERA,P_CLIENTE.COORX,P_CLIENTE.COORY " +
+					"FROM P_CLIRUTA INNER JOIN P_CLIENTE ON P_CLIRUTA.CLIENTE=P_CLIENTE.CODIGO " +
+					"WHERE (1=1) ";
+
 			if (mu.emptystr(filt)) {
-				 if (dweek!=0) sql+="AND (P_CLIRUTA.DIA ="+dweek+") ";
+				if (dweek != 0) sql += "AND (P_CLIRUTA.DIA =" + dweek + ") ";
 			}
-           
-            if (!mu.emptystr(filt)) {
-            	sql+="AND ((P_CLIRUTA.CLIENTE LIKE '%"+filt+"%') OR (P_CLIENTE.NOMBRE LIKE '%"+filt+"%')) ";
-            }
-            sql+="ORDER BY P_CLIRUTA.SECUENCIA,P_CLIENTE.NOMBRE";
-			
-			DT=Con.OpenDT(sql);
-			
-			lblCant.setText(""+DT.getCount()+"");
+
+			if (!mu.emptystr(filt)) {
+				sql += "AND ((P_CLIRUTA.CLIENTE LIKE '%" + filt + "%') OR (P_CLIENTE.NOMBRE LIKE '%" + filt + "%')) ";
+			}
+			sql += "ORDER BY P_CLIRUTA.SECUENCIA,P_CLIENTE.NOMBRE";
+
+			DT = Con.OpenDT(sql);
+
+			lblCant.setText("" + DT.getCount() + "");
 
 
-			if (DT.getCount()>0) {
-			
+			if (DT.getCount() > 0) {
+
 				DT.moveToFirst();
 				while (!DT.isAfterLast()) {
-				  
-					id=DT.getString(0);
-					
-					vItem =clsCls.new clsCDB();
-			  	
-					vItem.Cod=DT.getString(0);ss=DT.getString(0);
-					vItem.Desc=DT.getString(1);
-					vItem.Bandera=DT.getInt(2);
 
-					if (cobros.contains(ss)) vItem.Cobro=1;else vItem.Cobro=0;
-					if (ppago.contains(ss)) vItem.ppend=1;else vItem.ppend=0;
+					id = DT.getString(0);
+
+					vItem = clsCls.new clsCDB();
+
+					vItem.Cod = DT.getString(0);
+					ss = DT.getString(0);
+					vItem.Desc = DT.getString(1);
+					vItem.Bandera = DT.getInt(2);
+					vItem.Adds = "";
+					vItem.coorx = DT.getDouble(3);
+					vItem.coory = DT.getDouble(4);
+
+					if (cobros.contains(ss)) vItem.Cobro = 1;
+					else vItem.Cobro = 0;
+					if (ppago.contains(ss)) vItem.ppend = 1;
+					else vItem.ppend = 0;
 
 					switch (spinFilt.getSelectedItemPosition()) {
 						case 0:
-							items.add(vItem);break;
+							items.add(vItem);
+							break;
 						case 1:
-							if (vItem.Cobro==1) items.add(vItem);break;
+							if (vItem.Cobro == 1) items.add(vItem);
+							break;
 						case 2:
-							if (vItem.ppend==1) items.add(vItem);break;
+							if (vItem.ppend == 1) items.add(vItem);
+							break;
 					}
 
-					if (id.equalsIgnoreCase(selid)) selidx=vP;
-					vP+=1;
-			  
+					if (id.equalsIgnoreCase(selid)) selidx = vP;
+					vP += 1;
+
 					DT.moveToNext();
-				}	
+				}
 			}
-			
+
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox(e.getMessage());
-	    }
-			 
-		adapter=new ListAdaptCliList(this, items);
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			mu.msgbox(e.getMessage());
+		}
+
+		adapter = new ListAdaptCliList(this, items);
 		listView.setAdapter(adapter);
-		
-		if (selidx>-1) {
+
+		if (selidx > -1) {
 			adapter.setSelectedIndex(selidx);
 			listView.setSelection(selidx);
 		}
-	    	    
+
 	}
-	
+
 	public void showCliente() {
 
-		try{
-			gl.cliente=selid;
+		try {
+			gl.cliente = selid;
 
-			gl.closeCliDet=false;
-			gl.closeVenta=false;
+			gl.closeCliDet = false;
+			gl.closeVenta = false;
 
 			Intent intent;
-			intent = new Intent(this,CliDet.class);
+			intent = new Intent(this, CliDet.class);
 			startActivity(intent);
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
 	}
-	
+
 	private void editCliente() {
-		try{
-			gl.tcorel=selid;
-			startActivity(new Intent(this,CliNuevoAprEdit.class));
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		try {
+			gl.tcorel = selid;
+			startActivity(new Intent(this, CliNuevoAprEdit.class));
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
 	}
@@ -406,12 +466,13 @@ public class Clientes extends PBase {
 		Cursor dt;
 
 		try {
-			sql="SELECT Codigo FROM P_CLIENTE WHERE CODBARRA='"+bcode+"'";
-			dt=Con.OpenDT(sql);
+			sql = "SELECT Codigo FROM P_CLIENTE WHERE CODBARRA='" + bcode + "'";
+			dt = Con.OpenDT(sql);
 
-			if (dt.getCount()==0) {
-				msgbox("Cliente no existe "+bcode+" ");
-				txtFiltro.setText("");txtFiltro.requestFocus();
+			if (dt.getCount() == 0) {
+				msgbox("Cliente no existe " + bcode + " ");
+				txtFiltro.setText("");
+				txtFiltro.requestFocus();
 				return;
 			}
 
@@ -419,10 +480,115 @@ public class Clientes extends PBase {
 			selid = dt.getString(0);
 			showCliente();
 
-			txtFiltro.setText("");txtFiltro.requestFocus();
+			txtFiltro.setText("");
+			txtFiltro.requestFocus();
 		} catch (Exception e) {
-			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			msgbox(new Object() {
+			}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
 		}
+	}
+
+
+	// Distancia
+
+	private void ordenarPorDistancia() {
+		float[] results = new float[1];
+
+		if (items.size() == 0) return;
+
+		latitude = 0;longitude = 0;
+
+		try {
+			getLocation();
+			if (latitude + longitude == 0) throw new Exception();
+		} catch (Exception e) {
+			toast("No se puede definit posición actual");return;
+		}
+
+		for (int i = 0; i < items.size(); i++) {
+			try {
+				if (items.get(i).coorx+items.get(i).coory==0) {
+					items.get(i).valor=1000000;
+				} else {
+					Location.distanceBetween(items.get(i).coorx,items.get(i).coory,latitude,longitude, results);
+					items.get(i).valor=results[0];
+					items.get(i).Adds=" [ "+mu.frmint(items.get(i).valor)+"m ]";
+				}
+			} catch (Exception e) {
+				items.get(i).valor=1000000;
+			}
+
+			if (items.get(i).valor>=1000000) items.get(i).Adds="";
+		}
+
+		Collections.sort(items, new distanceComparator());
+
+		adapter = new ListAdaptCliList(this, items);
+		listView.setAdapter(adapter);
+
+		adapter.setSelectedIndex(0);
+		listView.setSelection(0);
+
+	}
+
+	public class distanceComparator implements Comparator<clsCDB> {
+		public int compare(clsCDB left, clsCDB right) {
+				 return (int)left.valor-(int)right.valor;
+		}
+	}
+
+	public Location getLocation() {
+
+		try {
+			locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+
+			isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+			if (!isGPSEnabled) 	toastcent("¡GPS Deshabilitado!");
+
+			isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+			if (!isGPSEnabled && !isNetworkEnabled) {
+				this.canGetLocation = false;
+			} else {
+				this.canGetLocation = true;
+				if (isNetworkEnabled) {
+					if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+					}
+					locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
+							MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
+					if (locationManager != null) {
+						location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+						if (location != null) {
+							latitude = location.getLatitude();
+							longitude = location.getLongitude();
+						}
+					}
+				}
+
+				// if GPS Enabled get lat/long using GPS Services
+				if (isGPSEnabled) {
+					if (location == null) {
+						locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,MIN_TIME_BW_UPDATES,
+								MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListener);
+
+						if (locationManager != null) {
+							location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+							if (location != null) {
+								latitude = location.getLatitude();
+								longitude = location.getLongitude();
+							}
+						}
+					}
+				}
+
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			return null;
+		}
+
+		return location;
 	}
 
 
@@ -551,13 +717,13 @@ public class Clientes extends PBase {
 
 			dialog.setMessage("¿" + msg + "?");
 
-			dialog.setNegativeButton("Si", new DialogInterface.OnClickListener() {
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					borraCliNuevo();
 				}
 			});
 
-			dialog.setPositiveButton("No", new DialogInterface.OnClickListener() {
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {}
 			});
 
@@ -575,13 +741,13 @@ public class Clientes extends PBase {
 
 			dialog.setMessage("¿" + msg + "?");
 
-			dialog.setNegativeButton("Si", new DialogInterface.OnClickListener() {
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					editCliente();
 				}
 			});
 
-			dialog.setPositiveButton("No", new DialogInterface.OnClickListener() {
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {}
 			});
 
@@ -589,10 +755,30 @@ public class Clientes extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
 	}
-	
+
+	private void msgAskDist(String msg) {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setMessage("¿" + msg + "?");
+			dialog.setTitle("Clientes");
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					ordenarPorDistancia();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
+
 	private void borraCliNuevo() {
 		try {
 			db.beginTransaction();
@@ -610,7 +796,7 @@ public class Clientes extends PBase {
 			mu.msgbox(e.getMessage());
 		}
 	}
-	//#HS_20181211 Agregue funcion que lista las opciones de incidencia de no lectura
+
 	private void listNoLectura(){
 		Cursor DT;
 		String code,name;
@@ -647,7 +833,7 @@ public class Clientes extends PBase {
 		showIncNoLectura();
 
 	}
-	//#HS_20181211 Funcion que abre el dialogo, opciones de incidencia de no lectura
+
 	public void showIncNoLectura() {
 		try{
 			final AlertDialog Dialog;

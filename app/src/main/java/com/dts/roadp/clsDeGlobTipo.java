@@ -308,7 +308,6 @@ public class clsDeGlobTipo {
 	    } catch (Exception e) {
 	    	active= 0;
 	    }
-	}		
-
+	}
 
 }

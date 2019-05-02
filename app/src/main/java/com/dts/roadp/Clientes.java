@@ -883,7 +883,6 @@ public class Clientes extends PBase {
 	protected void onResume() {
 		try{
 			super.onResume();
-
 			listItems();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

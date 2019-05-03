@@ -18,7 +18,6 @@ import com.zebra.sdk.printer.SGD;
 import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
 import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
-import com.zebra.sdk.printer.ZebraPrinterLinkOs;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -377,7 +376,7 @@ public class printZebraZPL extends printBase {
         AlertDialog.Builder dialog = new AlertDialog.Builder(cont);
 
         dialog.setTitle(R.string.app_name);
-        dialog.setMessage("Desea repetir la impresión ?");
+        dialog.setMessage("¿Quiere volver a intentar la impresión?");
 
         dialog.setCancelable(false);
         dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {

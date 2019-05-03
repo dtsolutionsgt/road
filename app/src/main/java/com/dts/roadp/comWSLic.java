@@ -57,6 +57,8 @@ public class comWSLic extends PBase {
     private clsDataBuilder dbld;
     private DateUtils DU;
 
+    private boolean licenciaRuta=false, licenciaHH=false;
+
     // 355030097127235
 
     // Web Service -
@@ -114,6 +116,8 @@ public class comWSLic extends PBase {
 
         setHandlers();
 
+        validaLicencia();
+
     }
 
 
@@ -146,6 +150,41 @@ public class comWSLic extends PBase {
         }
 
 
+    }
+
+    private void validaLicencia() {
+        CryptUtil cu = new CryptUtil();
+        Cursor dt;
+        String lic, lickey, licruta, rutaencrypt;
+
+        try {
+            lickey = cu.encrypt(gl.deviceId);
+            rutaencrypt = cu.encrypt(gl.ruta);
+
+            sql = "SELECT lic, licparam FROM Params";
+            dt = Con.OpenDT(sql);
+            dt.moveToFirst();
+            lic = dt.getString(0);
+            licruta = dt.getString(1);
+
+            if (!mu.emptystr(lic)){
+                if (lic.equalsIgnoreCase(lickey) ) {
+                    licenciaHH=true;
+                }
+            }
+
+            if (!mu.emptystr(licruta)){
+                if (licruta.equalsIgnoreCase(rutaencrypt)) {
+                    licenciaRuta=true;
+                }
+            }
+
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            mu.msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
+        }
     }
 
     private void setHandlers() {
@@ -385,6 +424,46 @@ public class comWSLic extends PBase {
         return 0;
     }
 
+    public int requestLicenceRuta(String ruta) {
+        int rc;
+        String s, ss;
+
+        METHOD_NAME = "requestLicenceRuta";
+        sstr = "OK";
+
+        try {
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            PropertyInfo param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("Ruta");
+            param.setValue(ruta);
+            request.addProperty(param);
+
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+            s = response.toString();
+
+            sstr = "#";
+            if (s.equalsIgnoreCase("#")) return 1;
+
+            sstr = s;
+            return 0;
+        } catch (Exception e) {
+            sstr = e.getMessage();
+        }
+
+        return 0;
+    }
+
     public int OpenDTt(String sql) {
         int rc;
 
@@ -507,18 +586,26 @@ public class comWSLic extends PBase {
 
         try {
 
-            if (requestLicence(gl.deviceId,devinfo)==1) {
-                errflag=false;
-            } else {
-                fterr = sstr;
-                errflag=true;
+            if (!licenciaHH){
+                if (requestLicence(gl.deviceId,devinfo)==1) {
+                    errflag=false;
+                } else {
+                    fterr = sstr;errflag=true;
+                }
+            }
+
+            if (!licenciaRuta){
+                if (requestLicenceRuta(gl.ruta)==1) {
+                    errflag=false;
+                } else {
+                    fterr = sstr;
+                    errflag=true;
+                }
             }
 
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            fstr = e.getMessage();
-            errflag=true;
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            fstr = e.getMessage();errflag=true;
         }
 
     }

@@ -381,9 +381,8 @@ public class Anulacion extends PBase {
 	}	
 	
 	private boolean anulFactura(String itemid) {
-
 		Cursor DT;
-		String prod,um;
+		String prod,um,ncred;
 
 		boolean vAnulFactura=false;
 
@@ -440,6 +439,20 @@ public class Anulacion extends PBase {
             db.execSQL(sql);
 
 			anulBonif(itemid);
+
+			// Nota credito
+
+			sql="SELECT COREL FROM D_NOTACRED WHERE FACTURA='"+itemid+"'";
+			DT=Con.OpenDT(sql);
+			if (DT.getCount()>0) {
+				DT.moveToFirst();ncred=DT.getString(0);
+
+				sql = "UPDATE D_CXC SET ANULADO='S' WHERE COREL='" + ncred + "' ";
+				db.execSQL(sql);
+
+				sql = "UPDATE D_NOTACRED SET ANULADO='S' WHERE COREL='" + ncred + "'";
+				db.execSQL(sql);
+			}
 
 			//ImpresionFactura();
 
@@ -776,6 +789,7 @@ public class Anulacion extends PBase {
 		return vAnulDevol;
 
 	}
+
 	private void anulRecib(String itemid) {
 		try{
 			sql="UPDATE D_COBRO  SET Anulado='S' WHERE COREL='"+itemid+"'";

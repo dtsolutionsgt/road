@@ -1155,7 +1155,8 @@ public class CliDet extends PBase {
 	@Override
 	public void onBackPressed() {
 		try{
-			msgAskExit("Salir");
+			//msgAskExit("Salir");
+			super.onBackPressed();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

@@ -79,7 +79,7 @@ public class Menu extends PBase {
 
 			vApp=this.getApplication();
 			rutatipo=gl.rutatipog;
-
+			gl.devfindia=false;
 			rutapos=false;gl.rutapos=false;
 
 			iicon=1;

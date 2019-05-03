@@ -35,6 +35,8 @@ public class DevolBodCan extends PBase {
 
     private clsWSEnvio vWSEnvio;
 
+    private AppMethods app;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,9 +54,14 @@ public class DevolBodCan extends PBase {
         lblTot = (TextView) findViewById(R.id.textView9);lblTot.setText("");
         setHandlers();
 
+        gl.devprncierre=false;
+
         printclose= new Runnable() {
             public void run() {
-
+                //if (gl.devprncierre) {
+                    gl.closeDevBod=true;
+                    DevolBodCan.super.finish();
+                //}
             }
         };
 
@@ -74,6 +81,10 @@ public class DevolBodCan extends PBase {
         fpaseantebod=new clsDocCanastaBod(this,prn_paseante.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
         fpaseantebod.deviceid =gl.deviceId;
         fpaseantebod.vTipo="PASEANTE";
+
+        app = new AppMethods(this, gl, Con, db);
+        gl.validimp=app.validaImpresora();
+        if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
         listItems();
 
@@ -471,9 +482,11 @@ public class DevolBodCan extends PBase {
                         prn_can.printnoask(printclose, "printdevcan.txt");
                     }
 
-                   /* if (!EnviaDev()){
-                      mu.msgbox("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
-                    }*/
+                    if (!gl.devfindia) {
+                        if (!EnviaDev()){
+                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                        }
+                    }
 
                     gl.closeDevBod=true;
                     DevolBodCan.super.finish();
@@ -484,11 +497,13 @@ public class DevolBodCan extends PBase {
             dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
 
-                    /*if (!EnviaDev()){
-                        mu.msgbox("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
-                    }*/
+                    if (!gl.devfindia) {
+                        if (!EnviaDev()){
+                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                        }
+                    }
 
-                    gl.closeDevBod=true;
+                   gl.closeDevBod=true;
                    DevolBodCan.super.finish();
                 }
             });
@@ -503,20 +518,15 @@ public class DevolBodCan extends PBase {
 
     private boolean EnviaDev(){
 
-        String resultado="";
         boolean vEnvia=false;
 
         try{
 
             vWSEnvio = new clsWSEnvio(this, gl.ruta, gl.emp, 1);
-            vWSEnvio.wsExecuteEnvio();
-
-            resultado=vWSEnvio.fstr;
-
-            if (resultado.equals("")) vEnvia=true;
+            vWSEnvio.runExecuteEnvio();
 
         }catch (Exception e){
-            mu.msgbox("Ocurrió un error enviando los datos " + resultado);
+            mu.toast("Ocurrió un error enviando los datos " + e.getMessage() );
         }
 
         return vEnvia;
@@ -541,13 +551,18 @@ public class DevolBodCan extends PBase {
             if (prn_can.isEnabled()) {
 
                 String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
-
-                if(impres==0 || impres==1){
-                    fpaseantebod.buildPrint(corel,0,vModo);
+                try {
+                    if(impres==0 || impres==1){
+                        fpaseantebod.buildPrint(corel,0,vModo);
+                    }
+                } catch (Exception e) {
                 }
 
-                if(impres==0 || impres==2){
-                    fcanastabod.buildPrint(corel,0, vModo);
+                try {
+                    if(impres==0 || impres==2){
+                        fcanastabod.buildPrint(corel,0, vModo);
+                    }
+                } catch (Exception e) {
                 }
 
                 if(impres==0) {
@@ -570,8 +585,10 @@ public class DevolBodCan extends PBase {
                     fcanastabod.buildPrint(corel,0, vModo);
                 }
 
-               /* vWSEnvio = new clsWSEnvio(this, gl.ruta, gl.emp, 1);
-                vWSEnvio.wsExecuteEnvio();*/
+                if (!EnviaDev()){
+                    mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                }
+
             }
 
         if (!prn_can.isEnabled()) {

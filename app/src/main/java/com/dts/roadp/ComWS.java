@@ -55,9 +55,9 @@ public class ComWS extends PBase {
 	private ImageView imgRec, imgEnv, imgExis;
 	private RelativeLayout ralBack, relExist, relPrecio, relStock;
 
-	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult;
+	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
 	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs;
-	private String licSerial,licSerialEnc,parImprID;
+	private String licSerial,licRuta,licSerialEnc,licRutaEnc,parImprID;
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag;
 
 	private SQLiteDatabase dbT;
@@ -151,11 +151,16 @@ public class ComWS extends PBase {
 		} else {
 			this.setTitle("Comunicación Local");
 		}
+
 		licSerial=gl.deviceId;
+		licRuta=gl.ruta;
+
 		try {
 			licSerialEnc=cu.encrypt(licSerial);
+			licRutaEnc=cu.encrypt(gl.ruta);
 		} catch (Exception e) {
 			licSerialEnc="";
+			licRutaEnc="";
 		}
 
 		getWSURL();
@@ -210,6 +215,9 @@ public class ComWS extends PBase {
 			return;
 		}
 
+		if (mu.emptystr(gl.ruta)) gl.ruta=txtRuta.getText().toString();
+
+
 		//CKFK 20190222 Se agregó esta validación para no sobreescribir los datos si ya se importaron
 		if (!gl.modoadmin) {
 
@@ -245,11 +253,9 @@ public class ComWS extends PBase {
 				return;
 			}
 
-			if (gl.contlic) {
-				if (!validaLicencia()) {
-					mu.msgbox("Licencia inválida!");
-					return;
-				}
+			if (!validaLicencia()) {
+				mu.msgbox("Licencia inválida!");
+				return;
 			}
 
 			if (gl.banderafindia) {
@@ -721,11 +727,14 @@ public class ComWS extends PBase {
 	public int commitSQL() {
 		int rc;
 		String s, ss;
+		//#CKFK 20190429 Creé esta variable para retornar si la comunicación fue correcta o no
+		//e hice modificaciones en la función para garantizar esta funcionalidad
+		int vCommit=0;
 
 		METHOD_NAME = "Commit";
 		sstr = "OK";
 
-		if (dbld.size() == 0) return 1;
+		if (dbld.size() == 0) vCommit =1;//return 1
 
 		s = "";
 		for (int i = 0; i < dbld.size(); i++) {
@@ -759,17 +768,19 @@ public class ComWS extends PBase {
 			s = response.toString();
 
 			sstr = "#";
-			if (s.equalsIgnoreCase("#")) return 1;
+			if (s.equalsIgnoreCase("#")) vCommit =1;// return 1;
 
 			sstr = s;
-			return 0;
+			//return 0;
+
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			sstr = e.getMessage();
+			vCommit=0;
 		}
 
-		return 0;
+		return vCommit;
 	}
 
 	public int OpenDTt(String sql) {
@@ -941,6 +952,44 @@ public class ComWS extends PBase {
 		return 0;
 	}
 
+	public int checkLicenceRuta(String ruta) {
+		int rc;
+		String s, ss;
+
+		METHOD_NAME = "checkLicenceRuta";
+		sstr = "OK";
+
+		try {
+
+			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+			envelope.dotNet = true;
+
+			PropertyInfo param = new PropertyInfo();
+			param.setType(String.class);
+			param.setName("Ruta");
+			param.setValue(ruta);
+			request.addProperty(param);
+
+			envelope.setOutputSoapObject(request);
+
+			HttpTransportSE transport = new HttpTransportSE(URL);
+			transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+			s = response.toString();
+			if (s.equalsIgnoreCase("1")) return 1;
+
+			sstr = s;
+			return 0;
+		} catch (Exception e) {
+			sstr = e.getMessage();
+		}
+
+		return 0;
+	}
+
 	public int guardaImagen(String idprod) {
 		int rc;
 		String s, ss,resstr;
@@ -1083,6 +1132,8 @@ public class ComWS extends PBase {
 			if (!AddTable("P_HANDHELD")) return false;
 
 			licResult=checkLicence(licSerial);
+			licResultRuta=checkLicenceRuta(licRuta);
+
 			fillTableImpresora();
 
 			if (!AddTable("P_REF1")) return false;
@@ -1178,7 +1229,9 @@ public class ComWS extends PBase {
 
 			Actualiza_FinDia();
 			encodePrinters();
+
 			encodeLicence();
+			encodeLicenceRuta();
 
             SetStatusRecToTrans("1");
 
@@ -1410,6 +1463,7 @@ public class ComWS extends PBase {
 
 		} catch (Exception ex) {
 			vActualizaFD = false;
+			fstr=ex.getMessage();
 		}
 
 		return vActualizaFD;
@@ -2116,6 +2170,51 @@ public class ComWS extends PBase {
 
 	}
 
+	private void encodeLicenceRuta() {
+		String lic;
+
+		try {
+			if (licResultRuta==1) lic=licRutaEnc; else lic="";
+			sql = "UPDATE Params SET licparam='" + lic + "'";
+			dbT.execSQL(sql);
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+		}
+
+	}
+
+
+	private boolean validaLicencia() {
+		CryptUtil cu=new CryptUtil();
+		Cursor dt;
+		String lic,lickey,licruta,rutaencrypt;
+		Integer msgLic=0;
+
+		try {
+			lickey=cu.encrypt(gl.deviceId);
+			rutaencrypt=cu.encrypt(gl.ruta);
+
+			sql="SELECT lic, licparam FROM Params";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			lic=dt.getString(0);
+			licruta=dt.getString(1);
+
+			if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) return true;
+			else if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)){msgLic=1;}
+			else if(!lic.equalsIgnoreCase(lickey)){msgLic=2;}
+			else if(!licruta.equalsIgnoreCase(rutaencrypt)){msgLic=3;}
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" : "+e.getMessage());
+		}
+
+		if(msgLic==1)toastlong("El dispositivo no tiene licencia válida de handheld, ni de ruta");
+		else if(msgLic==2){toastlong("El dispositivo no tiene licencia valida de handheld");}
+		else if(msgLic==3){toastlong("El dispositivo no tiene licencia valida de ruta");}
+
+		return false;
+	}
 
 	//endregion
 
@@ -2185,16 +2284,13 @@ public class ComWS extends PBase {
 			comparaCorrel();
 
 			paramsExtra();
-			//mu.msgbox("::"+esql);
-
-			//mu.msgbox(rrs+" \nsstr : "+sstr);
 
 			if (ftflag) msgbox(ftmsg);
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
-		//if (licResult==0) msgAskSinLicencia();
+		if (!validaLicencia()) restartApp();
 
 	}
 
@@ -2276,32 +2372,98 @@ public class ComWS extends PBase {
 		try {
 
 			envioFacturas();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			envioPedidos();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			envioNotasCredito();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			envioNotasDevolucion();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 
 			envioCobros();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 
 			envioDepositos();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
+
 			envio_D_MOV();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			envioCli();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 
 			envioAtten();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			envioCoord();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			envioSolicitud();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 
 			updateAcumulados();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 			updateInventario();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 
-			update_Corel_GrandTotal();
+			if (!update_Corel_GrandTotal()){
+				dbld.savelog();
+				return true;
+			}
 
 			envioFinDia();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return true;
+			}
 
 			dbld.savelog();
 
-			//ComWS.super.finish();
-
-			//listaFachada();
+			//#CKFK 20190429 Saqué esto de envioFinDia para que se guarde bien el log y luego se realice el envío.
+			if (!envioparcial){
+				if (commitSQL() == 1) {
+					errflag=false;
+				} else {
+					errflag=true;
+					fterr += "\n" + sstr;
+				}
+			}
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -2356,6 +2518,7 @@ public class ComWS extends PBase {
 		int i, pc = 0, pcc = 0, ccorel;
 
 		fterr = "";
+		err="";
 
 		try {
 
@@ -2428,10 +2591,14 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
-			sql = "DELETE FROM D_FACTURA_BARRA";
-			db.execSQL(sql);
-			sql = "DELETE FROM D_STOCKB_DEV";
-			db.execSQL(sql);
+			DT.close();
+
+			if (envioparcial && (fterr.isEmpty())) {
+				sql = "DELETE FROM D_FACTURA_BARRA";
+				db.execSQL(sql);
+				sql = "DELETE FROM D_STOCKB_DEV";
+				db.execSQL(sql);
+			}
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -3199,32 +3366,44 @@ public class ComWS extends PBase {
 
 	public void envioFinDia() {
 
+		int pc = 0, pcc=3;
+
 		fprog = " ";
 		wsStask.onProgressUpdate();
 
 		try {
 
+			pc = 0;
+
 			if (envioparcial) dbld.clear();
 
-            ss = "UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parVer+"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'";
+			ss = "UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parVer+"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'";
             dbld.add(ss);
 
             dbld.add("DELETE FROM D_REPFINDIA WHERE RUTA='" + gl.ruta + "'");
 			dbld.insert("D_REPFINDIA", "WHERE (LINEA>=0)");
 
-			//if (envioparcial) commitSQL();
-			if (commitSQL() == 1) {
-				errflag=false;
-			} else {
-				errflag=true;
-				fterr += "\n" + sstr;
-			}
-
+			if (envioparcial) {
+				if (commitSQL() == 1) {
+					pc = 3;
+				} else {
+					errflag = true;
+					fterr += "\nFinDia : " + sstr;
+					dbg = sstr;
+				}
+			}else pc = 3;
 
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
+		}
+
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Envío Fin día : " + pc + " , NO ENVIADO : " + pf + "\n";
+		} else {
+			senv += "Envío Fin día : " + pc + "\n";
 		}
 	}
 
@@ -3456,6 +3635,7 @@ public class ComWS extends PBase {
 				if (!sendData()) {
 					fstr="Envio incompleto : "+sstr;
 				} else {
+
 				}
 			} else {
 				fstr="No se puede conectar al web service : "+sstr;
@@ -3641,7 +3821,10 @@ public class ComWS extends PBase {
 			dbld.clear();
 			dbld.add("DELETE FROM P_DOC_ENVIADOS_HH WHERE DOCUMENTO='"+docstock+"'");
 			dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('"+docstock+"','"+ActRuta+"','"+univdate+"',1)");
-						
+			dbld.add("UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parVer+"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'");
+			dbld.add("INSERT INTO P_BITACORA_VERSIONHH (RUTA,FECHA,NUMVERSION,ARQUITECTURA) " +
+					"VALUES('"+gl.ruta+"','"+ du.getActDateStr() +"','"+gl.parVer+"','ANDR')");
+
 			if (commitSQL()==1) conflag=1; else conflag=0;
 					
 		} catch (Exception e) {
@@ -3812,65 +3995,6 @@ public class ComWS extends PBase {
 
     }
 
-    private boolean validaLicencia() {
-        CryptUtil cu=new CryptUtil();
-        Cursor dt;
-        String lic,lickey;
-
-        try {
-            lickey=cu.encrypt(gl.deviceId);
-
-            sql="SELECT lic FROM Params";
-            dt=Con.OpenDT(sql);
-            dt.moveToFirst();
-            lic=dt.getString(0);
-
-            if (lic.equalsIgnoreCase(lickey)) return true;
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" : "+e.getMessage());
-        }
-        return false;
-    }
-
-	/*private boolean validaLicencia() {
-		Cursor dt;
-		String mac,lickey,idkey,binkey;
-		int fval,lkey;
-		long ff;
-
-		try {
-			mac=lic.getMac();
-			lkey=lic.getLicKey(mac);
-			lickey=lic.encodeLicence(lkey);
-
-			sql="SELECT IDKEY,BINKEY FROM LIC_CLIENTE WHERE ID='"+mac+"'";
-			dt=Con.OpenDT(sql);
-			if (dt.getCount()==0) return false;
-
-			dt.moveToFirst();
-			idkey=dt.getString(0);
-			binkey=dt.getString(1);
-
-			if (!idkey.equalsIgnoreCase(lickey)) return false;
-
-			ff=du.getActDate();
-			fval=lic.decodeValue(binkey);
-			fval=fval-lkey;
-
-			//Toast.makeText(this,""+fval, Toast.LENGTH_SHORT).show();
-
-			if (fval==999999) return true;
-			fval=fval*10000;
-
-			if (fval>=ff) return true; else return false;
-
-		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			mu.msgbox(e.getMessage());return false;
-		}
-
-	}*/
 
 	private String getMac() {
 		WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);

@@ -219,7 +219,7 @@ public class Venta extends PBase {
 					mu.msgbox("No puede totalizar la factura, es menor al monto permitido para la nota de crédito: " + gl.dvdispventa);return;
 				}
 			}
-
+			gl.brw=0;
 			if (rutatipo.equalsIgnoreCase("V")) {
 				Intent intent = new Intent(this,FacturaRes.class);
 				startActivity(intent);
@@ -463,6 +463,7 @@ public class Venta extends PBase {
 			if (mu.emptystr(pid)) {return;}
 
 			prodid=pid;
+			gl.bonprodid=prodid;
 			um=gl.um;
 
 			setCant();

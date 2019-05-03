@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -126,19 +127,6 @@
             android:layout_margin="5dp"
             android:background="@layout/spinner_style" />
 
-        <TextView
-            android:id="@+id/lblETipo"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_toLeftOf="@+id/spinner1"
-            android:gravity="center_vertical"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:text="Día : "
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp" />
-
         <ImageView
             android:id="@+id/imgImg"
             android:layout_width="wrap_content"
@@ -169,6 +157,18 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#FFFFFF"
             android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/imageView22"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/spinner1"
+            android:layout_toEndOf="@+id/lblCant"
+            android:clickable="true"
+            android:onClick="orderDist"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:src="@drawable/iconoubicacion" />
 
     </RelativeLayout>
 

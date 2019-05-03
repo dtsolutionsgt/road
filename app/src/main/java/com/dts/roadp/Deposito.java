@@ -51,6 +51,8 @@ public class Deposito extends PBase {
 	private double tef,tcheq,ttot;
 	private boolean depparc; //#HS_20181120_1625 Se cambio el tipo a la variable de entero a boolean.
 
+	private AppMethods app;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -96,7 +98,11 @@ public class Deposito extends PBase {
 		    	Deposito.super.finish();
 		    }
 		};
-		
+
+		app = new AppMethods(this, gl, Con, db);
+		gl.validimp=app.validaImpresora();
+		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+
 		prn=new printer(this,printclose,gl.validimp);
 		ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 
@@ -143,7 +149,7 @@ public class Deposito extends PBase {
 
 	public void OpenDesglose(View view){
 		try{
-			gl.totDep = tef;
+			gl.totDep =Double.parseDouble( mu.frmcur_sm(tef).replace(",",""));
 			startActivity(new Intent(this,desglose.class));
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

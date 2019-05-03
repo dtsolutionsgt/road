@@ -201,7 +201,7 @@ public class DevolCli extends PBase {
             cntprd = cntprd+1;
             cntunis = cntunis + Double.parseDouble(s);
             cntkgs = mu.round(cntkgs + DT.getDouble(5),gl.peDec);
-            cntotl = mu.round(cntotl + DT.getDouble(6),gl.peDec);
+            cntotl = mu.round(cntotl + DT.getDouble(6),2);
 
 			  items.add(vItem);	
 
@@ -384,6 +384,8 @@ public class DevolCli extends PBase {
 		
 		gl.dvcorreld = obtienecorrel("D");
 		gl.dvcorrelnc = obtienecorrel("NC");
+
+		cntotl=mu.round(cntotl,2);
 
 		try {
 

@@ -252,12 +252,11 @@ public class printDMax extends printBase {
 		
 	}
 
-
 	private void msgAskRePrint() {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(cont);
 
 		dialog.setTitle(R.string.app_name);
-		dialog.setMessage("Desea repetir la impresión ?");
+		dialog.setMessage("¿Quiere volver a intentar la impresión?");
 
 		dialog.setCancelable(false);
 		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
@@ -274,7 +273,8 @@ public class printDMax extends printBase {
 					@Override
 					public void run() {
 						try {
-							printclose.run();
+                            appG.devprncierre=true;
+  							printclose.run();
 						} catch (Exception e) {
 							//showmsg(e.getMessage());
 						}
@@ -317,8 +317,6 @@ public class printDMax extends printBase {
 				cbhandler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-
-						//printclose.run();
 						msgAskRePrint();
 					}
 				}, 200);

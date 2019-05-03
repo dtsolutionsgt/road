@@ -18,7 +18,7 @@ public class clsDocument {
 	public String resol,resfecha,resvence,resrango,fsfecha,modofact;
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;
-	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod;
+	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod,docdesglose;
 	public int ffecha,pendiente,diacred,condicionPago;
 	
 	protected android.database.sqlite.SQLiteDatabase db;
@@ -74,7 +74,7 @@ public class clsDocument {
 
 		if (modofact.equalsIgnoreCase("TOL")) {
 			if (docfactura && (reimpres==10)) flag=1;
-			if (docfactura && (reimpres==4)) flag=0;
+			if (docfactura && (reimpres==4) || docdesglose) flag=0;
 			if (doccanastabod) flag=2;
 			if (docrecibo && (reimpres==0)) flag=0;
         } else if(modofact.equalsIgnoreCase("*")) {
@@ -273,7 +273,7 @@ public class clsDocument {
         int idx;
 
         //residx=0;
-
+		if (emptystr(l)) return "";
         //lu=l.toUpperCase().trim();
         lu=l.trim();
 
@@ -291,12 +291,12 @@ public class clsDocument {
             l=l.replace("HH:mm:ss",s);return l;
         }
 
-		if (l.indexOf("##") >=0) {
+		if (l.indexOf("@Numero") >=0) {
 
-			int index = l.indexOf("##");
+			int index = l.indexOf("@Numero");
 
-			String temp = l.substring(index + 2, index + 4);
-			String temp1 = l.substring(index + 4, index + 5);
+			String temp = l.substring(index + 7, index + 9);
+			String temp1 = l.substring(index + 9, index + 10);
 
 			int ctemp= Integer.parseInt(temp);
 
@@ -313,25 +313,25 @@ public class clsDocument {
             }
 
 			if (l.length() > index + numero.length() ){
-				l = l.substring(0, index) + numero + l.substring(index + numero.length());
+				l = l.substring(0, index) + numero + l.substring(index + 10);
 			}else{
 				l = l.substring(0, index) + numero;
 			}
 
-			if (l.indexOf("##")>=0) {
-				l = StringUtils.replace(l,"##","");
+			if (l.indexOf("@Numero")>=0) {
+				l = StringUtils.replace(l,"@Numero","");
 				if (temp.length()>0 && temp1.length()>0){
 					l=StringUtils.replace(l,temp+temp1,"");
 				}
 			}
 		}
 
-		if (StringUtils.upperCase(l).indexOf("S#") != -1) {
+		if (StringUtils.upperCase(l).indexOf("@SerNum") != -1) {
 
-			int index = StringUtils.upperCase(l).indexOf("S#");
+			int index = StringUtils.upperCase(l).indexOf("@SerNum");
 
-			String temp = l.substring(index + 2, index + 4);
-			String temp1 = l.substring(index + 4, index + 5);
+			String temp = l.substring(index + 7, index + 9);
+			String temp1 = l.substring(index + 10, index + 11);
 
 			int ctemp= Integer.parseInt(temp);
 
@@ -345,27 +345,27 @@ public class clsDocument {
             }
 
 			if ((l.length()) > index + serie.length() + numero.length()) {
-				l = l.substring(0, index) + serie + numero + l.substring(index + serie.length() + numero.length());
+				l = l.substring(0, index) + serie + numero + l.substring(index + 1 + serie.length() + numero.length());
 			}else{
 				l = l.substring(0, index) + serie + numero;
 			}
 
-			if (l.indexOf("S#")>=0) {
-				l = StringUtils.replace(l,"S#","");
+			if (l.indexOf("@SerNum")>=0) {
+				l = StringUtils.replace(l,"@SerNum","");
 			}
 		}
 
-		idx=l.indexOf("SS");
+		idx=l.indexOf("@Serie");
         if (idx>=0) {
 
 			if (l.length() > idx + serie.length()) {
-				l = l.substring(0, idx) + serie + l.substring(idx + 2, idx + l.length() - idx - 2);
+				l = l.substring(0, idx) + serie + l.substring(idx + 6, idx + l.length() - idx - 6);
 			}else{
 				l = l.substring(0, idx) + serie;
 			}
 
-			if (l.indexOf("SS")>=0) {
-				l = StringUtils.replace(l,"SS","");
+			if (l.indexOf("@Serie")>=0) {
+				l = StringUtils.replace(l,"@Serie","");
 			}
 
         }
@@ -375,27 +375,27 @@ public class clsDocument {
 			l=l.trim();
 		}
 
-        idx=lu.indexOf("VV");
+        idx=lu.indexOf("@Vendedor");
         if (idx>=0) {
         	rep.addc("");
             if (emptystr(vendedor)) return "@@";
-            l=l.replace("VV",vendcod+" - "+vendedor);return l;
+            l=l.replace("@Vendedor",vendcod+" - "+vendedor);return l;
         }
 
-        idx=lu.indexOf("RR");
+        idx=lu.indexOf("@Ruta");
         if (idx>=0) {
             if (emptystr(ruta)) return "@@";
-            l=l.replace("RR",ruta);return l;
+            l=l.replace("@Ruta",ruta);return l;
         }
 
-        idx=lu.indexOf("CC");
+        idx=lu.indexOf("@Cliente");
         if (idx>=0) {
             if (emptystr(cliente)) return "@@";
-            if(l.length()>14){
-				l=l.replace("CC",clicod+" - "+cliente);
+            if(l.length()>20){
+				l=l.replace("@Cliente",clicod+" - "+cliente);
 				return l;
 			}
-            l=l.replace("CC",clicod+" - "+rep.ltrim(cliente, 14));return l;
+            l=l.replace("@Cliente",clicod+" - "+rep.ltrim(cliente, 20));return l;
         }
 
         return l;

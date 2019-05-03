@@ -1613,7 +1613,6 @@ public class FinDia extends PBase {
 
                 browse=1;
                 startActivity(new Intent(this,DevolBodTol.class));
-
                 toastlong("No ha efectuado la devolución a bodega,debe proceder a realizarla antes de fin del dia");
 
             } else  {

@@ -89,7 +89,7 @@ public class Deposito extends PBase {
 		
 		printcallback= new Runnable() {
 		    public void run() {
-		    	Deposito.super.finish();
+				askPrint();
 		    }
 		};
 		
@@ -157,6 +157,7 @@ public class Deposito extends PBase {
 
 	}
 
+	
 	// Main
 	
 	private void setHandlers(){
@@ -625,8 +626,6 @@ public class Deposito extends PBase {
 	}
 
 
-
-
 	// Aux
 	
 	private void fillSpinner(){
@@ -741,7 +740,6 @@ public class Deposito extends PBase {
 			
 	}	
 
-	
 	private void doExit(){
 		try {
 			super.finish();
@@ -750,7 +748,36 @@ public class Deposito extends PBase {
 		}
 
 	}
-	
+
+	private void askPrint() {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("¿Impresión correcta?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					finish();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					//singlePrint();
+					prn.printask(printcallback);
+					//finish();
+				}
+			});
+
+			dialog.show();
+		} catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+
 	// Activity Events
 	
 	@Override

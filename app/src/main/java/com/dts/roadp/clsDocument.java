@@ -77,6 +77,7 @@ public class clsDocument {
 			if (docfactura && (reimpres==4) || docdesglose) flag=0;
 			if (doccanastabod) flag=2;
 			if (docrecibo && (reimpres==0)) flag=0;
+			if (docdevolucion && (reimpres==1)) flag = 1;
         } else if(modofact.equalsIgnoreCase("*")) {
             if (doccanastabod) flag = 2;
 			if (docdevolucion || docpedido) flag = 1;

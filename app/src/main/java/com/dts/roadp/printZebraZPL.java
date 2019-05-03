@@ -76,15 +76,14 @@ public class printZebraZPL extends printBase {
     }
 
     public void printask(Runnable callBackHook,String fileName) {
-        hasCallback=false;
-
+        hasCallback=true;
+        callback=callBackHook;
         fname=fileName;	errmsg="";exitprint=false;
         msgAskPrint();
     }
 
     public boolean print(String fileName) {
         hasCallback=false;
-
         fname=fileName;errmsg="";
 
         try {
@@ -95,6 +94,18 @@ public class printZebraZPL extends printBase {
 
         return true;
     }
+
+    public void printnoask(Runnable callBackHook,String fileName) {
+        hasCallback=true;
+        callback=callBackHook;
+        fname=fileName;	errmsg="";exitprint=false;
+        try {
+            if (loadFile())	doStartPrint();
+        } catch (Exception e) {
+            showmsg("Error: " + e.getMessage());
+        }
+    }
+
 
     // Private
 
@@ -229,6 +240,8 @@ public class printZebraZPL extends printBase {
 
     private void doCallBack() {
 
+        int i=1;
+
         if (!hasCallback) return;
 
         try {
@@ -238,10 +251,14 @@ public class printZebraZPL extends printBase {
                 public void run() {
                     try {
                         callback.run();
-                    } catch (Exception ee) {}
+                    } catch (Exception ee) {
+                        String ss=ee.getMessage();
+                    }
                 }
             }, 500);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            String ss=e.getMessage();
+        }
 
         /*
         try {
@@ -324,7 +341,7 @@ public class printZebraZPL extends printBase {
             if (connection != null) connection.close();
 
             if (status) {
-                showmsg("Impresora lista");
+                //showmsg("Impresora lista");
             } else {
                 showmsg("Error : "+statstr);
             }

@@ -30,7 +30,7 @@ public class DevolCli extends PBase {
 
 	private printer prn;
 	private clsDocDevolucion fdevol;
-	public Runnable printcallback,printclose,printexit;
+	public Runnable printcallback,printclose,printexit,printvoid;
 
 	private String cliid,itemid,prodid;
 	private double cant;
@@ -75,10 +75,15 @@ public class DevolCli extends PBase {
 			}
 		};
 
+		printvoid= new Runnable() {
+			public void run() {
+			}
+		};
+
 		printclose= new Runnable() {
 			public void run() {
-				limpiavariables_devol();
-				DevolCli.super.finish();
+			limpiavariables_devol();
+			DevolCli.super.finish();
 			}
 		};
 
@@ -606,7 +611,7 @@ public class DevolCli extends PBase {
 
             }
 
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("createDoc: " + e.getMessage());
 		}
@@ -802,8 +807,9 @@ public class DevolCli extends PBase {
 
 						String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 						fdevol.buildPrint(gl.dvcorrelnc,1,vModo);
-						prn.printnoask(printclose, "printnc.txt");
-						prn.printnoask(printclose, "printnc.txt");
+						impres=0;
+						//prn.printnoask(printvoid, "printnc.txt");
+						prn.printnoask(printcallback, "printnc.txt");
 
 					}
 				}

@@ -632,11 +632,13 @@ public class FacturaRes extends PBase {
 
  	private void finishOrder(){
 
+
 		if (!saved) {
 			if (!saveOrder()) return;
 		}
 
 		impressOrder();
+
 	}
 
 	private void impressOrder(){
@@ -673,7 +675,7 @@ public class FacturaRes extends PBase {
 					singlePrint();
 				}
 
-			} else if(!prn.isEnabled()){
+			}else if(!prn.isEnabled()){
 				if (gl.peModal.equalsIgnoreCase("APR")) {
 					fdoc.buildPrintExt(corel,2,"APR");
 				} else if (gl.peModal.equalsIgnoreCase("...")) {

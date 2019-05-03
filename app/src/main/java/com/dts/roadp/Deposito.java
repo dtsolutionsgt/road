@@ -150,8 +150,7 @@ public class Deposito extends PBase {
 
 	public void OpenDesglose(View view){
 		try{
-
-			gl.totDep =Double.parseDouble( mu.frmcur_sm(tef));
+			gl.totDep =Double.parseDouble( mu.frmcur_sm(tef).replace(",",""));
 			startActivity(new Intent(this,desglose.class));
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

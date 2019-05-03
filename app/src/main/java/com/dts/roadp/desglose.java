@@ -3,8 +3,6 @@ package com.dts.roadp;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.graphics.Region;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -97,14 +95,17 @@ public class desglose extends PBase {
         txtCincoCvs.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(0)});
         txtUnCv.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(0)});
 
-
         printcallback = new Runnable() {
             public void run() {
-                //askPrint();
-                desglose.super.finish();
+                askPrint();
             }
         };
 
+        printclose = new Runnable() {
+            public void run() {
+                desglose.super.finish();
+            }
+        };
 
         prn=new printer(this,printclose,gl.validimp);
         fdesg=new clsDesglose(this,prn.prw,gl.ruta,0, "");
@@ -1629,27 +1630,15 @@ public class desglose extends PBase {
         if (SaveDesglose()) {
 
             if (prn.isEnabled()) {
-
-                if (impres == 0) {
-                    fdesg.buildPrint(corel, 0, "TOL");
-                } else {
-                    fdesg.buildPrint(corel, 10, "TOL");
-                }
-
+                fdesg.buildPrint(corel, 0, "TOL");
                 prn.printask(printcallback);
-
             } else {
-                if (impres == 0) {
-                    fdesg.buildPrint(corel, 0, gl.peFormatoFactura);
-                } else {
-                    fdesg.buildPrint(corel, 10, gl.peFormatoFactura);
-                }
+                finish();
             }
         }
 
         return;
     }
-
 
     private void askPrint() {
         try {
@@ -1674,7 +1663,7 @@ public class desglose extends PBase {
                         }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
                     }
 
-                    if (impres > 1) {
+                    /*if (impres > 1) {
 
                         try {
                             sql = "UPDATE D_DEPOSB SET IMPRES=IMPRES+1 WHERE COREL='" + corel + "'";
@@ -1691,14 +1680,17 @@ public class desglose extends PBase {
                         prn.printask(printcallback);
 
                     }
+                    */
+
+                    finish();
                 }
             });
 
             dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     //singlePrint();
-                    //prn.printask(printcallback);
-                    finish();
+                    prn.printask(printcallback);
+                    //finish();
                 }
             });
 

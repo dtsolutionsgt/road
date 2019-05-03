@@ -252,11 +252,9 @@ public class ComWS extends PBase {
 				return;
 			}
 
-			if (gl.contlic) {
-				if (!validaLicencia()) {
-					mu.msgbox("Licencia inválida!");
-					return;
-				}
+			if (!validaLicencia()) {
+				mu.msgbox("Licencia inválida!");
+				return;
 			}
 
 			if (gl.banderafindia) {

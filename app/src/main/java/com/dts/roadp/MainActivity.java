@@ -31,19 +31,19 @@ import java.lang.reflect.Field;
 
 public class MainActivity extends PBase {
 
-	private EditText txtUser,txtPass;
-	private TextView lblRuta,lblRTit,lblLogin,lblVer,lblID;
-	private ImageView imgLogo;
-		
-	private BaseDatosVersion dbVers;
-	
-	private boolean rutapos,scanning=false;
-	private String cs1,cs2,cs3,barcode;
+    private EditText txtUser, txtPass;
+    private TextView lblRuta, lblRTit, lblLogin, lblVer, lblID;
+    private ImageView imgLogo;
 
-	private String parVer="9.4.1 / 30-Abr-2019";
+    private BaseDatosVersion dbVers;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+    private boolean rutapos, scanning = false;
+    private String cs1, cs2, cs3, barcode;
+
+    private String parVer = "9.4.1 / 30-Abr-2019";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
 
         try {
             super.onCreate(savedInstanceState);
@@ -51,66 +51,68 @@ public class MainActivity extends PBase {
 
             grantPermissions();
         } catch (Exception e) {
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
 
-	}
+    }
 
-	// Grant permissions
+    // Grant permissions
 
-	private void grantPermissions() {
+    private void grantPermissions() {
 
-		try {
-			if (Build.VERSION.SDK_INT >= 20) {
+        try {
+            if (Build.VERSION.SDK_INT >= 20) {
 
-				if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
-						&& checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
-						&& checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
-                        && checkCallingOrSelfPermission(Manifest.permission.WAKE_LOCK)   == PackageManager.PERMISSION_GRANTED
-						&& checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
-                        && checkSelfPermission(Manifest.permission.READ_PHONE_STATE)== PackageManager.PERMISSION_GRANTED)
-				{
-					startApplication();
-				} else {
-  					ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-							Manifest.permission.ACCESS_FINE_LOCATION,
-							Manifest.permission.CALL_PHONE,
-							Manifest.permission.CAMERA,
-                            Manifest.permission.WAKE_LOCK,
-                            Manifest.permission.READ_PHONE_STATE
-                        }, 1);
-				}
-			}
+                if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                        && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                        && checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED
+                        && checkCallingOrSelfPermission(Manifest.permission.WAKE_LOCK) == PackageManager.PERMISSION_GRANTED
+                        && checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                        && checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                    startApplication();
+                } else {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                    Manifest.permission.CALL_PHONE,
+                                    Manifest.permission.CAMERA,
+                                    Manifest.permission.WAKE_LOCK,
+                                    Manifest.permission.READ_PHONE_STATE
+                            }, 1);
+                }
+            }
 
-		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-		}
-	}
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+        }
+    }
 
-	private void startApplication() {
+    private void startApplication() {
 
         try {
             super.InitBase();
 
             this.setTitle("ROAD");
-            gl.parVer=parVer;
+            gl.parVer = parVer;
 
-  			txtUser= (EditText) findViewById(R.id.txtUser);
-            txtPass= (EditText) findViewById(R.id.txtMonto);
-            lblRuta= (TextView) findViewById(R.id.lblCDisp);
-            lblRTit= (TextView) findViewById(R.id.lblCUsed);
-            lblLogin= (TextView) findViewById(R.id.lblDir);
-            lblVer= (TextView) findViewById(R.id.textView10);
-            lblID= (TextView) findViewById(R.id.textView81);
-            imgLogo= (ImageView) findViewById(R.id.imgNext);
+            txtUser = (EditText) findViewById(R.id.txtUser);
+            txtPass = (EditText) findViewById(R.id.txtMonto);
+            lblRuta = (TextView) findViewById(R.id.lblCDisp);
+            lblRTit = (TextView) findViewById(R.id.lblCUsed);
+            lblLogin = (TextView) findViewById(R.id.lblDir);
+            lblVer = (TextView) findViewById(R.id.textView10);
+            lblID = (TextView) findViewById(R.id.textView81);
+            imgLogo = (ImageView) findViewById(R.id.imgNext);
 
-            lblVer.setText("Version "+gl.parVer);
+            lblVer.setText("Version " + gl.parVer);
 
             // DB VERSION
-            dbVers=new BaseDatosVersion(this,db,Con);
+            dbVers = new BaseDatosVersion(this, db, Con);
             dbVers.checkVersion(1);
 
             setHandlers();
@@ -127,89 +129,103 @@ public class MainActivity extends PBase {
             }
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
-            if (gl.debug){
-                txtUser.setText("00100993");txtPass.setText("2613");
+            if (gl.debug) {
+                txtUser.setText("00100993");
+                txtPass.setText("2613");
             }
 
-            gl.contlic=false;
         } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-        }
-
-	}
-
-	@Override
-	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-	    try{
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
-                    && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED
-                    && checkSelfPermission(Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED
-                    && checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
-                    && checkSelfPermission(Manifest.permission.READ_PHONE_STATE)== PackageManager.PERMISSION_GRANTED)
-            {
-                startApplication();
-            } else {
-                 super.finish();
-            }
-          }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-        }
-
-	}
-
-	//region Events
-
-	public void comMan(View view) {
-	    try{
-            entraComunicacion();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-        }
-
-	}
-	
-	public void gotoMenu(){
-		try{
-            txtUser.setText("");txtPass.setText("");txtUser.requestFocus();
-
-            Intent intent = new Intent(this, Menu.class);
-            startActivity(intent);
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
     }
 
-	public void doLogin(View view) {
-
-	    if (!validaLicencia()) {
-            startActivity(new Intent(this, comWSLic.class));return;
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        try {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                startApplication();
+            } else {
+                super.finish();
+            }
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
-	    try{
+    }
+
+    //region Events
+
+    public void comMan(View view) {
+        try {
+            entraComunicacion();
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+        }
+
+    }
+
+    public void gotoMenu() {
+        try {
+            txtUser.setText("");
+            txtPass.setText("");
+            txtUser.requestFocus();
+
+            Intent intent = new Intent(this, Menu.class);
+            startActivity(intent);
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+        }
+
+    }
+
+    public void doLogin(View view) {
+
+        if (!validaLicencia()) {
+            startActivity(new Intent(this, comWSLic.class));
+            return;
+        }
+
+        try {
             processLogIn();
         } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
-	}
-	
-	public void doRegister(View view) {
-	    try{
+    }
+
+    public void doRegister(View view) {
+        try {
             startActivity(new Intent(this, comWSLic.class));
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
-	}
+    }
 
-	private void setHandlers() {
+    private void setHandlers() {
 
-	    try{
+        try {
             txtUser.setOnKeyListener(new OnKeyListener() {
                 @Override
                 public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
@@ -238,64 +254,66 @@ public class MainActivity extends PBase {
                     return false;
                 }
             });
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
         }
 
-	}
+    }
 
-	private void compareSC(CharSequence s) {
-	    try{
-            String os,bc;
+    private void compareSC(CharSequence s) {
+        try {
+            String os, bc;
 
-            bc=txtUser.getText().toString();
-            if (mu.emptystr(bc) || bc.length()<2) {
+            bc = txtUser.getText().toString();
+            if (mu.emptystr(bc) || bc.length() < 2) {
                 txtUser.setText("");
-                scanning=false;
+                scanning = false;
                 return;
             }
-            os=s.toString();
+            os = s.toString();
 
             if (bc.equalsIgnoreCase(os)) {
                 //Toast.makeText(this,"Codigo barra : " +bc, Toast.LENGTH_SHORT).show();
-                msgbox("Barra: "+bc);
+                msgbox("Barra: " + bc);
             }
 
             txtUser.setText("");
-            scanning=false;
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+            scanning = false;
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
         }
 
-	}
+    }
 
-	//endregion
+    //endregion
 
-	//region Main
+    //region Main
 
-	private void initSession() {
-		Cursor DT;
-		String s, rn = "";
-		String vCellCom = "";
+    private void initSession() {
+        Cursor DT;
+        String s, rn = "";
+        String vCellCom = "";
 
-		if (dbVacia()) {
-			gl.modoadmin=true;
-			gl.autocom=0;
-			toastcent("¡La base de datos está vacia!");
-			startActivity( new Intent(MainActivity.this,ComWS.class));
-		}
+        if (dbVacia()) {
+            gl.modoadmin = true;
+            gl.autocom = 0;
+            toastcent("¡La base de datos está vacia!");
+            startActivity(new Intent(MainActivity.this, ComWS.class));
+        }
 
-		try {
-			//#HS_20181122_1505 Se agrego el campo Impresion.
-			sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR FROM P_RUTA";
-			DT = Con.OpenDT(sql);
+        try {
+            //#HS_20181122_1505 Se agrego el campo Impresion.
+            sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR FROM P_RUTA";
+            DT = Con.OpenDT(sql);
 
-			if (DT.getCount()>0){
+            if (DT.getCount() > 0) {
 
                 DT.moveToFirst();
 
                 gl.ruta = DT.getString(0);
-                gl.rutanom=DT.getString(1);
+                gl.rutanom = DT.getString(1);
                 gl.vend = DT.getString(2);
                 gl.rutatipog = DT.getString(3);
                 s = DT.getString(3);
@@ -303,14 +321,14 @@ public class MainActivity extends PBase {
                 gl.impresora = DT.getString(5);
                 gl.sucur = DT.getString(6);
 
-                if (!mu.emptystr(DT.getString(7))){
+                if (!mu.emptystr(DT.getString(7))) {
                     vCellCom = DT.getString(7);
                 }
                 gl.CellCom = (vCellCom.equalsIgnoreCase("S"));
 
                 rutapos = s.equalsIgnoreCase("R");
 
-            }else{
+            } else {
 
                 gl.ruta = "";
                 gl.rutanom = "";
@@ -320,69 +338,74 @@ public class MainActivity extends PBase {
 
             }
 
-		} catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+        }
 
-		if (rutapos) {
-			lblRTit.setText("POS No. " + gl.ruta);
-			imgLogo.setImageResource(R.drawable.retail_logo);
-		} else {
-			lblRTit.setText("Ruta No. " + gl.ruta);
-		}
+        if (rutapos) {
+            lblRTit.setText("POS No. " + gl.ruta);
+            imgLogo.setImageResource(R.drawable.retail_logo);
+        } else {
+            lblRTit.setText("Ruta No. " + gl.ruta);
+        }
 
-		try {
-			//#HS_20181120_1616 Se agrego el campo UNIDAD_MEDIDA_PESO.//campo INCIDENCIA_NO_LECTURA
-			sql = " SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO," +
-				  " INCIDENCIA_NO_LECTURA, LOTE_POR_DEFECTO FROM P_EMPRESA";
-			DT = Con.OpenDT(sql);
+        try {
+            //#HS_20181120_1616 Se agrego el campo UNIDAD_MEDIDA_PESO.//campo INCIDENCIA_NO_LECTURA
+            sql = " SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO," +
+                    " INCIDENCIA_NO_LECTURA, LOTE_POR_DEFECTO FROM P_EMPRESA";
+            DT = Con.OpenDT(sql);
 
-			if (DT.getCount()>0){
+            if (DT.getCount() > 0) {
                 DT.moveToFirst();
 
                 gl.emp = DT.getString(0);
-                lblRuta.setText(DT.getString(1));gl.empnom =DT.getString(1);
+                lblRuta.setText(DT.getString(1));
+                gl.empnom = DT.getString(1);
                 gl.devol = DT.getInt(2) == 1;
                 s = DT.getString(3);
                 gl.usarpeso = s.equalsIgnoreCase("S");
-                gl.banderafindia=DT.getInt(4) == 1;
+                gl.banderafindia = DT.getInt(4) == 1;
                 gl.umpeso = DT.getString(6);
-                gl.incNoLectura = DT.getInt(7)==1; //#HS_20181211 Agregue campo incNoLectura para validacion en cliente.
-                gl.depparc = DT.getInt(5)==1;
+                gl.incNoLectura = DT.getInt(7) == 1; //#HS_20181211 Agregue campo incNoLectura para validacion en cliente.
+                gl.depparc = DT.getInt(5) == 1;
                 gl.lotedf = DT.getString(8);
-            }else{
+            } else {
                 gl.emp = "0";
                 lblRuta.setText("");
                 gl.devol = false;
             }
 
-		} catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+        }
 
-		gl.vendnom = "Vendedor 1";
+        gl.vendnom = "Vendedor 1";
 
-		try {
-			File directory = new File(Environment.getExternalStorageDirectory() + "/SyncFold");
-			directory.mkdirs();
-		} catch (Exception e) {
- 		}
+        try {
+            File directory = new File(Environment.getExternalStorageDirectory() + "/SyncFold");
+            directory.mkdirs();
+        } catch (Exception e) {
+        }
 
-		try {
-			File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos");
-			directory.mkdirs();
-		} catch (Exception e) {
-  		}
+        try {
+            File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos");
+            directory.mkdirs();
+        } catch (Exception e) {
+        }
 
         //Id de Dispositivo
         gl.deviceId = androidid();
-		gl.devicename =getLocalBluetoothName();lblID.setText(gl.devicename);
+        gl.devicename = getLocalBluetoothName();
+        lblID.setText(gl.devicename);
 
         try {
             AppMethods app = new AppMethods(this, gl, Con, db);
             app.parametrosExtra();
         } catch (Exception e) {
-            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             msgbox(e.getMessage());
         }
 
@@ -391,15 +414,15 @@ public class MainActivity extends PBase {
     private void processLogIn() {
         lblLogin.setVisibility(View.INVISIBLE);
 
-        if (gl.contlic) {
-            if (!validaLicencia()) {
-                lblLogin.setVisibility(View.VISIBLE);
-                mu.msgbox("¡Licencia invalida!");
-                return;
-            }
+        if (!validaLicencia()) {
+            lblLogin.setVisibility(View.VISIBLE);
+            mu.msgbox("¡Licencia invalida!");
+            startActivity(new Intent(this,comWSLic.class));
+            return;
         }
 
-        if (checkUser()) gotoMenu();else lblLogin.setVisibility(View.VISIBLE);
+        if (checkUser()) gotoMenu();
+        else lblLogin.setVisibility(View.VISIBLE);
     }
 
     private boolean checkUser() {
@@ -463,41 +486,43 @@ public class MainActivity extends PBase {
             return true;
 
         } catch (Exception e) {
-            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             return false;
         }
 
-	}
+    }
 
-	public void supervisorRuta(){
-		Cursor DT;
+    public void supervisorRuta() {
+        Cursor DT;
 
-		try{
+        try {
 
-			sql = "SELECT CODIGO FROM P_VENDEDOR WHERE RUTA = '" + gl.ruta + "' AND NIVEL = 2";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
+            sql = "SELECT CODIGO FROM P_VENDEDOR WHERE RUTA = '" + gl.ruta + "' AND NIVEL = 2";
+            DT = Con.OpenDT(sql);
+            DT.moveToFirst();
 
-			if(DT.getCount()>0) {
-				gl.codSupervisor = DT.getString(0);
-			}
+            if (DT.getCount() > 0) {
+                gl.codSupervisor = DT.getString(0);
+            }
 
-		}catch(Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			Log.d("supervisorRuta error: ", e.getMessage());
-		}
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            Log.d("supervisorRuta error: ", e.getMessage());
+        }
 
-	}
+    }
 
-	//endregion
+    //endregion
 
-	//region Ventas Demo
-	
-	public void showDemoMenu() {
+    //region Ventas Demo
 
-	    try {
+    public void showDemoMenu() {
+
+        try {
             final AlertDialog Dialog;
-            final String[] selitems = {"Datos de cliente","Base de datos original","Borrar datos de venta"};
+            final String[] selitems = {"Datos de cliente", "Base de datos original", "Borrar datos de venta"};
 
             AlertDialog.Builder menudlg = new AlertDialog.Builder(this);
             menudlg.setTitle("Datos de demo");
@@ -507,13 +532,15 @@ public class MainActivity extends PBase {
 
                     switch (item) {
                         case 0:
-                            Intent intent = new Intent(MainActivity.this,DemoData.class);
+                            Intent intent = new Intent(MainActivity.this, DemoData.class);
                             startActivity(intent);
                             break;
                         case 1:
-                            copyRawFile();break;
+                            copyRawFile();
+                            break;
                         case 2:
-                            borrarDatos(1);break;
+                            borrarDatos(1);
+                            break;
                     }
 
                     dialog.cancel();
@@ -529,109 +556,132 @@ public class MainActivity extends PBase {
 
             Dialog = menudlg.create();
             Dialog.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
         }
 
-	}	
-	
-	private void copyRawFile() {
-		String fn;
-		int rid, rslt;
-        try{
+    }
+
+    private void copyRawFile() {
+        String fn;
+        int rid, rslt;
+        try {
             Field[] fields = R.raw.class.getFields();
-            for(Field f : fields)
+            for (Field f : fields)
                 try {
-                    fn=f.getName();
+                    fn = f.getName();
                     if (fn.equalsIgnoreCase("rd_param")) {
-                        rid=f.getInt(null);
-                        rslt=copyRawFile(rid);
-                        if (rslt==1) {
-                            Intent intent = new Intent(this,ComDrop.class);
+                        rid = f.getInt(null);
+                        rslt = copyRawFile(rid);
+                        if (rslt == 1) {
+                            Intent intent = new Intent(this, ComDrop.class);
                             startActivity(intent);
                         }
                     }
-                }catch (Exception e) {
-                    addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                } catch (Exception e) {
+                    addlog(new Object() {
+                    }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
                 }
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
         }
 
-	}
-	
-	private int copyRawFile(int rawid) {
+    }
 
-		try {
-			InputStream in = getResources().openRawResource(rawid);
-			File file = new File(Environment.getExternalStorageDirectory(), "/SyncFold/rd_param.txt");
-			FileOutputStream out = new FileOutputStream(file);
+    private int copyRawFile(int rawid) {
 
-			byte[] buff = new byte[1024];
-			int read = 0;
+        try {
+            InputStream in = getResources().openRawResource(rawid);
+            File file = new File(Environment.getExternalStorageDirectory(), "/SyncFold/rd_param.txt");
+            FileOutputStream out = new FileOutputStream(file);
 
-			try {
-				while ((read = in.read(buff)) > 0) {
-					out.write(buff, 0, read);
-				}
-			} finally {
-				in.close();out.close();
-			}
-			return 1;
-		} catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			mu.msgbox("Error : "+e.getMessage());return 0;
-		}	
-	}
-	
-	private void borrarDatos(int showmsg) {
+            byte[] buff = new byte[1024];
+            int read = 0;
 
-		try {
-			
-			db.beginTransaction();
-				
-			sql="DELETE FROM D_FACTURA";db.execSQL(sql);
-			sql="DELETE FROM D_FACTURAD";db.execSQL(sql);
-			sql="DELETE FROM D_FACTURAP";db.execSQL(sql);
-			sql="DELETE FROM D_FACTURAD_LOTES";db.execSQL(sql);
-			
-			sql="DELETE FROM D_PEDIDO";db.execSQL(sql);
-			sql="DELETE FROM D_PEDIDOD";db.execSQL(sql);
-			
-			sql="DELETE FROM D_BONIF";db.execSQL(sql);
-			sql="DELETE FROM D_BONIF_LOTES";db.execSQL(sql);
-			sql="DELETE FROM D_REL_PROD_BON";db.execSQL(sql);
-			sql="DELETE FROM D_BONIFFALT";db.execSQL(sql);
-			
-			sql="DELETE FROM D_DEPOS";db.execSQL(sql);
-			sql="DELETE FROM D_DEPOSD";db.execSQL(sql);
-	
-			sql="DELETE FROM D_MOV";db.execSQL(sql);
-			sql="DELETE FROM D_MOVD";db.execSQL(sql);
+            try {
+                while ((read = in.read(buff)) > 0) {
+                    out.write(buff, 0, read);
+                }
+            } finally {
+                in.close();
+                out.close();
+            }
+            return 1;
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            mu.msgbox("Error : " + e.getMessage());
+            return 0;
+        }
+    }
 
-			sql="DELETE FROM D_ATENCION";db.execSQL(sql);
-		
-			
-			db.setTransactionSuccessful();			
-			db.endTransaction();
-					
-			if (showmsg==1) Toast.makeText(this,"Datos de venta borrados", Toast.LENGTH_SHORT).show();
-			
-		} catch (SQLException e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			db.endTransaction();
-			mu.msgbox("Error : " + e.getMessage());
-		}		
-		
-	}
+    private void borrarDatos(int showmsg) {
 
-	//endregion
-	
-	//region Aux
-	
-	private void entraComunicacion() {
+        try {
 
-	    try{
+            db.beginTransaction();
+
+            sql = "DELETE FROM D_FACTURA";
+            db.execSQL(sql);
+            sql = "DELETE FROM D_FACTURAD";
+            db.execSQL(sql);
+            sql = "DELETE FROM D_FACTURAP";
+            db.execSQL(sql);
+            sql = "DELETE FROM D_FACTURAD_LOTES";
+            db.execSQL(sql);
+
+            sql = "DELETE FROM D_PEDIDO";
+            db.execSQL(sql);
+            sql = "DELETE FROM D_PEDIDOD";
+            db.execSQL(sql);
+
+            sql = "DELETE FROM D_BONIF";
+            db.execSQL(sql);
+            sql = "DELETE FROM D_BONIF_LOTES";
+            db.execSQL(sql);
+            sql = "DELETE FROM D_REL_PROD_BON";
+            db.execSQL(sql);
+            sql = "DELETE FROM D_BONIFFALT";
+            db.execSQL(sql);
+
+            sql = "DELETE FROM D_DEPOS";
+            db.execSQL(sql);
+            sql = "DELETE FROM D_DEPOSD";
+            db.execSQL(sql);
+
+            sql = "DELETE FROM D_MOV";
+            db.execSQL(sql);
+            sql = "DELETE FROM D_MOVD";
+            db.execSQL(sql);
+
+            sql = "DELETE FROM D_ATENCION";
+            db.execSQL(sql);
+
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
+            if (showmsg == 1)
+                Toast.makeText(this, "Datos de venta borrados", Toast.LENGTH_SHORT).show();
+
+        } catch (SQLException e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            db.endTransaction();
+            mu.msgbox("Error : " + e.getMessage());
+        }
+
+    }
+
+    //endregion
+
+    //region Aux
+
+    private void entraComunicacion() {
+
+        try {
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
             alert.setTitle("Contraseña de administrador");//	alert.setMessage("Serial");
@@ -648,18 +698,20 @@ public class MainActivity extends PBase {
                     String s;
 
                     try {
-                        s=input.getText().toString();
+                        s = input.getText().toString();
 
                         if (s.equalsIgnoreCase("1965")) {
-                            gl.modoadmin=true;
-                            gl.autocom=0;
-                            startActivity( new Intent(MainActivity.this,ComWS.class));
+                            gl.modoadmin = true;
+                            gl.autocom = 0;
+                            startActivity(new Intent(MainActivity.this, ComWS.class));
                         } else {
-                            mu.msgbox("Contraseña incorrecta");return;
+                            mu.msgbox("Contraseña incorrecta");
+                            return;
                         }
 
                     } catch (Exception e) {
-                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                        addlog(new Object() {
+                        }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
                     }
                 }
             });
@@ -670,116 +722,145 @@ public class MainActivity extends PBase {
             });
 
             alert.show();
-        }catch (Exception  e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
         }
 
 
-	}
+    }
 
-	private boolean dbVacia() {
-		Cursor dt;
+    private boolean dbVacia() {
+        Cursor dt;
 
-		try {
-			sql = "SELECT CODIGO FROM P_RUTA";
-			dt = Con.OpenDT(sql);
+        try {
+            sql = "SELECT CODIGO FROM P_RUTA";
+            dt = Con.OpenDT(sql);
 
-			return dt.getCount()==0;
-		} catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			return true;
-		}
-	}
+            return dt.getCount() == 0;
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            return true;
+        }
+    }
 
-	private boolean validaLicencia() {
-        CryptUtil cu=new CryptUtil();
-		Cursor dt;
-		String lic,lickey,licruta,rutaencrypt;
-		Integer msgLic=0;
+    private boolean validaLicencia() {
+        CryptUtil cu = new CryptUtil();
+        Cursor dt;
+        String lic, lickey, licruta, rutaencrypt;
+        Integer msgLic = 0;
 
-		try {
-            lickey=cu.encrypt(gl.deviceId);
-            rutaencrypt=cu.encrypt(gl.ruta);
+        try {
+            lickey = cu.encrypt(gl.deviceId);
+            rutaencrypt = cu.encrypt(gl.ruta);
 
-            sql="SELECT lic, licparam FROM Params";
-            dt=Con.OpenDT(sql);
+            sql = "SELECT lic, licparam FROM Params";
+            dt = Con.OpenDT(sql);
             dt.moveToFirst();
-            lic=dt.getString(0);
-            licruta=dt.getString(1);
+            lic = dt.getString(0);
+            licruta = dt.getString(1);
 
-            if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) return true;
-            else if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)){msgLic=1;}
-            else if(!lic.equalsIgnoreCase(lickey)){msgLic=2;}
-            else if(!licruta.equalsIgnoreCase(rutaencrypt)){msgLic=3;}
-		} catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" : "+e.getMessage());
-		}
 
-		if(msgLic==1)toastlong("El dispositivo no tiene licencia válida de handheld, ni de ruta");
-		else if(msgLic==2){toastlong("El dispositivo no tiene licencia valida de handheld");}
-        else if(msgLic==3){toastlong("El dispositivo no tiene licencia valida de ruta");}
+            if (mu.emptystr(lic)) {
+                toastlong("El dispositivo no tiene licencia válida de handheld");
+                return false;
+            }
+
+            if (mu.emptystr(licruta)) {
+                toastlong("El dispositivo no tiene licencia válida de ruta");
+                return false;
+            }
+
+
+            if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) {
+               return true;
+            }
+
+            if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)) {
+                toastlong("El dispositivo no tiene licencia válida de handheld, ni de ruta");
+                return false;
+            }
+
+            if (!lic.equalsIgnoreCase(lickey)) {
+                toastlong("El dispositivo no tiene licencia válida de handheld");
+                return false;
+            }
+
+            if (!licruta.equalsIgnoreCase(rutaencrypt)) {
+                toastlong("El dispositivo no tiene licencia válida de ruta");
+                return false;
+            }
+
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            mu.msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
+        }
 
         return false;
-	}
+    }
 
-	private void msgAskLic(String msg) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+    private void msgAskLic(String msg) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-		dialog.setTitle(R.string.app_name);
-		dialog.setMessage(msg  );
-		dialog.setIcon(R.drawable.ic_quest);
+        dialog.setTitle(R.string.app_name);
+        dialog.setMessage(msg);
+        dialog.setIcon(R.drawable.ic_quest);
 
-		dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				finish();
-			}
-		});
+        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
 
-		dialog.show();
-	}
+        dialog.show();
+    }
 
-	@SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission")
     private String androidid() {
-		String uniqueID="";
-		try {
-			//uniqueID = Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID);
+        String uniqueID = "";
+        try {
+            //uniqueID = Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID);
             TelephonyManager tm = (TelephonyManager) this.getSystemService(this.TELEPHONY_SERVICE);
             uniqueID = tm.getDeviceId();
- 		} catch (Exception e) {
-			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-			uniqueID="0000000000";
-		}
+        } catch (Exception e) {
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+            uniqueID = "0000000000";
+        }
 
-		return uniqueID;
-	}
+        return uniqueID;
+    }
 
     public String getLocalBluetoothName() {
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        if (mBluetoothAdapter==null) {
+        if (mBluetoothAdapter == null) {
             return "";
         } else {
             return mBluetoothAdapter.getName();
         }
     }
 
-	//endregion
+    //endregion
 
-	//region Activity Events
-	
-	protected void onResume() {
-	    try{
+    //region Activity Events
+
+    protected void onResume() {
+        try {
             super.onResume();
             initSession();
             txtUser.requestFocus();
             lblLogin.setVisibility(View.VISIBLE);
-        }catch (Exception e){
-           addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
         }
-	}
+    }
 
-	//endregion
+    //endregion
 
 }
 

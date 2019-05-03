@@ -57,6 +57,8 @@ public class comWSLic extends PBase {
     private clsDataBuilder dbld;
     private DateUtils DU;
 
+    private boolean licenciaRuta=false, licenciaHH=false;
+
     // 355030097127235
 
     // Web Service -
@@ -114,6 +116,8 @@ public class comWSLic extends PBase {
 
         setHandlers();
 
+        validaLicencia();
+
     }
 
 
@@ -146,6 +150,41 @@ public class comWSLic extends PBase {
         }
 
 
+    }
+
+    private void validaLicencia() {
+        CryptUtil cu = new CryptUtil();
+        Cursor dt;
+        String lic, lickey, licruta, rutaencrypt;
+
+        try {
+            lickey = cu.encrypt(gl.deviceId);
+            rutaencrypt = cu.encrypt(gl.ruta);
+
+            sql = "SELECT lic, licparam FROM Params";
+            dt = Con.OpenDT(sql);
+            dt.moveToFirst();
+            lic = dt.getString(0);
+            licruta = dt.getString(1);
+
+            if (!mu.emptystr(lic)){
+                if (lic.equalsIgnoreCase(lickey) ) {
+                    licenciaHH=true;
+                }
+            }
+
+            if (!mu.emptystr(licruta)){
+                if (licruta.equalsIgnoreCase(rutaencrypt)) {
+                    licenciaRuta=true;
+                }
+            }
+
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            mu.msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
+        }
     }
 
     private void setHandlers() {
@@ -546,17 +585,22 @@ public class comWSLic extends PBase {
         wsStask.onProgressUpdate();
 
         try {
-            if (requestLicence(gl.deviceId,devinfo)==1) {
-                errflag=false;
-            } else {
-                fterr = sstr;errflag=true;
+
+            if (!licenciaHH){
+                if (requestLicence(gl.deviceId,devinfo)==1) {
+                    errflag=false;
+                } else {
+                    fterr = sstr;errflag=true;
+                }
             }
 
-            if (requestLicenceRuta(gl.ruta)==1) {
-                errflag=false;
-            } else {
-                fterr = sstr;
-                errflag=true;
+            if (!licenciaRuta){
+                if (requestLicenceRuta(gl.ruta)==1) {
+                    errflag=false;
+                } else {
+                    fterr = sstr;
+                    errflag=true;
+                }
             }
 
         } catch (Exception e) {

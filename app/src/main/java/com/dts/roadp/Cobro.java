@@ -42,10 +42,13 @@ public class Cobro extends PBase {
 	private double ttot,tsel,tpag,tpagos,tpend,vefect,plim,cred,pg,sal,ssal,total,monto,pago;
 	private boolean peexit;
 	private boolean porcentaje = false, validarCred = false;
-	private int fflag=1,fcorel,fechaven,medPago,checkCheck=0, impres=0;
+	private int fflag=1,fcorel,medPago,checkCheck=0, impres=0;
 	private String crrf,docfact,anulado;
+	private long fechaven;
 	private CheckBox cbCheckAll;
 	private RadioButton chkFactura,chkContado;
+
+	private boolean yaValidoCredito=false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -89,11 +92,12 @@ public class Cobro extends PBase {
 		printclose= new Runnable() {
 		    public void run() {
 
+				if (!yaValidoCredito) validaCredito();
+
 		    	if(gl.banderaCobro){
 		    		Cobro.super.finish();
 				}else{
 					if(browse==4){
-						validaCredito();
 						browse = 0;
 					}
 				}
@@ -402,7 +406,7 @@ public class Cobro extends PBase {
 					for (int i = 0; i != DTFecha.getCount(); i++) {
 						double tot = 0;
 						docfact = DTFecha.getString(0);
-						fechaven = DTFecha.getInt(2);
+						fechaven = DTFecha.getLong(2);
 						fechav = sfecha(fechaven);
 
 						if (date.compareTo(fechav) < 0) {
@@ -461,6 +465,8 @@ public class Cobro extends PBase {
 	private void  msgAskFact() {
 		try{
 
+			yaValidoCredito=true;
+
 			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 			alert.setTitle("Road");
@@ -485,7 +491,7 @@ public class Cobro extends PBase {
 
 			} else if(gl.credito<=0){
 
-				alert.setMessage("Cliente no tiene credito actualmente.");
+				alert.setMessage("Cliente no tiene crédito actualmente.");
 
 				chkFactura.setText("Pagar Facturas");
 				chkContado.setText("Continuar la venta al contado");
@@ -510,8 +516,9 @@ public class Cobro extends PBase {
 						initVenta();
 						layout.removeAllViews();
 					}else{
-						toast("Seleccione accion a realizar");
+						toast("Seleccione acción a realizar");
 						closekeyb();
+						yaValidoCredito=false;
 						msgAskFact();
 					}
 				}
@@ -556,6 +563,7 @@ public class Cobro extends PBase {
 
 			if (saveCobro()) {
 				listItems();
+
 				if (dtipo.equalsIgnoreCase("R")) {
 					if (prn.isEnabled()) {
 						fdocf.buildPrint(crrf,0,gl.peModal);
@@ -563,14 +571,15 @@ public class Cobro extends PBase {
 					}else if(!prn.isEnabled()){
 						fdocf.buildPrint(crrf,0,gl.peModal);
 
-						if(gl.validarCred==1){
+						/*if(gl.validarCred==1){
 							validaCredito();
 						}else if(gl.validarCred==2){
 							Cobro.super.finish();
 						}
 
-						gl.validarCred=0;
+						gl.validarCred=0;*/
 					}
+
 				}else {
 					if (prn.isEnabled()) {
 						fdoc.buildPrint(corel,0,gl.peModal);
@@ -579,15 +588,16 @@ public class Cobro extends PBase {
 					}else if(!prn.isEnabled()){
 						fdoc.buildPrint(corel,0,gl.peModal);
 
-						if(gl.validarCred==1){
-							validaCredito();
-						}else if(gl.validarCred==2){
-							Cobro.super.finish();
-						}
-
-						gl.validarCred=0;
 					}
 				}
+
+				if(gl.validarCred==1){
+					validaCredito();
+				}else if(gl.validarCred==2){
+					Cobro.super.finish();
+				}
+
+				gl.validarCred=0;
 			}
 
 		}catch (Exception e){
@@ -597,17 +607,17 @@ public class Cobro extends PBase {
 
 	}
 
-	public String sfecha(int f) {
-		int vy,vm,vd;
+	public String sfecha(long f) {
+		long vy,vm,vd;
 		String s;
 
-		vy=(int) f/100000000;f=f % 100000000;
-		vm=(int) f/1000000;f=f % 1000000;
-		vd=(int) f/10000;f=f % 10000;
+		vy=(long) f/100000000;f=f % 100000000;
+		vm=(long) f/1000000;f=f % 1000000;
+		vd=(long) f/10000;f=f % 10000;
 
 		s="";
 		if (vd>9) { s=s+String.valueOf(vd)+"-";} else {s=s+"0"+String.valueOf(vd)+"-";}
-		if (vm>9) { s=s+String.valueOf(vm)+"-20";} else {s=s+"0"+String.valueOf(vm)+"-20";}
+		if (vm>9) { s=s+String.valueOf(vm)+"-";} else {s=s+"0"+String.valueOf(vm)+"-";}
 		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
 
 		return s;
@@ -1238,24 +1248,20 @@ public class Cobro extends PBase {
 						db.execSQL(sql);
 					}
 
+					toast("Impres "+impres);
+
                     if (impres>1) {
 
-                       /* try {
-                            sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorreld+"'";
-                            db.execSQL(sql);
-                        } catch (Exception e) {
-                            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-                        }*/
-
-                        gl.brw=0;
+                    	gl.brw=0;
 
                     } else {
 
-                        if (dtipo.equalsIgnoreCase("R")) {
+                    	if (dtipo.equalsIgnoreCase("R")) {
                             if (prn.isEnabled()) {
                                 fdocf.buildPrint(crrf,1,gl.peModal);
                                 prn.printnoask(printclose, "print.txt");
                                 prn.printnoask(printclose, "print.txt");
+								impres=0;
                             }
                         }else {
                             if (prn.isEnabled()) {
@@ -1264,13 +1270,14 @@ public class Cobro extends PBase {
                                 browse = 4;
                                 prn.printnoask(printclose, "print.txt");
                                 prn.printnoask(printclose, "print.txt");
+								impres=0;
                             }
                         }
 
                     }
 
                     if(gl.validarCred==1){
-                        validaCredito();
+						if (!yaValidoCredito) validaCredito();
                     }else if(gl.validarCred==2){
                         Cobro.super.finish();
                     }
@@ -1282,6 +1289,7 @@ public class Cobro extends PBase {
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
+					if (!yaValidoCredito) validaCredito();
 					singlePrint();
 				}
 			});

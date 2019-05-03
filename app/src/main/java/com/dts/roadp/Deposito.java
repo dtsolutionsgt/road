@@ -584,8 +584,8 @@ public class Deposito extends PBase {
 						DT.moveToNext();
 					}
 
-					sql="Delete from T_DEPOSB";
-					db.execSQL(sql);
+					//sql="Delete from T_DEPOSB";
+					//db.execSQL(sql);
 				}
 
 			}
@@ -610,15 +610,17 @@ public class Deposito extends PBase {
 			if (!saveDoc()) return;
 
 			if (prn.isEnabled()) {
-				ddoc.buildPrint(corel,0);
+				ddoc.buildPrint(corel,0,gl.peModal);
 				prn.printask(printcallback);
 				claseFinDia.updateImpDeposito(3);
 			} else if(!prn.isEnabled()){
-				ddoc.buildPrint(corel, 0);
+				ddoc.buildPrint(corel, 0,gl.peModal);
 				Toast.makeText(this,"Depósito guardado", Toast.LENGTH_SHORT).show();
 				super.finish();
 			}
 			claseFinDia.updateDeposito(4);
+			sql="Delete from T_DEPOSB";
+			db.execSQL(sql);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

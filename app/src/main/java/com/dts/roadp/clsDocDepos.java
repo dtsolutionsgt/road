@@ -8,10 +8,12 @@ import android.widget.Toast;
 public class clsDocDepos extends clsDocument {
 	
 	private ArrayList<itemData> items= new ArrayList<itemData>();
+	private ArrayList<itemData> itemsD= new ArrayList<itemData>();
+	private ArrayList<itemData> itemsC= new ArrayList<itemData>();
 
-	private double tot,tote,totc;
+	private double tot,tote,totc,desgloseTotal=0;
 	private int numc;
-	private String banco,cuenta,ref;
+	private String banco1,banco,cuenta,ref;
 	protected appGlobals gl;
 	protected MiscUtils mu;
 	protected DateUtils du;
@@ -79,11 +81,16 @@ public class clsDocDepos extends clsDocument {
 	
 	protected boolean loadDocData(String corel) {
 		Cursor DT;
+		Cursor D;
+		Cursor T;
+		Cursor DTS;
 		itemData item;
 		double val;
 		String ss;
+		double cantDenom;
 		
 		items.clear();
+		itemsD.clear();
 	
 		
 		try {
@@ -112,46 +119,222 @@ public class clsDocDepos extends clsDocument {
 			}				
 			
 		} catch (Exception e) {
-	    }		
+	    }
+
+		try {
+			sql="SELECT D.DENOMINACION, D.CANTIDAD "+
+				"FROM T_DEPOSB D ";
+			DTS=Con.OpenDT(sql);
+			DTS.moveToFirst();
+
+			while (!DTS.isAfterLast()) {
+
+				item = new itemData();
+
+				item.denom=DTS.getDouble(0);
+
+				item.cant=DTS.getInt(1);
+
+				cantDenom = Double.parseDouble( item.denom.toString());
+
+				item.total = cantDenom * item.cant;
+
+				desgloseTotal += item.total;
+
+				itemsD.add(item);
+
+				DTS.moveToNext();
+			}
+
+			try {
+				sql="SELECT BANCO,CUENTA,TOTCHEQ,NUMCHEQ,FECHA FROM D_DEPOS WHERE COREL='"+corel+"'";
+				D=Con.OpenDT(sql);
+				D.moveToFirst();
+
+				while (!D.isAfterLast()){
+
+					item = new itemData();
+
+					item.bancoCorr=D.getString(0);
+					item.cuenta=D.getString(1);
+
+					item.totc=D.getDouble(2);
+					item.numc=D.getInt(3);
+
+					try {
+						sql="SELECT NOMBRE FROM P_BANCO  WHERE CODIGO='"+item.bancoCorr+"'";
+						T=Con.OpenDT(sql);
+						T.moveToFirst();
+
+						while (!T.isAfterLast()){
+
+							item.banco=T.getString(0);
+
+							T.moveToNext();
+						}
+					} catch (Exception e) {
+						item.banco=item.bancoCorr;
+					}
+
+
+					D.moveToNext();
+
+					banco1=item.banco;
+					itemsC.add(item);
+				}
+
+
+			} catch (Exception e) {
+				Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
+			}
+
+		} catch (Exception e) {
+			Toast.makeText(cont,"loadHeadData"+e.getMessage(), Toast.LENGTH_SHORT).show();return false;
+		}
 		
 		return true;
 	}	
 		
 	protected boolean buildDetail() {
-		itemData item;
 		
 		rep.empty();
-		rep.add("Banco : "+banco);
-		rep.add("Cuenta : "+cuenta);
-		rep.add("Boleto : "+ref);
-		rep.line();
-		
+		rep.add("Banco : "+banco1);
+
+		/*rep.add("Cuenta : "+cuenta);
+		rep.add("Boleto : "+ref);*/
+
+		if(modofact.equalsIgnoreCase("*"))detail();
+		if(modofact.equalsIgnoreCase("TOL"))detailToledano();
+
 		rep.addtot("Total efectivo :", rep.rtrim(rep.frmdec(tote),12));
 		rep.addtot("Total cheques :", rep.rtrim(rep.frmdec(totc),12));
 		rep.line();
+		rep.addtotD("Cheques :",numc);
 		rep.addtot("Total  :", rep.rtrim(rep.frmdec(tot),12));
-		rep.add("Cheques :"+numc);
 		rep.line();
 		rep.empty();
-		
+		rep.add("Observaciones:");
+		rep.add("");
+		rep.line();
+		rep.line();
+		rep.line();
+		rep.empty();
+		rep.add("");
+		rep.line();
+		rep.add("Firma Vendedor");
+		rep.empty();
+		rep.add("");
+		rep.line();
+		rep.add("Firma Cajero");
+		return true;
+	}
+
+
+	protected boolean detailToledano(){
+
+		itemData itemD;
+		itemData itemC;
+
+		rep.add("");
+		rep.add("DESGLOSE DE EFECTIVO");
+		rep.line();
+
+		for (int i = 0; i <itemsD.size(); i++) {
+			itemD=itemsD.get(i);
+		}
+
+		rep.add("");
+
+		detailDesgloseEfec();
+		rep.line();
+
+		rep.add("");
+		rep.add("DESGLOSE DE CHEQUES");
+		rep.line();
+		rep.add("");
+
+		for (int i = 0; i <itemsC.size(); i++) {
+			itemC=itemsC.get(i);
+		}
+
+		rep.add("");
+
+		detailDesgloseCheque();
+		rep.line();
+		rep.add("");
+
+		return true;
+	}
+
+	protected boolean detail(){
+
+		itemData item;
+
+		rep.line();
 		for (int i = 0; i <items.size(); i++) {
 			item=items.get(i);
-			
+
 			rep.add(item.nombre);
 			rep.add3lrr(item.tipo,item.num,item.monto);
 		}
-		
 		rep.line();
-		rep.empty();
-		
+		rep.add("");
+
 		return true;
-	}	
+	}
+
+	protected boolean detailDesgloseEfec() {
+		itemData item;
+		String ss;
+
+		rep.add("CANTIDAD      DENOMINACION     TOTAL");
+		rep.line();
+
+		for (int i = 0; i <itemsD.size(); i++) {
+			item=itemsD.get(i);
+
+			ss=rep.ltrim(frmdecimal(item.cant,0), prw-20);
+			ss=ss+rep.rtrim(item.denom+" ",5)+" "+rep.rtrim(frmdecimal(item.total,2),14);
+			rep.add(ss);
+
+		}
+
+		rep.line();
+
+		return true;
+	}
+
+	protected boolean detailDesgloseCheque() {
+		itemData item;
+		String ss;
+
+		rep.add("CHEQUE    BANCO    FECHA    VALOR");
+		rep.line();
+
+		for (int i = 0; i <itemsC.size(); i++) {
+			item=itemsC.get(i);
+
+			ss=rep.ltrim(frmdecimal(item.numc,0), prw-20)+" "+rep.ltrim(item.banco, prw-15);
+			ss=ss+rep.rtrim(item.bancoCorr+" ",5)+" "+rep.rtrim(frmdecimal(item.totc,2),14);
+			rep.add(ss);
+
+		}
+
+		rep.line();
+
+		return true;
+	}
 	
 	// Aux
 	
 	private class itemData {
-		public String cod,nombre,tipo,num, serie;
-		public double monto;
+		public String cod,nombre,tipo,num,serie,banco,cuenta;
+		public double monto,totc;
+
+
+		public Double denom,total;
+		public String corr,type,moneda,bancoCorr;
+		public int cant,numc;
 	}
 		
 	

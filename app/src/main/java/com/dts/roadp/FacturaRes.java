@@ -632,23 +632,21 @@ public class FacturaRes extends PBase {
 
  	private void finishOrder(){
 
+
+		if (!saved) {
+			if (!saveOrder()) return;
+		}
+
+		impressOrder();
+
+	}
+
+	private void impressOrder(){
 		try{
-			if (!saved) {
-				if (!saveOrder()) return;
-			}
 
 			rl_facturares.setVisibility(View.INVISIBLE);
 
 			if(gl.dvbrowse!=0) gl.dvbrowse =0;
-
-			clsBonifSave bonsave=new clsBonifSave(this,corel,"V");
-
-			bonsave.ruta=gl.ruta;
-			bonsave.cliente=gl.cliente;
-			bonsave.fecha=fecha;
-			bonsave.emp=gl.emp;
-
-			bonsave.save();
 
 			impres=0;
 
@@ -661,11 +659,11 @@ public class FacturaRes extends PBase {
 				} else if (gl.peModal.equalsIgnoreCase("TOL")) {
 
 					if (!gl.cobroPendiente) {
-					    if (impres==0) {
-                            fdoc.buildPrint(corel, 0,gl.peFormatoFactura);
-                        } else {
-                            fdoc.buildPrint(corel, 10,gl.peFormatoFactura);
-                        }
+						if (impres==0) {
+							fdoc.buildPrint(corel, 0,gl.peFormatoFactura);
+						} else {
+							fdoc.buildPrint(corel, 10,gl.peFormatoFactura);
+						}
 					}else{
 						fdoc.buildPrint(corel,4,gl.peFormatoFactura);
 					}
@@ -700,19 +698,15 @@ public class FacturaRes extends PBase {
 				}
 			}
 
-			gl.closeCliDet=true;
-			gl.closeVenta=true;
-
-			//#CKFK 20190412 Se inicializó variable cobroPendiente
-			//gl.cobroPendiente=false;
-
-			if (!prn.isEnabled()) super.finish();
-
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			mu.msgbox("finishOrder: "  + e.getMessage());
+			mu.msgbox("impressOrder: "  + e.getMessage());
 		}
 
+		gl.closeCliDet=true;
+		gl.closeVenta=true;
+
+		super.finish();
 
 	}
 
@@ -809,6 +803,19 @@ public class FacturaRes extends PBase {
 			ins.add("RAZON_ANULACION","");
 
 			db.execSQL(ins.sql());
+
+			//endregion
+
+			//region Bonificacion
+
+			clsBonifSave bonsave=new clsBonifSave(this,corel,"V");
+
+			bonsave.ruta=gl.ruta;
+			bonsave.cliente=gl.cliente;
+			bonsave.fecha=fecha;
+			bonsave.emp=gl.emp;
+
+			bonsave.save();
 
 			//endregion
 

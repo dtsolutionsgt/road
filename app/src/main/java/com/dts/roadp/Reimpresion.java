@@ -37,7 +37,9 @@ public class Reimpresion extends PBase {
 	private clsDocDepos ddoc;
 	private clsDocCobro cdoc;
 	private clsDocDevolucion fdev;
-	
+	private clsDocCanastaBod fcanastabod;
+	private clsDocCanastaBod fpaseantebod;
+
 	private int tipo;	
 	private String selid,itemid,corelNC,asignFact;
 	
@@ -78,6 +80,14 @@ public class Reimpresion extends PBase {
 
 		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 		fdev.deviceid =gl.deviceId;
+
+		fcanastabod=new clsDocCanastaBod(this,prn.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
+		fcanastabod.deviceid =gl.deviceId;
+		fcanastabod.vTipo="CANASTA";
+
+		fpaseantebod=new clsDocCanastaBod(this,prn.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
+		fpaseantebod.deviceid =gl.deviceId;
+		fpaseantebod.vTipo="PASEANTE";
 
 		printclose = new Runnable() {
 			public void run() {
@@ -379,10 +389,9 @@ public class Reimpresion extends PBase {
 				case 4:
 					imprRecarga();break;
 				case 5:
-					imprRecarga();break;
+					imprDevol();break;
 				case 6:
 					imprUltNotaCredito();break;
-
 				case 99:
 					imprFindia();break;
 			}
@@ -488,8 +497,30 @@ public class Reimpresion extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox(e.getMessage());
 		}
-	}	
-	
+	}
+
+	private void imprDevol() {
+		try {
+			if (prn.isEnabled()){
+				String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
+				try {
+					fpaseantebod.buildPrint(itemid, 0, vModo);
+					prn.printask("printpaseante.txt");
+
+					fcanastabod.buildPrint(itemid, 0, vModo);
+					prn.printnoask(printcallback, "printdevcan.txt");
+
+				} catch (Exception e) {
+				}
+
+			} else if (!prn.isEnabled()){
+				}
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox(e.getMessage());
+		}
+	}
+
 	private void imprFindia() {
 		try {
 			if(prn.isEnabled()){
@@ -600,7 +631,8 @@ public class Reimpresion extends PBase {
 
 				}else if(ncFact==2){
 					if(tipo==6){
-						fdev.buildPrint(itemid, 3, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+						fdev.buildPrint(itemid, 3, "TOL");
+						prn_nc.printask(printclose, "printnc.txt");
 
 						toast("Reimpresion de nota de credito generada");
 					}else{
@@ -608,11 +640,9 @@ public class Reimpresion extends PBase {
 
 						toast("Reimpresion de nota de credito generada");
 					}
-
 				}
 
-
-			}else if(!prn.isEnabled()){
+			} else if(!prn.isEnabled()){
 
 				if(ncFact==1){
 					fdev.buildPrint(itemid, 1, "TOL");

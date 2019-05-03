@@ -56,12 +56,20 @@ public class DevolBodCan extends PBase {
 
         gl.devprncierre=false;
 
-        printclose= new Runnable() {
+        app = new AppMethods(this, gl, Con, db);
+        gl.validimp=app.validaImpresora();
+        if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+
+        printclose = new Runnable() {
             public void run() {
-                //if (gl.devprncierre) {
-                    gl.closeDevBod=true;
-                    DevolBodCan.super.finish();
-                //}
+                if (!gl.devfindia) {
+                    if (!EnviaDev()) {
+                        mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                    }
+                }
+
+                gl.closeDevBod = true;
+                DevolBodCan.super.finish();
             }
         };
 
@@ -468,54 +476,6 @@ public class DevolBodCan extends PBase {
 
     }
 
-    private void askPrint() {
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle("Road");
-            dialog.setMessage("¿Impresión correcta?");
-
-            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-
-                    if (impres==0) {
-                        prn_can.printnoask(printclose, "printdevcan.txt");
-                    }
-
-                    if (!gl.devfindia) {
-                        if (!EnviaDev()){
-                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
-                        }
-                    }
-
-                    gl.closeDevBod=true;
-                    DevolBodCan.super.finish();
-
-                }
-            });
-
-            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-
-                    if (!gl.devfindia) {
-                        if (!EnviaDev()){
-                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
-                        }
-                    }
-
-                   gl.closeDevBod=true;
-                   DevolBodCan.super.finish();
-                }
-            });
-
-            dialog.show();
-        } catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-
-    }
-
     private boolean EnviaDev(){
 
         boolean vEnvia=false;
@@ -531,6 +491,7 @@ public class DevolBodCan extends PBase {
 
         return vEnvia;
     }
+
     //endregion
 
     //region createdoc
@@ -705,6 +666,56 @@ public class DevolBodCan extends PBase {
 
 
     }
+
+    private void askPrint() {
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle("Road");
+            dialog.setMessage("¿Impresión correcta?");
+
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                    //if (impres==0) {
+                    //     prn_can.printnoask(printclose, "printdevcan.txt");
+                    //}
+
+                    if (!gl.devfindia) {
+                        if (!EnviaDev()){
+                            toastlong("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                        }
+                    }
+
+                    gl.closeDevBod=true;
+                    DevolBodCan.super.finish();
+                }
+            });
+
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    prn_can.printask(printclose, "printdevcan.txt");
+                    /*
+                    if (!gl.devfindia) {
+                        if (!EnviaDev()){
+                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                        }
+                    }
+
+                    gl.closeDevBod=true;
+                    DevolBodCan.super.finish();
+                    */
+                }
+            });
+
+            dialog.show();
+        } catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+
+    }
+
 
     @Override
     protected void onResume() {

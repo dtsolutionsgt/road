@@ -1023,7 +1023,7 @@ public class FacturaRes extends PBase {
 					ins.add("DESC1", dt.getString(4));
 					ins.add("DESC2", dt.getString(5));
 					ins.add("DESC3", dt.getString(6));
-					ins.add("DEPOS", "");
+					ins.add("DEPOS", "N");
 
 					db.execSQL(ins.sql());
 

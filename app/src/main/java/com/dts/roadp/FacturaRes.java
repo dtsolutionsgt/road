@@ -632,13 +632,11 @@ public class FacturaRes extends PBase {
 
  	private void finishOrder(){
 
-
 		if (!saved) {
 			if (!saveOrder()) return;
 		}
 
 		impressOrder();
-
 	}
 
 	private void impressOrder(){
@@ -675,7 +673,7 @@ public class FacturaRes extends PBase {
 					singlePrint();
 				}
 
-			}else if(!prn.isEnabled()){
+			} else if(!prn.isEnabled()){
 				if (gl.peModal.equalsIgnoreCase("APR")) {
 					fdoc.buildPrintExt(corel,2,"APR");
 				} else if (gl.peModal.equalsIgnoreCase("...")) {
@@ -698,15 +696,20 @@ public class FacturaRes extends PBase {
 				}
 			}
 
+			gl.closeCliDet=true;
+			gl.closeVenta=true;
+
+			if (!prn.isEnabled()) super.finish();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("impressOrder: "  + e.getMessage());
+
+			gl.closeCliDet = true;
+			gl.closeVenta = true;
+
+			super.finish();
 		}
-
-		gl.closeCliDet=true;
-		gl.closeVenta=true;
-
-		super.finish();
 
 	}
 

@@ -99,7 +99,6 @@ public class Deposito extends PBase {
 		    }
 		};
 
-
 		app = new AppMethods(this, gl, Con, db);
 		gl.validimp=app.validaImpresora();
 		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");

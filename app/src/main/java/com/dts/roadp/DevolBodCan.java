@@ -35,6 +35,8 @@ public class DevolBodCan extends PBase {
 
     private clsWSEnvio vWSEnvio;
 
+    private AppMethods app;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +81,10 @@ public class DevolBodCan extends PBase {
         fpaseantebod=new clsDocCanastaBod(this,prn_paseante.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
         fpaseantebod.deviceid =gl.deviceId;
         fpaseantebod.vTipo="PASEANTE";
+
+        app = new AppMethods(this, gl, Con, db);
+        gl.validimp=app.validaImpresora();
+        if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
         listItems();
 

@@ -215,6 +215,8 @@ public class ComWS extends PBase {
 			return;
 		}
 
+		if (mu.emptystr(gl.ruta)) gl.ruta=txtRuta.getText().toString();
+
 		//CKFK 20190222 Se agregó esta validación para no sobreescribir los datos si ya se importaron
 		if (!gl.modoadmin) {
 

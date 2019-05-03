@@ -887,7 +887,7 @@ public class Clientes extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
+-
 	}
 
 	

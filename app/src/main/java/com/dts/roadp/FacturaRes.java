@@ -190,7 +190,10 @@ public class FacturaRes extends PBase {
 			lblMPago.setVisibility(View.VISIBLE);
 		}
 
+		fecha=du.getActDateTime();
 		fechae=fecha;
+		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(fecha);
+
 		dweek=mu.dayofweek();
 
 		clsDesc=new clsDescGlob(this);
@@ -352,16 +355,12 @@ public class FacturaRes extends PBase {
 	}
 
 	public void showBon(View view) {
-
 		try{
-
 			Intent intent = new Intent(this,BonVenta.class);
 			startActivity(intent);
-
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 
 	private void setHandlers(){
@@ -386,7 +385,6 @@ public class FacturaRes extends PBase {
 				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
 
 				public void onTextChanged(CharSequence s, int start,int before, int count) {
-
 					//Davuelto();
 				}
 
@@ -773,7 +771,7 @@ public class FacturaRes extends PBase {
 			ins.add("CLIENTE",gl.cliente);
 
 			ins.add("KILOMETRAJE",0);
-			ins.add("FECHAENTR",fecha);
+			ins.add("FECHAENTR",fechae);
 			ins.add("FACTLINK"," ");
 	   		ins.add("TOTAL",tot);
 			ins.add("DESMONTO",descmon);

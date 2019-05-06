@@ -1149,6 +1149,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_ENCABEZADO_REPORTESHH")) return false;
 			if (!AddTable("P_PORCMERMA")) return false;
 
+
 			// Objetivos
 
 			if (!AddTable("O_RUTA")) return false;
@@ -1234,9 +1235,10 @@ public class ComWS extends PBase {
 
 			Actualiza_FinDia();
 			encodePrinters();
-
 			encodeLicence();
 			encodeLicenceRuta();
+
+			fechaCarga();
 
             SetStatusRecToTrans("1");
 
@@ -2188,7 +2190,6 @@ public class ComWS extends PBase {
 
 	}
 
-
 	private boolean validaLicencia() {
 		CryptUtil cu=new CryptUtil();
 		Cursor dt;
@@ -2220,6 +2221,24 @@ public class ComWS extends PBase {
 		else if(msgLic==3){toastlong("El dispositivo no tiene licencia valida de ruta");}
 
 		return false;
+	}
+
+	private void fechaCarga() {
+
+		try {
+			dbT.beginTransaction();
+
+			dbT.execSQL("DELETE FROM P_FECHA");
+
+			sql="INSERT INTO P_FECHA VALUES('"+gl.ruta+"',"+du.getActDate()+")";
+			dbT.execSQL(sql);
+
+			dbT.setTransactionSuccessful();
+			dbT.endTransaction();
+		} catch (Exception e) {
+			dbT.endTransaction();
+		}
+
 	}
 
 	//endregion
@@ -4000,7 +4019,6 @@ public class ComWS extends PBase {
         return cnt;
 
     }
-
 
 	private String getMac() {
 		WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);

@@ -744,11 +744,9 @@ public class Cobro extends PBase {
                       // Ultimo corel
                       sql="UPDATE P_CORRELREC SET ACTUAL="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";
                       db.execSQL(sql);
-
                   }
 
                   db.setTransactionSuccessful();
-
                   db.endTransaction();
               }else{
 

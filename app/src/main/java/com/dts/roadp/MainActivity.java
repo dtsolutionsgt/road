@@ -371,7 +371,7 @@ public class MainActivity extends PBase {
                 gl.depparc = DT.getInt(5) == 1;
                 gl.lotedf = DT.getString(8);
             } else {
-                gl.emp = "0";
+                gl.emp = "03";
                 lblRuta.setText("");
                 gl.devol = false;
             }

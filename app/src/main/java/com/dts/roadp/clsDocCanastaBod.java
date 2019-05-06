@@ -1,10 +1,10 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class clsDocCanastaBod extends clsDocument {
 
@@ -97,7 +97,6 @@ public class clsDocCanastaBod extends clsDocument {
                     " FROM D_MOVDB M INNER JOIN P_PRODUCTO P ON M.PRODUCTO=P.CODIGO " +
                     " WHERE M.COREL='"+corel+"'";
             }
-
 
             DT=Con.OpenDT(sql);
             DT.moveToFirst();

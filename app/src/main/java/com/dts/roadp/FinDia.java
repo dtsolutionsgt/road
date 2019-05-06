@@ -1779,27 +1779,22 @@ public class FinDia extends PBase {
             sql = "SELECT STATCOM FROM D_MOV WHERE TIPO = 'D' AND ANULADO = 'N'";
             DT=Con.OpenDT(sql);
 
-            if (DT.getCount()==0)
-            {
+            if (DT.getCount()==0) {
 
                 vTieneInvDevol = Tiene_Inventario_Devolucion();
 
-                if (vTieneInvDevol)
-                {
+                if (vTieneInvDevol) {
                     Ya_Realizo_Devol = false;
                     claseFinDia.updateDevBodega(0);
 
-                }else
-                {
+                } else  {
                     Ya_Realizo_Devol = Inserta_Enc_D_Mov();
                     claseFinDia.updateDevBodega(5);
                 }
 
-            }else if (claseFinDia.getDevBodega() == 5)
-            {
+            }else if (claseFinDia.getDevBodega() == 5)  {
                 Ya_Realizo_Devol = true;
-            }else
-            {
+            }else  {
                 Ya_Realizo_Devol = true;
                 claseFinDia.updateDevBodega(5);
             }

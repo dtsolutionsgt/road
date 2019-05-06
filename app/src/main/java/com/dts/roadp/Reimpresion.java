@@ -85,7 +85,7 @@ public class Reimpresion extends PBase {
 		fcanastabod.deviceid =gl.deviceId;
 		fcanastabod.vTipo="CANASTA";
 
-		fpaseantebod=new clsDocCanastaBod(this,prn.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
+		fpaseantebod=new clsDocCanastaBod(this,prn.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
 		fpaseantebod.deviceid =gl.deviceId;
 		fpaseantebod.vTipo="PASEANTE";
 
@@ -502,13 +502,15 @@ public class Reimpresion extends PBase {
 	private void imprDevol() {
 		try {
 			if (prn.isEnabled()){
+
 				String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
+
 				try {
 					fpaseantebod.buildPrint(itemid, 0, vModo);
-					prn.printask("printpaseante.txt");
+					fcanastabod.buildPrintAppend(itemid, 0, vModo);
+					prn.printask("printdevcan.txt");
 
-					fcanastabod.buildPrint(itemid, 0, vModo);
-					prn.printnoask(printcallback, "printdevcan.txt");
+					//prn.printnoask(printcallback, "printdevcan.txt");
 
 				} catch (Exception e) {
 				}
@@ -597,8 +599,6 @@ public class Reimpresion extends PBase {
 					toast("Reimpresion de UltFactura generada");
 				}
 			}
-
-
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

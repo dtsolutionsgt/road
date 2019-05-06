@@ -95,6 +95,42 @@ public class clsDocument {
 
 		return true;
 	}
+
+	public boolean buildPrintAppend(String corel,int reimpres,String modo) {
+		int flag;
+
+		modofact=modo;
+		rep.clear();
+
+		if (!buildHeader(corel,reimpres)) return false;
+		if (!buildDetail()) return false;
+		if (!buildFooter()) return false;
+
+		flag=0;
+
+		if (modofact.equalsIgnoreCase("TOL")) {
+			if (docfactura && (reimpres==10)) flag=1;
+			if (docfactura && (reimpres==4) || docdesglose) flag=0;
+			if (doccanastabod) flag=2;
+			if (docrecibo && (reimpres==0)) flag=0;
+			if (docdevolucion && (reimpres==1)) flag = 1;
+		} else if(modofact.equalsIgnoreCase("*")) {
+			if (doccanastabod) flag = 2;
+			if (docdevolucion || docpedido) flag = 1;
+		}
+
+		if (flag==0) {
+			if (!rep.saveappend()) return false;
+		} else if (flag==1){
+			if (!rep.saveappend(2)) return false;
+		} else if (flag==2){
+			if (!rep.saveappend(3)) return false;
+		} else if (flag==3){
+			if (!rep.saveappend(3)) return false;
+		}
+
+		return true;
+	}
 	
 	public boolean buildPrint(String corel,int reimpres,BaseDatos pCon,android.database.sqlite.SQLiteDatabase pdb ) {
 		

@@ -13,7 +13,7 @@ public class clsDocDepos extends clsDocument {
 
 	private double tot,tote,totc,desgloseTotal=0;
 	private int numc;
-	private String banco1,banco,cuenta,ref;
+	private String banco1,banco,cuenta,ref,ss;
 	protected appGlobals gl;
 	protected MiscUtils mu;
 	protected DateUtils du;
@@ -86,7 +86,6 @@ public class clsDocDepos extends clsDocument {
 		Cursor DTS;
 		itemData item;
 		double val;
-		String ss;
 		double cantDenom;
 		
 		items.clear();
@@ -209,7 +208,6 @@ public class clsDocDepos extends clsDocument {
 		rep.addtot("Total efectivo :", rep.rtrim(rep.frmdec(tote),12));
 		rep.addtot("Total cheques :", rep.rtrim(rep.frmdec(totc),12));
 		rep.line();
-		rep.addtotD("Cheques :",numc);
 		rep.addtot("Total  :", rep.rtrim(rep.frmdec(tot),12));
 		rep.line();
 		rep.empty();
@@ -246,22 +244,24 @@ public class clsDocDepos extends clsDocument {
 		rep.add("");
 
 		detailDesgloseEfec();
-		rep.line();
 
-		rep.add("");
-		rep.add("DESGLOSE DE CHEQUES");
-		rep.line();
-		rep.add("");
+		if (ss.equalsIgnoreCase("S")){
+			rep.add("");
+			rep.add("DESGLOSE DE CHEQUES");
+			rep.line();
+			rep.add("");
 
-		for (int i = 0; i <itemsC.size(); i++) {
-			itemC=itemsC.get(i);
+			for (int i = 0; i <itemsC.size(); i++) {
+				itemC=itemsC.get(i);
+			}
+
+			rep.add("");
+
+			detailDesgloseCheque();
+
+			rep.addtotD("Cheques :",numc);
+			rep.add("");
 		}
-
-		rep.add("");
-
-		detailDesgloseCheque();
-		rep.line();
-		rep.add("");
 
 		return true;
 	}

@@ -1924,7 +1924,7 @@ public class BaseDatosScript {
 					"PRIMARY KEY ([IDIMPRESORA])"+
 			        ");";
 			database.execSQL(vSQL);
-			
+
 			vSQL="CREATE TABLE [P_FECHA]("+
 					"[RUTA] TEXT NOT NULL,"+
 					"[FECHA] INTEGER NOT NULL,"+

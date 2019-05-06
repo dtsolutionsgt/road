@@ -160,6 +160,8 @@ public class ComWS extends PBase {
 		rutatipo = gl.rutatipog;
 		rutapos = gl.rutapos;
 
+
+
 		if (gl.tipo == 0) {
 			this.setTitle("Comunicación");
 		} else {
@@ -3924,9 +3926,11 @@ public class ComWS extends PBase {
 	public void getWSURL() {
 		Cursor DT;
 		String wsurl;
-		
-		txtRuta.setText(ruta);
-		txtEmp.setText(gEmpresa);
+
+		if(!gl.debug){
+			txtRuta.setText(ruta);
+			txtEmp.setText(gEmpresa);
+		}
 		
 		try {
 

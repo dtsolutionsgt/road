@@ -247,6 +247,7 @@ public class Cobro extends PBase {
 			gl.pagolim=0;
 			gl.pagocobro=true;
 			browse=1;
+			dtipo="";
 
 			Intent intent = new Intent(this,Pago.class);
 			startActivity(intent);
@@ -591,13 +592,13 @@ public class Cobro extends PBase {
 					}
 				}
 
-				if(gl.validarCred==1){
+				/*if(gl.validarCred==1){
 					validaCredito();
 				}else if(gl.validarCred==2){
 					Cobro.super.finish();
 				}
 
-				gl.validarCred=0;
+				gl.validarCred=0;*/
 			}
 
 		}catch (Exception e){
@@ -1277,7 +1278,7 @@ public class Cobro extends PBase {
                     if(gl.validarCred==1){
 						if (!yaValidoCredito) validaCredito();
                     }else if(gl.validarCred==2){
-                        Cobro.super.finish();
+                        //Cobro.super.finish();
                     }
 
                     gl.validarCred=0;

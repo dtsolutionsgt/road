@@ -1420,7 +1420,8 @@ public class desglose extends PBase {
 
     public void save(View view){
         SaveDesglose();
-        impresDesglose();
+        //impresDesglose();
+        desglose.super.finish();
     }
 
     public boolean SaveDesglose() {

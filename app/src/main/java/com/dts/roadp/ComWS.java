@@ -140,7 +140,21 @@ public class ComWS extends PBase {
 		lblParam.setText("");
 		barInfo.setVisibility(View.INVISIBLE);
 
-		ruta = gl.ruta;
+		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
+		if (gl.debug) {
+			if (mu.emptystr(txtRuta.getText().toString())) {
+				txtRuta.setText("8001-1");
+				txtEmp.setText("03");
+				txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
+			}
+		}
+
+		if(gl.ruta.isEmpty()){
+			ruta = txtRuta.getText().toString();
+		}else {
+			ruta = gl.ruta;
+		}
+
 		ActRuta = ruta;
 		gEmpresa = gl.emp;
 		rutatipo = gl.rutatipog;
@@ -153,11 +167,11 @@ public class ComWS extends PBase {
 		}
 
 		licSerial=gl.deviceId;
-		licRuta=gl.ruta;
+		licRuta=ruta;
 
 		try {
 			licSerialEnc=cu.encrypt(licSerial);
-			licRutaEnc=cu.encrypt(gl.ruta);
+			licRutaEnc=cu.encrypt(licRuta);
 		} catch (Exception e) {
 			licSerialEnc="";
 			licRutaEnc="";
@@ -185,15 +199,6 @@ public class ComWS extends PBase {
 		envioparcial = gl.peEnvioParcial;
 
 		if (esvacio) txtWS.setEnabled(true);
-
-		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
-		if (gl.debug) {
-			if (mu.emptystr(txtRuta.getText().toString())) {
-				txtRuta.setText("8001-1");
-				txtEmp.setText("03");
-				txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
-			}
-		}
 
 		setHandlers();
 
@@ -2199,6 +2204,7 @@ public class ComWS extends PBase {
 			dt.moveToFirst();
 			lic=dt.getString(0);
 			licruta=dt.getString(1);
+			String ss=cu.decrypt(licruta);
 
 			if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) return true;
 			else if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)){msgLic=1;}

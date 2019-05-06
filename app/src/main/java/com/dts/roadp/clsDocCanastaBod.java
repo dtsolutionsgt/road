@@ -78,6 +78,7 @@ public class clsDocCanastaBod extends clsDocument {
     protected boolean loadDocData(String corel) {
         Cursor DT;
         itemData item;
+        String ss;
 
         loadHeadData(corel);
 
@@ -107,8 +108,8 @@ public class clsDocCanastaBod extends clsDocument {
 
                 item =new itemData();
 
-                item.cod=DT.getString(0);
-                item.nombre=DT.getString(1);
+                item.cod=DT.getString(0);ss=DT.getString(0);
+                item.nombre=DT.getString(1);ss=DT.getString(1);
                 item.cant=DT.getDouble(2);
                 item.peso=DT.getDouble(3);
                 item.lote=DT.getString(4);

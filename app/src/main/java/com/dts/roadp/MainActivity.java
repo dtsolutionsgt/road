@@ -371,14 +371,14 @@ public class MainActivity extends PBase {
                 gl.depparc = DT.getInt(5) == 1;
                 gl.lotedf = DT.getString(8);
             } else {
-                gl.emp = "";
-                lblRuta.setText("");
+                gl.emp = "";lblRuta.setText("");
                 gl.devol = false;
+                msgbox("¡No se pudo cargar configuración de la empresa!");
             }
 
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            msgbox("¡No se pudo cargar configuración de la empresa!");
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
         }
 
         gl.vendnom = "Vendedor 1";

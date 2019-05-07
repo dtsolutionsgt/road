@@ -285,6 +285,9 @@ public class DevolBodCan extends PBase {
 
         corel=gl.ruta+"_"+mu.getCorelBase();
 
+        fecha=du.getActDateTime();
+        if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
+
         try {
 
             db.beginTransaction();
@@ -293,7 +296,7 @@ public class DevolBodCan extends PBase {
             ins.add("COREL",corel);
             ins.add("RUTA",gl.ruta);
             ins.add("ANULADO","N");
-            ins.add("FECHA",du.getActDate());
+            ins.add("FECHA",fecha);
             ins.add("TIPO","D");
             ins.add("USUARIO",gl.vend);
             ins.add("REFERENCIA","Devolucion");
@@ -517,6 +520,7 @@ public class DevolBodCan extends PBase {
                         fpaseantebod.buildPrint(corel,0,vModo);
                     }
                 } catch (Exception e) {
+                    msgbox(e.getMessage());
                 }
 
                 try {

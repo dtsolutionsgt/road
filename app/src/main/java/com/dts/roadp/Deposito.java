@@ -439,7 +439,10 @@ public class Deposito extends PBase {
 		int nchec=0,it=0,cp;
 
 		if (!checkValues()) return false;
-		
+
+		fecha=du.getActDateTime();
+		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
+
 		try {
 			
 			for (int i = 0; i < items.size(); i++ ) {
@@ -465,7 +468,7 @@ public class Deposito extends PBase {
 			ins.init("D_DEPOS");
 			ins.add("COREL",corel);
 			ins.add("EMPRESA",((appGlobals) vApp).emp);
-			ins.add("FECHA",du.getActDate());
+			ins.add("FECHA",fecha);
 			ins.add("RUTA",((appGlobals) vApp).ruta);
 			ins.add("BANCO",bancoid);
 			ins.add("CUENTA",cuenta);

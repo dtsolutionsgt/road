@@ -25,12 +25,13 @@ public class DevolCli extends PBase {
 	private ArrayList<clsClasses.clsCFDV> items= new ArrayList<clsClasses.clsCFDV>();
 	private ListAdaptDevCli adapter;
 	private clsClasses.clsCFDV selitem;
+	private AppMethods app;
 
 	private double cntprd=0.0,cntunis=0.0,cntkgs=0.0,cntotl=0.0;
 
 	private printer prn;
 	private clsDocDevolucion fdevol;
-	public Runnable printcallback,printclose,printexit,printvoid;
+	private Runnable printcallback,printclose,printexit,printvoid;
 
 	private String cliid,itemid,prodid;
 	private double cant;
@@ -54,6 +55,8 @@ public class DevolCli extends PBase {
 		emp=gl.emp;
 		estado=gl.devtipo;
 		cliid=gl.cliente;
+
+		app = new AppMethods(this, gl, Con, db);
 		
 		setHandlers();
 		
@@ -123,7 +126,8 @@ public class DevolCli extends PBase {
 		}
 
 	}
-	
+
+
 	// Main
 	
 	private void setHandlers(){
@@ -390,15 +394,12 @@ public class DevolCli extends PBase {
 		gl.dvcorreld = obtienecorrel("D");
 		gl.dvcorrelnc = obtienecorrel("NC");
 
+		fecha=du.getActDateTime();
+		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
+
 		cntotl=mu.round(cntotl,2);
 
 		try {
-
-			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				fecha=du.getActDate();
-			} else {
-				fecha=du.getActDateTime();
-			}
 
 		    if (gl.tiponcredito==1){
 

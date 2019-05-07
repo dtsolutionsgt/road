@@ -763,7 +763,6 @@ public class AppMethods {
 
 			DT.moveToFirst();
 			ff=DT.getLong(0);
-			ff=1801010000;
 
 			return ff;
 		} catch (Exception e) {

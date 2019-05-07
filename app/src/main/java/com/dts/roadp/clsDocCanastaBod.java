@@ -32,7 +32,7 @@ public class clsDocCanastaBod extends clsDocument {
         super.loadHeadData(corel);
 
         if(vTipo.equals("CANASTA"))  nombre="DEVOLUCION DE CANASTA";
-        if(vTipo.equals("PASEANTE"))  nombre="DEVOLUCION DE BODEGA";
+        if(vTipo.equals("PASEANTE"))  nombre="DEVOLUCION A BODEGA";
 
         try {
             sql="SELECT COREL, RUTA, TIPO, REFERENCIA, USUARIO, FECHA "+
@@ -49,7 +49,8 @@ public class clsDocCanastaBod extends clsDocument {
             ref=DT.getString(3);
             vend=DT.getString(4);
 
-            ffecha=DT.getInt(5);fsfecha=sfecha(ffecha);
+            ffecha=DT.getInt(5);
+            fsfecha=sfecha(ffecha);
 
             corel=serie;
         } catch (Exception e) {

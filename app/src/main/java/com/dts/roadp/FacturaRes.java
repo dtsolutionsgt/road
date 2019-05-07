@@ -192,7 +192,7 @@ public class FacturaRes extends PBase {
 
 		fecha=du.getActDateTime();
 		fechae=fecha;
-		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(fecha);
+		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
 
 		dweek=mu.dayofweek();
 
@@ -730,12 +730,6 @@ public class FacturaRes extends PBase {
 		int mitem,bitem;
 		int dev_ins=1;
 		corel=gl.ruta+"_"+mu.getCorelBase();
-
-		if (gl.peModal.equalsIgnoreCase("TOL")) {
-			fecha=du.getActDate();
-		} else {
-			fecha=du.getActDateTime();
-		}
 
         sql="SELECT MAX(ITEM) FROM D_FACT_LOG";
         dt=Con.OpenDT(sql);

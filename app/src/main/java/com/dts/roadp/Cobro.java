@@ -37,6 +37,7 @@ public class Cobro extends PBase {
 	private printer prn;
 	private clsDocCobro fdoc;
 	private clsDocFactura fdocf;
+	private AppMethods app;
 
 	private String cliid,cod,itemid,prodid,sefect,corel,fserie,dtipo="",fechav;
 	private double ttot,tsel,tpag,tpagos,tpend,vefect,plim,cred,pg,sal,ssal,total,monto,pago;
@@ -68,6 +69,8 @@ public class Cobro extends PBase {
 		chkContado = new RadioButton(this,null);
 
 		cliid=gl.cliente;
+
+		app = new AppMethods(this, gl, Con, db);
 
 		setHandlers();
 
@@ -633,7 +636,11 @@ public class Cobro extends PBase {
 		if (!assignCorel()) return false;
 
 		corel= correlativo_recibo();
-		
+
+		fecha=du.getActDateTime();
+		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
+
+
 		try {
 
           if (!dtipo.equalsIgnoreCase("R")) {
@@ -649,7 +656,7 @@ public class Cobro extends PBase {
                   ins.init("D_COBRO");
                   ins.add("COREL",corel);
                   ins.add("ANULADO","N");
-                  ins.add("FECHA",du.getActDate());
+                  ins.add("FECHA",fecha);
                   ins.add("EMPRESA",gl.emp);
                   ins.add("RUTA",gl.ruta);
                   ins.add("VENDEDOR",gl.vend);

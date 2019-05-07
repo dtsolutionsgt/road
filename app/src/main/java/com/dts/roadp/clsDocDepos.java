@@ -1,9 +1,10 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
 import android.content.Context;
 import android.database.Cursor;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class clsDocDepos extends clsDocument {
 	
@@ -32,7 +33,7 @@ public class clsDocDepos extends clsDocument {
 		ruta=pruta;
 		vendedor=pvend;
 		vendcod=gl.vend;
-		fsfecha=du.getActDateStr();
+
 
 		
 	}
@@ -46,7 +47,7 @@ public class clsDocDepos extends clsDocument {
 		//nombre="DEPOSITO";
 			
 		try {
-			sql="SELECT BANCO,CUENTA,REFERENCIA,TOTAL,TOTEFEC,TOTCHEQ,NUMCHEQ FROM D_DEPOS WHERE COREL='"+corel+"'";
+			sql="SELECT BANCO,CUENTA,REFERENCIA,TOTAL,TOTEFEC,TOTCHEQ,NUMCHEQ,FECHA FROM D_DEPOS WHERE COREL='"+corel+"'";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
 			
@@ -59,7 +60,9 @@ public class clsDocDepos extends clsDocument {
 			totc=DT.getDouble(5);
 			numc=DT.getInt(6);
 			serie=corel;
-			
+
+			fsfecha=du.sfecha(DT.getInt(7));
+
 		} catch (Exception e) {
 			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 	    }	

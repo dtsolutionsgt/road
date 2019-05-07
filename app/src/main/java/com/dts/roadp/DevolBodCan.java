@@ -98,15 +98,16 @@ public class DevolBodCan extends PBase {
 
                     imprimecopias = true;
 
-                    askPrint();
                 }else{
 
                     if (imprimo==0) {
-                        prn_can.printnoask(printexit, "printdevcan.txt");
+                        prn_can.printnoask(printclose, "printdevcan.txt");
                     }
                     imprimecopias = false;
 
                 }
+
+                askPrint();
 
             }
         };
@@ -720,25 +721,55 @@ public class DevolBodCan extends PBase {
             dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
 
-                    //if (impres==0) {
-                    //     prn_can.printnoask(printclose, "printdevcan.txt");
-                    //}
-
-                    if (!gl.devfindia) {
-                        if (!EnviaDev()){
-                            toastlong("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
-                        }
+                    //Actualiza el número de impresiones para poder definir cuando es una re impresión o primera impresión.
+                    try {
+                        sql = "UPDATE D_MOV SET IMPRES=IMPRES+1 WHERE COREL='" + corel + "' AND TIPO='D' ";
+                        db.execSQL(sql);
+                    } catch (Exception e) {
+                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
                     }
 
-                    gl.closeDevBod=true;
-                    DevolBodCan.super.finish();
+                    if (imprimecopias){
+
+                        if (prn_can.isEnabled()) {
+
+                            String vModo = (gl.peModal.equalsIgnoreCase("TOL") ? "TOL" : "*");
+                            if (imprimo == 0 || imprimo == 1) {
+                                fpaseantebod.buildPrint(corel, 1, vModo);
+                            }
+
+                            if (imprimo == 0 || imprimo == 2) {
+                                fcanastabod.buildPrint(corel, 1, vModo);
+                            }
+
+                            if (imprimo == 0) {
+                                prn_paseante.printask(printcallback, "printpaseante.txt");
+                            } else if (imprimo == 1) {
+                                prn_paseante.printask(printcallback, "printpaseante.txt");
+                            } else if (imprimo == 2) {
+                                prn_can.printask(printcallback, "printdevcan.txt");
+                            }
+                        }
+
+                    }
+
+                    if (!imprimecopias){
+                        if (!gl.devfindia) {
+                            if (!EnviaDev()){
+                                toastlong("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                            }
+                        }
+
+                        gl.closeDevBod=true;
+                        DevolBodCan.super.finish();
+                    }
                 }
             });
 
             dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     prn_can.printask(printclose, "printdevcan.txt");
-                    /*
+
                     if (!gl.devfindia) {
                         if (!EnviaDev()){
                             mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
@@ -747,7 +778,6 @@ public class DevolBodCan extends PBase {
 
                     gl.closeDevBod=true;
                     DevolBodCan.super.finish();
-                    */
                 }
             });
 

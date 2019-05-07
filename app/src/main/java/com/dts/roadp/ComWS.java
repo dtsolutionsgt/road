@@ -1202,6 +1202,7 @@ public class ComWS extends PBase {
 				sql = listItems.get(i);esql = sql;
 				sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
 				sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
+                sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
 
 				try {
 					writer.write(sql);writer.write("\r\n");

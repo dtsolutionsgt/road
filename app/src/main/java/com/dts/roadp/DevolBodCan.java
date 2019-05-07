@@ -615,13 +615,14 @@ public class DevolBodCan extends PBase {
 
     private boolean validaDevolucion() {
         Cursor dt;
-        int cantstock=0,cantbolsa=0,cantcan=0;
+        long cantcan=0,cantstock=0,cantbolsa=0;;
 
         try {
-            sql="SELECT CANT FROM P_STOCK WHERE CANT+CANTM>0";
+            sql="SELECT IFNULL(SUM(CANT),0) FROM P_STOCK WHERE CANT+CANTM>0";
             dt=Con.OpenDT(sql);
 
-            cantstock=dt.getCount();
+            cantstock=dt.getLong(0);
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -629,10 +630,23 @@ public class DevolBodCan extends PBase {
         }
 
         try {
-            sql="SELECT BARRA FROM P_STOCKB";
+            sql="SELECT IFNULL(COUNT(BARRA),0) FROM P_STOCKB";
             dt=Con.OpenDT(sql);
 
-            cantbolsa=dt.getCount();
+            cantbolsa=dt.getLong(0);
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+            return false;
+        }
+
+        try {
+            sql="SELECT IFNULL(SUM(CANT),0) FROM D_CXC E INNER JOIN D_CXCD D ON  E.COREL = D.COREL WHERE E.ANULADO = 'N'";
+            dt=Con.OpenDT(sql);
+
+            cantcan=dt.getLong(0);
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());

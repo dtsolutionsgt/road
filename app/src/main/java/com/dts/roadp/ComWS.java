@@ -428,11 +428,15 @@ public class ComWS extends PBase {
 
 			if (!setComParams()) return;
 
-			//#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
-			View view = this.getCurrentFocus();
-			view.clearFocus();
-			if (view != null) {
-				keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
+			try{
+				//#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
+				View view = this.getCurrentFocus();
+				view.clearFocus();
+				if (view != null) {
+					keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
+				}
+			}catch (Exception e){
+
 			}
 
 			isbusy = 1;

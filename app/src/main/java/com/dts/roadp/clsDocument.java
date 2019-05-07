@@ -66,31 +66,43 @@ public class clsDocument {
         modofact=modo;
 		rep.clear();
 
-		if (!buildHeader(corel,reimpres)) return false;
-		if (!buildDetail()) return false;
-		if (!buildFooter()) return false;
+		try{
 
-		flag=0;
+			if (!buildHeader(corel,reimpres)) return false;
+			if (!buildDetail()) return false;
+			if (!buildFooter()) return false;
 
-		if (modofact.equalsIgnoreCase("TOL")) {
-			if (docfactura && (reimpres==10)) flag=1;
-			if (docfactura && (reimpres==4) || docdesglose) flag=0;
-			if (doccanastabod) flag=2;
-			if (docrecibo && (reimpres==0)) flag=0;
-			if (docdevolucion && (reimpres==1)) flag = 1;
-        } else if(modofact.equalsIgnoreCase("*")) {
-            if (doccanastabod) flag = 2;
-			if (docdevolucion || docpedido) flag = 1;
-        }
+			flag=0;
 
-		if (flag==0) {
-			if (!rep.save()) return false;
-		} else if (flag==1){
-			if (!rep.save(2)) return false;
-		} else if (flag==2){
-			if (!rep.save(3)) return false;
-		} else if (flag==3){
-			if (!rep.save(3)) return false;
+			if (modofact.equalsIgnoreCase("TOL")) {
+				if (docfactura && (reimpres==10)) flag=1;
+				if (docfactura && (reimpres==4) || docdesglose) flag=0;
+				if (doccanastabod){
+					if (reimpres==1){
+						flag=1;
+					}else{
+						flag=0;
+					}
+				}
+				if (docrecibo && (reimpres==0)) flag=0;
+				if (docdevolucion && (reimpres==1)) flag = 1;
+			} else if(modofact.equalsIgnoreCase("*")) {
+				if (doccanastabod) flag = 0;
+				if (docdevolucion || docpedido) flag = 1;
+			}
+
+			if (flag==0) {
+				if (!rep.save()) return false;
+			} else if (flag==1){
+				if (!rep.save(2)) return false;
+			} else if (flag==2){
+				if (!rep.save(3)) return false;
+			} else if (flag==3){
+				if (!rep.save(3)) return false;
+			}
+
+		}catch (Exception e){
+			setAddlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 		return true;
@@ -303,6 +315,13 @@ public class clsDocument {
 			rep.add("");
 
 		}
+
+		if (doccanastabod && !(modofact.equalsIgnoreCase("TOL"))){
+			rep.add("");
+			if (doccanastabod && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
+			rep.add("");
+		}
+
     }
 
     protected String encabezado(String l) {

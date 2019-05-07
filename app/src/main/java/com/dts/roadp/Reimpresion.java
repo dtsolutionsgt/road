@@ -45,7 +45,7 @@ public class Reimpresion extends PBase {
 	private String selid,itemid,corelNC,asignFact;
 	//Para reimpresión de devolución de canastas y paseante
 	private String  corel,existenciaC,existenciaP;
-	
+
 	// impresion nota credito
 
 	private ArrayList<String> lines= new ArrayList<String>();
@@ -442,10 +442,10 @@ public class Reimpresion extends PBase {
 	private void imprDeposito() {
 		try {
 			if (prn.isEnabled()){
-				ddoc.buildPrint(itemid, 1);
+				ddoc.buildPrint(itemid, 1,gl.peModal);
 				prn.printask(printcallback);
 			} else if (!prn.isEnabled()){
-				ddoc.buildPrint(itemid, 1);
+				ddoc.buildPrint(itemid, 1,gl.peModal);
 				toast("Reimpresion de deposito generada");
 			}
 		} catch (Exception e) {

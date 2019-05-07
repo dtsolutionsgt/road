@@ -14,7 +14,7 @@ public class clsDocDepos extends clsDocument {
 
 	private double tot,tote,totc,desgloseTotal=0;
 	private int numc;
-	private String banco1,banco,cuenta,ref,ss;
+	private String banco,cuenta,ref,ss,st="";
 	protected appGlobals gl;
 	protected MiscUtils mu;
 	protected DateUtils du;
@@ -114,7 +114,7 @@ public class clsDocDepos extends clsDocument {
 				
 				ss=DT.getString(5);
 				item.num=" ";
-				if (ss.equalsIgnoreCase("S")) item.num=""+DT.getString(4);
+				if (ss.equalsIgnoreCase("S")) {item.num=""+DT.getString(4); st="S";}
 			
 				items.add(item);	
 				DT.moveToNext();					
@@ -125,7 +125,7 @@ public class clsDocDepos extends clsDocument {
 
 		try {
 			sql="SELECT D.DENOMINACION, D.CANTIDAD "+
-				"FROM T_DEPOSB D ";
+				"FROM D_DEPOSB D WHERE COREL = '"+ corel +"'";
 			DTS=Con.OpenDT(sql);
 			DTS.moveToFirst();
 
@@ -149,7 +149,7 @@ public class clsDocDepos extends clsDocument {
 			}
 
 			try {
-				sql="SELECT BANCO,CUENTA,TOTCHEQ,NUMCHEQ,FECHA FROM D_DEPOS WHERE COREL='"+corel+"'";
+				sql="SELECT VALOR,DESC1,DESC2 FROM D_COBROP WHERE TIPO='C'";
 				D=Con.OpenDT(sql);
 				D.moveToFirst();
 
@@ -157,11 +157,10 @@ public class clsDocDepos extends clsDocument {
 
 					item = new itemData();
 
-					item.bancoCorr=D.getString(0);
+					item.bancoCorr=D.getString(2);
 					item.cuenta=D.getString(1);
 
-					item.totc=D.getDouble(2);
-					item.numc=D.getInt(3);
+					item.totc=D.getDouble(0);
 
 					try {
 						sql="SELECT NOMBRE FROM P_BANCO  WHERE CODIGO='"+item.bancoCorr+"'";
@@ -181,7 +180,40 @@ public class clsDocDepos extends clsDocument {
 
 					D.moveToNext();
 
-					banco1=item.banco;
+					itemsC.add(item);
+				}
+
+				sql="SELECT VALOR,DESC1,DESC2 FROM D_FACTURAP WHERE TIPO='C'";
+				D=Con.OpenDT(sql);
+				D.moveToFirst();
+
+				while (!D.isAfterLast()){
+
+					item = new itemData();
+
+					item.bancoCorr=D.getString(2);
+					item.cuenta=D.getString(1);
+
+					item.totc=D.getDouble(0);
+
+					try {
+						sql="SELECT NOMBRE FROM P_BANCO  WHERE CODIGO='"+item.bancoCorr+"'";
+						T=Con.OpenDT(sql);
+						T.moveToFirst();
+
+						while (!T.isAfterLast()){
+
+							item.banco=T.getString(0);
+
+							T.moveToNext();
+						}
+					} catch (Exception e) {
+						item.banco=item.bancoCorr;
+					}
+
+
+					D.moveToNext();
+
 					itemsC.add(item);
 				}
 
@@ -200,7 +232,7 @@ public class clsDocDepos extends clsDocument {
 	protected boolean buildDetail() {
 		
 		rep.empty();
-		rep.add("Banco : "+banco1);
+		rep.add("Banco : "+banco);
 
 		/*rep.add("Cuenta : "+cuenta);
 		rep.add("Boleto : "+ref);*/
@@ -248,11 +280,10 @@ public class clsDocDepos extends clsDocument {
 
 		detailDesgloseEfec();
 
-		if (ss.equalsIgnoreCase("S")){
+		if (st.equalsIgnoreCase("S")){
 			rep.add("");
 			rep.add("DESGLOSE DE CHEQUES");
 			rep.line();
-			rep.add("");
 
 			for (int i = 0; i <itemsC.size(); i++) {
 				itemC=itemsC.get(i);
@@ -311,14 +342,18 @@ public class clsDocDepos extends clsDocument {
 		itemData item;
 		String ss;
 
-		rep.add("CHEQUE    BANCO    FECHA    VALOR");
+		rep.add("BANCO                               ");
+		rep.add("   CHEQUE        FECHA         VALOR");
 		rep.line();
 
 		for (int i = 0; i <itemsC.size(); i++) {
 			item=itemsC.get(i);
 
-			ss=rep.ltrim(frmdecimal(item.numc,0), prw-20)+" "+rep.ltrim(item.banco, prw-15);
-			ss=ss+rep.rtrim(item.bancoCorr+" ",5)+" "+rep.rtrim(frmdecimal(item.totc,2),14);
+			ss=rep.ltrim(item.banco, prw-20);
+			rep.add(ss);
+			ss=rep.rtrim(item.cuenta,10)+" "+rep.rtrim(fsfecha,15);
+			ss=rep.ltrim(ss,prw-10);
+			ss=ss+" "+rep.rtrim(frmdecimal(item.totc,2),9);
 			rep.add(ss);
 
 		}

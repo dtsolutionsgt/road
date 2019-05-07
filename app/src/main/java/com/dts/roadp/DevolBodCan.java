@@ -20,14 +20,14 @@ public class DevolBodCan extends PBase {
     private TextView lblReg,lblTot;
     private ImageView imgNext;
     public String corel,existenciaC,existenciaP;
-    private int impres, close=0;
+    private int imprimo=0,close=0;
 
     private printer prn_can,prn_paseante;
     private clsDocCanastaBod fcanastabod;
     private clsDocCanastaBod fpaseantebod;
     private DevolBod DevBod;
-    public Runnable printclose, printcallback;
-
+    public Runnable printclose, printcallback,printexit;
+    private boolean imprimecopias=false;
     private ArrayList<clsClasses.clsDevCan> items= new ArrayList<clsClasses.clsDevCan>();
     private list_view_dev_bod_can adapter;
 
@@ -62,6 +62,19 @@ public class DevolBodCan extends PBase {
 
         printclose = new Runnable() {
             public void run() {
+                /*if (!gl.devfindia) {
+                    if (!EnviaDev()) {
+                        mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                    }
+                }
+
+                gl.closeDevBod = true;
+                DevolBodCan.super.finish();*/
+            }
+        };
+
+        printexit = new Runnable() {
+            public void run() {
                 if (!gl.devfindia) {
                     if (!EnviaDev()) {
                         mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
@@ -73,9 +86,28 @@ public class DevolBodCan extends PBase {
             }
         };
 
+
         printcallback= new Runnable() {
             public void run() {
-                askPrint();
+
+                if (!imprimecopias){
+
+                    if (imprimo==0) {
+                        prn_can.printnoask(printclose, "printdevcan.txt");
+                    }
+
+                    imprimecopias = true;
+
+                    askPrint();
+                }else{
+
+                    if (imprimo==0) {
+                        prn_can.printnoask(printexit, "printdevcan.txt");
+                    }
+                    imprimecopias = false;
+
+                }
+
             }
         };
 
@@ -503,38 +535,31 @@ public class DevolBodCan extends PBase {
 
         try{
 
-            impres=0;
+            imprimo=0;
 
             existenciaC=tieneCanasta(corel);
             existenciaP=tienePaseante(corel);
 
-            if(existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=1;
-            if(!existenciaC.isEmpty() && existenciaP.isEmpty()) impres=2;
-            if(existenciaC.isEmpty() && existenciaP.isEmpty()) impres=3;
+            if(existenciaC.isEmpty() && !existenciaP.isEmpty()) imprimo=1;
+            if(!existenciaC.isEmpty() && existenciaP.isEmpty()) imprimo=2;
+            if(existenciaC.isEmpty() && existenciaP.isEmpty()) imprimo=3;
 
             if (prn_can.isEnabled()) {
 
                 String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
-                try {
-                    if(impres==0 || impres==1){
-                        fpaseantebod.buildPrint(corel,0,vModo);
-                    }
-                } catch (Exception e) {
-                    msgbox(e.getMessage());
+                if(imprimo==0 || imprimo==1){
+                    fpaseantebod.buildPrint(corel,0,vModo);
                 }
 
-                try {
-                    if(impres==0 || impres==2){
-                        fcanastabod.buildPrint(corel,0, vModo);
-                    }
-                } catch (Exception e) {
+                if(imprimo==0 || imprimo==2){
+                    fcanastabod.buildPrint(corel,0, vModo);
                 }
 
-                if(impres==0) {
+                if(imprimo==0) {
                     prn_paseante.printask(printcallback, "printpaseante.txt");
-                }else if(impres==1) {
+                }else if(imprimo==1) {
                     prn_paseante.printask(printcallback, "printpaseante.txt");
-                }else if(impres==2) {
+                }else if(imprimo==2) {
                     prn_can.printask(printcallback, "printdevcan.txt");
                 }
 
@@ -542,11 +567,11 @@ public class DevolBodCan extends PBase {
 
                 String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 
-                if(impres==0 || impres==1){
+                if(imprimo==0 || imprimo==1){
                     fpaseantebod.buildPrint(corel,0,vModo);
                 }
 
-                if(impres==0 || impres==2){
+                if(imprimo==0 || imprimo==2){
                     fcanastabod.buildPrint(corel,0, vModo);
                 }
 
@@ -619,7 +644,7 @@ public class DevolBodCan extends PBase {
 
     private boolean validaDevolucion() {
         Cursor dt;
-        long cantcan=0,cantstock=0,cantbolsa=0;;
+        long cantcan=0,cantstock=0,cantbolsa=0;
 
         try {
             sql="SELECT IFNULL(SUM(CANT),0) FROM P_STOCK WHERE CANT+CANTM>0";

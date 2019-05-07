@@ -12,10 +12,8 @@ public class PrintDialog extends PBase {
 	private Runnable printcallback,printclose;
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
-		try
-		{
+	protected void onCreate(Bundle savedInstanceState) 	{
+		try {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.activity_print_dialog);
 
@@ -44,9 +42,7 @@ public class PrintDialog extends PBase {
 				}
 			}, 500);
 
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			Log.e("print",e.getMessage());
 		}
@@ -61,25 +57,28 @@ public class PrintDialog extends PBase {
  		prn.printask(printcallback);
  	}	
  	
-	private void askPrint()
-	{
+	private void askPrint() {
 
-		try
-		{
+		try {
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 			dialog.setTitle("Road");
 			dialog.setMessage("Impresion correcta ?");
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+			dialog.setNegativeButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
+					gl.closeCliDet=true;
+					gl.closeVenta=true;
 
-					((appGlobals) vApp).closeCliDet=true;
-					((appGlobals) vApp).closeVenta=true;
+					try{
+						db.execSQL("UPDATE FinDia SET val7=7");
+					} catch (Exception e){
+					}
+
 					PrintDialog.super.finish();
 				}
 			});
 
-			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			dialog.setPositiveButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					singlePrint();
 				}

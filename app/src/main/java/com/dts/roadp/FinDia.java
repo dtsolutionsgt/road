@@ -177,6 +177,7 @@ public class FinDia extends PBase {
                     shandler.postDelayed(new Runnable() {
                         @Override
                         public void run()  {
+                            gl.prdlgmode=1;
                             Intent intent = new Intent(FinDia.this, PrintDialog.class);
                             startActivity(intent);
                         }
@@ -189,11 +190,9 @@ public class FinDia extends PBase {
 
             FinDia.super.finish();
 
-        }catch (Exception e){
+        } catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
-
     }
 
     public boolean completeProcess() {
@@ -566,13 +565,6 @@ public class FinDia extends PBase {
             }
 
             if (gl.banderafindia == true) {
-                //#CKFK 20190304 Agregué validación para verificar si ya se realizó la devolución a Bodega.
-                if (claseFinDia.getDevBodega() != 5 ){
-                    if (!Ya_Realizo_Devolucion()){
-                        msgAskDevInventario();
-                        return false;
-                    }
-                }
 
                 //#CKFK 20190305 Agregué validación para verificar si ya se realizó el depósito
                 if ((claseFinDia.getDeposito() != 4) && (claseFinDia.getDocPendientesDeposito()>0)) {
@@ -583,9 +575,8 @@ public class FinDia extends PBase {
                 //#CKFK 20190304 Agregué validación para verificar si ya se realizó la impresión del depósito.
                 if (gl.sinimp) {
                     claseFinDia.updateImpDeposito(3);
-                }
-                else {
-                    if (claseFinDia.getImpresionDeposito() != 3) {
+                } else {
+                    if (claseFinDia.getImpresionDeposito() <1) {
 
                         totDeposito();
                          if ((depe+depc)>0){
@@ -597,8 +588,16 @@ public class FinDia extends PBase {
                     }
                 }
 
+                //#CKFK 20190304 Agregué validación para verificar si ya se realizó la devolución a Bodega.
+                if (claseFinDia.getDevBodega() != 5 ){
+                    if (!Ya_Realizo_Devolucion()){
+                        msgAskDevInventario();
+                        return false;
+                    }
+                }
+
                 //#CKFK 20190304 Agregué validación para verificar si ya se generó el cierreZ.
-                if ((claseFinDia.getGeneroCierreZ()!=6) && (claseFinDia.getImprimioCierreZ()!=7)){
+                if ((claseFinDia.getGeneroCierreZ()!=6) || (claseFinDia.getImprimioCierreZ()!=7)){
                     msgAskGeneraCierreZ();
                     return false;
                 }
@@ -660,8 +659,6 @@ public class FinDia extends PBase {
                     }, 2000);
                 }
             }
-
-            claseFinDia.updateImprimioCierreZ(7);
 
             vImprime=true;
 
@@ -2163,7 +2160,6 @@ public class FinDia extends PBase {
     }
 
     private double TotalEfectivo2(){
-
         Cursor DT;
         double vTotEfectivo2 = 0;
 
@@ -2256,7 +2252,7 @@ public class FinDia extends PBase {
 
             dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    ActivityImpresion(1);
+                    ActivityImpresion(2);
                 }
             });
 
@@ -2296,8 +2292,6 @@ public class FinDia extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
-
     }
 
     private void msgAskGeneraCierreZ() {

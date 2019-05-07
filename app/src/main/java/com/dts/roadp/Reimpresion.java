@@ -430,8 +430,8 @@ public class Reimpresion extends PBase {
 		try {
 			if (prn.isEnabled()){
 				ddoc.buildPrint(itemid, 1);
-				prn.printask();
-			}else if(!prn.isEnabled()){
+				prn.printask(printcallback);
+			} else if (!prn.isEnabled()){
 				ddoc.buildPrint(itemid, 1);
 				toast("Reimpresion de deposito generada");
 			}
@@ -1008,6 +1008,11 @@ public class Reimpresion extends PBase {
 								sql = "UPDATE D_COBRO SET IMPRES=IMPRES+1 WHERE COREL='" + itemid + "'";
 								db.execSQL(sql);
 								break;
+							case 2:
+								sql = "UPDATE D_DEPOS SET IMPRES=IMPRES+1 WHERE COREL='" + itemid + "'";
+								db.execSQL(sql);
+								db.execSQL("UPDATE FinDia SET val3=1");
+								break;
 							case 3:
 								sql = "UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='" + itemid + "'";
 								db.execSQL(sql);
@@ -1024,8 +1029,7 @@ public class Reimpresion extends PBase {
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-				}
+				public void onClick(DialogInterface dialog, int which) {}
 			});
 
 			dialog.show();

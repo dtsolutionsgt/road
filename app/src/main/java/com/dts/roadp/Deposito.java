@@ -593,6 +593,7 @@ public class Deposito extends PBase {
 
 			}
 
+			db.execSQL("UPDATE FinDia SET val3=0");
 
 			db.setTransactionSuccessful();
 			db.endTransaction();
@@ -615,7 +616,7 @@ public class Deposito extends PBase {
 			if (prn.isEnabled()) {
 				ddoc.buildPrint(corel,0,gl.peModal);
 				prn.printask(printcallback);
-				claseFinDia.updateImpDeposito(3);
+				claseFinDia.updateImpDeposito(0);
 			} else if(!prn.isEnabled()){
 				ddoc.buildPrint(corel, 0,gl.peModal);
 				Toast.makeText(this,"Depósito guardado", Toast.LENGTH_SHORT).show();
@@ -763,13 +764,22 @@ public class Deposito extends PBase {
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
+					try {
+						db.execSQL("UPDATE FinDia SET val3=1");
+					} catch (Exception e) {
+						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+					}
 					finish();
 				}
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					//singlePrint();
+					try {
+						db.execSQL("UPDATE FinDia SET val3=0");
+					} catch (Exception e) {
+						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+					}
 					prn.printask(printcallback);
 					//finish();
 				}

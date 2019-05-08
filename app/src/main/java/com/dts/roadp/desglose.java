@@ -111,7 +111,6 @@ public class desglose extends PBase {
         fdesg=new clsDesglose(this,prn.prw,gl.ruta,0, "");
     }
 
-
     private void ShowData() {
         Cursor DT;
         int c100 = 0, c50 = 0, c20 = 0, c10 = 0, c5 = 0, c2 = 0, c1 = 0, c050 = 0, c025 = 0, c010 = 0, c005 = 0, c001 = 0;
@@ -119,19 +118,22 @@ public class desglose extends PBase {
 
         try {
 
-
+        /*   JP20190508 - causo que en segundo desposito se mostraba desglose da la anterior
             sql = "SELECT DENOMINACION,CANTIDAD,TIPO,MONEDA " +
                     "FROM D_DEPOSB";
 
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() == 0) {
-                sql = "SELECT * " +
-                        "FROM T_DEPOSB";
+                sql = "SELECT * FROM T_DEPOSB";
                 DT = Con.OpenDT(sql);
             } else {
                 editando = true;
             }
+            */
+
+            sql = "SELECT * FROM T_DEPOSB";
+            DT = Con.OpenDT(sql);
 
             if (DT.getCount() == 0) {
 

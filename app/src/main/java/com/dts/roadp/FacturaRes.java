@@ -9,6 +9,7 @@ import android.database.SQLException;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputType;
@@ -218,7 +219,9 @@ public class FacturaRes extends PBase {
 					String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 					fdev.buildPrint(gl.dvcorrelnc,0, vModo);
 
+					SystemClock.sleep(3000);
 					prn_nc.printnoask(printclose, "printnc.txt");
+					SystemClock.sleep(3000);
 					if (impres>0) prn_nc.printnoask(printclose, "printnc.txt");
 				}
 

@@ -186,9 +186,10 @@ public class DevolBodCan extends PBase {
 
         try {
 
-            sql =  "SELECT D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA " +
-                    "FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO INNER JOIN D_CXC ON D_CXC.COREL = D_CXCD.COREL WHERE D_CxC.STATCOM='N' AND 1=1 ";
-            sql += "GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA ";
+            sql =  " SELECT D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA " +
+                   " FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO " +
+                   " INNER JOIN D_CXC ON D_CXC.COREL = D_CXCD.COREL WHERE D_CxC.STATCOM='N' AND D_CXC.ANULADO = 'N' " +
+                   " GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA ";
 
             dp = Con.OpenDT(sql);
 
@@ -205,10 +206,11 @@ public class DevolBodCan extends PBase {
 
                 pcod=dp.getString(0);
 
-                sql =  "SELECT D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA,SUM(D_CXCD.CANT) AS TOTAL,D_CXCD.UMVENTA,D_CXCD.LOTE,D_CXCD.COREL,D_CXCD.ESTADO,SUM(D_CXCD.PESO)  " +
+                sql =  "SELECT D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA,SUM(D_CXCD.CANT) AS TOTAL,D_CXCD.UMVENTA, " +
+                        "D_CXCD.LOTE,D_CXCD.COREL,D_CXCD.ESTADO,SUM(D_CXCD.PESO)  " +
                         "FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO INNER JOIN " +
                         "D_CxC ON D_CxC.COREL = D_CxCD.COREL  " +
-                        "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') AND D_CxC.STATCOM='N' " +
+                        "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') AND D_CxC.STATCOM='N' AND D_CxC.ANULADO='N' " +
                         "GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA,D_CXCD.UMVENTA,D_CXCD.LOTE,D_CXCD.COREL,D_CXCD.ESTADO ";
 
                 dt = Con.OpenDT(sql);

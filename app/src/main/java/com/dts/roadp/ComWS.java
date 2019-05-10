@@ -151,6 +151,7 @@ public class ComWS extends PBase {
 
 		if(gl.ruta.isEmpty()){
 			ruta = txtRuta.getText().toString();
+			gl.ruta=ruta;
 		}else {
 			ruta = gl.ruta;
 		}
@@ -222,8 +223,23 @@ public class ComWS extends PBase {
 			return;
 		}
 
-		if (mu.emptystr(gl.ruta)) gl.ruta=txtRuta.getText().toString();
+		if(gl.ruta.isEmpty()){
+			ruta = txtRuta.getText().toString();
+			gl.ruta=ruta;
+		}else {
+			ruta = gl.ruta;
+		}
 
+		licSerial=gl.deviceId;
+		licRuta=ruta;
+
+		try {
+			licSerialEnc=cu.encrypt(licSerial);
+			licRutaEnc=cu.encrypt(licRuta);
+		} catch (Exception e) {
+			licSerialEnc="";
+			licRutaEnc="";
+		}
 
 		//CKFK 20190222 Se agregó esta validación para no sobreescribir los datos si ya se importaron
 		if (!gl.modoadmin) {
@@ -1792,7 +1808,7 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_ENCABEZADO_REPORTESHH")) {
-			SQL = "SELECT CODIGO,TEXTO,SUCURSAL FROM P_ENCABEZADO_REPORTESHH";
+			SQL = "SELECT CODIGO,TEXTO,SUCURSAL FROM P_ENCABEZADO_REPORTESHH_II";
 			return SQL;
 		}
 
@@ -3441,30 +3457,34 @@ public class ComWS extends PBase {
 
 	public void updateInventario() {
 		DU = new DateUtils();
-		String vFecha;
+		String sFecha;
 		int rslt;
-		int vfecha = Get_Fecha_Inventario();
-		//#HS_20181203_1000 Agregue DU.univfechaext(vfecha) para convertir la fecha a formato de yymmdd hhmm
-		vFecha = DU.univfechasql(vfecha) + " 00:00:00";
+		long vfecha = clsAppM.fechaFactTol(du.getActDate());
+		sFecha = DU.univfechasinhora(vfecha);
 		String corel_d_mov = Get_Corel_D_Mov();
 
 		try {
 
 			if (envioparcial) dbld.clear();
 
+			if (gl.peModal.equalsIgnoreCase("TOL")){
+				fsqli = sFecha + " 00:00:00";
+				fsqlf = sFecha + " 23:59:59";
+			}
+
 			ss = " UPDATE P_STOCK SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
 					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA>='" + fsqli + "') AND ENVIADO = 0 " +
-					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + vFecha + "' )";
+					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "' )";
 			dbld.add(ss);
 
 			ss = " UPDATE P_STOCKB SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
-					" WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + vFecha + "' AND ENVIADO = 0 " +
-					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + vFecha + "')";
+					" WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + sFecha + "' AND ENVIADO = 0 " +
+					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "')";
 			dbld.add(ss);
 
 			ss = " UPDATE P_STOCK_PALLET SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
-					" WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + vFecha + "' AND ENVIADO = 0 " +
-					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + vFecha + "')";
+					" WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + sFecha + "' AND ENVIADO = 0 " +
+					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "')";
 			dbld.add(ss);
 
 			if (envioparcial) {
@@ -3855,7 +3875,7 @@ public class ComWS extends PBase {
 			dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('"+docstock+"','"+ActRuta+"','"+univdate+"',1)");
 			dbld.add("UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parVer+"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'");
 			dbld.add("INSERT INTO P_BITACORA_VERSIONHH (RUTA,FECHA,NUMVERSION,ARQUITECTURA) " +
-					"VALUES('"+gl.ruta+"','"+ du.getActDateStr() +"','"+gl.parVer+"','ANDR')");
+					"VALUES('"+gl.ruta+"','"+ du.univfechaseg() +"','"+gl.parVer+"','ANDR')");
 
 			if (commitSQL()==1) conflag=1; else conflag=0;
 					

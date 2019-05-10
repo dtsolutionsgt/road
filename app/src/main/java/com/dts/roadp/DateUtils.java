@@ -105,11 +105,12 @@ public class DateUtils {
 		return s;
 	}
 
+	//#CKFK 20190509 Modifiqué para quitale el 00 que le puso Henry
 	public String univfechasinhora(long f) {
 		int vy,vm,vd;
 		String s;
 
-		//yyyyMMdd hh:mm:ss
+		//yyyyMMdd
 
 		vy=(int) f/10000;f=f % 10000;
 		vm=(int) f/100;f=f % 100;
@@ -118,26 +119,57 @@ public class DateUtils {
 		s=""+vy;
 		if (vm>9) s=s+vm; else s=s+"0"+vm;
 		if (vd>9) s=s+vd; else s=s+"0"+vd;
-		s=vy+" "+vm+":"+vd+":00"; //#HS_20181128_1102 Agregue " "+vm+":"+vd+":00" para que devolviera la hora.
+		s=vy+" "+vm+":"+vd;
 
 		return s;
 	}
 	
-	public String univfechaext(long f) {
-		long vy,vm,vd;
+	public String univfechaseg() {
+
+		long f,fecha, vy,vm,vd;;
+		int cyear,cmonth,cday,ch,cm, cs;
 		String s;
-		
+
+		final Calendar c = Calendar.getInstance();
+		cyear = c.get(Calendar.YEAR);
+		cmonth = c.get(Calendar.MONTH)+1;
+		cday = c.get(Calendar.DAY_OF_MONTH);
+		ch=c.get(Calendar.HOUR_OF_DAY);
+		cm=c.get(Calendar.MINUTE);
+		cs=c.get(Calendar.SECOND);
+
 		//yyyyMMdd hh:mm:ss
 		
-		vy=(long) f/10000;f=f % 10000;
-		vm=(long) f/100;f=f % 100;
-		vd=(long) f;
+		vy=cyear;
+		vm=cmonth;
+		vd=cday;
 			
 		s=""+vy; 
 		if (vm>9) s=s+vm; else s=s+"0"+vm;
-		if (vd>9) s=s+vd; else s=s+"0"+vd;  
+		if (vd>9) s=s+vd; else s=s+"0"+vd;
+		s = s + " ";
+		if (ch>9) s=s+ch; else s=s+"0"+ch; s=s+ ":";
+		if (cm>9) s=s+cm; else s=s+"0"+cm; s=s+ ":";
+		if (cs>9) s=s+cs; else s=s+"0"+cs;
+
+		return s;
+	}
+
+	public String univfechaext(long f) {
+		long vy,vm,vd;
+		String s;
+
+		//yyyyMMdd hh:mm:ss
+
+		vy=(long) f/10000;f=f % 10000;
+		vm=(long) f/100;f=f % 100;
+		vd=(long) f;
+
+		s=""+vy;
+		if (vm>9) s=s+vm; else s=s+"0"+vm;
+		if (vd>9) s=s+vd; else s=s+"0"+vd;
 		s=vy+" "+vm+":"+vd+":00"; //#HS_20181128_1102 Agregue " "+vm+":"+vd+":00" para que devolviera la hora.
-		
+
 		return s;
 	}
 
@@ -318,7 +350,7 @@ public class DateUtils {
 		
 		return fecha;
 	}
-		
+
 	public String getActDateStr(){
 		long f;
 		int cyear,cmonth,cday;

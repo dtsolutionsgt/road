@@ -97,7 +97,7 @@ public class Cobro extends PBase {
 					Cobro.super.finish();
 				}else{
 					if(browse==4){
-						if (gl.validarCred==1)validaCredito(); //#CKFK 20190503 Printclose
+						if (gl.validarCred==1) validaCredito(); //#CKFK 20190503 Printclose
 						browse = 0;
 					}
 				}
@@ -108,7 +108,16 @@ public class Cobro extends PBase {
 
 		printexit= new Runnable() {
 			public void run() {
-				Cobro.super.finish();
+
+				if(gl.banderaCobro){
+					Cobro.super.finish();
+				}else{
+					if(browse==4){
+						if (gl.validarCred==1) validaCredito(); //#CKFK 20190503 Printclose
+						browse = 0;
+					}
+				}
+				//Cobro.super.finish();
 			}
 		};
 
@@ -584,11 +593,11 @@ public class Cobro extends PBase {
 						browse = 4;
 						prn.printask(printcallback);
 
-						if(gl.validarCred==1){
+						/*if(gl.validarCred==1){
 							validaCredito();
 						}
 
-						gl.validarCred=0;
+						gl.validarCred=0;*/
 
 					}else if(!prn.isEnabled()){
 						fdoc.buildPrint(corel,0,gl.peModal);

@@ -298,7 +298,7 @@ public class printZebraZPL extends printBase {
         } catch (ConnectionException e) {
             setStatus(e.getMessage());
         } finally {
-            disconnect();
+          disconnect();
         }
     }
 

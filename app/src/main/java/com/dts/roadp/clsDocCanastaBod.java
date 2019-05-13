@@ -1,10 +1,10 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class clsDocCanastaBod extends clsDocument {
 
@@ -12,7 +12,7 @@ public class clsDocCanastaBod extends clsDocument {
 
     private double tot,desc,imp,stot,percep;
     private boolean sinimp;
-    private String 	contrib,recfact,estadoDev,corelNC,corelF,asignacion;
+    private String 	contrib,recfact,estadoDev,corelNC,corelF,asignacion,s1;
     private int totitems, totcant;
 
     public String vTipo;
@@ -28,19 +28,28 @@ public class clsDocCanastaBod extends clsDocument {
     protected boolean loadHeadData(String corel) {
         Cursor DT;
         String vend,val;
+        int cntimpres;
 
         super.loadHeadData(corel);
 
-        if(vTipo.equals("CANASTA"))  nombre="DEVOLUCION DE CANASTA";
-        if(vTipo.equals("PASEANTE"))  nombre="DEVOLUCION DE BODEGA";
-
         try {
-            sql="SELECT COREL, RUTA, TIPO, REFERENCIA, USUARIO, FECHA "+
+            sql="SELECT COREL, RUTA, TIPO, REFERENCIA, USUARIO, FECHA, IMPRES "+
                 "FROM D_MOV "+
-                "WHERE ANULADO =  'N'";
+                "WHERE ANULADO =  'N' AND TIPO='D' " ;
 
             DT=Con.OpenDT(sql);
-            DT.moveToFirst();
+
+            if (DT.getCount()>0)DT.moveToFirst();
+
+            cntimpres=DT.getInt(6);
+
+            if (cntimpres>0){
+                if(vTipo.equals("CANASTA"))  nombre="COPIA DE DEVOLUCION DE CANASTA";
+                if(vTipo.equals("PASEANTE"))  nombre="COPIA DE DEVOLUCION DE BODEGA";
+            }else{
+                if(vTipo.equals("CANASTA"))  nombre="DEVOLUCION DE CANASTA";
+                if(vTipo.equals("PASEANTE"))  nombre="DEVOLUCION DE BODEGA";
+            }
 
             serie=DT.getString(0);
             ruta=DT.getString(1);
@@ -49,7 +58,8 @@ public class clsDocCanastaBod extends clsDocument {
             ref=DT.getString(3);
             vend=DT.getString(4);
 
-            ffecha=DT.getInt(5);fsfecha=sfecha(ffecha);
+            ffecha=DT.getInt(5);
+            fsfecha=sfecha(ffecha);
 
             corel=serie;
         } catch (Exception e) {
@@ -76,9 +86,10 @@ public class clsDocCanastaBod extends clsDocument {
     }
 
     protected boolean loadDocData(String corel) {
-        Cursor DT;
+        Cursor DTs;
         itemData item;
-
+        String ss;
+        String cod="";
         loadHeadData(corel);
 
         items.clear();
@@ -98,26 +109,32 @@ public class clsDocCanastaBod extends clsDocument {
                     " WHERE M.COREL='"+corel+"'";
             }
 
+            DTs=Con.OpenDT(sql);
 
-            DT=Con.OpenDT(sql);
-            DT.moveToFirst();
+            if (DTs.getCount()>0)DTs.moveToFirst();
 
-            totitems = DT.getCount();
+            totitems = DTs.getCount();
 
-            while (!DT.isAfterLast()) {
+            while (!DTs.isAfterLast()) {
 
-                item =new itemData();
+                ss=DTs.getString(0);
 
-                item.cod=DT.getString(0);
-                item.nombre=DT.getString(1);
-                item.cant=DT.getDouble(2);
-                item.peso=DT.getDouble(3);
-                item.lote=DT.getString(4);
-                item.um=DT.getString(5);
+                if (!emptystr(ss)){
 
-                items.add(item);
+                    item =new itemData();
 
-                DT.moveToNext();
+                    item.cod= ss;
+                    item.nombre=DTs.getString(1);ss=DTs.getString(1);
+                    item.cant=DTs.getDouble(2);
+                    item.peso=DTs.getDouble(3);
+                    item.lote=DTs.getString(4);
+                    item.um=DTs.getString(5);
+
+                    items.add(item);
+
+                }
+
+                DTs.moveToNext();
             }
 
         } catch (Exception e) {

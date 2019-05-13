@@ -41,7 +41,7 @@ public class clsDesglose extends clsDocument {
             item=items.get(i);
 
             ss=rep.ltrim(item.denom+" ",prw-20);
-            ss=ss+rep.rtrim(frmdecimal(item.cant,2), 5)+" "+rep.rtrim(frmdecimal(item.total,2),15);
+            ss=ss+rep.rtrim(frmdecimal(item.cant,0), 5)+" "+rep.rtrim(frmdecimal(item.total,2),14);
             rep.add(ss);
             ss=rep.rtrim(item.moneda,10)+" "+rep.rtrim(item.tipo,15);
             rep.add(ss);
@@ -131,18 +131,9 @@ public class clsDesglose extends clsDocument {
 
     protected boolean buildDetail() {
         itemData item;
-        int onceMerc = 0;
-
-        //rep.add("");
 
         for (int i = 0; i <items.size(); i++) {
             item=items.get(i);
-
-            if(onceMerc==1){
-                rep.addp("Mercancia ","");
-                onceMerc = 1;
-            }
-
         }
 
         rep.add("");

@@ -89,7 +89,7 @@ public class Deposito extends PBase {
 		
 		printcallback= new Runnable() {
 		    public void run() {
-		    	Deposito.super.finish();
+				askPrint();
 		    }
 		};
 		
@@ -156,6 +156,7 @@ public class Deposito extends PBase {
 		}
 
 	}
+
 
 	// Main
 	
@@ -438,7 +439,10 @@ public class Deposito extends PBase {
 		int nchec=0,it=0,cp;
 
 		if (!checkValues()) return false;
-		
+
+		fecha=du.getActDateTime();
+		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
+
 		try {
 			
 			for (int i = 0; i < items.size(); i++ ) {
@@ -464,7 +468,7 @@ public class Deposito extends PBase {
 			ins.init("D_DEPOS");
 			ins.add("COREL",corel);
 			ins.add("EMPRESA",((appGlobals) vApp).emp);
-			ins.add("FECHA",du.getActDate());
+			ins.add("FECHA",fecha);
 			ins.add("RUTA",((appGlobals) vApp).ruta);
 			ins.add("BANCO",bancoid);
 			ins.add("CUENTA",cuenta);
@@ -583,12 +587,13 @@ public class Deposito extends PBase {
 						DT.moveToNext();
 					}
 
-					sql="Delete from T_DEPOSB";
-					db.execSQL(sql);
+					//sql="Delete from T_DEPOSB";
+					//db.execSQL(sql);
 				}
 
 			}
 
+			db.execSQL("UPDATE FinDia SET val3=0");
 
 			db.setTransactionSuccessful();
 			db.endTransaction();
@@ -609,22 +614,22 @@ public class Deposito extends PBase {
 			if (!saveDoc()) return;
 
 			if (prn.isEnabled()) {
-				ddoc.buildPrint(corel,0);
+				ddoc.buildPrint(corel,0,gl.peModal);
 				prn.printask(printcallback);
-				claseFinDia.updateImpDeposito(3);
+				claseFinDia.updateImpDeposito(0);
 			} else if(!prn.isEnabled()){
-				ddoc.buildPrint(corel, 0);
+				ddoc.buildPrint(corel, 0,gl.peModal);
 				Toast.makeText(this,"Depósito guardado", Toast.LENGTH_SHORT).show();
 				super.finish();
 			}
 			claseFinDia.updateDeposito(4);
+			sql="Delete from T_DEPOSB";
+			db.execSQL(sql);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 	}
-
-
 
 
 	// Aux
@@ -741,7 +746,6 @@ public class Deposito extends PBase {
 			
 	}	
 
-	
 	private void doExit(){
 		try {
 			super.finish();
@@ -750,7 +754,45 @@ public class Deposito extends PBase {
 		}
 
 	}
-	
+
+	private void askPrint() {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("¿Impresión correcta?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					try {
+						db.execSQL("UPDATE FinDia SET val3=1");
+					} catch (Exception e) {
+						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+					}
+					finish();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					try {
+						db.execSQL("UPDATE FinDia SET val3=0");
+					} catch (Exception e) {
+						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+					}
+					prn.printask(printcallback);
+					//finish();
+				}
+			});
+
+			dialog.show();
+		} catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+
 	// Activity Events
 	
 	@Override

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -26,7 +25,7 @@ public class Anulacion extends PBase {
 	private ListAdaptCFDV adapter;
 	private clsClasses.clsCFDV selitem;
 	
-	private Runnable printcallback,printclose;
+	private Runnable printotrodoc,printclose;
 	private printer prn;
     private printer prn_nc;
 	public  clsRepBuilder rep;
@@ -76,15 +75,16 @@ public class Anulacion extends PBase {
 
 		itemid="*";
 				
-		printcallback= new Runnable() {
+		printotrodoc = new Runnable() {
 		    public void run() {
-		    	//askPrint();
+
+				askPrint();
 		    }
 		};
 		
 		printclose= new Runnable() {
 		    public void run() {
-		    }
+			}
 		};
 		
 		prn=new printer(this,printclose,gl.validimp);
@@ -321,30 +321,35 @@ public class Anulacion extends PBase {
 
 				clsDocFactura fdoc;
 
-				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"");
+				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
 				fdoc.deviceid =gl.deviceId;
+				fdoc.buildPrint(itemid, 3, "TOL");
 
-				fdoc.buildPrint(itemid, 3, "TOL"); prn.printask(printclose);
+				String corelNotaCred=tieneNotaCredFactura(itemid);
+
+				if (!corelNotaCred.isEmpty()){
+					prn.printask(printotrodoc);
+				}else {
+					prn.printask(printclose);
+				}
+
 
 			}else if (tipo==6){
 
-				clsDocFactura fdoc;
 				clsDocDevolucion fdev;
-				String corelFactura=tieneFacturaNC(itemid);
-
-				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
-				fdoc.deviceid =gl.deviceId;
-
-				if (!corelFactura.isEmpty()){
-					fdoc.buildPrint(corelFactura, 3, "TOL"); prn.printask(printclose);
-				}
-
-				SystemClock.sleep(50);
 
 				fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 				fdev.deviceid =gl.deviceId;
 
-				fdev.buildPrint(itemid, 3, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+				fdev.buildPrint(itemid, 3, "TOL");
+
+				String corelFactura=tieneFacturaNC(itemid);
+
+				if (!corelFactura.isEmpty()){
+					prn_nc.printask(printotrodoc, "printnc.txt");
+				}else {
+					prn_nc.printask(printclose, "printnc.txt");
+				}
 
 			}
 
@@ -870,6 +875,28 @@ public class Anulacion extends PBase {
 		return vtieneFacturaNC;
 	}
 
+	private String tieneNotaCredFactura(String vCorel){
+
+	Cursor DT;
+	String vtieneNotaCredFactura= "";
+
+	try{
+
+		sql = "SELECT COREL FROM D_NOTACRED WHERE FACTURA = '" + vCorel + "' AND FACTURA IN (SELECT COREL FROM D_FACTURA)";
+		DT=Con.OpenDT(sql);
+
+		if (DT.getCount()>0){
+			DT.moveToFirst();
+			vtieneNotaCredFactura = DT.getString(0);
+		}
+
+	}catch (Exception ex){
+		mu.msgbox("Ocurrió un error "+ex.getMessage());
+	}
+
+	return vtieneNotaCredFactura;
+}
+
     private boolean ExisteFactura(String vCorel){
 
         Cursor DT;
@@ -909,7 +936,74 @@ public class Anulacion extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	}
-	
+
+	private void ImprimeNC_Fact(){
+
+		try{
+
+			if (tipo==3){
+
+				clsDocDevolucion fdev;
+				String corelNotaCred=tieneNotaCredFactura(itemid);
+
+				if (!corelNotaCred.isEmpty()){
+
+					fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+					fdev.deviceid =gl.deviceId;
+
+					fdev.buildPrint(corelNotaCred, 3, "TOL"); prn_nc.printnoask(printclose, "printnc.txt");
+
+				}
+			}else if (tipo==6){
+
+				String corelFactura=tieneFacturaNC(itemid);
+
+				if (!corelFactura.isEmpty()){
+					clsDocFactura fdoc;
+
+					fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+					fdoc.deviceid =gl.deviceId;
+
+					fdoc.buildPrint(corelFactura, 3, "TOL"); prn.printnoask(printclose,"print.txt");
+				}
+
+			}
+
+		}catch(Exception ex){
+
+		}
+	}
+
+	private void askPrint() {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("¿Impresión correcta?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if (tipo==3 || tipo==6){
+						ImprimeNC_Fact();
+					}
+
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+
+				}
+			});
+
+			dialog.show();
+		} catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
+	}
+
 	private class clsDocAnul extends clsDocument {
 
 		public clsDocAnul(Context context, int printwidth, String archivo) {

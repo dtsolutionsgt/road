@@ -20,14 +20,14 @@ public class DevolBodCan extends PBase {
     private TextView lblReg,lblTot;
     private ImageView imgNext;
     public String corel,existenciaC,existenciaP;
-    private int impres, close=0;
+    private int imprimo=0,close=0;
 
     private printer prn_can,prn_paseante;
     private clsDocCanastaBod fcanastabod;
     private clsDocCanastaBod fpaseantebod;
     private DevolBod DevBod;
-    public Runnable printclose, printcallback;
-
+    public Runnable printclose, printcallback,printexit;
+    private boolean imprimecopias=false;
     private ArrayList<clsClasses.clsDevCan> items= new ArrayList<clsClasses.clsDevCan>();
     private list_view_dev_bod_can adapter;
 
@@ -56,18 +56,59 @@ public class DevolBodCan extends PBase {
 
         gl.devprncierre=false;
 
-        printclose= new Runnable() {
+        app = new AppMethods(this, gl, Con, db);
+        gl.validimp=app.validaImpresora();
+        if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+
+        printclose = new Runnable() {
             public void run() {
-                //if (gl.devprncierre) {
-                    gl.closeDevBod=true;
-                    DevolBodCan.super.finish();
-                //}
+                /*if (!gl.devfindia) {
+                    if (!EnviaDev()) {
+                        mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                    }
+                }
+
+                gl.closeDevBod = true;
+                DevolBodCan.super.finish();*/
             }
         };
 
+        printexit = new Runnable() {
+            public void run() {
+                if (!gl.devfindia) {
+                    if (!EnviaDev()) {
+                        mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                    }
+                }
+
+                gl.closeDevBod = true;
+                DevolBodCan.super.finish();
+            }
+        };
+
+
         printcallback= new Runnable() {
             public void run() {
+
+                if (!imprimecopias){
+
+                    if (imprimo==0) {
+                        prn_can.printnoask(printclose, "printdevcan.txt");
+                    }
+
+                    imprimecopias = true;
+
+                }else{
+
+                    if (imprimo==0) {
+                        prn_can.printnoask(printclose, "printdevcan.txt");
+                    }
+                    imprimecopias = false;
+
+                }
+
                 askPrint();
+
             }
         };
 
@@ -145,9 +186,10 @@ public class DevolBodCan extends PBase {
 
         try {
 
-            sql =  "SELECT D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA " +
-                    "FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO INNER JOIN D_CXC ON D_CXC.COREL = D_CXCD.COREL WHERE D_CxC.STATCOM='N' AND 1=1 ";
-            sql += "GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA ";
+            sql =  " SELECT D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA " +
+                   " FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO " +
+                   " INNER JOIN D_CXC ON D_CXC.COREL = D_CXCD.COREL WHERE D_CxC.STATCOM='N' AND D_CXC.ANULADO = 'N' " +
+                   " GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA ";
 
             dp = Con.OpenDT(sql);
 
@@ -164,10 +206,11 @@ public class DevolBodCan extends PBase {
 
                 pcod=dp.getString(0);
 
-                sql =  "SELECT D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA,SUM(D_CXCD.CANT) AS TOTAL,D_CXCD.UMVENTA,D_CXCD.LOTE,D_CXCD.COREL,D_CXCD.ESTADO,SUM(D_CXCD.PESO)  " +
+                sql =  "SELECT D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA,SUM(D_CXCD.CANT) AS TOTAL,D_CXCD.UMVENTA, " +
+                        "D_CXCD.LOTE,D_CXCD.COREL,D_CXCD.ESTADO,SUM(D_CXCD.PESO)  " +
                         "FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO INNER JOIN " +
                         "D_CxC ON D_CxC.COREL = D_CxCD.COREL  " +
-                        "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') AND D_CxC.STATCOM='N' " +
+                        "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') AND D_CxC.STATCOM='N' AND D_CxC.ANULADO='N' " +
                         "GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA,D_CXCD.UMVENTA,D_CXCD.LOTE,D_CXCD.COREL,D_CXCD.ESTADO ";
 
                 dt = Con.OpenDT(sql);
@@ -277,6 +320,9 @@ public class DevolBodCan extends PBase {
 
         corel=gl.ruta+"_"+mu.getCorelBase();
 
+        fecha=du.getActDateTime();
+        if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
+
         try {
 
             db.beginTransaction();
@@ -285,7 +331,7 @@ public class DevolBodCan extends PBase {
             ins.add("COREL",corel);
             ins.add("RUTA",gl.ruta);
             ins.add("ANULADO","N");
-            ins.add("FECHA",du.getActDate());
+            ins.add("FECHA",fecha);
             ins.add("TIPO","D");
             ins.add("USUARIO",gl.vend);
             ins.add("REFERENCIA","Devolucion");
@@ -468,54 +514,6 @@ public class DevolBodCan extends PBase {
 
     }
 
-    private void askPrint() {
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle("Road");
-            dialog.setMessage("¿Impresión correcta?");
-
-            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-
-                    if (impres==0) {
-                        prn_can.printnoask(printclose, "printdevcan.txt");
-                    }
-
-                    if (!gl.devfindia) {
-                        if (!EnviaDev()){
-                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
-                        }
-                    }
-
-                    gl.closeDevBod=true;
-                    DevolBodCan.super.finish();
-
-                }
-            });
-
-            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-
-                    if (!gl.devfindia) {
-                        if (!EnviaDev()){
-                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
-                        }
-                    }
-
-                   gl.closeDevBod=true;
-                   DevolBodCan.super.finish();
-                }
-            });
-
-            dialog.show();
-        } catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-
-    }
-
     private boolean EnviaDev(){
 
         boolean vEnvia=false;
@@ -531,6 +529,7 @@ public class DevolBodCan extends PBase {
 
         return vEnvia;
     }
+
     //endregion
 
     //region createdoc
@@ -539,37 +538,31 @@ public class DevolBodCan extends PBase {
 
         try{
 
-            impres=0;
+            imprimo=0;
 
             existenciaC=tieneCanasta(corel);
             existenciaP=tienePaseante(corel);
 
-            if(existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=1;
-            if(!existenciaC.isEmpty() && existenciaP.isEmpty()) impres=2;
-            if(existenciaC.isEmpty() && existenciaP.isEmpty()) impres=3;
+            if(existenciaC.isEmpty() && !existenciaP.isEmpty()) imprimo=1;
+            if(!existenciaC.isEmpty() && existenciaP.isEmpty()) imprimo=2;
+            if(existenciaC.isEmpty() && existenciaP.isEmpty()) imprimo=3;
 
             if (prn_can.isEnabled()) {
 
                 String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
-                try {
-                    if(impres==0 || impres==1){
-                        fpaseantebod.buildPrint(corel,0,vModo);
-                    }
-                } catch (Exception e) {
+                if(imprimo==0 || imprimo==1){
+                    fpaseantebod.buildPrint(corel,0,vModo);
                 }
 
-                try {
-                    if(impres==0 || impres==2){
-                        fcanastabod.buildPrint(corel,0, vModo);
-                    }
-                } catch (Exception e) {
+                if(imprimo==0 || imprimo==2){
+                    fcanastabod.buildPrint(corel,0, vModo);
                 }
 
-                if(impres==0) {
+                if(imprimo==0) {
                     prn_paseante.printask(printcallback, "printpaseante.txt");
-                }else if(impres==1) {
+                }else if(imprimo==1) {
                     prn_paseante.printask(printcallback, "printpaseante.txt");
-                }else if(impres==2) {
+                }else if(imprimo==2) {
                     prn_can.printask(printcallback, "printdevcan.txt");
                 }
 
@@ -577,11 +570,11 @@ public class DevolBodCan extends PBase {
 
                 String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 
-                if(impres==0 || impres==1){
+                if(imprimo==0 || imprimo==1){
                     fpaseantebod.buildPrint(corel,0,vModo);
                 }
 
-                if(impres==0 || impres==2){
+                if(imprimo==0 || imprimo==2){
                     fcanastabod.buildPrint(corel,0, vModo);
                 }
 
@@ -654,13 +647,14 @@ public class DevolBodCan extends PBase {
 
     private boolean validaDevolucion() {
         Cursor dt;
-        int cantstock=0,cantbolsa=0,cantcan=0;
+        long cantcan=0,cantstock=0,cantbolsa=0;
 
         try {
-            sql="SELECT CANT FROM P_STOCK WHERE CANT+CANTM>0";
+            sql="SELECT IFNULL(SUM(CANT),0) FROM P_STOCK WHERE CANT+CANTM>0";
             dt=Con.OpenDT(sql);
 
-            cantstock=dt.getCount();
+            cantstock=dt.getLong(0);
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -668,10 +662,23 @@ public class DevolBodCan extends PBase {
         }
 
         try {
-            sql="SELECT BARRA FROM P_STOCKB";
+            sql="SELECT IFNULL(COUNT(BARRA),0) FROM P_STOCKB";
             dt=Con.OpenDT(sql);
 
-            cantbolsa=dt.getCount();
+            cantbolsa=dt.getLong(0);
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+            return false;
+        }
+
+        try {
+            sql="SELECT IFNULL(SUM(CANT),0) FROM D_CXC E INNER JOIN D_CXCD D ON  E.COREL = D.COREL WHERE E.ANULADO = 'N'";
+            dt=Con.OpenDT(sql);
+
+            cantcan=dt.getLong(0);
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -705,6 +712,85 @@ public class DevolBodCan extends PBase {
 
 
     }
+
+    private void askPrint() {
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle("Road");
+            dialog.setMessage("¿Impresión correcta?");
+
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                    //Actualiza el número de impresiones para poder definir cuando es una re impresión o primera impresión.
+                    try {
+                        sql = "UPDATE D_MOV SET IMPRES=IMPRES+1 WHERE COREL='" + corel + "' AND TIPO='D' ";
+                        db.execSQL(sql);
+                    } catch (Exception e) {
+                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                    }
+
+                    if (imprimecopias){
+
+                        if (prn_can.isEnabled()) {
+
+                            String vModo = (gl.peModal.equalsIgnoreCase("TOL") ? "TOL" : "*");
+                            if (imprimo == 0 || imprimo == 1) {
+                                fpaseantebod.buildPrint(corel, 1, vModo);
+                            }
+
+                            if (imprimo == 0 || imprimo == 2) {
+                                fcanastabod.buildPrint(corel, 1, vModo);
+                            }
+
+                            if (imprimo == 0) {
+                                prn_paseante.printask(printcallback, "printpaseante.txt");
+                            } else if (imprimo == 1) {
+                                prn_paseante.printask(printcallback, "printpaseante.txt");
+                            } else if (imprimo == 2) {
+                                prn_can.printask(printcallback, "printdevcan.txt");
+                            }
+                        }
+
+                    }
+
+                    if (!imprimecopias){
+                        if (!gl.devfindia) {
+                            if (!EnviaDev()){
+                                toastlong("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                            }
+                        }
+
+                        gl.closeDevBod=true;
+                        DevolBodCan.super.finish();
+                    }
+                }
+            });
+
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    prn_can.printask(printclose, "printdevcan.txt");
+
+                    if (!gl.devfindia) {
+                        if (!EnviaDev()){
+                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                        }
+                    }
+
+                    gl.closeDevBod=true;
+                    DevolBodCan.super.finish();
+                }
+            });
+
+            dialog.show();
+        } catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+
+    }
+
 
     @Override
     protected void onResume() {

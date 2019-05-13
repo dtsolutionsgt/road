@@ -169,11 +169,11 @@ public class clsFinDia extends PBase{
     }
 
     public int getImpresionDeposito() {
-
         Cursor DT;
         int rslt=0;
 
         try {
+
             sql="SELECT val3 FROM FinDia";
             DT=Con.OpenDT(sql);
 

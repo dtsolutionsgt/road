@@ -92,6 +92,8 @@ public class FinDia extends PBase {
 
     }
 
+    //region Events
+
     public void iniciaCierre(View view) {
         //#HS_20181128_0906 Agregue validacion para FinDia.
         if (gl.banderafindia) {
@@ -107,49 +109,9 @@ public class FinDia extends PBase {
         }
     }
 
-    //#HS_20181123_0950 Agregué funcion para llamar activity deposito.
-    public void ActivityDeposito() {
-        try{
-            Intent deposito = new Intent(this, Deposito.class);
-            startActivity(deposito);
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
+    //endregion
 
-    }
-
-    //#HS_20181123_1014 Agregue funcion para llamar activity de reimpresion de deposito.
-    public void ActivityImpresion(int doctipo) {
-        try{
-            gl.tipo = doctipo;
-            Intent intent = new Intent(this, Reimpresion.class);
-            startActivity(intent);
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-    }
-
-    //#CKFK 20190304 Agregué funcion para llamar activity de comunicación.
-    public void ActivityComunicacion() {
-        try{
-            Intent intent = new Intent(this, ComWS.class);
-            startActivity(intent);
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-    }
-
-    public void ActivityMenu() {
-        try{
-            Intent menu = new Intent(this, Menu.class);
-            startActivity(menu);
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-    }
+    //region Main
 
 	public void startFDD()  {
 
@@ -215,6 +177,7 @@ public class FinDia extends PBase {
                     shandler.postDelayed(new Runnable() {
                         @Override
                         public void run()  {
+                            gl.prdlgmode=1;
                             Intent intent = new Intent(FinDia.this, PrintDialog.class);
                             startActivity(intent);
                         }
@@ -227,11 +190,9 @@ public class FinDia extends PBase {
 
             FinDia.super.finish();
 
-        }catch (Exception e){
+        } catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
-
     }
 
     public boolean completeProcess() {
@@ -509,7 +470,6 @@ public class FinDia extends PBase {
 
     }
 
-	//#EJC20190226: Insertar solo cabecera de d_mov.
     private boolean Inserta_Enc_D_Mov() {
 
         String corel;
@@ -552,7 +512,6 @@ public class FinDia extends PBase {
 
     }
 
-    // Validaciones del fin de día
     private boolean validaFinDia() {
         Cursor DT;
         int pend, fechaUltimoCierre;
@@ -606,13 +565,6 @@ public class FinDia extends PBase {
             }
 
             if (gl.banderafindia == true) {
-                //#CKFK 20190304 Agregué validación para verificar si ya se realizó la devolución a Bodega.
-                if (claseFinDia.getDevBodega() != 5 ){
-                    if (!Ya_Realizo_Devolucion()){
-                        msgAskDevInventario();
-                        return false;
-                    }
-                }
 
                 //#CKFK 20190305 Agregué validación para verificar si ya se realizó el depósito
                 if ((claseFinDia.getDeposito() != 4) && (claseFinDia.getDocPendientesDeposito()>0)) {
@@ -623,9 +575,8 @@ public class FinDia extends PBase {
                 //#CKFK 20190304 Agregué validación para verificar si ya se realizó la impresión del depósito.
                 if (gl.sinimp) {
                     claseFinDia.updateImpDeposito(3);
-                }
-                else {
-                    if (claseFinDia.getImpresionDeposito() != 3) {
+                } else {
+                    if (claseFinDia.getImpresionDeposito() <1) {
 
                         totDeposito();
                          if ((depe+depc)>0){
@@ -634,12 +585,19 @@ public class FinDia extends PBase {
                          }else{
                              claseFinDia.updateImpDeposito(3);
                          }
+                    }
+                }
 
+                //#CKFK 20190304 Agregué validación para verificar si ya se realizó la devolución a Bodega.
+                if (claseFinDia.getDevBodega() != 5 ){
+                    if (!Ya_Realizo_Devolucion()){
+                        msgAskDevInventario();
+                        return false;
                     }
                 }
 
                 //#CKFK 20190304 Agregué validación para verificar si ya se generó el cierreZ.
-                if ((claseFinDia.getGeneroCierreZ()!=6) && (claseFinDia.getImprimioCierreZ()!=7)){
+                if ((claseFinDia.getGeneroCierreZ()!=6) || (claseFinDia.getImprimioCierreZ()!=7)){
                     msgAskGeneraCierreZ();
                     return false;
                 }
@@ -679,7 +637,6 @@ public class FinDia extends PBase {
 
     }
 
-    //Impresion Cierre Z
     private boolean imprimeCierreZ(){
 
         boolean vImprime=false;
@@ -703,8 +660,6 @@ public class FinDia extends PBase {
                 }
             }
 
-            claseFinDia.updateImprimioCierreZ(7);
-
             vImprime=true;
 
         } catch (Exception e) {
@@ -716,7 +671,55 @@ public class FinDia extends PBase {
 
     }
 
-    // Reportes
+    //endregion
+
+    //region Activities
+
+    public void ActivityDeposito() {
+        try{
+            Intent deposito = new Intent(this, Deposito.class);
+            startActivity(deposito);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+    public void ActivityImpresion(int doctipo) {
+        try{
+            gl.tipo = doctipo;
+            Intent intent = new Intent(this, Reimpresion.class);
+            startActivity(intent);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+    }
+
+    public void ActivityComunicacion() {
+        try{
+            Intent intent = new Intent(this, ComWS.class);
+            startActivity(intent);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+    public void ActivityMenu() {
+        try{
+            Intent menu = new Intent(this, Menu.class);
+            startActivity(menu);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+
+    //endregion
+
+    //region Reportes
+
     private void repProductos() {
         Cursor DT;
         String s1, s2, s3, s4, s5, ump;
@@ -1024,7 +1027,7 @@ public class FinDia extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-        
+
     }
 
     private void repDevolTotal() {
@@ -1189,681 +1192,9 @@ public class FinDia extends PBase {
         rep.empty();
     }
 
-    private void totRecibos() {
-        Cursor DT;
-        String s1;
+    //endregion
 
-        rec = 0;
-        reca = 0;
-
-        try {
-            sql = "SELECT ANULADO FROM D_COBRO WHERE BANDERA<>'F'";
-            DT = Con.OpenDT(sql);
-
-            DT.moveToFirst();
-            while (!DT.isAfterLast()) {
-                s1 = DT.getString(0);
-                if (s1.equalsIgnoreCase("N")) rec++;
-                else reca++;
-
-                DT.moveToNext();
-            }
-
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Recibos : " + e.getMessage());
-            fail = true;
-        }
-
-    }
-
-    private void totDeposito() {
-        Cursor DT;
-
-        depe = 0;
-        depc = 0;
-
-        try {
-            sql = "SELECT SUM(TOTEFEC),SUM(TOTCHEQ) FROM D_DEPOS WHERE CODIGOLIQUIDACION=0 AND ANULADO='N'";
-            DT = Con.OpenDT(sql);
-            DT.moveToFirst();
-
-            depe = DT.getDouble(0);
-            depc = DT.getDouble(1);
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Depositos : " + e.getMessage());
-            fail = true;
-            depe = 0;
-            depc = 0;
-        }
-
-    }
-
-    private void detVentas() {
-        Cursor DT;
-        String s1;
-        double val;
-        int flag;
-
-        tte = 0;
-        ttc = 0;
-        ttk = 0;
-        tto = 0;
-
-        try {
-            sql = "SELECT SUM(D_FACTURAP.VALOR) AS Suma,D_FACTURAP.TIPO " +
-                    "FROM D_FACTURAP INNER JOIN D_FACTURA ON D_FACTURAP.COREL = D_FACTURA.COREL " +
-                    "GROUP BY D_FACTURAP.TIPO, D_FACTURA.ANULADO, D_FACTURA.BANDERA " +
-                    "HAVING (D_FACTURA.ANULADO='N') AND (D_FACTURA.BANDERA<>'F')";
-
-            DT = Con.OpenDT(sql);
-
-            DT.moveToFirst();
-            while (!DT.isAfterLast()) {
-                val = DT.getDouble(0);
-                s1 = DT.getString(1);
-
-                flag = 0;
-                if (s1.equalsIgnoreCase("E")) {
-                    tte += val;
-                    flag = 1;
-                }
-                if (s1.equalsIgnoreCase("C")) {
-                    ttc += val;
-                    flag = 1;
-                }
-                if (s1.equalsIgnoreCase("K")) {
-                    ttk += val;
-                    flag = 1;
-                }
-                if (flag == 0) tto += val;
-
-                DT.moveToNext();
-            }
-
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Det. ventas : " + e.getMessage());
-            fail = true;
-        }
-
-    }
-
-    private void detRecibos() {
-        Cursor DT;
-        String s1;
-        double val;
-        int flag;
-
-        tre = 0;
-        trc = 0;
-        tro = 0;
-
-        try {
-            sql = "SELECT SUM(D_COBROP.VALOR) AS Suma,D_COBROP.TIPO " +
-                    "FROM D_COBROP INNER JOIN D_COBRO ON D_COBROP.COREL = D_COBRO.COREL " +
-                    "GROUP BY D_COBROP.TIPO, D_COBRO.ANULADO, D_COBRO.BANDERA " +
-                    "HAVING (D_COBRO.ANULADO='N') AND (D_COBRO.BANDERA<>'F')";
-
-            DT = Con.OpenDT(sql);
-
-            DT.moveToFirst();
-            while (!DT.isAfterLast()) {
-                val = DT.getDouble(0);
-                s1 = DT.getString(1);
-
-                flag = 0;
-                if (s1.equalsIgnoreCase("E")) {
-                    tre += val;
-                    flag = 1;
-                }
-                if (s1.equalsIgnoreCase("C")) {
-                    trc += val;
-                    flag = 1;
-                }
-                if (flag == 0) tro += val;
-
-                DT.moveToNext();
-            }
-
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Det. ventas : " + e.getMessage());
-            fail = true;
-        }
-
-    }
-
-    private void setFactCor() {
-        Cursor DT;
-
-        fcorel = 0;
-        fserie = "";
-
-        try {
-            sql = "SELECT SERIE,CORELULT FROM P_COREL WHERE RUTA='" + gl.ruta + "'";
-            DT = Con.OpenDT(sql);
-
-            DT.moveToFirst();
-
-            fserie = DT.getString(0);
-            fcorel = DT.getInt(1) + 1;
-
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            fcorel = 0;
-            fserie = "";
-            return;
-        }
-    }
-
-    private void delPrintFiles() {
-        try {
-            new File(Environment.getExternalStorageDirectory() + "/print.txt").delete();
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-        try {
-            new File(Environment.getExternalStorageDirectory() + "/SyncFold/findia.txt").delete();
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-    }
-
-    private void msgAskDeposito() {
-
-        try{
-            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
-
-            dialog1.setTitle("Road");
-            dialog1.setMessage("No se ha realizado el depósito. ¿Quiere realizar el depósito?");
-
-            dialog1.setIcon(R.drawable.ic_quest);
-
-            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityDeposito();
-                }
-            });
-
-            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
-
-            dialog1.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-
-    }
-
-    private void msgAskImpresionDeposito() {
-
-        try{
-            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
-
-            dialog1.setTitle("Road");
-            dialog1.setMessage("Debe imprimir el recibo de depósito. ¿Imprimir depósito?");
-
-            dialog1.setIcon(R.drawable.ic_quest);
-
-            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityImpresion(1);
-                }
-            });
-
-            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
-
-            dialog1.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-    }
-
-    private void msgAskComunicacion() {
-
-        try{
-            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
-
-            dialog1.setTitle("Road");
-            dialog1.setMessage("No ha comunicado los datos.¿Quiere comunicar los datos?");
-
-            dialog1.setIcon(R.drawable.ic_quest);
-
-            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityComunicacion();
-                }
-            });
-
-            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
-
-            dialog1.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-
-    }
-
-    private void msgAskGeneraCierreZ() {
-
-        try {
-            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
-
-            dialog1.setTitle("Road");
-            dialog1.setMessage("No ha generado el Cierre Z. ¿Quiere generarlo ahora?");
-
-            dialog1.setIcon(R.drawable.ic_quest);
-
-            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-
-                   if ( buildReportsTOL()){
-
-                      if(imprimeCierreZ()){
-                           corelz+=1;
-                           claseFinDia.updateGrandTotalCorelZ(gSumados,corelz);
-                       }
-                   }else{
-                       msgAskCierreIncompleto("No se pudo generar el reporte Z");
-                   }
-
-                }
-            });
-
-            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    msgAskCierreIncompleto("Proceso de fin de día incompleto");
-                }
-            });
-
-            dialog1.show();
-        } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-        }
-    }
-
-    private void msgAskCierreIncompleto(String mensaje) {
-
-        try {
-            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
-
-            dialog1.setTitle("Road");
-            dialog1.setMessage(mensaje + "¿Quiere volver a intentarlo?");
-
-            dialog1.setIcon(R.drawable.ic_quest);
-
-            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                   msgAskGeneraCierreZ();
-                }
-            });
-
-            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which)
-                {
-                }
-            });
-
-            dialog1.show();
-        } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-        }
-    }
-
-    private void msgAsk() {
-
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle("Road");
-            dialog.setMessage("Este proceso prepara el sistema para el siguiente día de venta. Continuar ?");
-
-            dialog.setIcon(R.drawable.ic_quest);
-
-            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    startFDD();
-                }
-            });
-
-            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
-
-            dialog.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-
-    }
-
-	private void msgAskFinDiaTrue()	{
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle("Road");
-            dialog.setMessage("Este proceso prepara el sistema para el siguiente día de venta. Continuar?");
-            dialog.setIcon(R.drawable.ic_quest);
-            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    //#HS_20181121_1453 Se habilito el mensaje de confirmación.
-                    msgAsk2();
-                }
-            });
-
-            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {}
-            });
-
-            dialog.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-	}
-
-	private void msgAsk2()	{
-
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle(R.string.app_name);
-            dialog.setMessage("¿Está seguro de continuar?");
-            dialog.setIcon(R.drawable.ic_quest);
-
-            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    validaFinDia();//#CKFK 20190305 Agregué esta validación aquí porque aquí es que inicia el proceso
-                }
-            });
-
-            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {}
-            });
-
-            dialog.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-
-	}
-
-	//#HS_20181121_1506 Se creo la pregunta para la devolución de inventario.
-	private void msgAskDevInventario() {
-
-        try{
-            if (!Ya_Realizo_Devolucion()) {
-
-                browse=1;
-                startActivity(new Intent(this,DevolBodTol.class));
-
-                toastlong("No ha efectuado la devolución a bodega,debe proceder a realizarla antes de fin del dia");
-
-            } else  {
-                startFDD();
-            }
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-
-    }
-
-    private void msgExit(String msg) {
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle(R.string.app_name);
-            dialog.setMessage(msg);
-
-            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    FinDia.super.finish();
-                }
-            });
-
-            dialog.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-    }
-
-    private void msgPendPago(String msg) {
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle(R.string.app_name);
-            dialog.setMessage(msg);
-
-            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    gl.filtrocli = 2;
-                    startActivity(new Intent(FinDia.this, Clientes.class));
-                }
-            });
-
-            dialog.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-    }
-
-	public void msgAskFlag(View view) {
-        try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle(R.string.app_name);
-            dialog.setMessage("Limpiar bandera cierre del día?");
-
-            dialog.setIcon(R.drawable.ic_quest);
-
-            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    db.execSQL("UPDATE FinDia SET val1=0");
-                }
-            });
-
-            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {}
-            });
-
-            dialog.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-
-	}
-
-	//#EJC 20190226 Creé esta función para saber si hay inventario para devolver
-    private boolean Tiene_Inventario_Devolucion(){
-
-        boolean TieneInvDevol = false;
-
-        Cursor DT;
-
-        try
-        {
-
-            double vTotalLbsB = 0;
-            double vTotalUB = 0;
-
-            //Producto con lote
-            sql= " SELECT SUM(ifnull(S.PESO,0)) AS PESOTOT, SUM(ifnull(S.CANT,0))AS CANTUNI " +
-            " FROM P_STOCK S, P_PRODUCTO P " +
-            " WHERE P.ES_PROD_BARRA = 0 AND S.CODIGO= P.CODIGO " ;
-
-            DT=Con.OpenDT(sql);
-
-            if (DT.getCount()!=0)
-            {
-                DT.moveToFirst();
-
-                vTotalLbsB =   DT.getDouble(0);
-                vTotalUB = DT.getDouble(1);
-            }
-
-            //Producto con HU
-            sql = " SELECT SUM(ifnull(S.CANT,0)) AS PESOTOT, COUNT(S.CODIGO)AS CANTUNI " +
-            " FROM P_STOCKB S, P_PRODUCTO P " +
-            " WHERE P.ES_PROD_BARRA = 1 AND S.CODIGO= P.CODIGO AND (S.COREL = '' OR S.COREL IS NULL)";
-
-                    /*+
-            " AND S.BARRA NOT IN (SELECT BARRA FROM D_BONIF_BARRA WHERE COREL NOT IN (" +
-            " SELECT COREL FROM D_FACTURA WHERE ANULADO = 'S')) "; */
-
-            DT=Con.OpenDT(sql);
-
-            if (DT.getCount()!=0)
-            {
-                DT.moveToFirst();
-
-                vTotalLbsB +=   DT.getDouble(0);
-                vTotalUB += DT.getDouble(1);
-            }
-
-            //Devolución de dañado.
-            sql = " SELECT SUM(S.PESO) AS PESOTOT, SUM(S.CANT)AS CANTUNI " +
-            " FROM D_CXC E, D_CxCD S, P_PRODUCTO P WHERE E.COREL = S.COREL AND S.CODIGO= P.CODIGO AND E.ANULADO = 'N' ";
-
-            DT=Con.OpenDT(sql);
-
-            if (DT.getCount()!=0)
-            {
-                DT.moveToFirst();
-
-                vTotalLbsB +=   DT.getDouble(0);
-                vTotalUB += DT.getDouble(1);
-            }
-
-            TieneInvDevol = (vTotalUB > 0);
-
-        }catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            Log.e("TieneInvDevol",e.getMessage());
-        }
-
-        return  TieneInvDevol;
-
-    }
-
-    //#EJC 20190226 Creé esta función para saber si ya se había realizado la devolución
-    private boolean Ya_Realizo_Devolucion(){
-
-        boolean Ya_Realizo_Devol = false;
-
-        Cursor DT;
-
-        try  {
-
-            boolean vTieneInvDevol = false;
-
-            sql = "SELECT STATCOM FROM D_MOV WHERE TIPO = 'D' AND ANULADO = 'N'";
-            DT=Con.OpenDT(sql);
-
-            if (DT.getCount()==0)
-            {
-
-                vTieneInvDevol = Tiene_Inventario_Devolucion();
-
-                if (vTieneInvDevol)
-                {
-                    Ya_Realizo_Devol = false;
-                    claseFinDia.updateDevBodega(0);
-
-                }else
-                {
-                    Ya_Realizo_Devol = Inserta_Enc_D_Mov();
-                    claseFinDia.updateDevBodega(5);
-                }
-
-            }else if (claseFinDia.getDevBodega() == 5)
-            {
-                Ya_Realizo_Devol = true;
-            }else
-            {
-                Ya_Realizo_Devol = true;
-                claseFinDia.updateDevBodega(5);
-            }
-
-        }catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            Log.e("TieneInvDevol",e.getMessage());
-        }
-
-        return  Ya_Realizo_Devol;
-
-    }
-
-    private boolean yaInicioFinDia(){
-
-        boolean vInicio=false;
-        Cursor DT;
-
-        try{
-
-            sql="SELECT val5 FROM findia ";
-            DT=Con.OpenDT(sql);
-
-            if (DT.getCount()>0){
-                DT.moveToFirst();
-
-                vInicio=((DT.getInt(0)==5));
-
-            }
-
-        }catch (Exception ex){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
-            mu.msgbox(ex.getMessage());
-        }
-
-        return vInicio;
-
-    }
-
-	// Activity Events
-	@Override
-	public void onBackPressed() {
-		if (idle) super.onBackPressed();
-	}
-
-
-    @Override
-    protected void onResume() {
-        try{
-
-            if (gl.findiaactivo){
-                super.finish();
-            }
-
-            super.onResume();
-
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-    }
-
-    //region "Funciones y procedimientos creados para generar el reporte Cierre Z de Toledano"
+    //region Toledano Cierre Z
 
     //CKFK 20190226 Modifiqué este procedimiento a como debe ser el fin de día en Toledano
     private boolean buildReportsTOL() {
@@ -1879,7 +1210,7 @@ public class FinDia extends PBase {
 
             rep.empty();
             sql = " SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO " +
-                  " FROM P_SUCURSAL WHERE CODIGO='" + gl.sucur + "'";
+                    " FROM P_SUCURSAL WHERE CODIGO='" + gl.sucur + "'";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -2242,12 +1573,12 @@ public class FinDia extends PBase {
 
         try{
 
-             vCadena = "LISTADO DE COBROS";
-             rep.add(vCadena);
-             rep.line();
+            vCadena = "LISTADO DE COBROS";
+            rep.add(vCadena);
+            rep.line();
 
-             vCadena= "No. Rec "  + StringUtils.leftPad("Total",10)  + StringUtils.leftPad("E",12);
-             rep.add(vCadena);
+            vCadena= "No. Rec "  + StringUtils.leftPad("Total",10)  + StringUtils.leftPad("E",12);
+            rep.add(vCadena);
 
             sql = "SELECT COREL, TOTAL, ANULADO FROM D_COBRO WHERE STATCOM='N'";
             DT = Con.OpenDT(sql);
@@ -2313,9 +1644,9 @@ public class FinDia extends PBase {
             rep.line();
 
             sql = " SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N, D_FACTURAP F " +
-                  " WHERE N.FACTURA = F.COREL AND N.STATCOM='N'  AND F.TIPO = 'K'  " +
-                  " UNION SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N, D_CXC C " +
-                  " WHERE N.FACTURA = C.COREL AND N.STATCOM='N' ";
+                    " WHERE N.FACTURA = F.COREL AND N.STATCOM='N'  AND F.TIPO = 'K'  " +
+                    " UNION SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N, D_CXC C " +
+                    " WHERE N.FACTURA = C.COREL AND N.STATCOM='N' ";
 
             DT = Con.OpenDT(sql);
 
@@ -2347,7 +1678,7 @@ public class FinDia extends PBase {
             rep.line();
 
             sql = " SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N " +
-                  " WHERE N.STATCOM='N' AND N.FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO <> 'K')";
+                    " WHERE N.STATCOM='N' AND N.FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO <> 'K')";
 
             DT = Con.OpenDT(sql);
 
@@ -2381,7 +1712,7 @@ public class FinDia extends PBase {
             rep.add(vCadena);
             vCadena = "Total:             " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCred), 16);
             rep.add(vCadena);
-           rep.empty();
+            rep.empty();
 
         }catch (Exception ex){
             mu.msgbox("Notas de crédito: " + ex.getMessage());
@@ -2414,17 +1745,17 @@ public class FinDia extends PBase {
                 vComunicacion = " AND F.STATCOM = 'N' ";
             }
             sql = " SELECT IFNULL(SUM(S.IMPMONTO),0) AS IMPMONTO, IFNULL(SUM(S.GRAVADO),0) AS GRAVADO, " +
-                  " IFNULL(SUM(S.NO_GRAVADO),0) AS NO_GRAVADO " +
-                  " FROM (SELECT SUM(D.IMP) AS IMPMONTO, " +
-                  " SUM(D.PRECIODOC * D.CANT) AS GRAVADO, 0 AS NO_GRAVADO " +
-                  " FROM D_FACTURA F INNER JOIN D_FACTURAD D ON F.COREL = D .COREL " +
-                  " WHERE D.IMP > 0 " + vComunicacion +
-                  " AND F.ANULADO = 'N' " +
-                  " UNION SELECT SUM(D.IMP) AS IMPMONTO, " +
-                  " 0 AS GRAVADO, SUM(D.TOTAL) AS NO_GRAVADO " +
-                  " FROM D_FACTURA F INNER JOIN D_FACTURAD D ON F.COREL = D .COREL " +
-                  " WHERE D.IMP = 0 " + vComunicacion +
-                  " AND F.ANULADO = 'N') S ";
+                    " IFNULL(SUM(S.NO_GRAVADO),0) AS NO_GRAVADO " +
+                    " FROM (SELECT SUM(D.IMP) AS IMPMONTO, " +
+                    " SUM(D.PRECIODOC * D.CANT) AS GRAVADO, 0 AS NO_GRAVADO " +
+                    " FROM D_FACTURA F INNER JOIN D_FACTURAD D ON F.COREL = D .COREL " +
+                    " WHERE D.IMP > 0 " + vComunicacion +
+                    " AND F.ANULADO = 'N' " +
+                    " UNION SELECT SUM(D.IMP) AS IMPMONTO, " +
+                    " 0 AS GRAVADO, SUM(D.TOTAL) AS NO_GRAVADO " +
+                    " FROM D_FACTURA F INNER JOIN D_FACTURAD D ON F.COREL = D .COREL " +
+                    " WHERE D.IMP = 0 " + vComunicacion +
+                    " AND F.ANULADO = 'N') S ";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -2506,10 +1837,10 @@ public class FinDia extends PBase {
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
                 vCadena = "Siguiente Factura     :" + StringUtils.leftPad(DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)+1), 6),13);
-             }else{
+            }else{
                 vCadena = "Siguiente Factura     :" + StringUtils.leftPad("0", 13);
-             }
-             rep.add(vCadena);
+            }
+            rep.add(vCadena);
 
             sql = "SELECT SERIE, ACTUAL FROM P_CORRELREC";
             DT = Con.OpenDT(sql);
@@ -2520,7 +1851,7 @@ public class FinDia extends PBase {
             }else{
                 vCadena = "Siguiente Recibo      :" + StringUtils.leftPad("0", 13);
             }
-                rep.add(vCadena);
+            rep.add(vCadena);
 
             sql = "SELECT SERIE, ACTUAL FROM P_CORREL_OTROS WHERE TIPO = 'NC'";
             DT = Con.OpenDT(sql);
@@ -2554,9 +1885,9 @@ public class FinDia extends PBase {
         try{
 
             sql = " SELECT IFNULL(COUNT(F.COREL),0) AS TOTAL " +
-                  " FROM D_FACTURA F " +
-                  " WHERE F.COREL IN (SELECT P.COREL FROM D_FACTURAP P WHERE (P.TIPO = 'K') " +
-                  " AND P.ANULADO='N') AND F.RUTA='" + gl.ruta + "'";
+                    " FROM D_FACTURA F " +
+                    " WHERE F.COREL IN (SELECT P.COREL FROM D_FACTURAP P WHERE (P.TIPO = 'K') " +
+                    " AND P.ANULADO='N') AND F.RUTA='" + gl.ruta + "'";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -2580,9 +1911,9 @@ public class FinDia extends PBase {
         try{
 
             sql = " SELECT IFNULL(COUNT(F.COREL),0) AS TOTAL " +
-                  " FROM D_FACTURA F " +
-                  " WHERE F.COREL IN (SELECT P.COREL FROM D_FACTURAP P WHERE (P.TIPO = 'E' OR P.TIPO = 'C')" +
-                  " AND P.ANULADO='N') AND F.RUTA='" + gl.ruta + "'";
+                    " FROM D_FACTURA F " +
+                    " WHERE F.COREL IN (SELECT P.COREL FROM D_FACTURAP P WHERE (P.TIPO = 'E' OR P.TIPO = 'C')" +
+                    " AND P.ANULADO='N') AND F.RUTA='" + gl.ruta + "'";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -2656,8 +1987,8 @@ public class FinDia extends PBase {
         try{
 
             sql =  " SELECT IFNULL(COUNT(F.COREL),0) AS TOTAL " +
-                   " FROM D_COBRO F " +
-                   " WHERE F.RUTA='" + gl.ruta + "'";
+                    " FROM D_COBRO F " +
+                    " WHERE F.RUTA='" + gl.ruta + "'";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -2706,8 +2037,8 @@ public class FinDia extends PBase {
         try{
 
             sql =  " SELECT IFNULL(COUNT(NC.COREL),0) AS TOTAL " +
-                   " FROM D_NOTACRED NC " +
-                   " WHERE NC.RUTA='" + gl.ruta + "'";
+                    " FROM D_NOTACRED NC " +
+                    " WHERE NC.RUTA='" + gl.ruta + "'";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -2756,10 +2087,10 @@ public class FinDia extends PBase {
         try{
 
             sql =  " SELECT IFNULL(SUM(NC.TOTAL),0) AS TOTAL " +
-                   " FROM D_NOTACRED NC " +
-                   " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='N' " +
-                   " AND (FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO = 'K')" +
-                   " OR   FACTURA IN (SELECT COREL FROM D_CXC))";
+                    " FROM D_NOTACRED NC " +
+                    " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='N' " +
+                    " AND (FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO = 'K')" +
+                    " OR   FACTURA IN (SELECT COREL FROM D_CXC))";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -2809,9 +2140,9 @@ public class FinDia extends PBase {
         try{
 
             sql = " SELECT IFNULL(SUM(F.TOTAL),0) AS TOTAL " +
-                  " FROM D_FACTURAP P, D_FACTURA F " +
-                  " WHERE P.TIPO = 'K' AND P.COREL=F.COREL " +
-                  " AND F.RUTA='" + gl.ruta + "' AND P.ANULADO='N'";
+                    " FROM D_FACTURAP P, D_FACTURA F " +
+                    " WHERE P.TIPO = 'K' AND P.COREL=F.COREL " +
+                    " AND F.RUTA='" + gl.ruta + "' AND P.ANULADO='N'";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -2829,15 +2160,14 @@ public class FinDia extends PBase {
     }
 
     private double TotalEfectivo2(){
-
         Cursor DT;
         double vTotEfectivo2 = 0;
 
         try{
 
             sql = " SELECT IFNULL(SUM(F.TOTAL),0) AS TOTAL FROM D_FACTURA F " +
-                  " WHERE F.COREL  IN (SELECT COREL FROM D_FACTURAP P WHERE (P.TIPO <>'K') )" +
-                  " AND F.RUTA='" + gl.ruta + "' AND F.ANULADO='N' ";
+                    " WHERE F.COREL  IN (SELECT COREL FROM D_FACTURAP P WHERE (P.TIPO <>'K') )" +
+                    " AND F.RUTA='" + gl.ruta + "' AND F.ANULADO='N' ";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -2879,4 +2209,677 @@ public class FinDia extends PBase {
 
     //endregion
 
+    //region Dialogos
+
+    private void msgAskDeposito() {
+
+        try{
+            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
+
+            dialog1.setTitle("Road");
+            dialog1.setMessage("No se ha realizado el depósito. ¿Quiere realizar el depósito?");
+
+            dialog1.setIcon(R.drawable.ic_quest);
+
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityDeposito();
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+            dialog1.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+
+    }
+
+    private void msgAskImpresionDeposito() {
+
+        try{
+            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
+
+            dialog1.setTitle("Road");
+            dialog1.setMessage("Debe imprimir el recibo de depósito. ¿Imprimir depósito?");
+
+            dialog1.setIcon(R.drawable.ic_quest);
+
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityImpresion(2);
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+            dialog1.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+    }
+
+    private void msgAskComunicacion() {
+
+        try{
+            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
+
+            dialog1.setTitle("Road");
+            dialog1.setMessage("No ha comunicado los datos.¿Quiere comunicar los datos?");
+
+            dialog1.setIcon(R.drawable.ic_quest);
+
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityComunicacion();
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+            dialog1.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+    }
+
+    private void msgAskGeneraCierreZ() {
+
+        try {
+            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
+
+            dialog1.setTitle("Road");
+            dialog1.setMessage("No ha generado el Cierre Z. ¿Quiere generarlo ahora?");
+
+            dialog1.setIcon(R.drawable.ic_quest);
+
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                   if ( buildReportsTOL()){
+
+                      if(imprimeCierreZ()){
+                           corelz+=1;
+                           claseFinDia.updateGrandTotalCorelZ(gSumados,corelz);
+                       }
+                   }else{
+                       msgAskCierreIncompleto("No se pudo generar el reporte Z");
+                   }
+
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    msgAskCierreIncompleto("Proceso de fin de día incompleto");
+                }
+            });
+
+            dialog1.show();
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+        }
+    }
+
+    private void msgAskCierreIncompleto(String mensaje) {
+
+        try {
+            AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
+
+            dialog1.setTitle("Road");
+            dialog1.setMessage(mensaje + "¿Quiere volver a intentarlo?");
+
+            dialog1.setIcon(R.drawable.ic_quest);
+
+            dialog1.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                   msgAskGeneraCierreZ();
+                }
+            });
+
+            dialog1.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which)
+                {
+                }
+            });
+
+            dialog1.show();
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+        }
+    }
+
+    private void msgAsk() {
+
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle("Road");
+            dialog.setMessage("Este proceso prepara el sistema para el siguiente día de venta. Continuar ?");
+
+            dialog.setIcon(R.drawable.ic_quest);
+
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    startFDD();
+                }
+            });
+
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+
+    }
+
+	private void msgAskFinDiaTrue()	{
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle("Road");
+            dialog.setMessage("Este proceso prepara el sistema para el siguiente día de venta. Continuar?");
+            dialog.setIcon(R.drawable.ic_quest);
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    //#HS_20181121_1453 Se habilito el mensaje de confirmación.
+                    msgAsk2();
+                }
+            });
+
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {}
+            });
+
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+	}
+
+	private void msgAsk2()	{
+
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle(R.string.app_name);
+            dialog.setMessage("¿Está seguro de continuar?");
+            dialog.setIcon(R.drawable.ic_quest);
+
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    validaFinDia();//#CKFK 20190305 Agregué esta validación aquí porque aquí es que inicia el proceso
+                }
+            });
+
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {}
+            });
+
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+
+	}
+
+	private void msgAskDevInventario() {
+
+        try{
+            if (!Ya_Realizo_Devolucion()) {
+
+                browse=1;
+                startActivity(new Intent(this,DevolBodTol.class));
+                toastlong("No ha efectuado la devolución a bodega,debe proceder a realizarla antes de fin del dia");
+
+            } else  {
+                startFDD();
+            }
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+
+    }
+
+    private void msgExit(String msg) {
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle(R.string.app_name);
+            dialog.setMessage(msg);
+
+            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    FinDia.super.finish();
+                }
+            });
+
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+    private void msgPendPago(String msg) {
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle(R.string.app_name);
+            dialog.setMessage(msg);
+
+            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    gl.filtrocli = 2;
+                    startActivity(new Intent(FinDia.this, Clientes.class));
+                }
+            });
+
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+	private void msgAskFlag(View view) {
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle(R.string.app_name);
+            dialog.setMessage("Limpiar bandera cierre del día?");
+
+            dialog.setIcon(R.drawable.ic_quest);
+
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    db.execSQL("UPDATE FinDia SET val1=0");
+                }
+            });
+
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {}
+            });
+
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+
+	}
+
+	//endregion
+
+    //region Aux
+
+	//#EJC 20190226 Creé esta función para saber si hay inventario para devolver
+    private boolean Tiene_Inventario_Devolucion(){
+
+        boolean TieneInvDevol = false;
+
+        Cursor DT;
+
+        try
+        {
+
+            double vTotalLbsB = 0;
+            double vTotalUB = 0;
+
+            //Producto con lote
+            sql= " SELECT SUM(ifnull(S.PESO,0)) AS PESOTOT, SUM(ifnull(S.CANT,0))AS CANTUNI " +
+            " FROM P_STOCK S, P_PRODUCTO P " +
+            " WHERE P.ES_PROD_BARRA = 0 AND S.CODIGO= P.CODIGO " ;
+
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()!=0)
+            {
+                DT.moveToFirst();
+
+                vTotalLbsB =   DT.getDouble(0);
+                vTotalUB = DT.getDouble(1);
+            }
+
+            //Producto con HU
+            sql = " SELECT SUM(ifnull(S.CANT,0)) AS PESOTOT, COUNT(S.CODIGO)AS CANTUNI " +
+            " FROM P_STOCKB S, P_PRODUCTO P " +
+            " WHERE P.ES_PROD_BARRA = 1 AND S.CODIGO= P.CODIGO AND (S.COREL = '' OR S.COREL IS NULL)";
+
+                    /*+
+            " AND S.BARRA NOT IN (SELECT BARRA FROM D_BONIF_BARRA WHERE COREL NOT IN (" +
+            " SELECT COREL FROM D_FACTURA WHERE ANULADO = 'S')) "; */
+
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()!=0)
+            {
+                DT.moveToFirst();
+
+                vTotalLbsB +=   DT.getDouble(0);
+                vTotalUB += DT.getDouble(1);
+            }
+
+            //Devolución de dañado.
+            sql = " SELECT SUM(S.PESO) AS PESOTOT, SUM(S.CANT)AS CANTUNI " +
+            " FROM D_CXC E, D_CxCD S, P_PRODUCTO P WHERE E.COREL = S.COREL AND S.CODIGO= P.CODIGO AND E.ANULADO = 'N' ";
+
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()!=0)
+            {
+                DT.moveToFirst();
+
+                vTotalLbsB +=   DT.getDouble(0);
+                vTotalUB += DT.getDouble(1);
+            }
+
+            TieneInvDevol = (vTotalUB > 0);
+
+        }catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            Log.e("TieneInvDevol",e.getMessage());
+        }
+
+        return  TieneInvDevol;
+
+    }
+
+    //#EJC 20190226 Creé esta función para saber si ya se había realizado la devolución
+    private boolean Ya_Realizo_Devolucion(){
+
+        boolean Ya_Realizo_Devol = false;
+
+        Cursor DT;
+
+        try  {
+
+            boolean vTieneInvDevol = false;
+
+            sql = "SELECT STATCOM FROM D_MOV WHERE TIPO = 'D' AND ANULADO = 'N'";
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()==0) {
+
+                vTieneInvDevol = Tiene_Inventario_Devolucion();
+
+                if (vTieneInvDevol) {
+                    Ya_Realizo_Devol = false;
+                    claseFinDia.updateDevBodega(0);
+
+                } else  {
+                    Ya_Realizo_Devol = Inserta_Enc_D_Mov();
+                    claseFinDia.updateDevBodega(5);
+                }
+
+            }else if (claseFinDia.getDevBodega() == 5)  {
+                Ya_Realizo_Devol = true;
+            }else  {
+                Ya_Realizo_Devol = true;
+                claseFinDia.updateDevBodega(5);
+            }
+
+        }catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            Log.e("TieneInvDevol",e.getMessage());
+        }
+
+        return  Ya_Realizo_Devol;
+
+    }
+
+    private boolean yaInicioFinDia(){
+
+        boolean vInicio=false;
+        Cursor DT;
+
+        try{
+
+            sql="SELECT val5 FROM findia ";
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()>0){
+                DT.moveToFirst();
+
+                vInicio=((DT.getInt(0)==5));
+
+            }
+
+        }catch (Exception ex){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
+            mu.msgbox(ex.getMessage());
+        }
+
+        return vInicio;
+
+    }
+
+    private void totRecibos() {
+        Cursor DT;
+        String s1;
+
+        rec = 0;
+        reca = 0;
+
+        try {
+            sql = "SELECT ANULADO FROM D_COBRO WHERE BANDERA<>'F'";
+            DT = Con.OpenDT(sql);
+
+            DT.moveToFirst();
+            while (!DT.isAfterLast()) {
+                s1 = DT.getString(0);
+                if (s1.equalsIgnoreCase("N")) rec++;
+                else reca++;
+
+                DT.moveToNext();
+            }
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox("Recibos : " + e.getMessage());
+            fail = true;
+        }
+
+    }
+
+    private void totDeposito() {
+        Cursor DT;
+
+        depe = 0;
+        depc = 0;
+
+        try {
+            sql = "SELECT SUM(TOTEFEC),SUM(TOTCHEQ) FROM D_DEPOS WHERE CODIGOLIQUIDACION=0 AND ANULADO='N'";
+            DT = Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            depe = DT.getDouble(0);
+            depc = DT.getDouble(1);
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox("Depositos : " + e.getMessage());
+            fail = true;
+            depe = 0;
+            depc = 0;
+        }
+
+    }
+
+    private void detVentas() {
+        Cursor DT;
+        String s1;
+        double val;
+        int flag;
+
+        tte = 0;
+        ttc = 0;
+        ttk = 0;
+        tto = 0;
+
+        try {
+            sql = "SELECT SUM(D_FACTURAP.VALOR) AS Suma,D_FACTURAP.TIPO " +
+                    "FROM D_FACTURAP INNER JOIN D_FACTURA ON D_FACTURAP.COREL = D_FACTURA.COREL " +
+                    "GROUP BY D_FACTURAP.TIPO, D_FACTURA.ANULADO, D_FACTURA.BANDERA " +
+                    "HAVING (D_FACTURA.ANULADO='N') AND (D_FACTURA.BANDERA<>'F')";
+
+            DT = Con.OpenDT(sql);
+
+            DT.moveToFirst();
+            while (!DT.isAfterLast()) {
+                val = DT.getDouble(0);
+                s1 = DT.getString(1);
+
+                flag = 0;
+                if (s1.equalsIgnoreCase("E")) {
+                    tte += val;
+                    flag = 1;
+                }
+                if (s1.equalsIgnoreCase("C")) {
+                    ttc += val;
+                    flag = 1;
+                }
+                if (s1.equalsIgnoreCase("K")) {
+                    ttk += val;
+                    flag = 1;
+                }
+                if (flag == 0) tto += val;
+
+                DT.moveToNext();
+            }
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox("Det. ventas : " + e.getMessage());
+            fail = true;
+        }
+
+    }
+
+    private void detRecibos() {
+        Cursor DT;
+        String s1;
+        double val;
+        int flag;
+
+        tre = 0;
+        trc = 0;
+        tro = 0;
+
+        try {
+            sql = "SELECT SUM(D_COBROP.VALOR) AS Suma,D_COBROP.TIPO " +
+                    "FROM D_COBROP INNER JOIN D_COBRO ON D_COBROP.COREL = D_COBRO.COREL " +
+                    "GROUP BY D_COBROP.TIPO, D_COBRO.ANULADO, D_COBRO.BANDERA " +
+                    "HAVING (D_COBRO.ANULADO='N') AND (D_COBRO.BANDERA<>'F')";
+
+            DT = Con.OpenDT(sql);
+
+            DT.moveToFirst();
+            while (!DT.isAfterLast()) {
+                val = DT.getDouble(0);
+                s1 = DT.getString(1);
+
+                flag = 0;
+                if (s1.equalsIgnoreCase("E")) {
+                    tre += val;
+                    flag = 1;
+                }
+                if (s1.equalsIgnoreCase("C")) {
+                    trc += val;
+                    flag = 1;
+                }
+                if (flag == 0) tro += val;
+
+                DT.moveToNext();
+            }
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox("Det. ventas : " + e.getMessage());
+            fail = true;
+        }
+
+    }
+
+    private void setFactCor() {
+        Cursor DT;
+
+        fcorel = 0;
+        fserie = "";
+
+        try {
+            sql = "SELECT SERIE,CORELULT FROM P_COREL WHERE RUTA='" + gl.ruta + "'";
+            DT = Con.OpenDT(sql);
+
+            DT.moveToFirst();
+
+            fserie = DT.getString(0);
+            fcorel = DT.getInt(1) + 1;
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            fcorel = 0;
+            fserie = "";
+            return;
+        }
+    }
+
+    private void delPrintFiles() {
+        try {
+            new File(Environment.getExternalStorageDirectory() + "/print.txt").delete();
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+        try {
+            new File(Environment.getExternalStorageDirectory() + "/SyncFold/findia.txt").delete();
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+    }
+
+    //endregion
+
+	//region Activity Events
+	@Override
+	public void onBackPressed() {
+		if (idle) super.onBackPressed();
+	}
+
+    @Override
+    protected void onResume() {
+        try{
+
+            if (gl.findiaactivo){
+                super.finish();
+            }
+
+            super.onResume();
+
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+    //endregion
 }

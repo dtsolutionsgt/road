@@ -40,7 +40,7 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parVer = "9.4.1 / 30-Abr-2019";
+    private String parVer = "9.4.1 / 09-Mayo-2019";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -371,14 +371,14 @@ public class MainActivity extends PBase {
                 gl.depparc = DT.getInt(5) == 1;
                 gl.lotedf = DT.getString(8);
             } else {
-                gl.emp = "0";
-                lblRuta.setText("");
+                gl.emp = "";lblRuta.setText("");
                 gl.devol = false;
+                msgbox("¡No se pudo cargar configuración de la empresa!");
             }
 
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            msgbox("¡No se pudo cargar configuración de la empresa!");
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
         }
 
         gl.vendnom = "Vendedor 1";

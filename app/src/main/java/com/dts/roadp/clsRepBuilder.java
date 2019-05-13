@@ -2,7 +2,6 @@ package com.dts.roadp;
 
 import android.content.Context;
 import android.os.Environment;
-import android.view.ViewDebug;
 import android.widget.Toast;
 
 import org.apache.commons.lang.StringUtils;
@@ -76,8 +75,16 @@ public class clsRepBuilder {
 		}
 
 	}
-		
+
 	public boolean save(){
+		return saverep(false);
+	}
+
+	public boolean saveappend(){
+		return saverep(true);
+	}
+
+	public boolean saverep(boolean append){
 		String s;
 		int lns=0;
 
@@ -85,8 +92,13 @@ public class clsRepBuilder {
 
 		try {
 
-			wfile=new FileWriter(fname,false);
+			wfile=new FileWriter(fname,append);
 			writer = new BufferedWriter(wfile);
+
+			if (append) {
+				writer.write("\r\n");
+				writer.write("\r\n");
+			}
 
 			for (int i = 0; i < items.size(); i++) {
 				try {
@@ -110,6 +122,14 @@ public class clsRepBuilder {
 	}
 
 	public boolean save(int cnt){
+		return saverep(cnt,false);
+	}
+
+	public boolean saveappend(int cnt){
+		return saverep(cnt,true);
+	}
+
+	public boolean saverep(int cnt,boolean append){
 		String s;
 		int lns=0;
 
@@ -117,8 +137,13 @@ public class clsRepBuilder {
 
 		try {
 
-			wfile=new FileWriter(fname,false);
+			wfile=new FileWriter(fname,append);
 			writer = new BufferedWriter(wfile);
+
+			if (append) {
+				writer.write("\r\n");
+				writer.write("\r\n");
+			}
 
 			for (int j = 0; j < cnt; j++) {
 

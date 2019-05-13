@@ -21,7 +21,6 @@ import datamaxoneil.connection.Connection_Bluetooth;
 public class printDMax extends printBase {
 	
 	private String ss,ess;
-	private PrintDialog printDialog;
 	private appGlobals appG;
 	private boolean validprint;
 	

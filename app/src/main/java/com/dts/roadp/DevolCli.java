@@ -25,12 +25,13 @@ public class DevolCli extends PBase {
 	private ArrayList<clsClasses.clsCFDV> items= new ArrayList<clsClasses.clsCFDV>();
 	private ListAdaptDevCli adapter;
 	private clsClasses.clsCFDV selitem;
+	private AppMethods app;
 
 	private double cntprd=0.0,cntunis=0.0,cntkgs=0.0,cntotl=0.0;
 
 	private printer prn;
 	private clsDocDevolucion fdevol;
-	public Runnable printcallback,printclose,printexit;
+	private Runnable printcallback,printclose,printexit,printvoid;
 
 	private String cliid,itemid,prodid;
 	private double cant;
@@ -54,6 +55,8 @@ public class DevolCli extends PBase {
 		emp=gl.emp;
 		estado=gl.devtipo;
 		cliid=gl.cliente;
+
+		app = new AppMethods(this, gl, Con, db);
 		
 		setHandlers();
 		
@@ -75,10 +78,15 @@ public class DevolCli extends PBase {
 			}
 		};
 
+		printvoid= new Runnable() {
+			public void run() {
+			}
+		};
+
 		printclose= new Runnable() {
 			public void run() {
-				limpiavariables_devol();
-				DevolCli.super.finish();
+			limpiavariables_devol();
+			DevolCli.super.finish();
 			}
 		};
 
@@ -118,7 +126,8 @@ public class DevolCli extends PBase {
 		}
 
 	}
-	
+
+
 	// Main
 	
 	private void setHandlers(){
@@ -385,15 +394,12 @@ public class DevolCli extends PBase {
 		gl.dvcorreld = obtienecorrel("D");
 		gl.dvcorrelnc = obtienecorrel("NC");
 
+		fecha=du.getActDateTime();
+		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
+
 		cntotl=mu.round(cntotl,2);
 
 		try {
-
-			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				fecha=du.getActDate();
-			} else {
-				fecha=du.getActDateTime();
-			}
 
 		    if (gl.tiponcredito==1){
 
@@ -606,7 +612,7 @@ public class DevolCli extends PBase {
 
             }
 
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("createDoc: " + e.getMessage());
 		}
@@ -802,8 +808,9 @@ public class DevolCli extends PBase {
 
 						String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 						fdevol.buildPrint(gl.dvcorrelnc,1,vModo);
-						prn.printnoask(printclose, "printnc.txt");
-						prn.printnoask(printclose, "printnc.txt");
+						impres=0;
+						//prn.printnoask(printvoid, "printnc.txt");
+						prn.printnoask(printcallback, "printnc.txt");
 
 					}
 				}
@@ -812,8 +819,8 @@ public class DevolCli extends PBase {
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					//singlePrint();
-					//prn.printask(printcallback);
-					finish();
+					prn.printask(printcallback);
+					//finish();
 				}
 			});
 

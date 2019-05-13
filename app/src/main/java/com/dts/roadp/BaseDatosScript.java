@@ -1354,7 +1354,6 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX P_DESCUENTO_idx4 ON P_DESCUENTO(FECHAFIN)";
 			database.execSQL(vSQL);
 
-			
 			vSQL="CREATE TABLE [P_EMPRESA] ("+
 					"[EMPRESA] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
@@ -1923,6 +1922,13 @@ public class BaseDatosScript {
 					"[MACADDRESS] TEXT NOT NULL,"+
 					"PRIMARY KEY ([IDIMPRESORA])"+
 			        ");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE TABLE [P_FECHA]("+
+					"[RUTA] TEXT NOT NULL,"+
+					"[FECHA] INTEGER NOT NULL,"+
+					"PRIMARY KEY ([RUTA])"+
+					");";
 			database.execSQL(vSQL);
 
 			vSQL= "CREATE TABLE [P_HANDHELD]("+

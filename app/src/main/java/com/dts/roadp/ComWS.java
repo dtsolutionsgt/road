@@ -140,11 +140,28 @@ public class ComWS extends PBase {
 		lblParam.setText("");
 		barInfo.setVisibility(View.INVISIBLE);
 
-		ruta = gl.ruta;
+		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
+		if (gl.debug) {
+			if (mu.emptystr(txtRuta.getText().toString())) {
+				txtRuta.setText("8001-1");
+				txtEmp.setText("03");
+				txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
+			}
+		}
+
+		if(gl.ruta.isEmpty()){
+			ruta = txtRuta.getText().toString();
+			gl.ruta=ruta;
+		}else {
+			ruta = gl.ruta;
+		}
+
 		ActRuta = ruta;
 		gEmpresa = gl.emp;
 		rutatipo = gl.rutatipog;
 		rutapos = gl.rutapos;
+
+
 
 		if (gl.tipo == 0) {
 			this.setTitle("Comunicación");
@@ -153,11 +170,11 @@ public class ComWS extends PBase {
 		}
 
 		licSerial=gl.deviceId;
-		licRuta=gl.ruta;
+		licRuta=ruta;
 
 		try {
 			licSerialEnc=cu.encrypt(licSerial);
-			licRutaEnc=cu.encrypt(gl.ruta);
+			licRutaEnc=cu.encrypt(licRuta);
 		} catch (Exception e) {
 			licSerialEnc="";
 			licRutaEnc="";
@@ -186,15 +203,6 @@ public class ComWS extends PBase {
 
 		if (esvacio) txtWS.setEnabled(true);
 
-		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
-		if (gl.debug) {
-			if (mu.emptystr(txtRuta.getText().toString())) {
-				txtRuta.setText("8001-1");
-				txtEmp.setText("03");
-				txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
-			}
-		}
-
 		setHandlers();
 
 		try {
@@ -215,8 +223,23 @@ public class ComWS extends PBase {
 			return;
 		}
 
-		if (mu.emptystr(gl.ruta)) gl.ruta=txtRuta.getText().toString();
+		if(gl.ruta.isEmpty()){
+			ruta = txtRuta.getText().toString();
+			gl.ruta=ruta;
+		}else {
+			ruta = gl.ruta;
+		}
 
+		licSerial=gl.deviceId;
+		licRuta=ruta;
+
+		try {
+			licSerialEnc=cu.encrypt(licSerial);
+			licRutaEnc=cu.encrypt(licRuta);
+		} catch (Exception e) {
+			licSerialEnc="";
+			licRutaEnc="";
+		}
 
 		//CKFK 20190222 Se agregó esta validación para no sobreescribir los datos si ya se importaron
 		if (!gl.modoadmin) {
@@ -421,11 +444,15 @@ public class ComWS extends PBase {
 
 			if (!setComParams()) return;
 
-			//#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
-			View view = this.getCurrentFocus();
-			view.clearFocus();
-			if (view != null) {
-				keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
+			try{
+				//#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
+				View view = this.getCurrentFocus();
+				view.clearFocus();
+				if (view != null) {
+					keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
+				}
+			}catch (Exception e){
+
 			}
 
 			isbusy = 1;
@@ -1144,6 +1171,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_ENCABEZADO_REPORTESHH")) return false;
 			if (!AddTable("P_PORCMERMA")) return false;
 
+
 			// Objetivos
 
 			if (!AddTable("O_RUTA")) return false;
@@ -1194,6 +1222,7 @@ public class ComWS extends PBase {
 				sql = listItems.get(i);esql = sql;
 				sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
 				sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
+                sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
 
 				try {
 					writer.write(sql);writer.write("\r\n");
@@ -1229,9 +1258,10 @@ public class ComWS extends PBase {
 
 			Actualiza_FinDia();
 			encodePrinters();
-
 			encodeLicence();
 			encodeLicenceRuta();
+
+			fechaCarga();
 
             SetStatusRecToTrans("1");
 
@@ -1778,7 +1808,7 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_ENCABEZADO_REPORTESHH")) {
-			SQL = "SELECT CODIGO,TEXTO,SUCURSAL FROM P_ENCABEZADO_REPORTESHH";
+			SQL = "SELECT CODIGO,TEXTO,SUCURSAL FROM P_ENCABEZADO_REPORTESHH_II";
 			return SQL;
 		}
 
@@ -2183,7 +2213,6 @@ public class ComWS extends PBase {
 
 	}
 
-
 	private boolean validaLicencia() {
 		CryptUtil cu=new CryptUtil();
 		Cursor dt;
@@ -2199,6 +2228,7 @@ public class ComWS extends PBase {
 			dt.moveToFirst();
 			lic=dt.getString(0);
 			licruta=dt.getString(1);
+			String ss=cu.decrypt(licruta);
 
 			if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) return true;
 			else if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)){msgLic=1;}
@@ -2214,6 +2244,24 @@ public class ComWS extends PBase {
 		else if(msgLic==3){toastlong("El dispositivo no tiene licencia valida de ruta");}
 
 		return false;
+	}
+
+	private void fechaCarga() {
+
+		try {
+			dbT.beginTransaction();
+
+			dbT.execSQL("DELETE FROM P_FECHA");
+
+			sql="INSERT INTO P_FECHA VALUES('"+gl.ruta+"',"+du.getActDate()+")";
+			dbT.execSQL(sql);
+
+			dbT.setTransactionSuccessful();
+			dbT.endTransaction();
+		} catch (Exception e) {
+			dbT.endTransaction();
+		}
+
 	}
 
 	//endregion
@@ -3409,30 +3457,34 @@ public class ComWS extends PBase {
 
 	public void updateInventario() {
 		DU = new DateUtils();
-		String vFecha;
+		String sFecha;
 		int rslt;
-		int vfecha = Get_Fecha_Inventario();
-		//#HS_20181203_1000 Agregue DU.univfechaext(vfecha) para convertir la fecha a formato de yymmdd hhmm
-		vFecha = DU.univfechasql(vfecha) + " 00:00:00";
+		long vfecha = clsAppM.fechaFactTol(du.getActDate());
+		sFecha = DU.univfechasinhora(vfecha);
 		String corel_d_mov = Get_Corel_D_Mov();
 
 		try {
 
 			if (envioparcial) dbld.clear();
 
+			if (gl.peModal.equalsIgnoreCase("TOL")){
+				fsqli = sFecha + " 00:00:00";
+				fsqlf = sFecha + " 23:59:59";
+			}
+
 			ss = " UPDATE P_STOCK SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
 					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA>='" + fsqli + "') AND ENVIADO = 0 " +
-					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + vFecha + "' )";
+					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "' )";
 			dbld.add(ss);
 
 			ss = " UPDATE P_STOCKB SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
-					" WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + vFecha + "' AND ENVIADO = 0 " +
-					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + vFecha + "')";
+					" WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + sFecha + "' AND ENVIADO = 0 " +
+					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "')";
 			dbld.add(ss);
 
 			ss = " UPDATE P_STOCK_PALLET SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
-					" WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + vFecha + "' AND ENVIADO = 0 " +
-					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + vFecha + "')";
+					" WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + sFecha + "' AND ENVIADO = 0 " +
+					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "')";
 			dbld.add(ss);
 
 			if (envioparcial) {
@@ -3823,7 +3875,7 @@ public class ComWS extends PBase {
 			dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('"+docstock+"','"+ActRuta+"','"+univdate+"',1)");
 			dbld.add("UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parVer+"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'");
 			dbld.add("INSERT INTO P_BITACORA_VERSIONHH (RUTA,FECHA,NUMVERSION,ARQUITECTURA) " +
-					"VALUES('"+gl.ruta+"','"+ du.getActDateStr() +"','"+gl.parVer+"','ANDR')");
+					"VALUES('"+gl.ruta+"','"+ du.univfechaseg() +"','"+gl.parVer+"','ANDR')");
 
 			if (commitSQL()==1) conflag=1; else conflag=0;
 					
@@ -3899,9 +3951,11 @@ public class ComWS extends PBase {
 	public void getWSURL() {
 		Cursor DT;
 		String wsurl;
-		
-		txtRuta.setText(ruta);
-		txtEmp.setText(gEmpresa);
+
+		if(!gl.debug){
+			txtRuta.setText(ruta);
+			txtEmp.setText(gEmpresa);
+		}
 		
 		try {
 
@@ -3994,7 +4048,6 @@ public class ComWS extends PBase {
         return cnt;
 
     }
-
 
 	private String getMac() {
 		WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);

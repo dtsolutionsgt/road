@@ -752,6 +752,24 @@ public class AppMethods {
 		}
 	}
 
+	public long fechaFactTol(long f0) {
+		Cursor DT;
+		String sql;
+		long ff;
+
+		try {
+			sql = "SELECT FECHA FROM P_FECHA";
+			DT = Con.OpenDT(sql);
+
+			DT.moveToFirst();
+			ff=DT.getLong(0);
+
+			return ff;
+		} catch (Exception e) {
+			return f0;
+		}
+	}
+
 
 	// Common
 	

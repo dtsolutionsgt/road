@@ -29,6 +29,7 @@ public class Reimpresion extends PBase {
 	private AppMethods app;
 	private printer prn;
 	private printer prn_nc;
+	private printer  prn_can,prn_paseante;
 	private Runnable printclose,printcallback,printvoid;
 	public  clsRepBuilder rep;
 	
@@ -37,16 +38,21 @@ public class Reimpresion extends PBase {
 	private clsDocDepos ddoc;
 	private clsDocCobro cdoc;
 	private clsDocDevolucion fdev;
-	
-	private int tipo;	
+	private clsDocCanastaBod fcanastabod;
+	private clsDocCanastaBod fpaseantebod;
+
+	private int tipo,impres;
 	private String selid,itemid,corelNC,asignFact;
-	
+	//Para reimpresión de devolución de canastas y paseante
+	private String  corel,existenciaC,existenciaP;
+
 	// impresion nota credito
 
 	private ArrayList<String> lines= new ArrayList<String>();
 	private String pserie,pnumero,pruta,pvend,pcli,presol,presfecha,pfser,pfcor;
 	private String presvence,presrango,pvendedor,pcliente,pclicod,pclidir;
 	private double ptot;
+	private boolean imprimecan=false;
 	private int residx,ncFact;
 
 	@Override
@@ -73,11 +79,22 @@ public class Reimpresion extends PBase {
 		prn=new printer(this,printclose,gl.validimp);
 		prn_nc=new printer(this,printclose,gl.validimp);
 
+		prn_can=new printer(this,printclose,gl.validimp);
+		prn_paseante=new printer(this,printclose,gl.validimp);
+
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
 		fdoc.deviceid =gl.deviceId;
 
 		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 		fdev.deviceid =gl.deviceId;
+
+		fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
+		fcanastabod.deviceid =gl.deviceId;
+		fcanastabod.vTipo="CANASTA";
+
+		fpaseantebod=new clsDocCanastaBod(this,prn_paseante.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
+		fpaseantebod.deviceid =gl.deviceId;
+		fpaseantebod.vTipo="PASEANTE";
 
 		printclose = new Runnable() {
 			public void run() {
@@ -110,6 +127,12 @@ public class Reimpresion extends PBase {
 						fdev.buildPrint(corelNC, 1, "TOL");
 						prn_nc.printnoask(printvoid, "printnc.txt");
 					}
+
+					if (imprimecan){
+						prn_can.printnoask(printclose, "printdevcan.txt");
+						imprimecan=false;
+					}
+
 					askPrint();
 				} catch (Exception e) {
 					msgbox(e.getMessage());
@@ -379,10 +402,9 @@ public class Reimpresion extends PBase {
 				case 4:
 					imprRecarga();break;
 				case 5:
-					imprRecarga();break;
+					imprDevol();break;
 				case 6:
 					imprUltNotaCredito();break;
-
 				case 99:
 					imprFindia();break;
 			}
@@ -420,10 +442,10 @@ public class Reimpresion extends PBase {
 	private void imprDeposito() {
 		try {
 			if (prn.isEnabled()){
-				ddoc.buildPrint(itemid, 1);
-				prn.printask();
-			}else if(!prn.isEnabled()){
-				ddoc.buildPrint(itemid, 1);
+				ddoc.buildPrint(itemid, 1,gl.peModal);
+				prn.printask(printcallback);
+			} else if (!prn.isEnabled()){
+				ddoc.buildPrint(itemid, 1,gl.peModal);
 				toast("Reimpresion de deposito generada");
 			}
 		} catch (Exception e) {
@@ -488,8 +510,115 @@ public class Reimpresion extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox(e.getMessage());
 		}
-	}	
-	
+	}
+
+	private void imprDevol() {
+		try {
+
+			corel = itemid;
+
+			impres=0;
+
+			existenciaC=tieneCanasta(corel);
+			existenciaP=tienePaseante(corel);
+
+			if(existenciaC.isEmpty() && !existenciaP.isEmpty()) impres=1;
+			if(!existenciaC.isEmpty() && existenciaP.isEmpty()) impres=2;
+			if(existenciaC.isEmpty() && existenciaP.isEmpty()) impres=3;
+
+			if (prn_can.isEnabled()) {
+
+				String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
+				try {
+					if(impres==0 || impres==1){
+						fpaseantebod.buildPrint(corel,0,vModo);
+					}
+				} catch (Exception e) {
+				}
+
+				try {
+					if(impres==0 || impres==2){
+						imprimecan=true;
+						fcanastabod.buildPrint(corel,0, vModo);
+					}
+				} catch (Exception e) {
+				}
+
+				if(impres==0) {
+					prn_paseante.printask(printcallback, "printpaseante.txt");
+				}else if(impres==1) {
+					prn_paseante.printask(printcallback, "printpaseante.txt");
+				}else if(impres==2) {
+					prn_can.printask(printcallback, "printdevcan.txt");
+				}
+
+			}else if(!prn_can.isEnabled()){
+
+				String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
+
+				if(impres==0 || impres==1){
+					fpaseantebod.buildPrint(corel,0,vModo);
+				}
+
+				if(impres==0 || impres==2){
+					imprimecan=true;
+					fcanastabod.buildPrint(corel,0, vModo);
+				}
+
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox(e.getMessage());
+		}
+	}
+
+	//CM_20190506: Valida si tiene cantastas y devolución
+
+	private String tieneCanasta(String vCorel){
+
+		Cursor DT;
+		String vtieneCanasta= "";
+
+		try{
+
+			sql = "SELECT COREL FROM D_MOVDCAN WHERE COREL = '" + vCorel + "' AND COREL IN (SELECT COREL FROM D_MOV)";
+			DT=Con.OpenDT(sql);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				vtieneCanasta = DT.getString(0);
+			}
+
+		}catch (Exception ex){
+			mu.msgbox("Ocurrió un error "+ex.getMessage());
+		}
+
+		return vtieneCanasta;
+	}
+
+	private String tienePaseante(String vCorel){
+
+		Cursor DT;
+		String vtienePaseante= "";
+
+		try{
+
+			sql = "SELECT COREL FROM D_MOVD WHERE COREL = '" + vCorel + "' AND COREL IN (SELECT COREL FROM D_MOV)";
+			DT=Con.OpenDT(sql);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				vtienePaseante = DT.getString(0);
+			}
+
+		}catch (Exception ex){
+			mu.msgbox("Ocurrió un error "+ex.getMessage());
+		}
+
+		return vtienePaseante;
+	}
+
 	private void imprFindia() {
 		try {
 			if(prn.isEnabled()){
@@ -567,8 +696,6 @@ public class Reimpresion extends PBase {
 				}
 			}
 
-
-
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -600,7 +727,8 @@ public class Reimpresion extends PBase {
 
 				}else if(ncFact==2){
 					if(tipo==6){
-						fdev.buildPrint(itemid, 3, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+						fdev.buildPrint(itemid, 3, "TOL");
+						prn_nc.printask(printclose, "printnc.txt");
 
 						toast("Reimpresion de nota de credito generada");
 					}else{
@@ -608,11 +736,9 @@ public class Reimpresion extends PBase {
 
 						toast("Reimpresion de nota de credito generada");
 					}
-
 				}
 
-
-			}else if(!prn.isEnabled()){
+			} else if(!prn.isEnabled()){
 
 				if(ncFact==1){
 					fdev.buildPrint(itemid, 1, "TOL");
@@ -978,6 +1104,11 @@ public class Reimpresion extends PBase {
 								sql = "UPDATE D_COBRO SET IMPRES=IMPRES+1 WHERE COREL='" + itemid + "'";
 								db.execSQL(sql);
 								break;
+							case 2:
+								sql = "UPDATE D_DEPOS SET IMPRES=IMPRES+1 WHERE COREL='" + itemid + "'";
+								db.execSQL(sql);
+								db.execSQL("UPDATE FinDia SET val3=1");
+								break;
 							case 3:
 								sql = "UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='" + itemid + "'";
 								db.execSQL(sql);
@@ -985,6 +1116,10 @@ public class Reimpresion extends PBase {
 									sql = "UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='" + corelNC + "'";
 									db.execSQL(sql);
 								} catch (Exception e) {}
+								break;
+							case 5:
+								sql = "UPDATE D_MOV SET IMPRES=IMPRES+1 WHERE COREL='" + itemid + "' AND TIPO='D' ";
+								db.execSQL(sql);
 								break;
 						}
 					} catch (Exception e) {
@@ -994,8 +1129,7 @@ public class Reimpresion extends PBase {
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-				}
+				public void onClick(DialogInterface dialog, int which) {}
 			});
 
 			dialog.show();

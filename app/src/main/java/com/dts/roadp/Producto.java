@@ -381,8 +381,6 @@ public class Producto extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-		
 	}
 	
 	private boolean getDisp(String prodid) {

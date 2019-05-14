@@ -1,113 +1,84 @@
 package com.dts.roadp;
 
-import android.app.AlertDialog;
+
 import android.content.Context;
-import android.content.DialogInterface;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.view.Gravity;
-import android.widget.Toast;
+import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
 
-import java.util.Currency;
-import java.util.Locale;
+import java.util.ArrayList;
 
-public class ListAdaptCFDV {
+public class ListAdaptCFDV extends BaseAdapter {
 
-	private Context cont;
-	private appGlobals gl;
-	private SQLiteDatabase db;
-	private BaseDatos.Insert ins;
-	private BaseDatos.Update upd;
-	private BaseDatos Con;
-	private String sql;
-	private String sp;
+	private static ArrayList<clsClasses.clsCFDV> itemDetailsrrayList;
 
-	public ListAdaptCFDV(Context context, appGlobals global, BaseDatos dbconnection, SQLiteDatabase database) {
+	private int selectedIndex;
 
-		cont = context;
-		gl = global;
-		Con = dbconnection;
-		db = database;
+	private LayoutInflater l_Inflater;
 
-		ins = Con.Ins;
-		upd = Con.Upd;
+	public ListAdaptCFDV(Context context, ArrayList<clsClasses.clsCFDV> results) {
+		itemDetailsrrayList = results;
+		l_Inflater = LayoutInflater.from(context);
+		selectedIndex = -1;
 	}
 
-	public void reconnect(BaseDatos dbconnection, SQLiteDatabase database) {
-		Con = dbconnection;
-		db = database;
-
-		ins = Con.Ins;
-		upd = Con.Upd;
+	public void setSelectedIndex(int ind) {
+		selectedIndex = ind;
+		notifyDataSetChanged();
 	}
 
-	//Función para saber la cantidad de registros en una tabla
-	public int getDocCount(String ss, String pps) {
+	public void refreshItems() {
+		notifyDataSetChanged();
+	}
 
-		Cursor DT;
-		int cnt = 0;
-		String st;
+	public int getCount() {
+		return itemDetailsrrayList.size();
+	}
 
-		try {
-			sql = ss;
-			DT = Con.OpenDT(sql);
+	public Object getItem(int position) {
+		return itemDetailsrrayList.get(position);
+	}
 
-			if (DT.getCount() > 0) {
-				cnt = DT.getCount();
-				st = pps + " " + cnt;
-				sp = sp + st + "\n";
-			}
+	public long getItemId(int position) {
+		return position;
+	}
 
-			return cnt;
-		} catch (Exception e) {
-			//mu.msgbox(sql+"\n"+e.getMessage());
-			return 0;
+	public View getView(int position, View convertView, ViewGroup parent) {
+		ViewHolder holder;
+
+		if (convertView == null) {
+
+			convertView = l_Inflater.inflate(R.layout.activity_list_view_cfdv, null);
+			holder = new ViewHolder();
+
+			holder.lblFecha  = (TextView) convertView.findViewById(R.id.lblETipo);
+			holder.lblDesc = (TextView) convertView.findViewById(R.id.lblPNum);
+			holder.lblValor = (TextView) convertView.findViewById(R.id.lblPValor);
+
+			convertView.setTag(holder);
+		} else {
+			holder = (ViewHolder) convertView.getTag();
 		}
-	}
 
-	//Función para saber la cantidad de registros en una tabla específica
-	public int getDocCountTipo(String tipo, boolean sinEnviar) {
+		holder.lblFecha.setText(itemDetailsrrayList.get(position).Fecha);
+		holder.lblDesc.setText(itemDetailsrrayList.get(position).Desc);
+		holder.lblValor.setText(itemDetailsrrayList.get(position).Valor);
 
-		Cursor DT;
-		int cnt = 0;
-		String st, ss;
-		String pps = "";
-
-		try {
-
-			switch (tipo) {
-				case "Facturas":
-
-					sql = "SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_FACTURA";
-					sql += (sinEnviar ? " WHERE STATCOM = 'N'" : "");
-					break;
-
-				case "Pedidos":
-
-					sql = "SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_PEDIDO";
-					sql += (sinEnviar ? " WHERE STATCOM = 'N'" : "");
-					break;
-
-				case "Cobros":
-
-					sql = "SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_COBRO";
-					sql += (sinEnviar ? " WHERE STATCOM = 'N'" : "");
-					break;
-
-				case "Devolucion":
-
-					sql = "SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_NOTACRED";
-					sql += (sinEnviar ? " WHERE STATCOM = 'N'" : "");
-					break;
-
-				case "Inventario":
-
-					sql = "";
-
-			}
-		} catch (Exception e) {
-
+		if(selectedIndex!= -1 && position == selectedIndex) {
+			convertView.setBackgroundColor(Color.rgb(26,138,198));
+		} else {
+			convertView.setBackgroundColor(Color.TRANSPARENT);
 		}
-		return 1;
+
+		return convertView;
 	}
+
+
+	static class ViewHolder {
+		TextView  lblFecha,lblDesc,lblValor;
+	}
+
 }

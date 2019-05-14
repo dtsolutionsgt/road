@@ -434,6 +434,29 @@ public class Clientes extends PBase {
 	}
 
 	public void showCliente() {
+		Cursor DT;
+		float[] results = new float[1];
+		double cx=0,cy=0;
+
+		gl.gpsdist=-1;
+
+		try {
+
+			sql="SELECT COORX,COORY FROM P_CLIENTE WHERE CODIGO='"+selid+"'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			cx=DT.getDouble(0);	cy=DT.getDouble(1);
+			if (cx+cy==0) throw new Exception();
+
+			getLocation();
+			if (latitude+longitude==0) throw new Exception();
+			Location.distanceBetween(cx,cy,latitude,longitude, results);
+
+			gl.gpsdist=(int) results[0];
+		} catch (Exception e) {
+			gl.gpsdist=-1;
+		}
 
 		try {
 			gl.cliente = selid;
@@ -849,13 +872,7 @@ public class Clientes extends PBase {
 
 			mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-				//	try {
-						//String opcion=listcode.get(item);
 						showCliente();
-
-				/*	} catch (Exception e) {
-						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-					}*/
 				}
 			});
 

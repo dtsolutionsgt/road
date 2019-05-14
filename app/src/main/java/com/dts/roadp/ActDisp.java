@@ -64,7 +64,7 @@ public class ActDisp extends PBase {
 	}
 
 	@Override
-	public void wsCallBack(){
+	public void wsCallBack(Boolean throwing,String errmsg){
 		try{
 			if (ws.complete) {
 				processData();

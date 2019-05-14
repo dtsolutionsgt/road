@@ -1952,7 +1952,7 @@ public class BaseDatosScript {
 			return 0;
 		} 	
 	}
-	
+
 	private int scriptTablasT(SQLiteDatabase database) {
 		String vSQL;
 

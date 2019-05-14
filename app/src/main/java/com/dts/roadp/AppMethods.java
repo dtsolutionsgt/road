@@ -147,7 +147,19 @@ public class AppMethods {
 		int ival;
 
 		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=1";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
 
+			val=dt.getString(0);
+			ival=Integer.parseInt(val);
+			if (ival<1)  ival=1;
+			gl.peLimiteGPS =ival;
+		} catch (Exception e) {
+			gl.peLimiteGPS =0;
+		}
+
+		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=2";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
@@ -344,6 +356,38 @@ public class AppMethods {
 			gl.peImprFactCorrecta=val.equalsIgnoreCase("S");
 		} catch (Exception e) {
 			gl.peImprFactCorrecta=false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=18";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) throw new Exception();
+
+			if (val.equalsIgnoreCase("S")) {
+				gl.peVentaGps = 1;
+			} else if (val.equalsIgnoreCase("P")) {
+				gl.peVentaGps = -1;
+			} else {
+				gl.peVentaGps = 0;
+			}
+		} catch (Exception e) {
+			gl.peVentaGps=-1;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=19";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			ival=Integer.parseInt(val);
+			if (ival<0)  ival=0;
+			gl.peMargenGPS =ival;
+		} catch (Exception e) {
+			gl.peMargenGPS =0;
 		}
 
 	}

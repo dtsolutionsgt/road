@@ -429,11 +429,15 @@ public class ProdCant extends PBase {
 			}
 			dt.close();
 
+			umfactor=umf1/umf2;
+
+			/*
 			if (umf1>=umf2) {
 				umfactor=umf1/umf2;
 			} else {
 				umfactor=umf2/umf1;
 			}
+			*/
 			
 			sql="SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO FROM P_STOCK " +
 				" WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";

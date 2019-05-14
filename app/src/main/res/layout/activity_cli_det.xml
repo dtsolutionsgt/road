@@ -371,6 +371,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentBottom="false"
                 android:clickable="false"
+                android:onClick="showVenta"
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
                 android:src="@drawable/next48" />

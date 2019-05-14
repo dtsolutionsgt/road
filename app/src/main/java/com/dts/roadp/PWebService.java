@@ -1,6 +1,6 @@
 package com.dts.roadp;
 
-import java.util.ArrayList;
+import android.os.AsyncTask;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -9,7 +9,7 @@ import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
-import android.os.AsyncTask;
+import java.util.ArrayList;
 
 public class PWebService {
 
@@ -87,8 +87,10 @@ public class PWebService {
 			status=fstr;
 			statusex=istr;
 		}
-		
-		parent.wsCallBack();
+
+		try {
+			parent.wsCallBack(false," ");
+		} catch (Exception e) {}
 
 	}
 	
@@ -187,8 +189,7 @@ public class PWebService {
 	    	return 0;
 	    }
 	}	
-	
-	
+
 	public int OpenDT(String sql) {
 		int rc;
 	

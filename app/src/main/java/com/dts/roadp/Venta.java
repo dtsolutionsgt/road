@@ -1274,7 +1274,7 @@ public class Venta extends PBase {
 			ins.add("CODOPER","X");
 			ins.add("COREL","");
 
-			ins.add("SCANNED",gl.escaneo);
+			if (gl.gpspass) ins.add("SCANNED","G");else ins.add("SCANNED",gl.escaneo);
 			ins.add("STATCOM","N");
 			ins.add("LLEGO_COMPETENCIA_ANTES",0);
 

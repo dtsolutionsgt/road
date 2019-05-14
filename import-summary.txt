@@ -9,6 +9,11 @@ so manually move them:
 
 This is a comment by erik
 
+This comment i made in branch:
+	Toledano.
+		20190510
+			dev
+
 * ic_launcher-web.png
 * proguard-project.txt
 

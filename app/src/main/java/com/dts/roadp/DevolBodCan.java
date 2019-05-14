@@ -66,10 +66,10 @@ public class DevolBodCan extends PBase {
                     if (!EnviaDev()) {
                         mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
                     }
-                }
+                }*/
 
                 gl.closeDevBod = true;
-                DevolBodCan.super.finish();*/
+                DevolBodCan.super.finish();
             }
         };
 

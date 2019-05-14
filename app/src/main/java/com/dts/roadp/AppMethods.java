@@ -5,11 +5,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import android.location.Location;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.view.Gravity;
 import android.widget.Toast;
 
 import java.util.Currency;
 import java.util.Locale;
+
+import static android.content.Context.LOCATION_SERVICE;
 
 public class AppMethods {
 
@@ -21,6 +28,10 @@ public class AppMethods {
 	private BaseDatos Con;
 	private String sql;
 	private String sp;
+
+	// Location
+	private LocationManager locationManager;
+	private Location location;
 
 	public AppMethods(Context context,appGlobals global,BaseDatos dbconnection, SQLiteDatabase database) {
 
@@ -809,6 +820,35 @@ public class AppMethods {
 
 		}catch (Exception ex)
 			{toast(ex.getMessage());}
+	}
+
+	public int isOnWifi(){
+
+		int activo=0;
+
+		try{
+
+			ConnectivityManager connectivityManager = (ConnectivityManager) cont.getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+			if (networkInfo != null && networkInfo.isConnected()){
+
+				if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+					activo=1;
+				}
+
+				if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
+					activo = 2;
+				}
+
+			}
+
+		}catch (Exception ex){
+
+		}
+
+		return activo;
+
 	}
 
 }

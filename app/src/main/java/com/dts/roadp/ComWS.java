@@ -161,8 +161,6 @@ public class ComWS extends PBase {
 		rutatipo = gl.rutatipog;
 		rutapos = gl.rutapos;
 
-
-
 		if (gl.tipo == 0) {
 			this.setTitle("Comunicación");
 		} else {
@@ -179,6 +177,8 @@ public class ComWS extends PBase {
 			licSerialEnc="";
 			licRutaEnc="";
 		}
+
+		gl.isOnWifi = clsAppM.isOnWifi();
 
 		getWSURL();
 
@@ -3460,20 +3460,15 @@ public class ComWS extends PBase {
 		String sFecha;
 		int rslt;
 		long vfecha = clsAppM.fechaFactTol(du.getActDate());
-		sFecha = DU.univfechasinhora(vfecha);
+		sFecha = DU.univfechasql(vfecha);
 		String corel_d_mov = Get_Corel_D_Mov();
 
 		try {
 
 			if (envioparcial) dbld.clear();
 
-			if (gl.peModal.equalsIgnoreCase("TOL")){
-				fsqli = sFecha + " 00:00:00";
-				fsqlf = sFecha + " 23:59:59";
-			}
-
 			ss = " UPDATE P_STOCK SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
-					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA>='" + fsqli + "') AND ENVIADO = 0 " +
+					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA ='" + sFecha + "') AND ENVIADO = 0 " +
 					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "' )";
 			dbld.add(ss);
 
@@ -3965,16 +3960,20 @@ public class ComWS extends PBase {
 			if (DT.getCount()>0){
 				DT.moveToFirst();
 
-				//if (gl.tipo==0) {
-				//	wsurl=DT.getString(1);
-				//} else {
-				//	wsurl=DT.getString(0);
-				//}
+				if (gl.isOnWifi==1) {
+					URL = DT.getString(0);
+				}else if(gl.isOnWifi==2){
+					URL = DT.getString(1);
+				}
 
-				wsurl=DT.getString(0);
+				//URL=wsurl;
 
-				URL=wsurl;
-				txtWS.setText(URL);
+				if (URL!=null && !URL.equalsIgnoreCase("")){
+					txtWS.setText(URL);
+				}else{
+					toast("No hay configurada ruta para transferencia de datos");
+				}
+
 			}
 
 		} catch (Exception e) {
@@ -3984,7 +3983,6 @@ public class ComWS extends PBase {
 			URL="*";txtWS.setText("http://192.168.1.142/wsAndr/wsandr.asmx");
 			//URL="*";txtWS.setText("http://192.168.1.142/wsimagen/baktun1.asmx");
 			//txtWS.setText("");
-			return;
 
 		}
 		

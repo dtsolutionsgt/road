@@ -810,7 +810,7 @@ public class DevolCli extends PBase {
 						fdevol.buildPrint(gl.dvcorrelnc,1,vModo);
 						impres=0;
 						//prn.printnoask(printvoid, "printnc.txt");
-						prn.printnoask(printcallback, "printnc.txt");
+						prn.printnoask(printclose, "printnc.txt");
 
 					}
 				}

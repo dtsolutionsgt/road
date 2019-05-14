@@ -40,7 +40,7 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parVer = "9.4.1 / 09-Mayo-2019";
+    private String parVer = "9.4.1 / 10-Mayo-2019";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -752,6 +752,7 @@ public class MainActivity extends PBase {
         Integer msgLic = 0;
 
         try {
+
             lickey = cu.encrypt(gl.deviceId);
             rutaencrypt = cu.encrypt(gl.ruta);
 
@@ -800,6 +801,7 @@ public class MainActivity extends PBase {
         }
 
         return false;
+
     }
 
     private void msgAskLic(String msg) {

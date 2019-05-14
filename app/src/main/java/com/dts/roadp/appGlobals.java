@@ -75,4 +75,7 @@ public class appGlobals extends Application {
 	//Desglose de efectivo
 	public double totDep;
 
+	//Comunicación con WS
+	public int isOnWifi = 0;
+
 }

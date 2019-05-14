@@ -3,6 +3,8 @@ package com.dts.roadp;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Handler;
@@ -43,6 +45,7 @@ public class clsWSEnvio {
 
     private int scon;
     private String gEmpresa, sql, proceso;
+    private int isOnWifi=0;
 
     private final String NAMESPACE ="http://tempuri.org/";
     private String METHOD_NAME,URL;
@@ -63,11 +66,42 @@ public class clsWSEnvio {
         opendb();
         ins=Con.Ins;upd=Con.Upd;
 
+        isOnWifi = isOnWifi();
+
         getWSURL();
 
         dbld=new clsDataBuilder(Cont);
 
         tipoEnvio=vTipoEnvio;
+    }
+
+    public int isOnWifi(){
+
+        int activo=0;
+
+        try{
+
+            ConnectivityManager connectivityManager = (ConnectivityManager) Cont.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+            if (networkInfo != null && networkInfo.isConnected()){
+
+                if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                    activo=1;
+                }
+
+                if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
+                    activo = 2;
+                }
+
+            }
+
+        }catch (Exception ex){
+
+        }
+
+        return activo;
+
     }
 
     public void opendb() {
@@ -94,9 +128,17 @@ public class clsWSEnvio {
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
 
-            wsurl=DT.getString(0);
+            if (isOnWifi==1) {
+                URL = DT.getString(0);
+            }else if(isOnWifi==2){
+                URL = DT.getString(1);
+            }
 
-            URL=wsurl;
+            if (URL.equals(null) && URL.equals("")){
+                Toast.makeText(Cont,"No hay configurada ruta para transferencia de datos",Toast.LENGTH_SHORT).show();
+            }
+
+            //URL=wsurl;
         } catch (Exception e) {
             ferr=e.getMessage();
             URL="*";

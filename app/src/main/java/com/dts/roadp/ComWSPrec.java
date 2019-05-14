@@ -36,6 +36,7 @@ public class ComWSPrec extends PBase {
     private SQLiteDatabase dbT;
     private BaseDatos ConT;
     private BaseDatos.Insert insT;
+    private AppMethods clsAppM;
 
     private ArrayList<String> listItems=new ArrayList<String>();
     private ArrayList<String> results=new ArrayList<String>();
@@ -72,6 +73,8 @@ public class ComWSPrec extends PBase {
         txtWS= (EditText) findViewById(R.id.txtWS);txtWS.setEnabled(false);
         txtEmp= (EditText) findViewById(R.id.txtEmp);txtEmp.setEnabled(false);
 
+        clsAppM = new AppMethods(this, gl, Con, db);
+
         isbusy=0;
 
         lblInfo.setText("");lblParam.setText("");
@@ -79,6 +82,8 @@ public class ComWSPrec extends PBase {
 
         ruta=gl.ruta;
         gEmpresa=gl.emp;
+
+        gl.isOnWifi = clsAppM.isOnWifi();
 
         getWSURL();
 
@@ -707,10 +712,19 @@ public class ComWSPrec extends PBase {
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
 
-            wsurl=DT.getString(0);
+            if (gl.isOnWifi==1) {
+                URL = DT.getString(0);
+            }else if(gl.isOnWifi==2){
+                URL = DT.getString(1);
+            }
 
-            URL=wsurl;
-            txtWS.setText(URL);
+            //URL=wsurl;
+            if (URL!=null && !URL.equalsIgnoreCase("")){
+                txtWS.setText(URL);
+            }else{
+                toast("No hay configurada ruta para transferencia de datos");
+            }
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             //MU.msgbox(e.getMessage());

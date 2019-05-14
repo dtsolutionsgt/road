@@ -35,6 +35,7 @@ public class ComWSExist extends PBase {
 	private SQLiteDatabase dbT;
 	private BaseDatos ConT;
 	private BaseDatos.Insert insT;
+	private AppMethods clsAppM;
 
 	private ArrayList<String> listItems=new ArrayList<String>();
 	private ArrayList<String> results=new ArrayList<String>();
@@ -72,12 +73,16 @@ public class ComWSExist extends PBase {
 		txtEmp= (EditText) findViewById(R.id.txtEmp);txtEmp.setEnabled(false);	
 		
 		isbusy=0;
+
+		clsAppM = new AppMethods(this, gl, Con, db);
 		
 		lblInfo.setText("");lblParam.setText("");
 		barInfo.setVisibility(View.INVISIBLE);
 		
 		ruta=gl.ruta;
 	    gEmpresa=gl.emp;
+
+		gl.isOnWifi = clsAppM.isOnWifi();
 
 	    getWSURL();
 
@@ -804,11 +809,20 @@ public class ComWSExist extends PBase {
 			sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='"+ruta+"'";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-					
-			wsurl=DT.getString(0);
-			
-			URL=wsurl;
-			txtWS.setText(URL);
+
+			if (gl.isOnWifi==1) {
+				URL = DT.getString(0);
+			}else if(gl.isOnWifi==2){
+				URL = DT.getString(1);
+			}
+
+			//URL=wsurl;
+			if (URL!=null && !URL.equalsIgnoreCase("")){
+				txtWS.setText(URL);
+			}else{
+				toast("No hay configurada ruta para transferencia de datos");
+			}
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//MU.msgbox(e.getMessage());

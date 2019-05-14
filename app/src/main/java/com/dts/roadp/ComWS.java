@@ -3460,20 +3460,15 @@ public class ComWS extends PBase {
 		String sFecha;
 		int rslt;
 		long vfecha = clsAppM.fechaFactTol(du.getActDate());
-		sFecha = DU.univfechasinhora(vfecha);
+		sFecha = DU.univfechasql(vfecha);
 		String corel_d_mov = Get_Corel_D_Mov();
 
 		try {
 
 			if (envioparcial) dbld.clear();
 
-			if (gl.peModal.equalsIgnoreCase("TOL")){
-				fsqli = sFecha + " 00:00:00";
-				fsqlf = sFecha + " 23:59:59";
-			}
-
 			ss = " UPDATE P_STOCK SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
-					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA>='" + fsqli + "') AND ENVIADO = 0 " +
+					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA ='" + sFecha + "') AND ENVIADO = 0 " +
 					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "' )";
 			dbld.add(ss);
 

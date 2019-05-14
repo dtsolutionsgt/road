@@ -109,6 +109,8 @@ public class comWSLic extends PBase {
         gEmpresa = gl.emp;
         rutatipo = gl.rutatipog;
 
+        gl.isOnWifi = app.isOnWifi();
+
         getWSURL();
 
         devinfo=gl.devicename+" / "+Build.MODEL;
@@ -773,16 +775,18 @@ public class comWSLic extends PBase {
             if (DT.getCount()>0){
                 DT.moveToFirst();
 
-                //if (gl.tipo==0) {
-                //	wsurl=DT.getString(1);
-                //} else {
-                //	wsurl=DT.getString(0);
-                //}
+                if (gl.isOnWifi==1) {
+                    URL = DT.getString(0);
+                }else if(gl.isOnWifi==2){
+                    URL = DT.getString(1);
+                }
 
-                wsurl=DT.getString(0);
-
-                URL=wsurl;
-                txtWS.setText(URL);
+                //URL=wsurl;
+                if (URL!=null && !URL.equalsIgnoreCase("")){
+                    txtWS.setText(URL);
+                }else{
+                    toast("No hay configurada ruta para transferencia de datos");
+                }
             }
 
         } catch (Exception e) {

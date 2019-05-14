@@ -161,8 +161,6 @@ public class ComWS extends PBase {
 		rutatipo = gl.rutatipog;
 		rutapos = gl.rutapos;
 
-
-
 		if (gl.tipo == 0) {
 			this.setTitle("Comunicación");
 		} else {
@@ -179,6 +177,8 @@ public class ComWS extends PBase {
 			licSerialEnc="";
 			licRutaEnc="";
 		}
+
+		gl.isOnWifi = clsAppM.isOnWifi();
 
 		getWSURL();
 
@@ -3965,16 +3965,20 @@ public class ComWS extends PBase {
 			if (DT.getCount()>0){
 				DT.moveToFirst();
 
-				//if (gl.tipo==0) {
-				//	wsurl=DT.getString(1);
-				//} else {
-				//	wsurl=DT.getString(0);
-				//}
+				if (gl.isOnWifi==1) {
+					URL = DT.getString(0);
+				}else if(gl.isOnWifi==2){
+					URL = DT.getString(1);
+				}
 
-				wsurl=DT.getString(0);
+				//URL=wsurl;
 
-				URL=wsurl;
-				txtWS.setText(URL);
+				if (URL!=null && !URL.equalsIgnoreCase("")){
+					txtWS.setText(URL);
+				}else{
+					toast("No hay configurada ruta para transferencia de datos");
+				}
+
 			}
 
 		} catch (Exception e) {
@@ -3984,7 +3988,6 @@ public class ComWS extends PBase {
 			URL="*";txtWS.setText("http://192.168.1.142/wsAndr/wsandr.asmx");
 			//URL="*";txtWS.setText("http://192.168.1.142/wsimagen/baktun1.asmx");
 			//txtWS.setText("");
-			return;
 
 		}
 		

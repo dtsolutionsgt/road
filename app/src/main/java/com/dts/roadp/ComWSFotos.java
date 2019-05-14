@@ -40,6 +40,7 @@ public class ComWSFotos extends PBase {
     private SQLiteDatabase dbT;
     private BaseDatos ConT;
     private BaseDatos.Insert insT;
+    private AppMethods clsAppM;
 
     private ArrayList<String> listItems=new ArrayList<String>();
 
@@ -70,6 +71,8 @@ public class ComWSFotos extends PBase {
 
         rootdir= Environment.getExternalStorageDirectory()+"/RoadFotos/";
 
+        clsAppM = new AppMethods(this, gl, Con, db);
+
         lblParam= (TextView) findViewById(R.id.lblProd);
         lblInfo= (TextView) findViewById(R.id.lblETipo);
         lblAct= (TextView) findViewById(R.id.textView5);lblAct.setVisibility(View.INVISIBLE);
@@ -86,6 +89,8 @@ public class ComWSFotos extends PBase {
 
         ruta=gl.ruta;
         gEmpresa=gl.emp;
+
+        gl.isOnWifi = clsAppM.isOnWifi();
 
         getWSURL();
 
@@ -420,10 +425,19 @@ public class ComWSFotos extends PBase {
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
 
-            wsurl=DT.getString(0);
+            if (gl.isOnWifi==1) {
+                URL = DT.getString(0);
+            }else if(gl.isOnWifi==2){
+                URL = DT.getString(1);
+            }
 
-            URL=wsurl;
-            txtWS.setText(URL);
+           // URL=wsurl;
+            if (URL!=null && URL.equalsIgnoreCase("")){
+                txtWS.setText(URL);
+            }else{
+                toast("No hay configurada ruta para transferencia de datos");
+            }
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             //MU.msgbox(e.getMessage());

@@ -542,6 +542,7 @@ public class ComWS extends PBase {
 			dbld.insert("D_PEDIDO", "WHERE 1=1");
 			dbld.insert("D_PEDIDOD", "WHERE 1=1");
 			dbld.save();
+			dbld.saveArchivo(du.getActDateStr());
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -2502,6 +2503,7 @@ public class ComWS extends PBase {
 			}
 
 			dbld.savelog();
+			dbld.saveArchivo(du.getActDateStr());
 
 			//#CKFK 20190429 Saqué esto de envioFinDia para que se guarde bien el log y luego se realice el envío.
 			if (!envioparcial){

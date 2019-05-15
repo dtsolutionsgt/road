@@ -7,6 +7,22 @@
     android:background="@layout/back"
     tools:context=".ComDrop">
 
+    <Button
+        android:id="@+id/btnSenHand"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView23"
+        android:layout_marginLeft="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_toRightOf="@+id/textView1"
+        android:background="@layout/back"
+        android:minWidth="64dp"
+        android:minHeight="32dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="Envío manual"
+        android:textSize="15sp" />
+
     <RelativeLayout
         android:id="@+id/relRoad"
         android:layout_width="match_parent"
@@ -422,5 +438,16 @@
             android:text="Recarga"
             android:textAppearance="?android:attr/textAppearanceSmall" />
     </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/imageView23"
+        android:layout_width="96dp"
+        android:layout_height="66dp"
+        android:layout_below="@+id/btnSend"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="216dp"
+        android:layout_marginTop="2dp"
+        android:onClick="askSendManual"
+        android:src="@drawable/enviaarchivosmanual" />
 
 </RelativeLayout>

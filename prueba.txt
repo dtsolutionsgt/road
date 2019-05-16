@@ -1,12 +1,7 @@
 Este mensaje lo escribió erik en la rama dev
-<<<<<<< HEAD
-
-
-
-
-
 Carolina también modificó el archivo en la rama dev
-=======
-Carlos Tzirin 
->>>>>>> cb60f65cf228f68a35df557113ca77bb4def2703
+Carlos Tzirin
 Continuamos modificando
+Aaron escribio esto
+Carlos Tzirin 
+jaroslav

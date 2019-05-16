@@ -33,7 +33,7 @@ public class ProdCant extends PBase {
 	
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant;
-	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom,pesostock;
+	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
 	private boolean pexist,esdecimal,porpeso,esbarra;
 	
 	@Override
@@ -365,21 +365,29 @@ public class ProdCant extends PBase {
 			
 		try {
 
+			pesostock=0;
+
 			sql=" SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO " +
-				" FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
+					" FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
 			dt=Con.OpenDT(sql);
 
-			if (dt.getCount()>0){
+			if (dt.getCount()>0) {
 
 				dt.moveToFirst();
 
-				umstock=um;umfactor=1;
+				umstock = um;
+				umfactor = 1;
 
-				disp=dt.getDouble(0);
-				ipeso=dt.getDouble(1);
+				disp = dt.getDouble(0);
+				ipeso = dt.getDouble(1);
 
-				pesostock=ipeso/(disp==0?1:disp);
-
+				if (disp>0) {
+					pesostock = ipeso / disp;
+				} else {
+					pesostock = ipeso / 1;
+				}
+			} else {
+				pesostock=0;
 			}
 
 			if (disp>0) return disp;
@@ -453,6 +461,8 @@ public class ProdCant extends PBase {
 				}
 				ipeso=dt.getDouble(1);
 				pesostock = ipeso/disp;
+			} else {
+				pesostock=0;
 			}
 
 			dt.close();
@@ -511,6 +521,7 @@ public class ProdCant extends PBase {
 					}
 				}
 			} else {
+				if(Double.isNaN(pesostock))	pesostock=1;
 				if (pesoprom == 0) ppeso = pesostock * cant;
 				else ppeso = pesoprom * cant;
 			}

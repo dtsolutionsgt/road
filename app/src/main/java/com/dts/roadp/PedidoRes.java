@@ -196,7 +196,7 @@ public class PedidoRes extends PBase {
 			stot=mu.round2(stot0);
 
 			fillTotals();
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
@@ -286,7 +286,7 @@ public class PedidoRes extends PBase {
 
 			bonsave.save();
 
-			if (prn.isEnabled()) {
+			if (gl.impresora.equalsIgnoreCase("S")) {
 				pdoc.buildPrint(corel,0);
 				prn.printask(printcallback);
 			}
@@ -294,7 +294,9 @@ public class PedidoRes extends PBase {
 			gl.closeCliDet=true;
 			gl.closeVenta=true;
 
-			//super.finish();
+			if (!gl.impresora.equalsIgnoreCase("S")) {
+				super.finish();
+			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -713,8 +715,7 @@ public class PedidoRes extends PBase {
 			
 	}	
 
-	
-	
+
 	// Activity Events
 	
 	@Override

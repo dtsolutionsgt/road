@@ -725,6 +725,8 @@ public class AppMethods {
 		Cursor dt;
 		String se,sd,prid;
 
+		if (gl.impresora.equalsIgnoreCase("N")) return true;
+
 		try {
 			sql = "SELECT prnserie FROM Params";
 			dt = Con.OpenDT(sql);
@@ -887,7 +889,7 @@ public class AppMethods {
 
 			}
 
-		}catch (Exception ex){
+		} catch (Exception ex){
 
 		}
 

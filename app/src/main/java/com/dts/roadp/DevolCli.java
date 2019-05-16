@@ -90,7 +90,6 @@ public class DevolCli extends PBase {
 			}
 		};
 
-
 		prn=new printer(this,printexit,gl.validimp);
 
 		fdevol=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");

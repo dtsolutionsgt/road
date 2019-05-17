@@ -239,7 +239,7 @@ public class ProdCant extends PBase {
 			pesoprom = dt.getDouble(10);
 			if (pesoprom==0) pesoprom = dt.getDouble(9);
 
-			if (dt.getString(7).equalsIgnoreCase("P")) pexist=true; else pexist=false;
+			if (dt.getString(8).equalsIgnoreCase("P")) pexist=true; else pexist=false;
 			
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -684,7 +684,7 @@ public class ProdCant extends PBase {
 
 		}
 
-		if (porpeso) {
+		if (porpeso && gl.rutatipo.equalsIgnoreCase("V")) {
 			if (!checkLimits(vpeso,opeso)) return 2;
 		}
 
@@ -707,7 +707,7 @@ public class ProdCant extends PBase {
 			sql="SELECT PORCMINIMO,PORCMAXIMO FROM P_PORCMERMA WHERE PRODUCTO='"+prodid+"'";
 			dt=Con.OpenDT(sql);
 
-			if (dt.getCount() == 0 ) {
+			if (dt.getCount() == 0) {
 				toast("No está definido rango de repesaje para el producto, no se podrá modificar el peso");
 				//#EJC20190226: Si no está definido repesaje no se puede modificar el peso según observación de Carolina se debe dejar vender.
 				txtPeso.setEnabled(false);

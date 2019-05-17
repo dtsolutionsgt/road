@@ -708,10 +708,11 @@ public class ComWS extends PBase {
 			ActualizaStatcom();
 			Eliminadas = claseFindia.eliminarTablasD();
 
-
 			if (Eliminadas){
 			    mu.msgbox("Envío de datos correcto");
             }
+
+			visibilidadBotones();
 
 		}catch (Exception e){
 

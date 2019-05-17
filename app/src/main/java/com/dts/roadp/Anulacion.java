@@ -836,7 +836,7 @@ public class Anulacion extends PBase {
 			}else{
 				vCorelDevol = itemid;
 
-				sql = "UPDATE D_CXC SET ANULADO='S' WHERE COREL='" + vCorelDevol + "' AND TIPO  = 'N' ";
+				sql = "UPDATE D_CXC SET ANULADO='S' WHERE COREL='" + vCorelDevol + "' ";
 				db.execSQL(sql);
 
 				sql = "UPDATE D_NOTACRED SET ANULADO='S' WHERE COREL='" + vCorelNotaC + "'";

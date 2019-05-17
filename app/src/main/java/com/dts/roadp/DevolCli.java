@@ -74,6 +74,7 @@ public class DevolCli extends PBase {
 
 		printexit= new Runnable() {
 			public void run() {
+				limpiavariables_devol();
 				DevolCli.super.finish();
 			}
 		};
@@ -808,8 +809,7 @@ public class DevolCli extends PBase {
 						String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 						fdevol.buildPrint(gl.dvcorrelnc,1,vModo);
 						impres=0;
-						//prn.printnoask(printvoid, "printnc.txt");
-						prn.printnoask(printclose, "printnc.txt");
+						prn.printask(printclose, "printnc.txt");
 
 					}
 				}
@@ -817,9 +817,9 @@ public class DevolCli extends PBase {
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					//singlePrint();
-					prn.printask(printcallback);
-					//finish();
+
+					prn.printask(printcallback, "printnc.txt");
+
 				}
 			});
 

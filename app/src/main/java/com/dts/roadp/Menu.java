@@ -1228,7 +1228,7 @@ public class Menu extends PBase {
 	public void showInvMenuUtils() {
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ","Soporte","Serial del dipositivo"};
+			final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ","Soporte","Serial del dipositivo","Impresión de barras"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.utils48);
@@ -1248,6 +1248,9 @@ public class Menu extends PBase {
 							startActivity(new Intent(Menu.this,Soporte.class));break;
 						case 4:
 							msgbox("Serial# : "+gl.deviceId);break;
+						case 5:
+							startActivity(new Intent(Menu.this,imprime_barras.class));break;
+
 					}
 
 					dialog.cancel();

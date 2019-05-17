@@ -144,7 +144,7 @@ public class printDMax extends printBase {
 			dfile.close();	
 				       
 	        printData = docLP.getDocumentData();
-	
+
 			return true;
 
 		} catch (Exception e) {

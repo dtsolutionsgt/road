@@ -3,6 +3,8 @@ package com.dts.roadp;
 import android.content.Context;
 import android.os.Handler;
 
+import java.util.ArrayList;
+
 import datamaxoneil.connection.ConnectionBase;
 import datamaxoneil.printer.DocumentLP;
 
@@ -55,11 +57,19 @@ public class printBase {
 	public void printask() {
 		hasCallback=false;
 	}
+
+	public void printaskBarra(ArrayList<String> listitems) {
+		hasCallback=false;
+	}
 		
 	public boolean print() {
 		return true;
 	}
-		
+
+	public boolean printBarra(ArrayList<String> listitems) {
+		return true;
+	}
+
 	public void printask(String fileName) {	
 		hasCallback=false;
 	}

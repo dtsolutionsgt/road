@@ -25,7 +25,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class printZebraZPL extends printBase {
+public class printBarZebraZPL extends printBase {
 
     private Connection connection;
 
@@ -39,20 +39,9 @@ public class printZebraZPL extends printBase {
     // ZQ320 AC:3F:A4:C8:5F:D9
 
 
-    public printZebraZPL(Context context, String printerMAC, boolean validprinter) {
+    public printBarZebraZPL(Context context, String printerMAC, boolean validprinter) {
         super(context,printerMAC);
         validprint=validprinter;
-    }
-
-    // Main
-
-    public void printask(Runnable callBackHook) {
-
-        hasCallback=true;
-        callback=callBackHook;
-
-        fname="print.txt";errmsg="";exitprint=false;
-        msgAskPrint();
     }
 
     public void printask() {
@@ -68,20 +57,6 @@ public class printZebraZPL extends printBase {
         fname="print.txt";errmsg="";
         try {
             if (loadFile())	doStartPrint();else return false;
-        } catch (Exception e) {
-            showmsg("Error: " + e.getMessage());return false;
-        }
-
-        return true;
-    }
-
-
-    public boolean printBarra(ArrayList<String> listitems) {
-        hasCallback=false;
-
-        errmsg="";
-        try {
-            if (loadFileBarra(listitems))	doStartPrintBarra();else return false;
         } catch (Exception e) {
             showmsg("Error: " + e.getMessage());return false;
         }
@@ -119,9 +94,6 @@ public class printZebraZPL extends printBase {
             showmsg("Error: " + e.getMessage());
         }
     }
-
-
-    // Private
 
     private boolean loadFile() {
         File ffile;
@@ -171,107 +143,29 @@ public class printZebraZPL extends printBase {
         }
     }
 
-    private boolean loadFileBarra(ArrayList<String> listitems) {
-        File ffile;
-        BufferedReader dfile;
-        String ss;
-
-        try {
-
-            //lines.clear();
-
-            lines = listitems;
-
-            showmsg("Lines : "+lines.size());
-
-            return true;
-
-        } catch (Exception e) {
-            try {
-
-            } catch (Exception e1) {}
-
-            showmsg("Error: " + e.getMessage());
-
-            return false;
-        }
-    }
-
     private byte[] printData() {
         byte[] prdata = null;
         int ccnt,dlen;
         String ps,ss;
-        int altolinea,anchopapel,psx;
+        int altobarra,anchopapel,psx;
 
         try {
 
-            altolinea=20;
+            altobarra=270;
             psx = 0;
             anchopapel=500;
             if (prwidth>40) anchopapel=300;
             if (prwidth>60) anchopapel=400;
 
             ccnt=lines.size();
-            dlen=ccnt*altolinea+60;
 
             ps="";
-            /*ps+="! 0 "+anchopapel+" "+anchopapel+" "+dlen+" 1\r\n";dbg=ps;
-            ps+="ML "+altolinea+"\r\n" + "TEXT 0 2 10 0\r\n";*/
 
             ps+="^XA";
-            ps+="^PW"+anchopapel;
-            ps+="^LL"+dlen;
 
             for (int i = 0; i <ccnt; i++) {
+                ps+="^BY5,2,'"+altobarra+"'";
                 ps+="^FO,"+psx+",0";
-                ps+="^ADN,"+altolinea+",0";
-                ps+="^FD";
-                ss=lines.get(i);
-                ps+=ss;
-                ps+="^FS";
-                psx =psx + altolinea;
-            }
-
-            ps+="^XZ";
-            //ps+="FORM\r\n";
-            //ps+="PRINT\r\n";
-
-            prdata =ps.getBytes();
-
-        } catch (Exception e) {
-            setStatus(e.getMessage());
-        }
-
-        return prdata;
-    }
-
-    private byte[] printDataBarra() {
-        byte[] prdata = null;
-        int ccnt,dlen;
-        String ps,ss;
-        int altobarra,anchopapel,psx;
-        int anchobarra;
-
-        try {
-
-            altobarra=100;
-            anchobarra = 2;
-            psx = 20;
-            anchopapel=500;
-            if (prwidth>40) anchopapel=300;
-            if (prwidth>60) anchopapel=400;
-
-            ccnt=lines.size();
-            dlen=ccnt*(altobarra+62);
-
-            ps="";
-
-            ps+="^XA";
-            ps+="^PW"+anchopapel;
-            ps+="^LL"+dlen;
-            for (int i = 0; i <ccnt; i++) {
-                ps+="^BY'"+anchobarra+"',2,'"+altobarra+"'";
-                ps+="^FO,"+psx+",62";
                 ps+="^BC";
                 ps+="^FD";
                 ss=lines.get(i);
@@ -312,44 +206,11 @@ public class printZebraZPL extends printBase {
 
     }
 
-    private void doStartPrintBarra() {
-       /* if (!validprint) {
-            showmsg("¡La impresora no está autorizada!");return;
-        }*/
-
-        showmsg("Imprimiendo ..." );
-        status=true;
-
-        new Thread(new Runnable() {
-            public void run() {
-                Looper.prepare();
-
-                doPrintBarra();
-
-                Looper.loop();
-                Looper.myLooper().quit();
-            }
-        }).start();
-
-    }
-
     private void doPrint() {
         printer = connect();
 
         if (printer != null) {
             processPrint();
-        } else {
-            disconnect();
-        }
-
-        doCallBack();
-    }
-
-    private void doPrintBarra() {
-        printer = connect();
-
-        if (printer != null) {
-            processPrintBarra();
         } else {
             disconnect();
         }
@@ -396,8 +257,6 @@ public class printZebraZPL extends printBase {
     }
 
 
-    // Zebra
-
     private void processPrint() {
 
         try {
@@ -406,29 +265,6 @@ public class printZebraZPL extends printBase {
 
             if (printerStatus.isReadyToPrint) {
                 byte[] configLabel = printData();
-                connection.write(configLabel);
-            } else if (printerStatus.isHeadOpen) {
-                setStatus("Impresora abierta");
-            } else if (printerStatus.isPaused) {
-                setStatus("Impresora detenida");
-            } else if (printerStatus.isPaperOut) {
-                setStatus("Papel afuera");
-            }
-        } catch (ConnectionException e) {
-            setStatus(e.getMessage());
-        } finally {
-          disconnect();
-        }
-    }
-
-    private void processPrintBarra() {
-
-        try {
-
-            PrinterStatus printerStatus = printer.getCurrentStatus();
-
-            if (printerStatus.isReadyToPrint) {
-                byte[] configLabel = printDataBarra();
                 connection.write(configLabel);
             } else if (printerStatus.isHeadOpen) {
                 setStatus("Impresora abierta");
@@ -492,9 +328,6 @@ public class printZebraZPL extends printBase {
             setStatus("COMM Error : "+e.getMessage());
         }
     }
-
-
-    // Aux
 
     private void msgAskPrint() {
         AlertDialog.Builder dialog = new AlertDialog.Builder(cont);
@@ -588,5 +421,6 @@ public class printZebraZPL extends printBase {
             Thread.sleep(ms);
         } catch (InterruptedException e) {}
     }
+
 
 }

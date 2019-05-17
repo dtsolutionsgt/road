@@ -110,4 +110,8 @@ public class clsClasses {
 	public class clsVehiculo{
 		public String idVehiculo,marca,placa;
 	}
+
+	public class clsBarras{
+		public String barra,peso;
+	}
 }

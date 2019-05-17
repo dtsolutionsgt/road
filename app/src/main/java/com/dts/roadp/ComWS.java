@@ -708,10 +708,11 @@ public class ComWS extends PBase {
 			ActualizaStatcom();
 			Eliminadas = claseFindia.eliminarTablasD();
 
-
 			if (Eliminadas){
 			    mu.msgbox("Envío de datos correcto");
             }
+
+			visibilidadBotones();
 
 		}catch (Exception e){
 
@@ -1635,8 +1636,7 @@ public class ComWS extends PBase {
 
 				try {
 					writer.write(sql);writer.write("\r\n");
-				} catch (Exception e) {
-				}
+				} catch (Exception e) {}
 
 				try {
 					dbT = ConT.getWritableDatabase();
@@ -2909,6 +2909,8 @@ public class ComWS extends PBase {
 				dbld.savelog();
 				return true;
 			}
+
+			listaFachada();
 
 			dbld.savelog();
 			dbld.saveArchivo(du.getActDateStr());

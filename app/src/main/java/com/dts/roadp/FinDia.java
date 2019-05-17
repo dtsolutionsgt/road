@@ -1441,13 +1441,15 @@ public class FinDia extends PBase {
             if ((!gl.CellCom) || (gl.banderafindia)) {
                 vComunicacion = " AND F.STATCOM = 'N' ";
             }
+//SELECT F.SERIE, F.CORELATIVO, F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO, " +
+//                    " SUM(D.PRECIODOC * D.CANT) AS GRAVADO, 0 AS NO_GRAVADO " +
 
-            sql = " SELECT F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO, " +
+            sql = " SELECT '' AS SERIE,'' AS CORELATIVO,F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO, " +
                     " SUM(D.PRECIODOC * D.CANT) AS GRAVADO, 0 AS NO_GRAVADO " +
                     " FROM D_PEDIDO F INNER JOIN D_PEDIDOD D ON F.COREL = D .COREL " +
                     " WHERE D.IMP > 0 " + vComunicacion +
                     " GROUP BY F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO " +
-                    " UNION SELECT F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO, " +
+                    " UNION SELECT '' AS SERIE,'' AS CORELATIVO,F.COREL, F.TOTAL, F.IMPMONTO, F.ANULADO, " +
                     " 0 AS GRAVADO, SUM(D.TOTAL) AS NO_GRAVADO " +
                     " FROM D_PEDIDO F INNER JOIN D_PEDIDOD D ON F.COREL = D .COREL " +
                     " WHERE D.IMP = 0 " + vComunicacion +
@@ -1479,7 +1481,7 @@ public class FinDia extends PBase {
 
                         anulada = (DT.getString(5).equalsIgnoreCase("S"));
 
-                        vCadena = DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)), 6);
+                        vCadena = DT.getString(2);
 
                         if (anulada) vCadena += " - ANULADO";
 

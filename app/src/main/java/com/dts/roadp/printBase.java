@@ -6,7 +6,9 @@ import android.os.Handler;
 import java.util.ArrayList;
 
 import datamaxoneil.connection.ConnectionBase;
+import datamaxoneil.printer.DocumentEZ;
 import datamaxoneil.printer.DocumentLP;
+import datamaxoneil.printer.ParametersEZ;
 
 public class printBase {
 
@@ -21,7 +23,9 @@ public class printBase {
 	protected ConnectionBase prconn = null;
 	protected String fname;
 	protected DocumentLP docLP = new DocumentLP("!");
-	
+    protected DocumentEZ docEZ = new DocumentEZ("MF204");
+    protected ParametersEZ paramEZ = new ParametersEZ();
+
 	protected Thread prthread;
 	protected Handler handler = new Handler(); 
 	protected Runnable callback;

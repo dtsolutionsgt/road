@@ -151,13 +151,6 @@ public class printer {
 		}		
 		
 		try {
-			sql="SELECT TIPO_IMPRESORA,PUERTO_IMPRESION FROM P_ARCHIVOCONF";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			
-			//prtipo=DT.getString(0);
-			//prpar=DT.getString(1);
-
 			prtipo=app.impresTipo();
 			prpar=app.impresParam();
 			

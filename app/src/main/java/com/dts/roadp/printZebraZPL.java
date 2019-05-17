@@ -75,7 +75,6 @@ public class printZebraZPL extends printBase {
         return true;
     }
 
-
     public boolean printBarra(ArrayList<String> listitems) {
         hasCallback=false;
 
@@ -313,9 +312,9 @@ public class printZebraZPL extends printBase {
     }
 
     private void doStartPrintBarra() {
-       /* if (!validprint) {
+        if (!validprint) {
             showmsg("¡La impresora no está autorizada!");return;
-        }*/
+        }
 
         showmsg("Imprimiendo ..." );
         status=true;

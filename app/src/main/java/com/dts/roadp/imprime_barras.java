@@ -35,6 +35,8 @@ public class imprime_barras extends PBase{
 
     private printer prn;
 
+    private AppMethods app;
+    
     private Runnable printexit,printcallback;
 
     @Override
@@ -47,6 +49,10 @@ public class imprime_barras extends PBase{
 
         list = (ListView) findViewById(R.id.listBars);
         spin = (Spinner) findViewById(R.id.spinner9);
+
+        app = new AppMethods(this, gl, Con, db);
+        gl.validimp=app.validaImpresora();
+        if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
         printexit= new Runnable() {
             public void run() {

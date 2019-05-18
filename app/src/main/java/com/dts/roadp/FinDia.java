@@ -522,18 +522,17 @@ public class FinDia extends PBase {
 
             fechaUltimoCierre = claseFinDia.ultimoCierreFecha();
 
-            //#HS_20181127_1033 Agregué validacion para cantidad de facturas.
-            if (claseFinDia.getCantFactura() == 0) {
-                msgExit("No hay facturas, no se puede realizar el Fin de Día");
-            }
-
             if (fullfd) {
+
+                if (claseFinDia.getCantFactura() == 0) {
+                    msgExit("No hay facturas, no se puede realizar el Fin de Día");
+                    return false;
+                }
 
                 if (!validaPagosPend()) {
                     msgPendPago("Existen facturas pendientes de pago. No se puede realizar fin del día");
                     return false;
                 }
-
 
                 if (gl.peModal.equalsIgnoreCase("APR")) {
                     setFactCor();

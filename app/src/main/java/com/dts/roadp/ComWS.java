@@ -4636,7 +4636,7 @@ public class ComWS extends PBase {
 				TienePedidos = (clsAppM.getDocCountTipo("Pedidos",false)>0?true:false);
 				TieneCobros = (clsAppM.getDocCountTipo("Cobros",false)>0?true:false);
 				TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",false)>0?true:false);
-				YaComunico=(claseFindia.getComunicacion() == 4?true:false);
+				YaComunico=(claseFindia.getComunicacion() == 2?true:false);
 				TieneInventario=(clsAppM.getDocCountTipo("Inventario",false)>0?true:false);
 
 				if (gl.peModal.equalsIgnoreCase("TOL"))

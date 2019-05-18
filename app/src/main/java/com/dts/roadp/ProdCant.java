@@ -147,9 +147,11 @@ public class ProdCant extends PBase {
 		try{
 			txtCant.addTextChangedListener(new TextWatcher() {
 
-				public void afterTextChanged(Editable s) {}
+				public void afterTextChanged(Editable s) {
+				}
 
-				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) {
+					 }
 
 				public void onTextChanged(CharSequence s, int start,int before, int count) {
 					setCant(true);
@@ -390,6 +392,10 @@ public class ProdCant extends PBase {
 				pesostock=0;
 			}
 
+			if(gl.rutatipo.equalsIgnoreCase("P")){
+				umfactor = pesoprom;
+			}
+
 			if (disp>0) return disp;
 
 			dt.close();
@@ -602,6 +608,7 @@ public class ProdCant extends PBase {
 		cu=0;
 
 		try {
+
 			if (txtCant.getText().toString().trim()!=""){
 				cu=Double.parseDouble(txtCant.getText().toString());
 			}
@@ -635,10 +642,18 @@ public class ProdCant extends PBase {
 
 		cant = mu.round(cant, gl.peDecImp);
 		if (porpeso) {
-			prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, umfactor * cant,um);
-			if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, umfactor * cant)) {
-				if (prc.precioespecial > 0) prec = prc.precioespecial;
+			if (gl.rutatipo.equalsIgnoreCase("V")){
+				prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, umfactor * cant,um);
+				if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, umfactor * cant)) {
+					if (prc.precioespecial > 0) prec = prc.precioespecial;
+				}
+			}else{
+				prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, pesoprom * cant,um);
+				if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, pesoprom * cant)) {
+					if (prc.precioespecial > 0) prec = prc.precioespecial;
+				}
 			}
+
 		} else {
 			prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, 0,um);
 			if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, 0)) {
@@ -660,6 +675,10 @@ public class ProdCant extends PBase {
 		}
 
         lblTot.setText(mu.frmcur(tv));
+
+		if(gl.rutatipo.equalsIgnoreCase("P")){
+			umfactor=(umfactor==1 || umfactor==0?pesoprom:umfactor);
+		}
 
 		opeso=umfactor*cant;
 		try {

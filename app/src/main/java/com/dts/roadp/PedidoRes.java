@@ -89,7 +89,7 @@ public class PedidoRes extends PBase {
 
 		processFinalPromo();
 		
-	processFinalPromo();
+	    processFinalPromo();
 		
 		printcallback= new Runnable() {
 		    public void run() {
@@ -105,6 +105,7 @@ public class PedidoRes extends PBase {
 		
 		prn=new printer(this,printclose,gl.validimp);
 		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp, "");
+		pdoc.deviceid =gl.deviceId;
 	}
 		
 	
@@ -287,7 +288,8 @@ public class PedidoRes extends PBase {
 			bonsave.save();
 
 			if (gl.impresora.equalsIgnoreCase("S")) {
-				pdoc.buildPrint(corel,0);
+				String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
+				pdoc.buildPrint(corel,0, vModo);
 				prn.printask(printcallback);
 			}
 
@@ -671,7 +673,7 @@ public class PedidoRes extends PBase {
 					impres++;toast("Impres "+impres);
 
 					try {
-						sql="UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorrelnc+"'";
+						sql="UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
 						db.execSQL(sql);
 					} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -680,7 +682,7 @@ public class PedidoRes extends PBase {
 					if (impres>1) {
 
 						try {
-							sql="UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorrelnc+"'";
+							sql="UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
 							db.execSQL(sql);
 						} catch (Exception e) {
 							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -689,8 +691,8 @@ public class PedidoRes extends PBase {
 						gl.brw=0;
 
 					} else {
-
-						pdoc.buildPrint(corel,1,"*");
+						String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
+						pdoc.buildPrint(corel,1,vModo);
 
 						prn.printask(printclose);
 

@@ -831,7 +831,7 @@ public class CliDet extends PBase {
 			//startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("sms:"+to)));
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			msgbox("No pudo enviar mensaje : "+e.getMessage());
+			msgbox("No pudo enviar mensaje verifique que esté instalada la aplicación");
 		}
 
 		//try {

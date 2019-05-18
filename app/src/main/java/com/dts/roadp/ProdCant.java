@@ -392,7 +392,8 @@ public class ProdCant extends PBase {
 				pesostock=0;
 			}
 
-			if(gl.rutatipo.equalsIgnoreCase("P")){
+            //#CKFK 20190517 Agregué para que el umfactor sea igual al peso promedio en el pedido y se calcule correctamente
+            if(gl.rutatipo.equalsIgnoreCase("P")){
 				umfactor = pesoprom;
 			}
 
@@ -647,11 +648,6 @@ public class ProdCant extends PBase {
 				if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, umfactor * cant)) {
 					if (prc.precioespecial > 0) prec = prc.precioespecial;
 				}
-			}else{
-				prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, pesoprom * cant,um);
-				if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, pesoprom * cant)) {
-					if (prc.precioespecial > 0) prec = prc.precioespecial;
-				}
 			}
 
 		} else {
@@ -676,6 +672,7 @@ public class ProdCant extends PBase {
 
         lblTot.setText(mu.frmcur(tv));
 
+		//#CKFK 20190517 Agregué para que el umfactor sea igual al peso promedio en el pedido y se calcule correctamente
 		if(gl.rutatipo.equalsIgnoreCase("P")){
 			umfactor=(umfactor==1 || umfactor==0?pesoprom:umfactor);
 		}

@@ -156,7 +156,7 @@ public class ComWS extends PBase {
         txtUser = new EditText(this,null);
         txtPassword = new EditText(this,null);
 
-		txtVersion.setText("Vrs 20-Mayo-2019");
+		txtVersion.setText(gl.parVer);
 
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {

@@ -325,7 +325,7 @@
             android:textSize="15sp" />
 
         <TextView
-            android:id="@+id/textView72"
+            android:id="@+id/txtVersion"
             android:layout_width="118dp"
             android:layout_height="18dp"
             android:layout_alignParentStart="true"
@@ -335,7 +335,7 @@
             android:layout_marginTop="14dp"
             android:layout_marginBottom="16dp"
             android:gravity="center"
-            android:text="10-Mayo-2019"
+            android:text="20-Mayo-2019"
             android:textColor="#FFFFFF"
             android:visibility="visible" />
 

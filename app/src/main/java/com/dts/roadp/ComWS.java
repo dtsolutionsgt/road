@@ -58,7 +58,7 @@ public class ComWS extends PBase {
 	private EditText txtRuta, txtWS, txtEmp;
 	private ImageView imgRec, imgEnv, imgExis,imgEnvM;
 	private RelativeLayout ralBack, relExist, relPrecio, relStock;
-    private TextView lblUser,lblPassword;
+    private TextView lblUser,lblPassword,txtVersion;
     private EditText txtUser, txtPassword;
 
 	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
@@ -121,6 +121,7 @@ public class ComWS extends PBase {
 
 		lblInfo = (TextView) findViewById(R.id.lblETipo);
 		lblParam = (TextView) findViewById(R.id.lblProd);
+		txtVersion = (TextView) findViewById(R.id.txtVersion);
 		barInfo = (ProgressBar) findViewById(R.id.progressBar2);
 		txtRuta = (EditText) findViewById(R.id.txtRuta);
 		txtRuta.setEnabled(false);
@@ -150,9 +151,12 @@ public class ComWS extends PBase {
 
         lblUser = new TextView(this,null);
         lblPassword = new TextView(this,null);
+		txtVersion=new TextView(this, null);
 
         txtUser = new EditText(this,null);
         txtPassword = new EditText(this,null);
+
+		txtVersion.setText("Vrs 20-Mayo-2019");
 
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {

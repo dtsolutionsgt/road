@@ -33,7 +33,7 @@ public class ProdCant extends PBase {
 	
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant;
-	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom,pesostock;
+	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
 	private boolean pexist,esdecimal,porpeso,esbarra;
 	
 	@Override
@@ -147,9 +147,11 @@ public class ProdCant extends PBase {
 		try{
 			txtCant.addTextChangedListener(new TextWatcher() {
 
-				public void afterTextChanged(Editable s) {}
+				public void afterTextChanged(Editable s) {
+				}
 
-				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) {
+					 }
 
 				public void onTextChanged(CharSequence s, int start,int before, int count) {
 					setCant(true);
@@ -239,7 +241,7 @@ public class ProdCant extends PBase {
 			pesoprom = dt.getDouble(10);
 			if (pesoprom==0) pesoprom = dt.getDouble(9);
 
-			if (dt.getString(7).equalsIgnoreCase("P")) pexist=true; else pexist=false;
+			if (dt.getString(8).equalsIgnoreCase("P")) pexist=true; else pexist=false;
 			
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -365,21 +367,34 @@ public class ProdCant extends PBase {
 			
 		try {
 
+			pesostock=0;
+
 			sql=" SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO " +
-				" FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
+					" FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
 			dt=Con.OpenDT(sql);
 
-			if (dt.getCount()>0){
+			if (dt.getCount()>0) {
 
 				dt.moveToFirst();
 
-				umstock=um;umfactor=1;
+				umstock = um;
+				umfactor = 1;
 
-				disp=dt.getDouble(0);
-				ipeso=dt.getDouble(1);
+				disp = dt.getDouble(0);
+				ipeso = dt.getDouble(1);
 
-				pesostock=ipeso/(disp==0?1:disp);
+				if (disp>0) {
+					pesostock = ipeso / disp;
+				} else {
+					pesostock = ipeso / 1;
+				}
+			} else {
+				pesostock=0;
+			}
 
+            //#CKFK 20190517 Agregué para que el umfactor sea igual al peso promedio en el pedido y se calcule correctamente
+            if(gl.rutatipo.equalsIgnoreCase("P")){
+				umfactor = pesoprom;
 			}
 
 			if (disp>0) return disp;
@@ -453,6 +468,8 @@ public class ProdCant extends PBase {
 				}
 				ipeso=dt.getDouble(1);
 				pesostock = ipeso/disp;
+			} else {
+				pesostock=0;
 			}
 
 			dt.close();
@@ -511,6 +528,7 @@ public class ProdCant extends PBase {
 					}
 				}
 			} else {
+				if(Double.isNaN(pesostock))	pesostock=1;
 				if (pesoprom == 0) ppeso = pesostock * cant;
 				else ppeso = pesoprom * cant;
 			}
@@ -591,6 +609,7 @@ public class ProdCant extends PBase {
 		cu=0;
 
 		try {
+
 			if (txtCant.getText().toString().trim()!=""){
 				cu=Double.parseDouble(txtCant.getText().toString());
 			}
@@ -624,10 +643,13 @@ public class ProdCant extends PBase {
 
 		cant = mu.round(cant, gl.peDecImp);
 		if (porpeso) {
-			prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, umfactor * cant,um);
-			if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, umfactor * cant)) {
-				if (prc.precioespecial > 0) prec = prc.precioespecial;
+			if (gl.rutatipo.equalsIgnoreCase("V")){
+				prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, umfactor * cant,um);
+				if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, umfactor * cant)) {
+					if (prc.precioespecial > 0) prec = prc.precioespecial;
+				}
 			}
+
 		} else {
 			prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, 0,um);
 			if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, 0)) {
@@ -649,6 +671,11 @@ public class ProdCant extends PBase {
 		}
 
         lblTot.setText(mu.frmcur(tv));
+
+		//#CKFK 20190517 Agregué para que el umfactor sea igual al peso promedio en el pedido y se calcule correctamente
+		if(gl.rutatipo.equalsIgnoreCase("P")){
+			umfactor=(umfactor==1 || umfactor==0?pesoprom:umfactor);
+		}
 
 		opeso=umfactor*cant;
 		try {
@@ -673,7 +700,7 @@ public class ProdCant extends PBase {
 
 		}
 
-		if (porpeso) {
+		if (porpeso && gl.rutatipo.equalsIgnoreCase("V")) {
 			if (!checkLimits(vpeso,opeso)) return 2;
 		}
 

@@ -75,6 +75,19 @@ public class printZebraZPL extends printBase {
         return true;
     }
 
+    public boolean printBarra(ArrayList<String> listitems) {
+        hasCallback=false;
+
+        errmsg="";
+        try {
+            if (loadFileBarra(listitems))	doStartPrintBarra();else return false;
+        } catch (Exception e) {
+            showmsg("Error: " + e.getMessage());return false;
+        }
+
+        return true;
+    }
+
     public void printask(Runnable callBackHook,String fileName) {
         hasCallback=true;
         callback=callBackHook;
@@ -157,6 +170,32 @@ public class printZebraZPL extends printBase {
         }
     }
 
+    private boolean loadFileBarra(ArrayList<String> listitems) {
+        File ffile;
+        BufferedReader dfile;
+        String ss;
+
+        try {
+
+            //lines.clear();
+
+            lines = listitems;
+
+            showmsg("Lines : "+lines.size());
+
+            return true;
+
+        } catch (Exception e) {
+            try {
+
+            } catch (Exception e1) {}
+
+            showmsg("Error: " + e.getMessage());
+
+            return false;
+        }
+    }
+
     private byte[] printData() {
         byte[] prdata = null;
         int ccnt,dlen;
@@ -205,6 +244,52 @@ public class printZebraZPL extends printBase {
         return prdata;
     }
 
+    private byte[] printDataBarra() {
+        byte[] prdata = null;
+        int ccnt,dlen;
+        String ps,ss;
+        int altobarra,anchopapel,psx;
+        int anchobarra;
+
+        try {
+
+            altobarra=100;
+            anchobarra = 2;
+            psx = 20;
+            anchopapel=500;
+            if (prwidth>40) anchopapel=300;
+            if (prwidth>60) anchopapel=400;
+
+            ccnt=lines.size();
+            dlen=ccnt*(altobarra+62);
+
+            ps="";
+
+            ps+="^XA";
+            ps+="^PW"+anchopapel;
+            ps+="^LL"+dlen;
+            for (int i = 0; i <ccnt; i++) {
+                ps+="^BY'"+anchobarra+"',2,'"+altobarra+"'";
+                ps+="^FO,"+psx+",62";
+                ps+="^BC";
+                ps+="^FD";
+                ss=lines.get(i);
+                ps+=ss;
+                ps+="^FS";
+                psx =psx+55 + altobarra;
+            }
+
+            ps+="^XZ";
+
+            prdata =ps.getBytes();
+
+        } catch (Exception e) {
+            setStatus(e.getMessage());
+        }
+
+        return prdata;
+    }
+
     private void doStartPrint() {
         if (!validprint) {
             showmsg("¡La impresora no está autorizada!");return;
@@ -226,11 +311,44 @@ public class printZebraZPL extends printBase {
 
     }
 
+    private void doStartPrintBarra() {
+        if (!validprint) {
+            showmsg("¡La impresora no está autorizada!");return;
+        }
+
+        showmsg("Imprimiendo ..." );
+        status=true;
+
+        new Thread(new Runnable() {
+            public void run() {
+                Looper.prepare();
+
+                doPrintBarra();
+
+                Looper.loop();
+                Looper.myLooper().quit();
+            }
+        }).start();
+
+    }
+
     private void doPrint() {
         printer = connect();
 
         if (printer != null) {
             processPrint();
+        } else {
+            disconnect();
+        }
+
+        doCallBack();
+    }
+
+    private void doPrintBarra() {
+        printer = connect();
+
+        if (printer != null) {
+            processPrintBarra();
         } else {
             disconnect();
         }
@@ -299,6 +417,29 @@ public class printZebraZPL extends printBase {
             setStatus(e.getMessage());
         } finally {
           disconnect();
+        }
+    }
+
+    private void processPrintBarra() {
+
+        try {
+
+            PrinterStatus printerStatus = printer.getCurrentStatus();
+
+            if (printerStatus.isReadyToPrint) {
+                byte[] configLabel = printDataBarra();
+                connection.write(configLabel);
+            } else if (printerStatus.isHeadOpen) {
+                setStatus("Impresora abierta");
+            } else if (printerStatus.isPaused) {
+                setStatus("Impresora detenida");
+            } else if (printerStatus.isPaperOut) {
+                setStatus("Papel afuera");
+            }
+        } catch (ConnectionException e) {
+            setStatus(e.getMessage());
+        } finally {
+            disconnect();
         }
     }
 

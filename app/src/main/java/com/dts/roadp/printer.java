@@ -8,6 +8,8 @@ import android.widget.Toast;
 import com.epson.eposdevice.Device;
 import com.epson.eposdevice.printer.Printer;
 
+import java.util.ArrayList;
+
 public class printer {
 
 	public int prw;
@@ -72,6 +74,11 @@ public class printer {
 		if (prid>0) prn.printask();
 	}
 
+	public void printaskBarra(ArrayList<String> listitems) {
+		if (emptyparam()) return;
+		if (prid>0) prn.printaskBarra(listitems);
+	}
+
 	public void printask(Runnable callBackHook, String fName)    {
 		if (emptyparam()) return;
 		if(prid>0) prn.printask(callBackHook,fName);
@@ -86,7 +93,12 @@ public class printer {
 		if (emptyparam()) return false;
 		if (prid>0) return prn.print();else return true;
 	}
-		
+
+	public boolean printBarra(ArrayList<String> listitems) {
+		if (emptyparam()) return false;
+		if (prid>0) return prn.printBarra(listitems);else return true;
+	}
+
 	public void printask(String fileName) {	
 		if (emptyparam()) return;
 		if (prid>0) prn.printask(fileName);
@@ -139,13 +151,6 @@ public class printer {
 		}		
 		
 		try {
-			sql="SELECT TIPO_IMPRESORA,PUERTO_IMPRESION FROM P_ARCHIVOCONF";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			
-			//prtipo=DT.getString(0);
-			//prpar=DT.getString(1);
-
 			prtipo=app.impresTipo();
 			prpar=app.impresParam();
 			

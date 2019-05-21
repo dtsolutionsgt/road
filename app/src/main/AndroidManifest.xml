@@ -31,7 +31,8 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-
+        <activity android:name=".list_view_barras"></activity>
+        <activity android:name=".imprime_barras" />
         <activity android:name=".desglose" />
         <activity
             android:name=".MainActivity"
@@ -442,8 +443,7 @@
             android:name=".WSTest"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-            android:windowSoftInputMode="stateHidden"          />
-
+            android:windowSoftInputMode="stateHidden" />
     </application>
 
 </manifest>

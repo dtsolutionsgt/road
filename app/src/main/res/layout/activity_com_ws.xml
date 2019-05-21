@@ -326,19 +326,18 @@
 
         <TextView
             android:id="@+id/txtVersion"
-            android:layout_width="167dp"
-            android:layout_height="19dp"
+            android:layout_width="wrap_content"
+            android:layout_height="22dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="121dp"
-            android:layout_marginTop="14dp"
-            android:layout_marginEnd="26dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginStart="87dp"
+            android:layout_marginTop="11dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
             android:layout_toStartOf="@+id/textView9"
             android:enabled="true"
             android:gravity="center"
-            android:text="9.4.2 / 20-Mayo-2019"
             android:textColor="#FFFFFF"
             android:visibility="visible" />
 

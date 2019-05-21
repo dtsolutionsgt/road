@@ -216,7 +216,7 @@ public class printDMax extends printBase {
 
 				printData = doc.getDocumentData();
 
-				prconn.write(printData,2,printData.length);
+				prconn.write(printData,0,printData.length);
 
 				prthread.sleep(500);
 

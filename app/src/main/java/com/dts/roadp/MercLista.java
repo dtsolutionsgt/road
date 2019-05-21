@@ -86,13 +86,13 @@ public class MercLista extends PBase {
            	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 				
-			s=DT.getString(0);
+			s=DT.getString(1);
 			mprop=s.equalsIgnoreCase("S");if (mprop) vis+=1;
 			
-			s=DT.getString(1);
+			s=DT.getString(2);
 			mcomp=s.equalsIgnoreCase("S");if (mcomp) vis+=1;
 			
-			s=DT.getString(2);
+			s=DT.getString(0);
 			menc=s.equalsIgnoreCase("S");if (menc) vis+=1;
 			
 			s=DT.getString(3);

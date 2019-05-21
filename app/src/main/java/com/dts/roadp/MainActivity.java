@@ -12,6 +12,7 @@ import android.database.SQLException;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
@@ -824,9 +825,14 @@ public class MainActivity extends PBase {
     private String androidid() {
         String uniqueID = "";
         try {
-            //uniqueID = Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID);
+
             TelephonyManager tm = (TelephonyManager) this.getSystemService(this.TELEPHONY_SERVICE);
             uniqueID = tm.getDeviceId();
+
+            if (uniqueID==null){
+                uniqueID = Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID);
+            }
+
         } catch (Exception e) {
             msgbox(new Object() {
             }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());

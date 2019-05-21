@@ -20,7 +20,7 @@ public class appGlobals extends Application {
 	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor,prectemp;
 	public boolean CellCom,closeDevBod;
 	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra,parVer;
-	public int tiponcredito,validarCred;
+	public int tiponcredito,validarCred,gpsdist;
     public boolean vcredito,vcheque,vchequepost,validimp;
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
@@ -33,15 +33,16 @@ public class appGlobals extends Application {
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;
 	public double dvfactor,dvpeso,dvprec,dvpreclista,dvtotal;
 	public int dvbrowse=0,tienelote,facturaVen,brw=0;
-    public boolean dvporpeso,devfindia,devprncierre;
+    public boolean dvporpeso,devfindia,devprncierre,gpspass;
     public double dvdispventa;
     public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc;
 
 	// Parametros Extra
 	public String peModal,peMon,peFormatoFactura,CodDev;
 	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec,endPrint;
-	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre,peImprFactCorrecta;
-	public int peDec,peDecCant,peDecImp;
+	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre;
+	public boolean peImprFactCorrecta;
+	public int peDec,peDecCant,peDecImp,peLimiteGPS,peMargenGPS,peVentaGps;
 	
 	// Descuentos
 	
@@ -73,5 +74,8 @@ public class appGlobals extends Application {
 
 	//Desglose de efectivo
 	public double totDep;
+
+	//Comunicación con WS
+	public int isOnWifi = 0;
 
 }

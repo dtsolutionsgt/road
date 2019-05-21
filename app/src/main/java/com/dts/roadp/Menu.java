@@ -1811,6 +1811,10 @@ public class Menu extends PBase {
 				
 	}
 
+	public void doWSTest(View view) {
+		startActivity(new Intent(Menu.this,WSTest.class));
+	}
+
 	//endregion
 
 	//region Activity Events

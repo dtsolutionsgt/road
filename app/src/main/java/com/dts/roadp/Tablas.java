@@ -1,13 +1,10 @@
 package com.dts.roadp;
 
 import android.database.Cursor;
-import android.database.SQLException;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;

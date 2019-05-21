@@ -81,6 +81,8 @@ public class ComWSRec extends PBase {
         ruta=gl.ruta;
         gEmpresa=gl.emp;
 
+        gl.isOnWifi = clsAppM.isOnWifi();
+
         getWSURL();
 
         dbld=new clsDataBuilder(this);
@@ -838,10 +840,19 @@ public class ComWSRec extends PBase {
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
 
-            wsurl=DT.getString(0);
+            if (gl.isOnWifi==1) {
+                URL = DT.getString(0);
+            }else if(gl.isOnWifi==2){
+                URL = DT.getString(1);
+            }
 
-            URL=wsurl;
-            txtWS.setText(URL);
+            //URL=wsurl;
+            if (URL!=null && !URL.equalsIgnoreCase("")){
+                txtWS.setText(URL);
+            }else{
+                toast("No hay configurada ruta para transferencia de datos");
+            }
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             //MU.msgbox(e.getMessage());

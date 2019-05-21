@@ -47,21 +47,17 @@ public class CliDet extends PBase {
 	private ImageView imgCobro,imgDevol,imgRoadTit;
 	private RadioButton chknc,chkncv;
 
-	private Exist Existencia = new Exist();
-	private String cod,tel, Nombre, NIT;
-	//#HS_20181220 Variables para fachada;
-	private String imagenbase64,path,fechav;
-	private Boolean imgPath, imgDB;
 	private PhotoViewAttacher zoomFoto;
 	private AppMethods app;
-	private double credito;
-	////
-	private double clim,cused,cdisp,cred;
-	private int nivel,browse,merc;
+
+	private Exist Existencia = new Exist();
+	private String cod,tel, Nombre, NIT, sgp1, sgp2;
+	private String imagenbase64,path,fechav;
+	private Boolean imgPath, imgDB, ventaGPS,flagGPS=true,permiteVenta=true;
+	private double gpx,gpy,credito,clim,cused,cdisp,cred;
+	private int nivel,browse,merc,rangoGPS,modoGPS;
 	private boolean porcentaje = false;
 	private byte[] imagenBit;
-	
-	private double gpx,gpy;
 
 	
 	@Override
@@ -104,6 +100,23 @@ public class CliDet extends PBase {
 
 		cod=gl.cliente;
 
+		ventaGPS=gl.peVentaGps!=0;
+		rangoGPS=gl.peLimiteGPS+gl.peMargenGPS;
+		flagGPS=ventaGPS;
+		if (rangoGPS<=1) flagGPS=false;
+		if (gl.gpsdist<1) flagGPS=false;
+
+		if (flagGPS) {
+			permiteVenta=gl.gpsdist<=rangoGPS;
+		} else {
+			permiteVenta=true;
+		}
+
+		gl.gpspass=false;
+
+		sgp2 =" ( "+mu.frmint(rangoGPS)+"m ) ";
+		sgp1 =" ( "+mu.frmint(gl.gpsdist)+"m ) ";
+
 		/*if (!gl.devol) {
 			lblDevol.setVisibility(View.INVISIBLE);
 			imgDevol.setVisibility(View.INVISIBLE);
@@ -116,8 +129,6 @@ public class CliDet extends PBase {
 		merc=1;
 
 		habilitaOpciones();
-		
-		defineGeoPos();
 
 		miniFachada();
 
@@ -146,7 +157,79 @@ public class CliDet extends PBase {
 	}
 
 
-	// Events
+	//region  Events
+
+	public void showVenta(View view){
+		if (!permiteVenta) {
+			if (gl.peVentaGps==1) {
+				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 +"!\nPara realizar la venta debe asercarse más al cliente.");
+				return;
+			} else {
+				modoGPS=1;
+				msgAskGPSVenta();
+			}
+		} else {
+			doVenta();
+		}
+	}
+
+	public void showPreventa(View view) {
+		if (!permiteVenta) {
+			if (gl.peVentaGps == 1) {
+				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\nPara realizar la venta debe asercarse más al cliente.");
+				return;
+			} else {
+				modoGPS = 2;
+				msgAskGPSVenta();
+			}
+		} else {
+			doPreventa();
+		}
+	}
+
+	public void showDespacho(View view) {
+
+		if (!permiteVenta) {
+			msgbox("¡Distancia del cliente mayor que permitida!\nPara realizar la venta debe asercarse más al cliente.");return;
+		}
+
+		try {
+			mu.msgbox("La funcionalidad no esta implementada.");
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+		//gl.rutatipo="D";
+		//runVenta();
+	}
+
+	public void showCredit(View viev){
+		if (!permiteVenta) {
+			if (gl.peVentaGps == 1) {
+				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\nPara realizar el cobro debe asercarse más al cliente.");
+				return;
+			} else {
+				modoGPS = 3;
+				msgAskGPSVenta();
+			}
+		} else {
+			doCredit();
+		}
+	}
+
+	public void showDevol(View view){
+		if (!permiteVenta) {
+			if (gl.peVentaGps == 1) {
+				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que permitida "+ sgp2 + "!\nPara realizar la devolución debe asercarse más al cliente.");
+				return;
+			} else {
+				modoGPS = 4;
+				msgAskGPSVenta();
+			}
+		} else {
+			msgAskTipoDev();
+		}
+	}
 
 	public void tomarFoto(View view){
 		int codResult = 1;
@@ -211,7 +294,6 @@ public class CliDet extends PBase {
 
 	}
 
-
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -241,8 +323,46 @@ public class CliDet extends PBase {
 
 	}
 
+	private void setHandlers(){
 
-	// Main
+		try {
+
+			chknc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+					if (chknc.isChecked()==true){
+						chkncv.setChecked(false);
+						gl.tiponcredito = 1;
+					}
+
+				}
+			});
+
+			chkncv.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+					if (chkncv.isChecked()==true){
+						chknc.setChecked(false);
+						gl.tiponcredito = 2;
+
+						VerificaCantidad();
+
+					}
+
+				}
+			});
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	//endregion
+
+	//region Main
 	
 	private void showData() {
 		Cursor DT;
@@ -479,8 +599,9 @@ public class CliDet extends PBase {
 		}
 	}
 
+	//endregion
 
-	// Fachada
+	//region Fachada
 
 	public Bitmap redimensionarImagen(Bitmap mBitmap, float newWidth, float newHeigth){
 
@@ -528,42 +649,46 @@ public class CliDet extends PBase {
 
 	}
 
+	//endregion
 
-	// GPS
-	
-	private void defineGeoPos(){
-		
-	}
+	//endregion
 
-	//  Misc
+	//region  Misc
 
-	public void showVenta(View view){
+	private void doVenta(){
 
 		try{
 			gl.banderaCobro = false;
 
 			if (!validaVenta()) return;//Se valida si hay correlativos de factura para la venta
 
-			if(porcentaje == false) {
-				VerificaCantidad();
-			}
+			if(porcentaje == false) VerificaCantidad();
 
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			mu.msgbox("showVenta: " + e.getMessage());
+			mu.msgbox("doVenta: " + e.getMessage());
 		}
 
+	}
 
-		//#HS_20181129_1033 lo agregue en funcion VerificaCantidad.
-		//Asigna conexión actual a la forma de Existencias.
-		/*Existencia.Con = Con;
-		cantidad = Float.valueOf(Existencia.CantExistencias());
-		if(cantidad == 0){
-			mu.msgbox("No hay existencias disponibles.");
-		}else{
+	private void doPreventa() {
+		try{
+			gl.rutatipo="P";
 			runVenta();
-		}*/
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
 
+	private void doCredit(){
+		try{
+			gl.validarCred=2;
+			gl.banderaCobro = true;
+			Intent intent = new Intent(this,Cobro.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 
 	public void VerificaCantidad(){
@@ -587,27 +712,6 @@ public class CliDet extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
-	}
-
-	public void showPreventa(View view) {
-		try{
-			gl.rutatipo="P";
-			runVenta();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-	}
-
-	public void showDespacho(View view) {
-		try{
-			mu.msgbox("La funcionalidad no esta implementada.");
-
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-		//gl.rutatipo="D";
-		//runVenta();
 	}
 
 	private void runVenta() {
@@ -636,63 +740,6 @@ public class CliDet extends PBase {
 
 	}
 
-	private void msgAskEditCliente() {
-		try{
-			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-			dialog.setTitle("Road");
-			dialog.setMessage("¿Quiere editar datos del cliente?");
-
-			dialog.setIcon(R.drawable.ic_quest);
-
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					inputCliente();
-				}
-			});
-
-			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					closekeyb();
-				}
-			});
-
-			dialog.show();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-	}
-
-	/*private void  msgAskFact() {
-		try{
-			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-			dialog.setTitle("Road");
-			dialog.setMessage("Cliente no tiene credito, Desea continuar la facturacion al contado?");
-
-			dialog.setIcon(R.drawable.ic_quest);
-
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					if(porcentaje == false) {
-						VerificaCantidad();
-					}
-				}
-			});
-
-			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					closekeyb();
-				}
-			});
-
-			dialog.show();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-	}*/
-
-	//#HS_20181207 Cuadro de dialogo para editar datos del cliente
 	private void inputCliente() {
 
 		try{
@@ -748,7 +795,6 @@ public class CliDet extends PBase {
 
 	}
 
-	//#HS_20181211 agregue funcion para actualizar los campos de Nombre y NIT del cliente
 	private void ActualizarCliente(String corel, String NombreEdit, String NitEdit){
 		Cursor DT;
 		try {
@@ -764,27 +810,6 @@ public class CliDet extends PBase {
 		try{
 			browse=2;
 			startActivity(new Intent(this,CliGPS.class));
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-	}
-
-	public void showCredit(View viev){
-		try{
-			gl.validarCred=2;
-			gl.banderaCobro = true;
-			Intent intent = new Intent(this,Cobro.class);
-			startActivity(intent);
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-	}
-
-	public void showDevol(View view){
-		try{
-			msgAskTipoDev();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -863,6 +888,134 @@ public class CliDet extends PBase {
 
 	}
 
+	private void setDevType(String tdev) {
+		try{
+			gl.devtipo=tdev;
+			Intent intent = new Intent(this,DevolCli.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	private void habilitaOpciones() {
+		try
+		{
+			String rt;
+			boolean flag;
+
+			rt=gl.rutatipog;
+
+			flag=false;
+			if (rt.equalsIgnoreCase("V") || rt.equalsIgnoreCase("T")) flag=true;
+			if (flag) relV.setVisibility(View.VISIBLE);else relV.setVisibility(View.GONE);
+
+			flag=false;
+			if (rt.equalsIgnoreCase("P") || rt.equalsIgnoreCase("T")) flag=true;
+			if (flag) relP.setVisibility(View.VISIBLE);else relP.setVisibility(View.GONE);
+
+			flag=false;
+			//if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
+			if (flag) relD.setVisibility(View.VISIBLE);else relD.setVisibility(View.GONE);
+
+		}catch (Exception ex)
+		{
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
+			Log.d("habilitaOpciones_err", ex.getMessage());
+		}
+	}
+
+	protected void toastcent(String msg) {
+
+		try{
+			Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_LONG);
+			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	private void doExit(){
+		try{
+			gl.closeCliDet=true;
+			super.finish();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	//endregion
+
+	//region Dialogs
+
+	private void msgAskGPSVenta() {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\n¿Está seguro de continuar?");
+			dialog.setIcon(R.drawable.ic_quest);
+			dialog.setCancelable(false);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					gl.gpspass=true;
+					switch (modoGPS) {
+						case 1:
+							doVenta();break;
+						case 2:
+							doPreventa();break;
+						case 3:
+							doCredit();break;
+						case 4:
+							msgAskTipoDev();break;
+					}
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
+
+	private void msgAskExit(String msg) {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage("¿" + msg + "?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+			dialog.setCancelable(false);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					doExit();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
 	private void msgAskTipoEstadoDev(String msg) {
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -917,12 +1070,12 @@ public class CliDet extends PBase {
 			chkncv.setText("Nota de crédito con venta");
 
 			layout.addView(chknc);
-            layout.addView(chkncv);
+			layout.addView(chkncv);
 
 			alert.setView(layout);
 
 			showkeyb();
-            alert.setCancelable(false);
+			alert.setCancelable(false);
 			alert.create();
 
 			alert.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
@@ -976,121 +1129,26 @@ public class CliDet extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
-
 	}
 
-	private void setDevType(String tdev) {
-		try{
-			gl.devtipo=tdev;
-			Intent intent = new Intent(this,DevolCli.class);
-			startActivity(intent);
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-	}
-
-	private void habilitaOpciones() {
-		try
-		{
-			String rt;
-			boolean flag;
-
-			rt=gl.rutatipog;
-
-			flag=false;
-			if (rt.equalsIgnoreCase("V") || rt.equalsIgnoreCase("T")) flag=true;
-			if (flag) relV.setVisibility(View.VISIBLE);else relV.setVisibility(View.GONE);
-
-			flag=false;
-			if (rt.equalsIgnoreCase("P") || rt.equalsIgnoreCase("T")) flag=true;
-			if (flag) relP.setVisibility(View.VISIBLE);else relP.setVisibility(View.GONE);
-
-			flag=false;
-			//if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
-			if (flag) relD.setVisibility(View.VISIBLE);else relD.setVisibility(View.GONE);
-
-		}catch (Exception ex)
-		{
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
-			Log.d("habilitaOpciones_err", ex.getMessage());
-		}
-	}
-
-	protected void toastcent(String msg) {
-
-		try{
-			Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_LONG);
-			toast.setGravity(Gravity.CENTER, 0, 0);
-			toast.show();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-	}
-
-
-	//Region Events
-
-	private void setHandlers(){
-
-		try {
-
-			chknc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-					if (chknc.isChecked()==true){
-						chkncv.setChecked(false);
-						gl.tiponcredito = 1;
-					}
-
-				}
-			});
-
-			chkncv.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-					if (chkncv.isChecked()==true){
-						chknc.setChecked(false);
-						gl.tiponcredito = 2;
-
-						VerificaCantidad();
-
-					}
-
-				}
-			});
-
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-	}
-
-
-	private void msgAskExit(String msg) {
+	private void msgAskEditCliente() {
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-			dialog.setTitle(R.string.app_name);
-			dialog.setMessage("¿" + msg + "?");
+			dialog.setTitle("Road");
+			dialog.setMessage("¿Quiere editar datos del cliente?");
 
 			dialog.setIcon(R.drawable.ic_quest);
-			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					doExit();
+					inputCliente();
 				}
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					;
+					closekeyb();
 				}
 			});
 
@@ -1098,21 +1156,13 @@ public class CliDet extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 
-	private void doExit(){
-		try{
-			gl.closeCliDet=true;
-			super.finish();
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-	}
+	//endregion
 
 
-	// Activity Events
+
+	//region Activity Events
 
 	@Override
 	protected void onResume() {
@@ -1162,5 +1212,7 @@ public class CliDet extends PBase {
 		}
 
 	}
+
+	//endregion
 
 }

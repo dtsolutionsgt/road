@@ -130,7 +130,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/textView2"
-            android:ems="10">
+            android:ems="10"
+            android:nextFocusRight="@id/txtEmp"
+            android:singleLine="true">
 
             <requestFocus />
         </EditText>
@@ -144,6 +146,7 @@
             android:layout_alignParentRight="true"
             android:ems="10"
             android:hint="http://172.16.10.9/rdc7_sap_qas_andr/wsandr.asmx"
+            android:nextFocusForward="@id/txtEmp"
             android:text="http://172.16.10.9/rdc7_sap_qas_andr/wsandr.asmx" />
 
         <TextView
@@ -173,7 +176,10 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/txtWS"
             android:layout_toRightOf="@+id/textView4"
-            android:ems="10" />
+            android:ems="10"
+            android:nextFocusLeft="@id/txtRuta"
+            android:nextFocusDown="@id/txtWS"
+            android:singleLine="true" />
     </RelativeLayout>
 
     <Button

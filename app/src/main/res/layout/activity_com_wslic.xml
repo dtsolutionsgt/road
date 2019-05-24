@@ -171,7 +171,7 @@
         android:layout_below="@+id/progressBar2"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="-2dp"
-        android:layout_marginTop="9dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="2dp"
         android:clickable="true"
         android:onClick="askSend"

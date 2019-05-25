@@ -251,7 +251,7 @@ public class Producto extends PBase {
 			switch (prodtipo) {
 
 				case 0: // Preventa
-					sql="SELECT CODIGO,DESCCORTA,'' FROM P_PRODUCTO WHERE 1=1 ";
+					sql="SELECT CODIGO,DESCCORTA,UNIDBAS FROM P_PRODUCTO WHERE 1=1 ";
 					if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
 					if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
 
@@ -296,7 +296,9 @@ public class Producto extends PBase {
 					
 				case 2: // Mercadeo propio
 					sql="SELECT CODIGO,DESCCORTA,'' FROM P_PRODUCTO WHERE 1=1 ";
-					if (!mu.emptystr(famid)) {sql=sql+"AND (LINEA='"+famid+"') ";}
+					if (!mu.emptystr(famid)){
+						if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
+					}
 					if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
 
 					if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";

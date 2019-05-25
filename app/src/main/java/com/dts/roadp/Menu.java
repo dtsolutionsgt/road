@@ -1835,7 +1835,15 @@ public class Menu extends PBase {
 
 	}
 
+	@Override
+	public void onBackPressed() {
+		try{
 
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
 
 	//endregion
 }

@@ -156,7 +156,7 @@ public class ComWS extends PBase {
         txtUser = new EditText(this,null);
         txtPassword = new EditText(this,null);
 
-		txtVersion.setText("21-Mayo-2019");
+		txtVersion.setText("24-Mayo-2019");
 
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
@@ -211,13 +211,13 @@ public class ComWS extends PBase {
 
 		pendientes = validaPendientes();
 
+		envioparcial = gl.peEnvioParcial;
+
 		visibilidadBotones();
 
 		//if (gl.autocom==1) runSend();
 
 		//relExist.setVisibility(View.VISIBLE);
-
-		envioparcial = gl.peEnvioParcial;
 
 		if (esvacio) txtWS.setEnabled(true);
 
@@ -680,6 +680,8 @@ public class ComWS extends PBase {
 
 			envioSolicitud();
 
+            envioRating();
+
 			updateAcumulados();
 
 			updateInventario();
@@ -907,6 +909,7 @@ public class ComWS extends PBase {
 			showprogress = true;
 			wsStask = new AsyncCallSend();
 			wsStask.execute();
+
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -1571,6 +1574,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MUNI")) return false;
 			if (!AddTable("P_VEHICULO")) return false;
 			if (!AddTable("P_HANDHELD")) return false;
+            if (!AddTable("P_TRANSERROR")) return false;
 
 			licResult=checkLicence(licSerial);
 			licResultRuta=checkLicenceRuta(licRuta);
@@ -2221,13 +2225,15 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_ENCABEZADO_REPORTESHH")) {
-			SQL = "SELECT CODIGO,TEXTO,SUCURSAL FROM P_ENCABEZADO_REPORTESHH_II";
+			SQL = "SELECT CODIGO,TEXTO,SUCURSAL FROM P_ENCABEZADO_REPORTESHH_II WHERE SUCURSAL IN (SELECT SUCURSAL FROM P_RUTA WHERE CODIGO = '"+ActRuta+"')";
 			return SQL;
 		}
 
 
 		if (TN.equalsIgnoreCase("P_BONLIST")) {
-			SQL = "SELECT CODIGO,PRODUCTO,CANT,CANTMIN,NOMBRE FROM P_BONLIST";
+			SQL = "SELECT CODIGO,PRODUCTO,CANT,CANTMIN,NOMBRE FROM P_BONLIST "+
+				  "	WHERE CODIGO IN (SELECT LISTA FROM P_BONIF WHERE TIPOLISTA in (1,2) "+
+				  "	AND DATEDIFF(D, FECHAINI,GETDATE()) >=0 AND DATEDIFF(D,GETDATE(), FECHAFIN) >=0  AND EMP = '" + gl.emp +"')";
 			return SQL;
 		}
 
@@ -2277,6 +2283,12 @@ public class ComWS extends PBase {
                     "0 AS FECHA_CREADA,0 AS FECHA_MODIFICADA,MACADDRESS FROM P_IMPRESORA";
 			return SQL;
 		}
+
+        //#CKFK_20190522 Agregué tabla P_TRANSERROR
+        if (TN.equalsIgnoreCase("P_TRANSERROR")) {
+            SQL = " SELECT IDTRANSERROR, TRANSERROR FROM P_TRANSERROR";
+            return SQL;
+        }
 
 		if (TN.equalsIgnoreCase("P_MUNI")) {
 			SQL = "SELECT * FROM P_MUNI";
@@ -2525,6 +2537,7 @@ public class ComWS extends PBase {
 				db.execSQL("UPDATE D_ATENCION SET STATCOM='S'");
 				db.execSQL("UPDATE D_CLICOORD SET STATCOM='S'");
 				db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
+                db.execSQL("UPDATE D_RATING SET STATCOM='S'");
 				db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
 				db.execSQL("UPDATE FINDIA SET VAL5=0, VAL4=0,VAL3=0, VAL2=0");
 				db.setTransactionSuccessful();
@@ -2558,6 +2571,7 @@ public class ComWS extends PBase {
 			db.execSQL("UPDATE D_CLICOORD SET STATCOM='S'");
 			db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
 			db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
+            db.execSQL("UPDATE D_RATING SET STATCOM='S'");
 			db.execSQL("UPDATE P_RUTA SET PARAM2 = ''");
 			db.setTransactionSuccessful();
 			db.endTransaction();
@@ -2891,6 +2905,11 @@ public class ComWS extends PBase {
 				dbld.savelog();
 				return true;
 			}
+            envioRating();
+            if (!fstr.equals("Sync OK")){
+                dbld.savelog();
+                return true;
+            }
 
 			updateAcumulados();
 			if (!fstr.equals("Sync OK")){
@@ -3897,6 +3916,69 @@ public class ComWS extends PBase {
 		}
 	}
 
+	//#CKFK 20190522 Función creada para enviar los rating
+    public void envioRating() {
+        Cursor DT;
+        String ruta, vendedor, comentario, fecha;
+        int id, idtranserror;
+        float rating;
+
+        if (!esEnvioManual){
+            wsStask.onProgressUpdate();
+        }
+
+        try {
+            sql = " SELECT IDRATING, RUTA, VENDEDOR, RATING, COMENTARIO, IDTRANSERROR, FECHA, STATCOM " +
+                  " FROM D_RATING WHERE STATCOM='N'";
+            DT = Con.OpenDT(sql);
+            if (DT.getCount() == 0) return;
+
+            DT.moveToFirst();
+            while (!DT.isAfterLast()) {
+
+                id = DT.getInt(0);
+                ruta = DT.getString(1);
+                vendedor = DT.getString(2);
+                rating = DT.getFloat(3);
+                comentario = DT.getString(4);
+                idtranserror=DT.getInt(5);
+                fecha=DT.getString(6);
+
+                try {
+
+                    if (envioparcial) dbld.clear();
+
+                    ss = "INSERT INTO D_RATING (RUTA, VENDEDOR, RATING, COMENTARIO, IDTRANSERROR, FECHA, STATCOM)"+
+                         " VALUES('" + ruta +"','" + vendedor +"'," + rating +",'" + comentario +"'," +
+                         "" + idtranserror +",'" + fecha +"','N')";
+                    dbld.add(ss);
+
+                    if (envioparcial && !esEnvioManual) {
+                        if (commitSQL() == 1) {
+                            sql = "UPDATE D_RATING SET STATCOM='S' WHERE IDRATING='" + id + "'";
+                            db.execSQL(sql);
+                        }else{
+                            fterr += "\n" + sstr;
+                        }
+                    }
+
+                } catch (Exception e) {
+                    addlog(new Object() {
+                    }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+                    fterr += "\n" + e.getMessage();
+                }
+
+                DT.moveToNext();
+            }
+
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            fstr = e.getMessage();
+        }
+
+    }
+
 	public void updateInventario() {
 		DU = new DateUtils();
 		String sFecha;
@@ -4197,7 +4279,6 @@ public class ComWS extends PBase {
             }
 
 			visibilidadBotones();
-
 			//if (!errflag) ComWS.super.finish();
 
 			isbusy=0;
@@ -4636,12 +4717,21 @@ public class ComWS extends PBase {
 				//Tiene documentos
 				boolean TieneFact,TienePedidos,TieneCobros,TieneDevol,YaComunico, TieneInventario, TieneOtros;
 
-				TieneFact = (clsAppM.getDocCountTipo("Facturas",false)>0?true:false);
-				TienePedidos = (clsAppM.getDocCountTipo("Pedidos",false)>0?true:false);
-				TieneCobros = (clsAppM.getDocCountTipo("Cobros",false)>0?true:false);
-				TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",false)>0?true:false);
-				YaComunico=(claseFindia.getComunicacion() == 2?true:false);
-				TieneInventario=(clsAppM.getDocCountTipo("Inventario",false)>0?true:false);
+                if (!envioparcial){
+                    TieneFact = (clsAppM.getDocCountTipo("Facturas",false)>0?true:false);
+                    TienePedidos = (clsAppM.getDocCountTipo("Pedidos",false)>0?true:false);
+                    TieneCobros = (clsAppM.getDocCountTipo("Cobros",false)>0?true:false);
+                    TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",false)>0?true:false);
+                    YaComunico=(claseFindia.getComunicacion() == 2?true:false);
+                    TieneInventario=(clsAppM.getDocCountTipo("Inventario",false)>0?true:false);
+                }else{
+                    TieneFact = (clsAppM.getDocCountTipo("Facturas",true)>0?true:false);
+                    TienePedidos = (clsAppM.getDocCountTipo("Pedidos",true)>0?true:false);
+                    TieneCobros = (clsAppM.getDocCountTipo("Cobros",true)>0?true:false);
+                    TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",true)>0?true:false);
+                    YaComunico=(claseFindia.getComunicacion() == 2?true:false);
+                    TieneInventario=(clsAppM.getDocCountTipo("Inventario",true)>0?true:false);
+                }
 
 				if (gl.peModal.equalsIgnoreCase("TOL"))
                     {
@@ -4721,7 +4811,7 @@ public class ComWS extends PBase {
 														relPrecio.setVisibility(View.INVISIBLE);
 													}
                                             }
-                                        else
+										else
                                             {
                                                 lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
                                                 lblEnv.setVisibility(View.VISIBLE);imgEnv.setVisibility(View.VISIBLE);
@@ -4904,6 +4994,7 @@ public class ComWS extends PBase {
 			dialog.setPositiveButton("Envio correcto", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which)
 				{
+					startActivity(new Intent(ComWS.this,rating.class));
 					ComWS.super.finish();
 				}
 			});

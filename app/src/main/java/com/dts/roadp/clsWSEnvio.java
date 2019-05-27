@@ -204,6 +204,8 @@ public class clsWSEnvio {
 
                     case 1:
                         if (!envio_D_MOV_en_dev()) fstr="Envío incompleto : "+sstr;
+                    case 2:
+                        if (!envio_Rating()) fstr="Envío incompleto : "+sstr;
                 }
 
 
@@ -402,6 +404,71 @@ public class clsWSEnvio {
         }
 
         return  vEnvio;
+
+    }
+
+    //#CKFK 20190522 Función creada para enviar los rating
+    public boolean envio_Rating() {
+        Cursor DT;
+        String ruta, vendedor, comentario, fecha,ss;
+        int id, idtranserror;
+        float rating;
+
+        boolean vEnvio=false;
+
+        try {
+
+            wsEtask.onProgressUpdate();
+
+            sql = " SELECT IDRATING, RUTA, VENDEDOR, RATING, COMENTARIO, IDTRANSERROR, FECHA, STATCOM " +
+                    " FROM D_RATING WHERE STATCOM='N'";
+            DT = Con.OpenDT(sql);
+            if (DT.getCount() == 0) return true;
+
+            dbld.clear();
+
+            DT.moveToFirst();
+            while (!DT.isAfterLast()) {
+
+                id = DT.getInt(0);
+                ruta = DT.getString(1);
+                vendedor = DT.getString(2);
+                rating = DT.getFloat(3);
+                comentario = DT.getString(4);
+                idtranserror=DT.getInt(5);
+                fecha=DT.getString(6);
+
+                try {
+
+                    ss = "INSERT INTO D_RATING (RUTA, VENDEDOR, RATING, COMENTARIO, IDTRANSERROR, FECHA, STATCOM)"+
+                            " VALUES('" + ruta +"','" + vendedor +"'," + rating +",'" + comentario +"'," +
+                            "" + idtranserror +",'" + fecha +"','N')";
+                    dbld.add(ss);
+
+                } catch (Exception e) {
+                    addlog(new Object() {
+                    }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+                    fterr += "\n" + e.getMessage();
+                }
+
+                DT.moveToNext();
+            }
+
+            if (commitSQL() == 1) {
+                sql = "UPDATE D_RATING SET STATCOM='S' WHERE STATCOM='N'";
+                db.execSQL(sql);
+                vEnvio = true;
+            }else{
+                fterr += "\n" + sstr;
+            }
+
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            fstr = e.getMessage();
+        }
+
+        return vEnvio;
 
     }
 

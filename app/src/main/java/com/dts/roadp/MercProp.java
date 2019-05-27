@@ -336,6 +336,15 @@ public class MercProp extends PBase {
 			ins.add("PRECIO",0);
 			ins.add("PRECLISTA",0);
 			ins.add("REF","");
+			ins.add("PESO",0);
+			ins.add("FECHA_CAD",0);
+			ins.add("LOTE","");
+			ins.add("UMVENTA","");
+			ins.add("UMSTOCK","");
+			ins.add("UMPESO","");
+			ins.add("FACTOR",0);
+			ins.add("POR_PESO","");
+			ins.add("TIENE_LOTE",0);
 			
 	    	db.execSQL(ins.sql());
 	    	

@@ -1945,6 +1945,25 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+			vSQL= "CREATE TABLE [P_TRANSERROR]("+
+					"[IDTRANSERROR] INTEGER NOT NULL,"+
+					"[TRANSERROR] TEXT NOT NULL,"+
+					"PRIMARY KEY ([IDTRANSERROR])"+
+					");";
+			database.execSQL(vSQL);
+
+			vSQL= "CREATE TABLE [D_RATING]("+
+					"[IDRATING] INTEGER PRIMARY KEY AUTOINCREMENT,"+
+					"[RUTA] TEXT NOT NULL,"+
+					"[VENDEDOR] TEXT NOT NULL,"+
+					"[RATING] REAL NOT NULL,"+
+					"[COMENTARIO] TEXT NOT NULL,"+
+					"[IDTRANSERROR] INTEGER NOT NULL,"+
+					"[FECHA] INTEGER NOT NULL,"+
+					"[STATCOM] TEXT NOT NULL"+
+					");";
+			database.execSQL(vSQL);
+
 			return 1;
 			 
 		} catch (SQLiteException e) {

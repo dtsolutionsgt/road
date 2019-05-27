@@ -68,7 +68,7 @@
             android:layout_toRightOf="@+id/lblProd"
             android:ems="10"
             android:imeOptions="actionNext"
-            android:maxLines="1"
+            android:singleLine="true"
             android:textStyle="bold" />
 
         <TextView
@@ -94,7 +94,7 @@
             android:layout_marginRight="20dp"
             android:ems="10"
             android:inputType="textPassword"
-            android:maxLines="1"
+            android:singleLine="true"
             android:textSize="18sp"
             android:textStyle="bold" />
 

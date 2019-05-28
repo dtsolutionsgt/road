@@ -114,4 +114,10 @@ public class clsClasses {
 	public class clsBarras{
 		public String barra,peso;
 	}
+
+	public class clsProd {
+		public int Icon;
+		public String Cod,DesLarga,DesCorta;
+	}
+
 }

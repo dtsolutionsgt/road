@@ -8,7 +8,7 @@
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="517dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -104,13 +104,10 @@
         <GridView
             android:id="@+id/dgprods"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="367dp"
+            android:layout_above="@+id/relbotpan"
             android:layout_below="@+id/relRoad"
-            android:layout_alignBottom="@+id/relbotpan"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="1dp"
-            android:layout_marginTop="-3dp"
-            android:layout_marginBottom="-6dp">
+            android:layout_alignParentStart="true">
 
         </GridView>
 

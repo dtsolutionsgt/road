@@ -1,19 +1,14 @@
 package com.dts.roadp;
 
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.RelativeLayout;
 
-import com.dts.roadp.clsClasses.clsProd;
+import com.dts.roadp.clsClasses.clsCD;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class gridproducto extends PBase {
@@ -24,21 +19,31 @@ public class gridproducto extends PBase {
 
     private int selId,selIdx,iicon;
     private String rutatipo,codProd;
+    private int act,prodtipo;
 
     private boolean rutapos,horizpos;
+    boolean ordPorNombre;
 
-    private ArrayList<clsProd> items= new ArrayList<clsProd>();
+    private ArrayList<clsCD> items= new ArrayList<clsCD>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gridproducto);
 
-        rutapos=false;gl.rutapos=false;
+        super.InitBase();
+
+        gridView = (GridView) findViewById(R.id.dgprods);
+        relbotpan = (RelativeLayout) findViewById(R.id.relbotpan);
 
         iicon=1;
 
         selId=-1;selIdx=-1;
+
+        prodtipo=gl.prodtipo;
+        gl.prodtipo=0;
+
+        ordPorNombre=gl.peOrdPorNombre;
 
         int ori=this.getResources().getConfiguration().orientation; // 1 - portrait , 2 - landscape
         horizpos=ori==2;
@@ -62,7 +67,7 @@ public class gridproducto extends PBase {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
 
-                    clsProd vItem = (clsProd) adaptergrid.getItem(position);
+                    clsCD vItem = (clsCD) adaptergrid.getItem(position);
                     codProd=vItem.Cod;
 
                     adaptergrid.setSelectedIndex(position);
@@ -81,15 +86,22 @@ public class gridproducto extends PBase {
 
         try{
 
-            clsProd vItem;
-            String vCod="",prodimg;
+            clsCD vItem;
+            String vF;
             items.clear();selIdx=-1;
 
             try {
 
+                switch (prodtipo) {
+                    case 0: // Preventa
+                        sql="SELECT CODIGO,DESCLARGA,DESCCORTA,UNIDBAS FROM P_PRODUCTO WHERE 1=1 ";
+                       /* if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
+                        if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
+                        */
+                        if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
+                        break;
 
-                sql = "SELECT PM.CODIGO,P.DESCLARGA,P.DESCCORTA FROM P_PRODIMAGEN PM INNER JOIN \n" +
-                        "P_PRODUCTO P ON P.CODIGO = PM.CODIGO";
+                }
 
                 DT=Con.OpenDT(sql);
 
@@ -99,11 +111,11 @@ public class gridproducto extends PBase {
 
                     while (!DT.isAfterLast()) {
 
-                        vItem = clsCls.new clsProd();
+                        vItem = clsCls.new clsCD();
 
                         vItem.Cod=DT.getString(0);
                         vItem.DesLarga=DT.getString(1);
-                        vItem.DesCorta=DT.getString(2);
+                        vItem.Desc=DT.getString(2);
                         items.add(vItem);
 
                         DT.moveToNext();

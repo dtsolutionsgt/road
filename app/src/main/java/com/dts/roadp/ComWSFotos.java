@@ -432,7 +432,7 @@ public class ComWSFotos extends PBase {
             }
 
            // URL=wsurl;
-            if (URL!=null && URL.equalsIgnoreCase("")){
+            if (URL!=null && !URL.equalsIgnoreCase("")){
                 txtWS.setText(URL);
             }else{
                 toast("No hay configurada ruta para transferencia de datos");

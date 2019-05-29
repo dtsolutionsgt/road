@@ -106,6 +106,7 @@ public class BonList extends PBase {
 
 			Intent intent = new Intent(this,Producto.class);
 			startActivity(intent);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

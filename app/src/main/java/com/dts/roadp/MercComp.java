@@ -66,6 +66,7 @@ private ListView listView;
 
 			Intent intent = new Intent(this,Producto.class);
 			startActivity(intent);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

@@ -17,13 +17,13 @@ import java.util.ArrayList;
 
 public class ListAdaptProductoGrid extends BaseAdapter {
 
-    private static ArrayList<clsClasses.clsProd> items;
+    private static ArrayList<clsClasses.clsCD> items;
 
     private int selectedIndex;
 
     private LayoutInflater l_Inflater;
 
-    public ListAdaptProductoGrid(Context context, ArrayList<clsClasses.clsProd> results) {
+    public ListAdaptProductoGrid(Context context, ArrayList<clsClasses.clsCD> results) {
         items = results;
         l_Inflater = LayoutInflater.from(context);
         selectedIndex = -1;
@@ -69,8 +69,11 @@ public class ListAdaptProductoGrid extends BaseAdapter {
         }
 
         holder.lblDesLarga.setText(items.get(position).DesLarga);
-        holder.lblDesCorta.setText(items.get(position).DesCorta);
+        holder.lblDesCorta.setText(items.get(position).Desc);
         holder.lblCodigo.setText(items.get(position).Cod);
+        holder.imgEst.setImageResource(R.drawable.blank256);
+
+        prodimg = items.get(position).Cod;
 
         try {
 
@@ -81,8 +84,10 @@ public class ListAdaptProductoGrid extends BaseAdapter {
                     Bitmap bmImg = BitmapFactory.decodeFile(prodimg);
                     holder.imgEst.setImageBitmap(bmImg);
                 } catch (Exception e) {
-                  }
+
+                }
             }
+
         } catch (Exception e) {
 
         }

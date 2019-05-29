@@ -180,4 +180,14 @@
         android:text="TextView"
         android:visibility="invisible" />
 
+    <GridView
+        android:id="@+id/gridPrd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lblProd"
+        android:layout_alignTop="@+id/textView29"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="45dp"
+        android:visibility="invisible" />
+
 </RelativeLayout>

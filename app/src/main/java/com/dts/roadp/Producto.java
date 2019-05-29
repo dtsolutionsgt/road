@@ -15,7 +15,9 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 public class Producto extends PBase {
 
 	private ListView listView;
+	private GridView gridView;
 	private EditText txtFilter;
 	private Spinner spinFam;
 	
@@ -34,6 +37,7 @@ public class Producto extends PBase {
 	
 	private ArrayList<clsCD> items;
 	private ListAdaptProd adapter;
+	private ListAdaptProductoGrid adaptergrid;
 	private AppMethods app;
 	
 	private String famid,itemid,pname,prname,um,ubas;
@@ -41,7 +45,8 @@ public class Producto extends PBase {
 	private double disp_und;
 	private double disp_peso;
 	boolean ordPorNombre;
-	
+	private boolean horizpos;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	
@@ -54,7 +59,8 @@ public class Producto extends PBase {
 		listView = (ListView) findViewById(R.id.listView1);
 		txtFilter = (EditText) findViewById(R.id.editText1);
 		spinFam = (Spinner) findViewById(R.id.spinner1);
-			
+		gridView = (GridView) findViewById(R.id.gridPrd);
+
 		prodtipo=gl.prodtipo;
 		gl.prodtipo=0;
 		this.setTitle("Producto");
@@ -66,6 +72,21 @@ public class Producto extends PBase {
 		
 		act=0;
 		ordPorNombre=gl.peOrdPorNombre;
+
+		if (gl.fotos){
+			listView.setVisibility(View.INVISIBLE);
+			gridView.setVisibility(View.VISIBLE);
+			int ori=this.getResources().getConfiguration().orientation; // 1 - portrait , 2 - landscape
+			horizpos=ori==2;
+
+			if (horizpos) {
+				gridView.setNumColumns(4);
+			} else {
+				gridView.setNumColumns(4);
+			}
+		}else{
+			gridView.setVisibility(View.INVISIBLE);
+		}
 
 		fillSpinner();
 		
@@ -148,6 +169,72 @@ public class Producto extends PBase {
 						clsCD item = (clsCD) lvObj;
 
 						adapter.setSelectedIndex(position);
+
+						if (prodBarra(item.Cod)) {
+							toastcent("Producto tipo barra, no se puede ingresar la cantidad");
+							finish();return true;
+						}
+
+						itemid = item.Cod;
+						prname = item.Desc;
+						gl.um = item.um;
+						gl.pprodname = prname;
+
+						appProd();
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox(e.getMessage());
+					}
+					return true;
+				}
+			});
+
+			gridView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+					try {
+
+						Object lvObj = gridView.getItemAtPosition(position);
+						clsCD item = (clsCD) lvObj;
+
+						adaptergrid.setSelectedIndex(position);
+
+						switch (prodtipo) {
+
+							case  1:
+
+								if (prodBarra(item.Cod)) {
+									toastcent("Producto tipo barra, no se puede ingresar la cantidad");
+									finish();return;
+								}
+
+						}
+
+						itemid = item.Cod;
+						prname = item.Desc;
+						gl.um = item.um;
+						gl.pprodname = prname;
+
+						appProd();
+					} catch (Exception e) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+						mu.msgbox(e.getMessage());
+					}
+				}
+
+				;
+			});
+
+			gridView.setOnItemLongClickListener(new OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+					try {
+						Object lvObj = gridView.getItemAtPosition(position);
+						clsCD item = (clsCD) lvObj;
+
+						adaptergrid.setSelectedIndex(position);
 
 						if (prodBarra(item.Cod)) {
 							toastcent("Producto tipo barra, no se puede ingresar la cantidad");
@@ -251,7 +338,7 @@ public class Producto extends PBase {
 			switch (prodtipo) {
 
 				case 0: // Preventa
-					sql="SELECT CODIGO,DESCCORTA,UNIDBAS FROM P_PRODUCTO WHERE 1=1 ";
+					sql="SELECT CODIGO,DESCCORTA,UNIDBAS,DESCLARGA FROM P_PRODUCTO WHERE 1=1 ";
 					if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
 					if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
 
@@ -260,7 +347,7 @@ public class Producto extends PBase {
 					
 				case 1:  // Venta
 
-					sql="SELECT DISTINCT P_PRODUCTO.CODIGO, P_PRODUCTO.DESCCORTA, P_PRODPRECIO.UNIDADMEDIDA " +
+					sql="SELECT DISTINCT P_PRODUCTO.CODIGO, P_PRODUCTO.DESCCORTA,P_PRODPRECIO.UNIDADMEDIDA,P_PRODUCTO.DESCLARGA " +
 						"FROM P_PRODUCTO INNER JOIN	P_STOCK ON P_STOCK.CODIGO=P_PRODUCTO.CODIGO INNER JOIN " +
 						"P_PRODPRECIO ON (P_STOCK.CODIGO=P_PRODPRECIO.CODIGO)  " +
 						"WHERE (P_STOCK.CANT > 0) AND (P_PRODPRECIO.NIVEL = " + gl.nivel +")";
@@ -270,13 +357,13 @@ public class Producto extends PBase {
 					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
 					sql+="UNION ";
 
-					sql+="SELECT DISTINCT P_PRODUCTO.CODIGO, P_PRODUCTO.DESCCORTA, P_PRODPRECIO.UNIDADMEDIDA " +
+					sql+="SELECT DISTINCT P_PRODUCTO.CODIGO, P_PRODUCTO.DESCCORTA, P_PRODPRECIO.UNIDADMEDIDA,P_PRODUCTO.DESCLARGA " +
 						"FROM P_PRODUCTO INNER JOIN	P_STOCKB ON P_STOCKB.CODIGO=P_PRODUCTO.CODIGO INNER JOIN " +
 						"P_PRODPRECIO ON (P_STOCKB.CODIGO=P_PRODPRECIO.CODIGO)  " +
 						"WHERE (P_STOCKB.CANT > 0) AND (P_PRODPRECIO.NIVEL = " + gl.nivel +")";
 
 					sql+="UNION ";
-					sql+="SELECT DISTINCT P_PRODUCTO.CODIGO,P_PRODUCTO.DESCCORTA,''  " +
+					sql+="SELECT DISTINCT P_PRODUCTO.CODIGO,P_PRODUCTO.DESCCORTA,'',P_PRODUCTO.DESCLARGA  " +
 							"FROM P_PRODUCTO "  +
 							"WHERE (P_PRODUCTO.TIPO ='S') ";
 					if (!mu.emptystr(famid)){
@@ -295,7 +382,7 @@ public class Producto extends PBase {
 					break;	
 					
 				case 2: // Mercadeo propio
-					sql="SELECT CODIGO,DESCCORTA,'' FROM P_PRODUCTO WHERE 1=1 ";
+					sql="SELECT CODIGO,DESCCORTA,'',DESCLARGA FROM P_PRODUCTO WHERE 1=1 ";
 					if (!mu.emptystr(famid)){
 						if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
 					}
@@ -329,7 +416,7 @@ public class Producto extends PBase {
 			  
 			  vItem.Cod=cod;
 			  vItem.Desc=name;
-
+			  vItem.DesLarga = DT.getString(3);
 			  //#EJC20181127: En aprof. no tienen un viene vacío, colocar por defecto un.
 			  if (um.equalsIgnoreCase(""))  um="UN";
 
@@ -350,9 +437,14 @@ public class Producto extends PBase {
 
 	    items = (ArrayList<clsCD>) vitems.clone();
 
-		adapter=new ListAdaptProd(this,vitems);
-		listView.setAdapter(adapter);
-		
+		if (!gl.fotos){
+			adapter=new ListAdaptProd(this,vitems);
+			listView.setAdapter(adapter);
+		}else{
+			adaptergrid=new ListAdaptProductoGrid(this, items);
+			gridView.setAdapter(adaptergrid);
+		}
+
 		if (prodtipo==1) dispUmCliente();
 		
 	}

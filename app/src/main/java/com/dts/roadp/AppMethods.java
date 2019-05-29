@@ -390,6 +390,27 @@ public class AppMethods {
 			gl.peMargenGPS =0;
 		}
 
+        try {
+            sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=20";
+            dt=Con.OpenDT(sql);
+
+            if (dt.getCount()>0){
+            	dt.moveToFirst();
+
+				val=dt.getString(0);
+
+				if (val.equalsIgnoreCase("S")) {
+					gl.fotos = true;
+				} else {
+					gl.fotos = false;
+				}
+
+            }
+
+        } catch (Exception e) {
+            gl.fotos = false;
+        }
+
 
 	}
 

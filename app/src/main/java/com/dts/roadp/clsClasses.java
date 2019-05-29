@@ -3,7 +3,7 @@ package com.dts.roadp;
 public class clsClasses {
 	
 	public class clsCD {
-		public String Cod,Desc,Text,um;
+		public String Cod,Desc,Text,um,DesLarga;
 	}
 	
 	public class clsCDB {

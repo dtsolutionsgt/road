@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -67,6 +68,7 @@ public class ComWS extends PBase {
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag,esEnvioManual=false;
 
 	private SQLiteDatabase dbT;
+	private DatabaseErrorHandler er;
 	private BaseDatos ConT;
 	private BaseDatos.Insert insT;
 	private AppMethods clsAppM;
@@ -161,8 +163,8 @@ public class ComWS extends PBase {
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
 			if (mu.emptystr(txtRuta.getText().toString())) {
-				txtRuta.setText("8001-1");
-				txtEmp.setText("03");
+				txtRuta.setText("1");
+				txtEmp.setText("009");
 				txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
 			}
 		}
@@ -174,8 +176,14 @@ public class ComWS extends PBase {
 			ruta = gl.ruta;
 		}
 
+		if(gl.emp.isEmpty()){
+			gEmpresa = txtEmp.getText().toString();
+			gl.emp= gEmpresa;
+		}else {
+			gEmpresa = gl.emp;
+		}
+
 		ActRuta = ruta;
-		gEmpresa = gl.emp;
 		rutatipo = gl.rutatipog;
 		rutapos = gl.rutapos;
 
@@ -2076,7 +2084,7 @@ public class ComWS extends PBase {
 			SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
 			SQL += "FROM P_PRODUCTO WHERE ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
 			" OR CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "'))" +
-			" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "') AND EMPRESA = '" + gl.emp + "') OR UNIDMED='CAN' )" +
+			" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) OR UNIDMED='CAN' )" +
 			" AND CODIGO IN ( " +
 			" SELECT CODIGO FROM P_PRODPRECIO WHERE (NIVEL IN ( SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE " +
 			" WHERE (CODIGO IN ( SELECT DISTINCT CLIENTE FROM DS_PEDIDO WHERE (RUTA ='" + ActRuta + "') AND (BANDERA='D')))))OR " +

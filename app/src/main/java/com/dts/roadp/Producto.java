@@ -3,12 +3,20 @@ package com.dts.roadp;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.view.MotionEventCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -46,6 +54,15 @@ public class Producto extends PBase {
 	private double disp_peso;
 	boolean ordPorNombre;
 	private boolean horizpos;
+	private float scale = 1f;
+	private ScaleGestureDetector detector;
+	private boolean Scale=false;
+
+	float onScaleBegin = 0;
+	float onScaleEnd = 0;
+
+	float firstTouchX,firstTouchY;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,9 +97,9 @@ public class Producto extends PBase {
 			horizpos=ori==2;
 
 			if (horizpos) {
-				gridView.setNumColumns(4);
+				gridView.setNumColumns(gl.cols);
 			} else {
-				gridView.setNumColumns(4);
+				gridView.setNumColumns(gl.cols);
 			}
 		}else{
 			gridView.setVisibility(View.INVISIBLE);
@@ -99,6 +116,11 @@ public class Producto extends PBase {
 	}
 
 
+	@Override
+	public boolean onTouchEvent(MotionEvent et) {
+		detector.onTouchEvent(et);
+		return super.onTouchEvent(et);
+	}
     // Events
 
 	public void porCodigo(View view) {
@@ -122,7 +144,9 @@ public class Producto extends PBase {
 	}
 
     private void setHandlers() {
-		try{
+
+	    try{
+
 			listView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -254,6 +278,42 @@ public class Producto extends PBase {
 					return true;
 				}
 			});
+
+			gridView.setOnTouchListener(new SwipeListener(Producto.this) {
+
+				public void onSwipeRight() {
+					gl.cols+=1;
+
+					if (gl.cols>0){
+						if (horizpos) {
+							gridView.setNumColumns(gl.cols);
+						} else {
+							gridView.setNumColumns(gl.cols);
+						}
+						mu.toast("Columnas: " + gl.cols);
+					}else{
+						gl.cols=1;
+					}
+
+				}
+				public void onSwipeLeft() {
+					gl.cols-=1;
+
+					if (gl.cols>0){
+						if (horizpos) {
+							gridView.setNumColumns(gl.cols);
+						} else {
+							gridView.setNumColumns(gl.cols);
+						}
+						mu.toast("Columnas: " + gl.cols);
+					}else{
+						gl.cols=1;
+					}
+
+				}
+
+			});
+
 
 			txtFilter.addTextChangedListener(new TextWatcher() {
 

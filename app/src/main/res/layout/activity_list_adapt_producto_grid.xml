@@ -14,10 +14,11 @@
 
         <ImageView
             android:id="@+id/imgNext2"
-            android:layout_width="match_parent"
-            android:layout_height="96dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
+            android:adjustViewBounds="true"
             android:minHeight="96dp"
             android:padding="10dp"
             android:src="@drawable/ok48" />
@@ -52,7 +53,9 @@
             android:layout_below="@+id/lblCod"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
+            android:ellipsize="end"
             android:gravity="center_horizontal"
+            android:maxLines="2"
             android:text="Desc Larga"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="15sp" />
@@ -64,7 +67,9 @@
             android:layout_below="@+id/lblTrat2"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
+            android:ellipsize="end"
             android:gravity="center_horizontal"
+            android:maxLines="2"
             android:text="Desc Corta"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="15sp" />

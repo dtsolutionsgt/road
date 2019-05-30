@@ -71,7 +71,7 @@ public class ListAdaptProductoGrid extends BaseAdapter {
         holder.lblDesLarga.setText(items.get(position).DesLarga);
         holder.lblDesCorta.setText(items.get(position).Desc);
         holder.lblCodigo.setText(items.get(position).Cod);
-        holder.imgEst.setImageResource(R.drawable.blank256);
+        holder.imgEst.setImageResource(R.drawable.nodisponible);
 
         prodimg = items.get(position).Cod;
 

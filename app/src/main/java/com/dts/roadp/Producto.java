@@ -126,11 +126,6 @@ public class Producto extends PBase {
 		detector = new ScaleGestureDetector(this, new ScaleListener(gridView,this,gl.cols));
 	}
 
-	public boolean OnTouchEvent(MotionEvent event){
-		detector.onTouchEvent(event);
-		return  super.onTouchEvent(event);
-	}
-
     // Events
 
 	public void porCodigo(View view) {
@@ -296,9 +291,9 @@ public class Producto extends PBase {
 											@Override
 											public boolean onTouch(View v, MotionEvent event) {
 												detector.onTouchEvent(event);
-												//return  super.onTouchEvent(event);
+												//return  detector.onTouchEvent(event);
 												gl.cols = gridView.getNumColumns();
-												return false;
+												return true;
 											}
 										}
 

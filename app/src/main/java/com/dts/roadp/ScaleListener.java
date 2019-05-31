@@ -11,7 +11,7 @@ public class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureList
     private float scale=1f;
 
     private Context cont;
-    private int ncol;
+    private int ncol=1;
 
     public ScaleListener(GridView gridView, Context context,int numcolum){
         this.gridView = gridView;
@@ -27,11 +27,19 @@ public class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureList
 
             if (ncol<10){
                 gridView.setNumColumns(ncol);
+            }else{
+                ncol=9;
+                gridView.setNumColumns(ncol);
             }
 
-        }else{
+        }
+
+        if (scale<1){
             ncol-=1;
             if (ncol>=1){
+                gridView.setNumColumns(ncol);
+            }else{
+                ncol=1;
                 gridView.setNumColumns(ncol);
             }
 

@@ -383,7 +383,25 @@ public class MainActivity extends PBase {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
         }
 
-        gl.cols = 3;
+        try {
+
+            sql = "   SELECT PS.COLGRID FROM P_SUCURSAL PS INNER JOIN \n" +
+                    "   P_RUTA PR ON PR.SUCURSAL = PS.CODIGO \n" +
+                    "   WHERE PR.CODIGO = '"+gl.ruta+"'";
+
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+
+                gl.cols = DT.getInt(0);
+
+            }else{
+                gl.cols = 3;
+            }
+
+            }catch (Exception e){
+            gl.cols = 3;
+        }
 
         gl.vendnom = "Vendedor 1";
 

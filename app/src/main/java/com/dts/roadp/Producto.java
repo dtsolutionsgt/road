@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.FloatMath;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -28,6 +29,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dts.roadp.clsClasses.clsCD;
 
@@ -56,12 +58,10 @@ public class Producto extends PBase {
 	private boolean horizpos;
 	private float scale = 1f;
 	private ScaleGestureDetector detector;
-	private boolean Scale=false;
+	private boolean mTwoFingersTapped=false;
 
-	float onScaleBegin = 0;
-	float onScaleEnd = 0;
-
-	float firstTouchX,firstTouchY;
+	private  float xBegin=0;
+	private  float yBegin=0;
 
 
 	@Override
@@ -77,6 +77,11 @@ public class Producto extends PBase {
 		txtFilter = (EditText) findViewById(R.id.editText1);
 		spinFam = (Spinner) findViewById(R.id.spinner1);
 		gridView = (GridView) findViewById(R.id.gridPrd);
+
+		xBegin = gridView.getScaleX();
+		yBegin = gridView.getScaleY();
+
+		detector = new ScaleGestureDetector( this,new ScaleListener(gridView,this,gl.cols));
 
 		prodtipo=gl.prodtipo;
 		gl.prodtipo=0;
@@ -115,12 +120,17 @@ public class Producto extends PBase {
 		
 	}
 
-
-	@Override
-	public boolean onTouchEvent(MotionEvent et) {
-		detector.onTouchEvent(et);
-		return super.onTouchEvent(et);
+	public void reset (View view){
+		gridView.setScaleX(xBegin);
+		gridView.setScaleY(yBegin);
+		detector = new ScaleGestureDetector(this, new ScaleListener(gridView,this,gl.cols));
 	}
+
+	public boolean OnTouchEvent(MotionEvent event){
+		detector.onTouchEvent(event);
+		return  super.onTouchEvent(event);
+	}
+
     // Events
 
 	public void porCodigo(View view) {
@@ -222,6 +232,9 @@ public class Producto extends PBase {
 						Object lvObj = gridView.getItemAtPosition(position);
 						clsCD item = (clsCD) lvObj;
 
+						int pos=position;
+						long iid=id;
+
 						adaptergrid.setSelectedIndex(position);
 
 						switch (prodtipo) {
@@ -279,40 +292,18 @@ public class Producto extends PBase {
 				}
 			});
 
-			gridView.setOnTouchListener(new SwipeListener(Producto.this) {
+			gridView.setOnTouchListener(new View.OnTouchListener() {
+											@Override
+											public boolean onTouch(View v, MotionEvent event) {
+												detector.onTouchEvent(event);
+												//return  super.onTouchEvent(event);
+												gl.cols = gridView.getNumColumns();
+												return false;
+											}
+										}
 
-				public void onSwipeRight() {
-					gl.cols+=1;
+			);
 
-					if (gl.cols>0){
-						if (horizpos) {
-							gridView.setNumColumns(gl.cols);
-						} else {
-							gridView.setNumColumns(gl.cols);
-						}
-						mu.toast("Columnas: " + gl.cols);
-					}else{
-						gl.cols=1;
-					}
-
-				}
-				public void onSwipeLeft() {
-					gl.cols-=1;
-
-					if (gl.cols>0){
-						if (horizpos) {
-							gridView.setNumColumns(gl.cols);
-						} else {
-							gridView.setNumColumns(gl.cols);
-						}
-						mu.toast("Columnas: " + gl.cols);
-					}else{
-						gl.cols=1;
-					}
-
-				}
-
-			});
 
 
 			txtFilter.addTextChangedListener(new TextWatcher() {
@@ -375,7 +366,6 @@ public class Producto extends PBase {
 		}
 
     }
-
 
     // Main
 	

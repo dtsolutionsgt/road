@@ -38,17 +38,9 @@ public class SwipeListener implements View.OnTouchListener {
                 if (Math.abs(diffX) > Math.abs(diffY)) {
                     if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                         if (diffX > 0) onSwipeRight(); else onSwipeLeft();
-                        result = true;
+                        result = false;
                     }
                 }
-                else if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                    if (diffY > 0) {
-                        onSwipeBottom();
-                    } else {
-                        onSwipeTop();
-                    }
-                }
-                result = true;
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -60,8 +52,8 @@ public class SwipeListener implements View.OnTouchListener {
 
     public void onSwipeLeft() { }
 
-   public void onSwipeTop() { }
+   //public void onSwipeTop() { }
 
-    public void onSwipeBottom() { }
+    //public void onSwipeBottom() { }
 
 }

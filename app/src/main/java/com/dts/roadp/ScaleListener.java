@@ -45,7 +45,7 @@ public class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureList
 
         }
 
-        return true;
+        return false;
     }
 
 

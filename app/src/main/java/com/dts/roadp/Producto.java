@@ -291,14 +291,13 @@ public class Producto extends PBase {
 											@Override
 											public boolean onTouch(View v, MotionEvent event) {
 												detector.onTouchEvent(event);
-												//return  detector.onTouchEvent(event);
 												gl.cols = gridView.getNumColumns();
-												return true;
+												//return  detector.onTouchEvent(event);
+												return false;
 											}
 										}
 
 			);
-
 
 
 			txtFilter.addTextChangedListener(new TextWatcher() {

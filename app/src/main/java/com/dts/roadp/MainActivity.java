@@ -354,7 +354,7 @@ public class MainActivity extends PBase {
         try {
             //#HS_20181120_1616 Se agrego el campo UNIDAD_MEDIDA_PESO.//campo INCIDENCIA_NO_LECTURA
             sql = " SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO," +
-                    " INCIDENCIA_NO_LECTURA, LOTE_POR_DEFECTO FROM P_EMPRESA";
+                    " INCIDENCIA_NO_LECTURA, LOTE_POR_DEFECTO, INITPATH AS PRECIO_SIN_IMPUESTO FROM P_EMPRESA";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -371,6 +371,7 @@ public class MainActivity extends PBase {
                 gl.incNoLectura = DT.getInt(7) == 1; //#HS_20181211 Agregue campo incNoLectura para validacion en cliente.
                 gl.depparc = DT.getInt(5) == 1;
                 gl.lotedf = DT.getString(8);
+                gl.precioSinImpuesto=DT.getString(9);//#CKFK Agregué este campo para poder obtener los precios sin impuesto
             } else {
                 gl.emp = "";
                 lblRuta.setText("");

@@ -432,10 +432,10 @@ public class MainActivity extends PBase {
 
         try {
 
-            if (fecha > 1905310000) {
+            /*if (fecha > 1905310000) {
                 msgAskLic("¡Su licencia expiró!");
                 return false;
-            }
+            }*/
 
             usr = txtUser.getText().toString().trim();
             pwd = txtPass.getText().toString().trim();

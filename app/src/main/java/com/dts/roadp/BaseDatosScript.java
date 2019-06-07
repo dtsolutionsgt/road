@@ -1398,6 +1398,7 @@ public class BaseDatosScript {
 					"[TELEFONO] TEXT NOT NULL,"+
 					"[NIT] TEXT NOT NULL,"+
 					"[TEXTO] TEXT NOT NULL,"+
+					"[COLGRID] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

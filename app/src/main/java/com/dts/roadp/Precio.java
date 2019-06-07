@@ -18,19 +18,17 @@ public class Precio {
 	
 	private DecimalFormat ffrmprec;
 	private MiscUtils mu;
-	protected appGlobals gl;
 
 	private String prodid,um,umpeso,umventa;
 	private double cant,desc,prec;
 	private int nivel,ndec;
 	private boolean porpeso;
 	
-	public Precio(Context context,MiscUtils mutil,int numdec) {
+	public Precio(Context context,MiscUtils mutil,int numdec ) {
 		
 		cont=context;
 		mu=mutil;
 		ndec=numdec;
-		gl=((appGlobals) context);
 
 		try {
 			active=0;
@@ -108,7 +106,7 @@ public class Precio {
 		//percep=0;
 		
 		imp=getImp();
-		pr=pr*(gl.precioSinImpuesto.equals("S")?1:(1+imp/100));
+		pr=pr*(1+imp/100);
 
 		// total
 		stot=pr*cant;stot=mu.round(stot,ndec);

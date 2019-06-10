@@ -162,7 +162,7 @@ public class CliDet extends PBase {
 	public void showVenta(View view){
 		if (!permiteVenta) {
 			if (gl.peVentaGps==1) {
-				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 +"!\nPara realizar la venta debe asercarse más al cliente.");
+				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 +"!\nPara realizar la venta debe acercarse más al cliente.");
 				return;
 			} else {
 				modoGPS=1;
@@ -176,7 +176,7 @@ public class CliDet extends PBase {
 	public void showPreventa(View view) {
 		if (!permiteVenta) {
 			if (gl.peVentaGps == 1) {
-				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\nPara realizar la venta debe asercarse más al cliente.");
+				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\nPara realizar la venta debe acercarse más al cliente.");
 				return;
 			} else {
 				modoGPS = 2;
@@ -190,7 +190,7 @@ public class CliDet extends PBase {
 	public void showDespacho(View view) {
 
 		if (!permiteVenta) {
-			msgbox("¡Distancia del cliente mayor que permitida!\nPara realizar la venta debe asercarse más al cliente.");return;
+			msgbox("¡Distancia del cliente mayor que permitida!\nPara realizar la venta debe acercarse más al cliente.");return;
 		}
 
 		try {
@@ -206,7 +206,7 @@ public class CliDet extends PBase {
 	public void showCredit(View viev){
 		if (!permiteVenta) {
 			if (gl.peVentaGps == 1) {
-				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\nPara realizar el cobro debe asercarse más al cliente.");
+				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\nPara realizar el cobro debe acercarse más al cliente.");
 				return;
 			} else {
 				modoGPS = 3;
@@ -220,7 +220,7 @@ public class CliDet extends PBase {
 	public void showDevol(View view){
 		if (!permiteVenta) {
 			if (gl.peVentaGps == 1) {
-				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que permitida "+ sgp2 + "!\nPara realizar la devolución debe asercarse más al cliente.");
+				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que permitida "+ sgp2 + "!\nPara realizar la devolución debe acercarse más al cliente.");
 				return;
 			} else {
 				modoGPS = 4;

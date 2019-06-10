@@ -291,12 +291,12 @@ public class ProdCant extends PBase {
 			mu.msgbox("3-"+ e.getMessage());
 		}
 
-		lblPrec.setText("Precio: "+mu.frmcur(0));
-
 		prec=prc.precio(prodid,1,nivel,um,gl.umpeso,0,um);
 		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
 			if (prc.precioespecial>0) prec=prc.precioespecial;
 		}
+
+		lblPrec.setText("Precio: "+mu.frmcur(0));
 
 		if (prec==0) {
 			hidekeyb();

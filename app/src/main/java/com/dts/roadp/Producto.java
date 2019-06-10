@@ -41,9 +41,13 @@ public class Producto extends PBase {
 	private GridView gridView;
 	private EditText txtFilter;
 	private Spinner spinFam;
-	
+	private Spinner spinTipo;
+
 	private ArrayList<String> spincode= new ArrayList<String>();
 	private ArrayList<String> spinlist = new ArrayList<String>();
+
+	private ArrayList<String> spincodetipo= new ArrayList<String>();
+	private ArrayList<String> spinlisttipo = new ArrayList<String>();
 	
 	private ArrayList<clsCD> items;
 	private ListAdaptProd adapter;
@@ -76,6 +80,7 @@ public class Producto extends PBase {
 		listView = (ListView) findViewById(R.id.listView1);
 		txtFilter = (EditText) findViewById(R.id.editText1);
 		spinFam = (Spinner) findViewById(R.id.spinner1);
+		spinTipo = (Spinner) findViewById(R.id.spinner10);
 		gridView = (GridView) findViewById(R.id.gridPrd);
 
 		xBegin = gridView.getScaleX();
@@ -737,7 +742,63 @@ public class Producto extends PBase {
 			spinFam.setSelection(0);
 	    }
 		
-	}	
+	}
+
+	private void fillSpinnerTipo(){
+		Cursor DT;
+		String icode,iname;
+
+		try {
+
+			switch (prodtipo) {
+				case 0: // Preventa
+					sql="SELECT Codigo,Nombre FROM P_LINEA ORDER BY Nombre";break;
+				case 1:  // Venta
+					sql="SELECT DISTINCT P_PRODUCTO.LINEA,P_LINEA.NOMBRE "+
+							"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_STOCK.CODIGO=P_PRODUCTO.CODIGO " +
+							"INNER JOIN P_LINEA ON P_PRODUCTO.LINEA=P_LINEA.CODIGO " +
+							"WHERE (P_STOCK.CANT > 0) ORDER BY P_LINEA.NOMBRE";
+					break;
+				case 2: // Mercadeo propio
+					sql="SELECT Codigo,Nombre FROM P_LINEA ORDER BY Nombre";break;
+				case 3:  // Mercadeo comp
+					sql="SELECT Codigo,Nombre FROM P_MERMARCACOMP ORDER BY Nombre";break;
+			}
+
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				icode=DT.getString(0);
+				iname=DT.getString(1);
+
+				spincode.add(icode);
+				spinlist.add(iname);
+
+				DT.moveToNext();
+			}
+
+		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox(e.getMessage());
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox( e.getMessage());
+		}
+
+		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, spinlist);
+		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+		spinFam.setAdapter(dataAdapter);
+
+		try {
+			spinFam.setSelection(0);
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			spinFam.setSelection(0);
+		}
+
+	}
 
 	public String ltrim(String ss,int sw) {
 		try{

@@ -1583,6 +1583,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_VEHICULO")) return false;
 			if (!AddTable("P_HANDHELD")) return false;
             if (!AddTable("P_TRANSERROR")) return false;
+			if (!AddTable("P_CATALOGO_PRODUCTO")) return false;
 
 			licResult=checkLicence(licSerial);
 			licResultRuta=checkLicenceRuta(licRuta);
@@ -2403,6 +2404,22 @@ public class ComWS extends PBase {
 		if (TN.equalsIgnoreCase("P_SUCURSAL")) {
 			SQL = " SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO, COLGRID " +
 					" FROM P_SUCURSAL WHERE CODIGO IN (SELECT SUCURSAL FROM P_RUTA WHERE CODIGO = '" + ActRuta + "')";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_CATALOGO_PRODUCTO")) {
+			SQL = " SELECT CODIGO_PRODUCTO, ORDEN FROM P_CATALOGO_PRODUCTO " +
+				  "	WHERE CODIGO_PRODUCTO IN (SELECT CODIGO ";
+			SQL += "FROM P_PRODUCTO WHERE ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
+					" OR CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "'))" +
+					" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) OR UNIDMED='CAN' )" +
+					" AND CODIGO IN ( " +
+					" SELECT CODIGO FROM P_PRODPRECIO WHERE (NIVEL IN ( SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE " +
+					" WHERE (CODIGO IN ( SELECT DISTINCT CLIENTE FROM DS_PEDIDO WHERE (RUTA ='" + ActRuta + "') AND (BANDERA='D')))))OR " +
+					" NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE  " +
+					" WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "')))" +
+					" OR TIENE_VINETA_O_TUBO = 1 )";
+
 			return SQL;
 		}
 

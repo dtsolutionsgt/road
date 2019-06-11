@@ -973,6 +973,18 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+			vSQL= "CREATE TABLE [D_RATING]("+
+					"[IDRATING] INTEGER PRIMARY KEY AUTOINCREMENT,"+
+					"[RUTA] TEXT NOT NULL,"+
+					"[VENDEDOR] TEXT NOT NULL,"+
+					"[RATING] REAL NOT NULL,"+
+					"[COMENTARIO] TEXT NOT NULL,"+
+					"[IDTRANSERROR] INTEGER NOT NULL,"+
+					"[FECHA] INTEGER NOT NULL,"+
+					"[STATCOM] TEXT NOT NULL"+
+					");";
+			database.execSQL(vSQL);
+
 			return 1;
 		} catch (SQLiteException e) {
 		   	msgbox(e.getMessage());
@@ -1953,15 +1965,10 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-			vSQL= "CREATE TABLE [D_RATING]("+
-					"[IDRATING] INTEGER PRIMARY KEY AUTOINCREMENT,"+
-					"[RUTA] TEXT NOT NULL,"+
-					"[VENDEDOR] TEXT NOT NULL,"+
-					"[RATING] REAL NOT NULL,"+
-					"[COMENTARIO] TEXT NOT NULL,"+
-					"[IDTRANSERROR] INTEGER NOT NULL,"+
-					"[FECHA] INTEGER NOT NULL,"+
-					"[STATCOM] TEXT NOT NULL"+
+			vSQL= "CREATE TABLE [P_CATALOGO_PRODUCTO]("+
+					"[CODIGO_PRODUCTO] TEXT NOT NULL,"+
+					"[ORDEN] INTEGER NOT NULL,"+
+					"PRIMARY KEY ([CODIGO_PRODUCTO])"+
 					");";
 			database.execSQL(vSQL);
 

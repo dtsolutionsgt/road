@@ -54,7 +54,7 @@ public class Producto extends PBase {
 	private ListAdaptProductoGrid adaptergrid;
 	private AppMethods app;
 	
-	private String famid,itemid,pname,prname,um,ubas, tipoid;
+	private String famid,itemid,pname,prname,um,ubas,tipoid;
 	private int act,prodtipo;
 	private double disp_und;
 	private double disp_peso;
@@ -424,13 +424,29 @@ public class Producto extends PBase {
 			switch (prodtipo) {
 
 				case 0: // Preventa
-					sql="SELECT CODIGO,DESCCORTA,UNIDBAS,DESCLARGA FROM P_PRODUCTO WHERE 1=1 ";
-					if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
-					if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
 
-					if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
+                    switch (tipoid) {
+                        case "0": // Catálogo producto
+                            sql=" SELECT CODIGO,DESCCORTA,UNIDBAS,DESCLARGA "+
+                                " FROM P_PRODUCTO INNER JOIN P_CATALOGO_PRODUCTO ON " +
+                                " P_PRODUCTO.CODIGO = P_CATALOGO_PRODUCTO.CODIGO_PRODUCTO WHERE 1=1 ";
+                            if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
+                            if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
+
+                            sql+="ORDER BY P_CATALOGO_PRODUCTO.ORDEN";
+                            break;
+
+                        case "1": // Catálogo producto
+                            sql="SELECT CODIGO,DESCCORTA,UNIDBAS,DESCLARGA FROM P_PRODUCTO WHERE 1=1 ";
+                            if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
+                            if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
+
+                            if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
+                            break;
+                    }
+
 					break;
-					
+
 				case 1:  // Venta
 
 					sql="SELECT DISTINCT P_PRODUCTO.CODIGO, P_PRODUCTO.DESCCORTA,P_PRODPRECIO.UNIDADMEDIDA,P_PRODUCTO.DESCLARGA " +

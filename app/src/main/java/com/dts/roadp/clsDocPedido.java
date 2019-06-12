@@ -29,15 +29,18 @@ public class clsDocPedido extends clsDocument {
 	protected boolean buildDetail() {
 		itemData item;
 		String cu,cp;
-		
+
+		rep.line();
+		rep.add("CODIGO   DESCRIPCION                ");
+		rep.add("CANT  UM   KGS   PRECIO        VALOR");
 		rep.line();
 		//rep.empty();
 		
 		for (int i = 0; i <items.size(); i++) {
 			item=items.get(i);
-			rep.add(item.nombre);
+			rep.add(item.cod + " " + item.nombre);
 			//rep.add3lrr(rep.rtrim(""+item.cant,5),item.prec,item.tot);
-			
+
 			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um,6);
 			cp=frmdecimal(0,decimp)+" "+rep.ltrim(item.ump,3);
 			
@@ -69,21 +72,27 @@ public class clsDocPedido extends clsDocument {
 			}		
 			rep.addtotsp("TOTAL A PAGAR", tot);			
 		}
-		
+
+		rep.empty();
+		rep.add("Serial : "+deviceid);
+		rep.empty();
+
 		return super.buildFooter();
 	}	
 		
 	protected boolean loadHeadData(String corel) {
 		Cursor DT;
-		String cli,vend,val,empp;
+		String cli,vend,val,empp, anulado;
 		int ff;
+		int impres, cantimpres;
 				
 		super.loadHeadData(corel);
 		
 		nombre="PEDIDO";
 		
 		try {
-			sql="SELECT COREL,'' as CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2 FROM D_PEDIDO WHERE COREL='"+corel+"'";
+			sql=" SELECT COREL,'' as CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2, IMPRES, ANULADO " +
+				" FROM D_PEDIDO WHERE COREL='"+corel+"'";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
 			
@@ -98,7 +107,25 @@ public class clsDocPedido extends clsDocument {
 			desc=DT.getDouble(6);
 			imp=DT.getDouble(7);
 			stot=tot+desc;
-			
+
+			anulado=DT.getString(13);
+			impres=DT.getInt(12);
+			cantimpres=0;
+
+			if (anulado.equals("S")?true:false){
+				cantimpres = -1;
+			}else if (cantimpres == 0 && impres > 0){
+				cantimpres = 1;
+			}
+
+			if (cantimpres>0){
+				nombre = "COPIA DE PEDIDO";
+			}else if (cantimpres==-1){
+				nombre = "PEDIDO ANULADO";
+			}else if (cantimpres==0){
+				nombre = "PEDIDO";
+			}
+
 			empp=DT.getString(8);
 			ffecha=DT.getInt(9);fsfecha=sfecha(ffecha);
 			
@@ -116,7 +143,7 @@ public class clsDocPedido extends clsDocument {
 			
 			resol="Resolucion No. : "+DT.getString(0);
 			ff=DT.getInt(1);resfecha="De Fecha : "+sfecha(ff);
-			ff=DT.getInt(2);resvence="Resolucion vence : "+sfecha(ff);		
+			ff=DT.getInt(2);resvence="Resolucion vence : "+sfecha(ff);
 			resrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
 			
 		} catch (Exception e) {
@@ -147,7 +174,7 @@ public class clsDocPedido extends clsDocument {
 
 	    vendcod=vend;
 		vendedor=val;
-		
+
 		try {
 			sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION,NIT FROM P_CLIENTE WHERE CODIGO='"+cli+"'";
 			DT=Con.OpenDT(sql);	
@@ -163,6 +190,7 @@ public class clsDocPedido extends clsDocument {
 			clicod=cli;
 			clidir=DT.getString(3);
 			nit=DT.getString(4);
+			cliente=DT.getString(0);
 			
 		} catch (Exception e) {
 			val=cli;

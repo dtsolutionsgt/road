@@ -19,12 +19,16 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,16 +53,18 @@ import java.util.ArrayList;
 
 public class ComWS extends PBase {
 
-	private TextView lblInfo, lblParam, lblRec, lblEnv, lblExis;
+	private TextView lblInfo, lblParam, lblRec, lblEnv, lblExis,lblEnvM;
 	private ProgressBar barInfo;
 	private EditText txtRuta, txtWS, txtEmp;
-	private ImageView imgRec, imgEnv, imgExis;
+	private ImageView imgRec, imgEnv, imgExis,imgEnvM;
 	private RelativeLayout ralBack, relExist, relPrecio, relStock;
+    private TextView lblUser,lblPassword,txtVersion;
+    private EditText txtUser, txtPassword;
 
 	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
 	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs;
 	private String licSerial,licRuta,licSerialEnc,licRutaEnc,parImprID;
-	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag;
+	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag,esEnvioManual=false;
 
 	private SQLiteDatabase dbT;
 	private BaseDatos ConT;
@@ -115,6 +121,7 @@ public class ComWS extends PBase {
 
 		lblInfo = (TextView) findViewById(R.id.lblETipo);
 		lblParam = (TextView) findViewById(R.id.lblProd);
+		txtVersion = (TextView) findViewById(R.id.txtVersion);
 		barInfo = (ProgressBar) findViewById(R.id.progressBar2);
 		txtRuta = (EditText) findViewById(R.id.txtRuta);
 		txtRuta.setEnabled(false);
@@ -125,8 +132,10 @@ public class ComWS extends PBase {
 
 		lblRec = (TextView) findViewById(R.id.btnRec);
 		lblEnv = (TextView) findViewById(R.id.btnSend);
+        lblEnvM = (TextView) findViewById(R.id.btnSenHand);
 
 		imgEnv = (ImageView) findViewById(R.id.imageView6);
+        imgEnvM = (ImageView) findViewById(R.id.imageView23);
 		imgRec = (ImageView) findViewById(R.id.imageView5);
 
 		ralBack = (RelativeLayout) findViewById(R.id.relwsmail);
@@ -139,6 +148,15 @@ public class ComWS extends PBase {
 		lblInfo.setText("");
 		lblParam.setText("");
 		barInfo.setVisibility(View.INVISIBLE);
+
+        lblUser = new TextView(this,null);
+        lblPassword = new TextView(this,null);
+		//txtVersion=new TextView(this, null);
+
+        txtUser = new EditText(this,null);
+        txtPassword = new EditText(this,null);
+
+		txtVersion.setText("21-Mayo-2019");
 
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
@@ -308,6 +326,401 @@ public class ComWS extends PBase {
 		}
 
 
+	}
+
+    public void askSendManual(View view) {
+
+        try {
+            if (isbusy == 1) {
+                toastcent("Por favor, espere que se termine la tarea actual.");
+                return;
+            }
+
+            if (!validaLicencia()) {
+                mu.msgbox("Licencia inválida!");
+                return;
+            }
+
+            if (gl.banderafindia) {
+                if (!puedeComunicar()) {
+                    mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+                    return;
+                }
+            }
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle("Envio");
+            dialog.setMessage("¿Va a realizar la COMUNICACIÓN MANUAL, está seguro?");
+
+            dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    DatosSupervisor();
+                }
+            });
+
+            dialog.setNegativeButton("Cancelar", null);
+
+            dialog.show();
+
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+        }
+
+
+    }
+
+	public void askSendContinue() {
+
+		try {
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Envio");
+			dialog.setMessage("La COMUNICACIÓN MANUAL no envía los datos directamente a liquidación,¿está seguro?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if (sendDataManual()){
+						askOk();
+					}
+				}
+			});
+
+			dialog.setNegativeButton("No", null);
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+
+	}
+
+	public void askSendCorrect() {
+
+		try {
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Envio");
+			dialog.setMessage("¿Comunicación correcta?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					askOkCom();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					askIncorrect();
+				}
+			});
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+	}
+
+	public void askIncorrect() {
+
+		try {
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Envio");
+			dialog.setMessage("¿Está seguro de que la comunicacion NO fue correcta?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					return;
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					Eliminatablas();
+				}
+			});
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+	}
+
+	private void askOk() {
+
+		try {
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Envio");//	alert.setMessage("Serial");
+
+			final TextView input = new TextView(this);
+			alert.setView(input);
+
+			input.setText("Archivo de datos creado conecte el dispotivo al ordenador");
+			input.requestFocus();
+
+			alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					askSendCorrect();
+				}
+			});
+
+			alert.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+
+	}
+
+	private void askOkCom() {
+
+		try {
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Envio");//	alert.setMessage("Serial");
+
+			final TextView input = new TextView(this);
+			alert.setView(input);
+
+			input.setText("Está seguro de que la comunicación fue correcta");
+			input.requestFocus();
+
+			alert.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					Eliminatablas();
+				}
+			});
+
+			alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					return;
+				}
+			});
+
+			alert.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+
+	}
+
+    private void DatosSupervisor() {
+
+        try{
+
+            final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+            alert.setTitle("Envío");
+
+            final LinearLayout layout   = new LinearLayout(this);
+            layout.setOrientation(LinearLayout.VERTICAL);
+
+            if(lblUser.getParent()!= null){
+                ((ViewGroup) lblUser.getParent()).removeView(lblUser);
+            }
+
+            if(lblPassword.getParent()!= null){
+                ((ViewGroup) lblPassword.getParent()).removeView(lblPassword);
+            }
+
+            if(txtUser.getParent()!= null){
+                ((ViewGroup) txtUser.getParent()).removeView(txtUser);
+            }
+
+            if(txtPassword.getParent()!= null){
+                ((ViewGroup) txtPassword.getParent()).removeView(txtPassword);
+            }
+
+            lblUser.setText("Usuario: ");
+            lblPassword.setText("Contraseña: ");
+			txtPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+			txtUser.setText("");
+			txtPassword.setText("");
+
+            layout.addView(lblUser);
+            layout.addView(txtUser);
+			layout.addView(lblPassword);
+            layout.addView(txtPassword);
+
+            alert.setView(layout);
+
+            showkeyb();
+            alert.setCancelable(false);
+            alert.create();
+
+            alert.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    String usr, pwd;
+					boolean dtCorrectos;
+
+                    usr = txtUser.getText().toString().trim();
+                    pwd = txtPassword.getText().toString().trim();
+
+                    if (mu.emptystr(usr)) {
+                        toast("Usuario incorrecto.");
+                        return;
+                    }
+
+                    if (mu.emptystr(pwd)) {
+                        toast("Contraseña incorrecta.");
+						return;
+                    }
+
+					dtCorrectos = validaDatos(usr,pwd);
+
+                    if (dtCorrectos){
+						askSendContinue();
+					}else{
+						layout.removeAllViews();
+						return;
+					}
+
+                }
+            });
+
+            alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    layout.removeAllViews();
+                }
+            });
+
+            alert.show();
+
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+    private boolean validaDatos(String user,String psw){
+
+        Cursor DT;
+	    boolean correctos=false;
+        String dpsw;
+	    try{
+
+
+            sql = "SELECT NOMBRE,CLAVE,NIVEL,NIVELPRECIO FROM P_VENDEDOR WHERE CODIGO='" + user + "' AND NIVEL=1";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() == 0) {
+               mu.msgbox("Usuario incorrecto !");
+				return false;
+            }
+
+            DT.moveToFirst();
+            dpsw = DT.getString(1);
+            if (!psw.equalsIgnoreCase(dpsw)) {
+				mu.msgbox("Contraseña incorrecta !");
+                return false;
+            }
+
+
+			correctos = true;
+
+         }catch (Exception e){
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            return false;
+        }
+
+        return  correctos;
+
+    }
+
+	private boolean sendDataManual() {
+
+		errflag = false;
+
+		senv = "Envío terminado \n \n";
+
+		items.clear();
+		dbld.clearlog();
+
+		try {
+
+			esEnvioManual = true;
+
+			envioFacturas();
+
+			envioPedidos();
+
+			envioNotasCredito();
+
+			envioNotasDevolucion();
+
+			envioCobros();
+
+			envioDepositos();
+
+			envio_D_MOV();
+
+			envioCli();
+
+			envioAtten();
+
+			envioCoord();
+
+			envioSolicitud();
+
+			updateAcumulados();
+
+			updateInventario();
+
+			update_Corel_GrandTotal();
+
+			envioFinDia();
+
+			dbld.saveArchivo(du.getActDateStr());
+
+			esEnvioManual = false;
+
+			errflag = true;
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			esEnvioManual = false;
+		}
+
+		return errflag;
+	}
+
+	private void Eliminatablas(){
+        boolean Eliminadas = false;
+		try{
+
+			claseFindia.updateFinDia(du.getActDate());
+			claseFindia.updateComunicacion(2);
+
+			ActualizaStatcom();
+			Eliminadas = claseFindia.eliminarTablasD();
+
+			if (Eliminadas){
+			    mu.msgbox("Envío de datos correcto");
+            }
+
+			visibilidadBotones();
+
+		}catch (Exception e){
+
+		}
 	}
 
 	private boolean puedeComunicar() {
@@ -542,6 +955,7 @@ public class ComWS extends PBase {
 			dbld.insert("D_PEDIDO", "WHERE 1=1");
 			dbld.insert("D_PEDIDOD", "WHERE 1=1");
 			dbld.save();
+			dbld.saveArchivo(du.getActDateStr());
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -1226,8 +1640,7 @@ public class ComWS extends PBase {
 
 				try {
 					writer.write(sql);writer.write("\r\n");
-				} catch (Exception e) {
-				}
+				} catch (Exception e) {}
 
 				try {
 					dbT = ConT.getWritableDatabase();
@@ -2501,7 +2914,10 @@ public class ComWS extends PBase {
 				return true;
 			}
 
+			listaFachada();
+
 			dbld.savelog();
+			dbld.saveArchivo(du.getActDateStr());
 
 			//#CKFK 20190429 Saqué esto de envioFinDia para que se guarde bien el log y luego se realice el envío.
 			if (!envioparcial){
@@ -2598,7 +3014,9 @@ public class ComWS extends PBase {
 
 					i += 1;
 					fprog = "Factura " + i;
-					wsStask.onProgressUpdate();
+					if (!esEnvioManual){
+						wsStask.onProgressUpdate();
+					}
 
 					if (envioparcial) dbld.clear();
 
@@ -2617,7 +3035,7 @@ public class ComWS extends PBase {
 
 					dbld.add("UPDATE P_COREL SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");
 
-					if (envioparcial) {
+					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_FACTURA SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -2641,7 +3059,7 @@ public class ComWS extends PBase {
 
 			DT.close();
 
-			if (envioparcial && (fterr.isEmpty())) {
+			if (envioparcial && (fterr.isEmpty()) && !esEnvioManual) {
 				sql = "DELETE FROM D_FACTURA_BARRA";
 				db.execSQL(sql);
 				sql = "DELETE FROM D_STOCKB_DEV";
@@ -2693,7 +3111,10 @@ public class ComWS extends PBase {
 
 					i += 1;
 					fprog = "Pedido " + i;
-					wsStask.onProgressUpdate();
+					if (!esEnvioManual){
+						wsStask.onProgressUpdate();
+					}
+
 
 					if (envioparcial) dbld.clear();
 
@@ -2705,7 +3126,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_REL_PROD_BON", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIFFALT", "WHERE COREL='" + cor + "'");
 
-					if (envioparcial) {
+					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_PEDIDO SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -2770,7 +3191,9 @@ public class ComWS extends PBase {
 
 					i += 1;
 					fprog = "Cobro " + i;
-					wsStask.onProgressUpdate();
+					if (!esEnvioManual){
+						wsStask.onProgressUpdate();
+					}
 
 					if (envioparcial) dbld.clear();
 
@@ -2781,7 +3204,7 @@ public class ComWS extends PBase {
 
 					dbld.add("UPDATE P_CORRELREC SET Actual=" + corult + "  WHERE RUTA='" + fruta + "'");
 
-					if (envioparcial){
+					if (envioparcial && !esEnvioManual){
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_COBRO SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -2847,7 +3270,10 @@ public class ComWS extends PBase {
 
 					i += 1;
 					fprog = "Nota crédito " + i;
-					wsStask.onProgressUpdate();
+					if (!esEnvioManual){
+						wsStask.onProgressUpdate();
+					}
+
 
 					if (envioparcial) dbld.clear();
 
@@ -2857,7 +3283,7 @@ public class ComWS extends PBase {
 					dbld.add("UPDATE P_CORELNC SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");
 					dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'NC'");
 
-					if (envioparcial) {
+					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_NOTACRED SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -2921,14 +3347,16 @@ public class ComWS extends PBase {
 
 					i += 1;
 					fprog = "Nota de devolución " + i;
-					wsStask.onProgressUpdate();
+					if (!esEnvioManual){
+						wsStask.onProgressUpdate();
+					}
 
 					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_CXC", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_CXCD", "WHERE COREL='" + cor + "'");
 
-					if (envioparcial) {
+					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_CXC SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -3004,14 +3432,16 @@ public class ComWS extends PBase {
 
 					i += 1;
 					fprog = "Depósito " + i;
-					wsStask.onProgressUpdate();
+					if (!esEnvioManual){
+						wsStask.onProgressUpdate();
+					}
 
 					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_DEPOS", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_DEPOSD", "WHERE COREL='" + cor + "'");
 
-					if (envioparcial) {
+					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_DEPOS SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -3098,7 +3528,9 @@ public class ComWS extends PBase {
 
 					i += 1;
 					fprog = "Inventario " + i;
-					wsStask.onProgressUpdate();
+					if (!esEnvioManual){
+						wsStask.onProgressUpdate();
+					}
 
 					if (envioparcial) dbld.clear();
 
@@ -3118,7 +3550,7 @@ public class ComWS extends PBase {
 							" FROM D_MOV E INNER JOIN D_MOVDB D ON E.COREL = D.COREL" +
 							" WHERE E.COREL = '" + cor + "'");
 
-					if (envioparcial) {
+					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_MOV SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -3184,7 +3616,9 @@ public class ComWS extends PBase {
 
 					i += 1;
 					fprog = "Inventario " + i;
-					wsStask.onProgressUpdate();
+					if (!esEnvioManual){
+						wsStask.onProgressUpdate();
+					}
 
 					if (envioparcial) {
 						dbld.clear();
@@ -3195,7 +3629,7 @@ public class ComWS extends PBase {
 						dbld.insert("D_CLINUEVO_APR", "WHERE CODIGO='" + cor + "'");
 					}
 
-					if (envioparcial) {
+					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 
 							sql = "UPDATE D_CLINUEVO SET STATCOM='S' WHERE CODIGO='" + cor + "'";
@@ -3242,7 +3676,9 @@ public class ComWS extends PBase {
 		int fecha;
 
 		fprog = " ";
-		wsStask.onProgressUpdate();
+		if (!esEnvioManual){
+			wsStask.onProgressUpdate();
+		}
 
 		try {
 			sql = "SELECT RUTA,FECHA,HORALLEG FROM D_ATENCION WHERE STATCOM='N'";
@@ -3262,7 +3698,7 @@ public class ComWS extends PBase {
 
 					dbld.insert("D_ATENCION", "WHERE (RUTA='" + cor + "') AND (FECHA=" + fecha + ") AND (HORALLEG='" + hora + "') ");
 
-					if (envioparcial) {
+					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_ATENCION SET STATCOM='S' WHERE (RUTA='" + cor + "') AND (FECHA=" + fecha + ") AND (HORALLEG='" + hora + "') ";
 							db.execSQL(sql);
@@ -3294,7 +3730,9 @@ public class ComWS extends PBase {
 		int stp;
 		double px, py;
 		fprog = " ";
-		wsStask.onProgressUpdate();
+		if (!esEnvioManual){
+			wsStask.onProgressUpdate();
+		}
 
 		try {
 			sql = "SELECT CODIGO,COORX,COORY,STAMP FROM D_CLICOORD WHERE STATCOM='N'";
@@ -3316,7 +3754,7 @@ public class ComWS extends PBase {
 					ss = "UPDATE P_CLIENTE SET COORX=" + px + ",COORY=" + py + " WHERE (CODIGO='" + cod + "')";
 					dbld.add(ss);
 
-					if (envioparcial) {
+					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_CLICOORD SET STATCOM='S' WHERE (CODIGO='" + cod + "') AND (STAMP=" + stp + ") ";
 							db.execSQL(sql);
@@ -3370,14 +3808,16 @@ public class ComWS extends PBase {
 
 					i += 1;
 					fprog = "Solicitud " + i;
-					wsStask.onProgressUpdate();
+					if (!esEnvioManual){
+						wsStask.onProgressUpdate();
+					}
 
 					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_SOLICINV", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_SOLICINVD", "WHERE COREL='" + cor + "'");
 
-					if (envioparcial) {
+					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_SOLICINV SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -3417,7 +3857,9 @@ public class ComWS extends PBase {
 		int pc = 0, pcc=3;
 
 		fprog = " ";
-		wsStask.onProgressUpdate();
+		if (!esEnvioManual){
+			wsStask.onProgressUpdate();
+		}
 
 		try {
 
@@ -3431,7 +3873,7 @@ public class ComWS extends PBase {
             dbld.add("DELETE FROM D_REPFINDIA WHERE RUTA='" + gl.ruta + "'");
 			dbld.insert("D_REPFINDIA", "WHERE (LINEA>=0)");
 
-			if (envioparcial) {
+			if (envioparcial && !esEnvioManual) {
 				if (commitSQL() == 1) {
 					pc = 3;
 				} else {
@@ -3482,7 +3924,7 @@ public class ComWS extends PBase {
 					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "')";
 			dbld.add(ss);
 
-			if (envioparcial) {
+			if (envioparcial && !esEnvioManual) {
 				//fterr=ss+"\n";
 				rslt = commitSQL();
 				//fterr=fterr+rslt+"\n";
@@ -3512,7 +3954,7 @@ public class ComWS extends PBase {
 			ss = "exec AcumuladoObjetivos '" + gl.ruta + "'," + oyear + "," + omonth;
 			dbld.add(ss);
 
-			if (envioparcial) {
+			if (envioparcial && !esEnvioManual) {
 				rslt = commitSQL();
 				fterr = fterr + rslt + "\n";
 			}
@@ -4166,6 +4608,7 @@ public class ComWS extends PBase {
 
 					if (esvacio) {
 						lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+                        lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
 						lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
 					}
 
@@ -4182,6 +4625,10 @@ public class ComWS extends PBase {
 				lblEnv.setVisibility(View.INVISIBLE);
 				imgEnv.setVisibility(View.INVISIBLE);
 
+                //Invisible botón y texto de envío manual
+                lblEnvM.setVisibility(View.INVISIBLE);
+                imgEnvM.setVisibility(View.INVISIBLE);
+
 				//Invisible botón y texto de recepción
 				lblRec.setVisibility(View.INVISIBLE);
 				imgRec.setVisibility(View.INVISIBLE);
@@ -4193,7 +4640,7 @@ public class ComWS extends PBase {
 				TienePedidos = (clsAppM.getDocCountTipo("Pedidos",false)>0?true:false);
 				TieneCobros = (clsAppM.getDocCountTipo("Cobros",false)>0?true:false);
 				TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",false)>0?true:false);
-				YaComunico=(claseFindia.getComunicacion() == 4?true:false);
+				YaComunico=(claseFindia.getComunicacion() == 2?true:false);
 				TieneInventario=(clsAppM.getDocCountTipo("Inventario",false)>0?true:false);
 
 				if (gl.peModal.equalsIgnoreCase("TOL"))
@@ -4206,6 +4653,7 @@ public class ComWS extends PBase {
                                         {
                                             lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
                                             lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+                                            lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
 											if (StringUtils.equals(GetStatusRec(),"1"))
 												{
 													relExist.setVisibility(gl.peBotInv && !TieneFact?View.VISIBLE:View.INVISIBLE);
@@ -4225,6 +4673,7 @@ public class ComWS extends PBase {
                                         {
                                             lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
                                             lblEnv.setVisibility(View.VISIBLE); imgEnv.setVisibility(View.VISIBLE);
+                                            lblEnvM.setVisibility(View.VISIBLE);imgEnvM.setVisibility(View.VISIBLE);
                                             relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
                                             relExist.setVisibility(View.INVISIBLE);
                                             relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
@@ -4237,6 +4686,7 @@ public class ComWS extends PBase {
                                     {
                                         lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
                                         lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+                                        lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
 										if (StringUtils.equals(GetStatusRec(),"1"))
 											{
 												relExist.setVisibility(gl.peBotInv && !TieneFact?View.VISIBLE:View.INVISIBLE);
@@ -4256,6 +4706,7 @@ public class ComWS extends PBase {
                                             {
                                                 lblRec.setVisibility(View.VISIBLE);	imgRec.setVisibility(View.VISIBLE);
                                                 lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+                                                lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
 
 												if (StringUtils.equals(GetStatusRec(),"1"))
 													{
@@ -4274,6 +4725,7 @@ public class ComWS extends PBase {
                                             {
                                                 lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
                                                 lblEnv.setVisibility(View.VISIBLE);imgEnv.setVisibility(View.VISIBLE);
+                                                lblEnvM.setVisibility(View.VISIBLE);imgEnvM.setVisibility(View.VISIBLE);
 												relExist.setVisibility(View.INVISIBLE);
 												relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
 												relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
@@ -4289,6 +4741,7 @@ public class ComWS extends PBase {
 
                             	lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
 								lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+                                lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
 
 								if (StringUtils.equals(GetStatusRec(),"1"))
 									{
@@ -4312,6 +4765,7 @@ public class ComWS extends PBase {
                                     {
                                         lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
 										lblEnv.setVisibility(View.VISIBLE);imgEnv.setVisibility(View.VISIBLE);
+                                        lblEnvM.setVisibility(View.VISIBLE);imgEnvM.setVisibility(View.VISIBLE);
                                         relExist.setVisibility(View.INVISIBLE);
 										relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
                                         relPrecio.setVisibility(View.INVISIBLE);
@@ -4482,6 +4936,7 @@ public class ComWS extends PBase {
 			});
 
 			dialog.show();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

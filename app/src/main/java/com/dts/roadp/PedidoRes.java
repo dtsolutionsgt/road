@@ -89,7 +89,7 @@ public class PedidoRes extends PBase {
 
 		processFinalPromo();
 		
-	processFinalPromo();
+	    processFinalPromo();
 		
 		printcallback= new Runnable() {
 		    public void run() {
@@ -105,6 +105,7 @@ public class PedidoRes extends PBase {
 		
 		prn=new printer(this,printclose,gl.validimp);
 		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp, "");
+		pdoc.deviceid =gl.deviceId;
 	}
 		
 	
@@ -196,7 +197,7 @@ public class PedidoRes extends PBase {
 			stot=mu.round2(stot0);
 
 			fillTotals();
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
@@ -286,15 +287,18 @@ public class PedidoRes extends PBase {
 
 			bonsave.save();
 
-			if (prn.isEnabled()) {
-				pdoc.buildPrint(corel,0);
+			if (gl.impresora.equalsIgnoreCase("S")) {
+				String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
+				pdoc.buildPrint(corel,0, vModo);
 				prn.printask(printcallback);
 			}
 
 			gl.closeCliDet=true;
 			gl.closeVenta=true;
 
-			//super.finish();
+			if (!gl.impresora.equalsIgnoreCase("S")) {
+				super.finish();
+			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -669,7 +673,7 @@ public class PedidoRes extends PBase {
 					impres++;toast("Impres "+impres);
 
 					try {
-						sql="UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorrelnc+"'";
+						sql="UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
 						db.execSQL(sql);
 					} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -678,7 +682,7 @@ public class PedidoRes extends PBase {
 					if (impres>1) {
 
 						try {
-							sql="UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorrelnc+"'";
+							sql="UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
 							db.execSQL(sql);
 						} catch (Exception e) {
 							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -687,8 +691,8 @@ public class PedidoRes extends PBase {
 						gl.brw=0;
 
 					} else {
-
-						pdoc.buildPrint(corel,1,"*");
+						String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
+						pdoc.buildPrint(corel,1,vModo);
 
 						prn.printask(printclose);
 
@@ -713,8 +717,7 @@ public class PedidoRes extends PBase {
 			
 	}	
 
-	
-	
+
 	// Activity Events
 	
 	@Override

@@ -819,17 +819,19 @@ public class CliDet extends PBase {
 	public void sendSMS(View view){
 		String to=tel;
 
-		//to="42161467";
+		//to="59393195";
 
 		if (to.length()==0) {
 			msgbox("Número incorrecto ");return;
 		}
 
 		try {
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("sms:"+to)));
+			Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.whatsapp");
+			startActivity(launchIntent);
+			//startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("sms:"+to)));
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			msgbox("No pudo enviar mensaje : "+e.getMessage());
+			msgbox("No pudo enviar mensaje verifique que esté instalada la aplicación");
 		}
 
 		//try {
@@ -876,9 +878,21 @@ public class CliDet extends PBase {
 		*/
 
 		try {
-			String url = "waze://?ll=14.6017278,-90.5236343";
-			Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( url ) );
-			startActivity( intent );
+
+			String sgps = "";
+
+			sgps=lblGPS.getText().toString();
+
+			if (!sgps.equalsIgnoreCase("0.0000000 , 0.0000000")){
+				String url = "waze://?ll="+sgps;
+				//"waze://?ll=14.6017278,-90.5236343";
+				//"waze://?ll=14.586997,-90.513685";
+						Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( url ) );
+				startActivity( intent );
+			}else{
+				msgbox("El cliente no tiene definidas las coordenadas GPS");
+			}
+
 		} catch ( ActivityNotFoundException ex )	{
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
 			Intent intent =

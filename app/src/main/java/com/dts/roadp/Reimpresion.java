@@ -40,6 +40,7 @@ public class Reimpresion extends PBase {
 	private clsDocDevolucion fdev;
 	private clsDocCanastaBod fcanastabod;
 	private clsDocCanastaBod fpaseantebod;
+	private clsDocPedido docPed;
 
 	private int tipo,impres;
 	private String selid,itemid,corelNC,asignFact;
@@ -142,9 +143,10 @@ public class Reimpresion extends PBase {
 		};
 
 		switch (tipo) {
-		case 0:  
+		case 0:
+			docPed = new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp,"");
 			lblTipo.setText("Pedido");break;
-		case 1:  
+		case 1:
 			cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.deviceId, "");
 			lblTipo.setText("Recibo");break;	
 		case 2:  
@@ -416,6 +418,14 @@ public class Reimpresion extends PBase {
 	
 	private void imprPedido() {
 		try{
+
+			if(prn.isEnabled()){
+				docPed.buildPrint(itemid,1,"");
+				prn.printask(printcallback);
+			}else if(!prn.isEnabled()){
+				docPed.buildPrint(itemid,1,"");
+				toast("Reimpresion pedido");
+			}
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

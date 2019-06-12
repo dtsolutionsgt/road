@@ -294,7 +294,8 @@ public class Venta extends PBase {
 						prodid=vItem.Cod;
 						adapter.setSelectedIndex(position);
 
-						if (prodBarra(prodid)) {
+						//#CKFK 20190517 Agregué la validación de que esta pantalla solo se levanta cuando sea venta directa
+						if (prodBarra(prodid) && gl.rutatipo.equalsIgnoreCase("V")) {
 							gl.gstr=prodid;
 							gl.gstr2=vItem.Nombre;
 							browse=4;
@@ -321,8 +322,8 @@ public class Venta extends PBase {
 						adapter.setSelectedIndex(position);
 
 						//if (prodBarra(prodid)) return true;
-
-						if (prodRepesaje(prodid)) {
+						//#CKFK 20190517 Agregué la validación de que esta pantalla solo se levanta cuando sea venta directa
+						if (prodRepesaje(prodid) && gl.rutatipo.equalsIgnoreCase("V")) {
 							gl.gstr=prodid;
 							gl.gstr2=vItem.Nombre;
 							showItemMenu();

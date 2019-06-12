@@ -13,8 +13,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import datamaxoneil.connection.Connection_Bluetooth;
+import datamaxoneil.printer.Document;
+import datamaxoneil.printer.DocumentEZ;
+import datamaxoneil.printer.ParametersEZ;
 
 // 00:17:AC:15:EC:C3
 
@@ -23,6 +27,9 @@ public class printDMax extends printBase {
 	private String ss,ess;
 	private appGlobals appG;
 	private boolean validprint;
+
+	private ArrayList<String> lines = new ArrayList<String>();
+	private ArrayList<Document> documentlist = new  ArrayList<Document>();
 	
 	public printDMax(Context context,String printerMAC,boolean validprinter) {
 		super(context,printerMAC);
@@ -80,6 +87,18 @@ public class printDMax extends printBase {
 			showmsg("Error: " + e.getMessage());return false;
 		}			
 		
+		return true;
+	}
+
+	public boolean printBarra(ArrayList<String> listitems) 	{
+		hasCallback=false;
+
+		try	{
+			if (loadFileBarra(listitems)){}
+		} catch (Exception e) {
+			showmsg("Error: " + e.getMessage());return false;
+		}
+
 		return true;
 	}
 	
@@ -144,7 +163,7 @@ public class printDMax extends printBase {
 			dfile.close();	
 				       
 	        printData = docLP.getDocumentData();
-	
+
 			return true;
 
 		} catch (Exception e) {
@@ -157,7 +176,68 @@ public class printDMax extends printBase {
 			return false;
 		}			
 	}
-	
+
+	private boolean loadFileBarra(ArrayList<String> listitems) {
+
+		try {
+
+			int ccnt;
+			String txt;
+           documentlist.clear();
+
+			lines = listitems;
+
+			showmsg("Lines : "+lines.size());
+
+			ccnt=lines.size();
+
+			for (int i = 0; i <ccnt; i++) {
+				docEZ = new DocumentEZ("MF204");
+				txt="";
+				ss=lines.get(i);
+				txt=lines.get(i);
+				paramEZ.setHorizontalMultiplier(2);
+				paramEZ.setVerticalMultiplier(14);
+				docEZ.writeText(txt, 120, 30);
+				docEZ.writeBarCode("BC128",ss,40,20,paramEZ);
+                documentlist.add(docEZ);
+
+			}
+
+			prconn = null;
+
+			//Looper.prepare();
+
+			prconn = Connection_Bluetooth.createClient(printerAddress);
+
+			if (!prconn.getIsOpen()) prconn.open();
+
+			for (Document doc: documentlist){
+
+				printData = doc.getDocumentData();
+
+				prconn.write(printData,0,printData.length);
+
+				prthread.sleep(500);
+
+				prconn.clearWriteBuffer();
+			}
+
+			prconn.close();
+
+			return true;
+
+		} catch (Exception e) {
+			try {
+
+			} catch (Exception e1) {}
+
+			showmsg("Error: " + e.getMessage());
+
+			return false;
+		}
+	}
+
 	private void doStartPrint() {
 		if (!validprint) {
 			showmsg("¡La impresora no está autorizada!");return;
@@ -218,9 +298,9 @@ public class printDMax extends printBase {
 	}
 	
 	public void processPrint() {
-		
+
 		ss="p1..";
-		
+
 		try {
 
 			prconn = null;
@@ -247,8 +327,8 @@ public class printDMax extends printBase {
 				if (prconn != null) prconn.close();
 			} catch (Exception ee) {
 			}
-		}	
-		
+		}
+
 	}
 
 	private void msgAskRePrint() {

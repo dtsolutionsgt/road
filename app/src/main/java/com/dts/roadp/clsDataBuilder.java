@@ -29,7 +29,7 @@ public class clsDataBuilder {
 	
 	private BufferedWriter writer = null,lwriter = null;
 	private FileWriter wfile,lfile;
-	private String fname,logname;
+	private String fname,logname,namefile;
 
 	public clsDataBuilder(Context context) {
 		
@@ -49,6 +49,8 @@ public class clsDataBuilder {
 		
 		fname = Environment.getExternalStorageDirectory()+"/SyncFold/rd_data.txt";
 		logname = Environment.getExternalStorageDirectory()+"/roadenvio.txt";
+		namefile = Environment.getExternalStorageDirectory()+"/data.acr";
+
 	}
 	
 	public void close(){
@@ -178,6 +180,30 @@ public class clsDataBuilder {
 		}
 				
 		return 1;		
+	}
+
+	public int saveArchivo(String fecha){
+		String s;
+		if (items.size()==0) {return 1;}
+
+		try {
+
+			wfile=new FileWriter(namefile,false);
+			writer = new BufferedWriter(wfile);
+			writer.write("#"+fecha);writer.write("\r\n");
+
+			for (int i = 0; i < items.size(); i++) {
+				s=items.get(i);
+				writer.write(s);writer.write("\r\n");
+			}
+
+			writer.close();
+
+		} catch(Exception e){
+			return 0;
+		}
+
+		return 1;
 	}
 
 	public void clearlog() {

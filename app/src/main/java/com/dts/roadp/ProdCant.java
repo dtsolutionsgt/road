@@ -7,16 +7,23 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -27,20 +34,25 @@ public class ProdCant extends PBase {
 	private EditText txtCant,txtPeso;
 	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot,lblCodProd;
 	private TextView lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso,lblPesoUni;
-	private ImageView imgProd,imgUpd,imgDel;	
-	
+	private ImageView imgProd,imgUpd,imgDel;
+	private Button cmdModifPrecio;
+
+	//#CKFK 20190613 Objetos creados para poder modificar el precio de un producto
+	private EditText txtNuevoPrecio;
+	private TextView lblNuevoPrecio, lblPrecioMinimo;
+
 	private Precio prc;
 	
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
-	private int nivel,browse=0,deccant;
-	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
+	private int nivel,browse=0,deccant, modifprecio;
+	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0, costo=0, nuevoprecio=0;
 	private boolean pexist,esdecimal,porpeso,esbarra;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_prod_cant);
-		
+
 		super.InitBase();
 		addlog("ProdCant",""+du.getActDateTime(),gl.vend);
 
@@ -58,6 +70,13 @@ public class ProdCant extends PBase {
 		if (rutatipo.equalsIgnoreCase("V")) {
 			getDisp();
 		}
+
+		lblNuevoPrecio = new TextView(this,null);
+		lblPrecioMinimo = new TextView(this,null);
+		txtNuevoPrecio = new EditText(this,null);
+		txtNuevoPrecio.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		//Limita cantidad de decimales para los EditText.
+		txtNuevoPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(2)});
 
 		setHandlers();
 
@@ -200,6 +219,7 @@ public class ProdCant extends PBase {
 					return false;
 				}
 			});
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -228,8 +248,9 @@ public class ProdCant extends PBase {
 	
 		try {
 							
-			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO,PESO_PROMEDIO,FACTORCONV "+
-				 "FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
+			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO,PESO_PROMEDIO,FACTORCONV, "+
+                "COSTO, MODIF_PRECIO "+
+				"FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 				
@@ -242,6 +263,16 @@ public class ProdCant extends PBase {
 
 			pesoprom = dt.getDouble(10);
 			if (pesoprom==0) pesoprom = dt.getDouble(9);
+
+            costo=dt.getDouble(11);
+            modifprecio=dt.getInt(12);
+
+            //#CKFK 20190612 Modificar el formato del label para que al hacer clic pueda ingresar el nuevo precio
+            if (modifprecio==1){
+				cmdModifPrecio.setBackgroundColor(Color.rgb(51,181,229));
+            }else{
+				lblPrec.setBackgroundColor(Color.WHITE);
+            }
 
 			if (dt.getString(8).equalsIgnoreCase("P")) pexist=true; else pexist=false;
 			
@@ -291,7 +322,22 @@ public class ProdCant extends PBase {
 			mu.msgbox("3-"+ e.getMessage());
 		}
 
-		prec=prc.precio(prodid,1,nivel,um,gl.umpeso,0,um);
+		try {
+			sql="SELECT CANT,PESO,PRECIO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
+			dt=Con.OpenDT(sql);
+
+			if(dt.getCount()>0){
+				dt.moveToFirst();
+				icant=dt.getDouble(0);
+				ippeso=dt.getDouble(1);
+				gl.nuevoprecio = dt.getDouble(2);;
+			}
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			icant=0;ippeso=0;
+		}
+
+		prec=prc.precio(prodid,1,nivel,um,gl.umpeso,0,um, gl.nuevoprecio);
 		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
 			if (prc.precioespecial>0) prec=prc.precioespecial;
 		}
@@ -307,19 +353,22 @@ public class ProdCant extends PBase {
 
 		//lblPrec.setText("Precio: "+mu.frmcur(prec));
 
-		try {
-			sql="SELECT CANT,PESO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
+		//#CKFK 20190614 Cambié esto de posición para que calcule bien el precio
+		/*try {
+			sql="SELECT CANT,PESO,PRECIO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
            	dt=Con.OpenDT(sql);
 
            	if(dt.getCount()>0){
 				dt.moveToFirst();
 				icant=dt.getDouble(0);
 				ippeso=dt.getDouble(1);
+				prec=dt.getDouble(2);
+				gl.nuevoprecio = prec;
 			}
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			icant=0;ippeso=0;
-	    }	
+	    }	*/
 
 		if (icant>0) {
 			parseCant(icant);
@@ -584,7 +633,7 @@ public class ProdCant extends PBase {
 			lblDesc=(TextView) findViewById(R.id.lblFecha);
 			lblCant=(TextView) findViewById(R.id.lblCant);
 			lblPrec=(TextView) findViewById(R.id.lblPNum);
-			lblDisp=(TextView) findViewById(R.id.lblDisp);
+            lblDisp=(TextView) findViewById(R.id.lblDisp);
 			lblBU=(TextView) findViewById(R.id.lblBU);
 			lblTot=(TextView) findViewById(R.id.textView1);lblTot.setText("");
 			lblDispLbl=(TextView) findViewById(R.id.textView8);
@@ -593,6 +642,7 @@ public class ProdCant extends PBase {
 			lblFactor=(TextView) findViewById(R.id.textView22);lblFactor.setVisibility(View.INVISIBLE);
 			lblCantPeso=(TextView) findViewById(R.id.textView21);lblCantPeso.setText("");lblCantPeso.setVisibility(View.INVISIBLE);
 			lblCodProd=(TextView) findViewById(R.id.txtRoadTit);
+			cmdModifPrecio=(Button) findViewById(R.id.cmdModifPrecio);
 			imgProd=(ImageView) findViewById(R.id.imgPFoto);
 			imgUpd=(ImageView) findViewById(R.id.imageView1);
 			imgDel=(ImageView) findViewById(R.id.imageView2);
@@ -646,16 +696,17 @@ public class ProdCant extends PBase {
 		}
 
 		cant = mu.round(cant, gl.peDecImp);
+
 		if (porpeso) {
 			if (gl.rutatipo.equalsIgnoreCase("V")){
-				prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, umfactor * cant,um);
+				prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, umfactor * cant,um, gl.nuevoprecio);
 				if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, umfactor * cant)) {
 					if (prc.precioespecial > 0) prec = prc.precioespecial;
 				}
 			}
 
 		} else {
-			prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, 0,um);
+			prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, 0,um, gl.nuevoprecio);
 			if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, 0)) {
 				if (prc.precioespecial > 0) prec = prc.precioespecial;
 			}
@@ -994,5 +1045,98 @@ public class ProdCant extends PBase {
 	}
 
 	//endregion
+
+	//#CKFK 20190613 Modificar el precio del producto
+
+	public void ModificarPrecio(final View view) {
+
+		try{
+
+            final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Modificar precio");
+
+			final LinearLayout layout   = new LinearLayout(this);
+			layout.setOrientation(LinearLayout.VERTICAL);
+
+			if(lblPrecioMinimo.getParent()!= null){
+				((ViewGroup) lblPrecioMinimo.getParent()).removeView(lblPrecioMinimo);
+			}
+
+			if(lblNuevoPrecio.getParent()!= null){
+				((ViewGroup) lblNuevoPrecio.getParent()).removeView(lblNuevoPrecio);
+			}
+
+			if(txtNuevoPrecio.getParent()!= null){
+				((ViewGroup) txtNuevoPrecio.getParent()).removeView(txtNuevoPrecio);
+			}
+
+			lblPrecioMinimo.setTextSize(20);
+			lblPrecioMinimo.setTypeface(lblPrecioMinimo.getTypeface(), Typeface.BOLD_ITALIC);
+			lblPrecioMinimo.setGravity(Gravity.CENTER);
+			lblPrecioMinimo.setTextColor(Color.rgb(51,131,55));
+			lblPrecioMinimo.setText("Precio mínimo: " + mu.frmcur(costo));
+
+			lblNuevoPrecio.setTypeface(lblPrecioMinimo.getTypeface(), Typeface.BOLD_ITALIC);
+			lblNuevoPrecio.setTextSize(20);
+			lblNuevoPrecio.setGravity(Gravity.CENTER);
+			lblNuevoPrecio.setText("Nuevo precio");
+
+            txtNuevoPrecio.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            //Limita cantidad de decimales para los EditText.
+            txtNuevoPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(2)});
+			txtNuevoPrecio.setTextSize(20);
+			txtNuevoPrecio.setText(mu.frmcur_sm(costo));
+			txtNuevoPrecio.selectAll();
+
+			layout.addView(lblPrecioMinimo);
+			layout.addView(lblNuevoPrecio);
+			layout.addView(txtNuevoPrecio);
+
+			alert.setView(layout);
+
+			showkeyb();
+			alert.setCancelable(false);
+			alert.create();
+
+			alert.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+
+				    nuevoprecio=Double.parseDouble((txtNuevoPrecio.getText().toString().isEmpty()?"0.00":txtNuevoPrecio.getText().toString()));
+
+					if(nuevoprecio==0){
+                        mu.toast("El precio debe ser mayor que 0");
+						ModificarPrecio(view);
+                    }else if (nuevoprecio < costo) {
+                        mu.toast("El precio debe ser mayor o igual que el precio mínimo");
+						ModificarPrecio(view);
+                    } else {
+						lblPrec.setText("Precio: "+mu.frmcur(nuevoprecio));
+						gl.nuevoprecio = nuevoprecio;
+						prec=gl.nuevoprecio;
+						setCant(true);
+                        closekeyb();
+                        layout.removeAllViews();
+                    }
+				}
+
+			});
+
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					layout.removeAllViews();
+				}
+			});
+
+			alert.show();
+			showkeyb();
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
+
+	}
 
 }

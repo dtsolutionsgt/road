@@ -20,7 +20,7 @@ public class Precio {
 	private MiscUtils mu;
 
 	private String prodid,um,umpeso,umventa;
-	private double cant,desc,prec;
+	private double cant,desc,prec, nuevoprecio;
 	private int nivel,ndec;
 	private boolean porpeso;
 	
@@ -43,11 +43,12 @@ public class Precio {
 		
 	}
 
-	public double precio(String prod,double pcant,int nivelprec,String unimedida,String unimedidapeso,double ppeso,String umven) {
+	public double precio(String prod,double pcant,int nivelprec,String unimedida,String unimedidapeso,double ppeso,String umven, double pnuevoprecio) {
 
 		prodid=prod;cant=pcant;nivel=nivelprec;
 		um=unimedida;umpeso=unimedidapeso;umventa=umven;
 		prec=0;costo=0;descmon=0;imp=0;tot=0;precioespecial=0;
+		nuevoprecio=pnuevoprecio;
 
 		clsDescuento clsDesc=new clsDescuento(cont,prodid,cant);
 		desc=clsDesc.getDesc();
@@ -86,7 +87,7 @@ public class Precio {
 
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-			pr=DT.getDouble(0);
+			pr=(nuevoprecio>0?nuevoprecio:DT.getDouble(0));
 			
 		} catch (Exception e) {
 			pr=0;
@@ -169,8 +170,8 @@ public class Precio {
 			sql="SELECT PRECIO FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+nivel+") AND (UNIDADMEDIDA='"+um+"') ";
            	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-							  
-			pr=DT.getDouble(0);
+
+			pr=(nuevoprecio>0?nuevoprecio:DT.getDouble(0));
 			
 		} catch (Exception e) {
 			pr=0;

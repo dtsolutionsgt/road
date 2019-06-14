@@ -73,7 +73,6 @@ public class Venta extends PBase {
 	private static final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
 	private static final long  MIN_TIME_BW_UPDATES = 1000; // in Milliseconds
 
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -292,6 +291,7 @@ public class Venta extends PBase {
 						clsVenta vItem = (clsVenta)lvObj;
 
 						prodid=vItem.Cod;
+						gl.nuevoprecio=0;
 						adapter.setSelectedIndex(position);
 
 						//#CKFK 20190517 Agregué la validación de que esta pantalla solo se levanta cuando sea venta directa
@@ -319,6 +319,7 @@ public class Venta extends PBase {
 						clsVenta vItem = (clsVenta)lvObj;
 
 						prodid=vItem.Cod;
+						gl.nuevoprecio=0;
 						adapter.setSelectedIndex(position);
 
 						//if (prodBarra(prodid)) return true;
@@ -570,12 +571,12 @@ public class Venta extends PBase {
 			//prodPrecio();
 
 			if (prodPorPeso(prodid)) {
-				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, gl.dpeso,um);
+				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, gl.dpeso,um, gl.nuevoprecio);
 				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
 					if (prc.precioespecial>0) prec=prc.precioespecial;
 				}
 			} else {
-				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0,um);
+				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0,um, gl.nuevoprecio);
 				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
 					if (prc.precioespecial>0) prec=prc.precioespecial;
 				}
@@ -615,7 +616,7 @@ public class Venta extends PBase {
 
 	private void prodPrecio() {
 		try{
-			prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,gl.dpeso,um);
+			prec=prc.precio(prodid,cant,nivel,um,gl.umpeso,gl.dpeso,um, gl.nuevoprecio);
 
             if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
                 if (prc.precioespecial>0) prec=prc.precioespecial;
@@ -811,12 +812,12 @@ public class Venta extends PBase {
 				//if (sinimp) precdoc=precsin; else precdoc=prec;
 
 				if (prodPorPeso(prodid)) {
-					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, ppeso,umven);
+					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, ppeso,umven, gl.nuevoprecio);
 					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,ppeso)) {
 						if (prc.precioespecial>0) prec=prc.precioespecial;
 					}
 				} else {
-					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0,umven);
+					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0,umven, gl.nuevoprecio);
 					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,0)) {
 						if (prc.precioespecial>0) prec=prc.precioespecial;
 					}

@@ -348,14 +348,14 @@ public class PedidoRes extends PBase {
 			ins.add("STATCOM","N");
 			ins.add("CALCOBJ","N");
 			ins.add("IMPRES",0);
-			ins.add("ADD1","");
+			ins.add("ADD1",gl.media);//Se está guardando aquí la media de pago del cliente ya que La gran Fortuna lo necesita
 			ins.add("ADD2","");
 			ins.add("ADD3","");
 			ins.add("STATPROC","");
 			ins.add("RECHAZADO",0);
 			ins.add("RAZON_RECHAZADO","");  // valor de percepcion 0 o xxx.xx
 			ins.add("INFORMADO",0);
-			ins.add("SUCURSAL","");
+			ins.add("SUCURSAL",gl.sucur);//Se está guardando aquí la sucursal
 			ins.add("ID_DESPACHO",0);
 			ins.add("ID_FACTURACION",0);
 		

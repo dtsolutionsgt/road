@@ -41,7 +41,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parVer = "9.4.3 / 24-Mayo-2019";
+    private String parNumVer = "9.5.2 / ";
+    private String parVerFecha= "24-Mayo-2019";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +100,8 @@ public class MainActivity extends PBase {
             super.InitBase();
 
             this.setTitle("ROAD");
-            gl.parVer = parVer;
+            gl.parNumVer = parNumVer;
+            gl.parVerFecha=parVerFecha;
 
             txtUser = (EditText) findViewById(R.id.txtUser);
             txtPass = (EditText) findViewById(R.id.txtMonto);
@@ -110,7 +112,7 @@ public class MainActivity extends PBase {
             lblID = (TextView) findViewById(R.id.textView81);
             imgLogo = (ImageView) findViewById(R.id.imgNext);
 
-            lblVer.setText("Version " + gl.parVer);
+            lblVer.setText("Version " + gl.parNumVer + gl.parVerFecha);
 
             // DB VERSION
             dbVers = new BaseDatosVersion(this, db, Con);

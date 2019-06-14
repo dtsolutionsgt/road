@@ -554,6 +554,7 @@ public class Producto extends PBase {
 	private void appProd(){
 		try{
 			gl.gstr=itemid;
+			gl.nuevoprecio=0;
 			super.finish();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

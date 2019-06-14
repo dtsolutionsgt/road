@@ -29,7 +29,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -158,7 +157,7 @@ public class ComWS extends PBase {
         txtUser = new EditText(this,null);
         txtPassword = new EditText(this,null);
 
-		txtVersion.setText("24-Mayo-2019");
+		txtVersion.setText(gl.parVerFecha);
 
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
@@ -2986,6 +2985,8 @@ public class ComWS extends PBase {
 
 		try {
 
+			listItems.clear();
+
 			db.execSQL("DELETE FROM P_LIQUIDACION");
 
 			AddTableVL("P_LIQUIDACION");
@@ -3911,7 +3912,7 @@ public class ComWS extends PBase {
 
 			if (envioparcial) dbld.clear();
 
-			ss = "UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parVer+"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'";
+			ss = "UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parNumVer +"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'";
             dbld.add(ss);
 
             dbld.add("DELETE FROM D_REPFINDIA WHERE RUTA='" + gl.ruta + "'");
@@ -4416,9 +4417,9 @@ public class ComWS extends PBase {
 			dbld.clear();
 			dbld.add("DELETE FROM P_DOC_ENVIADOS_HH WHERE DOCUMENTO='"+docstock+"'");
 			dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('"+docstock+"','"+ActRuta+"','"+univdate+"',1)");
-			dbld.add("UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parVer+"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'");
+			dbld.add("UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parNumVer +"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'");
 			dbld.add("INSERT INTO P_BITACORA_VERSIONHH (RUTA,FECHA,NUMVERSION,ARQUITECTURA) " +
-					"VALUES('"+gl.ruta+"','"+ du.univfechaseg() +"','"+gl.parVer+"','ANDR')");
+					"VALUES('"+gl.ruta+"','"+ du.univfechaseg() +"','"+gl.parNumVer +"','ANDR')");
 
 			if (commitSQL()==1) conflag=1; else conflag=0;
 					

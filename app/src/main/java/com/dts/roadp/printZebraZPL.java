@@ -207,6 +207,7 @@ public class printZebraZPL extends printBase {
             altolinea=20;
             psx = 0;
             anchopapel=500;
+            if (prwidth>35) anchopapel=400; //#CKFK 20190614 Agregué esta condición para el ancho del papel
             if (prwidth>40) anchopapel=300;
             if (prwidth>60) anchopapel=400;
 
@@ -253,10 +254,11 @@ public class printZebraZPL extends printBase {
 
         try {
 
-            altobarra=100;
-            anchobarra = 2;
+            altobarra=80;//#CKFK 20190614 Modifiqué el alto de la barra a 80 antes era 100
+            anchobarra = 1;//#CKFK 20190614 Modifiqué el ancho de la barra a 1 antes era 2
             psx = 20;
             anchopapel=500;
+            if (prwidth>35) anchopapel=400;//#CKFK 20190614 Agregué esta condición para el ancho del papel
             if (prwidth>40) anchopapel=300;
             if (prwidth>60) anchopapel=400;
 

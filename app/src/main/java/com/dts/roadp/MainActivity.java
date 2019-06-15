@@ -41,7 +41,7 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parVer = "9.4.4 / 04-Jun-2019";
+    private String parVer = "9.4.5 / 14-Jun-2019";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -505,6 +505,8 @@ public class MainActivity extends PBase {
 
             if (DT.getCount() > 0) {
                 gl.codSupervisor = DT.getString(0);
+            }else{
+                gl.codSupervisor = "";
             }
 
         } catch (Exception e) {

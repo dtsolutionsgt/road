@@ -1972,6 +1972,24 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+			vSQL= "CREATE TABLE [P_PEDSUG]("+
+				  "[IDPEDIDOSUG] INTEGER NOT NULL,"+
+				  "[RUTA] TEXT NOT NULL,"+
+				  "[VENDEDOR] TEXT NOT NULL,"+
+				  "[CLIENTE] TEXT NOT NULL,"+
+				  "[PRODUCTO] TEXT NOT NULL,"+
+				  "[CANTIDAD] REAL NOT NULL,"+
+				  "[UNIDADMEDIDA] TEXT NOT NULL,"+
+				  "[PESO] REAL NOT NULL,"+
+				  "[UNIDADMEDIDAPESO] TEXT NOT NULL,"+
+				  "[PRECIO] REAL NOT NULL,"+
+				  "[TOTAL] REAL NOT NULL,"+
+				  "[ORDEN] INTEGER NOT NULL,"+
+				  "[ACIERTO] INTEGER NOT NULL,"+
+				  "PRIMARY KEY ([IDPEDIDOSUG])"+
+				  ");";
+			database.execSQL(vSQL);
+
 			return 1;
 			 
 		} catch (SQLiteException e) {

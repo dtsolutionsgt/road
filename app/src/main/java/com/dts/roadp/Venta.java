@@ -1598,9 +1598,13 @@ public class Venta extends PBase {
 		try {
 			sql="SELECT TIPO_HH FROM P_ARCHIVOCONF WHERE RUTA='"+gl.ruta+"'";
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
 
-			tiposcan=DT.getString(0);
+			if(DT.getCount()>0){
+				DT.moveToFirst();
+
+				tiposcan=DT.getString(0);
+			}
+			
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			tiposcan="*";msgbox(e.getMessage());

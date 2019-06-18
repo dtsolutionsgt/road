@@ -207,7 +207,7 @@ public class printZebraZPL extends printBase {
             altolinea=20;
             psx = 0;
             anchopapel=500;
-            if (prwidth>35) anchopapel=400; //#CKFK 20190614 Agregué esta condición para el ancho del papel
+            if (prwidth>35) anchopapel=350; //#CKFK 20190614 Agregué esta condición para el ancho del papel
             if (prwidth>40) anchopapel=300;
             if (prwidth>60) anchopapel=400;
 
@@ -224,7 +224,7 @@ public class printZebraZPL extends printBase {
 
             for (int i = 0; i <ccnt; i++) {
                 ps+="^FO,"+psx+",0";
-                ps+="^ADN,"+altolinea+",0";
+                ps+="^ABN,"+10+",0";
                 ps+="^FD";
                 ss=lines.get(i);
                 ps+=ss;

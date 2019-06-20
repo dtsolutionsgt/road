@@ -973,6 +973,18 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+			vSQL= "CREATE TABLE [D_RATING]("+
+					"[IDRATING] INTEGER PRIMARY KEY AUTOINCREMENT,"+
+					"[RUTA] TEXT NOT NULL,"+
+					"[VENDEDOR] TEXT NOT NULL,"+
+					"[RATING] REAL NOT NULL,"+
+					"[COMENTARIO] TEXT NOT NULL,"+
+					"[IDTRANSERROR] INTEGER NOT NULL,"+
+					"[FECHA] INTEGER NOT NULL,"+
+					"[STATCOM] TEXT NOT NULL"+
+					");";
+			database.execSQL(vSQL);
+
 			return 1;
 		} catch (SQLiteException e) {
 		   	msgbox(e.getMessage());
@@ -1952,16 +1964,17 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-			vSQL= "CREATE TABLE [D_RATING]("+
-					"[IDRATING] INTEGER PRIMARY KEY AUTOINCREMENT,"+
-					"[RUTA] TEXT NOT NULL,"+
-					"[VENDEDOR] TEXT NOT NULL,"+
-					"[RATING] REAL NOT NULL,"+
-					"[COMENTARIO] TEXT NOT NULL,"+
-					"[IDTRANSERROR] INTEGER NOT NULL,"+
-					"[FECHA] INTEGER NOT NULL,"+
-					"[STATCOM] TEXT NOT NULL"+
-					");";
+			//#CKFK 20190619 Agregué la tabla P_GLOBPARAM para poder obtener los datos de los clientes nuevos
+			vSQL= "CREATE TABLE [P_GLOBPARAM]("+
+				  "[EMPID] TEXT NOT NULL,"+
+				  "[COMSERVER] TEXT NOT NULL,"+
+				  "[FTPSERVER] TEXT NOT NULL,"+
+				  "[VERFACTURA] TEXT NOT NULL,"+
+				  "[VERPEDIDO] TEXT NOT NULL,"+
+				  "[VERCOBRO] TEXT NOT NULL,"+
+				  "[VALORN1] REAL NOT NULL,"+
+				  "PRIMARY KEY ([EMPID])"+
+				  ");";
 			database.execSQL(vSQL);
 
 			return 1;

@@ -95,7 +95,7 @@ public class Anulacion extends PBase {
 				
 		doc=new clsDocAnul(this,prn.prw,"");
 
-		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"");
+		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
 	}
 
 	
@@ -321,7 +321,7 @@ public class Anulacion extends PBase {
 
 				clsDocFactura fdoc;
 
-				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
 				fdoc.deviceid =gl.deviceId;
 				fdoc.buildPrint(itemid, 3, "TOL");
 
@@ -961,7 +961,7 @@ public class Anulacion extends PBase {
 				if (!corelFactura.isEmpty()){
 					clsDocFactura fdoc;
 
-					fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+					fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
 					fdoc.deviceid =gl.deviceId;
 
 					fdoc.buildPrint(corelFactura, 3, "TOL"); prn.printnoask(printclose,"print.txt");

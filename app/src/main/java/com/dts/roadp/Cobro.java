@@ -125,7 +125,7 @@ public class Cobro extends PBase {
 		fdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.deviceId, "");
 		fdoc.deviceid=gl.deviceId;
 
-		fdocf = new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+		fdocf = new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(cliid),gl.codCliNuevo,gl.peModal);
 		fdocf.deviceid=gl.deviceId;
 	}
 

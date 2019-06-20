@@ -29,7 +29,7 @@ public class clsDataBuilder {
 	
 	private BufferedWriter writer = null,lwriter = null;
 	private FileWriter wfile,lfile;
-	private String fname,logname,namefile;
+	private String fname,logname,namefile, codCliNuevo;
 
 	public clsDataBuilder(Context context) {
 		
@@ -44,7 +44,9 @@ public class clsDataBuilder {
 	    } catch (Exception e) {
 	    	MU.msgbox(e.getMessage());
 	    }
-		
+
+		parametrosGlobales();
+
 		System.setProperty("line.separator","\r\n");
 		
 		fname = Environment.getExternalStorageDirectory()+"/SyncFold/rd_data.txt";
@@ -103,6 +105,12 @@ public class clsDataBuilder {
 				  
 			    PRG.moveToNext();j+=1;
 			}
+
+			if (tn.equals("D_FACTURA")) SS="SELECT COREL, ANULADO, FECHA, EMPRESA, RUTA, VENDEDOR, " +
+					                       "CASE ADD1 WHEN 'NUEVO' THEN '" + codCliNuevo + "' ELSE CLIENTE END  CLIENTE, " +
+					                       "KILOMETRAJE, FECHAENTR, FACTLINK, TOTAL, DESMONTO, IMPMONTO, PESO, BANDERA, "+
+					                       "STATCOM, CALCOBJ, SERIE, CORELATIVO, IMPRES, ADD1, ADD2, ADD3, DEPOS, PEDCOREL," +
+					                       "REFERENCIA, ASIGNACION, SUPERVISOR, AYUDANTE, VEHICULO, CODIGOLIQUIDACION, RAZON_ANULACION";
 			
 		} catch (Exception e) {
 			err=e.getMessage();//return false;
@@ -148,6 +156,28 @@ public class clsDataBuilder {
 		}
 		
 		return (!err.isEmpty()?false:true);
+	}
+
+	public void parametrosGlobales() {
+		Cursor dt;
+		String sql;
+
+		try {
+			sql="SELECT FTPSERVER FROM P_GLOBPARAM";
+			dt=Con.OpenDT(sql);
+
+			if(dt.getCount()>0){
+				dt.moveToFirst();
+
+				codCliNuevo =dt.getString(0);
+			}else{
+				codCliNuevo ="";
+			}
+
+		} catch (Exception e) {
+			MU.toast("Ocurrió un error obteniendo los valores de clientes nuevos" + e.getMessage());
+		}
+
 	}
 
 	public void clear(){

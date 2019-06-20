@@ -41,8 +41,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.4.6 / ";
-    private String parFechaVer = "18-Jun-2019";
+    private String parNumVer = "9.4.7 / ";
+    private String parFechaVer = "20-Jun-2019";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -406,6 +406,7 @@ public class MainActivity extends PBase {
         try {
             AppMethods app = new AppMethods(this, gl, Con, db);
             app.parametrosExtra();
+            app.parametrosGlobales();
         } catch (Exception e) {
             addlog(new Object() {
             }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");

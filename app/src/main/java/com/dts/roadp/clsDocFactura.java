@@ -15,9 +15,11 @@ public class clsDocFactura extends clsDocument {
 	private boolean sinimp;
 	private String 	contrib,corelNotaC,asignacion,ccorel,corelF;
 	private int decimp,totitems;
+	private boolean esClienteNuevo;
+	private String codCliNuevo, modo;
 
-
-	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres, String archivo) {
+	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres, String archivo,
+						 boolean pClienteNuevo, String pCodClienteNuevo,String pModo) {
 		super(context, printwidth,cursymbol,decimpres, archivo);
 
 		docfactura=true;
@@ -25,6 +27,9 @@ public class clsDocFactura extends clsDocument {
 		docpedido=false;
 		docrecibo=false;
 		decimp=decimpres;
+		esClienteNuevo=pClienteNuevo;
+		codCliNuevo=pCodClienteNuevo;
+		modo = pModo;
 	}
 
 	protected boolean loadHeadData(String corel) {
@@ -50,7 +55,12 @@ public class clsDocFactura extends clsDocument {
 				ruta=DT.getString(2);
 
 				vend=DT.getString(3);
-				cli=DT.getString(4);
+
+				if (modo.equalsIgnoreCase("TOL") && esClienteNuevo) {
+					cli=codCliNuevo;
+				}else{
+					cli=DT.getString(4);
+				}
 
 				tot=DT.getDouble(5);
 				desc=DT.getDouble(6);
@@ -156,6 +166,7 @@ public class clsDocFactura extends clsDocument {
 			
 		} catch (Exception e) {
 			val=cli;
+			clicod=cli;
 	    }
 
 		try {

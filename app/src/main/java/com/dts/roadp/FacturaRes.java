@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class FacturaRes extends PBase {
 
@@ -244,7 +245,7 @@ public class FacturaRes extends PBase {
 		prn=new printer(this,printexit,gl.validimp);
 		prn_nc=new printer(this,printclose,gl.validimp);
 
-		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(cliid),gl.codCliNuevo,gl.peModal);
 		fdoc.deviceid =gl.deviceId;
 
 		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
@@ -782,7 +783,11 @@ public class FacturaRes extends PBase {
 			ins.add("CORELATIVO",fcorel);
 			ins.add("IMPRES",0);
 
-			ins.add("ADD1",gl.ref1);
+			if (gl.peModal.equalsIgnoreCase("TOL") && app.esClienteNuevo(gl.cliente)) {
+				ins.add("ADD1","NUEVO");
+			}else{
+				ins.add("ADD1",gl.ref1);
+			}
 			ins.add("ADD2",gl.ref2);
 			ins.add("ADD3",gl.ref3);
 
@@ -848,7 +853,6 @@ public class FacturaRes extends PBase {
 				ins.add("ESTADO","S");
 
 				db.execSQL(ins.sql());
-
 
 				ins.init("D_NOTACRED");
 
@@ -1251,7 +1255,7 @@ public class FacturaRes extends PBase {
 
 			//endregion
 
-			//region Actualizacion de ultimo correlativo
+			//region Actualización del último correlativo
 
 			sql="UPDATE P_COREL SET CORELULT="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";
 			db.execSQL(sql);

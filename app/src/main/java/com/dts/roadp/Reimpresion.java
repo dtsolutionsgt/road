@@ -83,7 +83,7 @@ public class Reimpresion extends PBase {
 		prn_can=new printer(this,printclose,gl.validimp);
 		prn_paseante=new printer(this,printclose,gl.validimp);
 
-		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
 		fdoc.deviceid =gl.deviceId;
 
 		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
@@ -153,7 +153,7 @@ public class Reimpresion extends PBase {
 			ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 			lblTipo.setText("Deposito");break;
 		case 3:  
-			fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+			fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
 			lblTipo.setText("Factura");break;
 		case 4:  
 			mdoc=new clsDocMov(this,prn.prw,"Recarga",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");

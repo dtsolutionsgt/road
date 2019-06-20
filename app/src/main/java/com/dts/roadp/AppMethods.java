@@ -392,6 +392,49 @@ public class AppMethods {
 
 	}
 
+	public void parametrosGlobales() {
+		Cursor dt;
+		String sql;
+
+		try {
+			sql="SELECT COMSERVER, FTPSERVER FROM P_GLOBPARAM";
+			dt=Con.OpenDT(sql);
+
+			if(dt.getCount()>0){
+				dt.moveToFirst();
+
+				gl.cuentaCliNuevo= dt.getString(0);
+				gl.codCliNuevo =dt.getString(1);
+			}else{
+				gl.cuentaCliNuevo= "";
+				gl.codCliNuevo ="";
+			}
+
+		} catch (Exception e) {
+			toast("Ocurrió un error obteniendo los valores de clientes nuevos" + e.getMessage());
+		}
+
+	}
+
+
+	public boolean esClienteNuevo(String cod) {
+		Cursor DT;
+		boolean clienteNuevo=false;
+
+		try{
+
+			sql="SELECT CODIGO FROM D_CLINUEVO WHERE CODIGO = '" + cod + "'";
+			DT=Con.OpenDT(sql);
+
+			clienteNuevo=(DT.getCount()>0);
+
+		}catch(Exception e){
+			msgbox("Ocurrió un error en la función esClienteNuevo " + e.getMessage());
+		}
+
+		return clienteNuevo;
+
+	}
 
     // Productos
 

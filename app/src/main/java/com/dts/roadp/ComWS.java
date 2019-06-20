@@ -1574,6 +1574,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_VEHICULO")) return false;
 			if (!AddTable("P_HANDHELD")) return false;
             if (!AddTable("P_TRANSERROR")) return false;
+			if (!AddTable("P_GLOBPARAM")) return false;
 
 			licResult=checkLicence(licSerial);
 			licResultRuta=checkLicenceRuta(licRuta);
@@ -1587,7 +1588,6 @@ public class ComWS extends PBase {
 			if (!AddTable("P_ARCHIVOCONF")) return false;
 			if (!AddTable("P_ENCABEZADO_REPORTESHH")) return false;
 			if (!AddTable("P_PORCMERMA")) return false;
-
 
 			// Objetivos
 
@@ -2288,6 +2288,11 @@ public class ComWS extends PBase {
             SQL = " SELECT IDTRANSERROR, TRANSERROR FROM P_TRANSERROR";
             return SQL;
         }
+		//#CKFK_20190522 Agregué tabla P_GLOBPARAM
+		if (TN.equalsIgnoreCase("P_GLOBPARAM")) {
+			SQL = " SELECT EMPID, COMSERVER, FTPSERVER, VERFACTURA, VERPEDIDO, VERCOBRO, VALORN1 FROM P_GLOBPARAM";
+			return SQL;
+		}
 
 		if (TN.equalsIgnoreCase("P_MUNI")) {
 			SQL = "SELECT * FROM P_MUNI";
@@ -2757,7 +2762,7 @@ public class ComWS extends PBase {
 			isbusy = 0;
 			comparaCorrel();
 
-			paramsExtra();
+			paramsExtrasGlob();
 
 			if (ftflag) msgbox(ftmsg);
 		} catch (Exception e){
@@ -4867,10 +4872,11 @@ public class ComWS extends PBase {
 		    }
 	}
 	
-	private void paramsExtra() {
+	private void paramsExtrasGlob() {
 		try {
 			AppMethods app=new AppMethods(this,gl,Con,db);
 			app.parametrosExtra();
+			app.parametrosGlobales();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			msgbox(e.getMessage());

@@ -447,8 +447,13 @@ public class CliNuevo extends PBase {
 		Cursor DT;
 				  
 		try {
-			
-			sql="SELECT Codigo,Nombre FROM P_NIVELPRECIO ORDER BY Codigo";
+
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				sql="SELECT Codigo,Nombre FROM P_NIVELPRECIO WHERE NOMBRE = 'GENERALES'";
+			}else{
+				sql="SELECT Codigo,Nombre FROM P_NIVELPRECIO ORDER BY Codigo";
+			}
+
 			DT=Con.OpenDT(sql);
 					
 			DT.moveToFirst();

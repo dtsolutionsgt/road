@@ -32,7 +32,7 @@ import java.text.DecimalFormat;
 public class ProdCant extends PBase {
 
 	private EditText txtCant,txtPeso;
-	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot,lblCodProd;
+	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot,lblCodProd, lblUltPrecio, txtUltPrecio;
 	private TextView lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso,lblPesoUni;
 	private ImageView imgProd,imgUpd,imgDel;
 	private Button cmdModifPrecio;
@@ -57,7 +57,16 @@ public class ProdCant extends PBase {
 		addlog("ProdCant",""+du.getActDateTime(),gl.vend);
 
 		setControls();
-				
+
+		if (gl.mostrarPedidoSugerido==1){
+			txtUltPrecio.setVisibility(View.VISIBLE);
+			lblUltPrecio.setVisibility(View.VISIBLE);
+			txtUltPrecio.setText("0");
+		}else{
+			txtUltPrecio.setVisibility(View.INVISIBLE);
+			lblUltPrecio.setVisibility(View.INVISIBLE);
+		}
+
 		prodid=gl.prod;lblCodProd.setText(prodid);
 		um=gl.um;
 		nivel=gl.nivel;
@@ -646,6 +655,8 @@ public class ProdCant extends PBase {
 			imgProd=(ImageView) findViewById(R.id.imgPFoto);
 			imgUpd=(ImageView) findViewById(R.id.imageView1);
 			imgDel=(ImageView) findViewById(R.id.imageView2);
+			lblUltPrecio=(TextView) findViewById(R.id.lblUltPrecio);
+			txtUltPrecio=(TextView) findViewById(R.id.txtUltPrecio);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -791,8 +802,8 @@ public class ProdCant extends PBase {
 			pmax = opeso + dt.getDouble(1) * opeso / 100;
 
 			if (vpeso<pmin) {
-				ss="El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por debajo de los porcentajes permitidos," +
-						" minimo : "+mu.frmdecimal(pmin, gl.peDecImp)+", no se puede aplicar.";
+				ss=" El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por debajo de los porcentajes permitidos," +
+				   " mínimo : "+mu.frmdecimal(pmin, gl.peDecImp)+", no se puede aplicar.";
 				msgbox(ss);return false;
 			}
 

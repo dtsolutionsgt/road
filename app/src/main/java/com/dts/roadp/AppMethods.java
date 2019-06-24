@@ -414,7 +414,6 @@ public class AppMethods {
 
 	}
 
-
     // Productos
 
     public boolean ventaPeso(String cod) {

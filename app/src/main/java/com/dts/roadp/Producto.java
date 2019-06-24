@@ -93,6 +93,9 @@ public class Producto extends PBase {
 		this.setTitle("Producto");
 		if (prodtipo==1) this.setTitle("Producto con existencia");
 
+		//#CKFK 20190624 Incializo la variable en falso
+		gl.mostrarPedidoSugerido=0;
+
         app = new AppMethods(this, gl, Con, db);
 
         items = new ArrayList<clsCD>();
@@ -427,6 +430,9 @@ public class Producto extends PBase {
 
                     switch (tipoid) {
                         case "0": // Catálogo producto
+
+							gl.mostrarPedidoSugerido=0;
+
                             sql=" SELECT CODIGO,DESCCORTA,UNIDBAS,DESCLARGA "+
                                 " FROM P_PRODUCTO INNER JOIN P_CATALOGO_PRODUCTO ON " +
                                 " P_PRODUCTO.CODIGO = P_CATALOGO_PRODUCTO.CODIGO_PRODUCTO WHERE 1=1 ";
@@ -436,12 +442,17 @@ public class Producto extends PBase {
                             sql+="ORDER BY P_CATALOGO_PRODUCTO.ORDEN";
                             break;
 
-                        case "1": // Catálogo producto
-                            sql="SELECT CODIGO,DESCCORTA,UNIDBAS,DESCLARGA FROM P_PRODUCTO WHERE 1=1 ";
-                            if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
-                            if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
+                        case "1": // Pedido Sugerido
 
-                            if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
+							gl.mostrarPedidoSugerido=1;
+
+							sql=" SELECT P.CODIGO,P.DESCCORTA,P.UNIDBAS,P.DESCLARGA "+
+									" FROM P_PRODUCTO P INNER JOIN P_PEDSUG PS ON " +
+									" P.CODIGO = PS.PRODUCTO WHERE 1=1 ";
+							if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P.LINEA='"+famid+"') ";
+							if (vF.length()>0) {sql=sql+"AND ((P.DESCCORTA LIKE '%" + vF + "%') OR (P.CODIGO LIKE '%" + vF + "%')) ";}
+
+							sql+="ORDER BY PS.ORDEN";
                             break;
                     }
 

@@ -1996,23 +1996,6 @@ public class BaseDatosScript {
 				  ");";
 			database.execSQL(vSQL);
 
-			vSQL = "CREATE TABLE [P_PARAM_PEDSUG]("+
-				   "[IDPARAMPEDSUG] INTEGER NOT NULL, "+
-				   "[EMPRESA] TEXT NOT NULL,"+
-				   "[SUCURSAL] TEXT NOT NULL,"+
-				   "[DIASPEDSUG] INTEGER NOT NULL, "+
-				   "[ORDENCANT] INTEGER NOT NULL, "+
-				   "[ORDENMONTO] INTEGER NOT NULL,"+
-				   "[TOPPRODUCTO] INTEGER NOT NULL,"+
-				   "[EJECUTARHH] INTEGER NOT NULL,"+
-				   "[USERAGR] TEXT NOT NULL,"+
-				   "[FECHAAGR] INTEGER NOT NULL,"+
-				   "[USERMOD] TEXT NOT NULL,"+
-				   "[FECHAMOD] INTEGER NOT NULL,"+
-				   "PRIMARY KEY ([IDPARAMPEDSUG])"+
-				   ");";
-			database.execSQL(vSQL);
-
 			return 1;
 			 
 		} catch (SQLiteException e) {

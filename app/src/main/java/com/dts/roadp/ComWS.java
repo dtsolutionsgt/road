@@ -1503,6 +1503,7 @@ public class ComWS extends PBase {
 		BufferedWriter writer = null;
 		FileWriter wfile;
 		int rc, scomp, prn, jj;
+		int ejecutarhh = 0;
 		String s, val = "";
 
 		try {
@@ -1522,6 +1523,8 @@ public class ComWS extends PBase {
 			} else {
 				val = "N";
 			}
+
+			DT.close();
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -1616,9 +1619,12 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MERPRODCOMP")) return false;
 
 			//Pedido Sugerido
+			dbld.clear();
+			dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");
+			commitSQL();
 
 			if (!AddTable("P_PEDSUG")) return false;
-			if (!AddTable("P_PARAM_PEDSUG")) return false;
+
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -2434,12 +2440,6 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
-		if (TN.equalsIgnoreCase("P_PARAM_PEDSUG")) {
-			SQL = " SELECT IDPARAMPEDSUG, EMPRESA, SUCURSAL, DIASPEDSUG, ORDENCANT, ORDENMONTO, TOPPRODUCTO, EJECUTARHH, USERAGR, " +
-				  "	FECHAAGR, USERMOD, FECHAMOD FROM P_PARAM_PEDSUG " +
-				  " WHERE SUCURSAL IN (SELECT SUCURSAL FROM P_RUTA WHERE RUTA ='" + ActRuta + "')";
-			return SQL;
-		}
 		return SQL;
 	}
 

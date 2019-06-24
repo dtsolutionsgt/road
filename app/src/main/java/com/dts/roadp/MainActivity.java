@@ -425,6 +425,8 @@ public class MainActivity extends PBase {
         gl.devicename = getLocalBluetoothName();
         lblID.setText(gl.devicename);
 
+        //
+
         try {
             AppMethods app = new AppMethods(this, gl, Con, db);
             app.parametrosExtra();

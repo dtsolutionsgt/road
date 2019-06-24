@@ -861,16 +861,6 @@ public class comWSLic extends PBase {
 
     }
 
-    private void paramsExtra() {
-        try {
-            AppMethods app=new AppMethods(this,gl,Con,db);
-            app.parametrosExtra();
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-            msgbox(e.getMessage());
-        }
-    }
-
     private void writeErrLog(String errstr) {
         BufferedWriter writer = null;
         FileWriter wfile;

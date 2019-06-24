@@ -80,4 +80,7 @@ public class appGlobals extends Application {
 	//Comunicación con WS
 	public int isOnWifi = 0;
 
+	//Mostrar producto: Catálogo o Pedido Sugerido
+	public int mostrarPedidoSugerido;
+
 }

@@ -258,7 +258,7 @@ public class printZebraZPL extends printBase {
             anchobarra = 1;//#CKFK 20190614 Modifiqué el ancho de la barra a 1 antes era 2
             psx = 20;
             anchopapel=500;
-            if (prwidth>35) anchopapel=400;//#CKFK 20190614 Agregué esta condición para el ancho del papel
+            if (prwidth>35) anchopapel=350;//#CKFK 20190614 Agregué esta condición para el ancho del papel
             if (prwidth>40) anchopapel=300;
             if (prwidth>60) anchopapel=400;
 
@@ -271,7 +271,7 @@ public class printZebraZPL extends printBase {
             ps+="^PW"+anchopapel;
             ps+="^LL"+dlen;
             for (int i = 0; i <ccnt; i++) {
-                ps+="^BY'"+anchobarra+"',2,'"+altobarra+"'";
+                ps+="^BY"+anchobarra+",2,"+altobarra+"";
                 ps+="^FO,"+psx+",62";
                 ps+="^BC";
                 ps+="^FD";

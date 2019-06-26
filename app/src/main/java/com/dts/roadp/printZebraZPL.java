@@ -215,8 +215,6 @@ public class printZebraZPL extends printBase {
             dlen=ccnt*altolinea+60;
 
             ps="";
-            /*ps+="! 0 "+anchopapel+" "+anchopapel+" "+dlen+" 1\r\n";dbg=ps;
-            ps+="ML "+altolinea+"\r\n" + "TEXT 0 2 10 0\r\n";*/
 
             ps+="^XA";
             ps+="^PW"+anchopapel;
@@ -224,7 +222,7 @@ public class printZebraZPL extends printBase {
 
             for (int i = 0; i <ccnt; i++) {
                 ps+="^FO,"+psx+",0";
-                ps+="^ABN,"+10+",0";
+                ps+="^ADN,5,0";
                 ps+="^FD";
                 ss=lines.get(i);
                 ps+=ss;
@@ -233,8 +231,6 @@ public class printZebraZPL extends printBase {
             }
 
             ps+="^XZ";
-            //ps+="FORM\r\n";
-            //ps+="PRINT\r\n";
 
             prdata =ps.getBytes();
 

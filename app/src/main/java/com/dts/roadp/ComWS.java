@@ -994,7 +994,7 @@ public class ComWS extends PBase {
 	public int fillTable(String value, String delcmd) {
 
 		int rc;
-		String s, ss;
+		String s, ss, tabla;
 
 		METHOD_NAME = "getIns";
 
@@ -1038,6 +1038,30 @@ public class ComWS extends PBase {
 			// 	idbg=idbg+" RC ="+rc+"---";
 			//}
 
+            tabla=delcmd.substring(13,delcmd.length()-13);
+            switch (tabla){
+                case "P_CLIENTE":
+                    if (rc==0){
+                        throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+                    }
+                break;
+
+                case "P_PRODUCTO":
+                    if (rc==0){
+                        throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+                    }
+                break;
+                case "P_PRODPRECIO":
+                    if (rc==0){
+                        throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+                    }
+                    break;
+                case "P_COREL":
+                    if (rc==0){
+                        throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+                    }
+                    break;
+            }
 
 			for (int i = 0; i < rc; i++) {
 				String str = "";

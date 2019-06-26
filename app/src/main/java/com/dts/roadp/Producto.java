@@ -381,6 +381,8 @@ public class Producto extends PBase {
 						scod = spincodetipo.get(position);
 						tipoid = scod;
 
+						listItems();
+
 						spinTipo.requestFocus();
 						//if (act>0) {hidekeyb();}
 						hidekeyb();

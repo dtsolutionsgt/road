@@ -996,6 +996,8 @@ public class ComWS extends PBase {
 		int rc;
 		String s, ss, tabla;
 
+		int retFillTable = 0;
+
 		METHOD_NAME = "getIns";
 
 		sstr = "OK";
@@ -1038,26 +1040,33 @@ public class ComWS extends PBase {
 			// 	idbg=idbg+" RC ="+rc+"---";
 			//}
 
-            tabla=delcmd.substring(13,delcmd.length()-13);
+            tabla=delcmd.substring(12);
             switch (tabla){
-                case "P_CLIENTE":
-                    if (rc==0){
+
+				case "P_RUTA":
+					if (rc==1){
+						throw new Exception("La ruta ingresada no es válida, ruta: " + ruta + ", no se puede continuar la carga de datos");
+					}
+					break;
+
+				case "P_CLIENTE":
+                    if (rc==1){
                         throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
                     }
                 break;
 
                 case "P_PRODUCTO":
-                    if (rc==0){
+                    if (rc==1){
                         throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
                     }
                 break;
                 case "P_PRODPRECIO":
-                    if (rc==0){
+                    if (rc==1){
                         throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
                     }
                     break;
                 case "P_COREL":
-                    if (rc==0){
+                    if (rc==1 && gl.rutatipo.equals("V")){
                         throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
                     }
                     break;
@@ -1098,15 +1107,20 @@ public class ComWS extends PBase {
 				}
 			}
 
-			return 1;
+			retFillTable= 1;
+
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+
 			//#EJC20190226: Evitar que se muestre OK después del nombre de la tabla cuando da error de timeOut.
 			sstr = e.getMessage();
 			idbg = idbg + " ERR " + e.getMessage();
-			return 0;
+			retFillTable= 0;
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), idbg, value);
+
 		}
+
+		return  retFillTable;
 	}
 
 	public int fillTableImpresora() {
@@ -1556,8 +1570,12 @@ public class ComWS extends PBase {
 			if (!AddTable("P_PARAMEXT")) return false;
 			procesaParamsExt();
 
-			if (!AddTable("P_NIVELPRECIO")) return false;
+			listItems.clear();
 			if (!AddTable("P_RUTA")) return false;
+			procesaRuta();
+
+			listItems.clear();
+			if (!AddTable("P_NIVELPRECIO")) return false;
 			if (!AddTable("P_CLIENTE")) return false;
 			if (!AddTable("P_CLIENTE_FACHADA")) return false;
 			if (!AddTable("P_CLIRUTA")) return false;
@@ -1633,7 +1651,7 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			}.getClass().getEnclosingMethod().getName(),idbg, fstr);
 			return false;
 		}
 
@@ -1827,6 +1845,62 @@ public class ComWS extends PBase {
 
 	}
 
+	private void procesaRuta() {
+		Cursor dt;
+		String sql, val = "";
+		int ival, rc;
+
+		try {
+
+			rc = listItems.size();
+			reccnt = rc;
+			if (rc == 0) return;
+
+			ConT = new BaseDatos(this);
+			dbT = ConT.getWritableDatabase();
+			ConT.vDatabase = dbT;
+			insT = ConT.Ins;
+
+			dbT.beginTransaction();
+
+			for (int i = 0; i < rc; i++) {
+
+				sql = listItems.get(i);
+				esql = sql;
+				dbT.execSQL(sql);
+
+				try {
+					if (i % 10 == 0) {
+
+						SystemClock.sleep(20);
+					}
+				} catch (Exception e) {
+					Log.e("z", e.getMessage());
+				}
+			}
+
+			dbT.setTransactionSuccessful();
+			dbT.endTransaction();
+
+			try {
+				sql = "SELECT VENTA FROM P_RUTA";
+				dt = Con.OpenDT(sql);
+				dt.moveToFirst();
+				val = dt.getString(0);
+			} catch (Exception e) {
+				val = "V";
+			}
+			gl.rutatipo = val;
+
+		} catch (Exception e) {
+			try {
+				ConT.close();
+			} catch (Exception ee) {
+			}
+		}
+
+	}
+
 	//#EJC20181120: Inserta los documentos que bajaron a la HH
 	private boolean Actualiza_Documentos() {
 		DateUtils DU = new DateUtils();
@@ -1956,15 +2030,15 @@ public class ComWS extends PBase {
 			} else {
 				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " fail " + sstr;
 				idbg = idbg + SQL + "#" + " PASS FAIL  ";
-				fstr = "Tab:" + TN + " " + sstr;
+				fstr = "Tabla:" + TN + " " + sstr;
 				return false;
 			}
 
 		} catch (Exception e) {
+			fstr = "Tabla:" + TN;
+			idbg = idbg;
 			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-			fstr = "Tab:" + TN + ", " + e.getMessage();
-			idbg = idbg + e.getMessage();
+			}.getClass().getEnclosingMethod().getName(),idbg, fstr);
 			return false;
 		}
 	}
@@ -1986,12 +2060,12 @@ public class ComWS extends PBase {
 			} else {
 				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " fail " + sstr;
 				idbg = idbg + SQL + "#" + " PASS FAIL  ";
-				fstr = "Tab:" + TN + " " + sstr;
+				fstr = "Tabla:" + TN + " " + sstr;
 				return false;
 			}
 
 		} catch (Exception e) {
-			fstr = "Tab:" + TN + ", " + e.getMessage();
+			fstr = "Tabla:" + TN + ", " + e.getMessage();
 			idbg = idbg + e.getMessage();
 			return false;
 		}
@@ -2744,8 +2818,8 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			scon = 0;
-			fstr = "No se puede conectar al web service. " + e.getMessage();
-			Log.d("E", fstr + sstr);
+			fstr = "Error importando los datos: " + fstr;
+			Log.d("E", fstr + " " + sstr);
 		}
 
 	}
@@ -2772,11 +2846,11 @@ public class ComWS extends PBase {
 
 			} else {
 				lblInfo.setText(fstr);
-				mu.msgbox("Ocurrió error : \n" + fstr + " (" + reccnt + ") ");
+				mu.msgbox("Ocurrió error : \n" + fstr + " " + idbg + " (Registro: " + reccnt + ") ");
 				//mu.msgbox("::" + esql);
 				isbusy = 0;
 				barInfo.setVisibility(View.INVISIBLE);
-				addlog("Recepcion", fstr, esql);
+				addlog("Recepcion", fstr, idbg);
 				return;
 			}
 
@@ -4097,10 +4171,10 @@ public class ComWS extends PBase {
 			}
 			idbg = idbg + " :: " + listItems.size();
 		} catch (Exception e) {
+			fstr = "Tabla:" + TN + ", " + e.getMessage();
+			idbg = idbg + " " + e.getMessage();
 			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-			fstr = "Tab:" + TN + ", " + e.getMessage();
-			idbg = idbg + e.getMessage();
+			}.getClass().getEnclosingMethod().getName(), idbg, fstr);
 		}
 	}
 

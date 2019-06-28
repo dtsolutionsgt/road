@@ -176,7 +176,7 @@ public class Producto extends PBase {
 
 							case  1:
 
-								if (prodBarra(item.Cod)) {
+								if (prodBarra(item.Cod) && (gl.rutatipo.equals("V"))) {
 									toastcent("Producto tipo barra, no se puede ingresar la cantidad");
 									finish();return;
 								}
@@ -208,7 +208,7 @@ public class Producto extends PBase {
 
 						adapter.setSelectedIndex(position);
 
-						if (prodBarra(item.Cod)) {
+						if (prodBarra(item.Cod)&& (gl.rutatipo.equals("V"))) {
 							toastcent("Producto tipo barra, no se puede ingresar la cantidad");
 							finish();return true;
 						}
@@ -245,7 +245,7 @@ public class Producto extends PBase {
 
 							case  1:
 
-								if (prodBarra(item.Cod)) {
+								if (prodBarra(item.Cod) && (gl.rutatipo.equals("V")))  {
 									toastcent("Producto tipo barra, no se puede ingresar la cantidad");
 									finish();return;
 								}
@@ -277,7 +277,7 @@ public class Producto extends PBase {
 
 						adaptergrid.setSelectedIndex(position);
 
-						if (prodBarra(item.Cod)) {
+						if (prodBarra(item.Cod)&& (gl.rutatipo.equals("V"))) {
 							toastcent("Producto tipo barra, no se puede ingresar la cantidad");
 							finish();return true;
 						}
@@ -450,7 +450,7 @@ public class Producto extends PBase {
 
 							sql=" SELECT P.CODIGO,P.DESCCORTA,P.UNIDBAS,P.DESCLARGA "+
 									" FROM P_PRODUCTO P INNER JOIN P_PEDSUG PS ON " +
-									" P.CODIGO = PS.PRODUCTO WHERE 1=1 ";
+									" P.CODIGO = PS.PRODUCTO WHERE CLIENTE = '"+gl.cliente+"'";
 							if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P.LINEA='"+famid+"') ";
 							if (vF.length()>0) {sql=sql+"AND ((P.DESCCORTA LIKE '%" + vF + "%') OR (P.CODIGO LIKE '%" + vF + "%')) ";}
 

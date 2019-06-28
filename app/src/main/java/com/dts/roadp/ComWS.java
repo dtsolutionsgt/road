@@ -1621,10 +1621,11 @@ public class ComWS extends PBase {
 			//Pedido Sugerido
 			dbld.clear();
 			dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");
+			dbld.add("EXEC SP_ULTIMOSPRECIOS '" + ruta + "'");
 			commitSQL();
 
 			if (!AddTable("P_PEDSUG")) return false;
-
+			if (!AddTable("P_ULTIMOPRECIO")) return false;
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -2437,6 +2438,13 @@ public class ComWS extends PBase {
 				  " TOTAL, ORDEN, ACIERTO, FECHAGENERACION, FECHASISTEMA, USERAGR, FECHAAGR, USERMOD, FECHAMOD "+
 				  " FROM P_PEDSUG " +
 		          " WHERE RUTA='" + ActRuta + "' AND (FECHAGENERACION>='" + fsqli + "') AND (FECHAGENERACION<='" + fsqlf + "')";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_ULTIMOPRECIO")) {
+			SQL = " SELECT IDULTIMOPRECIO, RUTA, CLIENTE, PRODUCTO, PRECIO, FECHAGENERACION "+
+					" FROM P_ULTIMOPRECIO " +
+					" WHERE RUTA='" + ActRuta + "' AND (FECHAGENERACION>='" + fsqli + "') AND (FECHAGENERACION<='" + fsqlf + "')";
 			return SQL;
 		}
 

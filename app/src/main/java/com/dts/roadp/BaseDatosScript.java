@@ -1996,6 +1996,17 @@ public class BaseDatosScript {
 				  ");";
 			database.execSQL(vSQL);
 
+			vSQL = "CREATE TABLE [P_ULTIMOPRECIO](" +
+					"[IDULTIMOPRECIO] INT NOT NULL," +
+					"[RUTA] TEXT NOT NULL," +
+					"[CLIENTE] TEXT NOT NULL," +
+					"[PRODUCTO] TEXT NOT NULL," +
+					"[PRECIO] REAL NOT NULL," +
+					"[FECHAGENERACION] INT NOT NULL,"+
+					"PRIMARY KEY ([IDULTIMOPRECIO])"+
+					");";
+			database.execSQL(vSQL);
+
 			return 1;
 			 
 		} catch (SQLiteException e) {

@@ -59,12 +59,21 @@ public class ProdCant extends PBase {
 		setControls();
 
 		if (gl.mostrarPedidoSugerido==1){
+
 			txtUltPrecio.setVisibility(View.VISIBLE);
 			lblUltPrecio.setVisibility(View.VISIBLE);
-			txtUltPrecio.setText("0");
+
+			double ultimoPrecio=getUtimoPrecio(gl.prod,gl.cliente);
+
+			txtUltPrecio.setText(mu.frmcur_sm(ultimoPrecio));
+
+			setAcierto(gl.prod,gl.cliente);
+
 		}else{
+
 			txtUltPrecio.setVisibility(View.INVISIBLE);
 			lblUltPrecio.setVisibility(View.INVISIBLE);
+
 		}
 
 		prodid=gl.prod;lblCodProd.setText(prodid);
@@ -913,6 +922,42 @@ public class ProdCant extends PBase {
         super.finish();
     }
 
+    private double getUtimoPrecio(String producto,String cliente){
+		Cursor DT;
+		double ultPrec=0;
+
+		try {
+
+			sql="SELECT PRECIO FROM P_ULTIMOPRECIO WHERE (CLIENTE='"+cliente+"') AND (PRODUCTO='"+producto+"')";
+			DT=Con.OpenDT(sql);
+
+			if(DT.getCount()>0){
+				DT.moveToFirst();
+				ultPrec=DT.getDouble(0);
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox("1-"+ e.getMessage());
+		}
+
+		return ultPrec;
+	}
+
+	private void setAcierto(String producto,String cliente){
+		Cursor DT;
+
+		try {
+
+			sql="UPDATE P_PEDSUG SET ACIERTO = 1 WHERE (CLIENTE='"+cliente+"') AND (PRODUCTO='"+producto+"')";
+			db.execSQL(sql);
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox("1-"+ e.getMessage());
+		}
+	}
+
 	//endregion
 
     //region Msg
@@ -1057,8 +1102,9 @@ public class ProdCant extends PBase {
 
 	//endregion
 
-	//#CKFK 20190613 Modificar el precio del producto
+	//region ModificarPrecio
 
+	//#CKFK 20190613 Modificar el precio del producto
 	public void ModificarPrecio(final View view) {
 
 		try{
@@ -1149,5 +1195,7 @@ public class ProdCant extends PBase {
 
 
 	}
+
+	//endregion
 
 }

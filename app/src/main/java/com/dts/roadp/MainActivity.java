@@ -57,7 +57,6 @@ public class MainActivity extends PBase {
             }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
-
     }
 
     // Grant permissions
@@ -133,8 +132,8 @@ public class MainActivity extends PBase {
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
             if (gl.debug) {
-                txtUser.setText("00101067");
-                txtPass.setText("123");
+                txtUser.setText("00105192");
+                txtPass.setText("105192EDG");
             }
 
         } catch (Exception e) {

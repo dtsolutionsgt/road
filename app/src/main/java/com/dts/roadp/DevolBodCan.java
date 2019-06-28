@@ -26,7 +26,7 @@ public class DevolBodCan extends PBase {
     private clsDocCanastaBod fcanastabod;
     private clsDocCanastaBod fpaseantebod;
     private DevolBod DevBod;
-    public Runnable printclose, printcallback,printexit;
+    public Runnable printclose, printcallback,printexit, printclosecan;
     private boolean imprimecopias=false;
     private ArrayList<clsClasses.clsDevCan> items= new ArrayList<clsClasses.clsDevCan>();
     private list_view_dev_bod_can adapter;
@@ -59,6 +59,12 @@ public class DevolBodCan extends PBase {
         app = new AppMethods(this, gl, Con, db);
         gl.validimp=app.validaImpresora();
         if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+
+        printclosecan = new Runnable() {
+            public void run() {
+
+            }
+        };
 
         printclose = new Runnable() {
             public void run() {
@@ -93,7 +99,7 @@ public class DevolBodCan extends PBase {
                 if (!imprimecopias){
 
                     if (imprimo==0) {
-                        prn_can.printnoask(printclose, "printdevcan.txt");
+                        prn_can.printnoask(printclosecan, "printdevcan.txt");
                     }
 
                     imprimecopias = true;
@@ -101,7 +107,7 @@ public class DevolBodCan extends PBase {
                 }else{
 
                     if (imprimo==0) {
-                        prn_can.printnoask(printclose, "printdevcan.txt");
+                        prn_can.printnoask(printclosecan, "printdevcan.txt");
                     }
                     imprimecopias = false;
 
@@ -744,7 +750,7 @@ public class DevolBodCan extends PBase {
                                 fcanastabod.buildPrint(corel, 1, vModo);
                             }
 
-                            if (imprimo == 0) {
+                           if (imprimo == 0) {
                                 prn_paseante.printask(printcallback, "printpaseante.txt");
                             } else if (imprimo == 1) {
                                 prn_paseante.printask(printcallback, "printpaseante.txt");

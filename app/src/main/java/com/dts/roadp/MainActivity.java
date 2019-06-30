@@ -41,8 +41,9 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.4.11 / ";
-    private String parFechaVer = "28-Jun-2019";
+    private String parNumVer = "9.4.12 / ";
+    private String parFechaVer = "30-Jun-2019";
+    private String parTipoVer = "ROAD PRD";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +57,6 @@ public class MainActivity extends PBase {
             msgbox(new Object() {
             }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
-
 
     }
 
@@ -102,6 +102,7 @@ public class MainActivity extends PBase {
             this.setTitle("ROAD");
             gl.parNumVer = parNumVer;
             gl.parFechaVer = parFechaVer;
+            gl.parTipoVer = parTipoVer;
 
             txtUser = (EditText) findViewById(R.id.txtUser);
             txtPass = (EditText) findViewById(R.id.txtMonto);
@@ -112,7 +113,7 @@ public class MainActivity extends PBase {
             lblID = (TextView) findViewById(R.id.textView81);
             imgLogo = (ImageView) findViewById(R.id.imgNext);
 
-            lblVer.setText("Version " + gl.parNumVer + gl.parFechaVer);
+            lblVer.setText(gl.parTipoVer + " Version " + gl.parNumVer + gl.parFechaVer);
 
             // DB VERSION
             dbVers = new BaseDatosVersion(this, db, Con);
@@ -133,8 +134,8 @@ public class MainActivity extends PBase {
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
             if (gl.debug) {
-                txtUser.setText("00101067");
-                txtPass.setText("123");
+                txtUser.setText("00105192");
+                txtPass.setText("105192EDG");
             }
 
         } catch (Exception e) {

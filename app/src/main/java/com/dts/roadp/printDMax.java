@@ -26,6 +26,7 @@ public class printDMax extends printBase {
 	
 	private String ss,ess;
 	private appGlobals appG;
+	private PBase clsPBase;
 	private boolean validprint;
 
 	private ArrayList<String> lines = new ArrayList<String>();
@@ -35,6 +36,7 @@ public class printDMax extends printBase {
 		super(context,printerMAC);
 		validprint=validprinter;
 		appG = new appGlobals();
+		clsPBase=new PBase();
 	}
 	
 	
@@ -256,6 +258,7 @@ public class printDMax extends printBase {
 			try {
 				processPrint();
 			} catch (Exception e) {
+				ss=ss + e.getMessage();
 				Log.d("Err_Impr",e.getMessage());
 			}
 	            
@@ -266,7 +269,10 @@ public class printDMax extends printBase {
 	    protected void onPostExecute(Void result) {
 	    	try {
 	    		doCallBack();
-			} catch (Exception e) {}
+			} catch (Exception e) {
+	    		ss=ss+e.getMessage();
+				clsPBase.addlog("onPostExecute", "" , ss);
+			}
 	    }
 	 
         @Override
@@ -293,6 +299,7 @@ public class printDMax extends printBase {
             }, 500);
         } catch (Exception e) {
         	ess=e.getMessage();
+        	ss=ss+e.getMessage();
 		}
 
 	}
@@ -309,15 +316,39 @@ public class printDMax extends printBase {
 
 			prconn = Connection_Bluetooth.createClient(printerAddress);
 
-			if (!prconn.getIsOpen()) prconn.open();
+			//CKFK 20190630 06:11 PM agregué a este proceso que intente la conexión con la impresora 10 veces
+			// y si no logra abrir la conexión de mensaje de que no pudo establecer conexión
+			//Además reduje el sleep a 500
+			int intento =0;
 
-			prconn.write(printData);
+			while (!prconn.getIsOpen() && intento <10) {
+				try{
 
-			prthread.sleep(1500);
+					prconn.open();
 
-			prconn.clearWriteBuffer();
-			//printclose.run();
-			prconn.close();
+					intento+=1;
+
+				} catch (Exception e) {
+					ss = ss + "Error : " + e.getMessage()+ ", intento " + intento;
+					Log.d("processPrint_ERR: ", ss);
+					clsPBase.addlog("processPrint", "" , ss);}
+			}
+
+			if(!prconn.getIsOpen() && intento ==10){
+				showmsg("No fue posible abrir la conexión con la impresora, se intentó: " + intento);
+				return;
+			}else{
+				prconn.write(printData);
+
+				prthread.sleep(500);
+
+				prconn.clearWriteBuffer();
+				//printclose.run();
+				prconn.close();
+
+			}
+
+		//	if (!prconn.getIsOpen()) prconn.open();
 
 		} catch (Exception e) {
 			ss = ss + "Error : " + e.getMessage();
@@ -326,6 +357,7 @@ public class printDMax extends printBase {
 			try {
 				if (prconn != null) prconn.close();
 			} catch (Exception ee) {
+			ss=ss + ee.getMessage();
 			}
 		}
 

@@ -282,7 +282,7 @@ public class Menu extends PBase {
 							mu.msgbox("No puede realizar esta acción");
 						}else {
 
-							if(gl.vnivel == 2){
+							if(gl.vnivel == 1){
 								msgAskSupervisor1();
 							}else {
 								startActivity(intent);

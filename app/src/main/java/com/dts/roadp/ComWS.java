@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -1045,28 +1046,33 @@ public class ComWS extends PBase {
 
 				case "P_RUTA":
 					if (rc==1){
+						borraDatos();
 						throw new Exception("La ruta ingresada no es válida, ruta: " + ruta + ", no se puede continuar la carga de datos");
 					}
 					break;
 
 				case "P_CLIENTE":
                     if (rc==1){
+						borraDatos();
                         throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
                     }
                 break;
 
                 case "P_PRODUCTO":
                     if (rc==1){
+						borraDatos();
                         throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
                     }
                 break;
                 case "P_PRODPRECIO":
                     if (rc==1){
+						borraDatos();
                         throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
                     }
                     break;
                 case "P_COREL":
                     if (rc==1 && gl.rutatipo.equals("V")){
+						borraDatos();
                         throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
                     }
                     break;
@@ -1317,6 +1323,8 @@ public class ComWS extends PBase {
 		return 0;
 
 	}
+
+
 
 	public int getTest() {
 
@@ -1575,15 +1583,16 @@ public class ComWS extends PBase {
 			procesaRuta();
 
 			listItems.clear();
-			if (!AddTable("P_NIVELPRECIO")) return false;
+			if (!AddTable("P_COREL")) return false;
 			if (!AddTable("P_CLIENTE")) return false;
+			if (!AddTable("P_PRODUCTO")) return false;
+			if (!AddTable("P_PRODPRECIO")) return false;
+			if (!AddTable("P_NIVELPRECIO")) return false;
 			if (!AddTable("P_CLIENTE_FACHADA")) return false;
 			if (!AddTable("P_CLIRUTA")) return false;
 			if (!AddTable("P_CLIDIR")) return false;
-			if (!AddTable("P_PRODUCTO")) return false;
 			if (!AddTable("P_FACTORCONV")) return false;
 			if (!AddTable("P_LINEA")) return false;
-			if (!AddTable("P_PRODPRECIO")) return false;
 			if (!AddTable("TMP_PRECESPEC")) return false;
 			if (!AddTable("P_DESCUENTO")) return false;
 			if (!AddTable("P_EMPRESA")) return false;
@@ -1595,7 +1604,6 @@ public class ComWS extends PBase {
 			if (!AddTable("P_CODDEV")) return false;
 			if (!AddTable("P_CODNOLEC")) return false;
 			if (!AddTable("P_NIVELPRECIO")) return false;
-			if (!AddTable("P_COREL")) return false;
 			if (!AddTable("P_CORELNC")) return false;
 			if (!AddTable("P_CORRELREC")) return false;
 			if (!AddTable("P_CORREL_OTROS")) return false;
@@ -1899,6 +1907,32 @@ public class ComWS extends PBase {
 			}
 		}
 
+	}
+
+	private boolean borraDatos(){
+
+		try {
+
+			db.beginTransaction();
+
+			sql="DELETE FROM P_RUTA";db.execSQL(sql);
+			sql="DELETE FROM P_PRODUCTO";db.execSQL(sql);
+			sql="DELETE FROM P_COREL";db.execSQL(sql);
+			sql="DELETE FROM P_PARAMEXT";db.execSQL(sql);
+			sql="DELETE FROM P_PRODPRECIO";db.execSQL(sql);
+			sql="DELETE FROM P_CLIENTE";db.execSQL(sql);
+
+			db.setTransactionSuccessful();
+			db.endTransaction();
+
+		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			db.endTransaction();
+			//mu.msgbox("Error : " + e.getMessage());
+			return false;
+		}
+
+		return true;
 	}
 
 	//#EJC20181120: Inserta los documentos que bajaron a la HH

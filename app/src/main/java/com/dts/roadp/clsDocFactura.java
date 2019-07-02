@@ -189,17 +189,19 @@ public class clsDocFactura extends clsDocument {
           	clidir=DT.getString(2);
 					
 		} catch (Exception e) {
-	    }	
-		
-		
-		try {
-			sql="SELECT NOMBRE FROM P_REF1  WHERE CODIGO='"+add1+"'";
-			DT=Con.OpenDT(sql);	
-			DT.moveToFirst();
-			
-			add1=add1+" - "+DT.getString(0);
-		} catch (Exception e) {
 	    }
+
+
+		if (!modofact.equalsIgnoreCase("TOL")) {
+			try {
+				sql="SELECT NOMBRE FROM P_REF1  WHERE CODIGO='"+add1+"'";
+				DT=Con.OpenDT(sql);
+				DT.moveToFirst();
+
+				add1=add1+" - "+DT.getString(0);
+			} catch (Exception e) {
+			}
+		}
 				
 		try {
 			sql="SELECT NOMBRE FROM P_REF2  WHERE CODIGO='"+add2+"'";

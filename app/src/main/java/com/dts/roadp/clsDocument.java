@@ -248,7 +248,7 @@ public class clsDocument {
 			if(i==7){
 				rep.add("");
 
-				if (docfactura) {
+				if (docfactura && !modofact.equalsIgnoreCase("TOL")) {
 					rep.add(resol);
 					rep.add(resfecha);
 					rep.add(resvence);
@@ -282,13 +282,13 @@ public class clsDocument {
 
         //if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
 
-        if (!emptystr(add1)) {
-
-            rep.add("");
-            rep.add(add1);
-            if (!emptystr(add2)) rep.add(add2);
-            rep.add("");
-
+       if (!modofact.equalsIgnoreCase("TOL")){
+		   if (!emptystr(add1)) {
+			   rep.add("");
+				rep.add(add1);
+				if (!emptystr(add2)) rep.add(add2);
+				rep.add("");
+			}
         }
 
         if (docfactura && !(modofact.equalsIgnoreCase("TOL"))){

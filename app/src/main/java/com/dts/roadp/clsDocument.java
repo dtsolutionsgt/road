@@ -369,10 +369,12 @@ public class clsDocument {
 
             }
 
-			if (l.length() > index + numero.length() ){
-				l = l.substring(0, index) + numero + l.substring(index + 10);
-			}else{
-				l = l.substring(0, index) + numero;
+			if (!numero.isEmpty()) {
+				if (l.length() > index + numero.length() ){
+					l = l.substring(0, index) + numero + l.substring(index + 10);
+				}else{
+					l = l.substring(0, index) + numero;
+				}
 			}
 
 			if (l.indexOf("@Numero")>=0) {
@@ -415,10 +417,13 @@ public class clsDocument {
 		idx=l.indexOf("@Serie");
         if (idx>=0) {
 
-			if (l.length() > idx + serie.length()) {
-				l = l.substring(0, idx) + serie + l.substring(idx + 6, idx + l.length() - idx - 6);
-			}else{
-				l = l.substring(0, idx) + serie;
+			if (!serie.isEmpty()) {
+				if (l.length() > idx + serie.length()) {
+					l = l.substring(0, idx) + serie + l.substring(idx + 6);
+					//l = l.substring(0, idx) + serie + l.substring(idx + 6, idx + l.length() - idx - 6); #CKFK 20190701
+				}else{
+					l = l.substring(0, idx) + serie;
+				}
 			}
 
 			if (l.indexOf("@Serie")>=0) {

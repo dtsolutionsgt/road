@@ -1693,7 +1693,9 @@ public class ComWS extends PBase {
 
 				try {
 					writer.write(sql);writer.write("\r\n");
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					Log.d("M", "Write Something happend there " + e.getMessage());
+				}
 
 				try {
 					dbT = ConT.getWritableDatabase();
@@ -1713,9 +1715,10 @@ public class ComWS extends PBase {
 						SystemClock.sleep(20);
 					}
 				} catch (Exception e) {
+					Log.e("z", e.getMessage());
+					ferr += " " +e.getMessage();
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-					Log.e("z", e.getMessage());
 				}
 			}
 
@@ -1760,8 +1763,6 @@ public class ComWS extends PBase {
 			return true;
 
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fprog = "Actualización incompleta";
 			wsRtask.onProgressUpdate();
 
@@ -1769,15 +1770,19 @@ public class ComWS extends PBase {
 			try {
 				ConT.close();
 			} catch (Exception ee) {
-				addlog(new Object() {
-				}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+				sstr = e.getMessage();
+				ferr += " " + sstr;
 			}
 
 			sstr = e.getMessage();
-			ferr = sstr + "\n" + sql;
+			ferr += " " + sstr + "\n" + sql;
 			esql = sql;
 
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), ferr, esql);
+
 			return false;
+
 		}
 
 	}

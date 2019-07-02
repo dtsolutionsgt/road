@@ -934,6 +934,12 @@ public class CliDet extends PBase {
 			//if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
 			if (flag) relD.setVisibility(View.VISIBLE);else relD.setVisibility(View.GONE);
 
+			if (esClienteNuevo()){
+				imgDevol.setVisibility(View.INVISIBLE);
+			}else{
+				imgDevol.setVisibility(View.VISIBLE);
+			}
+
 		}catch (Exception ex)
 		{
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
@@ -961,6 +967,23 @@ public class CliDet extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
+	}
+
+	private boolean esClienteNuevo() {
+		Cursor dt;
+		String sql = "";
+
+		try {
+			sql="SELECT * FROM D_CLINUEVO WHERE CODIGO='"+selid+"'";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return false;
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return true;
 	}
 
 	//endregion

@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -354,9 +355,8 @@ public class Venta extends PBase {
 						barcode = txtBarra.getText().toString();
 						txtBarra.requestFocus();
 						if (!mu.emptystr(barcode)) addBarcode();
-
 					}
-				}, 500);
+				}, 300);
 			}
 		});
 
@@ -891,8 +891,9 @@ public class Venta extends PBase {
 
 				db.execSQL(ins.sql());
 
-			} catch (SQLException e) {
-
+			} catch (Exception e) {
+			//	msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			//	addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			}
 
 			actualizaTotalesBarra();
@@ -902,6 +903,7 @@ public class Venta extends PBase {
 			return true;
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 		return false;
@@ -1006,13 +1008,22 @@ public class Venta extends PBase {
 		Cursor dt;
 
 		try {
+
 			sql="SELECT PRODUCTO FROM T_BARRA_BONIF WHERE (BARRA='"+barcode+"')";
 			dt=Con.OpenDT(sql);
-			return dt.getCount()>0;
+
+			//return dt.getCount()>0;
+
+			if (dt!=null)return dt.getCount()>0;
+			else return false;
+
 		} catch (Exception e) {
+			Log.d("Error en barraBonif",e.getMessage());
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			return false;
 		}
-		return true;
+		//return true;
 	}
 
 	private void validaBarraBon() {

@@ -717,8 +717,10 @@ public class FacturaRes extends PBase {
 
 	}
 
- 	private void singlePrint() {
-		try{
+ 	private void singlePrint()
+	{
+		try
+		{
 			prn.printask(printcallback);
 
 		}catch (Exception e){
@@ -727,7 +729,8 @@ public class FacturaRes extends PBase {
 
  	}
 
-	private boolean saveOrder(){
+	private boolean saveOrder()
+	{
 		Cursor dt;
 		String vprod,vumstock,vumventa,vbarra;
 		double vcant,vpeso,vfactor,peso,factpres,vtot,vprec;
@@ -1689,6 +1692,7 @@ public class FacturaRes extends PBase {
 		Cursor DT;
 
 		try {
+
 			sql="SELECT TIPO FROM P_PRODUCTO WHERE CODIGO='"+prcodd+"'";
            	DT=Con.OpenDT(sql);
 

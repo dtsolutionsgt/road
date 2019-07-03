@@ -5,6 +5,17 @@
     tools:context=".Img_view_list" >
 
     <TextView
+        android:id="@+id/lblPrecio"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lblFecha"
+        android:layout_toEndOf="@+id/lblPeso"
+        android:gravity="right"
+        android:text="99.99"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="18sp" />
+
+    <TextView
         android:id="@+id/lblETipo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

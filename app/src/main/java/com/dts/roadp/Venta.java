@@ -950,6 +950,7 @@ public class Venta extends PBase {
 								}
 							});
 
+
 							dialogBarra.setNegativeButton("No", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
 									txtBarra.setText("");

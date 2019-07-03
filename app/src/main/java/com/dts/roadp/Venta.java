@@ -74,6 +74,11 @@ public class Venta extends PBase {
 	private static final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
 	private static final long  MIN_TIME_BW_UPDATES = 1000; // in Milliseconds
 
+	private Runnable scanCallBack;
+
+	private boolean isDialogBarraShowed = false;
+
+	private AlertDialog.Builder dialogBarra;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +125,14 @@ public class Venta extends PBase {
 		validaNivelPrecio();
 
 		txtBarra.requestFocus();txtBarra.setText("");
+
+		dialogBarra= new AlertDialog.Builder(this);
+
+		scanCallBack= new Runnable() {
+			public void run() {
+				addBarcode();
+			}
+		};
 	}
 
 
@@ -316,6 +329,7 @@ public class Venta extends PBase {
 				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
 					try {
+
 						Object lvObj = listView.getItemAtPosition(position);
 						clsVenta vItem = (clsVenta)lvObj;
 
@@ -338,7 +352,8 @@ public class Venta extends PBase {
 					return true;
 				}
 			});
-		}catch (Exception e){
+		}catch (Exception e)
+		{
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
@@ -348,15 +363,30 @@ public class Venta extends PBase {
 
 			public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
 
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				Handler handlerTimer = new Handler();
-				handlerTimer.postDelayed(new Runnable() {
-					public void run() {
-						barcode = txtBarra.getText().toString();
-						txtBarra.requestFocus();
-						if (!mu.emptystr(barcode)) addBarcode();
-					}
-				}, 300);
+			public void onTextChanged(CharSequence s, int start, int before, int count)
+			{
+
+				Log.d("ElHuevo","Negro");
+
+				barcode = txtBarra.getText().toString();
+
+				if (barcode.length()>=10)
+				{
+					txtBarra.requestFocus();
+					if (!mu.emptystr(barcode)) scanCallBack.run();
+				}
+
+//				Handler handlerTimer = new Handler();
+//				handlerTimer.postDelayed(new Runnable() {
+//					public void run() {
+//						barcode = txtBarra.getText().toString();
+//						if (barcode.length()>=10)
+//						{
+//							txtBarra.requestFocus();
+//							if (!mu.emptystr(barcode)) scanCallBack.run();
+//						}
+//					}
+//				}, 300);
 			}
 		});
 
@@ -375,7 +405,8 @@ public class Venta extends PBase {
 		items.clear();tot=0;ttimp=0;ttperc=0;selidx=-1;ii=0;
 
 		try {
-			sql="SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, T_VENTA.TOTAL, T_VENTA.CANT, T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, T_VENTA.PESO, T_VENTA.UMSTOCK " +
+			sql="SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, T_VENTA.TOTAL, T_VENTA.CANT, "+
+				"T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, T_VENTA.PESO, T_VENTA.UMSTOCK, T_VENTA.PRECIO  " +
 				 "FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO "+
 				 "ORDER BY P_PRODUCTO.DESCCORTA ";
 
@@ -405,6 +436,7 @@ public class Venta extends PBase {
 						item.um=app.umVenta(item.Cod);
 					}
 					item.Peso=DT.getDouble(9);
+					item.precio=DT.getDouble(11);
 
 					item.val=mu.frmdecimal(item.Cant,gl.peDecImp)+" "+ltrim(item.um,6);
 					if (gl.usarpeso) {
@@ -759,29 +791,45 @@ public class Venta extends PBase {
 
 	//region Barras
 
-	private void addBarcode() {
-		gl.barra=barcode;
+	private void addBarcode()
+	{
 
-		if (barraBonif()) {
-			toastlong("¡La barra es parte de bonificacion!");
-			txtBarra.setText("");return;
-		}
+		if (!isDialogBarraShowed)
+		{
 
-		if (barraBolsa()) {
+			gl.barra=barcode;
+
+			if (barraBonif())
+			{
+				toastlong("¡La barra es parte de bonificacion!");
+				txtBarra.setText("");return;
+			}
+
+			if (barraBolsa())
+			{
+				txtBarra.setText("");
+				listItems();
+				return;
+			}
+
+			if (barraProducto())
+			{
+				txtBarra.setText("");
+				return;
+			}
+
+			toastlong("¡La barra "+barcode+" no existe!");
 			txtBarra.setText("");
-			listItems();
-			return;
+		}else{
+			toastlong("¡Conteste la pregunta por favor!");
+			txtBarra.setText("");
 		}
 
-		if (barraProducto()) {
-			txtBarra.setText("");return;
-		}
-
-		toastlong("¡La barra "+barcode+" no existe!");
-		txtBarra.setText("");
 	}
 
-	private boolean barraBolsa() {
+	private boolean barraBolsa()
+	{
+
 		Cursor dt;
 		double ppeso=0,pprecdoc=0,factbolsa;
 		String uum,umven;
@@ -790,9 +838,11 @@ public class Venta extends PBase {
 		porpeso=true;
 
 		try {
+
 			sql="SELECT CODIGO,CANT,PESO,UNIDADMEDIDA " +
 				"FROM P_STOCKB WHERE (BARRA='"+barcode+"') ";
 			dt=Con.OpenDT(sql);
+
 			if (dt.getCount()==0) return false;
 
 			try {
@@ -826,28 +876,66 @@ public class Venta extends PBase {
 				pprecdoc = prec;
 
 				prodtot = prec;
+
 				if (factbolsa>1) prodtot = cant*prec;
 				if (prodPorPeso(prodid)) prodtot=mu.round2(prec*ppeso);
 
 				try {
-					ins.init("T_BARRA");
 
+					ins.init("T_BARRA");
 					ins.add("BARRA",barcode);
 					ins.add("CODIGO",prodid);
 					ins.add("PRECIO",prodtot);
 					ins.add("PESO",ppeso);
 					ins.add("PESOORIG",ppeso);
 					ins.add("CANTIDAD",cant);
-
 					db.execSQL(ins.sql());
-
 					toast(barcode);
-				} catch (Exception e) {
+
+				} catch (Exception e)
+				{
+
+					Log.d("Err_AF20190702",e.getMessage());
+
 					isnew=false;
+
 					if (chkBorrar.isChecked()) {
-						borraBarra();return true;
-					} else {
-						msgAskBarra("Borrar la barra "+barcode);return true;
+						borraBarra();
+						return true;
+					} else
+					{
+
+						if (!isDialogBarraShowed)
+						{
+
+							isDialogBarraShowed = true;
+
+							dialogBarra.setTitle(R.string.app_name);
+							dialogBarra.setMessage("Borrar la barra "  + " ?");
+							dialogBarra.setIcon(R.drawable.ic_quest);
+
+							dialogBarra.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									isDialogBarraShowed = false;
+									borraBarra();
+								}
+							});
+
+							dialogBarra.setNegativeButton("No", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									isDialogBarraShowed = false;
+								}
+							});
+
+							dialogBarra.show();
+
+						}else {
+							Log.d("CerrarDialog","vos");
+							isDialogBarraShowed=false;
+						}
+
+//						msgAskBarra("Borrar la barra "+barcode);
+						return true;
 					}
 				}
 
@@ -855,10 +943,11 @@ public class Venta extends PBase {
 				prodtot=mu.round(prodtot,2);
 
 				ins.init("T_VENTA");
-
 				ins.add("PRODUCTO",prodid);
 				ins.add("EMPRESA",emp);
-				if (prodPorPeso(prodid)) {
+
+				if (prodPorPeso(prodid))
+				{
 					ins.add("UM",gl.umpeso);
 				} else {
 					if (factbolsa==1) ins.add("UM",umven);else ins.add("UM",umven);
@@ -866,22 +955,28 @@ public class Venta extends PBase {
 				ins.add("CANT",cant);
 				ins.add("UMSTOCK",umven);
 				ins.add("FACTOR",gl.umfactor);
-				if (prodPorPeso(prodid)) {
+
+				if (prodPorPeso(prodid))
+				{
 					//ins.add("PRECIO",gl.prectemp);
 					ins.add("PRECIO",prec);
 				} else {
 					ins.add("PRECIO",prec);
 				}
+
 				ins.add("IMP",0);
 				ins.add("DES",0);
 				ins.add("DESMON",0);
 				ins.add("TOTAL",prodtot);
-				if (prodPorPeso(prodid)) {
+
+				if (prodPorPeso(prodid))
+				{
 					//ins.add("PRECIODOC",gl.prectemp);
 					ins.add("PRECIODOC",pprecdoc);
 				} else {
 					ins.add("PRECIODOC",pprecdoc);
 				}
+
 				ins.add("PESO",ppeso);
 				ins.add("VAL1",0);
 				ins.add("VAL2","");
@@ -894,6 +989,7 @@ public class Venta extends PBase {
 			} catch (Exception e) {
 			//	msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			//	addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				Log.d("Err_On_Insert",e.getMessage());
 			}
 
 			actualizaTotalesBarra();
@@ -901,7 +997,10 @@ public class Venta extends PBase {
 			if (isnew) validaBarraBon();
 
 			return true;
-		} catch (Exception e) {
+
+		} catch (Exception e)
+		{
+			Log.d("Err_On_Insert",e.getMessage());
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -1508,8 +1607,10 @@ public class Venta extends PBase {
 
 	}
 
-	private void msgAskBarra(String msg) {
-		try{
+	private void msgAskBarra(String msg)
+	{
+		try
+		{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle(R.string.app_name);
@@ -1551,6 +1652,7 @@ public class Venta extends PBase {
 					switch (item) {
 						case 0:
 							browse=4;
+							actualizaBarras();
 							startActivity(new Intent(Venta.this,RepesajeLista.class));break;
 						case 1:
 							msgAskDel("Borrar producto");break;
@@ -1575,11 +1677,20 @@ public class Venta extends PBase {
 
 	}
 
+	private void actualizaBarras(){
+		try{
+
+			sql="UPDATE T_BARRA SET ";
+		}catch(Exception e){
+
+		}
+	}
+
 	private void setControls(){
 
 		try{
+			
 			listView = (ListView) findViewById(R.id.listView1);
-
 			lblProd= (TextView) findViewById(R.id.lblProd);
 			lblPres= (TextView) findViewById(R.id.lblPres);
 			lblCant= (TextView) findViewById(R.id.lblCant);
@@ -1892,7 +2003,8 @@ public class Venta extends PBase {
 			if (browse==5) {
 				browse=0;addBarcode();return;
 			}
-		}catch (Exception e){
+		}catch (Exception e)
+		{
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 

@@ -32,7 +32,7 @@ public class Repesaje extends PBase {
 
     private String prodid;
     private int ival,tcant;
-    private double dpeso,dcan,tpeso,ocant,opeso;
+    private double dpeso,dcan,tpeso,ocant,opeso,ttotal, tprecio, tcantidad;
     private boolean esbarra;
 
     // Calculator
@@ -218,6 +218,7 @@ public class Repesaje extends PBase {
     private void loadItem() {
         try{
             if (esbarra) {
+                getPrecio();
                 loadBarras();
             } else {
                 loadItemSingle();
@@ -232,7 +233,7 @@ public class Repesaje extends PBase {
         Cursor DT;
 
         try {
-            sql = "SELECT PESO,TOTAL,CANT FROM T_VENTA WHERE PRODUCTO='"+prodid+"' ";
+            sql = "SELECT PESO,TOTAL,CANT, PRECIO FROM T_VENTA WHERE PRODUCTO='"+prodid+"' ";
 
             DT = Con.OpenDT(sql);
             DT.moveToFirst();
@@ -243,6 +244,27 @@ public class Repesaje extends PBase {
 
             opeso=DT.getDouble(0);
             ocant=DT.getDouble(2);
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox(e.getMessage());
+        }
+    }
+
+    private void getPrecio() {
+        Cursor DT;
+
+        try {
+
+            sql = "SELECT PRECIO FROM T_VENTA WHERE PRODUCTO='"+prodid+"' ";
+
+            DT = Con.OpenDT(sql);
+
+            if(DT.getCount()>0){
+                DT.moveToFirst();
+                tprecio=DT.getDouble(0);
+            }
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());
@@ -253,17 +275,19 @@ public class Repesaje extends PBase {
         Cursor DT;
 
         try {
-            sql = "SELECT SUM(PESO),SUM(PRECIO),COUNT(BARRA) FROM T_BARRA WHERE CODIGO='"+prodid+"' ";
+
+            sql = "SELECT SUM(PESO),SUM(PRECIO),COUNT(BARRA), SUM(PESOORIG) FROM T_BARRA WHERE CODIGO='"+prodid+"' ";
 
             DT = Con.OpenDT(sql);
             DT.moveToFirst();
 
             lblOCant.setText(""+DT.getInt(2));
-            lblOPeso.setText(mu.frmdecimal(DT.getDouble(0),gl.peDecImp));
+            lblOPeso.setText(mu.frmdecimal(DT.getDouble(3),gl.peDecImp));
             lblPrec.setText(mu.frmdecimal(DT.getDouble(1),2));
 
-            opeso=DT.getDouble(0);
+            opeso=DT.getDouble(3);
             ocant=DT.getDouble(2);
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());
@@ -329,6 +353,7 @@ public class Repesaje extends PBase {
 
     private void apply() {
         if (esbarra) applyBarra();else applySimple();
+        browse=1;
     }
 
     private void applySimple() {
@@ -360,16 +385,20 @@ public class Repesaje extends PBase {
 
             rf=tpeso/opeso;rf=mu.roundr(rf,gl.peDec);tp=0;
 
-            sql = "SELECT BARRA,PESO FROM T_BARRA WHERE CODIGO='"+prodid+"' ";
+            sql = "SELECT BARRA,PESO,CANTIDAD,PESOORIG FROM T_BARRA WHERE CODIGO='"+prodid+"' ";
             dt = Con.OpenDT(sql);
             dt.moveToFirst();
 
             while (!dt.isAfterLast()) {
                 bar=dt.getString(0);
-                pp0=dt.getDouble(1);pp=pp0*rf;ppr=mu.roundr(pp,gl.peDec);
+                pp0=dt.getDouble(3);pp=pp0*rf;ppr=mu.roundr(pp,gl.peDec);
+                tcantidad=dt.getDouble(2);
                 tp+=ppr;
 
-                sql="UPDATE T_BARRA SET PESO="+ppr+" WHERE CODIGO='"+prodid+"' AND BARRA='"+bar+"'";
+                if (prodPorPeso(prodid)) ttotal=mu.round2(tprecio*ppr);
+                else ttotal=tprecio*tcantidad;
+
+                sql="UPDATE T_BARRA SET PESO="+ppr+", PRECIO="+ttotal+" WHERE CODIGO='"+prodid+"' AND BARRA='"+bar+"'";
                 db.execSQL(sql);
 
                 dt.moveToNext();
@@ -379,18 +408,30 @@ public class Repesaje extends PBase {
             dtp=tpeso-tp;
             dtp=mu.roundr(dtp,gl.peDec+2);// diferencia por redondeo
 
-            sql = "SELECT BARRA,PESO FROM T_BARRA WHERE CODIGO='"+prodid+"' ";
+            sql = "SELECT BARRA,PESO,CANTIDAD FROM T_BARRA WHERE CODIGO='"+prodid+"' ";
             dt = Con.OpenDT(sql);
             dt.moveToFirst();
             bar=dt.getString(0);
             pp=dt.getDouble(1);
+            tcantidad=dt.getDouble(2);
 
             // agregar la diferencia a la primera barra
-            sql="UPDATE T_BARRA SET PESO=PESO+"+dtp+" WHERE CODIGO='"+prodid+"' AND BARRA='"+bar+"'";
+            sql="UPDATE T_BARRA SET PESO=PESO+"+dtp+", PRECIO="+ttotal+" WHERE CODIGO='"+prodid+"' AND BARRA='"+bar+"'";
             db.execSQL(sql);
 
+           //Actualizar totales
+            sql = "SELECT CANT FROM T_VENTA WHERE PRODUCTO='"+prodid+"' ";
+            dt = Con.OpenDT(sql);
+            dt.moveToFirst();
+            tcantidad=dt.getDouble(0);
+
+           if (prodPorPeso(prodid)) ttotal=mu.round2(tprecio*tpeso);
+           else ttotal=tprecio*tcantidad;
+
+           lblPrec.setText(mu.frmdecimal(ttotal,2));
+
             // actualizar peso en T_VENTA
-            sql="UPDATE T_VENTA SET PESO="+tpeso+" WHERE PRODUCTO='"+prodid+"'";
+            sql="UPDATE T_VENTA SET TOTAL="+ttotal+",PESO="+tpeso+" WHERE PRODUCTO='"+prodid+"'";
             db.execSQL(sql);
 
             finish();
@@ -398,6 +439,16 @@ public class Repesaje extends PBase {
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());
+        }
+    }
+
+
+    private boolean prodPorPeso(String prodid) {
+        try {
+            return app.ventaPeso(prodid);
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+            return false;
         }
     }
 

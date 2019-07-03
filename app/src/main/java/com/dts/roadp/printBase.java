@@ -41,7 +41,8 @@ public class printBase {
 	
 	// Abstract Methods
 	
-	public void printask(Runnable callBackHook) {
+	public void printask(Runnable callBackHook)
+	{
 		hasCallback=true;
 		callback=callBackHook;
 	}

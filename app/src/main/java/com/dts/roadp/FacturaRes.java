@@ -995,7 +995,7 @@ public class FacturaRes extends PBase {
 				ins.add("VAL2",dt.getString(10));
 				ins.add("UMVENTA",dt.getString(11));
 				ins.add("FACTOR",dt.getDouble(12));
-				ins.add("UMSTOCK",vumstock);
+				ins.add("UMSTOCK",dt.getString(13));//vumstock);
 				ins.add("UMPESO",gl.umpeso); //#HS_20181120_1625 Se agrego el valor gl.umpeso anteriormente estaba ""
 
 			    db.execSQL(ins.sql());

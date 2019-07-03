@@ -626,13 +626,13 @@ public class Repesaje extends PBase {
             pmax = opeso + dt.getDouble(1) * opeso / 100;
 
             if (tpeso<pmin) {
-                ss="El repesaje ("+mu.frmdecimal(tpeso, gl.peDecImp)+") está por debajo de los percentajes permitidos," +
+                ss="El repesaje ("+mu.frmdecimal(tpeso, gl.peDecImp)+") está por debajo de los porcentajes permitidos," +
                         " minimo : "+mu.frmdecimal(pmin, gl.peDecImp)+", no se puede aplicar.";
                 msgbox(ss);return false;
             }
 
             if (tpeso>pmax) {
-                ss="El repesaje ("+mu.frmdecimal(tpeso, gl.peDecImp)+") está por debajo de los percentajes permitidos," +
+                ss="El repesaje ("+mu.frmdecimal(tpeso, gl.peDecImp)+") está por debajo de los porcentajes permitidos," +
                         " máximo : "+mu.frmdecimal(pmax, gl.peDecImp)+", no se puede aplicar.";
                 msgbox(ss);return false;
             }

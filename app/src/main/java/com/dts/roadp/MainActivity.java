@@ -136,6 +136,9 @@ public class MainActivity extends PBase {
             if (gl.debug) {
                 txtUser.setText("00105192");
                 txtPass.setText("105192EDG");
+
+                txtUser.setText("00100993");
+                txtPass.setText("2613");
             }
 
         } catch (Exception e) {

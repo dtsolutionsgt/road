@@ -226,13 +226,9 @@ public class clsDocument {
                 s=s.replace("numero : 0","");
             }
 
-            if (docrecibo) {
-				s=s.replace("Factura","Recibo");
-            }
+            if (docrecibo) s=s.replace("Factura","Recibo");
 
-            if(docdevolucion){
-				s=s.replace("Factura","Recibo");
-			}
+            if(docdevolucion) s=s.replace("Factura","Recibo");
 
 			if(doccanastabod){
 				s=s.replace("Factura","Recibo");
@@ -257,7 +253,10 @@ public class clsDocument {
 			}
         }
 
-        if (!emptystr(nit)) rep.add("RUC : "+nit);
+        if (!emptystr(nit)) {
+        	rep.add("RUC : "+nit);
+		}
+
         if (!emptystr(clidir)) rep.add("Dir : "+clidir);
         if(docfactura){
 			if(condicionPago==4){

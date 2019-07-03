@@ -634,7 +634,6 @@ public class FacturaRes extends PBase {
 
  	private void finishOrder(){
 
-
 		if (!saved) {
 			if (!saveOrder()) return;
 		}
@@ -677,7 +676,7 @@ public class FacturaRes extends PBase {
 					singlePrint();
 				}
 
-			}else if(!prn.isEnabled()){
+			} else if(!prn.isEnabled()){
 				if (gl.peModal.equalsIgnoreCase("APR")) {
 					fdoc.buildPrintExt(corel,2,"APR");
 				} else if (gl.peModal.equalsIgnoreCase("...")) {
@@ -717,20 +716,15 @@ public class FacturaRes extends PBase {
 
 	}
 
- 	private void singlePrint()
-	{
-		try
-		{
+ 	private void singlePrint() 	{
+		try 		{
 			prn.printask(printcallback);
-
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
  	}
 
-	private boolean saveOrder()
-	{
+	private boolean saveOrder() {
 		Cursor dt;
 		String vprod,vumstock,vumventa,vbarra;
 		double vcant,vpeso,vfactor,peso,factpres,vtot,vprec;
@@ -1997,7 +1991,7 @@ public class FacturaRes extends PBase {
 			final EditText input = new EditText(this);
 			alert.setView(input);
 
-			input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			input.setInputType(InputType.TYPE_NULL);
 			input.setText(""+tot);
 			input.requestFocus();
 
@@ -2026,6 +2020,27 @@ public class FacturaRes extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+
+	}
+
+
+	private void pagarCredito() {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle("Title");
+		dialog.setMessage("¿   ?");
+
+		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				;
+			}
+		});
+
+		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {}
+		});
+
+		dialog.show();
 
 	}
 

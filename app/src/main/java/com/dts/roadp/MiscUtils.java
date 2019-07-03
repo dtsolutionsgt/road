@@ -252,7 +252,7 @@ public class MiscUtils {
 		if (ndec>10)return val;
 		
 		if (ndec<0) ndec=0;
-		v=val;
+		v=val+0.0001;
 		pw=Math.pow(10,ndec);
 		v=v*pw;
 		v=Math.floor(v);

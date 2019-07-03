@@ -53,7 +53,7 @@ public class CliDet extends PBase {
 	private Exist Existencia = new Exist();
 	private String cod,tel, Nombre, NIT, sgp1, sgp2;
 	private String imagenbase64,path,fechav;
-	private Boolean imgPath, imgDB, ventaGPS,flagGPS=true,permiteVenta=true;
+	private Boolean imgPath, imgDB, ventaGPS,flagGPS=true,permiteVenta=true,clicred;
 	private double gpx,gpy,credito,clim,cused,cdisp,cred;
 	private int nivel,browse,merc,rangoGPS,modoGPS;
 	private boolean porcentaje = false;
@@ -96,7 +96,6 @@ public class CliDet extends PBase {
 		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
 
 		app = new AppMethods(this, gl, Con, db);
-		credito=gl.credito;
 
 		cod=gl.cliente;
 
@@ -124,6 +123,7 @@ public class CliDet extends PBase {
 
 		showData();
 		calcCredit();
+		credito=gl.credito;
 
 		browse=0;
 		merc=1;
@@ -366,7 +366,7 @@ public class CliDet extends PBase {
 	
 	private void showData() {
 		Cursor DT;
-		int uvis;
+		int uvis,dcred;
 		String contr,sgps="0.00000000 , 0.00000000";
 		
 		lblNom.setText("");lblRep.setText("");
@@ -411,9 +411,13 @@ public class CliDet extends PBase {
 
 			if(gl.media != 4){
 				lblClientePago.setText("CONTADO");
+				if (gl.peModal.equalsIgnoreCase("TOL")) clicred=false;
 			}else if(gl.media == 4){
 				lblClientePago.setText("CRÉDITO");
+				if (gl.peModal.equalsIgnoreCase("TOL")) clicred=true;
 			}
+
+			dcred=DT.getInt(17);
 
 			clim=DT.getDouble(5);
 						
@@ -445,6 +449,8 @@ public class CliDet extends PBase {
 			cused=getUsedCred();
 			cdisp=clim-cused;if (cdisp<0) cdisp=0;
 			gl.credito=cdisp;
+
+			if (!gl.peModal.equalsIgnoreCase("TOL")) clicred=gl.credito>0;
 
 			lblCLim.setText(mu.frmcur(clim));
 			lblCUsed.setText(mu.frmcur(cused));
@@ -1108,7 +1114,7 @@ public class CliDet extends PBase {
 			chkncv.setText("Nota de crédito con venta");
 
 			layout.addView(chknc);
-			layout.addView(chkncv);
+			if (!clicred) layout.addView(chkncv);
 
 			alert.setView(layout);
 

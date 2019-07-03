@@ -336,7 +336,7 @@ public class Repesaje extends PBase {
 
         try {
             ritems.remove(selidx);
-            clearItem();
+            //clearItem();
 
             for (int i = 0; i <ritems.size(); i++) {
                 ritems.get(i).id=i+1;

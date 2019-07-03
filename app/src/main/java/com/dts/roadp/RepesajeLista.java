@@ -153,7 +153,6 @@ public class RepesajeLista extends PBase {
         items.clear();
 
         try {
-            //sql = "SELECT BARRA,PESO,PRECIO FROM T_BARRA WHERE CODIGO='"+prodid+"' AND VENTA=1";
             sql = "SELECT BARRA,PESO,PRECIO FROM T_BARRA WHERE CODIGO='"+prodid+"'";
             dt = Con.OpenDT(sql);
             dt.moveToFirst();
@@ -201,10 +200,10 @@ public class RepesajeLista extends PBase {
         try{
             super.onResume();
 
-           // if (browse==1) {
+            if (browse==1) {
                 browse=0;
                 listItems();return;
-            //}
+            }
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }

@@ -163,7 +163,7 @@ public class clsDocDevolucion extends clsDocument {
         vendedor=val;
 
         try {
-            sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION FROM P_CLIENTE WHERE CODIGO='"+cli+"'";
+            sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION,NIT FROM P_CLIENTE WHERE CODIGO='"+cli+"'";
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
 
@@ -176,6 +176,7 @@ public class clsDocDevolucion extends clsDocument {
 
             clicod=cli;
             clidir=DT.getString(3);
+            nit=DT.getString(4);
 
         } catch (Exception e) {
             val=cli;

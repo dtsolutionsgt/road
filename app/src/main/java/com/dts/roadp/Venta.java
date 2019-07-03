@@ -827,6 +827,7 @@ public class Venta extends PBase {
 	//region Barras
 
 	private void addBarcode() 	{
+		int bbolsa;
 
 		if (!isDialogBarraShowed) 	{
 
@@ -837,9 +838,13 @@ public class Venta extends PBase {
 				txtBarra.setText("");return;
 			}
 
-			if (barraBolsa()) {
+			bbolsa=barraBolsa();
+			if (bbolsa==1) {
 				txtBarra.setText("");
 				listItems();
+				return;
+			} else if (bbolsa==-1) {
+				toastlong("Barra vendida.");
 				return;
 			}
 
@@ -859,7 +864,7 @@ public class Venta extends PBase {
 
 	}
 
-	private boolean barraBolsa() {
+	private int barraBolsa() {
 
 		Cursor dt;
 		double ppeso=0,pprecdoc=0,factbolsa;
@@ -874,7 +879,11 @@ public class Venta extends PBase {
 				"FROM P_STOCKB WHERE (BARRA='"+barcode+"') ";
 			dt=Con.OpenDT(sql);
 
-			if (dt.getCount()==0) return false;
+			if (dt.getCount()==0) {
+				sql="SELECT Barra FROM D_FACTURA_BARRA  WHERE (BARRA='"+barcode+"') ";
+				dt=Con.OpenDT(sql);
+				if (dt.getCount()==0) return 0;else return -1;
+			}
 
 			try {
 
@@ -931,7 +940,7 @@ public class Venta extends PBase {
 
 					if (chkBorrar.isChecked()) {
 						borraBarra();
-						return true;
+						return 1;
 					} else 	{
 						if (!isDialogBarraShowed)	{
 
@@ -970,7 +979,7 @@ public class Venta extends PBase {
 						}
 
 //						msgAskBarra("Borrar la barra "+barcode);
-						return true;
+						return 1;
 					}
 				}
 
@@ -1038,7 +1047,7 @@ public class Venta extends PBase {
 
 			if (isnew) validaBarraBon();
 
-			return true;
+			return 1;
 
 		} catch (Exception e) 	{
 			Log.d("Err_On_Insert",e.getMessage());
@@ -1046,7 +1055,7 @@ public class Venta extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		return false;
+		return 0;
 	}
 
 	private void actualizaTotalesBarra() {

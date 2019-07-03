@@ -57,7 +57,7 @@ public class Venta extends PBase {
 	private double px,py,cpx,cpy,cdist;
 
 	private String emp,cliid,rutatipo,prodid,um,tiposcan;
-	private int nivel,dweek,clidia;
+	private int nivel,dweek,clidia,scanc=0;
 	private boolean sinimp,rutapos,softscanexist,porpeso,usarscan;
 
 	private AppMethods app;
@@ -136,7 +136,6 @@ public class Venta extends PBase {
 		};
 	}
 
-
 	//region Events
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -145,7 +144,7 @@ public class Venta extends PBase {
 			if (resultCode == RESULT_OK) {
 				String contents = intent.getStringExtra("SCAN_RESULT");
 				barcode=contents;
-				toast(barcode);
+				//toast(barcode);
 			}
 			//}
 		}catch (Exception e){
@@ -365,16 +364,23 @@ public class Venta extends PBase {
 			public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
 
 			public void onTextChanged(CharSequence s, int start, int before, int count) 			{
-				/*
+/*
+				//scanc++;lblTit.setText("Scan : "+scanc);
 				Log.d("ElHuevo","Negro");
 
 				barcode = txtBarra.getText().toString();
 
-				if (barcode.length()>=10)
-				{
+				if (barcode.length()>=10) {
 					txtBarra.requestFocus();
 					if (!mu.emptystr(barcode)) scanCallBack.run();
 				}
+
+				Handler handlerTimer = new Handler();
+				handlerTimer.postDelayed(new Runnable() {
+					public void run() {
+							txtBarra.requestFocus();
+					}
+				}, 300);
 */
 //				Handler handlerTimer = new Handler();
 //				handlerTimer.postDelayed(new Runnable() {
@@ -390,32 +396,36 @@ public class Venta extends PBase {
 			}
 		});
 
-		txtBarra.setOnKeyListener(new View.OnKeyListener() {
-			@Override
-			public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
-				if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
-					switch (arg1) {
-						case KeyEvent.KEYCODE_ENTER:
-							toast("key ");
-							txtBarra.requestFocus();
-							return true;
-					}
-				}
-				return false;
-			}
-		});
-
 	}
 
-/*
+
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
 		if (e.getAction() == KeyEvent.ACTION_DOWN && e.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-			bcode = txtFiltro.getText().toString().trim();
-			barcodeClient();
+			barcode = txtBarra.getText().toString().trim();
+
+			Handler handlerTimer = new Handler();
+			handlerTimer.postDelayed(new Runnable() {
+				public void run() {
+					txtBarra.setText("");
+				}
+			}, 20);
+
+			lblTit.setText(barcode);
+
+			if (!isDialogBarraShowed)	{
+				if (!mu.emptystr(barcode)) 	scanCallBack.run();
+			}
+
+			Handler handlerTimer2 = new Handler();
+			handlerTimer2.postDelayed(new Runnable() {
+				public void run() {
+					txtBarra.requestFocus();
+				}
+			}, 100);
 		}
 		return super.dispatchKeyEvent(e);
-	}*/
+	}
 
 	//endregion
 
@@ -816,44 +826,40 @@ public class Venta extends PBase {
 
 	//region Barras
 
-	private void addBarcode()
-	{
+	private void addBarcode() 	{
 
-		if (!isDialogBarraShowed)
-		{
+		if (!isDialogBarraShowed) 	{
 
 			gl.barra=barcode;
 
-			if (barraBonif())
-			{
+			if (barraBonif()) {
 				toastlong("¡La barra es parte de bonificacion!");
 				txtBarra.setText("");return;
 			}
 
-			if (barraBolsa())
-			{
+			if (barraBolsa()) {
 				txtBarra.setText("");
 				listItems();
 				return;
 			}
 
-			if (barraProducto())
-			{
+			if (barraProducto()) {
 				txtBarra.setText("");
 				return;
 			}
 
 			toastlong("¡La barra "+barcode+" no existe!");
 			txtBarra.setText("");
-		}else{
+			txtBarra.requestFocus();
+		} else {
 			toastlong("¡Conteste la pregunta por favor!");
 			txtBarra.setText("");
+			txtBarra.requestFocus();
 		}
 
 	}
 
-	private boolean barraBolsa()
-	{
+	private boolean barraBolsa() {
 
 		Cursor dt;
 		double ppeso=0,pprecdoc=0,factbolsa;
@@ -915,10 +921,9 @@ public class Venta extends PBase {
 					ins.add("PESOORIG",ppeso);
 					ins.add("CANTIDAD",cant);
 					db.execSQL(ins.sql());
-					toast(barcode);
+					//toast(barcode);
 
-				} catch (Exception e)
-				{
+				} catch (Exception e) 	{
 
 					Log.d("Err_AF20190702",e.getMessage());
 
@@ -927,16 +932,15 @@ public class Venta extends PBase {
 					if (chkBorrar.isChecked()) {
 						borraBarra();
 						return true;
-					} else
-					{
+					} else 	{
+						if (!isDialogBarraShowed)	{
 
-						if (!isDialogBarraShowed)
-						{
+							txtBarra.setText("");
 
 							isDialogBarraShowed = true;
 
 							dialogBarra.setTitle(R.string.app_name);
-							dialogBarra.setMessage("Borrar la barra "  + " ?");
+							dialogBarra.setMessage("Borrar la barra \n"+ barcode  + "\n ?");
 							dialogBarra.setIcon(R.drawable.ic_quest);
 
 							dialogBarra.setPositiveButton("Si", new DialogInterface.OnClickListener() {
@@ -948,13 +952,18 @@ public class Venta extends PBase {
 
 							dialogBarra.setNegativeButton("No", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
+									txtBarra.setText("");
+									txtBarra.requestFocus();
 									isDialogBarraShowed = false;
 								}
 							});
 
 							dialogBarra.show();
 
-						}else {
+
+							txtBarra.requestFocus();
+
+						} else {
 							Log.d("CerrarDialog","vos");
 							isDialogBarraShowed=false;
 						}
@@ -971,13 +980,14 @@ public class Venta extends PBase {
 				ins.add("PRODUCTO",prodid);
 				ins.add("EMPRESA",emp);
 
-				if (prodPorPeso(prodid))
-				{
+				if (prodPorPeso(prodid)) {
 					ins.add("UM",gl.umpeso);//ins.add("UM",gl.umpeso);
 				} else {
 					if (factbolsa==1) ins.add("UM",umven);else ins.add("UM",umven);
 				}
+
 				ins.add("CANT",cant);
+
 				if (prodPorPeso(prodid))
 				{
 					ins.add("UMSTOCK",um);//ins.add("UM",gl.umpeso);
@@ -1029,8 +1039,7 @@ public class Venta extends PBase {
 
 			return true;
 
-		} catch (Exception e)
-		{
+		} catch (Exception e) 	{
 			Log.d("Err_On_Insert",e.getMessage());
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

@@ -201,10 +201,10 @@ public class RepesajeLista extends PBase {
         try{
             super.onResume();
 
-            if (browse==1) {
+           // if (browse==1) {
                 browse=0;
                 listItems();return;
-            }
+            //}
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }

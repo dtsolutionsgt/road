@@ -948,12 +948,18 @@ public class Venta extends PBase {
 
 				if (prodPorPeso(prodid))
 				{
-					ins.add("UM",gl.umpeso);
+					ins.add("UM",gl.umpeso);//ins.add("UM",gl.umpeso);
 				} else {
 					if (factbolsa==1) ins.add("UM",umven);else ins.add("UM",umven);
 				}
 				ins.add("CANT",cant);
-				ins.add("UMSTOCK",umven);
+				if (prodPorPeso(prodid))
+				{
+					ins.add("UMSTOCK",um);//ins.add("UM",gl.umpeso);
+				} else {
+					ins.add("UMSTOCK",umven);
+				}
+
 				ins.add("FACTOR",gl.umfactor);
 
 				if (prodPorPeso(prodid))
@@ -1652,7 +1658,6 @@ public class Venta extends PBase {
 					switch (item) {
 						case 0:
 							browse=4;
-							actualizaBarras();
 							startActivity(new Intent(Venta.this,RepesajeLista.class));break;
 						case 1:
 							msgAskDel("Borrar producto");break;
@@ -1675,15 +1680,6 @@ public class Venta extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	}
-
-	private void actualizaBarras(){
-		try{
-
-			sql="UPDATE T_BARRA SET ";
-		}catch(Exception e){
-
-		}
 	}
 
 	private void setControls(){

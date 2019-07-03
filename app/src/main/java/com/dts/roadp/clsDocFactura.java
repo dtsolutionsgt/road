@@ -278,7 +278,7 @@ public class clsDocFactura extends clsDocument {
 
             }
 
-			sql="SELECT D_FACTURAD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_FACTURAD.CANT,D_FACTURAD.PRECIODOC,D_FACTURAD.IMP, D_FACTURAD.DES,D_FACTURAD.DESMON, D_FACTURAD.TOTAL, D_FACTURAD.UMVENTA, D_FACTURAD.UMPESO, D_FACTURAD.PESO " +
+			sql="SELECT D_FACTURAD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_FACTURAD.CANT,D_FACTURAD.PRECIODOC,D_FACTURAD.IMP, D_FACTURAD.DES,D_FACTURAD.DESMON, D_FACTURAD.TOTAL, D_FACTURAD.UMVENTA, D_FACTURAD.UMPESO, D_FACTURAD.PESO, D_FACTURAD.UMSTOCK " +
 				"FROM D_FACTURAD INNER JOIN P_PRODUCTO ON D_FACTURAD.PRODUCTO = P_PRODUCTO.CODIGO " +
 				"WHERE (D_FACTURAD.COREL='"+corel+"')";	
 			
@@ -302,6 +302,7 @@ public class clsDocFactura extends clsDocument {
                 item.um = DT.getString(8);
                 item.ump = DT.getString(9);
                 item.peso = DT.getDouble(10);
+				item.ums = DT.getString(11);
 
                 if (sinimp) item.tot = item.tot - item.imp;
 
@@ -372,7 +373,7 @@ public class clsDocFactura extends clsDocument {
 			item=items.get(i);
 
 			ss=rep.ltrim(item.cod+" "+item.nombre,prw-10);
-			ss=ss+rep.rtrim(item.um,4)+" "+rep.rtrim(frmdecimal(item.cant,2),5);
+			ss=ss+rep.rtrim(item.ums,4)+" "+rep.rtrim(frmdecimal(item.cant,2),5);
 			rep.add(ss);
 			ss=rep.rtrim(frmdecimal(item.peso,decimp),10)+" "+rep.rtrim(frmdecimal(item.prec,2),8);
 			ss=rep.ltrim(ss,prw-10);
@@ -577,7 +578,7 @@ public class clsDocFactura extends clsDocument {
 	}
 	
 	private class itemData {
-		public String cod,nombre,um,ump;
+		public String cod,nombre,um,ump,ums;
 		public double cant,peso,prec,imp,descper,desc,tot;
 	}
 	

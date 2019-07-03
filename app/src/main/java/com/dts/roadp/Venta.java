@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -363,9 +364,8 @@ public class Venta extends PBase {
 
 			public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
 
-			public void onTextChanged(CharSequence s, int start, int before, int count)
-			{
-
+			public void onTextChanged(CharSequence s, int start, int before, int count) 			{
+				/*
 				Log.d("ElHuevo","Negro");
 
 				barcode = txtBarra.getText().toString();
@@ -375,7 +375,7 @@ public class Venta extends PBase {
 					txtBarra.requestFocus();
 					if (!mu.emptystr(barcode)) scanCallBack.run();
 				}
-
+*/
 //				Handler handlerTimer = new Handler();
 //				handlerTimer.postDelayed(new Runnable() {
 //					public void run() {
@@ -390,7 +390,32 @@ public class Venta extends PBase {
 			}
 		});
 
+		txtBarra.setOnKeyListener(new View.OnKeyListener() {
+			@Override
+			public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
+				if (arg2.getAction() == KeyEvent.ACTION_DOWN) {
+					switch (arg1) {
+						case KeyEvent.KEYCODE_ENTER:
+							toast("key ");
+							txtBarra.requestFocus();
+							return true;
+					}
+				}
+				return false;
+			}
+		});
+
 	}
+
+/*
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent e) {
+		if (e.getAction() == KeyEvent.ACTION_DOWN && e.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+			bcode = txtFiltro.getText().toString().trim();
+			barcodeClient();
+		}
+		return super.dispatchKeyEvent(e);
+	}*/
 
 	//endregion
 

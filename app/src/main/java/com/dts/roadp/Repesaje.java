@@ -415,6 +415,9 @@ public class Repesaje extends PBase {
             pp=dt.getDouble(1);
             tcantidad=dt.getDouble(2);
 
+            if (prodPorPeso(prodid)) ttotal=mu.round2(tprecio*(pp+dtp));
+            else ttotal=tprecio*tcantidad;
+
             // agregar la diferencia a la primera barra
             sql="UPDATE T_BARRA SET PESO=PESO+"+dtp+", PRECIO="+ttotal+" WHERE CODIGO='"+prodid+"' AND BARRA='"+bar+"'";
             db.execSQL(sql);

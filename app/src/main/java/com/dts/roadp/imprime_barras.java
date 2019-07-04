@@ -216,10 +216,10 @@ public class imprime_barras extends PBase{
         try{
 
             if (barlist.size()>0){
-                btnPrint.setVisibility(View.INVISIBLE);
+               // btnPrint.setVisibility(View.INVISIBLE);
                 mu.toast("Imprimiendo barras...");
                 prn.printBarra(barlist);
-                btnPrint.setVisibility(View.VISIBLE);
+               // btnPrint.setVisibility(View.VISIBLE);
             }else{
                 mu.msgbox("No hay barras para imprimir.");
             }

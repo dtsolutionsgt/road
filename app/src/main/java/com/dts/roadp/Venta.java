@@ -833,6 +833,8 @@ public class Venta extends PBase {
 
 			gl.barra=barcode;
 
+            opendb();
+
 			if (barraBonif()) {
 				toastlong("¡La barra es parte de bonificacion!");
 				txtBarra.setText("");return;
@@ -1051,8 +1053,8 @@ public class Venta extends PBase {
 
 		} catch (Exception e) 	{
 			Log.d("Err_On_Insert",e.getMessage());
-			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		//	msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		//	addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 		return 0;
@@ -1111,7 +1113,8 @@ public class Venta extends PBase {
 			}
 
 		} catch (Exception e) {
-			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+            Log.d("Error en barraBonif",e.getMessage());
+			//msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 
 		return false;
@@ -1168,8 +1171,8 @@ public class Venta extends PBase {
 
 		} catch (Exception e) {
 			Log.d("Error en barraBonif",e.getMessage());
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			//msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			return false;
 		}
 		//return true;
@@ -2043,6 +2046,7 @@ public class Venta extends PBase {
 			if (browse==5) {
 				browse=0;addBarcode();return;
 			}
+
 		}catch (Exception e)
 		{
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

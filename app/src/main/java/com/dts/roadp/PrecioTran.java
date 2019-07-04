@@ -88,7 +88,9 @@ public class PrecioTran {
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			pr=DT.getDouble(0);
-			
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			pr=0;
 
@@ -97,6 +99,7 @@ public class PrecioTran {
 				DT=Con.OpenDT(sql);
 				DT.moveToFirst();
 				pr=DT.getDouble(0);
+				if(DT!=null) DT.close();
 			} catch (Exception ee) {
 				pr=0;
 			}
@@ -172,7 +175,8 @@ public class PrecioTran {
 			DT.moveToFirst();
 							  
 			pr=DT.getDouble(0);
-			
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			pr=0;
 	    }	
@@ -229,7 +233,9 @@ public class PrecioTran {
 			ic1=DT.getInt(0);
 			ic2=DT.getInt(1);
 			ic3=DT.getInt(2);
-			
+
+			if(DT!=null) DT.close();
+
 			if (ic1>0) {
 				sql="SELECT VALOR FROM P_IMPUESTO WHERE CODIGO="+ic1;
 	           	DT=Con.OpenDT(sql);
@@ -239,8 +245,8 @@ public class PrecioTran {
 					im1=DT.getDouble(0);
 				} catch (Exception e) {
 					im1=0;
-				}	
-				
+				}
+				if(DT!=null) DT.close();
 			}
 			
 			if (ic2>0) {
@@ -252,8 +258,8 @@ public class PrecioTran {
 					im2=DT.getDouble(0);
 				} catch (Exception e) {
 					im2=0;
-				}	
-				
+				}
+				if(DT!=null) DT.close();
 			}
 			
 			if (ic3>0) {
@@ -265,8 +271,8 @@ public class PrecioTran {
 					im3=DT.getDouble(0);
 				} catch (Exception e) {
 					im3=0;
-				}	
-				
+				}
+				if(DT!=null) DT.close();
 			}			
 			
 			
@@ -314,6 +320,8 @@ public class PrecioTran {
 					dt.moveToNext();
 				}
 			}
+
+			if(dt!=null) dt.close();
 
 		} catch (Exception e) {
 			pr=0;

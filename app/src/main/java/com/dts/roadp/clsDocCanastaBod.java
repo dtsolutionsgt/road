@@ -104,9 +104,9 @@ public class clsDocCanastaBod extends clsDocument {
                 sql=" SELECT M.PRODUCTO,P.DESCLARGA,M.CANT,M.PESO,M.LOTE,M.UNIDADMEDIDA "+
                     " FROM D_MOVD M INNER JOIN P_PRODUCTO P ON M.PRODUCTO=P.CODIGO "+
                     " WHERE M.COREL='"+corel+"'"+
-                    " UNION SELECT M.PRODUCTO,P.DESCLARGA,COUNT(M.BARRA) AS CANT,M.PESO,'' AS LOTE,M.UNIDADMEDIDA " +
+                    " UNION SELECT M.PRODUCTO,P.DESCLARGA,COUNT(M.BARRA) AS CANT,SUM(M.PESO) AS TPESO,'' AS LOTE,M.UNIDADMEDIDA " +
                     " FROM D_MOVDB M INNER JOIN P_PRODUCTO P ON M.PRODUCTO=P.CODIGO " +
-                    " WHERE M.COREL='"+corel+"'";
+                    " WHERE M.COREL='"+corel+"' GROUP BY M.PRODUCTO,P.DESCLARGA,LOTE,M.UNIDADMEDIDA ";
             }
 
             DTs=Con.OpenDT(sql);

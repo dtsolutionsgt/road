@@ -347,8 +347,11 @@ public class DevolBodCan extends PBase {
 
             db.execSQL(ins.sql());
 
+
+
             sql="SELECT CODIGO,LOTE,SUM(CANT),SUM(CANTM),SUM(PESO),UNIDADMEDIDA FROM P_STOCK GROUP BY CODIGO,LOTE,UNIDADMEDIDA " +
                 "HAVING SUM(CANT)>0 OR SUM(CANTM) >0";
+
             DT=Con.OpenDT(sql);
 
             if(DT.getCount()>0){

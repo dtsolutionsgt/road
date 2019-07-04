@@ -67,7 +67,7 @@ public class Repesaje extends PBase {
         app = new AppMethods(this, gl, Con, db);
         esbarra=app.prodBarra(prodid);
 
-        prc=new Precio(this,mu,gl.peDec, false);
+        prc=new Precio(this,mu,gl.peDec);
 
         setHandlers();
 

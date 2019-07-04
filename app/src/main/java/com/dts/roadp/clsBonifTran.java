@@ -2,41 +2,40 @@ package com.dts.roadp;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.dts.roadp.clsClasses.clsBonifItem;
 
 import java.util.ArrayList;
 
-public class clsBonif {
-		
+public class clsBonifTran {
+
 	public  ArrayList<clsBonifItem> items = new ArrayList<clsBonifItem>();
-	
+
 	private int active;
-	private android.database.sqlite.SQLiteDatabase db;
+	private SQLiteDatabase db;
+	private BaseDatos.Insert ins;
+	private BaseDatos.Update upd;
 	private BaseDatos Con;
-	private String vSQL;
-	
+	private String sql;
+
 	private MiscUtils MU;
 	private clsClasses clsCls = new clsClasses();
 
 	private Context cont;
-	
+
 	private String prodid,lineaid,slineaid,marcaid;
 	private double cant,monto,vmax;
-	
-	public clsBonif(Context context,String producto,double cantidad,double montoventa) {
+
+	public clsBonifTran(Context context, String producto, double cantidad, double montoventa, BaseDatos dbconnection, SQLiteDatabase database) {
 		
 		cont=context;
 		
 		prodid=producto;cant=cantidad;monto=montoventa;
 
-		/*
-		try {
-			active=0;
-			Con = new BaseDatos(context);
-			opendb();
-		} catch (Exception e) {
-		}*/
+		Con=dbconnection;
+		db=database;
+		ins=Con.Ins;upd=Con.Upd;
 
 	    MU=new MiscUtils(context);
 		
@@ -71,10 +70,10 @@ public class clsBonif {
 		double val;
 		
 		try {
-			vSQL="SELECT PRODUCTO,PTIPO,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
+			sql ="SELECT PRODUCTO,PTIPO,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
 				 "FROM T_BONIF WHERE  ("+cant+">=RANGOINI) AND ("+cant+"<=RANGOFIN) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='U') AND (TIPOBON='R') AND (GLOBBON='N') AND (PORCANT='S')";
-			DT=Con.OpenDT(vSQL);
+			DT=Con.OpenDT(sql);
 		
 			
 			if (DT.getCount()==0) return;
@@ -133,10 +132,10 @@ public class clsBonif {
 		double val;
 		
 		try {
-			vSQL="SELECT PRODUCTO,PTIPO,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
+			sql ="SELECT PRODUCTO,PTIPO,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
 				 "FROM T_BONIF WHERE  ("+monto+">=RANGOINI) AND ("+monto+"<=RANGOFIN) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='V') AND (TIPOBON='R') AND (GLOBBON='N') AND (PORCANT='N')";
-			DT=Con.OpenDT(vSQL);
+			DT=Con.OpenDT(sql);
 		
 			if (DT.getCount()==0) return;
 			
@@ -194,10 +193,10 @@ public class clsBonif {
 		double val,mcant,mul;
 		
 		try {
-			vSQL="SELECT PRODUCTO,PTIPO,RANGOINI,RANGOFIN,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
+			sql ="SELECT PRODUCTO,PTIPO,RANGOINI,RANGOFIN,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
 				 "FROM T_BONIF WHERE ("+cant+">=RANGOINI) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='U') AND (TIPOBON='M') AND (GLOBBON='N') AND (PORCANT='S')";
-			DT=Con.OpenDT(vSQL);
+			DT=Con.OpenDT(sql);
 			
 			if (DT.getCount()==0) return;
 						
@@ -265,10 +264,10 @@ public class clsBonif {
 		double val,mcant,mul;
 		
 		try {
-			vSQL="SELECT PRODUCTO,PTIPO,RANGOINI,RANGOFIN,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
+			sql ="SELECT PRODUCTO,PTIPO,RANGOINI,RANGOFIN,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
 				 "FROM T_BONIF WHERE ("+monto+">=RANGOINI) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='V') AND (TIPOBON='M') AND (GLOBBON='N') AND (PORCANT='N')";
-			DT=Con.OpenDT(vSQL);
+			DT=Con.OpenDT(sql);
 			
 			if (DT.getCount()==0) return;
 						
@@ -335,8 +334,8 @@ public class clsBonif {
 		Cursor DT;
 		
 		try {
-			vSQL="SELECT BONIFICACION,LINEA,SUBLINEA,MARCA FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
-           	DT=Con.OpenDT(vSQL);
+			sql ="SELECT BONIFICACION,LINEA,SUBLINEA,MARCA FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
+           	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			
 			if (DT.getString(0).equalsIgnoreCase("N")) return false;

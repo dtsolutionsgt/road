@@ -45,6 +45,7 @@ public class Venta extends PBase {
 	private ListAdaptVenta adapter;
 	private clsVenta selitem;
 	private Precio prc;
+	private PrecioTran prctr;
 
 	private AlertDialog.Builder mMenuDlg;
 	private ArrayList<String> lcode = new ArrayList<String>();
@@ -111,7 +112,8 @@ public class Venta extends PBase {
 		}
 		if (rutapos) imgroad.setImageResource(R.drawable.pedidos_3_gray);
 
-		prc=new Precio(this,mu,2, true);
+		prc=new Precio(this,mu,2);
+		prctr=new PrecioTran(this,mu,2,Con,db);
 
 		setHandlers();
 
@@ -429,7 +431,6 @@ public class Venta extends PBase {
 
 	//endregion
 
-
 	//region Main
 
 	public void listItems() {
@@ -599,7 +600,7 @@ public class Venta extends PBase {
 
 			vv = cant * prec;vv = mu.round(vv, 2);
 
-			clsBonif = new clsBonif(this, prodid, cant, vv, true);
+			clsBonif = new clsBonif(this, prodid, cant, vv);
 			if (clsBonif.tieneBonif()) {
 				for (int i = 0; i < clsBonif.items.size(); i++) {
 					gl.bonus.add(clsBonif.items.get(i));
@@ -608,7 +609,7 @@ public class Venta extends PBase {
 
 			// Descuento
 
-			clsDesc = new clsDescuento(this, prodid, cant, true);
+			clsDesc = new clsDescuento(this, prodid, cant);
 			desc = clsDesc.getDesc();
 			mdesc = clsDesc.monto;
 
@@ -927,14 +928,14 @@ public class Venta extends PBase {
 				//if (sinimp) precdoc=precsin; else precdoc=prec;
 
 				if (prodPorPeso(prodid)) {
-					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, ppeso,umven);
-					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,ppeso)) {
-						if (prc.precioespecial>0) prec=prc.precioespecial;
+					prec = prctr.precio(prodid, cant, nivel, um, gl.umpeso, ppeso,umven);
+					if (prctr.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,ppeso)) {
+						if (prctr.precioespecial>0) prec=prctr.precioespecial;
 					}
 				} else {
-					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0,umven);
-					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,0)) {
-						if (prc.precioespecial>0) prec=prc.precioespecial;
+					prec = prctr.precio(prodid, cant, nivel, um, gl.umpeso, 0,umven);
+					if (prctr.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,0)) {
+						if (prctr.precioespecial>0) prec=prctr.precioespecial;
 					}
 				}
 
@@ -984,7 +985,11 @@ public class Venta extends PBase {
 								public void onClick(DialogInterface dialog, int which) {
 									isDialogBarraShowed = false;
 									borraBarra();
-									db.setTransactionSuccessful();
+									try {
+										db.setTransactionSuccessful();
+									} catch (Exception ee) {
+										String er=ee.getMessage();
+									}
 								}
 							});
 
@@ -997,8 +1002,6 @@ public class Venta extends PBase {
 							});
 
 							dialogBarra.show();
-
-
 							txtBarra.requestFocus();
 
 						} else {
@@ -1007,7 +1010,10 @@ public class Venta extends PBase {
 						}
 
 //						msgAskBarra("Borrar la barra "+barcode);
-						db.endTransaction();
+						try {
+							db.endTransaction();
+						} catch (Exception e1) {
+						}
 						return 1;
 					}
 				}
@@ -1150,7 +1156,7 @@ public class Venta extends PBase {
 	}
 
 	private void borraBarra() {
-		clsBonif clsBonif;
+		clsBonifTran clsBoniftr;
 		int bcant,bontotal,boncant,bfaltcant,bon;
 		String bprod="";
 
@@ -1164,11 +1170,11 @@ public class Venta extends PBase {
 			boncant=cantBonif();
 			bfaltcant=cantFalt();
 
-			clsBonif = new clsBonif(this, prodid, bcant, 0, false);
-			if (clsBonif.tieneBonif()) {
-				bon=(int) clsBonif.items.get(0).valor;
-				bprod=clsBonif.items.get(0).lista;
-				gl.bonbarid=clsBonif.items.get(0).lista;
+			clsBoniftr = new clsBonifTran(this, prodid, bcant, 0,Con,db);
+			if (clsBoniftr.tieneBonif()) {
+				bon=(int) clsBoniftr.items.get(0).valor;
+				bprod=clsBoniftr.items.get(0).lista;
+				gl.bonbarid=clsBoniftr.items.get(0).lista;
 			} else {
 				bon=0;gl.bonbarid="";
 			}
@@ -1217,7 +1223,7 @@ public class Venta extends PBase {
 		boncant=cantBonif();
 		bfaltcant=cantFalt();
 
-		clsBonif = new clsBonif(this, prodid, bcant, 0, false);
+		clsBonif = new clsBonif(this, prodid, bcant, 0);
 		if (clsBonif.tieneBonif()) {
 			bon=(int) clsBonif.items.get(0).valor;
 			gl.bonbarid=clsBonif.items.get(0).lista;

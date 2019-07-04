@@ -64,7 +64,7 @@ public class DevCliCant extends PBase {
 		raz=gl.devrazon;
 		gl.tienelote = 0;
 
-		prc=new Precio(this,mu,2, true);
+		prc=new Precio(this,mu,2);
 
 		gl.dval=-1;
 		
@@ -628,7 +628,7 @@ public class DevCliCant extends PBase {
 			spin = (Spinner) findViewById(R.id.spinner1);
 			cmbum = (Spinner) findViewById(R.id.cmbUM);
 
-			prc=new Precio(this,mu,2, true);
+			prc=new Precio(this,mu,2);
 
 			chkTieneLote = (CheckBox) findViewById(R.id.chkTieneLote);
 

@@ -2,41 +2,42 @@ package com.dts.roadp;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import java.text.DecimalFormat;
 
-public class Precio {
+public class PrecioTran {
 
 	public double costo,descmon,imp,impval,tot,precsin,totsin,precdoc,precioespecial;
-	
+
 	private int active;
-	private android.database.sqlite.SQLiteDatabase db;
+
+	private SQLiteDatabase db;
+	private BaseDatos.Insert ins;
+	private BaseDatos.Update upd;
 	private BaseDatos Con;
 	private String sql;
-	
+
 	private Context cont;
-	
+
 	private DecimalFormat ffrmprec;
 	private MiscUtils mu;
-	
+
 	private String prodid,um,umpeso,umventa;
 	private double cant,desc,prec;
 	private int nivel,ndec;
 	private boolean porpeso;
 
-	public Precio(Context context,MiscUtils mutil,int numdec) {
+	public PrecioTran(Context context, MiscUtils mutil, int numdec, BaseDatos dbconnection, SQLiteDatabase database) {
 		
 		cont=context;
 		mu=mutil;
 		ndec=numdec;
 
-		try {
-			active=0;
-			Con = new BaseDatos(context);
-			opendb();
-		} catch (Exception e) {
-		}
-		
+		Con=dbconnection;
+		db=database;
+		ins=Con.Ins;upd=Con.Upd;
+
 		costo=0;descmon=0;imp=0;tot=0;
 		
 		ffrmprec = new DecimalFormat("#0.00");
@@ -49,7 +50,7 @@ public class Precio {
 		um=unimedida;umpeso=unimedidapeso;umventa=umven;
 		prec=0;costo=0;descmon=0;imp=0;tot=0;precioespecial=0;
 
-		clsDescuento clsDesc=new clsDescuento(cont,prodid,cant);
+		clsDescuentoTran clsDesc=new clsDescuentoTran(cont,prodid,cant,Con,db);
 		desc=clsDesc.getDesc();
 
 		if (cant>0) prodPrecio(ppeso);else prodPrecioBase();

@@ -54,7 +54,7 @@ public class ProdCant extends PBase {
 		if (rutatipo.equalsIgnoreCase("V")) imgUpd.setVisibility(View.INVISIBLE);
 		imgUpd.setVisibility(View.INVISIBLE);
 		
-		prc=new Precio(this,mu,gl.peDec, true);
+		prc=new Precio(this,mu,gl.peDec);
 		getDisp();
 
 		setHandlers();

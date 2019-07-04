@@ -34,7 +34,7 @@ public class ProdCant extends PBase {
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant;
 	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
-	private boolean pexist,esdecimal,porpeso,esbarra;
+	private boolean pexist,esdecimal,porpeso,esbarra,idle=true;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -329,6 +329,12 @@ public class ProdCant extends PBase {
 		} else {
 		}
 
+		prec=prc.precio(prodid,1,nivel,um,gl.umpeso,0,um);
+		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
+			if (prc.precioespecial>0) prec=prc.precioespecial;
+		}
+
+
 		idisp=mu.trunc(idisp);
 
 		if (porpeso) {
@@ -602,15 +608,15 @@ public class ProdCant extends PBase {
 	private int setCant(boolean mode){
 		double cu=0.0,tv,corig,cround,fruni,frcant,adcant,vpeso=0,opeso;
 		boolean ajust=false;
+
+		if (!idle) return 0;
 		
 		lblTot.setText("***");
 		if (mode) txtPeso.setText("0");
-
 		cu=0;
 
 		try {
-
-			if (txtCant.getText().toString().trim()!=""){
+			if (!txtCant.getText().toString().trim().isEmpty()){
 				cu=Double.parseDouble(txtCant.getText().toString());
 			}
 
@@ -803,12 +809,13 @@ public class ProdCant extends PBase {
 			double ub;
 
 			ub=c;
+			idle=false;
 			if (ub>0) txtCant.setText(frmdec.format(ub));
+			idle=true;
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
 	}
 	
 	private double getDispInv(){

@@ -23,17 +23,24 @@ public class Precio {
 	private double cant,desc,prec;
 	private int nivel,ndec;
 	private boolean porpeso;
+	private boolean dbAbrir;
 	
-	public Precio(Context context,MiscUtils mutil,int numdec) {
+	public Precio(Context context,MiscUtils mutil,int numdec, boolean abrirdb) {
 		
 		cont=context;
 		mu=mutil;
 		ndec=numdec;
-		
+
+		dbAbrir = abrirdb;
+
 		try {
 			active=0;
-			Con = new BaseDatos(context);
-			opendb();
+
+			if (dbAbrir){
+				Con = new BaseDatos(context);
+				opendb();
+			}
+
 		} catch (Exception e) {
 		}
 		
@@ -49,7 +56,7 @@ public class Precio {
 		um=unimedida;umpeso=unimedidapeso;umventa=umven;
 		prec=0;costo=0;descmon=0;imp=0;tot=0;precioespecial=0;
 
-		clsDescuento clsDesc=new clsDescuento(cont,prodid,cant);
+		clsDescuento clsDesc=new clsDescuento(cont,prodid,cant,dbAbrir);
 		desc=clsDesc.getDesc();
 
 		if (cant>0) prodPrecio(ppeso);else prodPrecioBase();

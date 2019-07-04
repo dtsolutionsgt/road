@@ -565,6 +565,14 @@ public class FinDia extends PBase {
 
             if (gl.banderafindia == true) {
 
+                //#CKFK 20190304 Agregué validación para verificar si ya se realizó la devolución a Bodega.
+                if (claseFinDia.getDevBodega() != 5 ){
+                    if (!Ya_Realizo_Devolucion()){
+                        msgAskDevInventario();
+                        return false;
+                    }
+                }
+
                 //#CKFK 20190305 Agregué validación para verificar si ya se realizó el depósito
                 if ((claseFinDia.getDeposito() != 4) && (claseFinDia.getDocPendientesDeposito()>0)) {
                     msgAskDeposito();
@@ -584,14 +592,6 @@ public class FinDia extends PBase {
                          }else{
                              claseFinDia.updateImpDeposito(3);
                          }
-                    }
-                }
-
-                //#CKFK 20190304 Agregué validación para verificar si ya se realizó la devolución a Bodega.
-                if (claseFinDia.getDevBodega() != 5 ){
-                    if (!Ya_Realizo_Devolucion()){
-                        msgAskDevInventario();
-                        return false;
                     }
                 }
 

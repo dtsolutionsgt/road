@@ -24,15 +24,18 @@ public class clsBonif {
 	private String prodid,lineaid,slineaid,marcaid;
 	private double cant,monto,vmax;
 	
-	public clsBonif(Context context,String producto,double cantidad,double montoventa) {
+	public clsBonif(Context context,String producto,double cantidad,double montoventa, boolean abrirdb) {
 		
 		cont=context;
 		
 		prodid=producto;cant=cantidad;monto=montoventa;
 		
 		active=0;
-		Con = new BaseDatos(context);
-	    opendb();
+
+		if (abrirdb){
+			Con = new BaseDatos(context);
+			opendb();
+		}
 	    
 	    MU=new MiscUtils(context);
 		

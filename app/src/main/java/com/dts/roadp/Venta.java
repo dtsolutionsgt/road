@@ -833,29 +833,43 @@ public class Venta extends PBase {
 
 			gl.barra=barcode;
 
-            opendb();
+			try {
 
-			if (barraBonif()) {
-				toastlong("¡La barra es parte de bonificacion!");
-				txtBarra.setText("");return;
+				opendb();
+				//db.beginTransaction();
+
+				if (barraBonif()) {
+					toastlong("¡La barra es parte de bonificacion!");
+					txtBarra.setText("");return;
+				}
+
+				bbolsa=barraBolsa();
+				if (bbolsa==1) {
+					txtBarra.setText("");
+					listItems();
+					return;
+				} else if (bbolsa==-1) {
+					toastlong("Barra vendida.");
+					return;
+				}
+
+				if (barraProducto()) {
+					txtBarra.setText("");
+					return;
+				}
+
+				toastlong("¡La barra "+barcode+" no existe!");
+
+			} catch (Exception e) {
+				msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+				Log.d("VENTA","trans fail "+e.getMessage());
+			} finally {
+				//db.setTransactionSuccessful();
+				//db.endTransaction();
+				//Con.close();
+				Log.d("VENTA","trans closed");
 			}
 
-			bbolsa=barraBolsa();
-			if (bbolsa==1) {
-				txtBarra.setText("");
-				listItems();
-				return;
-			} else if (bbolsa==-1) {
-				toastlong("Barra vendida.");
-				return;
-			}
-
-			if (barraProducto()) {
-				txtBarra.setText("");
-				return;
-			}
-
-			toastlong("¡La barra "+barcode+" no existe!");
 			txtBarra.setText("");
 			txtBarra.requestFocus();
 		} else {
@@ -867,7 +881,6 @@ public class Venta extends PBase {
 	}
 
 	private int barraBolsa() {
-
 		Cursor dt;
 		double ppeso=0,pprecdoc=0,factbolsa;
 		String uum,umven;
@@ -960,7 +973,6 @@ public class Venta extends PBase {
 									borraBarra();
 								}
 							});
-
 
 							dialogBarra.setNegativeButton("No", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {

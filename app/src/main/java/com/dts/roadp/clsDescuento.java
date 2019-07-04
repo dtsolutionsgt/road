@@ -27,7 +27,7 @@ public class clsDescuento {
 	private double cant,vmax,dmax;
 	private boolean acum;
 	
-	public clsDescuento(Context context,String producto,double cantidad) {
+	public clsDescuento(Context context,String producto,double cantidad, boolean abrirdb) {
 		
 		cont=context;
 		
@@ -35,8 +35,12 @@ public class clsDescuento {
 		
 		try {
 			active=0;
-			Con = new BaseDatos(context);
-			opendb();
+
+			if (abrirdb){
+				Con = new BaseDatos(context);
+				opendb();
+			}
+
 		} catch (Exception e) {
 		}
 	    

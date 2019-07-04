@@ -660,7 +660,8 @@ public class ProdCant extends PBase {
 		try {
 			if (cant<0)	lblCant.setText(""); else lblCant.setText(String.valueOf(cant));
 			if (porpeso) {
-                tv=prec*cant;
+                //tv=prec*cant;
+				tv=prec;
             } else {
                 tv=prec*cant;
             }
@@ -774,7 +775,8 @@ public class ProdCant extends PBase {
 
         try {
 			if (porpeso) {
-				tv=prec*ppeso;
+				//tv=prec*ppeso;
+				tv=prec;
 			} else {
 				tv=prec*cant;
 			}

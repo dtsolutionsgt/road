@@ -449,6 +449,8 @@ public class AppMethods {
 
 			umm=DT.getString(0);
 
+			if(DT!=null) DT.close();
+
 			return  umm.equalsIgnoreCase(gl.umpeso);
 
         } catch (Exception e) {

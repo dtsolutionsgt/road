@@ -526,7 +526,7 @@ public class Venta extends PBase {
 
 	private void processItem(){
 		try{
-			Cursor DT;
+
 			String pid;
 
 			pid=gl.gstr;
@@ -559,7 +559,7 @@ public class Venta extends PBase {
 	private void processCant(){
 		clsDescuento clsDesc;
 		clsBonif clsBonif;
-		Cursor DT;
+		Cursor DT = null;
 		double cnt,vv;
 		String s;
 
@@ -573,9 +573,12 @@ public class Venta extends PBase {
 				DT = Con.OpenDT(sql);
 				DT.moveToFirst();
 				lblProd.setText(DT.getString(0) +" - "+ DT.getString(1));
+
 			} catch (Exception e) {
-				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 				mu.msgbox(e.getMessage());
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			}finally {
+				if(DT!=null) DT.close();
 			}
 
 			cant = cnt;
@@ -911,7 +914,13 @@ public class Venta extends PBase {
 					sql="SELECT Barra FROM D_FACTURA_BARRA  WHERE (BARRA='"+barcode+"') ";
 					dt=Con.OpenDT(sql);
 					db.endTransaction();
-					if (dt.getCount()==0) return 0;else return -1;
+					if (dt.getCount()==0) {
+						if(dt!=null) dt.close();
+						return 0;
+					}else{
+						if(dt!=null) dt.close();
+						return -1;
+					}
 				}
 
 				dt.moveToFirst();
@@ -920,6 +929,9 @@ public class Venta extends PBase {
 				cant = dt.getInt(1);
 				ppeso = dt.getDouble(2);
 				uum = dt.getString(3);
+
+				if(dt!=null) dt.close();
+
 				um=uum;
 				umven=app.umVenta(prodid);
 				factbolsa=app.factorPres(prodid,umven,um);
@@ -1117,6 +1129,8 @@ public class Venta extends PBase {
 				pprecio=dt.getDouble(2);
 			}
 
+			if(dt!=null) dt.close();
+
 			sql="UPDATE T_VENTA SET Cant="+ccant+",Peso="+ppeso+",Total="+pprecio+" WHERE PRODUCTO='"+prodid+"'";
 			db.execSQL(sql);
 
@@ -1144,6 +1158,7 @@ public class Venta extends PBase {
 
 				gl.gstr=dt.getString(0);gl.um="UN";
 				processItem();
+				if(dt!=null) dt.close();
 				return true;
 			}
 

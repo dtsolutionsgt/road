@@ -72,7 +72,7 @@ public class BonList extends PBase {
 		sethandlers();
 
 		app = new AppMethods(this, gl, Con, db);
-		prc=new Precio(this,mu,gl.peDec, true);
+		prc=new Precio(this,mu,gl.peDec);
 		um=gl.um;
 		
 		clearByProd();	

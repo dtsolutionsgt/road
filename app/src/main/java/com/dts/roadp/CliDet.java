@@ -1131,6 +1131,7 @@ public class CliDet extends PBase {
 						//toast("Seleccione accion a realizar");
 						closekeyb();
 						layout.removeAllViews();
+
 						msgAskTipoDev();
 					}
 				}
@@ -1203,8 +1204,6 @@ public class CliDet extends PBase {
 	}
 
 	//endregion
-
-
 
 	//region Activity Events
 

@@ -342,13 +342,13 @@ public class DevCliCant extends PBase {
 		
 		try {
 
-			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,PESO_PROMEDIO "+
+			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,PESO_PROMEDIO,UNID_INV "+
 				 " FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	DT=Con.OpenDT(sql);
 
            	if (DT.getCount()>0){
 				DT.moveToFirst();
-				ubas=DT.getString(0);
+				ubas=DT.getString(9);
 				pesoprom = DT.getDouble(8);
 				//lblBU.setText(ubas);
 				gl.ubas=ubas;
@@ -528,9 +528,9 @@ public class DevCliCant extends PBase {
 		
 	}
 
-	private void fillcmbUM(){
+	private void fillcmbUM() {
 		Cursor DT;
-		String ifactor,iname;
+		String ifactor, iname;
 
 		cmbumfact.add(0.0);
 		cmbumlist.add("Seleccione UM....");
@@ -538,37 +538,32 @@ public class DevCliCant extends PBase {
 		getUMCliente();
 
 		try {
+			sql = "SELECT UNIDADSUPERIOR,FACTORCONVERSION FROM P_FACTORCONV WHERE PRODUCTO='" + prodid + "' AND UNIDADSUPERIOR<>'" + gl.umpeso + "'  ORDER BY UNIDADSUPERIOR";
+			DT = Con.OpenDT(sql);
 
+			if (DT.getCount() > 0) {
 
-				sql="SELECT UNIDADSUPERIOR,FACTORCONVERSION FROM P_FACTORCONV WHERE PRODUCTO='"+prodid+"' AND UNIDADSUPERIOR<>'"+gl.umpeso+"'  ORDER BY UNIDADSUPERIOR";
-				DT=Con.OpenDT(sql);
+				DT.moveToFirst();
+				while (!DT.isAfterLast()) {
 
-				if (DT.getCount()>0) {
+					iname = DT.getString(0);
+					ifactor = DT.getString(1);
 
-					DT.moveToFirst();
-					while (!DT.isAfterLast()) {
+					cmbumfact.add(Double.parseDouble(ifactor));
+					cmbumlist.add(iname);
 
-						iname=DT.getString(0);
-						ifactor=DT.getString(1);
-
-						cmbumfact.add(Double.parseDouble(ifactor));
-						cmbumlist.add(iname);
-
-						DT.moveToNext();
-					}
-
-					ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, cmbumlist);
-					dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-					cmbum.setAdapter(dataAdapter);
-
-
+					DT.moveToNext();
 				}
 
-            if(gl.tiponcredito==1){
-                txtPrecio.setEnabled(true);
+				ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, cmbumlist);
+				dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-            }
+				cmbum.setAdapter(dataAdapter);
+			}
+
+			if (gl.tiponcredito == 1) {
+				txtPrecio.setEnabled(true);
+			}
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -712,7 +707,7 @@ public class DevCliCant extends PBase {
 				fact1 = getFactor(umcambiar);
 				fact2 = getFactor(um);
 
-				if (fact2>0)proprecio=fact1/fact2;
+				if (fact2>0) proprecio=fact1/fact2;
 
 			} proprecio = (umcambiar.equals(um)?1:proprecio);
 
@@ -731,10 +726,11 @@ public class DevCliCant extends PBase {
 
 		try{
 
+			ummin=gl.ubas;
 			sql = "SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE UNIDADSUPERIOR = '" + vUM + "' AND PRODUCTO = '"+ prodid +"' AND UNIDADMINIMA='"+ummin+"'";
 			DT=Con.OpenDT(sql);
 
-			if (DT.getCount()>0){
+			if (DT.getCount()>0) {
 				DT.moveToFirst();
 				fact = Double.parseDouble(DT.getString(0));
 			}

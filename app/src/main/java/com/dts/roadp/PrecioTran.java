@@ -294,9 +294,19 @@ public class PrecioTran {
 		pr=0;
 		try {
 			if (ppeso>0) {
-				sql="SELECT PRECIO,CODIGO,VALOR FROM TMP_PRECESPEC WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+umpeso+"') ";
+				sql=" SELECT PRECIO,CODIGO,VALOR FROM TMP_PRECESPEC "+
+						" WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+umpeso+"') "+
+						" AND ((VALOR='" + cliente + "' AND CODIGO ='CLIENTE') " +
+						" OR (CODIGO='RUTA' AND VALOR='" + cliente + "') OR  " +
+						" (CODIGO ='TIPO' AND VALOR IN (SELECT TIPO FROM P_CLIENTE WHERE CODIGO='" + cliente + "')))" +
+						" ORDER BY CODIGO ASC ";
 			} else {
-				sql="SELECT PRECIO,CODIGO,VALOR FROM TMP_PRECESPEC WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"') ";
+				sql=" SELECT PRECIO,CODIGO,VALOR FROM TMP_PRECESPEC "+
+						" WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"') "+
+						" AND ((VALOR='" + cliente + "' AND CODIGO ='CLIENTE') " +
+						" OR (CODIGO='RUTA' AND VALOR='" + cliente + "') OR  " +
+						" (CODIGO ='TIPO' AND VALOR IN (SELECT TIPO FROM P_CLIENTE WHERE CODIGO='" + cliente + "')))" +
+						" ORDER BY CODIGO ASC ";
 			}
 			dt=Con.OpenDT(sql);
 

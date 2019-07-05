@@ -45,7 +45,7 @@ public class Venta extends PBase {
 	private ListAdaptVenta adapter;
 	private clsVenta selitem;
 	private Precio prc;
-	private PrecioTran prctr;
+	//private PrecioTran prctr;
 
 	private AlertDialog.Builder mMenuDlg;
 	private ArrayList<String> lcode = new ArrayList<String>();
@@ -113,7 +113,7 @@ public class Venta extends PBase {
 		if (rutapos) imgroad.setImageResource(R.drawable.pedidos_3_gray);
 
 		prc=new Precio(this,mu,2);
-		prctr=new PrecioTran(this,mu,2,Con,db);
+		//prctr=new PrecioTran(this,mu,2,Con,db);
 
 		setHandlers();
 
@@ -133,7 +133,18 @@ public class Venta extends PBase {
 
 		scanCallBack= new Runnable() {
 			public void run() {
-				addBarcode();
+
+				try {
+					addBarcode();
+				} catch (Exception e) {
+				}
+
+				Handler handlerTimer = new Handler();
+				handlerTimer.postDelayed(new Runnable() {
+					public void run() {
+						txtBarra.setText("");
+					}
+				}, 1000);
 			}
 		};
 	}
@@ -399,7 +410,6 @@ public class Venta extends PBase {
 		});
 
 	}
-
 
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
@@ -842,15 +852,15 @@ public class Venta extends PBase {
 
 				opendb();
 
-				db.beginTransaction();
+				//db.beginTransaction();
 
 				if (barraBonif()) {
 					toastlong("¡La barra es parte de bonificacion!");
-					db.setTransactionSuccessful();
-					db.endTransaction();
+					//db.setTransactionSuccessful();
+					//db.endTransaction();
 					txtBarra.setText("");return;
 				}else{
-					db.endTransaction();
+					//db.endTransaction();
 				}
 
 				bbolsa=barraBolsa();
@@ -861,22 +871,22 @@ public class Venta extends PBase {
 
 					return;
 				} else if (bbolsa==-1) {
-					toastlong("Barra vendida");
+					toast("Barra vendida");
 					return;
 				}
 
 
-				db.beginTransaction();
+				//db.beginTransaction();
 
 				if (barraProducto()) {
 					txtBarra.setText("");
-					db.beginTransaction();
+					//db.beginTransaction();
 					return;
 				}else{
-					db.beginTransaction();
+					//db.beginTransaction();
 				}
 
-				toastlong("¡La barra "+barcode+" no existe!");
+				toast("¡La barra "+barcode+" no existe!");
 
 			} catch (Exception e) {
 				msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
@@ -896,15 +906,14 @@ public class Venta extends PBase {
 	private int barraBolsa() {
 		Cursor dt;
 		double ppeso=0,pprecdoc=0,factbolsa;
-		String uum,umven;
+		String uum,umven,uunistock;
 		boolean isnew=true;
-		int resultado=0;
 
 		porpeso=true;
 
 			try {
 
-				db.beginTransaction();
+				//db.beginTransaction();
 
 				sql="SELECT CODIGO,CANT,PESO,UNIDADMEDIDA " +
 						"FROM P_STOCKB WHERE (BARRA='"+barcode+"') ";
@@ -913,7 +922,7 @@ public class Venta extends PBase {
 				if (dt.getCount()==0) {
 					sql="SELECT Barra FROM D_FACTURA_BARRA  WHERE (BARRA='"+barcode+"') ";
 					dt=Con.OpenDT(sql);
-					db.endTransaction();
+					//db.endTransaction();
 					if (dt.getCount()==0) {
 						if(dt!=null) dt.close();
 						return 0;
@@ -938,7 +947,7 @@ public class Venta extends PBase {
 				cant=cant*factbolsa;
 
 				//if (sinimp) precdoc=precsin; else precdoc=prec;
-
+				/*
 				if (prodPorPeso(prodid)) {
 					prec = prctr.precio(prodid, cant, nivel, um, gl.umpeso, ppeso,umven);
 					if (prctr.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,ppeso)) {
@@ -948,6 +957,18 @@ public class Venta extends PBase {
 					prec = prctr.precio(prodid, cant, nivel, um, gl.umpeso, 0,umven);
 					if (prctr.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,0)) {
 						if (prctr.precioespecial>0) prec=prctr.precioespecial;
+					}
+				}   */
+
+				if (prodPorPeso(prodid)) {
+					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, ppeso,umven);
+					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,ppeso)) {
+						if (prc.precioespecial>0) prec=prc.precioespecial;
+					}
+				} else {
+					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0,umven);
+					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,0)) {
+						if (prc.precioespecial>0) prec=prc.precioespecial;
 					}
 				}
 
@@ -979,8 +1000,8 @@ public class Venta extends PBase {
 
 					if (chkBorrar.isChecked()) {
 						borraBarra();
-						db.setTransactionSuccessful();
-						db.endTransaction();
+						//db.setTransactionSuccessful();
+						//db.endTransaction();
 						return 1;
 					} else 	{
 						if (!isDialogBarraShowed)	{
@@ -998,7 +1019,7 @@ public class Venta extends PBase {
 									isDialogBarraShowed = false;
 									borraBarra();
 									try {
-										db.setTransactionSuccessful();
+										//db.setTransactionSuccessful();
 									} catch (Exception ee) {
 										String er=ee.getMessage();
 									}
@@ -1023,7 +1044,7 @@ public class Venta extends PBase {
 
 //						msgAskBarra("Borrar la barra "+barcode);
 						try {
-							db.endTransaction();
+							//db.endTransaction();
 						} catch (Exception e1) {
 						}
 						return 1;
@@ -1045,17 +1066,21 @@ public class Venta extends PBase {
 
 				ins.add("CANT",cant);
 
-				if (prodPorPeso(prodid))
-				{
-					ins.add("UMSTOCK",um);//ins.add("UM",gl.umpeso);
+				if (prodPorPeso(prodid)) uunistock=um; else uunistock=umven;
+				if (prodid.equalsIgnoreCase("0006") || prodid.equalsIgnoreCase("0629") || prodid.equalsIgnoreCase("0747") ) {
+					Double stfact;
+
+					uunistock=um;
+					umven=app.umVenta(prodid);
+					stfact=app.factorPres(prodid,uunistock,umven);
+					ins.add("FACTOR",stfact);
 				} else {
-					ins.add("UMSTOCK",umven);
+					ins.add("FACTOR",gl.umfactor);
 				}
 
-				ins.add("FACTOR",gl.umfactor);
+				ins.add("UMSTOCK",uunistock);
 
-				if (prodPorPeso(prodid))
-				{
+				if (prodPorPeso(prodid)) {
 					//ins.add("PRECIO",gl.prectemp);
 					ins.add("PRECIO",prec);
 				} else {
@@ -1067,8 +1092,7 @@ public class Venta extends PBase {
 				ins.add("DESMON",0);
 				ins.add("TOTAL",prodtot);
 
-				if (prodPorPeso(prodid))
-				{
+				if (prodPorPeso(prodid)) {
 					//ins.add("PRECIODOC",gl.prectemp);
 					ins.add("PRECIODOC",pprecdoc);
 				} else {
@@ -1092,8 +1116,8 @@ public class Venta extends PBase {
 
 				if (isnew) validaBarraBon();
 
-				db.setTransactionSuccessful();
-				db.endTransaction();
+				//db.setTransactionSuccessful();
+				//db.endTransaction();
 
 				return 1;
 
@@ -1101,7 +1125,7 @@ public class Venta extends PBase {
 			//	msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			//	addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				Log.d("Err_On_Insert",e.getMessage());
-				db.endTransaction();
+				//db.endTransaction();
 				return 0;
 			}
 
@@ -1110,9 +1134,14 @@ public class Venta extends PBase {
 	private void actualizaTotalesBarra() {
 		Cursor dt;
 		int ccant;
-		double ppeso,pprecio;
+		double ppeso,pprecio,unfactor,stfact;
 
 		try {
+
+			sql="SELECT Factor FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			unfactor=dt.getDouble(0);
 
 			//sql="SELECT COUNT(BARRA),SUM(PESO),SUM(PRECIO) FROM T_BARRA WHERE CODIGO='"+prodid+"'";
 			//#CKFK 20190410 se modificó esta consulta para sumar la cantidad y no contar las barras
@@ -1127,6 +1156,12 @@ public class Venta extends PBase {
 				ccant=dt.getInt(0);
 				ppeso=dt.getDouble(1);
 				pprecio=dt.getDouble(2);
+			}
+
+			if (prodid.equalsIgnoreCase("0006") || prodid.equalsIgnoreCase("0629") || prodid.equalsIgnoreCase("0747") ) {
+				stfact=ccant;
+				stfact=stfact/unfactor;
+				ccant=(int) stfact;
 			}
 
 			if(dt!=null) dt.close();
@@ -1171,7 +1206,8 @@ public class Venta extends PBase {
 	}
 
 	private void borraBarra() {
-		clsBonifTran clsBoniftr;
+		//clsBonifTran clsBoniftr;
+		clsBonif clsBoniftr;
 		int bcant,bontotal,boncant,bfaltcant,bon;
 		String bprod="";
 
@@ -1185,7 +1221,8 @@ public class Venta extends PBase {
 			boncant=cantBonif();
 			bfaltcant=cantFalt();
 
-			clsBoniftr = new clsBonifTran(this, prodid, bcant, 0,Con,db);
+			//clsBoniftr = new clsBonifTran(this, prodid, bcant, 0,Con,db);
+			clsBoniftr = new clsBonif(this, prodid, bcant, 0);
 			if (clsBoniftr.tieneBonif()) {
 				bon=(int) clsBoniftr.items.get(0).valor;
 				bprod=clsBoniftr.items.get(0).lista;
@@ -1918,7 +1955,7 @@ public class Venta extends PBase {
 		lblPrec.setText(mu.frmcur(0));
 		lblTot.setText(mu.frmcur(0));
 
-
+		System.gc();
 	}
 
 	private boolean hasProducts(){

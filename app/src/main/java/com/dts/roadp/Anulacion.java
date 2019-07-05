@@ -386,7 +386,7 @@ public class Anulacion extends PBase {
 	}	
 	
 	private boolean anulFactura(String itemid) {
-		Cursor DT;
+		Cursor dt;
 		String prod,um,ncred;
 
 		boolean vAnulFactura=false;
@@ -394,25 +394,27 @@ public class Anulacion extends PBase {
 		try{
 
 			sql="SELECT PRODUCTO,UMSTOCK FROM D_FACTURAD WHERE Corel='"+itemid+"'";
-			DT=Con.OpenDT(sql);
+			dt=Con.OpenDT(sql);
 
-			if (DT.getCount()>0){
+			if (dt.getCount()>0){
 
-				DT.moveToFirst();
+				dt.moveToFirst();
 
-				while (!DT.isAfterLast()) {
+				while (!dt.isAfterLast()) {
 
-					prod=DT.getString(0);
-					um=DT.getString(1);
+					prod=dt.getString(0);
+					um=dt.getString(1);
 
 					if (valexist(prod)) {
 						revertStock(itemid,prod,um);
 					}
 
-					DT.moveToNext();
+					dt.moveToNext();
 				}
 
 			}
+
+			if(dt!=null) dt.close();
 
 			sql="UPDATE D_FACTURA  SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
@@ -448,9 +450,9 @@ public class Anulacion extends PBase {
 			// Nota credito
 
 			sql="SELECT COREL FROM D_NOTACRED WHERE FACTURA='"+itemid+"'";
-			DT=Con.OpenDT(sql);
-			if (DT.getCount()>0) {
-				DT.moveToFirst();ncred=DT.getString(0);
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()>0) {
+				dt.moveToFirst();ncred=dt.getString(0);
 
 				sql = "UPDATE D_CXC SET ANULADO='S' WHERE COREL='" + ncred + "' ";
 				db.execSQL(sql);
@@ -473,27 +475,28 @@ public class Anulacion extends PBase {
 	}
 	
 	private void anulBonif(String itemid) {
-		Cursor DT;
+		Cursor dt;
 		String prod,um;
 
 		try{
 
 			sql = "SELECT CODIGO,UNIDADMEDIDA FROM D_BONIF_STOCK WHERE Corel='" + itemid + "'";
-			DT = Con.OpenDT(sql);
+			dt = Con.OpenDT(sql);
 
-			if (DT.getCount() > 0) {
+			if (dt.getCount() > 0) {
 
-				DT.moveToFirst();
-				while (!DT.isAfterLast()) {
+				dt.moveToFirst();
+				while (!dt.isAfterLast()) {
 
-					prod = DT.getString(0);
-					um = DT.getString(1);
+					prod = dt.getString(0);
+					um = dt.getString(1);
 
 					revertStockBonif(itemid, prod, um);
 
-					DT.moveToNext();
+					dt.moveToNext();
 				}
 
+				if(dt!=null) dt.close();
 			}
 
 			sql = "UPDATE D_BONIF SET Anulado='S' WHERE COREL='" + itemid + "'";
@@ -512,8 +515,7 @@ public class Anulacion extends PBase {
 			//db.execSQL(sql);
 
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 		}
 	}
 	
@@ -575,6 +577,9 @@ public class Anulacion extends PBase {
 
 				dt.moveToNext();
 			}
+
+			if(dt!=null) dt.close();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
@@ -638,6 +643,8 @@ public class Anulacion extends PBase {
 
 				dt.moveToNext();
 			}
+
+			if(dt!=null) dt.close();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
@@ -675,6 +682,7 @@ public class Anulacion extends PBase {
 
 				DT.moveToNext();
 			}
+			if(DT!=null) DT.close();
 
 			if (!gl.depparc){
 				sql="DELETE FROM D_DEPOS WHERE COREL='"+itemid+"'";
@@ -737,6 +745,8 @@ public class Anulacion extends PBase {
 
 				DT.moveToNext();
 			}
+
+			if(DT!=null) DT.close();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
@@ -776,6 +786,8 @@ public class Anulacion extends PBase {
 					"FROM D_MOV M INNER JOIN D_MOVDB D ON M.COREL = D.COREL WHERE (M.COREL='"+itemid+"')";
 				db.execSQL(sql);
 			}
+
+			if(DT!=null) DT.close();
 
 			sql="UPDATE FinDia SET val5 = 0";
 			db.execSQL(sql);
@@ -876,7 +888,6 @@ public class Anulacion extends PBase {
 	}
 
 	private String tieneNotaCredFactura(String vCorel){
-
 	Cursor DT;
 	String vtieneNotaCredFactura= "";
 

@@ -415,6 +415,8 @@ public class Clientes extends PBase {
 
 					DT.moveToNext();
 				}
+
+				if(DT!=null) DT.close();
 			}
 
 		} catch (Exception e) {

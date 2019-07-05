@@ -64,7 +64,7 @@ public class Producto extends PBase {
 
         items = new ArrayList<clsCD>();
 		
-		act=0;
+		act=0;famid="";
 		ordPorNombre=gl.peOrdPorNombre;
 
 		fillSpinner();
@@ -344,8 +344,9 @@ public class Producto extends PBase {
 
 			  DT.moveToNext();
 			}
-		} catch (Exception e)
-		{
+
+			if(DT!=null) DT.close();
+		} catch (Exception e) {
 		   //	mu.msgbox( e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			Log.d("prods",e.getMessage());

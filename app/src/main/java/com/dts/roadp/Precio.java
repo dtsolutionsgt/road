@@ -280,16 +280,26 @@ public class Precio {
 	}
 
 	private void prodPrecioEsp(double ppeso,String cliente,String clitipo) {
-		Cursor dt;
+		Cursor dt = null;
 		double pr,prr,stot,pprec,tsimp;
 		String sprec="",vcod,vval;
 
 		pr=0;
 		try {
 			if (ppeso>0) {
-				sql="SELECT PRECIO,CODIGO,VALOR FROM TMP_PRECESPEC WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+umpeso+"') ORDER BY CODIGO ASC,FECHA DESC ";
+				sql=" SELECT PRECIO,CODIGO,VALOR FROM TMP_PRECESPEC "+
+					" WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+umpeso+"') "+
+					" AND ((VALOR='" + cliente + "' AND CODIGO ='CLIENTE') " +
+				    " OR (CODIGO='RUTA' AND VALOR='" + cliente + "') OR  " +
+				    " (CODIGO ='TIPO' AND VALOR IN (SELECT TIPO FROM P_CLIENTE WHERE CODIGO='" + cliente + "')))" +
+					" ORDER BY CODIGO ASC ";
 			} else {
-				sql="SELECT PRECIO,CODIGO,VALOR FROM TMP_PRECESPEC WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"') ORDER BY CODIGO ASC,FECHA DESC ";
+				sql=" SELECT PRECIO,CODIGO,VALOR FROM TMP_PRECESPEC "+
+					" WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"') "+
+					" AND ((VALOR='" + cliente + "' AND CODIGO ='CLIENTE') " +
+					" OR (CODIGO='RUTA' AND VALOR='" + cliente + "') OR  " +
+					" (CODIGO ='TIPO' AND VALOR IN (SELECT TIPO FROM P_CLIENTE WHERE CODIGO='" + cliente + "')))" +
+					" ORDER BY CODIGO ASC ";
 			}
 			dt=Con.OpenDT(sql);
 
@@ -316,6 +326,8 @@ public class Precio {
 
 		} catch (Exception e) {
 			pr=0;
+		}finally {
+			if (dt!=null) dt.close();
 		}
 
 		totsin=pr*cant;tsimp=mu.round(totsin,ndec);

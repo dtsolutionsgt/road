@@ -28,6 +28,7 @@ public class clsBonifSave {
 		cont=context;
 		corel=corelativo;
 		venped=ventaped;
+
 		
 		active=0;
 		//Con = new BaseDatos(context);

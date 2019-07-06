@@ -390,6 +390,19 @@ public class AppMethods {
 			gl.peMargenGPS =0;
 		}
 
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=21";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.pTransBarra =false;
+
+			gl.pTransBarra =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.pTransBarra =false;
+		}
 	}
 
 	public void parametrosGlobales() {

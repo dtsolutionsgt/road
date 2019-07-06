@@ -45,7 +45,7 @@ public class Venta extends PBase {
 	private ListAdaptVenta adapter;
 	private clsVenta selitem;
 	private Precio prc;
-	//private PrecioTran prctr;
+	private PrecioTran prctr;
 
 	private AlertDialog.Builder mMenuDlg;
 	private ArrayList<String> lcode = new ArrayList<String>();
@@ -59,7 +59,7 @@ public class Venta extends PBase {
 
 	private String emp,cliid,rutatipo,prodid,um,tiposcan;
 	private int nivel,dweek,clidia,scanc=0;
-	private boolean sinimp,rutapos,softscanexist,porpeso,usarscan;
+	private boolean sinimp,rutapos,softscanexist,porpeso,usarscan,contrans;
 
 	private AppMethods app;
 
@@ -112,8 +112,15 @@ public class Venta extends PBase {
 		}
 		if (rutapos) imgroad.setImageResource(R.drawable.pedidos_3_gray);
 
+		contrans=gl.pTransBarra;
+
+		if (contrans) {
+			prctr=new PrecioTran(this,mu,2,Con,db);
+			//msgbox("Con transaccion");
+		} else {
+			//msgbox("Sin transaccion");
+		}
 		prc=new Precio(this,mu,2);
-		//prctr=new PrecioTran(this,mu,2,Con,db);
 
 		setHandlers();
 
@@ -135,7 +142,11 @@ public class Venta extends PBase {
 			public void run() {
 
 				try {
-					addBarcode();
+					if (contrans) {
+						addBarcodeTrans();
+					} else {
+						addBarcode();
+					}
 				} catch (Exception e) {
 				}
 
@@ -903,6 +914,67 @@ public class Venta extends PBase {
 
 	}
 
+	private void addBarcodeTrans() 	{
+		int bbolsa;
+
+		if (!isDialogBarraShowed) 	{
+
+			gl.barra=barcode;
+
+			try {
+
+				opendb();
+
+				db.beginTransaction();
+
+				if (barraBonif()) {
+					toastlong("¡La barra es parte de bonificacion!");
+					db.setTransactionSuccessful();
+					db.endTransaction();
+					txtBarra.setText("");return;
+				}else{
+					db.endTransaction();
+				}
+
+				bbolsa=barraBolsaTrans();
+				if (bbolsa==1) {
+
+					txtBarra.setText("");
+					listItems();
+
+					return;
+				} else if (bbolsa==-1) {
+					toast("Barra vendida");
+					return;
+				}
+
+				db.beginTransaction();
+
+				if (barraProducto()) {
+					txtBarra.setText("");
+					db.beginTransaction();
+					return;
+				}else{
+					db.beginTransaction();
+				}
+
+				toast("¡La barra "+barcode+" no existe!");
+
+			} catch (Exception e) {
+				msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+				Log.d("VENTA","trans fail "+e.getMessage());
+			}
+
+			txtBarra.setText("");
+			txtBarra.requestFocus();
+		} else {
+			toastlong("¡Conteste la pregunta por favor!");
+			txtBarra.setText("");
+			txtBarra.requestFocus();
+		}
+
+	}
+
 	private int barraBolsa() {
 		Cursor dt;
 		double ppeso=0,pprecdoc=0,factbolsa;
@@ -1131,6 +1203,222 @@ public class Venta extends PBase {
 
 	}
 
+	private int barraBolsaTrans() {
+		Cursor dt;
+		double ppeso=0,pprecdoc=0,factbolsa;
+		String uum,umven,uunistock;
+		boolean isnew=true;
+
+		porpeso=true;
+
+		try {
+
+			db.beginTransaction();
+
+			sql="SELECT CODIGO,CANT,PESO,UNIDADMEDIDA " +
+					"FROM P_STOCKB WHERE (BARRA='"+barcode+"') ";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()==0) {
+				sql="SELECT Barra FROM D_FACTURA_BARRA  WHERE (BARRA='"+barcode+"') ";
+				dt=Con.OpenDT(sql);
+
+				db.endTransaction();
+
+				if (dt.getCount()==0) {
+					return 0;
+				}else{
+					return -1;
+				}
+			}
+
+			dt.moveToFirst();
+
+			prodid = dt.getString(0);
+			cant = dt.getInt(1);
+			ppeso = dt.getDouble(2);
+			uum = dt.getString(3);
+
+			if(dt!=null) dt.close();
+
+			um=uum;
+			umven=app.umVenta(prodid);
+			factbolsa=app.factorPres(prodid,umven,um);
+			cant=cant*factbolsa;
+
+			//if (sinimp) precdoc=precsin; else precdoc=prec;
+
+			if (prodPorPeso(prodid)) {
+				prec = prctr.precio(prodid, cant, nivel, um, gl.umpeso, ppeso,umven);
+				if (prctr.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,ppeso)) {
+					if (prctr.precioespecial>0) prec=prctr.precioespecial;
+				}
+			} else {
+				prec = prctr.precio(prodid, cant, nivel, um, gl.umpeso, 0,umven);
+				if (prctr.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,0)) {
+					if (prctr.precioespecial>0) prec=prctr.precioespecial;
+				}
+			}
+
+			if (prodPorPeso(prodid)) prec=mu.round2(prec/ppeso);
+			pprecdoc = prec;
+
+			prodtot = prec;
+
+			if (factbolsa>1) prodtot = cant*prec;
+			if (prodPorPeso(prodid)) prodtot=mu.round2(prec*ppeso);
+
+			try {
+
+				ins.init("T_BARRA");
+				ins.add("BARRA",barcode);
+				ins.add("CODIGO",prodid);
+				ins.add("PRECIO",prodtot);
+				ins.add("PESO",ppeso);
+				ins.add("PESOORIG",ppeso);
+				ins.add("CANTIDAD",cant);
+				db.execSQL(ins.sql());
+				//toast(barcode);
+
+			} catch (Exception e) 	{
+
+				Log.d("Err_AF20190702",e.getMessage());
+
+				isnew=false;
+
+				if (chkBorrar.isChecked()) {
+					borraBarra();
+					db.setTransactionSuccessful();
+					db.endTransaction();
+					return 1;
+				} else 	{
+					if (!isDialogBarraShowed)	{
+
+						txtBarra.setText("");
+
+						isDialogBarraShowed = true;
+
+						dialogBarra.setTitle(R.string.app_name);
+						dialogBarra.setMessage("Borrar la barra \n"+ barcode  + "\n ?");
+						dialogBarra.setIcon(R.drawable.ic_quest);
+
+						dialogBarra.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								isDialogBarraShowed = false;
+								borraBarra();
+								try {
+									db.setTransactionSuccessful();
+								} catch (Exception ee) {
+									String er=ee.getMessage();
+								}
+							}
+						});
+
+						dialogBarra.setNegativeButton("No", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								txtBarra.setText("");
+								txtBarra.requestFocus();
+								isDialogBarraShowed = false;
+							}
+						});
+
+						dialogBarra.show();
+						txtBarra.requestFocus();
+
+					} else {
+						Log.d("CerrarDialog","vos");
+						isDialogBarraShowed=false;
+					}
+
+//						msgAskBarra("Borrar la barra "+barcode);
+					try {
+						db.endTransaction();
+					} catch (Exception e1) {
+					}
+					return 1;
+				}
+			}
+
+			prec=mu.round(prec,2);
+			prodtot=mu.round(prodtot,2);
+
+			ins.init("T_VENTA");
+			ins.add("PRODUCTO",prodid);
+			ins.add("EMPRESA",emp);
+
+			if (prodPorPeso(prodid)) {
+				ins.add("UM",gl.umpeso);//ins.add("UM",gl.umpeso);
+			} else {
+				if (factbolsa==1) ins.add("UM",umven);else ins.add("UM",umven);
+			}
+
+			ins.add("CANT",cant);
+
+			if (prodPorPeso(prodid)) uunistock=um; else uunistock=umven;
+			if (prodid.equalsIgnoreCase("0006") || prodid.equalsIgnoreCase("0629") || prodid.equalsIgnoreCase("0747") ) {
+				Double stfact;
+
+				uunistock=um;
+				umven=app.umVenta(prodid);
+				stfact=app.factorPres(prodid,uunistock,umven);
+				ins.add("FACTOR",stfact);
+			} else {
+				ins.add("FACTOR",gl.umfactor);
+			}
+
+			ins.add("UMSTOCK",uunistock);
+
+			if (prodPorPeso(prodid)) {
+				//ins.add("PRECIO",gl.prectemp);
+				ins.add("PRECIO",prec);
+			} else {
+				ins.add("PRECIO",prec);
+			}
+
+			ins.add("IMP",0);
+			ins.add("DES",0);
+			ins.add("DESMON",0);
+			ins.add("TOTAL",prodtot);
+
+			if (prodPorPeso(prodid)) {
+				//ins.add("PRECIODOC",gl.prectemp);
+				ins.add("PRECIODOC",pprecdoc);
+			} else {
+				ins.add("PRECIODOC",pprecdoc);
+			}
+
+			ins.add("PESO",ppeso);
+			ins.add("VAL1",0);
+			ins.add("VAL2","");
+			ins.add("VAL3",0);
+			ins.add("VAL4","");
+			ins.add("PERCEP",percep);
+
+			try {
+				db.execSQL(ins.sql());
+			} catch (SQLException e) {
+				Log.d(e.getMessage(),"");
+			}
+
+			actualizaTotalesBarra();
+
+			if (isnew) validaBarraBon();
+
+			db.setTransactionSuccessful();
+			db.endTransaction();
+
+			return 1;
+
+		} catch (Exception e) {
+			//	msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			//	addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			Log.d("Err_On_Insert",e.getMessage());
+			//db.endTransaction();
+			return 0;
+		}
+
+	}
+
 	private void actualizaTotalesBarra() {
 		Cursor dt;
 		int ccant;
@@ -1213,6 +1501,7 @@ public class Venta extends PBase {
 
 		try {
 			db.execSQL("DELETE FROM T_BARRA WHERE BARRA='"+gl.barra+"' AND CODIGO='"+prodid+"'");
+			Log.d("BARRA","Borrar barra");
 			actualizaTotalesBarra();
 
 			gl.bonbarprod=prodid;

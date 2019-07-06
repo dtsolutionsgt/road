@@ -14,6 +14,7 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -704,7 +705,9 @@ public class FacturaRes extends PBase {
 
 			if (!prn.isEnabled()) super.finish();
 
-		}catch (Exception e){
+		}catch (Exception e)
+		{
+			Log.d("impressOrder","err: " + e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("impressOrder: "  + e.getMessage());
 
@@ -1838,9 +1841,11 @@ public class FacturaRes extends PBase {
                     svuelt=""+tot;
                     sefect=""+tot;
 
+                    Log.d("IniApplyCAsh","todobene");
 					applyCash();
+					Log.d("FinApplyCAsh","todobene");
 					checkPago();
-
+					Log.d("FinCheckpago","todobene?????");
 				}
 			});
 
@@ -2211,7 +2216,9 @@ public class FacturaRes extends PBase {
             }
         }
 
-        } catch (Exception e) {
+        } catch (Exception e)
+		{
+			Log.d("Un_Elol","Factura_Vaca checkpago" + e.getMessage());
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox( e.getMessage());
         }

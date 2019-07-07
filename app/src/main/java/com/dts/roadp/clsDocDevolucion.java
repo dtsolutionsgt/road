@@ -91,7 +91,7 @@ public class clsDocDevolucion extends clsDocument {
         rep.addc("PARA COMPROBAR  EL PAGO. ");
         rep.add("");
 
-        rep.add("Serial : "+deviceid);
+        rep.add("No. Serie : "+deviceid);
         rep.add(resol);
         rep.add(resfecha);
         rep.add("");

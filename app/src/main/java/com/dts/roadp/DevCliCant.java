@@ -63,6 +63,7 @@ public class DevCliCant extends PBase {
 		estado=gl.devtipo;
 		raz=gl.devrazon;
 		gl.tienelote = 0;
+		gl.dpeso=0;
 
 		prc=new Precio(this,mu,2);
 

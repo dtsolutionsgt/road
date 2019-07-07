@@ -122,11 +122,11 @@ public class DevolBodCan extends PBase {
         prn_paseante=new printer(this,printclose,gl.validimp);
 
         fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
-        fcanastabod.deviceid =gl.deviceId;
+        fcanastabod.deviceid =gl.numSerie;
         fcanastabod.vTipo="CANASTA";
 
         fpaseantebod=new clsDocCanastaBod(this,prn_paseante.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
-        fpaseantebod.deviceid =gl.deviceId;
+        fpaseantebod.deviceid =gl.numSerie;
         fpaseantebod.vTipo="PASEANTE";
 
         app = new AppMethods(this, gl, Con, db);

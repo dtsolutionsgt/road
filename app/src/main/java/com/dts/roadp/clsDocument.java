@@ -242,9 +242,9 @@ public class clsDocument {
 			if (!s.equalsIgnoreCase("@@")) rep.add(s);
 
 			if(i==7){
-				rep.add("");
 
 				if (docfactura && !modofact.equalsIgnoreCase("TOL")) {
+					rep.add("");
 					rep.add(resol);
 					rep.add(resfecha);
 					rep.add(resvence);

@@ -63,7 +63,7 @@ public class appGlobals extends Application {
 	public double gpspx,gpspy,gpscpx,gpscpy,gpscdist;
 	
 	//Id de Dispositivo Móvil
-	public String deviceId,devicename;
+	public String deviceId,devicename,numSerie;
 
 	// Epson
 	

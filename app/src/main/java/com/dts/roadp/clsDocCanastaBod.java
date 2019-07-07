@@ -191,7 +191,7 @@ public class clsDocCanastaBod extends clsDocument {
         rep.add("");
         rep.add("Total items: " + totitems);
         rep.add("");
-        rep.add("Serial : "+deviceid);
+        rep.add("No. Serie : "+deviceid);
         rep.add("");
 
         return super.buildFooter();

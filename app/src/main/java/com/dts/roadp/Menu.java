@@ -100,6 +100,16 @@ public class Menu extends PBase {
 				gl.rutapos=true;
 			}
 
+			try {
+				if (gl.peModal.equalsIgnoreCase("TOL")){
+					gl.numSerie = getNumSerie();
+				}else{
+					gl.numSerie = gl.deviceId;
+				}
+			} catch (Exception e) {
+				gl.numSerie="";
+			}
+
 			selId=-1;selIdx=-1;
 
 			setHandlers();
@@ -1818,6 +1828,35 @@ public class Menu extends PBase {
 
 	public void doWSTest(View view) {
 		startActivity(new Intent(Menu.this,WSTest.class));
+	}
+
+	//#CKFK 20190705 Se creó función para obtener número de serie de P_COREL
+	public String getNumSerie(){
+		Cursor DT;
+		String numSerie = "";
+
+		try {
+
+			sql = "SELECT NUMSERIE FROM P_HANDHELD" ;
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+
+				DT.moveToFirst();
+				numSerie = DT.getString(0);
+
+				if (DT!=null) DT.close();
+
+			} else {
+				numSerie="";
+			}
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+		}
+
+		return numSerie;
 	}
 
 	//endregion

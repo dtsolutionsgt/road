@@ -125,8 +125,6 @@ public class FacturaRes extends PBase {
 			lblCred.setVisibility(View.INVISIBLE);
 			lblCash.setVisibility(View.VISIBLE);
 			imgCash.setVisibility(View.VISIBLE);
-			lblPend.setVisibility(View.INVISIBLE);
-			imgPend.setVisibility(View.INVISIBLE);
 			imgMPago.setVisibility(View.VISIBLE);
 			lblMPago.setVisibility(View.VISIBLE);
 		}
@@ -139,8 +137,13 @@ public class FacturaRes extends PBase {
 			lblCred.setVisibility(View.INVISIBLE);
 			lblCash.setVisibility(View.VISIBLE);
 			imgCash.setVisibility(View.VISIBLE);
-			lblPend.setVisibility(View.VISIBLE);
-			imgPend.setVisibility(View.VISIBLE);
+			if (app.esClienteNuevo(gl.cliente)){
+				imgPend.setVisibility(View.INVISIBLE);
+				lblPend.setVisibility(View.INVISIBLE);
+			}else{
+				imgPend.setVisibility(View.VISIBLE);
+				lblPend.setVisibility(View.VISIBLE);
+			}
 		}
 
 		if (media==4) {
@@ -247,10 +250,10 @@ public class FacturaRes extends PBase {
 		prn_nc=new printer(this,printclose,gl.validimp);
 
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(cliid),gl.codCliNuevo,gl.peModal);
-		fdoc.deviceid =gl.deviceId;
+		fdoc.deviceid =gl.numSerie;
 
 		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-		fdev.deviceid =gl.deviceId;
+		fdev.deviceid =gl.numSerie;
 
 		saved=false;
 		assignCorel();

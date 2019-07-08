@@ -767,6 +767,8 @@ public class Venta extends PBase {
 			prodtot=mu.round(prec*cant,2);
 		}
 
+		gl.umstock=app.umStock(prodid);
+
 		try {
 
             if (sinimp) precdoc=precsin; else precdoc=prec;
@@ -777,7 +779,11 @@ public class Venta extends PBase {
 			ins.add("EMPRESA",emp);
 			if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
 			ins.add("CANT",cant);
-			if (rutatipo.equalsIgnoreCase("V")) ins.add("UMSTOCK",gl.umpres);else ins.add("UMSTOCK",gl.um);
+			if (rutatipo.equalsIgnoreCase("V")) {
+				ins.add("UMSTOCK",gl.umstock);
+			}else {
+				ins.add("UMSTOCK",gl.um);
+			}
 			if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
 			ins.add("FACTOR",gl.umfactor);
 			if (porpeso) ins.add("PRECIO",gl.prectemp); else ins.add("PRECIO",prec);

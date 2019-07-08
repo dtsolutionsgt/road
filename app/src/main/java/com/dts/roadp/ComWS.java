@@ -867,7 +867,6 @@ public class ComWS extends PBase {
 					keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
 				}
 			}catch (Exception e){
-
 			}
 
 			isbusy = 1;
@@ -1656,7 +1655,6 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MERRESP")) return false;
 			if (!AddTable("P_MERMARCACOMP")) return false;
 			if (!AddTable("P_MERPRODCOMP")) return false;
-
 
 		} catch (Exception e) {
 			addlog(new Object() {

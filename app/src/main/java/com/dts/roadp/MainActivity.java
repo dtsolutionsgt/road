@@ -438,11 +438,6 @@ public class MainActivity extends PBase {
 
         try {
 
-            /*if (fecha > 1905310000) {
-                msgAskLic("¡Su licencia expiró!");
-                return false;
-            }*/
-
             usr = txtUser.getText().toString().trim();
             pwd = txtPass.getText().toString().trim();
 
@@ -782,7 +777,6 @@ public class MainActivity extends PBase {
                 return false;
             }
 
-
             if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) {
                return true;
             }
@@ -803,8 +797,7 @@ public class MainActivity extends PBase {
             }
 
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
             mu.msgbox(new Object() {
             }.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
         }

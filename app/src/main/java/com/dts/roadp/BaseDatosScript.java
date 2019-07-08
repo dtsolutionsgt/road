@@ -1977,6 +1977,15 @@ public class BaseDatosScript {
 				  ");";
 			database.execSQL(vSQL);
 
+			//#CKFK 20190619 Agregué la tabla P_CONFIGBARRA para poder configurar la lectura de las barras
+			vSQL = "CREATE TABLE [P_CONFIGBARRA](" +
+					"[IDCONFIGBARRA] INT NOT NULL," +
+					"[LONGITUDBARRA] INT NOT NULL," +
+					"[PREFIJO] TEXT NOT NULL,"+
+					"PRIMARY KEY ([IDCONFIGBARRA])"+
+					");";
+			database.execSQL(vSQL);
+
 			return 1;
 			 
 		} catch (SQLiteException e) {

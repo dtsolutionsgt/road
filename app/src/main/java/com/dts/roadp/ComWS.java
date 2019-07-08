@@ -1625,6 +1625,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_HANDHELD")) return false;
             if (!AddTable("P_TRANSERROR")) return false;
 			if (!AddTable("P_GLOBPARAM")) return false;
+			if (!AddTable("P_CONFIGBARRA")) return false;
 
 			licResult=checkLicence(licSerial);
 			licResultRuta=checkLicenceRuta(licRuta);
@@ -2425,9 +2426,16 @@ public class ComWS extends PBase {
             SQL = " SELECT IDTRANSERROR, TRANSERROR FROM P_TRANSERROR";
             return SQL;
         }
-		//#CKFK_20190522 Agregué tabla P_GLOBPARAM
+
+        //#CKFK_20190707 Agregué tabla P_GLOBPARAM
 		if (TN.equalsIgnoreCase("P_GLOBPARAM")) {
 			SQL = " SELECT EMPID, COMSERVER, FTPSERVER, VERFACTURA, VERPEDIDO, VERCOBRO, VALORN1 FROM P_GLOBPARAM";
+			return SQL;
+		}
+
+		//#CKFK_20190522 Agregué tabla P_CONFIGBARRA
+		if (TN.equalsIgnoreCase("P_CONFIGBARRA")) {
+			SQL = " SELECT LONGITUDBARRA, PREFIJO FROM P_CONFIGBARRA";
 			return SQL;
 		}
 
@@ -2899,7 +2907,7 @@ public class ComWS extends PBase {
 			isbusy = 0;
 			comparaCorrel();
 
-			paramsExtrasGlob();
+			otrosParametros();
 
 			if (ftflag) msgbox(ftmsg);
 		} catch (Exception e){
@@ -5009,11 +5017,12 @@ public class ComWS extends PBase {
 		    }
 	}
 	
-	private void paramsExtrasGlob() {
+	private void otrosParametros() {
 		try {
 			AppMethods app=new AppMethods(this,gl,Con,db);
 			app.parametrosExtra();
 			app.parametrosGlobales();
+			app.parametrosBarras();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			msgbox(e.getMessage());

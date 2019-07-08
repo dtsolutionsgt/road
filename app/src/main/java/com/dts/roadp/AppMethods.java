@@ -16,8 +16,6 @@ import android.widget.Toast;
 import java.util.Currency;
 import java.util.Locale;
 
-import static android.content.Context.LOCATION_SERVICE;
-
 public class AppMethods {
 
 	private Context cont;
@@ -403,6 +401,31 @@ public class AppMethods {
 		} catch (Exception e) {
 			gl.pTransBarra =false;
 		}
+	}
+
+	public void parametrosBarras() {
+		Cursor dt;
+		String sql;
+
+		try {
+			sql="SELECT LONGITUDBARRA, PREFIJO FROM P_CONFIGBARRA";
+			dt=Con.OpenDT(sql);
+
+			if(dt.getCount()>0){
+				dt.moveToFirst();
+
+				gl.pLongitudBarra= dt.getInt(0);
+				gl.pPrefijoBarra =dt.getString(1);
+
+			}else{
+				gl.pLongitudBarra= 18;
+				gl.pPrefijoBarra ="0";
+			}
+
+		} catch (Exception e) {
+			toast("Ocurrió un error obteniendo los valores de clientes nuevos" + e.getMessage());
+		}
+
 	}
 
 	public void parametrosGlobales() {

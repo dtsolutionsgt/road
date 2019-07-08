@@ -81,4 +81,8 @@ public class appGlobals extends Application {
 	//Comunicación con WS
 	public int isOnWifi = 0;
 
+	//Parámetros configuración barra
+	public int pLongitudBarra;
+	public String pPrefijoBarra;
+
 }

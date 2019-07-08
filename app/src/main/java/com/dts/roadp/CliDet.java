@@ -1113,7 +1113,7 @@ public class CliDet extends PBase {
 			chknc.setText("Nota de crédito");
 			chkncv.setText("Nota de crédito con venta");
 
-			layout.addView(chknc);
+			if (clicred)layout.addView(chknc);
 			if (!clicred) layout.addView(chkncv);
 
 			alert.setView(layout);

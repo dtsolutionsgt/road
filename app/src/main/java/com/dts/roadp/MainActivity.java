@@ -409,6 +409,7 @@ public class MainActivity extends PBase {
             AppMethods app = new AppMethods(this, gl, Con, db);
             app.parametrosExtra();
             app.parametrosGlobales();
+            app.parametrosBarras();
         } catch (Exception e) {
             addlog(new Object() {
             }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");

@@ -995,20 +995,24 @@ public class FacturaRes extends PBase {
 				ins.add("VAL2",dt.getString(10));
 				ins.add("UMVENTA",dt.getString(11));
 				ins.add("FACTOR",dt.getDouble(12));
-				ins.add("UMSTOCK",dt.getString(13));//vumstock);
+				ins.add("UMSTOCK",dt.getString(13));
 				ins.add("UMPESO",gl.umpeso); //#HS_20181120_1625 Se agrego el valor gl.umpeso anteriormente estaba ""
 
 			    db.execSQL(ins.sql());
 
 			    vprod=dt.getString(0);
-				//vumstock=dt.getString(13);
+				vumstock=dt.getString(13);
 				vcant=dt.getDouble(1);
 				vpeso=dt.getDouble(8);
 				vfactor=vpeso/(vcant*factpres);
 				vumventa=dt.getString(11);
 
 				if (esProductoConStock(dt.getString(0))) {
-					rebajaStockUM(vprod, vumstock, vcant, vfactor, vumventa,factpres,peso);
+					if (!rebajaStockUM(vprod, vumstock, vcant, vfactor, vumventa,factpres,peso)) {
+						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),"Inconsistencia de lotes ",vprod);
+						db.endTransaction();
+						mu.msgbox("Error (factura) " + "Inconsistencia de lotes "+vprod);return false;
+					};
 				}
 
 			    dt.moveToNext();
@@ -1299,9 +1303,9 @@ public class FacturaRes extends PBase {
 		return true;
 	}
 
-	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {
+	private boolean rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {
 		Cursor dt;
-		double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso,factlote;
+		double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso,factlote,totcant,totpeso;
 		String lote,doc,stat;
 
 		if (porpeso) {
@@ -1311,6 +1315,8 @@ public class FacturaRes extends PBase {
 			actcant=cant*factpres;
 			actpeso=cant*factor;
 		}
+
+		totcant=0;totpeso=0;
 
 		try {
 
@@ -1322,13 +1328,13 @@ public class FacturaRes extends PBase {
 
 			dt=Con.OpenDT(sql);
 
-			if (dt.getCount()==0) return;
+			if (dt.getCount()==0) return true;
 
 			dt.moveToFirst();
 			while (!dt.isAfterLast()) {
 
-				cant=dt.getDouble(0);
-				speso=dt.getDouble(2);
+				cant=dt.getDouble(0);totcant+=cant;
+				speso=dt.getDouble(2);totpeso+=speso;
 				lote=dt.getString(4);
 				doc=dt.getString(5);
 				stat=dt.getString(9);
@@ -1390,13 +1396,7 @@ public class FacturaRes extends PBase {
 					ins.add("COREL",corel);
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
-
-					//if (porpeso) {
-						ins.add("CANTIDAD",cantapl);
-					//} else {
-						//ins.add("CANTIDAD",cantapl*factpres);
-					//}
-
+					ins.add("CANTIDAD",cantapl);
 					ins.add("PESO",pesoapl);
 					ins.add("UMSTOCK",umstock);
 					ins.add("UMPESO",gl.umpeso);
@@ -1420,9 +1420,16 @@ public class FacturaRes extends PBase {
 
             db.execSQL("DELETE FROM D_FACTURAD_LOTES WHERE CANTIDAD<=0");
 
+			if (cant!=totcant) {
+				return false;
+			} else {
+				return true;
+			}
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("rebajaStockUM: "+e.getMessage());
+			return false;
 		}
 	}
 

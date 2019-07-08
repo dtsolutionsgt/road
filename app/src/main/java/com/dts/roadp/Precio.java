@@ -124,7 +124,7 @@ public class Precio {
 			precdoc=prec;
 		}
 
-		if (ppeso>0) prec=prec*ppeso/cant;
+		//if (ppeso>0) prec=prec*ppeso/cant;
 			
 		try {
 			sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
@@ -350,7 +350,7 @@ public class Precio {
 			precdoc=prec;
 		}
 
-		if (ppeso>0) prec=prec*ppeso/cant;
+		//if (ppeso>0) prec=prec*ppeso/cant;
 
 		try {
 			sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");

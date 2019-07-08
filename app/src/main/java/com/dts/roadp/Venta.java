@@ -1059,7 +1059,8 @@ public class Venta extends PBase {
 					}
 				}
 
-				if (prodPorPeso(prodid)) prec=mu.round2(prec/ppeso);
+				//if (prodPorPeso(prodid)) prec=mu.round2(prec/ppeso);
+				if (prodPorPeso(prodid)) prec=mu.round2(prec);
 				pprecdoc = prec;
 
 				prodtot = prec;

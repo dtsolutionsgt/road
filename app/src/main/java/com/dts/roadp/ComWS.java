@@ -867,7 +867,6 @@ public class ComWS extends PBase {
 					keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
 				}
 			}catch (Exception e){
-
 			}
 
 			isbusy = 1;
@@ -1657,7 +1656,6 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MERMARCACOMP")) return false;
 			if (!AddTable("P_MERPRODCOMP")) return false;
 
-
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(),idbg, fstr);
@@ -2435,7 +2433,7 @@ public class ComWS extends PBase {
 
 		//#CKFK_20190522 Agregué tabla P_CONFIGBARRA
 		if (TN.equalsIgnoreCase("P_CONFIGBARRA")) {
-			SQL = " SELECT LONGITUDBARRA, PREFIJO FROM P_CONFIGBARRA";
+			SQL = " SELECT IDCONFIGBARRA, LONGITUDBARRA, PREFIJO FROM P_CONFIGBARRA";
 			return SQL;
 		}
 

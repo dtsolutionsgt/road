@@ -579,16 +579,27 @@ public class AppMethods {
 
 					if (fact1>=fact2) {
 						fact=fact1/fact2;
+
+						cant = cant * fact;
+						cantm = cantm * fact;
+
+						sql="UPDATE P_STOCK SET CANT=" + cant + ",CANTM=" + cantm + ",UNIDADMEDIDA='" + ub + "'  " +
+								"WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + us + "') AND (LOTE='" + lote + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
+						db.execSQL(sql);
+
 					} else {
 						fact=fact2/fact1;
+
+						cant = cant * fact;
+						cantm = cantm * fact;
+
+						sql="UPDATE P_STOCK SET CANT=" + cant + ",CANTM=" + cantm + ",UNIDADMEDIDA='" + ub + "'  " +
+								"WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + ub + "') AND (LOTE='" + lote + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
+						db.execSQL(sql);
+
 					}
 
-					cant = cant * fact;
-					cantm = cantm * fact;
 
-					sql="UPDATE P_STOCK SET CANT=" + cant + ",CANTM=" + cantm + ",UNIDADMEDIDA='" + ub + "'  " +
-						"WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + us + "') AND (LOTE='" + lote + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
-					db.execSQL(sql);
 
 				}
 

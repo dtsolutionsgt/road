@@ -254,7 +254,6 @@ public class desglose extends PBase {
 
                 lblTotC1.setText(String.valueOf(mu.frmcur(mu.round(valtotc1, gl.peDec))));
 
-
                 TotCntCvs.setText(String.valueOf(mu.frmcur(val050)));
                 totVCCvs.setText(String.valueOf(mu.frmcur(val025)));
                 totDiezCvs.setText(String.valueOf(mu.frmcur(val010)));

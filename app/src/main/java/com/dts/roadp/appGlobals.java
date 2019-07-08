@@ -26,8 +26,6 @@ public class appGlobals extends Application {
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
 	public int mpago;
 
-
-
 	//#CKFK 20190619 Agregué estas dos variables para los valores de clientes nuevos
 	public String cuentaCliNuevo, codCliNuevo;
 

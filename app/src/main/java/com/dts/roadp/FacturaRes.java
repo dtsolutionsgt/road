@@ -58,7 +58,7 @@ public class FacturaRes extends PBase {
 
 	private long fecha,fechae;
 	private int fcorel,clidia,media;
-	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt,corelNC;
+	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt,corelNC,consprod;
 	private int cyear, cmonth, cday, dweek,stp=0,brw=0,notaC,impres;
 
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
@@ -1015,9 +1015,9 @@ public class FacturaRes extends PBase {
 			}
 
 			if (!consistenciaLotes()) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),"Inconsistencia de lotes ","");
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),"Inconsistencia de lotes , producto : "+consprod+" / "+corel,"");
 				db.endTransaction();
-				mu.msgbox("Error (factura) " + "Inconsistencia de lotes ");return false;
+				mu.msgbox("Inconsistencia de lotes , producto : "+consprod+" / "+corel);return false;
 			};
 
 
@@ -1552,11 +1552,13 @@ public class FacturaRes extends PBase {
 
 	private boolean consistenciaLotes() {
 		Cursor dt,dtl;
-		String prod;
-		double cantl,cantd;
+		String prod="";
+		double pesol,pesod;
+
+		consprod="";
 
 		try {
-			sql="SELECT PRODUCTO,SUM(CANTIDAD) FROM D_FACTURAD_LOTES " +
+			sql="SELECT PRODUCTO,SUM(PESO) FROM D_FACTURAD_LOTES " +
 					"WHERE (COREL='"+corel+"') GROUP BY PRODUCTO";
 			dt=Con.OpenDT(sql);
 			if (dt.getCount()==0) return true;
@@ -1564,20 +1566,24 @@ public class FacturaRes extends PBase {
 			dt.moveToFirst();
 			while (!dt.isAfterLast()) {
 				prod=dt.getString(0);
-				cantl=dt.getDouble(1);
+				pesol=dt.getDouble(1);pesol=mu.round2(pesol);
 
-				sql="SELECT CANT*FACTOR FROM D_FACTURAD " +
+				sql="SELECT SUM(PESO) FROM D_FACTURAD " +
 					"WHERE (COREL='"+corel+"') AND (PRODUCTO='"+prod+"') ";
 				dtl=Con.OpenDT(sql);
-				cantd=dtl.getDouble(0);
 
-				if (cantd!=cantl) throw new Exception();
+				pesod=dtl.getDouble(0);pesod=mu.round2(pesod);
+
+				if (pesol>0) {
+					if (pesod!=pesol) throw new Exception();
+				}
 
 				dt.moveToNext();
 			}
 
 			return true;
 		} catch (Exception e) {
+			consprod=prod;
 			return false;
 		}
 

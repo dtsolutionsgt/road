@@ -3211,9 +3211,10 @@ public class ComWS extends PBase {
 							fterr += "\nFactura : " + sstr;
 							dbg = sstr;
 						}
-					}else pc += 1;
+					} else pc += 1;
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3233,8 +3234,8 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			errflag = true;
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 			dbg = fstr;
 		}
@@ -3305,6 +3306,7 @@ public class ComWS extends PBase {
 					}else pc += 1;
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					//fterr+="\n"+e.getMessage();
@@ -3313,6 +3315,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3382,6 +3385,7 @@ public class ComWS extends PBase {
 					}else pc += 1;
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					//fterr+="\n"+e.getMessage();
@@ -3391,6 +3395,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3455,11 +3460,13 @@ public class ComWS extends PBase {
 							db.execSQL(sql);
 							pc += 1;
 						} else {
+							errflag=true;
 							fterr += "\n" + sstr;
 						}
 					}else pc += 1;
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3469,6 +3476,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3528,11 +3536,13 @@ public class ComWS extends PBase {
 							db.execSQL(sql);
 							pc += 1;
 						} else {
+							errflag = true;
 							fterr += "\n" + sstr;
 						}
 					}else pc += 1;
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3555,6 +3565,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3613,11 +3624,13 @@ public class ComWS extends PBase {
 							db.execSQL(sql);
 							pc += 1;
 						} else {
+							errflag = true;
 							fterr += "\n" + sstr;
 						}
 					}else pc += 1;
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3627,6 +3640,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3727,11 +3741,13 @@ public class ComWS extends PBase {
 							pc += 1;
 
 						} else {
+							errflag = true;
 							fterr += "\n" + sstr;
 						}
 					}
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3741,6 +3757,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3807,6 +3824,7 @@ public class ComWS extends PBase {
 
 							pc += 1;
 						} else {
+							errflag = true;
 							fterr += "\n" + sstr;
 						}
 					}
@@ -3869,11 +3887,13 @@ public class ComWS extends PBase {
 							sql = "UPDATE D_ATENCION SET STATCOM='S' WHERE (RUTA='" + cor + "') AND (FECHA=" + fecha + ") AND (HORALLEG='" + hora + "') ";
 							db.execSQL(sql);
 						} else {
-							//fterr+="\n"+sstr;
+							errflag = true;
+							fterr+="\n"+sstr;
 						}
 					}
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					//fterr+="\n"+e.getMessage();
@@ -3883,6 +3903,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3925,11 +3946,13 @@ public class ComWS extends PBase {
 							sql = "UPDATE D_CLICOORD SET STATCOM='S' WHERE (CODIGO='" + cod + "') AND (STAMP=" + stp + ") ";
 							db.execSQL(sql);
 						} else {
+							errflag = true;
 							fterr += "\n" + sstr;
 						}
 					}
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3939,6 +3962,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3989,11 +4013,13 @@ public class ComWS extends PBase {
 							db.execSQL(sql);
 							pc += 1;
 						} else {
+							errflag = true;
 							fterr += "\n" + sstr;
 						}
 					}
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -4003,6 +4029,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -4050,6 +4077,7 @@ public class ComWS extends PBase {
 			}else pc = 3;
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -4105,11 +4133,12 @@ public class ComWS extends PBase {
                             sql = "UPDATE D_RATING SET STATCOM='S' WHERE IDRATING='" + id + "'";
                             db.execSQL(sql);
                         }else{
-                            fterr += "\n" + sstr;
+                          fterr += "\n" + sstr;
                         }
                     }
 
                 } catch (Exception e) {
+					errflag = true;
                     addlog(new Object() {
                     }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
                     fterr += "\n" + e.getMessage();
@@ -4119,6 +4148,7 @@ public class ComWS extends PBase {
             }
 
         } catch (Exception e) {
+			errflag = true;
             addlog(new Object() {
             }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
             fstr = e.getMessage();
@@ -4154,12 +4184,14 @@ public class ComWS extends PBase {
 			dbld.add(ss);
 
 			if (envioparcial && !esEnvioManual) {
-				//fterr=ss+"\n";
-				rslt = commitSQL();
-				//fterr=fterr+rslt+"\n";
+				if (commitSQL() == 0) {
+					fterr += "\n" + sstr;
+					errflag = true;
+				}
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -4184,11 +4216,14 @@ public class ComWS extends PBase {
 			dbld.add(ss);
 
 			if (envioparcial && !esEnvioManual) {
-				rslt = commitSQL();
-				fterr = fterr + rslt + "\n";
+				if (commitSQL() == 0) {
+					fterr += "\n" + sstr;
+					errflag = true;
+				}
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();

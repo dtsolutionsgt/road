@@ -795,7 +795,7 @@ public class MainActivity extends PBase {
                 return false;
             }
 
-            return true;
+            //return true;
 
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);

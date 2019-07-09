@@ -1308,8 +1308,12 @@ public class FacturaRes extends PBase {
 
 	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {
 		Cursor dt;
-		double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso,factlote,totcant,totpeso,detcant;
-		String lote,doc,stat;
+		double cantapl,dispcant,umfactor,actcant,pesoapl,disppeso,actpeso,speso,factlote,vcant,totcant,totpeso,detcant;
+		String lote,doc,stat,vumventa;
+
+		vcant=cant;vumventa=umventa;
+		umfactor=1;
+		if (!umstock.equalsIgnoreCase(umventa)) umfactor=factpres;
 
 		if (porpeso) {
 			actcant=cant;
@@ -1325,9 +1329,6 @@ public class FacturaRes extends PBase {
 
 			sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
 				"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') ORDER BY CANT";
-			//sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
-			//		"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') ORDER BY CANT";
-
 
 			dt=Con.OpenDT(sql);
 
@@ -1399,18 +1400,18 @@ public class FacturaRes extends PBase {
 					ins.add("COREL",corel);
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
-					ins.add("CANTIDAD",cantapl);
+					ins.add("CANTIDAD",vcant);
 					ins.add("PESO",pesoapl);
 					ins.add("UMSTOCK",umstock);
 					ins.add("UMPESO",gl.umpeso);
-					ins.add("UMVENTA",umventa);
+					ins.add("UMVENTA",vumventa);
 
 					db.execSQL(ins.sql());
 
 				} catch (SQLException e) {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 
-					sql="UPDATE D_FACTURAD_LOTES SET CANTIDAD=CANTIDAD+"+cantapl+",PESO=PESO+"+pesoapl+"  " +
+					sql="UPDATE D_FACTURAD_LOTES SET CANTIDAD=CANTIDAD+"+vcant+",PESO=PESO+"+pesoapl+"  " +
 						"WHERE (COREL='"+corel+"') AND (PRODUCTO='"+prid+"') AND (LOTE='"+lote+"')";
 					db.execSQL(sql);
 					//mu.msgbox(e.getMessage()+"\n"+ins.sql());
@@ -1553,30 +1554,28 @@ public class FacturaRes extends PBase {
 	private boolean consistenciaLotes() {
 		Cursor dt,dtl;
 		String prod="";
-		double pesol,pesod;
+		double cantl,cantd;
 
 		consprod="";
 
 		try {
-			sql="SELECT PRODUCTO,SUM(PESO) FROM D_FACTURAD_LOTES " +
-					"WHERE (COREL='"+corel+"') GROUP BY PRODUCTO";
+			sql="SELECT PRODUCTO,SUM(CANTIDAD) FROM D_FACTURAD_LOTES " +
+				"WHERE (COREL='"+corel+"') GROUP BY PRODUCTO";
 			dt=Con.OpenDT(sql);
 			if (dt.getCount()==0) return true;
 
 			dt.moveToFirst();
 			while (!dt.isAfterLast()) {
 				prod=dt.getString(0);
-				pesol=dt.getDouble(1);pesol=mu.round2(pesol);
+				cantl=dt.getDouble(1);
 
-				sql="SELECT SUM(PESO) FROM D_FACTURAD " +
+				sql="SELECT SUM(CANT) FROM D_FACTURAD " +
 					"WHERE (COREL='"+corel+"') AND (PRODUCTO='"+prod+"') ";
 				dtl=Con.OpenDT(sql);
 
-				pesod=dtl.getDouble(0);pesod=mu.round2(pesod);
+				cantd=dtl.getDouble(0);
 
-				if (pesol>0) {
-					if (pesod!=pesol) throw new Exception();
-				}
+				if (cantd!=cantl) throw new Exception();
 
 				dt.moveToNext();
 			}

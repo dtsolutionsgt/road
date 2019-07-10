@@ -356,7 +356,6 @@ public class DevCliCant extends PBase {
 				lblDesc.setText(prodid + " " + DT.getString(7));
 			}
 
-           	if(cant==0) cant=1;
 
 			if (prodPorPeso(prodid)) {
 				precioventa = prc.precio(prodid, cant, gl.nivel, um, gl.umpeso, gl.dpeso,um);

@@ -16,6 +16,9 @@ public class clsDocCanastaBod extends clsDocument {
     private int totitems, totcant;
 
     public String vTipo;
+    public boolean vCreate;
+
+
     public clsDocCanastaBod(Context context, int printwidth, String cursym, int decimpres, String archivo) {
         super(context, printwidth, cursym, decimpres, archivo);
         docpedido=false;

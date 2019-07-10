@@ -1657,8 +1657,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MERPRODCOMP")) return false;
 
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(),idbg, fstr);
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(),idbg, fstr);
 			return false;
 		}
 
@@ -1729,8 +1728,6 @@ public class ComWS extends PBase {
 			encodeLicence();
 			encodeLicenceRuta();
 
-			fechaCarga();
-
             SetStatusRecToTrans("1");
 
 			dbT.setTransactionSuccessful();
@@ -1739,6 +1736,7 @@ public class ComWS extends PBase {
 			fprog = "Documento de inventario recibido en BOF...";
 			wsRtask.onProgressUpdate();
 
+			fechaCarga();
 			Actualiza_Documentos();
 
 			fprog = "Fin de actualización";

@@ -62,8 +62,6 @@ public class Precio {
 		umpeso=unimedidapeso;
 		prec=0;costo=0;descmon=0;imp=0;tot=0;precioespecial=0;
 
-		if (cant==0) return false;
-
 		prodPrecioEsp(ppeso,cliente,clitipo);
 		precioespecial=prec;
 		return prec>0;

@@ -414,32 +414,25 @@ public class ComWSExist extends PBase {
 
 			prn=0;jj=0;
 
-		    for (int i = 0; i < rc; i++)
-		    {
+		    for (int i = 0; i < rc; i++)   {
 		    	sql=listItems.get(i);
 
-				try
-				{
+				try {
 					dbT = ConT.getWritableDatabase();
 					dbT.execSQL(sql);
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 					Log.d("M","Something happend there " + e.getMessage());
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage() + "EJC","Yo fui " + sql);
 					Log.e("z", e.getMessage());
 				}
 
-
 				try {
-					if (i % 10==0)
-					{
+					if (i % 10==0) 	{
 						fprog = "Procesando: " + i + " de: " + (rc-1);
 						wsRtask.onProgressUpdate();
 						SystemClock.sleep(20);
 					}
-				} catch (Exception e)
-				{
+				} catch (Exception e) {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 					Log.e("z", e.getMessage());
 				}
@@ -451,6 +444,7 @@ public class ComWSExist extends PBase {
 			fprog="Registrando el documento recibido de inventario en BOF...";
 			wsRtask.onProgressUpdate();
 
+			fechaCarga();
 			Actualiza_Documentos();
 
 			fprog="Fin de actualización";
@@ -524,6 +518,24 @@ public class ComWSExist extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			Log.e("Error",e.getMessage());
 			return  false;
+		}
+
+	}
+
+	private void fechaCarga() {
+
+		try {
+			dbT.beginTransaction();
+
+			dbT.execSQL("DELETE FROM P_FECHA");
+
+			sql="INSERT INTO P_FECHA VALUES('"+gl.ruta+"',"+du.getActDate()+")";
+			dbT.execSQL(sql);
+
+			dbT.setTransactionSuccessful();
+			dbT.endTransaction();
+		} catch (Exception e) {
+			dbT.endTransaction();
 		}
 
 	}

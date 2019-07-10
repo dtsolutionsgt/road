@@ -356,13 +356,15 @@ public class DevCliCant extends PBase {
 				lblDesc.setText(prodid + " " + DT.getString(7));
 			}
 
+           	if(cant==0) cant=1;
+
 			if (prodPorPeso(prodid)) {
-				precioventa = prc.precio(prodid, 1, gl.nivel, um, gl.umpeso, gl.dpeso,um);
+				precioventa = prc.precio(prodid, cant, gl.nivel, um, gl.umpeso, gl.dpeso,um);
 				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
 					if (prc.precioespecial>0) precioventa=prc.precioespecial;
 				}
 			} else {
-				precioventa = prc.precio(prodid, 1, gl.nivel, um, gl.umpeso, 0,um);
+				precioventa = prc.precio(prodid, cant, gl.nivel, um, gl.umpeso, 0,um);
 				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
 					if (prc.precioespecial>0) precioventa=prc.precioespecial;
 				}

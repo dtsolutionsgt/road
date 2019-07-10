@@ -41,8 +41,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.4.33 / ";
-    private String parFechaVer = "09-Jul-2019";
+    private String parNumVer = "9.4.34 / ";
+    private String parFechaVer = "10-Jul-2019";
     private String parTipoVer = "ROAD PRD";
 
     @Override
@@ -766,7 +766,7 @@ public class MainActivity extends PBase {
             lic = dt.getString(0);
             licruta = dt.getString(1);
 
-            /*
+
             if (mu.emptystr(lic)) {
                 toastlong("El dispositivo no tiene licencia válida de handheld");
                 return false;
@@ -795,9 +795,9 @@ public class MainActivity extends PBase {
                 toastlong("El dispositivo no tiene licencia válida de ruta");
                 return false;
             }
-            */
 
-            return true;
+
+            //return true;
 
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);

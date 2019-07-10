@@ -766,6 +766,7 @@ public class MainActivity extends PBase {
             lic = dt.getString(0);
             licruta = dt.getString(1);
 
+            /*
             if (mu.emptystr(lic)) {
                 toastlong("El dispositivo no tiene licencia válida de handheld");
                 return false;
@@ -794,8 +795,9 @@ public class MainActivity extends PBase {
                 toastlong("El dispositivo no tiene licencia válida de ruta");
                 return false;
             }
+            */
 
-            //return true;
+            return true;
 
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);

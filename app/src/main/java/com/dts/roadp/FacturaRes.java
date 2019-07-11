@@ -1332,8 +1332,9 @@ public class FacturaRes extends PBase {
 
 		try {
 
-			sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
-				"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') ORDER BY CANT";
+			sql="SELECT CANT,CANTM,PESO,plibra,LOTE,CODIGO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
+				"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') " +
+				"GROUP BY plibra,LOTE,CODIGO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV ORDER BY CANT";
 
 			dt=Con.OpenDT(sql);
 
@@ -1422,7 +1423,7 @@ public class FacturaRes extends PBase {
 					//mu.msgbox(e.getMessage()+"\n"+ins.sql());
 				}
 
-				//if (actcant<=0) return;
+				if (actcant<=0) return;
 
 				dt.moveToNext();
 			}
@@ -1574,12 +1575,10 @@ public class FacturaRes extends PBase {
 				prod=dt.getString(0);
 				cantl=dt.getDouble(1);
 
-				sql="SELECT SUM(CANT) FROM D_FACTURAD " +
-					"WHERE (COREL='"+corel+"') AND (PRODUCTO='"+prod+"') ";
+				sql="SELECT SUM(CANT) FROM D_FACTURAD WHERE (COREL='"+corel+"') AND (PRODUCTO='"+prod+"') ";
 				dtl=Con.OpenDT(sql);
 
 				cantd=dtl.getDouble(0);
-
 				if (cantd!=cantl) throw new Exception();
 
 				dt.moveToNext();
@@ -1984,7 +1983,6 @@ public class FacturaRes extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-
 	}
 
 	private void applyCash() {
@@ -2079,7 +2077,6 @@ public class FacturaRes extends PBase {
 		}
 
 	}
-
 
 	private void pagarCredito() {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);

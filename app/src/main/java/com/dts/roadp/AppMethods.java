@@ -423,7 +423,7 @@ public class AppMethods {
 			}
 
 		} catch (Exception e) {
-			toast("Ocurrió un error obteniendo los valores de clientes nuevos" + e.getMessage());
+			toast("Ocurrió un error obteniendo los valores de P_CONFIGBARRA" + e.getMessage());
 		}
 
 	}

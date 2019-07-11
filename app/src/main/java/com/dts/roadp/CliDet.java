@@ -942,8 +942,14 @@ public class CliDet extends PBase {
 
 			if (esClienteNuevo()){
 				imgDevol.setVisibility(View.INVISIBLE);
+				lblDevol.setVisibility(View.INVISIBLE);
+				imgCobro.setVisibility(View.INVISIBLE);
+				lblCobro.setVisibility(View.INVISIBLE);
 			}else{
 				imgDevol.setVisibility(View.VISIBLE);
+				lblDevol.setVisibility(View.VISIBLE);
+				imgCobro.setVisibility(View.INVISIBLE);
+				lblCobro.setVisibility(View.INVISIBLE);
 			}
 
 		}catch (Exception ex)
@@ -980,7 +986,7 @@ public class CliDet extends PBase {
 		String sql = "";
 
 		try {
-			sql="SELECT * FROM D_CLINUEVO WHERE CODIGO='"+selid+"'";
+			sql="SELECT * FROM D_CLINUEVO WHERE CODIGO='"+cod+"'";
 			dt=Con.OpenDT(sql);
 			if (dt.getCount()==0) return false;
 

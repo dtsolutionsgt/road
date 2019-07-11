@@ -19,12 +19,14 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,11 +39,12 @@ public class FacturaRes extends PBase {
 
 	private ListView listView;
 	private TextView lblPago,lblFact,lblTalon,lblMPago,lblCred,lblPend,lblCash;
-	private ImageView imgBon,imgMPago,imgCred,imgPend, imgCash;
+	private ImageView imgBon,imgMPago,imgCred,imgPend, imgCash, imgBack;
 	private CheckBox contadoCheck;
 	private TextView lblVuelto;
 	private EditText txtVuelto;
 	private RelativeLayout rl_facturares;
+	private ProgressBar pbar;
 
 	private List<String> spname = new ArrayList<String>();
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
@@ -83,16 +86,17 @@ public class FacturaRes extends PBase {
 		lblCred = (TextView) findViewById(R.id.lblPend);
 		lblPend = (TextView) findViewById(R.id.lblCVence2);
 		lblCash = (TextView) findViewById(R.id.textView4);
-		contadoCheck = (CheckBox) findViewById(R.id.checkContado);
 
 		imgBon = (ImageView) findViewById(R.id.imageView6);
 		imgMPago = (ImageView) findViewById(R.id.imageView1);
 		imgCred = (ImageView) findViewById(R.id.imageView3);
 		imgPend = (ImageView) findViewById(R.id.imageView12);
 		imgCash = (ImageView) findViewById(R.id.imageView2);
+		imgBack = (ImageView) findViewById(R.id.imageView5);
 
-		rl_facturares=(RelativeLayout)findViewById(R.id.relativeLayout1);
-		rl_facturares.setVisibility(View.VISIBLE);
+		contadoCheck = (CheckBox) findViewById(R.id.checkContado);
+		rl_facturares=(RelativeLayout)findViewById(R.id.relativeLayout1);rl_facturares.setVisibility(View.VISIBLE);
+		pbar = (ProgressBar) findViewById(R.id.progressBar);pbar.setVisibility(View.INVISIBLE);
 
 		lblVuelto = new TextView(this,null);
 		txtVuelto = new EditText(this,null);
@@ -650,6 +654,8 @@ public class FacturaRes extends PBase {
 		try{
 
 			rl_facturares.setVisibility(View.INVISIBLE);
+			pbar.setVisibility(View.VISIBLE);
+			imgBack.setVisibility(View.INVISIBLE);
 
 			if(gl.dvbrowse!=0) gl.dvbrowse =0;
 
@@ -708,8 +714,7 @@ public class FacturaRes extends PBase {
 
 			if (!prn.isEnabled()) super.finish();
 
-		}catch (Exception e)
-		{
+		}catch (Exception e) {
 			Log.d("impressOrder","err: " + e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("impressOrder: "  + e.getMessage());
@@ -2223,6 +2228,8 @@ public class FacturaRes extends PBase {
 		Cursor DT;
 		double tpago;
 
+		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
 		if (pagocompleto) return;
 
 		try {
@@ -2263,8 +2270,7 @@ public class FacturaRes extends PBase {
             }
         }
 
-        } catch (Exception e)
-		{
+        } catch (Exception e) 		{
 			Log.d("Un_Elol","Factura_Vaca checkpago" + e.getMessage());
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox( e.getMessage());

@@ -82,7 +82,7 @@ public class MiscUtils {
 	}
 	
 	public String frmdecimal(double val,int ndec) {
-		String ss="",ff="#,##0.";
+		String ss="",ff="###0.";
 		
 		if (ndec<=0) {		
 			ss=frmint((int) val);return ss;

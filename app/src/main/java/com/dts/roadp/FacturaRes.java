@@ -1332,9 +1332,13 @@ public class FacturaRes extends PBase {
 
 		try {
 
-			sql="SELECT CANT,CANTM,PESO,plibra,LOTE,CODIGO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
-				"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') " +
-				"GROUP BY plibra,LOTE,CODIGO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV ORDER BY CANT";
+			//sql="SELECT SUM(CANT),SUM(CANTM),SUM(PESO),plibra,LOTE,CODIGO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
+			//	"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') " +
+			//	"GROUP BY plibra,LOTE,CODIGO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV ORDER BY CANT";
+
+			sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
+					"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') ORDER BY CANT";
+
 
 			dt=Con.OpenDT(sql);
 
@@ -1363,13 +1367,12 @@ public class FacturaRes extends PBase {
 
 				// Stock
 
-				sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"')  AND (STATUS='"+stat+"') AND (UNIDADMEDIDA='"+umstock+"')";
-				//sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
+				//sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"')  AND (STATUS='"+stat+"') AND (UNIDADMEDIDA='"+umstock+"')";
+				sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
 				db.execSQL(sql);
 
 				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0)";
 				db.execSQL(sql);
-
 
 				// Factura Stock
 
@@ -1406,7 +1409,7 @@ public class FacturaRes extends PBase {
 					ins.add("COREL",corel);
 					ins.add("PRODUCTO",prid );
 					ins.add("LOTE",lote );
-					ins.add("CANTIDAD",vcant);
+					ins.add("CANTIDAD",cantapl);
 					ins.add("PESO",pesoapl);
 					ins.add("UMSTOCK",umstock);
 					ins.add("UMPESO",gl.umpeso);
@@ -1417,7 +1420,7 @@ public class FacturaRes extends PBase {
 				} catch (SQLException e) {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 
-					sql="UPDATE D_FACTURAD_LOTES SET CANTIDAD=CANTIDAD+"+vcant+",PESO=PESO+"+pesoapl+"  " +
+					sql="UPDATE D_FACTURAD_LOTES SET CANTIDAD=CANTIDAD+"+cantapl+",PESO=PESO+"+pesoapl+"  " +
 						"WHERE (COREL='"+corel+"') AND (PRODUCTO='"+prid+"') AND (LOTE='"+lote+"')";
 					db.execSQL(sql);
 					//mu.msgbox(e.getMessage()+"\n"+ins.sql());
@@ -1454,12 +1457,12 @@ public class FacturaRes extends PBase {
 
 		try {
 
-			//sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
-			//		"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') ORDER BY CANT";
+			sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
+					"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') ORDER BY CANT";
 
-			sql="SELECT CANT,CANTM,PESO,plibra,LOTE,CODIGO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
-                    "FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') " +
-                    "GROUP BY plibra,LOTE,CODIGO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV ORDER BY CANT";
+			//sql="SELECT SUM(CANT),SUM(CANTM),SUM(PESO),plibra,LOTE,CODIGO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
+            //        "FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"') " +
+            //        "GROUP BY plibra,LOTE,CODIGO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV ORDER BY CANT";
             dt=Con.OpenDT(sql);
 
 			if (dt.getCount()==0) return;
@@ -1487,7 +1490,8 @@ public class FacturaRes extends PBase {
 
 				// Stock
 
-				sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"')  AND (STATUS='"+stat+"') AND (UNIDADMEDIDA='"+umstock+"')";
+				//sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"')  AND (STATUS='"+stat+"') AND (UNIDADMEDIDA='"+umstock+"')";
+				sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
 				db.execSQL(sql);
 
 				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0)";
@@ -1549,7 +1553,7 @@ public class FacturaRes extends PBase {
 					db.execSQL(sql);
 				}
 
-				//if (actcant<=0) return;
+				if (actcant<=0) return;
 
 				dt.moveToNext();
 			}

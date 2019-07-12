@@ -519,11 +519,80 @@ public class Anulacion extends PBase {
 		}
 	}
 	
+	private void revertStock(String corel) {
+		Cursor dt;
+		String doc,stat,lot,cod,um;
+		double cant,ppeso;
+		
+		doc="";stat="";lot="";
+
+		try{
+			sql = "SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV,CODIGO,UNIDADMEDIDA FROM D_FACTURA_STOCK " +
+					"WHERE (COREL='" + corel + "') ";
+			dt = Con.OpenDT(sql);
+
+			if (dt.getCount()==0) return;
+
+			dt.moveToFirst();
+
+			while (!dt.isAfterLast()) {
+
+				cant = dt.getInt(0);
+				ppeso = dt.getDouble(2);
+				lot = dt.getString(4);
+				doc = dt.getString(5);
+				stat = dt.getString(9);
+				cod=dt.getString(13);
+				um=dt.getString(14);
+
+				try {
+
+					ins.init("P_STOCK");
+
+					ins.add("CODIGO", cod);
+					ins.add("CANT", 0);
+					ins.add("CANTM", dt.getDouble(1));
+					ins.add("PESO", 0);
+					ins.add("plibra", dt.getDouble(3));
+					ins.add("LOTE", lot);
+					ins.add("DOCUMENTO", doc);
+
+					ins.add("FECHA", dt.getInt(6));
+					ins.add("ANULADO", dt.getInt(7));
+					ins.add("CENTRO", dt.getString(8));
+					ins.add("STATUS", stat);
+					ins.add("ENVIADO", dt.getInt(10));
+					ins.add("CODIGOLIQUIDACION", dt.getInt(11));
+					ins.add("COREL_D_MOV", dt.getString(12));
+					ins.add("UNIDADMEDIDA", um);
+
+					db.execSQL(ins.sql());
+
+				} catch (Exception e) {
+					//#CKFK 20190308 Este addlog lo quité porque da error porque el registro ya existe y en ese caso solo se va a hacer el update.
+					//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+					//mu.msgbox(e.getMessage());
+				}
+
+				sql = "UPDATE P_STOCK SET CANT=CANT+"+cant+",PESO=PESO+"+ppeso+"  WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + um + "') AND (LOTE='" + lot + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
+				db.execSQL(sql);
+
+				dt.moveToNext();
+			}
+
+			if(dt!=null) dt.close();
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
+	}
+
 	private void revertStock(String corel,String pcod,String um) {
 		Cursor dt;
 		String doc,stat,lot;
 		double cant,ppeso;
-		
+
 		doc="";stat="";lot="";
 
 		try{

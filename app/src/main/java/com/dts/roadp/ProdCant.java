@@ -619,7 +619,8 @@ public class ProdCant extends PBase {
 		} else {
 			try {
 				if (!txtPeso.getText().toString().trim().isEmpty()){
-					peso=Double.parseDouble(txtPeso.getText().toString());
+					ss=txtPeso.getText().toString();
+					peso=Double.parseDouble(ss);
 				} else {
 					cant=-1;peso=0;return -1;
 				}

@@ -122,9 +122,9 @@ public class Soporte extends PBase {
 
         try {
 
-
-            Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE, Uri.fromParts(
-                    "mailto", "dtsolutionsgt@gmail.com", null));
+           Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+            String to= "dtsolutionsgt@gmail.com";
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, to);
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, subj);
             emailIntent.putExtra(Intent.EXTRA_TEXT, body);
 
@@ -143,7 +143,8 @@ public class Soporte extends PBase {
             emailIntent.putExtra(Intent.EXTRA_STREAM,  uris);
 
             if (contfile>0) {
-                startActivity(emailIntent);
+                //startActivity(emailIntent);
+                startActivity(Intent.createChooser(emailIntent , "Send with..."));
             }else{
                 msgbox("No hay archivos de envío de datos");
             }

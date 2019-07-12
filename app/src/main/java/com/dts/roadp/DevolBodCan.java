@@ -1,5 +1,4 @@
 package com.dts.roadp;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -22,8 +21,8 @@ public class DevolBodCan extends PBase {
     public String corel,existenciaC,existenciaP;
     private int imprimo=0,close=0;
 
-    private printer prn_paseante;//prn_can,;
-    //private clsDocCanastaBod fcanastabod;
+    private printer prn_can,prn_paseante;
+    private clsDocCanastaBod fcanastabod;
     private clsDocCanastaBod fpaseantebod;
     private DevolBod DevBod;
     public Runnable printclose, printcallback,printexit, printclosecan;
@@ -60,9 +59,6 @@ public class DevolBodCan extends PBase {
         gl.validimp=app.validaImpresora();
         if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
-        if (gl.peModal.equalsIgnoreCase("TOL")) imprimecopias=true;
-
-
         printclosecan = new Runnable() {
             public void run() {
 
@@ -78,7 +74,7 @@ public class DevolBodCan extends PBase {
                 }*/
 
                 gl.closeDevBod = true;
-                //DevolBodCan.super.finish();
+                DevolBodCan.super.finish();
             }
         };
 
@@ -99,35 +95,37 @@ public class DevolBodCan extends PBase {
         printcallback= new Runnable() {
             public void run() {
 
-                /*
                 if (!imprimecopias){
+
                     if (imprimo==0) {
                         prn_can.printnoask(printclosecan, "printdevcan.txt");
                     }
+
                     imprimecopias = true;
+
                 }else{
+
                     if (imprimo==0) {
                         prn_can.printnoask(printclosecan, "printdevcan.txt");
                     }
                     imprimecopias = false;
+
                 }
-                */
 
                 askPrint();
 
             }
         };
 
-        //prn_can=new printer(this,printclose,gl.validimp);
-        //prn_paseante=new printer(this,printclose,gl.validimp);
-        prn_paseante=new printer(this,printexit,gl.validimp);
+        prn_can=new printer(this,printclose,gl.validimp);
+        prn_paseante=new printer(this,printclose,gl.validimp);
 
-        //fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
-        //fcanastabod.deviceid =gl.numSerie;
-        //fcanastabod.vTipo="CANASTA";
+        fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
+        fcanastabod.deviceid =gl.deviceId;
+        fcanastabod.vTipo="CANASTA";
 
         fpaseantebod=new clsDocCanastaBod(this,prn_paseante.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
-        fpaseantebod.deviceid =gl.numSerie;
+        fpaseantebod.deviceid =gl.deviceId;
         fpaseantebod.vTipo="PASEANTE";
 
         app = new AppMethods(this, gl, Con, db);
@@ -194,9 +192,9 @@ public class DevolBodCan extends PBase {
         try {
 
             sql =  " SELECT D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA " +
-                   " FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO " +
-                   " INNER JOIN D_CXC ON D_CXC.COREL = D_CXCD.COREL WHERE D_CxC.STATCOM='N' AND D_CXC.ANULADO = 'N' " +
-                   " GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA ";
+                    " FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO " +
+                    " INNER JOIN D_CXC ON D_CXC.COREL = D_CXCD.COREL WHERE D_CxC.STATCOM='N' AND D_CXC.ANULADO = 'N' " +
+                    " GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA ";
 
             dp = Con.OpenDT(sql);
 
@@ -296,7 +294,7 @@ public class DevolBodCan extends PBase {
 
                 }
 
-               if (icnt>=1) {
+                if (icnt>=1) {
                     itemt = clsCls.new clsDevCan();
                     itemt.ValorT = sct;
                     itemt.PesoT = spt;
@@ -348,8 +346,10 @@ public class DevolBodCan extends PBase {
 
             db.execSQL(ins.sql());
 
+
+
             sql="SELECT CODIGO,LOTE,SUM(CANT),SUM(CANTM),SUM(PESO),UNIDADMEDIDA FROM P_STOCK GROUP BY CODIGO,LOTE,UNIDADMEDIDA " +
-                "HAVING SUM(CANT)>0 OR SUM(CANTM) >0";
+                    "HAVING SUM(CANT)>0 OR SUM(CANTM) >0";
 
             DT=Con.OpenDT(sql);
 
@@ -513,15 +513,14 @@ public class DevolBodCan extends PBase {
 
     }
 
-    /*
-
     private void singlePrint() {
         try{
             prn_can.printask(printclose, "printdevcan.txt");
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-    }*/
+
+    }
 
     private boolean EnviaDev(){
 
@@ -547,32 +546,24 @@ public class DevolBodCan extends PBase {
 
         try{
 
-            imprimo=1;
+            imprimo=0;
 
             existenciaC=tieneCanasta(corel);
             existenciaP=tienePaseante(corel);
 
-            //if(existenciaC.isEmpty() && !existenciaP.isEmpty()) imprimo=1;
-            //if(!existenciaC.isEmpty() && existenciaP.isEmpty()) imprimo=2;
-            //if(existenciaC.isEmpty() && existenciaP.isEmpty()) imprimo=3;
+            if(existenciaC.isEmpty() && !existenciaP.isEmpty()) imprimo=1;
+            if(!existenciaC.isEmpty() && existenciaP.isEmpty()) imprimo=2;
+            if(existenciaC.isEmpty() && existenciaP.isEmpty()) imprimo=3;
 
-            if (prn_paseante.isEnabled()) {
+            if (prn_can.isEnabled()) {
 
                 String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
                 if(imprimo==0 || imprimo==1){
-                    fpaseantebod.vTipo="PASEANTE";
-                    fpaseantebod.vCreate=true;
-                    fpaseantebod.buildPrintAppend(corel,0,vModo,false);
-
-                    //if (!existenciaC.isEmpty()) {
-                        fpaseantebod.vTipo = "CANASTA";
-                        fpaseantebod.vCreate = false;
-                        fpaseantebod.buildPrintAppend(corel, 0, vModo, true);
-                    //}
+                    fpaseantebod.buildPrint(corel,0,vModo);
                 }
 
                 if(imprimo==0 || imprimo==2){
-                    //fcanastabod.buildPrint(corel,0, vModo);
+                    fcanastabod.buildPrint(corel,0, vModo);
                 }
 
                 if(imprimo==0) {
@@ -580,28 +571,19 @@ public class DevolBodCan extends PBase {
                 }else if(imprimo==1) {
                     prn_paseante.printask(printcallback, "printpaseante.txt");
                 }else if(imprimo==2) {
-                   // prn_can.printask(printcallback, "printdevcan.txt");
-                    prn_paseante.printask(printcallback, "printpaseante.txt");
+                    prn_can.printask(printcallback, "printdevcan.txt");
                 }
 
-            } else if (!prn_paseante.isEnabled()){
+            }else if(!prn_can.isEnabled()){
 
                 String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 
                 if(imprimo==0 || imprimo==1){
-                    fpaseantebod.vTipo="PASEANTE";
-                    fpaseantebod.vCreate=true;
-                    fpaseantebod.buildPrintAppend(corel,0,vModo,false);
-
-                    //if (!existenciaC.isEmpty()) {
-                        fpaseantebod.vTipo = "CANASTA";
-                        fpaseantebod.vCreate = false;
-                        fpaseantebod.buildPrintAppend(corel, 0, vModo, true);
-                    //}
-                 }
+                    fpaseantebod.buildPrint(corel,0,vModo);
+                }
 
                 if(imprimo==0 || imprimo==2){
-                    //fcanastabod.buildPrint(corel,0, vModo);
+                    fcanastabod.buildPrint(corel,0, vModo);
                 }
 
                 if (!EnviaDev()){
@@ -610,11 +592,11 @@ public class DevolBodCan extends PBase {
 
             }
 
-        if (!prn_paseante.isEnabled()) {
-            Toast.makeText(this, "Devolucion completada y guardada.",Toast.LENGTH_SHORT);
-            gl.closeDevBod=true;
-            super.finish();
-        }
+            if (!prn_can.isEnabled()) {
+                Toast.makeText(this, "Devolucion completada y guardada.",Toast.LENGTH_SHORT);
+                gl.closeDevBod=true;
+                super.finish();
+            }
 
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -757,28 +739,25 @@ public class DevolBodCan extends PBase {
                         addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
                     }
 
-                    imprimo++;
-
                     if (imprimecopias){
 
-                        if (prn_paseante.isEnabled()) {
+                        if (prn_can.isEnabled()) {
 
                             String vModo = (gl.peModal.equalsIgnoreCase("TOL") ? "TOL" : "*");
-                            //if (imprimo == 0 || imprimo == 1) {
-                            //    fpaseantebod.buildPrint(corel, 1, vModo);
-                            //}
+                            if (imprimo == 0 || imprimo == 1) {
+                                fpaseantebod.buildPrint(corel, 1, vModo);
+                            }
 
-                           // if (imprimo == 0 || imprimo == 2) {
-                                //fcanastabod.buildPrint(corel, 1, vModo);
-                           //}
+                            if (imprimo == 0 || imprimo == 2) {
+                                fcanastabod.buildPrint(corel, 1, vModo);
+                            }
 
-                           if (imprimo == 0) {
+                            if (imprimo == 0) {
                                 prn_paseante.printask(printcallback, "printpaseante.txt");
-                            } else if (imprimo == 1 || imprimo==2) {
+                            } else if (imprimo == 1) {
                                 prn_paseante.printask(printcallback, "printpaseante.txt");
-                            } else if (imprimo >2) {
-                               gl.closeDevBod = true;
-                               DevolBodCan.super.finish();
+                            } else if (imprimo == 2) {
+                                prn_can.printask(printcallback, "printdevcan.txt");
                             }
                         }
 
@@ -799,7 +778,7 @@ public class DevolBodCan extends PBase {
 
             dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    //prn_can.printask(printclose, "printdevcan.txt");
+                    prn_can.printask(printclose, "printdevcan.txt");
 
                     if (!gl.devfindia) {
                         if (!EnviaDev()){
@@ -807,9 +786,8 @@ public class DevolBodCan extends PBase {
                         }
                     }
 
-                    prn_paseante.printask(printcallback, "printpaseante.txt");
-                    //gl.closeDevBod=true;
-                    //DevolBodCan.super.finish();
+                    gl.closeDevBod=true;
+                    DevolBodCan.super.finish();
                 }
             });
 
@@ -834,7 +812,6 @@ public class DevolBodCan extends PBase {
         }
 
     }
-
 
     //endregion
 

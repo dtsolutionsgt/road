@@ -462,8 +462,10 @@ public class CliDet extends PBase {
 			}
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				lblCobro.setVisibility(View.VISIBLE);
-				imgCobro.setVisibility(View.VISIBLE);
+				if (!esClienteNuevo()){
+					lblCobro.setVisibility(View.VISIBLE);
+					imgCobro.setVisibility(View.VISIBLE);
+				}
 			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -948,8 +950,8 @@ public class CliDet extends PBase {
 			}else{
 				imgDevol.setVisibility(View.VISIBLE);
 				lblDevol.setVisibility(View.VISIBLE);
-				imgCobro.setVisibility(View.INVISIBLE);
-				lblCobro.setVisibility(View.INVISIBLE);
+				imgCobro.setVisibility(View.VISIBLE);
+				lblCobro.setVisibility(View.VISIBLE);
 			}
 
 		}catch (Exception ex)

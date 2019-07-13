@@ -197,25 +197,25 @@ public class DevolCli extends PBase {
 			
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
-				  
-			  vItem = clsCls.new clsCFDV();
-			  
-			  vItem.Cod=DT.getString(0);
-			  vItem.Desc=DT.getString(3);
-			  vItem.Valor=DT.getString(2);
-			  s=mu.frmdec(DT.getDouble(1));
-			  vItem.Fecha=s;
-			  vItem.id=DT.getInt(4);
 
-            cntprd = cntprd+1;
-            cntunis = cntunis + Double.parseDouble(s);
-            cntkgs = mu.round(cntkgs + DT.getDouble(5),gl.peDec);
-            cntotl = mu.round(cntotl + DT.getDouble(6),2);
+				vItem = clsCls.new clsCFDV();
 
-			  items.add(vItem);	
+				vItem.Cod = DT.getString(0);
+				vItem.Desc = DT.getString(3);
+				vItem.Valor = DT.getString(2);
+				s = mu.frmdec(DT.getDouble(1));
+				vItem.Fecha = s;
+				vItem.id = DT.getInt(4);
 
-			 // vItem.Cod = gl.CodDev;
-			  DT.moveToNext();
+				cntprd = cntprd + 1;
+				cntunis = cntunis + Double.parseDouble(s);
+				cntkgs = mu.round(cntkgs + DT.getDouble(5), gl.peDec);
+				cntotl = mu.round(cntotl + DT.getDouble(6), 2);
+
+				items.add(vItem);
+
+			 	// vItem.Cod = gl.CodDev;
+			  	DT.moveToNext();
 			}
 
             lblCantProds.setText(String.valueOf(cntprd));

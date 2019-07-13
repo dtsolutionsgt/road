@@ -640,7 +640,7 @@ public class Deposito extends PBase {
 		Cursor DT;
 		  
 		try {
-			sql="SELECT CODIGO,NOMBRE,CUENTA FROM P_BANCO WHERE (TIPO='D') ORDER BY Nombre,Cuenta";
+			sql="SELECT CODIGO,NOMBRE,CUENTA FROM P_BANCO WHERE (TIPO='D') AND CUENTA = '"+gl.sucur+"' ORDER BY Nombre,Cuenta";
 			DT=Con.OpenDT(sql);
 					
 			DT.moveToFirst();

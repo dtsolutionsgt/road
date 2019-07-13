@@ -4379,7 +4379,7 @@ public class ComWS extends PBase {
 		try {
 
 			if (getTest()==1) scon=1;
-			scon=1;
+
 			if (scon==1) {
 				fstr="Sync OK";
 

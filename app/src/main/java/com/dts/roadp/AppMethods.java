@@ -751,6 +751,27 @@ public class AppMethods {
 		}
 	}
 
+	public double pesoProm(String cod) {
+		Cursor DT;
+		double pesoprom=0;
+
+		try {
+			String sql = "SELECT PESO_PROMEDIO,FACTORCONV FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				pesoprom = DT.getDouble(1);
+				if (pesoprom==0) pesoprom = DT.getDouble(0);
+			}
+
+		} catch (Exception e) {
+			toast(e.getMessage());
+		}
+
+		return  pesoprom;
+	}
+
 	public String umStock(String cod) {
 		Cursor DT;
 		String umm,sql;

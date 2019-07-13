@@ -30,9 +30,9 @@ public class MiscUtils {
 		cCont=context; 
 		curr="";
 		
-		ffrmdec = new DecimalFormat("#,##0.00"); 
-		ffrmint = new DecimalFormat("#,##0"); 
-		ffrmdec2 = new DecimalFormat("#,##0.##"); 
+		ffrmdec = new DecimalFormat("###0.00");
+		ffrmint = new DecimalFormat("###0");
+		ffrmdec2 = new DecimalFormat("###0.##");
 		ffrmgps = new DecimalFormat("##0.0000000");
 	}
 	
@@ -58,7 +58,9 @@ public class MiscUtils {
 	}
 	
 	public String frmdec(double val) {
-		return ffrmdec.format(val);
+		String ss=ffrmdec.format(val);
+		ss=ss.replace(",","");
+		return ss;
 	}
 	
 	public String frmdec(int val) {

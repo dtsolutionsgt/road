@@ -70,6 +70,8 @@ public class ProdCant extends PBase {
 
         paramProd();
 
+		txtPeso.setEnabled(validaRango());
+
 		showData();
 		
 	}
@@ -538,7 +540,9 @@ public class ProdCant extends PBase {
 			}
 
 			if (porpeso && gl.rutatipo.equalsIgnoreCase("V")) {
-				if (!checkLimits(ppeso,cant*umfactor)) return;
+				if (!checkLimits(ppeso,cant*umfactor)) {
+					return;
+				}
 			}
 
 			gl.dval = cant;
@@ -749,9 +753,7 @@ public class ProdCant extends PBase {
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount() == 0) {
-				toast("No está definido rango de repesaje para el producto, no se podrá modificar el peso");
-				//#EJC20190226: Si no está definido repesaje no se puede modificar el peso según observación de Carolina se debe dejar vender.
-				txtPeso.setEnabled(false);
+				//toast("No está definido rango de repesaje para el producto, no se podrá modificar el peso");
 				return true;
 			}
 
@@ -779,6 +781,32 @@ public class ProdCant extends PBase {
 
 		return true;
 	}
+
+	private boolean validaRango() {
+
+		Cursor dt;
+		double pmin,pmax;
+		String ss;
+
+		try {
+
+			sql="SELECT PORCMINIMO,PORCMAXIMO FROM P_PORCMERMA WHERE PRODUCTO='"+prodid+"'";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount() == 0) {
+				return false;
+			} else {
+				return true;
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return true;
+	}
+
 
 	private void setPrecio() {
 	    double cu,tv,corig,cround,fruni,frcant,adcant,ppeso=0;

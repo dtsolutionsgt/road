@@ -488,7 +488,7 @@ public class DevCliCant extends PBase {
 	
 	private void parseCant(double c) {
 		try{
-			DecimalFormat frmdec = new DecimalFormat("#.####");
+			DecimalFormat frmdec = new DecimalFormat("#####");
 			double ub;
 
 			ub=c;

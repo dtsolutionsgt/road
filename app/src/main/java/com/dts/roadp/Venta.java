@@ -1067,6 +1067,12 @@ public class Venta extends PBase {
 
 				//if (prodPorPeso(prodid)) prec=mu.round2(prec/ppeso);
 				if (prodPorPeso(prodid)) prec=mu.round2(prec);
+
+				if (prec==0){
+					msgbox("El producto no tiene precio definido para nivel de precio " + gl.nivel);
+					return 0;
+				}
+
 				pprecdoc = prec;
 
 				prodtot = prec;

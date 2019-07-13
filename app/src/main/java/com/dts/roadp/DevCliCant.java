@@ -106,7 +106,7 @@ public class DevCliCant extends PBase {
 
 			setCant();
 
-			if (cant<0){
+			if (cant<=0){
 				mu.msgbox("Cantidad incorrecta");return;
 			}
 
@@ -119,10 +119,30 @@ public class DevCliCant extends PBase {
 			gl.dval=cant;
 			gl.devrazon=razon;
 
-			if(txtkgs.getText().toString().trim().equalsIgnoreCase("")){
-				gl.dvpeso = 0.0;
+			if (app.ventaPeso(prodid)){
+
+				if(txtkgs.getText().toString().isEmpty()){
+					gl.dvpeso = 0.0;
+				}else{
+
+					try{
+						gl.dvpeso = Double.parseDouble(txtkgs.getText().toString());
+						if (gl.dvpeso<=0) throw new Exception();
+					}catch (Exception e){
+						gl.dvpeso =0.0;
+						mu.msgbox("Peso incorrecto, debe ser mayor a 0");
+						return;
+					}
+
+				}
 			}else{
-				gl.dvpeso = Double.parseDouble(txtkgs.getText().toString());
+
+				try{
+					gl.dvpeso = Double.parseDouble(txtkgs.getText().toString());
+					if (gl.dvpeso<=0) throw new Exception();
+				}catch (Exception e){
+					gl.dvpeso=app.pesoProm(prodid)*cant;
+				}
 			}
 
 			gl.dvumpeso = gl.umpeso;
@@ -218,7 +238,7 @@ public class DevCliCant extends PBase {
 						factor=cmbumfact.get(position);
 						umcambiar = cmbumlist.get(position);
 
-						clcpeso=pesoprom*factor;
+						clcpeso=app.pesoProm(prodid)*factor;
 
 						if (mu.emptystr(txtCant.getText().toString())) txtCant.setText("0");
 

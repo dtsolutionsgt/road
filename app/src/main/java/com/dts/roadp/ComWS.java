@@ -81,7 +81,7 @@ public class ComWS extends PBase {
 	private clsLicence lic;
 	private clsFinDia claseFindia;
     private DateUtils DU;
-    private String jsonWS;
+    private String jsonWS,updCxC;
 	private CryptUtil cu=new CryptUtil();
 
 	protected PowerManager.WakeLock wakeLock;
@@ -161,10 +161,14 @@ public class ComWS extends PBase {
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
 			if (mu.emptystr(txtRuta.getText().toString())) {
-				txtRuta.setText("2024-5");
-				txtEmp.setText("03");
-				txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
+				//txtRuta.setText("2024-5");
+				//txtEmp.setText("03");
+				//txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
 			}
+
+			txtRuta.setText("8001-1");
+			txtEmp.setText("03");
+			txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}
 
 		if(gl.ruta.isEmpty()){
@@ -300,11 +304,11 @@ public class ComWS extends PBase {
 			}
 
 			if (gl.banderafindia) {
-				if (!puedeComunicar()) {
-					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
-					return;
+					if (!puedeComunicar()) {
+						mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+						return;
+					}
 				}
-			}
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -836,7 +840,6 @@ public class ComWS extends PBase {
 		startActivity(new Intent(this,ComWSFotos.class));
 	}
 
-
 	private void setHandlers() {
 		ralBack.setOnTouchListener(new SwipeListener(this) {
 			public void onSwipeRight() {
@@ -1322,8 +1325,6 @@ public class ComWS extends PBase {
 		return 0;
 
 	}
-
-
 
 	public int getTest() {
 
@@ -2969,15 +2970,23 @@ public class ComWS extends PBase {
 	//region WS Envio Methods
 
 	private boolean sendData() {
+		int rslv;
 
 		errflag = false;
+
+		if (getTest()==0) return false;
 
 		senv = "Envío terminado \n \n";
 
 		if (gl.peModal.equalsIgnoreCase("TOL")) {
-			if (!validaLiquidacion()) {
+			rslv=validaLiquidacion();
+			if (rslv!=1) {
 				liqid = false;
-				senv = "La liquidación no está cerrada, no se puede enviar datos";
+				if (rslv==0) {
+					senv = "La liquidación no está cerrada, no se puede enviar datos";
+				} else {
+					senv = "No se puede determinar estado de la liquidación.";
+				}
 				return false;
 			} else {
 				liqid = true;
@@ -2994,88 +3003,88 @@ public class ComWS extends PBase {
 			envioFacturas();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			envioPedidos();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			envioNotasCredito();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			envioNotasDevolucion();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			envioCobros();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			envioDepositos();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			envio_D_MOV();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			envioCli();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			envioAtten();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			envioCoord();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			envioSolicitud();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
             envioRating();
             if (!fstr.equals("Sync OK")){
                 dbld.savelog();
-                return true;
+                return false;
             }
 
 			updateAcumulados();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			updateInventario();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			if (!update_Corel_GrandTotal()){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			envioFinDia();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			listaFachada();
@@ -3091,25 +3100,30 @@ public class ComWS extends PBase {
 				if (scon==1) {
 					if (commitSQL() == 1) {
 						errflag=false;
+						return true;
 					} else {
 						errflag=true;
 						fterr += "\n" + sstr;
+						return false;
 					}
 				} else {
 					errflag=true;
 					fstr="No se puede conectar al web service : "+sstr;
 					fterr += "\n" + fstr;
+					return false;
 				}
+			} else {
+				return true;
 			}
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
-		return errflag;
+		return true;
 	}
 
-	private boolean validaLiquidacion() {
+	private int validaLiquidacion() {
 		Cursor DT;
 		String ss;
 
@@ -3119,9 +3133,7 @@ public class ComWS extends PBase {
 
 			AddTableVL("P_LIQUIDACION");
 
-			if (listItems.size() < 2) {
-				return true;
-			}
+			if (listItems.size() < 2) return 1;
 
 			sql = listItems.get(0);
 			db.execSQL(sql);
@@ -3136,16 +3148,16 @@ public class ComWS extends PBase {
 				DT.moveToFirst();
 				ss = DT.getString(0);
 				if (ss.equalsIgnoreCase("Cerrada")) {
-					return true;
+					return 1;
 				} else {
-					return false;
+					return 0;
 				}
 			} else {
-				return false;
+				return 1;
 			}
 		} catch (Exception e) {
 			strliqid = e.getMessage();
-			return false;
+			return -1;
 		}
 	}
 
@@ -3206,7 +3218,8 @@ public class ComWS extends PBase {
 					dbld.insert("D_BONIFFALT", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_REL_PROD_BON", "WHERE COREL='" + cor + "'");
 
-					dbld.add("UPDATE P_COREL SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");
+					dbld.add("UPDATE P_COREL SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "' " +
+							"AND CORELULT<" + ccorel);
 
 					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
@@ -3378,7 +3391,8 @@ public class ComWS extends PBase {
 					dbld.insert("D_COBROD_SR", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_COBROP", "WHERE COREL='" + cor + "'");
 
-					dbld.add("UPDATE P_CORRELREC SET Actual=" + corult + "  WHERE RUTA='" + fruta + "'");
+					dbld.add("UPDATE P_CORRELREC SET Actual=" + corult + "  WHERE RUTA='" + fruta + "' " +
+							"AND Actual<"+corult);
 
 					if (envioparcial && !esEnvioManual){
 						if (commitSQL() == 1) {
@@ -3421,7 +3435,7 @@ public class ComWS extends PBase {
 
 	public void envioNotasCredito() {
 		Cursor DT;
-		String cor, fruta;
+		String cor, fruta="";
 		int i, pc = 0, pcc = 0, ccorel;
 
 		try {
@@ -3452,14 +3466,14 @@ public class ComWS extends PBase {
 						wsStask.onProgressUpdate();
 					}
 
-
 					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_NOTACRED", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_NOTACREDD", "WHERE COREL='" + cor + "'");
 
-					dbld.add("UPDATE P_CORELNC SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");
-					dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'NC'");
+					//dbld.add("UPDATE P_CORELNC SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");
+					dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'NC' " +
+							"AND ACTUAL<" + ccorel);
 
 					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
@@ -3525,7 +3539,6 @@ public class ComWS extends PBase {
 				fruta = DT.getString(1);
 
 				try {
-
 					i += 1;
 					fprog = "Nota de devolución " + i;
 					if (!esEnvioManual){
@@ -3566,8 +3579,15 @@ public class ComWS extends PBase {
 				ccorel = DT.getInt(0);
 				serie = DT.getString(1);
 
-				dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND SERIE = '"+serie +"' AND TIPO = 'D' " +
+				//dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND SERIE = '"+serie +"' AND TIPO = 'D' " +
+				//		" AND ACTUAL =< "+ccorel+1);
+
+				dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'D' " +
 						" AND ACTUAL < "+ccorel);
+				//updCxC="UPDATE P_CORREL_OTROS SET ACTUAL="+ccorel+ "  WHERE RUTA='"+fruta+"' AND TIPO='D' " ;
+
+				//ss = "exec actualizaCorelDev '" + gl.ruta + "'," + ccorel;
+				//dbld.add(ss);
 
 			}
 
@@ -4382,7 +4402,8 @@ public class ComWS extends PBase {
 	
 	public void wsSendExecute(){
 
-		running=1;fstr="No connect";scon=0;
+		running=1;scon=0;
+		fstr="Envio incompleto  ";
         errflag=false;
 
 		try {
@@ -4394,8 +4415,6 @@ public class ComWS extends PBase {
 
 				if (!sendData()) {
 					fstr="Envio incompleto : "+sstr;
-				} else {
-
 				}
 			} else {
 				fstr="No se puede conectar al web service : "+sstr;
@@ -4444,6 +4463,7 @@ public class ComWS extends PBase {
 					}
 				}
 
+				fstr="Envio completo ";
 				msgResultEnvio(senv);
 
 			} else {
@@ -4870,7 +4890,7 @@ public class ComWS extends PBase {
 				relStock.setVisibility(View.INVISIBLE);
 
 				//Si entra en modo administración, habilita los botones y se va
-				if (gl.modoadmin) {
+				if (gl.modoadmin || gl.debug) {
 
 					txtRuta.setEnabled(true);
 					txtWS.setEnabled(true);
@@ -5182,7 +5202,7 @@ public class ComWS extends PBase {
 			dialog.setMessage(msg);
 			dialog.setIcon(R.drawable.ic_quest);
 
-			dialog.setPositiveButton("Envio correcto", new DialogInterface.OnClickListener() {
+			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which)
 				{
 					startActivity(new Intent(ComWS.this,rating.class));

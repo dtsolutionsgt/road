@@ -135,8 +135,7 @@ public class Menu extends PBase {
 			//#CKFK 20190423 Quité esta validación de configuración de impresora
 			//ConfImpresora();
 
-		}catch (Exception e)
-		{
+		}catch (Exception e) 		{
 			Log.e("Mnu", e.getMessage());
 		}
 
@@ -1156,7 +1155,11 @@ public class Menu extends PBase {
 			gl.closeDevBod=false;
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				startActivity(new Intent(this,DevolBodTol.class));
+				if (tieneDevolucionTOL()) {
+					startActivity(new Intent(this,DevolBodTol.class));
+				} else {
+					msgbox("La devolución está vacia, no se puede aplicar");return;
+				}
 			} else {
 				startActivity(new Intent(this,DevolBod.class));
 			}
@@ -1857,6 +1860,32 @@ public class Menu extends PBase {
 		}
 
 		return numSerie;
+	}
+
+	private boolean tieneDevolucionTOL() {
+		Cursor dt;
+		long cantcan = 0, cantstock = 0, cantbolsa = 0;
+
+		try {
+			sql = "SELECT IFNULL(SUM(CANT),0) FROM P_STOCK WHERE CANT+CANTM>0";
+			dt = Con.OpenDT(sql);
+			cantstock = dt.getLong(0);
+
+			sql = "SELECT IFNULL(COUNT(BARRA),0) FROM P_STOCKB";
+			dt = Con.OpenDT(sql);
+			cantbolsa = dt.getLong(0);
+
+			sql = "SELECT IFNULL(SUM(CANT),0) FROM D_CXC E INNER JOIN D_CXCD D ON  E.COREL = D.COREL WHERE E.ANULADO = 'N'";
+			dt = Con.OpenDT(sql);
+			cantcan = dt.getLong(0);
+
+		} catch (Exception e) {
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+			return false;
+		}
+
+		return (cantstock + cantbolsa + cantcan > 0);
 	}
 
 	//endregion

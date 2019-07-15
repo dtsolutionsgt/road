@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,9 +17,11 @@ import java.util.ArrayList;
 public class DevolBodCan extends PBase {
 
     private ListView listView;
-    private TextView lblReg,lblTot;
+    private TextView lblReg,lblTot,lblTit;
     private ImageView imgNext;
-    public String corel,existenciaC,existenciaP;
+    private ProgressBar pbar;
+
+    public  String corel,existenciaC,existenciaP;
     private int imprimo=0,close=0;
 
     private printer prn_can,prn_paseante;
@@ -26,7 +29,8 @@ public class DevolBodCan extends PBase {
     private clsDocCanastaBod fpaseantebod;
     private DevolBod DevBod;
     public Runnable printclose, printcallback,printexit, printclosecan;
-    private boolean imprimecopias=false;
+
+    private boolean imprimecopias=false,idle=true;
     private ArrayList<clsClasses.clsDevCan> items= new ArrayList<clsClasses.clsDevCan>();
     private list_view_dev_bod_can adapter;
 
@@ -47,10 +51,12 @@ public class DevolBodCan extends PBase {
         listView = (ListView) findViewById(R.id.listView1);
         lblReg = (TextView) findViewById(R.id.textView61);lblReg.setText("");
         imgNext = (ImageView) findViewById(R.id.imgTitLogo);
+        pbar = (ProgressBar) findViewById(R.id.progressBar4);pbar.setVisibility(View.INVISIBLE);
+        lblReg = (TextView) findViewById(R.id.textView61);lblReg.setText("");
+        lblTit = (TextView) findViewById(R.id.txtRoadTit);lblTit.setText("Devolución de canastas");
 
         rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp,"");
 
-        lblTot = (TextView) findViewById(R.id.textView9);lblTot.setText("");
         setHandlers();
 
         gl.devprncierre=false;
@@ -90,7 +96,6 @@ public class DevolBodCan extends PBase {
                 DevolBodCan.super.finish();
             }
         };
-
 
         printcallback= new Runnable() {
             public void run() {
@@ -134,6 +139,7 @@ public class DevolBodCan extends PBase {
 
         listItems();
 
+        habilitaEnvio();
     }
 
     //region Events
@@ -323,6 +329,8 @@ public class DevolBodCan extends PBase {
         String pcod,plote,um,barra,barrapallet;
         Double pcant,pcantm,ppeso;
 
+        ocultaEnvio();
+
         corel=gl.ruta+"_"+mu.getCorelBase();
 
         gl.devfindia=app.getDevolBod();
@@ -508,6 +516,7 @@ public class DevolBodCan extends PBase {
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             db.endTransaction();
+            habilitaEnvio();
             mu.msgbox( e.getMessage());
         }
 
@@ -799,18 +808,36 @@ public class DevolBodCan extends PBase {
 
     }
 
+    private void habilitaEnvio() {
+        imgNext.setVisibility(View.VISIBLE);
+        pbar.setVisibility(View.INVISIBLE);
+        lblTit.setText("Devolución de canastas");
+    }
+
+    private void ocultaEnvio() {
+        imgNext.setVisibility(View.INVISIBLE);
+        pbar.setVisibility(View.VISIBLE);
+        lblTit.setText("Espere, por favor . . .");
+    }
+
+
+    //endregion
+
+    //region Activity Events
 
     @Override
     protected void onResume() {
         try{
             super.onResume();
-
             if (gl.closeDevBod) super.finish();
-
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
+    }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     //endregion

@@ -325,6 +325,8 @@ public class DevolBodCan extends PBase {
 
         corel=gl.ruta+"_"+mu.getCorelBase();
 
+        gl.devfindia=app.getDevolBod();
+
         fecha=du.getActDateTime();
         if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
 
@@ -345,8 +347,6 @@ public class DevolBodCan extends PBase {
             ins.add("CODIGOLIQUIDACION",0);
 
             db.execSQL(ins.sql());
-
-
 
             sql="SELECT CODIGO,LOTE,SUM(CANT),SUM(CANTM),SUM(PESO),UNIDADMEDIDA FROM P_STOCK GROUP BY CODIGO,LOTE,UNIDADMEDIDA " +
                     "HAVING SUM(CANT)>0 OR SUM(CANTM) >0";

@@ -84,7 +84,7 @@ public class RepesajeLista extends PBase {
                         Object lvObj = listView.getItemAtPosition(position);
                         clsClasses.clsCD vItem = (clsClasses.clsCD) lvObj;
 
-                        //prodid = vItem.Cod;
+                       // prodid = vItem.Cod;
                         adapter.setSelectedIndex(position);
 
                     } catch (Exception e) {

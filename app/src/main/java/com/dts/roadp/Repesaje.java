@@ -621,7 +621,7 @@ public class Repesaje extends PBase {
             dt=Con.OpenDT(sql);
 
             if (dt.getCount() == 0) {
-                msgbox("El repesaje no se puede aplicar,\n no esta definido rango de repesaje para el producto.");return false;
+                msgbox("El repesaje no se puede aplicar,\n no está definido rango de repesaje para el producto.");return false;
             }
             dt.moveToFirst();
 
@@ -630,12 +630,12 @@ public class Repesaje extends PBase {
 
             if (tpeso<pmin) {
                 ss="El repesaje ("+mu.frmdecimal(tpeso, gl.peDecImp)+") está por debajo de los porcentajes permitidos," +
-                        " minimo : "+mu.frmdecimal(pmin, gl.peDecImp)+", no se puede aplicar.";
+                        " mínimo : "+mu.frmdecimal(pmin, gl.peDecImp)+", no se puede aplicar.";
                 msgbox(ss);return false;
             }
 
             if (tpeso>pmax) {
-                ss="El repesaje ("+mu.frmdecimal(tpeso, gl.peDecImp)+") está por debajo de los porcentajes permitidos," +
+                ss="El repesaje ("+mu.frmdecimal(tpeso, gl.peDecImp)+") está por encima de los porcentajes permitidos," +
                         " máximo : "+mu.frmdecimal(pmax, gl.peDecImp)+", no se puede aplicar.";
                 msgbox(ss);return false;
             }

@@ -940,6 +940,26 @@ public class AppMethods {
 		}
 	}
 
+	public boolean getDevolBod(){
+		Cursor dt;
+		boolean devol=false;
+
+		try {
+			sql = "SELECT STATCOM FROM D_MOV WHERE ANULADO = 'N'";
+			dt = Con.OpenDT(sql);
+
+			if(dt.getCount()>0){
+				dt.moveToFirst();
+
+				devol = (dt.getString(0).equals("S")?true:false);
+			}
+
+		} catch (Exception e) {
+			msgbox("Ocurrió un error obteniendo el estado de comunicación de la devolución "+e.getMessage());
+			devol= false;
+		}
+		return devol;
+	}
 
 	// Common
 	

@@ -112,7 +112,7 @@ public class clsDocFactura extends clsDocument {
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
 			
-			resol="Resolucion No. : "+DT.getString(0);
+			resol="Resolucion No.: "+DT.getString(0);
 			ff=DT.getLong(1);resfecha="De Fecha: "+sfecha_dos(ff);
 			ff=DT.getLong(2);resvence="Vigente hasta: "+sfecha_dos(ff);
 			//#EJC20181130: Se cambió el mensaje por revisión de auditor de SAT.

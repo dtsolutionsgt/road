@@ -3085,11 +3085,20 @@ public class ComWS extends PBase {
 
 			//#CKFK 20190429 Saqué esto de envioFinDia para que se guarde bien el log y luego se realice el envío.
 			if (!envioparcial){
-				if (commitSQL() == 1) {
-					errflag=false;
+
+				if (getTest()==1) scon=1;
+
+				if (scon==1) {
+					if (commitSQL() == 1) {
+						errflag=false;
+					} else {
+						errflag=true;
+						fterr += "\n" + sstr;
+					}
 				} else {
 					errflag=true;
-					fterr += "\n" + sstr;
+					fstr="No se puede conectar al web service : "+sstr;
+					fterr += "\n" + fstr;
 				}
 			}
 

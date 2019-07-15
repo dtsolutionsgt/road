@@ -913,6 +913,7 @@ public class CliDet extends PBase {
 
 	private void setDevType(String tdev) {
 		try{
+			gl.dvbrowse=0;
 			gl.devtipo=tdev;
 			Intent intent = new Intent(this,DevolCli.class);
 			startActivity(intent);

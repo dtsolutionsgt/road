@@ -57,11 +57,13 @@ public class FinDia extends PBase {
         pBar.setVisibility(View.INVISIBLE);
 
         rutatipo = gl.rutatipog;
-        gl.devfindia=true;
 
         app = new AppMethods(this, gl, Con, db);
+
         gl.validimp=app.validaImpresora();
         if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+
+        gl.devfindia=app.getDevolBod();
 
         fullfd = false;
         if (rutatipo.equalsIgnoreCase("T")) {

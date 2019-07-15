@@ -166,9 +166,9 @@ public class ComWS extends PBase {
 				//txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
 			}
 
-			txtRuta.setText("8001-1");
-			txtEmp.setText("03");
-			txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
+			//txtRuta.setText("8001-1");
+			//txtEmp.setText("03");
+			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}
 
 		if(gl.ruta.isEmpty()){

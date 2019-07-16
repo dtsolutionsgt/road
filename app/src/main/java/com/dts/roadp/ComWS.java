@@ -158,18 +158,6 @@ public class ComWS extends PBase {
 
 		txtVersion.setText(gl.parFechaVer);
 
-		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
-		if (gl.debug) {
-			if (mu.emptystr(txtRuta.getText().toString())) {
-				//txtRuta.setText("2024-5");
-				//txtEmp.setText("03");
-				//txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
-			}
-
-			//txtRuta.setText("8001-1");
-			//txtEmp.setText("03");
-			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
-		}
 
 		if(gl.ruta.isEmpty()){
 			ruta = txtRuta.getText().toString();
@@ -203,6 +191,22 @@ public class ComWS extends PBase {
 		gl.isOnWifi = clsAppM.isOnWifi();
 
 		getWSURL();
+
+		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
+		if (gl.debug) {
+			if (mu.emptystr(txtRuta.getText().toString())) {
+				txtRuta.setText("2024-5");
+				txtEmp.setText("03");
+			}
+
+			txtWS.setText("http://200.46.46.104:8001/RDC7_SAP_PRD_ANDR/wsAndr.asmx");
+
+			//txtRuta.setText("8001-1");
+			//txtEmp.setText("03");
+			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
+		}
+
+
 
 		mac = getMac();
 		fsql = du.univfechasql(du.getActDate());

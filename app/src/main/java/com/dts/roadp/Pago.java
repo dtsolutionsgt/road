@@ -695,7 +695,7 @@ public class Pago extends PBase {
 			if (monto<0) monto=0;
 			monto=mu.round2(monto);
 
-			txtMonto.setText(""+monto);if (monto==0) txtMonto.setText("");
+			txtMonto.setText(mu.frmdec(monto));if (monto==0) txtMonto.setText("");
 			lblTotal.setText(mu.frmdec(tp));
 
 			if (pagomodo==0) {

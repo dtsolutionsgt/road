@@ -10,6 +10,7 @@ import android.os.StrictMode;
 import android.view.View;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class Soporte extends PBase {
 
@@ -17,6 +18,7 @@ public class Soporte extends PBase {
     private String email,subj,body,fname;
     private File file;
     private Uri uri;
+    private ArrayList<Uri> uris = new ArrayList<Uri>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,18 +98,62 @@ public class Soporte extends PBase {
 
     private void sendCarga() {
         body="Carga \n"+body;
-        fname= Environment.getExternalStorageDirectory()+"/roadcarga.txt";
-        file=new File(fname);
+
+       fname= Environment.getExternalStorageDirectory()+"/roadcarga.txt";
+       file=new File(fname);
 
         send("El archivo de carga no existe. Debe realizar una carga de datos");
     }
 
     private void sendEnvio() {
         body="Envio \n"+body;
+
         fname= Environment.getExternalStorageDirectory()+"/roadenvio.txt";
         file=new File(fname);
 
         send("El archivo de envio no existe. Debe realizar un envio de datos");
+    }
+
+    private void sendEnvioPorDia() {
+        body="Envio \n"+body;
+        int contfile=0;
+
+        Intent intent;
+
+        try {
+
+           Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+            String to= "dtsolutionsgt@gmail.com";
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, to);
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, subj);
+            emailIntent.putExtra(Intent.EXTRA_TEXT, body);
+
+            for (int i=0;i<8;i++){
+
+                fname= Environment.getExternalStorageDirectory()+"/roadenvio"+(i==0?"":i)+".txt";
+                file=new File(fname);
+
+                if(file.exists()){
+                    contfile++;
+                    uri = Uri.fromFile(file);
+                    uris.add(uri);
+                }
+            }
+
+            emailIntent.putExtra(Intent.EXTRA_STREAM,  uris);
+
+            if (contfile>0) {
+                //startActivity(emailIntent);
+                startActivity(Intent.createChooser(emailIntent , "Send with..."));
+            }else{
+                msgbox("No hay archivos de envío de datos");
+            }
+
+
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
     }
 
     private void sendError() {

@@ -26,17 +26,18 @@ public class clsDataBuilder {
 
 	private DateUtils DU;
 	private MiscUtils MU;
+	private AppMethods AM;
 	
-	private BufferedWriter writer = null,lwriter = null;
-	private FileWriter wfile,lfile;
-	private String fname,logname,namefile, codCliNuevo;
+	private BufferedWriter writer = null,lwriter = null,writerbk = null,lwriterbk = null;
+	private FileWriter wfile,lfile,wfilebk,lfilebk;
+	private String fname,logname,namefile, codCliNuevo,lognamebk,namefilebk;
 
 	public clsDataBuilder(Context context) {
 		
 		cCont=context; 
 		DU=new DateUtils();
 		MU=new MiscUtils(cCont);
-		
+
 		Con = new BaseDatos(cCont);
 		try {
 			db = Con.getWritableDatabase();
@@ -52,6 +53,9 @@ public class clsDataBuilder {
 		fname = Environment.getExternalStorageDirectory()+"/SyncFold/rd_data.txt";
 		logname = Environment.getExternalStorageDirectory()+"/roadenvio.txt";
 		namefile = Environment.getExternalStorageDirectory()+"/data.acr";
+
+		lognamebk = Environment.getExternalStorageDirectory()+"/roadenvio"+DU.dayofweek(fechaFactTol(DU.getActDate()))+".txt";
+		namefilebk = Environment.getExternalStorageDirectory()+"/data"+DU.dayofweek(fechaFactTol(DU.getActDate()))+".acr";
 
 	}
 	
@@ -180,6 +184,24 @@ public class clsDataBuilder {
 
 	}
 
+	public long fechaFactTol(long f0) {
+		Cursor DT;
+		String sql;
+		long ff;
+
+		try {
+			sql = "SELECT FECHA FROM P_FECHA";
+			DT = Con.OpenDT(sql);
+
+			DT.moveToFirst();
+			ff=DT.getLong(0);
+
+			return ff;
+		} catch (Exception e) {
+			return f0;
+		}
+	}
+
 	public void clear(){
 		items.clear();
 	}
@@ -250,12 +272,17 @@ public class clsDataBuilder {
 			lfile=new FileWriter(logname,false);
 			lwriter = new BufferedWriter(lfile);
 
+			lfilebk=new FileWriter(lognamebk,false);
+			lwriterbk = new BufferedWriter(lfilebk);
+
 			for (int i = 0; i < sendlog.size(); i++) {
 				s=sendlog.get(i);
 				lwriter.write(s);lwriter.write("\r\n");
+				lwriterbk.write(s);lwriterbk.write("\r\n");
 			}
 
 			lwriter.close();
+			lwriterbk.close();
 
 		} catch(Exception e){
 			return;

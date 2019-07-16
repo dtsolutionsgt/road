@@ -109,42 +109,55 @@ public class clsDocument {
 		return true;
 	}
 
-	public boolean buildPrintAppend(String corel,int reimpres,String modo) {
+	public boolean buildPrintAppend(String corel,int reimpres,String modo,Boolean append) {
 		int flag;
 
 		modofact=modo;
 		rep.clear();
 
-		if (!buildHeader(corel,reimpres)) return false;
-		if (!buildDetail()) return false;
-		if (!buildFooter()) return false;
+		try{
 
-		flag=0;
+			if (!buildHeader(corel,reimpres)) return false;
+			if (!buildDetail()) return false;
+			if (!buildFooter()) return false;
 
-		if (modofact.equalsIgnoreCase("TOL")) {
-			if (docfactura && (reimpres==10)) flag=1;
-			if (docfactura && (reimpres==4) || docdesglose) flag=0;
-			if (doccanastabod) flag=2;
-			if (docrecibo && (reimpres==0)) flag=0;
-			if (docdevolucion && (reimpres==1)) flag = 1;
-		} else if(modofact.equalsIgnoreCase("*")) {
-			if (doccanastabod) flag = 2;
-			if (docdevolucion || docpedido) flag = 1;
-		}
+			flag=0;
 
-		if (flag==0) {
-			if (!rep.saveappend()) return false;
-		} else if (flag==1){
-			if (!rep.saveappend(2)) return false;
-		} else if (flag==2){
-			if (!rep.saveappend(3)) return false;
-		} else if (flag==3){
-			if (!rep.saveappend(3)) return false;
+			if (modofact.equalsIgnoreCase("TOL")) {
+				if (docfactura && (reimpres==10)) flag=1;
+				if (docfactura && (reimpres==4) || docdesglose) flag=0;
+				if (doccanastabod){
+					if (reimpres==1){
+						flag=1;
+					}else{
+						flag=0;
+					}
+				}
+				if (docrecibo && (reimpres==0)) flag=0;
+				if (docdevolucion && (reimpres==1)) flag = 1;
+				if (docpedido && (reimpres==1)) flag = 1;
+			} else if(modofact.equalsIgnoreCase("*")) {
+				if (doccanastabod) flag = 0;
+				if (docdevolucion || docpedido) flag = 1;
+			}
+
+			if (flag==0) {
+				if (!rep.saverep(append)) return false;
+			} else if (flag==1){
+				if (!rep.saverep(2,append)) return false;
+			} else if (flag==2){
+				if (!rep.saverep(3,append)) return false;
+			} else if (flag==3){
+				if (!rep.saverep(3,append)) return false;
+			}
+
+		}catch (Exception e){
+			setAddlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 		return true;
 	}
-	
+
 	public boolean buildPrint(String corel,int reimpres,BaseDatos pCon,android.database.sqlite.SQLiteDatabase pdb ) {
 		
 		rep.clear();
@@ -226,13 +239,9 @@ public class clsDocument {
                 s=s.replace("numero : 0","");
             }
 
-            if (docrecibo) {
-				s=s.replace("Factura","Recibo");
-            }
+            if (docrecibo) s=s.replace("Factura","Recibo");
 
-            if(docdevolucion){
-				s=s.replace("Factura","Recibo");
-			}
+            if(docdevolucion) s=s.replace("Factura","Recibo");
 
 			if(doccanastabod){
 				s=s.replace("Factura","Recibo");
@@ -246,9 +255,9 @@ public class clsDocument {
 			if (!s.equalsIgnoreCase("@@")) rep.add(s);
 
 			if(i==7){
-				rep.add("");
 
-				if (docfactura) {
+				if (docfactura && !modofact.equalsIgnoreCase("TOL")) {
+					rep.add("");
 					rep.add(resol);
 					rep.add(resfecha);
 					rep.add(resvence);
@@ -257,7 +266,10 @@ public class clsDocument {
 			}
         }
 
-        if (!emptystr(nit)) rep.add("RUC : "+nit);
+        if (!emptystr(nit)) {
+        	rep.add("RUC : "+nit);
+		}
+
         if (!emptystr(clidir)) rep.add("Dir : "+clidir);
         if(docfactura){
 			if(condicionPago==4){
@@ -282,13 +294,13 @@ public class clsDocument {
 
         //if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
 
-        if (!emptystr(add1)) {
-
-            rep.add("");
-            rep.add(add1);
-            if (!emptystr(add2)) rep.add(add2);
-            rep.add("");
-
+       if (!modofact.equalsIgnoreCase("TOL")){
+		   if (!emptystr(add1)) {
+			   rep.add("");
+				rep.add(add1);
+				if (!emptystr(add2)) rep.add(add2);
+				rep.add("");
+			}
         }
 
         if (docfactura && !(modofact.equalsIgnoreCase("TOL"))){
@@ -369,10 +381,12 @@ public class clsDocument {
 
             }
 
-			if (l.length() > index + numero.length() ){
-				l = l.substring(0, index) + numero + l.substring(index + 10);
-			}else{
-				l = l.substring(0, index) + numero;
+			if (!numero.isEmpty()) {
+				if (l.length() > index + numero.length() ){
+					l = l.substring(0, index) + numero + l.substring(index + 10);
+				}else{
+					l = l.substring(0, index) + numero;
+				}
 			}
 
 			if (l.indexOf("@Numero")>=0) {
@@ -415,10 +429,13 @@ public class clsDocument {
 		idx=l.indexOf("@Serie");
         if (idx>=0) {
 
-			if (l.length() > idx + serie.length()) {
-				l = l.substring(0, idx) + serie + l.substring(idx + 6, idx + l.length() - idx - 6);
-			}else{
-				l = l.substring(0, idx) + serie;
+			if (!serie.isEmpty()) {
+				if (l.length() > idx + serie.length()) {
+					l = l.substring(0, idx) + serie + l.substring(idx + 6);
+					//l = l.substring(0, idx) + serie + l.substring(idx + 6, idx + l.length() - idx - 6); #CKFK 20190701
+				}else{
+					l = l.substring(0, idx) + serie;
+				}
 			}
 
 			if (l.indexOf("@Serie")>=0) {

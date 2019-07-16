@@ -64,7 +64,8 @@ public class printer {
 
 	}
 
-	public void printask(Runnable callBackHook)    {
+	public void printask(Runnable callBackHook)
+	{
 		if (emptyparam()) return;
 		if (prid>0) prn.printask(callBackHook);
 	}

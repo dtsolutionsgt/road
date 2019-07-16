@@ -26,6 +26,7 @@ public class printDMax extends printBase {
 	
 	private String ss,ess;
 	private appGlobals appG;
+	private PBase clsPBase;
 	private boolean validprint;
 
 	private ArrayList<String> lines = new ArrayList<String>();
@@ -35,6 +36,7 @@ public class printDMax extends printBase {
 		super(context,printerMAC);
 		validprint=validprinter;
 		appG = new appGlobals();
+		clsPBase=new PBase();
 	}
 	
 	
@@ -94,7 +96,9 @@ public class printDMax extends printBase {
 		hasCallback=false;
 
 		try	{
-			if (loadFileBarra(listitems)){}
+			if (loadFileBarra(listitems)){
+				doStartPrintBarra();
+			}
 		} catch (Exception e) {
 			showmsg("Error: " + e.getMessage());return false;
 		}
@@ -204,27 +208,6 @@ public class printDMax extends printBase {
 
 			}
 
-			prconn = null;
-
-			//Looper.prepare();
-
-			prconn = Connection_Bluetooth.createClient(printerAddress);
-
-			if (!prconn.getIsOpen()) prconn.open();
-
-			for (Document doc: documentlist){
-
-				printData = doc.getDocumentData();
-
-				prconn.write(printData,0,printData.length);
-
-				prthread.sleep(500);
-
-				prconn.clearWriteBuffer();
-			}
-
-			prconn.close();
-
 			return true;
 
 		} catch (Exception e) {
@@ -248,7 +231,18 @@ public class printDMax extends printBase {
 		AsyncPrintCall wsRtask = new AsyncPrintCall();
 		wsRtask.execute();
 	}
-	
+
+	private void doStartPrintBarra() {
+		if (!validprint) {
+			showmsg("¡La impresora no está autorizada!");return;
+		}
+
+		appG.endPrint = true;
+		showmsg("Imprimiendo ..." );
+		AsyncPrintBarraCall wsRtask = new AsyncPrintBarraCall();
+		wsRtask.execute();
+	}
+
 	private class AsyncPrintCall extends AsyncTask<String, Void, Void> {
 
 		@Override
@@ -256,6 +250,7 @@ public class printDMax extends printBase {
 			try {
 				processPrint();
 			} catch (Exception e) {
+				ss=ss + e.getMessage();
 				Log.d("Err_Impr",e.getMessage());
 			}
 	            
@@ -266,7 +261,10 @@ public class printDMax extends printBase {
 	    protected void onPostExecute(Void result) {
 	    	try {
 	    		doCallBack();
-			} catch (Exception e) {}
+			} catch (Exception e) {
+	    		ss=ss+e.getMessage();
+				clsPBase.addlog("onPostExecute", "" , ss);
+			}
 	    }
 	 
         @Override
@@ -275,8 +273,40 @@ public class printDMax extends printBase {
         @Override
         protected void onProgressUpdate(Void... values) {}
 	 
-    }	
-	
+    }
+
+	private class AsyncPrintBarraCall extends AsyncTask<String, Void, Void> {
+
+		@Override
+		protected Void doInBackground(String... params) {
+			try {
+				processPrintBarra();
+			} catch (Exception e) {
+				ss=ss + e.getMessage();
+				Log.d("Err_Impr",e.getMessage());
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			try {
+				doCallBack();
+			} catch (Exception e) {
+				ss=ss+e.getMessage();
+				clsPBase.addlog("onPostExecute", "" , ss);
+			}
+		}
+
+		@Override
+		protected void onPreExecute() {}
+
+		@Override
+		protected void onProgressUpdate(Void... values) {}
+
+	}
+
 	private void doCallBack() {
 
 		if (!hasCallback) return;
@@ -293,11 +323,12 @@ public class printDMax extends printBase {
             }, 500);
         } catch (Exception e) {
         	ess=e.getMessage();
+        	ss=ss+e.getMessage();
 		}
 
 	}
-	
-	public void processPrint() {
+
+	public void processPrintBarra() {
 
 		ss="p1..";
 
@@ -311,12 +342,37 @@ public class printDMax extends printBase {
 
 			if (!prconn.getIsOpen()) prconn.open();
 
-			prconn.write(printData);
+			for (Document doc: documentlist){
 
-			prthread.sleep(1500);
+				printData = doc.getDocumentData();
 
-			prconn.clearWriteBuffer();
-			//printclose.run();
+				int intento =0;
+
+				while (!prconn.getIsOpen() && intento <10) {
+					try{
+
+						prconn.open();
+
+						intento+=1;
+
+					} catch (Exception e) {
+						ss = ss + "Error : " + e.getMessage()+ ", intento " + intento;
+						Log.d("processPrint_ERR: ", ss);
+						clsPBase.addlog("processPrint", "" , ss);}
+				}
+
+				if(!prconn.getIsOpen() && intento ==10){
+					showmsg("No fue posible abrir la conexión con la impresora, se intentó: " + intento);
+				}else{
+					prconn.write(printData,0,printData.length);
+
+					prthread.sleep(500);
+
+					prconn.clearWriteBuffer();
+				}
+
+			}
+
 			prconn.close();
 
 		} catch (Exception e) {
@@ -326,6 +382,66 @@ public class printDMax extends printBase {
 			try {
 				if (prconn != null) prconn.close();
 			} catch (Exception ee) {
+				ss=ss + ee.getMessage();
+			}
+		}
+
+	}
+
+	public void processPrint() {
+
+		ss="p1..";
+
+		try {
+
+			prconn = null;
+
+			//Looper.prepare();
+
+			prconn = Connection_Bluetooth.createClient(printerAddress);
+
+			//CKFK 20190630 06:11 PM agregué a este proceso que intente la conexión con la impresora 10 veces
+			// y si no logra abrir la conexión de mensaje de que no pudo establecer conexión
+			//Además reduje el sleep a 500
+			int intento =0;
+
+			while (!prconn.getIsOpen() && intento <10) {
+				try{
+
+					prconn.open();
+
+					intento+=1;
+
+				} catch (Exception e) {
+					ss = ss + "Error : " + e.getMessage()+ ", intento " + intento;
+					Log.d("processPrint_ERR: ", ss);
+					clsPBase.addlog("processPrint", "" , ss);}
+			}
+
+			if(!prconn.getIsOpen() && intento ==10){
+				showmsg("No fue posible abrir la conexión con la impresora, se intentó: " + intento);
+				return;
+			}else{
+				prconn.write(printData);
+
+				prthread.sleep(500);
+
+				prconn.clearWriteBuffer();
+				//printclose.run();
+				prconn.close();
+
+			}
+
+			//	if (!prconn.getIsOpen()) prconn.open();
+
+		} catch (Exception e) {
+			ss = ss + "Error : " + e.getMessage();
+			Log.d("processPrint_ERR: ", ss);
+
+			try {
+				if (prconn != null) prconn.close();
+			} catch (Exception ee) {
+				ss=ss + ee.getMessage();
 			}
 		}
 

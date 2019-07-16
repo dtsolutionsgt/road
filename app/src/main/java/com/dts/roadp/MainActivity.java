@@ -41,8 +41,9 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.4.11 / ";
-    private String parFechaVer = "28-Jun-2019";
+    private String parNumVer = "9.4.42 / ";
+    private String parFechaVer = "15-Jul-2019";
+    private String parTipoVer = "ROAD PRD";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +57,6 @@ public class MainActivity extends PBase {
             msgbox(new Object() {
             }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
-
 
     }
 
@@ -102,6 +102,7 @@ public class MainActivity extends PBase {
             this.setTitle("ROAD");
             gl.parNumVer = parNumVer;
             gl.parFechaVer = parFechaVer;
+            gl.parTipoVer = parTipoVer;
 
             txtUser = (EditText) findViewById(R.id.txtUser);
             txtPass = (EditText) findViewById(R.id.txtMonto);
@@ -112,7 +113,7 @@ public class MainActivity extends PBase {
             lblID = (TextView) findViewById(R.id.textView81);
             imgLogo = (ImageView) findViewById(R.id.imgNext);
 
-            lblVer.setText("Version " + gl.parNumVer + gl.parFechaVer);
+            lblVer.setText(gl.parTipoVer + " Version " + gl.parNumVer + gl.parFechaVer);
 
             // DB VERSION
             dbVers = new BaseDatosVersion(this, db, Con);
@@ -133,15 +134,16 @@ public class MainActivity extends PBase {
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
             if (gl.debug) {
-                txtUser.setText("00101067");
-                txtPass.setText("123");
+                txtUser.setText("00103790");
+                txtPass.setText("04");
+
+                //txtUser.setText("00100993");
+                //txtPass.setText("2613");
             }
 
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-            msgbox(new Object() {
-            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
     }
@@ -407,6 +409,7 @@ public class MainActivity extends PBase {
             AppMethods app = new AppMethods(this, gl, Con, db);
             app.parametrosExtra();
             app.parametrosGlobales();
+            app.parametrosBarras();
         } catch (Exception e) {
             addlog(new Object() {
             }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -434,11 +437,6 @@ public class MainActivity extends PBase {
         String usr, pwd, dpwd;
 
         try {
-
-            /*if (fecha > 1905310000) {
-                msgAskLic("¡Su licencia expiró!");
-                return false;
-            }*/
 
             usr = txtUser.getText().toString().trim();
             pwd = txtPass.getText().toString().trim();
@@ -768,6 +766,7 @@ public class MainActivity extends PBase {
             lic = dt.getString(0);
             licruta = dt.getString(1);
 
+            if (!gl.debug ) {
 
             if (mu.emptystr(lic)) {
                 toastlong("El dispositivo no tiene licencia válida de handheld");
@@ -778,7 +777,6 @@ public class MainActivity extends PBase {
                 toastlong("El dispositivo no tiene licencia válida de ruta");
                 return false;
             }
-
 
             if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) {
                return true;
@@ -799,9 +797,12 @@ public class MainActivity extends PBase {
                 return false;
             }
 
+            } else {
+                return true;
+            }
+
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
             mu.msgbox(new Object() {
             }.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
         }

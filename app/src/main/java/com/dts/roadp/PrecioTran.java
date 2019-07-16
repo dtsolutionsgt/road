@@ -2,41 +2,42 @@ package com.dts.roadp;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import java.text.DecimalFormat;
 
-public class Precio {
+public class PrecioTran {
 
 	public double costo,descmon,imp,impval,tot,precsin,totsin,precdoc,precioespecial;
-	
+
 	private int active;
-	private android.database.sqlite.SQLiteDatabase db;
+
+	private SQLiteDatabase db;
+	private BaseDatos.Insert ins;
+	private BaseDatos.Update upd;
 	private BaseDatos Con;
 	private String sql;
-	
+
 	private Context cont;
-	
+
 	private DecimalFormat ffrmprec;
 	private MiscUtils mu;
-	
+
 	private String prodid,um,umpeso,umventa;
 	private double cant,desc,prec;
 	private int nivel,ndec;
 	private boolean porpeso;
 
-	public Precio(Context context,MiscUtils mutil,int numdec) {
+	public PrecioTran(Context context, MiscUtils mutil, int numdec, BaseDatos dbconnection, SQLiteDatabase database) {
 		
 		cont=context;
 		mu=mutil;
 		ndec=numdec;
 
-		try {
-			active=0;
-			Con = new BaseDatos(context);
-			opendb();
-		} catch (Exception e) {
-		}
-		
+		Con=dbconnection;
+		db=database;
+		ins=Con.Ins;upd=Con.Upd;
+
 		costo=0;descmon=0;imp=0;tot=0;
 		
 		ffrmprec = new DecimalFormat("#0.00");
@@ -49,7 +50,7 @@ public class Precio {
 		um=unimedida;umpeso=unimedidapeso;umventa=umven;
 		prec=0;costo=0;descmon=0;imp=0;tot=0;precioespecial=0;
 
-		clsDescuento clsDesc=new clsDescuento(cont,prodid,cant);
+		clsDescuentoTran clsDesc=new clsDescuentoTran(cont,prodid,cant,Con,db);
 		desc=clsDesc.getDesc();
 
 		if (cant>0) prodPrecio(ppeso);else prodPrecioBase();
@@ -61,6 +62,8 @@ public class Precio {
 		prodid=prod;cant=pcant;um=unimedida;
 		umpeso=unimedidapeso;
 		prec=0;costo=0;descmon=0;imp=0;tot=0;precioespecial=0;
+
+		if (cant==0) return false;
 
 		prodPrecioEsp(ppeso,cliente,clitipo);
 		precioespecial=prec;
@@ -85,7 +88,9 @@ public class Precio {
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			pr=DT.getDouble(0);
-			
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			pr=0;
 
@@ -94,6 +99,7 @@ public class Precio {
 				DT=Con.OpenDT(sql);
 				DT.moveToFirst();
 				pr=DT.getDouble(0);
+				if(DT!=null) DT.close();
 			} catch (Exception ee) {
 				pr=0;
 			}
@@ -122,7 +128,7 @@ public class Precio {
 			precdoc=prec;
 		}
 
-		//if (ppeso>0) prec=prec*ppeso/cant;
+		if (ppeso>0) prec=prec*ppeso/cant;
 			
 		try {
 			sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
@@ -169,7 +175,8 @@ public class Precio {
 			DT.moveToFirst();
 							  
 			pr=DT.getDouble(0);
-			
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			pr=0;
 	    }	
@@ -226,7 +233,9 @@ public class Precio {
 			ic1=DT.getInt(0);
 			ic2=DT.getInt(1);
 			ic3=DT.getInt(2);
-			
+
+			if(DT!=null) DT.close();
+
 			if (ic1>0) {
 				sql="SELECT VALOR FROM P_IMPUESTO WHERE CODIGO="+ic1;
 	           	DT=Con.OpenDT(sql);
@@ -236,8 +245,8 @@ public class Precio {
 					im1=DT.getDouble(0);
 				} catch (Exception e) {
 					im1=0;
-				}	
-				
+				}
+				if(DT!=null) DT.close();
 			}
 			
 			if (ic2>0) {
@@ -249,8 +258,8 @@ public class Precio {
 					im2=DT.getDouble(0);
 				} catch (Exception e) {
 					im2=0;
-				}	
-				
+				}
+				if(DT!=null) DT.close();
 			}
 			
 			if (ic3>0) {
@@ -262,8 +271,8 @@ public class Precio {
 					im3=DT.getDouble(0);
 				} catch (Exception e) {
 					im3=0;
-				}	
-				
+				}
+				if(DT!=null) DT.close();
 			}			
 			
 			
@@ -278,7 +287,7 @@ public class Precio {
 	}
 
 	private void prodPrecioEsp(double ppeso,String cliente,String clitipo) {
-		Cursor dt = null;
+		Cursor dt;
 		double pr,prr,stot,pprec,tsimp;
 		String sprec="",vcod,vval;
 
@@ -286,18 +295,18 @@ public class Precio {
 		try {
 			if (ppeso>0) {
 				sql=" SELECT PRECIO,CODIGO,VALOR FROM TMP_PRECESPEC "+
-					" WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+umpeso+"') "+
-					" AND ((VALOR='" + cliente + "' AND CODIGO ='CLIENTE') " +
-				    " OR (CODIGO='RUTA' AND VALOR='" + cliente + "') OR  " +
-				    " (CODIGO ='TIPO' AND VALOR IN (SELECT TIPO FROM P_CLIENTE WHERE CODIGO='" + cliente + "')))" +
-					" ORDER BY CODIGO ASC ";
+						" WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+umpeso+"') "+
+						" AND ((VALOR='" + cliente + "' AND CODIGO ='CLIENTE') " +
+						" OR (CODIGO='RUTA' AND VALOR='" + cliente + "') OR  " +
+						" (CODIGO ='TIPO' AND VALOR IN (SELECT TIPO FROM P_CLIENTE WHERE CODIGO='" + cliente + "')))" +
+						" ORDER BY CODIGO ASC ";
 			} else {
 				sql=" SELECT PRECIO,CODIGO,VALOR FROM TMP_PRECESPEC "+
-					" WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"') "+
-					" AND ((VALOR='" + cliente + "' AND CODIGO ='CLIENTE') " +
-					" OR (CODIGO='RUTA' AND VALOR='" + cliente + "') OR  " +
-					" (CODIGO ='TIPO' AND VALOR IN (SELECT TIPO FROM P_CLIENTE WHERE CODIGO='" + cliente + "')))" +
-					" ORDER BY CODIGO ASC ";
+						" WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"') "+
+						" AND ((VALOR='" + cliente + "' AND CODIGO ='CLIENTE') " +
+						" OR (CODIGO='RUTA' AND VALOR='" + cliente + "') OR  " +
+						" (CODIGO ='TIPO' AND VALOR IN (SELECT TIPO FROM P_CLIENTE WHERE CODIGO='" + cliente + "')))" +
+						" ORDER BY CODIGO ASC ";
 			}
 			dt=Con.OpenDT(sql);
 
@@ -322,10 +331,10 @@ public class Precio {
 				}
 			}
 
+			if(dt!=null) dt.close();
+
 		} catch (Exception e) {
 			pr=0;
-		}finally {
-			if (dt!=null) dt.close();
 		}
 
 		totsin=pr*cant;tsimp=mu.round(totsin,ndec);
@@ -348,7 +357,7 @@ public class Precio {
 			precdoc=prec;
 		}
 
-		//if (ppeso>0) prec=prec*ppeso/cant;
+		if (ppeso>0) prec=prec*ppeso/cant;
 
 		try {
 			sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");

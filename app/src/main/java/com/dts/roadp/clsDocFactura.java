@@ -112,7 +112,7 @@ public class clsDocFactura extends clsDocument {
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
 			
-			resol="Resolucion No. : "+DT.getString(0);
+			resol="Resolucion No.: "+DT.getString(0);
 			ff=DT.getLong(1);resfecha="De Fecha: "+sfecha_dos(ff);
 			ff=DT.getLong(2);resvence="Vigente hasta: "+sfecha_dos(ff);
 			//#EJC20181130: Se cambió el mensaje por revisión de auditor de SAT.
@@ -189,17 +189,19 @@ public class clsDocFactura extends clsDocument {
           	clidir=DT.getString(2);
 					
 		} catch (Exception e) {
-	    }	
-		
-		
-		try {
-			sql="SELECT NOMBRE FROM P_REF1  WHERE CODIGO='"+add1+"'";
-			DT=Con.OpenDT(sql);	
-			DT.moveToFirst();
-			
-			add1=add1+" - "+DT.getString(0);
-		} catch (Exception e) {
 	    }
+
+
+		if (!modofact.equalsIgnoreCase("TOL")) {
+			try {
+				sql="SELECT NOMBRE FROM P_REF1  WHERE CODIGO='"+add1+"'";
+				DT=Con.OpenDT(sql);
+				DT.moveToFirst();
+
+				add1=add1+" - "+DT.getString(0);
+			} catch (Exception e) {
+			}
+		}
 				
 		try {
 			sql="SELECT NOMBRE FROM P_REF2  WHERE CODIGO='"+add2+"'";
@@ -260,23 +262,19 @@ public class clsDocFactura extends clsDocument {
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
 
-            if(DT.getCount() != 0){
-
+            if (DT.getCount() != 0){
 				corelNotaC = DT.getString(0);
 				corelF = DT.getString(1);
 				totNotaC = DT.getDouble(2);
 				asignacion = DT.getString(3);
-
-			}else{
-
+			} else {
             	corelNotaC = "";
             	asignacion = "*";
             	totNotaC = 0;
 				corelF = "";
-
             }
 
-			sql="SELECT D_FACTURAD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_FACTURAD.CANT,D_FACTURAD.PRECIODOC,D_FACTURAD.IMP, D_FACTURAD.DES,D_FACTURAD.DESMON, D_FACTURAD.TOTAL, D_FACTURAD.UMVENTA, D_FACTURAD.UMPESO, D_FACTURAD.PESO " +
+			sql="SELECT D_FACTURAD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_FACTURAD.CANT,D_FACTURAD.PRECIODOC,D_FACTURAD.IMP, D_FACTURAD.DES,D_FACTURAD.DESMON, D_FACTURAD.TOTAL, D_FACTURAD.UMVENTA, D_FACTURAD.UMPESO, D_FACTURAD.PESO, D_FACTURAD.UMSTOCK, D_FACTURAD.FACTOR " +
 				"FROM D_FACTURAD INNER JOIN P_PRODUCTO ON D_FACTURAD.PRODUCTO = P_PRODUCTO.CODIGO " +
 				"WHERE (D_FACTURAD.COREL='"+corel+"')";	
 			
@@ -300,6 +298,8 @@ public class clsDocFactura extends clsDocument {
                 item.um = DT.getString(8);
                 item.ump = DT.getString(9);
                 item.peso = DT.getDouble(10);
+				item.ums = DT.getString(11);
+				item.fact = DT.getDouble(12);
 
                 if (sinimp) item.tot = item.tot - item.imp;
 
@@ -307,6 +307,7 @@ public class clsDocFactura extends clsDocument {
                 DT.moveToNext();
             }
 
+			if(DT!=null) DT.close();
 
 			try {
 				sql = "SELECT D_BONIF.PRODUCTO,P_PRODUCTO.DESCLARGA AS NOMBRE,D_BONIF.CANT, D_BONIF.UMVENTA, D_BONIF.CANT*D_BONIF.FACTOR AS TPESO " +
@@ -336,6 +337,7 @@ public class clsDocFactura extends clsDocument {
 					DT.moveToNext();
 				}
 
+				if(DT!=null) DT.close();
 			} catch (Exception e) {
 				Toast.makeText(cont,"Impresion bonif : "+e.getMessage(), Toast.LENGTH_LONG).show();
 			}
@@ -346,7 +348,6 @@ public class clsDocFactura extends clsDocument {
 		
 		return true;
 	}
-
 
 	// Detalle por empresa
 
@@ -369,14 +370,26 @@ public class clsDocFactura extends clsDocument {
 		for (int i = 0; i <items.size(); i++) {
 			item=items.get(i);
 
-			ss=rep.ltrim(item.cod+" "+item.nombre,prw-10);
-			ss=ss+rep.rtrim(item.um,4)+" "+rep.rtrim(frmdecimal(item.cant,2),5);
-			rep.add(ss);
-			ss=rep.rtrim(frmdecimal(item.peso,decimp),10)+" "+rep.rtrim(frmdecimal(item.prec,2),8);
-			ss=rep.ltrim(ss,prw-10);
-			ss=ss+" "+rep.rtrim(frmdecimal(item.tot,2),9);
-			rep.add(ss);
+			if (item.cod.equalsIgnoreCase("0006") || item.cod.equalsIgnoreCase("0629") || item.cod.equalsIgnoreCase("0747") ) {
+				ss = rep.ltrim(item.cod + " " + item.nombre, prw - 10);
+				ss = ss + rep.rtrim(item.um, 4) + " " + rep.rtrim(frmdecimal(item.cant*item.fact, 2), 5);
+				rep.add(ss);
+				ss = rep.rtrim(frmdecimal(item.peso, decimp), 10) + " " + rep.rtrim(frmdecimal(item.prec, 2), 8);
+				ss = rep.ltrim(ss, prw - 10);
+				ss = ss + " " + rep.rtrim(frmdecimal(item.tot, 2), 9);
+				rep.add(ss);
 
+			} else {
+
+				ss = rep.ltrim(item.cod + " " + item.nombre, prw - 10);
+				ss = ss + rep.rtrim(item.ums, 4) + " " + rep.rtrim(frmdecimal(item.cant, 2), 5);
+				rep.add(ss);
+				ss = rep.rtrim(frmdecimal(item.peso, decimp), 10) + " " + rep.rtrim(frmdecimal(item.prec, 2), 8);
+				ss = rep.ltrim(ss, prw - 10);
+				ss = ss + " " + rep.rtrim(frmdecimal(item.tot, 2), 9);
+				rep.add(ss);
+
+			}
 		}
 
 		rep.line();
@@ -408,6 +421,7 @@ public class clsDocFactura extends clsDocument {
 
 		return true;
 	}
+
 
 	// Bonificaciones
 
@@ -575,8 +589,8 @@ public class clsDocFactura extends clsDocument {
 	}
 	
 	private class itemData {
-		public String cod,nombre,um,ump;
-		public double cant,peso,prec,imp,descper,desc,tot;
+		public String cod,nombre,um,ump,ums;
+		public double cant,peso,prec,imp,descper,desc,tot,fact;
 	}
 	
 	

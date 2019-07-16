@@ -254,7 +254,6 @@ public class desglose extends PBase {
 
                 lblTotC1.setText(String.valueOf(mu.frmcur(mu.round(valtotc1, gl.peDec))));
 
-
                 TotCntCvs.setText(String.valueOf(mu.frmcur(val050)));
                 totVCCvs.setText(String.valueOf(mu.frmcur(val025)));
                 totDiezCvs.setText(String.valueOf(mu.frmcur(val010)));
@@ -1421,35 +1420,32 @@ public class desglose extends PBase {
     }
 
     public void save(View view){
-        SaveDesglose();
-        //impresDesglose();
-        desglose.super.finish();
+        if (SaveDesglose()) desglose.super.finish();
     }
 
     public boolean SaveDesglose() {
+        String sql = "";
+        double fdif;
 
         try {
-            String vsql = "";
 
-            if (gl.depparc) {
-                editando = false;
-            }
+            if (gl.depparc) editando = false;
 
             if (!editando) {
 
                 CalculaTotales();
 
-                if (mu.round(falta, 2) != 0) {
-                    msgbox("Cantidad faltante distinta a 0");
-                    return false;
+                fdif=mu.round(falta, 2);
+                if ( fdif!= 0) {
+                    msgbox("Cantidad faltante distinta a 0"); return false;
                 }
 
-                vsql = "DELETE FROM T_DEPOSB";
-                db.execSQL(vsql);
+                sql = "DELETE FROM T_DEPOSB";
+                db.execSQL(sql);
 
                 db.beginTransaction();
 
-                sql = "";
+                this.sql = "";
 
                 if (val100 > 0) {
                     int cant = 0;
@@ -1617,8 +1613,7 @@ public class desglose extends PBase {
             }
 
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
             db.endTransaction();
         }
 

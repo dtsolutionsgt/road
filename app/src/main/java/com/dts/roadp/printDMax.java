@@ -346,7 +346,6 @@ public class printDMax extends printBase {
 
 				printData = doc.getDocumentData();
 
-
 				int intento =0;
 
 				while (!prconn.getIsOpen() && intento <10) {

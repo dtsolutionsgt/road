@@ -61,7 +61,7 @@ public class FacturaRes extends PBase {
 
 	private long fecha,fechae;
 	private int fcorel,clidia,media;
-	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt,corelNC,consprod;
+	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt,corelNC,consprod,lotelote;
 	private int cyear, cmonth, cday, dweek,stp=0,brw=0,notaC,impres;
 
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
@@ -970,7 +970,7 @@ public class FacturaRes extends PBase {
 
 			//endregion
 
-			//region D_FACTURAD
+			//region D_FACTURAD , D_FACTURAD_LOTES
 
 			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK FROM T_VENTA";
 			dt=Con.OpenDT(sql);
@@ -1016,7 +1016,20 @@ public class FacturaRes extends PBase {
 					rebajaStockUM(vprod, vumstock, vcant, vfactor, vumventa,factpres,peso);
 				}
 
-			    dt.moveToNext();
+				ins.init("D_FACTURAD_LOTES");
+
+				ins.add("COREL",corel);
+				ins.add("PRODUCTO",vprod);
+				ins.add("LOTE",lotelote );
+				ins.add("CANTIDAD",vcant);
+				ins.add("PESO",vpeso);
+				ins.add("UMSTOCK",vumstock);
+				ins.add("UMPESO",gl.umpeso);
+				ins.add("UMVENTA",vumventa);
+
+				db.execSQL(ins.sql());
+
+				dt.moveToNext();
 			}
 
 			if (!consistenciaLotes()) {
@@ -1384,7 +1397,7 @@ public class FacturaRes extends PBase {
 				ins.add("CANTM",dt.getDouble(1));
 				ins.add("PESO",pesoapl);
 				ins.add("plibra",dt.getDouble(3));
-				ins.add("LOTE",lote );
+				ins.add("LOTE",lote );lotelote=lote;
 
 				ins.add("DOCUMENTO",doc);
 				ins.add("FECHA",dt.getInt(6));
@@ -1399,7 +1412,7 @@ public class FacturaRes extends PBase {
 				db.execSQL(ins.sql());
 
 				// Factura lotes
-
+				/*
 				factlote=factpres;if (factlote<1) factlote=1/factlote;
 
 				try {
@@ -1425,6 +1438,7 @@ public class FacturaRes extends PBase {
 					db.execSQL(sql);
 					//mu.msgbox(e.getMessage()+"\n"+ins.sql());
 				}
+				*/
 
 				if (actcant<=0) return;
 

@@ -234,8 +234,8 @@ public class Producto extends PBase {
 	
 	private void listItems() {
 		Cursor DT;
-		clsCD vItem;
-		int cantidad;
+		clsCD vItem = null;
+		int cantidad = 0;
 		String vF,cod,name,um;
 
 		ArrayList<clsCD> vitems = new ArrayList<clsCD>();;
@@ -243,6 +243,7 @@ public class Producto extends PBase {
 		items.clear();itemid="*";//famid="0";
 
 		vF=txtFilter.getText().toString().replace("'","");
+		vF=vF.replace("\r","");
 
 		String sql = "";
 
@@ -358,6 +359,16 @@ public class Producto extends PBase {
 		listView.setAdapter(adapter);
 		
 		if (prodtipo==1) dispUmCliente();
+
+		if (cantidad==1) {
+
+			itemid = vItem.Cod;
+			prname = vItem.Desc;
+			gl.um = vItem.um;
+			gl.pprodname = prname;
+
+			appProd();
+		}
 		
 	}
 	

@@ -790,7 +790,7 @@ public class AppMethods {
 
 			return  umm;
 		} catch (Exception e) {
-			toast(e.getMessage());
+			//toast(e.getMessage());
 			return "";
 		}
 	}

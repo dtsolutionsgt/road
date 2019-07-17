@@ -96,6 +96,7 @@ public class Clientes extends PBase {
 
 		dweek = mu.dayofweek();
 
+		if (gl.tolsuper) spinList.setVisibility(View.INVISIBLE);
 		fillSpinners();
 
 		listItems();
@@ -363,7 +364,11 @@ public class Clientes extends PBase {
 					"WHERE (1=1) ";
 
 			if (mu.emptystr(filt)) {
-				if (dweek != 0) sql += "AND (P_CLIRUTA.DIA =" + dweek + ") ";
+				if (!gl.tolsuper) {
+					if (dweek != 0) sql += "AND (P_CLIRUTA.DIA =" + dweek + ") ";
+				} else {
+					sql += "AND (P_CLIRUTA.DIA =1) ";
+				}
 			}
 
 			if (!mu.emptystr(filt)) {

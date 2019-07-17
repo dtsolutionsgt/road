@@ -31,8 +31,6 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".imprime_barras" />
-        <activity android:name=".desglose" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -443,11 +441,21 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".rating"
+        <activity
+            android:name=".rating"
             android:label="Rating"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".imprime_barras" />
+        <activity android:name=".desglose" />
+        <activity
+            android:name=".ComWSSend"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+
+
     </application>
 
 </manifest>

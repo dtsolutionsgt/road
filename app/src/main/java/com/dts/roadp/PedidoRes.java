@@ -43,7 +43,7 @@ public class PedidoRes extends PBase {
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
 	private ListAdaptTotals adapter;
 	
-	private Runnable printcallback,printclose;
+	private Runnable printcallback,printclose,printexit;
 	
 	private clsDescGlob clsDesc;
 	private printer prn;
@@ -99,11 +99,18 @@ public class PedidoRes extends PBase {
 		
 		printclose= new Runnable() {
 		    public void run() {
-		    	PedidoRes.super.finish();
+
 		    }
 		};
+
+		printexit= new Runnable() {
+			public void run() {
+				if (gl.tolsuper) startActivity(new Intent(PedidoRes.this,ComWSSend.class));
+				PedidoRes.super.finish();
+			}
+		};
 		
-		prn=new printer(this,printclose,gl.validimp);
+		prn=new printer(this,printexit,gl.validimp);
 		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp, "");
 		pdoc.deviceid =gl.numSerie;
 	}
@@ -297,6 +304,7 @@ public class PedidoRes extends PBase {
 			gl.closeVenta=true;
 
 			if (!gl.impresora.equalsIgnoreCase("S")) {
+				if (gl.tolsuper) startActivity(new Intent(PedidoRes.this,ComWSSend.class));
 				super.finish();
 			}
 		}catch (Exception e){
@@ -670,7 +678,7 @@ public class PedidoRes extends PBase {
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 
-					impres++;toast("Impres "+impres);
+					impres++;
 
 					try {
 						sql="UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
@@ -690,11 +698,26 @@ public class PedidoRes extends PBase {
 
 						gl.brw=0;
 
+
+						finish();
+
+
+						if (gl.tolsuper) {
+							Handler mtimer = new Handler();
+							Runnable mrunner=new Runnable() {
+								@Override
+								public void run() {
+									startActivity(new Intent(PedidoRes.this,ComWSSend.class));
+								}
+							};
+							mtimer.postDelayed(mrunner,200);
+						}
+
 					} else {
 						String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 						pdoc.buildPrint(corel,1,vModo);
 
-						prn.printask(printclose);
+						prn.printask(printcallback);
 
 					}
 				}
@@ -703,8 +726,9 @@ public class PedidoRes extends PBase {
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					//singlePrint();
-					//prn.printask(printcallback);
-					finish();
+					prn.printask(printcallback);
+					//if (gl.tolsuper) startActivity(new Intent(PedidoRes.this,ComWSSend.class));
+					//finish();
 				}
 			});
 

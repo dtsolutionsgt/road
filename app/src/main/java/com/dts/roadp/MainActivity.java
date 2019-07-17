@@ -123,6 +123,8 @@ public class MainActivity extends PBase {
 
             txtUser.requestFocus();
 
+            gl.tolsuper=false;
+
             initSession();
 
             if (!validaLicencia()) {
@@ -137,8 +139,8 @@ public class MainActivity extends PBase {
                 txtUser.setText("00103790");
                 txtPass.setText("04");
 
-                //txtUser.setText("00100993");
-                //txtPass.setText("2613");
+                txtUser.setText("00100979");
+                txtPass.setText("123456");
             }
 
         } catch (Exception e) {
@@ -411,8 +413,7 @@ public class MainActivity extends PBase {
             app.parametrosGlobales();
             app.parametrosBarras();
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             msgbox(e.getMessage());
         }
 
@@ -484,6 +485,13 @@ public class MainActivity extends PBase {
             gl.vend = usr;
             gl.vnivel = DT.getInt(2);
             gl.vnivprec = DT.getInt(3);
+
+            gl.tolsuper=false;
+            if (gl.peModal.equalsIgnoreCase("TOL")) {
+                if (gl.vnivel==2){
+                    gl.tolsuper=true;
+                }
+            }
 
             return true;
 

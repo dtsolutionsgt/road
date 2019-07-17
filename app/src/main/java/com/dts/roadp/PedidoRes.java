@@ -698,9 +698,7 @@ public class PedidoRes extends PBase {
 
 						gl.brw=0;
 
-
 						finish();
-
 
 						if (gl.tolsuper) {
 							Handler mtimer = new Handler();

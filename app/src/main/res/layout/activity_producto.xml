@@ -121,7 +121,7 @@
         android:layout_alignLeft="@+id/spinner1"
         android:layout_toLeftOf="@+id/imageView1"
         android:ems="10"
-        android:maxLines="1">
+        android:singleLine="true">
 
         <requestFocus />
     </EditText>

@@ -186,7 +186,11 @@ public class CliNuevo extends PBase {
 			ins.add("RUTA", gl.ruta);
 			ins.add("FECHA", fecha);
 			ins.add("NOMBRE", txtNom.getText().toString());
-			ins.add("NEGOCIO", "");
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				ins.add("NEGOCIO", gl.cuentaCliNuevo);
+			}else{
+				ins.add("NEGOCIO", "");
+			}
 			ins.add("DIRECCION", txtDir.getText().toString() + "");
 			ins.add("TELEFONO", txtTel.getText().toString() + "");
 			ins.add("NIT", txtNit.getText().toString() + "");
@@ -217,10 +221,14 @@ public class CliNuevo extends PBase {
 			ins.add("NOMBRE", txtNom.getText().toString());
 			ins.add("BLOQUEADO", "N");
 			ins.add("TIPONEG", "");
-			ins.add("TIPO", "");
-			ins.add("SUBTIPO", "");
-			ins.add("CANAL", "");
-			ins.add("SUBCANAL", "");
+			ins.add("TIPO", "NUEVO");
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				ins.add("SUBTIPO", gl.cuentaCliNuevo);
+			}else{
+				ins.add("SUBTIPO", "PRE");
+			}
+			ins.add("CANAL", "PRE");
+			ins.add("SUBCANAL", "PRE");
 			ins.add("NIVELPRECIO", nivel);
 
 			ins.add("MEDIAPAGO", "1");
@@ -257,6 +265,9 @@ public class CliNuevo extends PBase {
 			ins.add("COD_PAIS", "");
 			ins.add("FACT_VS_FACT", "0");
 			ins.add("CHEQUEPOST", "N");
+
+			ins.add("DESCUENTO", "N");
+			ins.add("BONIFICACION", "N");
 
 			ins.add("PERCEPCION", 0);
 			ins.add("TIPO_CONTRIBUYENTE", "");
@@ -347,7 +358,6 @@ public class CliNuevo extends PBase {
 		}
 	}
 
-
 	// Location
 
 	private void lastKnowPos() {
@@ -437,8 +447,13 @@ public class CliNuevo extends PBase {
 		Cursor DT;
 				  
 		try {
-			
-			sql="SELECT Codigo,Nombre FROM P_NIVELPRECIO ORDER BY Codigo";
+
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				sql="SELECT Codigo,Nombre FROM P_NIVELPRECIO WHERE NOMBRE = 'GENERALES'";
+			}else{
+				sql="SELECT Codigo,Nombre FROM P_NIVELPRECIO ORDER BY Codigo";
+			}
+
 			DT=Con.OpenDT(sql);
 					
 			DT.moveToFirst();
@@ -491,7 +506,6 @@ public class CliNuevo extends PBase {
 				mu.msgbox("Falta el NIT");return false;
 			}
 
-
 			dw = c.get(Calendar.DAY_OF_WEEK);
 			if (dw==0) dw=7; else dw-=1;
 
@@ -518,7 +532,6 @@ public class CliNuevo extends PBase {
 					case 7:d7=1;break;
 				}
 			}
-
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

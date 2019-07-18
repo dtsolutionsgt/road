@@ -84,7 +84,7 @@ public class RepesajeLista extends PBase {
                         Object lvObj = listView.getItemAtPosition(position);
                         clsClasses.clsCD vItem = (clsClasses.clsCD) lvObj;
 
-                        prodid = vItem.Cod;
+                       // prodid = vItem.Cod;
                         adapter.setSelectedIndex(position);
 
                     } catch (Exception e) {
@@ -153,7 +153,6 @@ public class RepesajeLista extends PBase {
         items.clear();
 
         try {
-            //sql = "SELECT BARRA,PESO,PRECIO FROM T_BARRA WHERE CODIGO='"+prodid+"' AND VENTA=1";
             sql = "SELECT BARRA,PESO,PRECIO FROM T_BARRA WHERE CODIGO='"+prodid+"'";
             dt = Con.OpenDT(sql);
             dt.moveToFirst();

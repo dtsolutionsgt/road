@@ -16,8 +16,6 @@ import android.widget.Toast;
 import java.util.Currency;
 import java.util.Locale;
 
-import static android.content.Context.LOCATION_SERVICE;
-
 public class AppMethods {
 
 	private Context cont;
@@ -411,6 +409,87 @@ public class AppMethods {
             gl.fotos = false;
         }
 
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=21";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.pTransBarra =false;
+
+			gl.pTransBarra =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.pTransBarra =false;
+		}
+	}
+
+	public void parametrosBarras() {
+		Cursor dt;
+		String sql;
+
+		try {
+			sql="SELECT LONGITUDBARRA, PREFIJO FROM P_CONFIGBARRA";
+			dt=Con.OpenDT(sql);
+
+			if(dt.getCount()>0){
+				dt.moveToFirst();
+
+				gl.pLongitudBarra= dt.getInt(0);
+				gl.pPrefijoBarra =dt.getString(1);
+
+			}else{
+				gl.pLongitudBarra= 18;
+				gl.pPrefijoBarra ="0";
+			}
+
+		} catch (Exception e) {
+			toast("Ocurrió un error obteniendo los valores de P_CONFIGBARRA" + e.getMessage());
+		}
+
+	}
+
+	public void parametrosGlobales() {
+		Cursor dt;
+		String sql;
+
+		try {
+			sql="SELECT COMSERVER, FTPSERVER FROM P_GLOBPARAM";
+			dt=Con.OpenDT(sql);
+
+			if(dt.getCount()>0){
+				dt.moveToFirst();
+
+				gl.cuentaCliNuevo= dt.getString(0);
+				gl.codCliNuevo =dt.getString(1);
+			}else{
+				gl.cuentaCliNuevo= "";
+				gl.codCliNuevo ="";
+			}
+
+		} catch (Exception e) {
+			toast("Ocurrió un error obteniendo los valores de clientes nuevos" + e.getMessage());
+		}
+
+	}
+
+
+	public boolean esClienteNuevo(String cod) {
+		Cursor DT;
+		boolean clienteNuevo=false;
+
+		try{
+
+			sql="SELECT CODIGO FROM D_CLINUEVO WHERE CODIGO = '" + cod + "'";
+			DT=Con.OpenDT(sql);
+
+			clienteNuevo=(DT.getCount()>0);
+
+		}catch(Exception e){
+			msgbox("Ocurrió un error en la función esClienteNuevo " + e.getMessage());
+		}
+
+		return clienteNuevo;
 
 	}
 
@@ -426,6 +505,8 @@ public class AppMethods {
 			DT.moveToFirst();
 
 			umm=DT.getString(0);
+
+			if(DT!=null) DT.close();
 
 			return  umm.equalsIgnoreCase(gl.umpeso);
 
@@ -519,16 +600,27 @@ public class AppMethods {
 
 					if (fact1>=fact2) {
 						fact=fact1/fact2;
+
+						cant = cant * fact;
+						cantm = cantm * fact;
+
+						sql="UPDATE P_STOCK SET CANT=" + cant + ",CANTM=" + cantm + ",UNIDADMEDIDA='" + ub + "'  " +
+								"WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + us + "') AND (LOTE='" + lote + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
+						db.execSQL(sql);
+
 					} else {
 						fact=fact2/fact1;
+
+						cant = cant * fact;
+						cantm = cantm * fact;
+
+						sql="UPDATE P_STOCK SET CANT=" + cant + ",CANTM=" + cantm + ",UNIDADMEDIDA='" + ub + "'  " +
+								"WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + ub + "') AND (LOTE='" + lote + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
+						db.execSQL(sql);
+
 					}
 
-					cant = cant * fact;
-					cantm = cantm * fact;
 
-					sql="UPDATE P_STOCK SET CANT=" + cant + ",CANTM=" + cantm + ",UNIDADMEDIDA='" + ub + "'  " +
-						"WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + us + "') AND (LOTE='" + lote + "') AND (DOCUMENTO='" + doc + "') AND (STATUS='" + stat + "')";
-					db.execSQL(sql);
 
 				}
 
@@ -680,6 +772,27 @@ public class AppMethods {
 		}
 	}
 
+	public double pesoProm(String cod) {
+		Cursor DT;
+		double pesoprom=0;
+
+		try {
+			String sql = "SELECT PESO_PROMEDIO,FACTORCONV FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				pesoprom = DT.getDouble(1);
+				if (pesoprom==0) pesoprom = DT.getDouble(0);
+			}
+
+		} catch (Exception e) {
+			toast(e.getMessage());
+		}
+
+		return  pesoprom;
+	}
+
 	public String umStock(String cod) {
 		Cursor DT;
 		String umm,sql;
@@ -698,7 +811,7 @@ public class AppMethods {
 
 			return  umm;
 		} catch (Exception e) {
-			toast(e.getMessage());
+			//toast(e.getMessage());
 			return "";
 		}
 	}
@@ -848,6 +961,26 @@ public class AppMethods {
 		}
 	}
 
+	public boolean getDevolBod(){
+		Cursor dt;
+		boolean devol=false;
+
+		try {
+			sql = "SELECT STATCOM FROM D_MOV WHERE ANULADO = 'N'";
+			dt = Con.OpenDT(sql);
+
+			if(dt.getCount()>0){
+				dt.moveToFirst();
+
+				devol = (dt.getString(0).equals("S")?true:false);
+			}
+
+		} catch (Exception e) {
+			msgbox("Ocurrió un error obteniendo el estado de comunicación de la devolución "+e.getMessage());
+			devol= false;
+		}
+		return devol;
+	}
 
 	// Common
 	

@@ -1,5 +1,4 @@
 package com.dts.roadp;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -8,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,17 +17,20 @@ import java.util.ArrayList;
 public class DevolBodCan extends PBase {
 
     private ListView listView;
-    private TextView lblReg,lblTot;
+    private TextView lblReg,lblTot,lblTit;
     private ImageView imgNext;
-    public String corel,existenciaC,existenciaP;
+    private ProgressBar pbar;
+
+    public  String corel,existenciaC,existenciaP;
     private int imprimo=0,close=0;
 
     private printer prn_can,prn_paseante;
     private clsDocCanastaBod fcanastabod;
     private clsDocCanastaBod fpaseantebod;
     private DevolBod DevBod;
-    public Runnable printclose, printcallback,printexit;
-    private boolean imprimecopias=false;
+    public Runnable printclose, printcallback,printexit, printclosecan;
+
+    private boolean imprimecopias=false,idle=true;
     private ArrayList<clsClasses.clsDevCan> items= new ArrayList<clsClasses.clsDevCan>();
     private list_view_dev_bod_can adapter;
 
@@ -48,10 +51,12 @@ public class DevolBodCan extends PBase {
         listView = (ListView) findViewById(R.id.listView1);
         lblReg = (TextView) findViewById(R.id.textView61);lblReg.setText("");
         imgNext = (ImageView) findViewById(R.id.imgTitLogo);
+        pbar = (ProgressBar) findViewById(R.id.progressBar4);pbar.setVisibility(View.INVISIBLE);
+        lblReg = (TextView) findViewById(R.id.textView61);lblReg.setText("");
+        lblTit = (TextView) findViewById(R.id.txtRoadTit);lblTit.setText("Devolución de canastas");
 
         rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp,"");
 
-        lblTot = (TextView) findViewById(R.id.textView9);lblTot.setText("");
         setHandlers();
 
         gl.devprncierre=false;
@@ -59,6 +64,12 @@ public class DevolBodCan extends PBase {
         app = new AppMethods(this, gl, Con, db);
         gl.validimp=app.validaImpresora();
         if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+
+        printclosecan = new Runnable() {
+            public void run() {
+
+            }
+        };
 
         printclose = new Runnable() {
             public void run() {
@@ -86,14 +97,13 @@ public class DevolBodCan extends PBase {
             }
         };
 
-
         printcallback= new Runnable() {
             public void run() {
 
                 if (!imprimecopias){
 
                     if (imprimo==0) {
-                        prn_can.printnoask(printclose, "printdevcan.txt");
+                        prn_can.printnoask(printclosecan, "printdevcan.txt");
                     }
 
                     imprimecopias = true;
@@ -101,7 +111,7 @@ public class DevolBodCan extends PBase {
                 }else{
 
                     if (imprimo==0) {
-                        prn_can.printnoask(printclose, "printdevcan.txt");
+                        prn_can.printnoask(printclosecan, "printdevcan.txt");
                     }
                     imprimecopias = false;
 
@@ -129,6 +139,7 @@ public class DevolBodCan extends PBase {
 
         listItems();
 
+        habilitaEnvio();
     }
 
     //region Events
@@ -187,9 +198,9 @@ public class DevolBodCan extends PBase {
         try {
 
             sql =  " SELECT D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA " +
-                   " FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO " +
-                   " INNER JOIN D_CXC ON D_CXC.COREL = D_CXCD.COREL WHERE D_CxC.STATCOM='N' AND D_CXC.ANULADO = 'N' " +
-                   " GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA ";
+                    " FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO " +
+                    " INNER JOIN D_CXC ON D_CXC.COREL = D_CXCD.COREL WHERE D_CxC.STATCOM='N' AND D_CXC.ANULADO = 'N' " +
+                    " GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA ";
 
             dp = Con.OpenDT(sql);
 
@@ -289,7 +300,7 @@ public class DevolBodCan extends PBase {
 
                 }
 
-               if (icnt>=1) {
+                if (icnt>=1) {
                     itemt = clsCls.new clsDevCan();
                     itemt.ValorT = sct;
                     itemt.PesoT = spt;
@@ -318,7 +329,11 @@ public class DevolBodCan extends PBase {
         String pcod,plote,um,barra,barrapallet;
         Double pcant,pcantm,ppeso;
 
+        ocultaEnvio();
+
         corel=gl.ruta+"_"+mu.getCorelBase();
+
+        gl.devfindia=app.getDevolBod();
 
         fecha=du.getActDateTime();
         if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
@@ -342,7 +357,8 @@ public class DevolBodCan extends PBase {
             db.execSQL(ins.sql());
 
             sql="SELECT CODIGO,LOTE,SUM(CANT),SUM(CANTM),SUM(PESO),UNIDADMEDIDA FROM P_STOCK GROUP BY CODIGO,LOTE,UNIDADMEDIDA " +
-                "HAVING SUM(CANT)>0 OR SUM(CANTM) >0";
+                    "HAVING SUM(CANT)>0 OR SUM(CANTM) >0";
+
             DT=Con.OpenDT(sql);
 
             if(DT.getCount()>0){
@@ -500,6 +516,7 @@ public class DevolBodCan extends PBase {
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             db.endTransaction();
+            habilitaEnvio();
             mu.msgbox( e.getMessage());
         }
 
@@ -584,11 +601,11 @@ public class DevolBodCan extends PBase {
 
             }
 
-        if (!prn_can.isEnabled()) {
-            Toast.makeText(this, "Devolucion completada y guardada.",Toast.LENGTH_SHORT);
-            gl.closeDevBod=true;
-            super.finish();
-        }
+            if (!prn_can.isEnabled()) {
+                Toast.makeText(this, "Devolucion completada y guardada.",Toast.LENGTH_SHORT);
+                gl.closeDevBod=true;
+                super.finish();
+            }
 
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -791,18 +808,36 @@ public class DevolBodCan extends PBase {
 
     }
 
+    private void habilitaEnvio() {
+        imgNext.setVisibility(View.VISIBLE);
+        pbar.setVisibility(View.INVISIBLE);
+        lblTit.setText("Devolución de canastas");
+    }
+
+    private void ocultaEnvio() {
+        imgNext.setVisibility(View.INVISIBLE);
+        pbar.setVisibility(View.VISIBLE);
+        lblTit.setText("Espere, por favor . . .");
+    }
+
+
+    //endregion
+
+    //region Activity Events
 
     @Override
     protected void onResume() {
         try{
             super.onResume();
-
             if (gl.closeDevBod) super.finish();
-
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
+    }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     //endregion

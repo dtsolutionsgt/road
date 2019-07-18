@@ -3,43 +3,40 @@ package com.dts.roadp;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class clsDescuento {
-		
+public class clsDescuentoTran {
+
 	public double monto;
-	
+
 	private int active;
-	private android.database.sqlite.SQLiteDatabase db;
+	private SQLiteDatabase db;
+	private BaseDatos.Insert ins;
+	private BaseDatos.Update upd;
 	private BaseDatos Con;
-	private String vSQL;
-	
+	private String sql;
+
 	private MiscUtils MU;
 
 	private ArrayList<Double> items = new ArrayList<Double>();
 	private ArrayList<Double> montos = new ArrayList<Double>();
-	
+
 	private Context cont;
-	
+
 	private String prodid,lineaid,slineaid,marcaid,canttipo;
 	private double cant,vmax,dmax;
 	private boolean acum;
-	
-	public clsDescuento(Context context,String producto,double cantidad) {
+
+	public clsDescuentoTran(Context context, String producto, double cantidad,BaseDatos dbconnection, SQLiteDatabase database) {
 		
 		cont=context;
 		
 		prodid=producto;cant=cantidad;
-		
-		/*
-		try {
-			active=0;
-			Con = new BaseDatos(context);
-			opendb();
-		} catch (Exception e) {
-		}*/
+
+		Con=dbconnection;
+		db=database;
+		ins=Con.Ins;upd=Con.Upd;
 	    
 	    MU=new MiscUtils(context);
 		
@@ -122,12 +119,12 @@ public class clsDescuento {
 		double val;
 		
 		try {
-			vSQL="SELECT PRODUCTO,PTIPO,VALOR,PORCANT "+
+			sql ="SELECT PRODUCTO,PTIPO,VALOR,PORCANT "+
 				 "FROM T_DESC WHERE  ("+cant+">=RANGOINI) AND ("+cant+"<=RANGOFIN) "+
 				 "AND (PTIPO<4) AND (DESCTIPO='R') AND (GLOBDESC='N') ";
 			     //"AND (PTIPO<4) AND (DESCTIPO='R') AND (GLOBDESC='N') AND ((PORCANT='S') OR (PORCANT='1'))";
 
-			DT=Con.OpenDT(vSQL);
+			DT=Con.OpenDT(sql);
 		
 			
 			if (DT.getCount()==0) return;
@@ -172,12 +169,12 @@ public class clsDescuento {
 		double val,mcant,mul;
 		
 		try {
-			vSQL="SELECT PRODUCTO,PTIPO,RANGOINI,RANGOFIN,VALOR,PORCANT "+
+			sql ="SELECT PRODUCTO,PTIPO,RANGOINI,RANGOFIN,VALOR,PORCANT "+
 				 "FROM T_DESC WHERE ("+cant+">=RANGOINI) "+
 				 "AND (PTIPO<4) AND (DESCTIPO='M') AND (GLOBDESC='N') ";
 			   //"AND (PTIPO<4) AND (DESCTIPO='M') AND (GLOBDESC='N') AND ((PORCANT='S') OR (PORCANT='1'))";
 
-			DT=Con.OpenDT(vSQL);
+			DT=Con.OpenDT(sql);
 			
 			if (DT.getCount()==0) return;
 						
@@ -233,8 +230,8 @@ public class clsDescuento {
 		Cursor DT;
 		
 		try {
-			vSQL="SELECT DESCUENTO,LINEA,SUBLINEA,MARCA FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
-           	DT=Con.OpenDT(vSQL);
+			sql ="SELECT DESCUENTO,LINEA,SUBLINEA,MARCA FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
+           	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			
 			if (DT.getString(0).equalsIgnoreCase("N")) return false;
@@ -248,8 +245,8 @@ public class clsDescuento {
 	    }
 		
 		try {
-			vSQL="SELECT ACUMDESC,DESCMAX FROM P_EMPRESA";
-           	DT=Con.OpenDT(vSQL);
+			sql ="SELECT ACUMDESC,DESCMAX FROM P_EMPRESA";
+           	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			
 			if (DT.getString(0).equalsIgnoreCase("N")) acum=false;

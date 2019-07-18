@@ -185,7 +185,6 @@ public class Pago extends PBase {
 		    
 	}
 
-
 	//region Main
 
 	private void listItems(){
@@ -544,9 +543,9 @@ public class Pago extends PBase {
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 			if (cpago==2) {
-				alert.setTitle("Numero de Cheque");
+				alert.setTitle("Número de Cheque");
 			} else if(cpago==3) {
-				alert.setTitle("Numero de Cheque");
+				alert.setTitle("Número de Cheque");
 			} else {
 				alert.setTitle("Pendiente especificación");
 			}
@@ -588,7 +587,7 @@ public class Pago extends PBase {
 			if (mu.emptystr(s)) {
 				showkeyb();
 				inputNumero();
-				mu.msgbox("Numero incorrecto");showkeyb();
+				mu.msgbox("Número incorrecto");showkeyb();
 				return;
 			}
 
@@ -681,7 +680,7 @@ public class Pago extends PBase {
 			sql="SELECT SUM(Valor) FROM T_PAGO";	
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();	
-			return DT.getDouble(0);
+			return mu.round2(DT.getDouble(0));
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return -1;
@@ -696,7 +695,7 @@ public class Pago extends PBase {
 			if (monto<0) monto=0;
 			monto=mu.round2(monto);
 
-			txtMonto.setText(""+monto);if (monto==0) txtMonto.setText("");
+			txtMonto.setText(mu.frmdec(monto));if (monto==0) txtMonto.setText("");
 			lblTotal.setText(mu.frmdec(tp));
 
 			if (pagomodo==0) {

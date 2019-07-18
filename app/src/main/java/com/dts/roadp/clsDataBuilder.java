@@ -26,17 +26,18 @@ public class clsDataBuilder {
 
 	private DateUtils DU;
 	private MiscUtils MU;
+	private AppMethods AM;
 	
-	private BufferedWriter writer = null,lwriter = null;
-	private FileWriter wfile,lfile;
-	private String fname,logname,namefile;
+	private BufferedWriter writer = null,lwriter = null,writerbk = null,lwriterbk = null;
+	private FileWriter wfile,lfile,wfilebk,lfilebk;
+	private String fname,logname,namefile, codCliNuevo,lognamebk,namefilebk;
 
 	public clsDataBuilder(Context context) {
 		
 		cCont=context; 
 		DU=new DateUtils();
 		MU=new MiscUtils(cCont);
-		
+
 		Con = new BaseDatos(cCont);
 		try {
 			db = Con.getWritableDatabase();
@@ -44,12 +45,17 @@ public class clsDataBuilder {
 	    } catch (Exception e) {
 	    	MU.msgbox(e.getMessage());
 	    }
-		
+
+		parametrosGlobales();
+
 		System.setProperty("line.separator","\r\n");
 		
 		fname = Environment.getExternalStorageDirectory()+"/SyncFold/rd_data.txt";
 		logname = Environment.getExternalStorageDirectory()+"/roadenvio.txt";
 		namefile = Environment.getExternalStorageDirectory()+"/data.acr";
+
+		lognamebk = Environment.getExternalStorageDirectory()+"/roadenvio"+DU.dayofweek(fechaFactTol(DU.getActDate()))+".txt";
+		namefilebk = Environment.getExternalStorageDirectory()+"/data"+DU.dayofweek(fechaFactTol(DU.getActDate()))+".acr";
 
 	}
 	
@@ -103,6 +109,12 @@ public class clsDataBuilder {
 				  
 			    PRG.moveToNext();j+=1;
 			}
+
+			if (tn.equals("D_FACTURA")) SS="SELECT COREL, ANULADO, FECHA, EMPRESA, RUTA, VENDEDOR, " +
+					                       "CASE ADD1 WHEN 'NUEVO' THEN '" + codCliNuevo + "' ELSE CLIENTE END  CLIENTE, " +
+					                       "KILOMETRAJE, FECHAENTR, FACTLINK, TOTAL, DESMONTO, IMPMONTO, PESO, BANDERA, "+
+					                       "STATCOM, CALCOBJ, SERIE, CORELATIVO, IMPRES, ADD1, ADD2, ADD3, DEPOS, PEDCOREL," +
+					                       "REFERENCIA, ASIGNACION, SUPERVISOR, AYUDANTE, VEHICULO, CODIGOLIQUIDACION, RAZON_ANULACION";
 			
 		} catch (Exception e) {
 			err=e.getMessage();//return false;
@@ -148,6 +160,46 @@ public class clsDataBuilder {
 		}
 		
 		return (!err.isEmpty()?false:true);
+	}
+
+	public void parametrosGlobales() {
+		Cursor dt;
+		String sql;
+
+		try {
+			sql="SELECT FTPSERVER FROM P_GLOBPARAM";
+			dt=Con.OpenDT(sql);
+
+			if(dt.getCount()>0){
+				dt.moveToFirst();
+
+				codCliNuevo =dt.getString(0);
+			}else{
+				codCliNuevo ="";
+			}
+
+		} catch (Exception e) {
+			MU.toast("Ocurrió un error obteniendo los valores de clientes nuevos" + e.getMessage());
+		}
+
+	}
+
+	public long fechaFactTol(long f0) {
+		Cursor DT;
+		String sql;
+		long ff;
+
+		try {
+			sql = "SELECT FECHA FROM P_FECHA";
+			DT = Con.OpenDT(sql);
+
+			DT.moveToFirst();
+			ff=DT.getLong(0);
+
+			return ff;
+		} catch (Exception e) {
+			return f0;
+		}
 	}
 
 	public void clear(){
@@ -220,12 +272,17 @@ public class clsDataBuilder {
 			lfile=new FileWriter(logname,false);
 			lwriter = new BufferedWriter(lfile);
 
+			lfilebk=new FileWriter(lognamebk,false);
+			lwriterbk = new BufferedWriter(lfilebk);
+
 			for (int i = 0; i < sendlog.size(); i++) {
 				s=sendlog.get(i);
 				lwriter.write(s);lwriter.write("\r\n");
+				lwriterbk.write(s);lwriterbk.write("\r\n");
 			}
 
 			lwriter.close();
+			lwriterbk.close();
 
 		} catch(Exception e){
 			return;

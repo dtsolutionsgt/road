@@ -28,11 +28,12 @@ public class clsBonifSave {
 		cont=context;
 		corel=corelativo;
 		venped=ventaped;
-		
+
+
 		active=0;
-		Con = new BaseDatos(context);
-	    opendb();
-	    ins=Con.Ins;upd=Con.Upd;
+		//Con = new BaseDatos(context);
+	    //opendb();
+	    //ins=Con.Ins;upd=Con.Upd;
 	    
 	    mu=new MiscUtils(context);	
 	}
@@ -50,7 +51,7 @@ public class clsBonifSave {
 		//saveDBonifFalt();
 		
 		try {
-			Con.close();
+			//Con.close();
 		} catch (Exception e) {
 		}
 		

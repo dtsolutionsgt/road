@@ -19,7 +19,9 @@ public class appGlobals extends Application {
 	public long nuevaFecha,atentini;
 	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor,prectemp, nuevoprecio;
 	public boolean CellCom,closeDevBod;
-	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra, parNumVer, parVerFecha;
+
+	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra, parNumVer, parFechaVer, parTipoVer;
+
 	public int tiponcredito,validarCred,gpsdist;
     public boolean vcredito,vcheque,vchequepost,validimp;
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,devol,modoadmin;
@@ -27,6 +29,9 @@ public class appGlobals extends Application {
 	public int mpago;
 	public boolean fotos;
 	public int cols;
+
+	//#CKFK 20190619 Agregué estas dos variables para los valores de clientes nuevos
+	public String cuentaCliNuevo, codCliNuevo;
 
 	//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true por defecto estará en false
 	public boolean debug=true;
@@ -43,7 +48,7 @@ public class appGlobals extends Application {
 	public String peModal,peMon,peFormatoFactura,CodDev;
 	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec,endPrint;
 	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre;
-	public boolean peImprFactCorrecta;
+	public boolean peImprFactCorrecta, pTransBarra;
 	public int peDec,peDecCant,peDecImp,peLimiteGPS,peMargenGPS,peVentaGps;
 	
 	// Descuentos
@@ -62,7 +67,7 @@ public class appGlobals extends Application {
 	public double gpspx,gpspy,gpscpx,gpscpy,gpscdist;
 	
 	//Id de Dispositivo Móvil
-	public String deviceId,devicename;
+	public String deviceId,devicename,numSerie;
 
 	// Epson
 	
@@ -82,5 +87,9 @@ public class appGlobals extends Application {
 
 	//Mostrar producto: Catálogo o Pedido Sugerido
 	public int mostrarPedidoSugerido;
+
+	//Parámetros configuración barra
+	public int pLongitudBarra;
+	public String pPrefijoBarra;
 
 }

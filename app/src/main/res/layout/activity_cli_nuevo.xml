@@ -91,8 +91,10 @@
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView4"
         android:layout_below="@+id/txtCNNit"
+        android:layout_alignLeft="@+id/textView4"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="10dp"
         android:paddingTop="5dp"
         android:text="Precio"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -103,15 +105,20 @@
         android:layout_height="36dp"
         android:layout_alignLeft="@+id/txtCNNit"
         android:layout_alignTop="@+id/textView5"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp"
         android:background="@layout/spinner_style"
         android:paddingRight="10dp" />
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="80dp"
+        android:layout_below="@+id/spinner1"
         android:layout_alignLeft="@+id/textView5"
         android:layout_alignRight="@+id/txtCNDir"
-        android:layout_below="@+id/spinner1" >
+        android:layout_marginLeft="-1dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="2dp">
 
         <CheckBox
             android:id="@+id/checkBox1"
@@ -157,17 +164,17 @@
             android:id="@+id/checkBox6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_below="@+id/checkBox1"
+            android:layout_alignParentLeft="true"
             android:text="Sa" />
 
         <CheckBox
             android:id="@+id/checkBox7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/checkBox6"
-            android:layout_alignTop="@+id/checkBox6"
             android:layout_below="@+id/checkBox1"
+            android:layout_alignTop="@+id/checkBox6"
+            android:layout_alignBottom="@+id/checkBox6"
             android:layout_toRightOf="@+id/checkBox1"
             android:text="Do" />
 

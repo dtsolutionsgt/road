@@ -135,8 +135,9 @@ public class Deposito extends PBase {
 				DT=Con.OpenDT(sql);
 
 				if (DT.getCount()==0) {
+					if (tef>0){
 					msgbox("Por favor realice el desglose antes de continuar.");
-					return;
+					return;}
 				}
 			}
 
@@ -446,6 +447,7 @@ public class Deposito extends PBase {
 		try {
 			
 			for (int i = 0; i < items.size(); i++ ) {
+
 				item=items.get(i);
 				
 				if (item.Bandera==1) {
@@ -567,9 +569,9 @@ public class Deposito extends PBase {
 				DT=Con.OpenDT(sql);
 
 				if (DT.getCount()==0){
-					msgbox("Por favor realice el desglose antes de continuar.");
+					if (tef>0){msgbox("Por favor realice el desglose antes de continuar.");
 					db.endTransaction();
-					return false;
+					return false;}
 				} else {
 
 					DT.moveToFirst();
@@ -638,7 +640,7 @@ public class Deposito extends PBase {
 		Cursor DT;
 		  
 		try {
-			sql="SELECT CODIGO,NOMBRE,CUENTA FROM P_BANCO WHERE (TIPO='D') ORDER BY Nombre,Cuenta";
+			sql="SELECT CODIGO,NOMBRE,CUENTA FROM P_BANCO WHERE (TIPO='D') AND CUENTA = '"+gl.sucur+"' ORDER BY Nombre,Cuenta";
 			DT=Con.OpenDT(sql);
 					
 			DT.moveToFirst();

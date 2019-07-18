@@ -415,6 +415,10 @@ public class Clientes extends PBase {
 
 					DT.moveToNext();
 				}
+
+				if(DT!=null) DT.close();
+			}else{
+				spinList.setSelection(0);
 			}
 
 		} catch (Exception e) {

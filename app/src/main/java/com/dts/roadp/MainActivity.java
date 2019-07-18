@@ -41,8 +41,9 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.5.2 / ";
-    private String parVerFecha= "14-Junio-2019";
+    private String parNumVer = "9.4.44 / ";
+    private String parFechaVer = "16-Jul-2019";
+    private String parTipoVer = "ROAD PRD";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +57,6 @@ public class MainActivity extends PBase {
             msgbox(new Object() {
             }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
-
 
     }
 
@@ -101,7 +101,8 @@ public class MainActivity extends PBase {
 
             this.setTitle("ROAD");
             gl.parNumVer = parNumVer;
-            gl.parVerFecha=parVerFecha;
+            gl.parFechaVer = parFechaVer;
+            gl.parTipoVer = parTipoVer;
 
             txtUser = (EditText) findViewById(R.id.txtUser);
             txtPass = (EditText) findViewById(R.id.txtMonto);
@@ -112,7 +113,7 @@ public class MainActivity extends PBase {
             lblID = (TextView) findViewById(R.id.textView81);
             imgLogo = (ImageView) findViewById(R.id.imgNext);
 
-            lblVer.setText("Version " + gl.parNumVer + gl.parVerFecha);
+            lblVer.setText(gl.parTipoVer + " Version " + gl.parNumVer + gl.parFechaVer);
 
             // DB VERSION
             dbVers = new BaseDatosVersion(this, db, Con);
@@ -138,10 +139,8 @@ public class MainActivity extends PBase {
             }
 
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-            msgbox(new Object() {
-            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
     }
@@ -430,6 +429,8 @@ public class MainActivity extends PBase {
         try {
             AppMethods app = new AppMethods(this, gl, Con, db);
             app.parametrosExtra();
+            app.parametrosGlobales();
+            app.parametrosBarras();
         } catch (Exception e) {
             addlog(new Object() {
             }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -457,11 +458,6 @@ public class MainActivity extends PBase {
         String usr, pwd, dpwd;
 
         try {
-
-           /* if (fecha > 1905310000) {
-                msgAskLic("¡Su licencia expiró!");
-                return false;
-            }*/
 
             usr = txtUser.getText().toString().trim();
             pwd = txtPass.getText().toString().trim();
@@ -531,6 +527,8 @@ public class MainActivity extends PBase {
 
             if (DT.getCount() > 0) {
                 gl.codSupervisor = DT.getString(0);
+            }else{
+                gl.codSupervisor = "";
             }
 
         } catch (Exception e) {
@@ -789,6 +787,7 @@ public class MainActivity extends PBase {
             lic = dt.getString(0);
             licruta = dt.getString(1);
 
+            if (!gl.debug ) {
 
             if (mu.emptystr(lic)) {
                 toastlong("El dispositivo no tiene licencia válida de handheld");
@@ -799,7 +798,6 @@ public class MainActivity extends PBase {
                 toastlong("El dispositivo no tiene licencia válida de ruta");
                 return false;
             }
-
 
             if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) {
                return true;
@@ -820,9 +818,12 @@ public class MainActivity extends PBase {
                 return false;
             }
 
+            } else {
+                return true;
+            }
+
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
             mu.msgbox(new Object() {
             }.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
         }

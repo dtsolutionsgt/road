@@ -100,6 +100,16 @@ public class Menu extends PBase {
 				gl.rutapos=true;
 			}
 
+			try {
+				if (gl.peModal.equalsIgnoreCase("TOL")){
+					gl.numSerie = getNumSerie();
+				}else{
+					gl.numSerie = gl.deviceId;
+				}
+			} catch (Exception e) {
+				gl.numSerie="";
+			}
+
 			selId=-1;selIdx=-1;
 
 			setHandlers();
@@ -125,8 +135,7 @@ public class Menu extends PBase {
 			//#CKFK 20190423 Quité esta validación de configuración de impresora
 			//ConfImpresora();
 
-		}catch (Exception e)
-		{
+		}catch (Exception e) 		{
 			Log.e("Mnu", e.getMessage());
 		}
 
@@ -282,7 +291,7 @@ public class Menu extends PBase {
 							mu.msgbox("No puede realizar esta acción");
 						}else {
 
-							if(gl.vnivel == 2){
+							if(gl.vnivel == 1){
 								msgAskSupervisor1();
 							}else {
 								startActivity(intent);
@@ -1146,7 +1155,11 @@ public class Menu extends PBase {
 			gl.closeDevBod=false;
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				startActivity(new Intent(this,DevolBodTol.class));
+				if (tieneDevolucionTOL()) {
+					startActivity(new Intent(this,DevolBodTol.class));
+				} else {
+					msgbox("La devolución está vacia, no se puede aplicar");return;
+				}
 			} else {
 				startActivity(new Intent(this,DevolBod.class));
 			}
@@ -1818,6 +1831,61 @@ public class Menu extends PBase {
 
 	public void doWSTest(View view) {
 		startActivity(new Intent(Menu.this,WSTest.class));
+	}
+
+	//#CKFK 20190705 Se creó función para obtener número de serie de P_COREL
+	public String getNumSerie(){
+		Cursor DT;
+		String numSerie = "";
+
+		try {
+
+			sql = "SELECT NUMSERIE FROM P_HANDHELD" ;
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+
+				DT.moveToFirst();
+				numSerie = DT.getString(0);
+
+				if (DT!=null) DT.close();
+
+			} else {
+				numSerie="";
+			}
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+		}
+
+		return numSerie;
+	}
+
+	private boolean tieneDevolucionTOL() {
+		Cursor dt;
+		long cantcan = 0, cantstock = 0, cantbolsa = 0;
+
+		try {
+			sql = "SELECT IFNULL(SUM(CANT),0) FROM P_STOCK WHERE CANT+CANTM>0";
+			dt = Con.OpenDT(sql);
+			cantstock = dt.getLong(0);
+
+			sql = "SELECT IFNULL(COUNT(BARRA),0) FROM P_STOCKB";
+			dt = Con.OpenDT(sql);
+			cantbolsa = dt.getLong(0);
+
+			sql = "SELECT IFNULL(SUM(CANT),0) FROM D_CXC E INNER JOIN D_CXCD D ON  E.COREL = D.COREL WHERE E.ANULADO = 'N'";
+			dt = Con.OpenDT(sql);
+			cantcan = dt.getLong(0);
+
+		} catch (Exception e) {
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+			return false;
+		}
+
+		return (cantstock + cantbolsa + cantcan > 0);
 	}
 
 	//endregion

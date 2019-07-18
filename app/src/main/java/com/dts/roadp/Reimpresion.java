@@ -83,18 +83,18 @@ public class Reimpresion extends PBase {
 		prn_can=new printer(this,printclose,gl.validimp);
 		prn_paseante=new printer(this,printclose,gl.validimp);
 
-		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
-		fdoc.deviceid =gl.deviceId;
+		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
+		fdoc.deviceid =gl.numSerie;
 
 		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-		fdev.deviceid =gl.deviceId;
+		fdev.deviceid =gl.numSerie;
 
 		fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
-		fcanastabod.deviceid =gl.deviceId;
+		fcanastabod.deviceid =gl.numSerie;
 		fcanastabod.vTipo="CANASTA";
 
 		fpaseantebod=new clsDocCanastaBod(this,prn_paseante.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
-		fpaseantebod.deviceid =gl.deviceId;
+		fpaseantebod.deviceid =gl.numSerie;
 		fpaseantebod.vTipo="PASEANTE";
 
 		printclose = new Runnable() {
@@ -147,13 +147,13 @@ public class Reimpresion extends PBase {
 			docPed = new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp,"");
 			lblTipo.setText("Pedido");break;
 		case 1:
-			cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.deviceId, "");
+			cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.numSerie, "");
 			lblTipo.setText("Recibo");break;	
 		case 2:  
 			ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
 			lblTipo.setText("Deposito");break;
 		case 3:  
-			fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "");
+			fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
 			lblTipo.setText("Factura");break;
 		case 4:  
 			mdoc=new clsDocMov(this,prn.prw,"Recarga",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
@@ -163,7 +163,7 @@ public class Reimpresion extends PBase {
 			lblTipo.setText("Devolución a bodega");break;
 		case 6:  
 			fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-			fdev.deviceid =gl.deviceId;
+			fdev.deviceid =gl.numSerie;
 			lblTipo.setText("Nota Crédito");break;
 			
 		case 99:  
@@ -468,7 +468,7 @@ public class Reimpresion extends PBase {
 		Cursor dt;
 		int impr;
 
-		fdoc.deviceid =gl.deviceId;
+		fdoc.deviceid =gl.numSerie;
 
 		try {
 			sql="SELECT IMPRES FROM D_FACTURA WHERE COREL='"+itemid+"'";
@@ -492,7 +492,7 @@ public class Reimpresion extends PBase {
 
 				if (!corelNC.isEmpty()){
 					/*fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-					fdev.deviceid =gl.deviceId;*/
+					fdev.deviceid =gl.numSerie;*/
 
 					fdev.buildPrint(corelNC, 1, "TOL");
 					toast("Reimpresion de factura y nota de credito generada");
@@ -684,7 +684,7 @@ public class Reimpresion extends PBase {
 
 				if (!corelNC.isEmpty()){
 					fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-					fdev.deviceid =gl.deviceId;
+					fdev.deviceid =gl.numSerie;
 					fdev.buildPrint(corelNC, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
 				}
 

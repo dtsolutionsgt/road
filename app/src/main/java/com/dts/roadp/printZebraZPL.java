@@ -207,6 +207,7 @@ public class printZebraZPL extends printBase {
             altolinea=20;
             psx = 0;
             anchopapel=500;
+            if (prwidth>35) anchopapel=350; //#CKFK 20190614 Agregué esta condición para el ancho del papel
             if (prwidth>40) anchopapel=300;
             if (prwidth>60) anchopapel=400;
 
@@ -214,8 +215,6 @@ public class printZebraZPL extends printBase {
             dlen=ccnt*altolinea+60;
 
             ps="";
-            /*ps+="! 0 "+anchopapel+" "+anchopapel+" "+dlen+" 1\r\n";dbg=ps;
-            ps+="ML "+altolinea+"\r\n" + "TEXT 0 2 10 0\r\n";*/
 
             ps+="^XA";
             ps+="^PW"+anchopapel;
@@ -223,7 +222,7 @@ public class printZebraZPL extends printBase {
 
             for (int i = 0; i <ccnt; i++) {
                 ps+="^FO,"+psx+",0";
-                ps+="^ADN,"+altolinea+",0";
+                ps+="^ADN,5,0";
                 ps+="^FD";
                 ss=lines.get(i);
                 ps+=ss;
@@ -232,8 +231,6 @@ public class printZebraZPL extends printBase {
             }
 
             ps+="^XZ";
-            //ps+="FORM\r\n";
-            //ps+="PRINT\r\n";
 
             prdata =ps.getBytes();
 
@@ -253,10 +250,11 @@ public class printZebraZPL extends printBase {
 
         try {
 
-            altobarra=100;
-            anchobarra = 2;
+            altobarra=80;//#CKFK 20190614 Modifiqué el alto de la barra a 80 antes era 100
+            anchobarra = 1;//#CKFK 20190614 Modifiqué el ancho de la barra a 1 antes era 2
             psx = 20;
             anchopapel=500;
+            if (prwidth>35) anchopapel=350;//#CKFK 20190614 Agregué esta condición para el ancho del papel
             if (prwidth>40) anchopapel=300;
             if (prwidth>60) anchopapel=400;
 
@@ -269,7 +267,7 @@ public class printZebraZPL extends printBase {
             ps+="^PW"+anchopapel;
             ps+="^LL"+dlen;
             for (int i = 0; i <ccnt; i++) {
-                ps+="^BY'"+anchobarra+"',2,'"+altobarra+"'";
+                ps+="^BY"+anchobarra+",2,"+altobarra+"";
                 ps+="^FO,"+psx+",62";
                 ps+="^BC";
                 ps+="^FD";

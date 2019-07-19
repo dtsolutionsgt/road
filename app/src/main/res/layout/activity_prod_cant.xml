@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context=".ProdCant">
 
     <TextView
@@ -307,6 +308,9 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="1dp"
+        android:layout_marginLeft="-1dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="33dp"
         android:background="@layout/blue_strip">
 
         <TextView
@@ -326,17 +330,15 @@
 
     <ImageView
         android:id="@+id/imgPFoto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="314dp"
+        android:layout_height="89dp"
         android:layout_above="@+id/relbotpan"
-        android:layout_below="@+id/imgImg"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginLeft="0dp"
         android:layout_marginEnd="12dp"
         android:layout_marginRight="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="0dp"
         android:clickable="true"
         android:focusable="true"
         android:onClick="showPic"

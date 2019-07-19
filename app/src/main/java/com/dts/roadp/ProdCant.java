@@ -112,6 +112,8 @@ public class ProdCant extends PBase {
 		txtPeso.setEnabled(validaRango());
 
 		showData();
+
+		showkeyb();
 		
 	}
 
@@ -399,12 +401,6 @@ public class ProdCant extends PBase {
 			idisp=getDisp();
 		} else {
 		}
-
-		prec=prc.precio(prodid,1,nivel,um,gl.umpeso,0,um,0);
-		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
-			if (prc.precioespecial>0) prec=prc.precioespecial;
-		}
-
 
 		idisp=mu.trunc(idisp);
 
@@ -758,6 +754,8 @@ public class ProdCant extends PBase {
 				if (prc.precioespecial > 0) prec = prc.precioespecial;
 			}
 		}
+
+		if (gl.sinimp) prec=prc.precsin;
 
 		try {
 			if (cant<0)	lblCant.setText(""); else lblCant.setText(String.valueOf(cant));

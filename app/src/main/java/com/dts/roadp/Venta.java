@@ -788,12 +788,22 @@ public class Venta extends PBase {
 			}
 			if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
 			ins.add("FACTOR",gl.umfactor);
-			if (porpeso) ins.add("PRECIO",gl.prectemp); else ins.add("PRECIO",prec);
+			if (rutatipo.equalsIgnoreCase("P")) {
+				ins.add("PRECIO",precdoc);
+			}else{
+				if (porpeso) ins.add("PRECIO",gl.prectemp); else ins.add("PRECIO",prec);
+			}
 			ins.add("IMP",impval);
 			ins.add("DES",desc);
 			ins.add("DESMON",descmon);
 			ins.add("TOTAL",prodtot);
-			if (porpeso) ins.add("PRECIODOC",gl.prectemp); else ins.add("PRECIODOC",precdoc);
+
+            if (rutatipo.equalsIgnoreCase("P")) {
+				ins.add("PRECIODOC",precdoc);
+			}else{
+				if (porpeso) ins.add("PRECIODOC",gl.prectemp); else ins.add("PRECIODOC",precdoc);
+			}
+
 			ins.add("PESO",peso);
 			ins.add("VAL1",0);
 			ins.add("VAL2","");

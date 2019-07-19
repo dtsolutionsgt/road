@@ -95,7 +95,7 @@
             android:label="@string/title_activity_prod_cant"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-            android:windowSoftInputMode="stateVisible" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".PedidoRes"
             android:configChanges="keyboardHidden|orientation|screenSize"

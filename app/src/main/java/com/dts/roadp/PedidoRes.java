@@ -373,7 +373,7 @@ public class PedidoRes extends PBase {
 				ins.add("EMPRESA",gl.emp);
 				ins.add("ANULADO","N");
 				ins.add("CANT",DT.getDouble(1));
-				ins.add("PRECIO",DT.getDouble(2));
+				ins.add("PRECIO",DT.getDouble(7));//#CKFK 20190719 Guardé el precio sin impuesto en ambos campos DT.getDouble(2)
 				ins.add("IMP",DT.getDouble(3));
 				ins.add("DES",DT.getDouble(4));
 				ins.add("DESMON",DT.getDouble(5));

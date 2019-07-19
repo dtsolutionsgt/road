@@ -1125,8 +1125,8 @@ public class CliDet extends PBase {
             chknc.setChecked(false);
             chkncv.setChecked(false);
 
-			if (clicred)layout.addView(chknc);
-			if (!clicred) layout.addView(chkncv);
+			if (clicred || gl.rutatipo.equals("P"))layout.addView(chknc);
+			if (!clicred & !gl.rutatipo.equals("P")) layout.addView(chkncv);
 
 			alert.setView(layout);
 

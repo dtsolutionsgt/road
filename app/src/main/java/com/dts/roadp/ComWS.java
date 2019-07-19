@@ -299,7 +299,7 @@ public class ComWS extends PBase {
 
 			}
 
-			if (ExistenDatos()) {
+			if (ExistenDatosSinEnviar()) {
 				BorraDatosAnteriores("¿Tiene facturas, pedidos, cobros, devoluciones o inventario, está seguro de borrar los datos?");
 			} else {
 				msgAskConfirmaRecibido();
@@ -584,7 +584,6 @@ public class ComWS extends PBase {
 
             alert.setView(layout);
 
-            showkeyb();
             alert.setCancelable(false);
             alert.create();
 
@@ -4162,13 +4161,13 @@ public class ComWS extends PBase {
 
 			if (envioparcial && !esEnvioManual) {
 				if (commitSQL() == 1) {
-					pc = 3;
+					pc = 1;
 				} else {
 					errflag = true;
 					fterr += "\nFinDia : " + sstr;
 					dbg = sstr;
 				}
-			}else pc = 3;
+			}else pc = 0;
 
 		} catch (Exception e) {
 			errflag = true;

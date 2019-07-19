@@ -87,7 +87,9 @@ public class ListAdaptVenta extends BaseAdapter {
 		holder.lblDesc.setText(items.get(position).sdesc);
 		val=items.get(position).Total;
 		holder.lblTot.setText(cursym+" "+frmdec.format(val));
-		holder.lblPrecio.setText(String.valueOf(items.get(position).precio));
+
+		//#CKFK 20190718 Modifiqué este valor porque en PrecioDoc es que se guarda el precio sin impuesto no en items.precio
+		holder.lblPrecio.setText(String.valueOf(items.get(position).Prec));
 
 		holder.lblPeso.setText(items.get(position).valp);
 		if (items.get(position).valp.equalsIgnoreCase(".")) holder.lblPeso.setVisibility(View.GONE);

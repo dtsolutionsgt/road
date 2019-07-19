@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -272,9 +273,16 @@ public class ComWSFotos extends PBase {
                 ims=listItems.get(i);
                 if (guardaImagen(ims)==1) rec++;
 
-                fprog = "Procesando "+(i+1)+" / "+reccnt;
-                wsRtask.onProgressUpdate();
+                if (i % 5 == 0) {
+                    fprog = "Procesando "+(i+1)+" / "+reccnt;
+                    wsRtask.onProgressUpdate();
+                    SystemClock.sleep(5);
+                }
             }
+
+            fprog = "Procesadas "+reccnt+" / "+reccnt;
+            wsRtask.onProgressUpdate();
+            SystemClock.sleep(5);
 
             ConT = new BaseDatos(this);
             dbT = ConT.getWritableDatabase();
@@ -343,7 +351,8 @@ public class ComWSFotos extends PBase {
         try{
             if (fstr.equalsIgnoreCase("Sync OK")) {
                 lblInfo.setText(" ");
-                msgExit("Actualizado imagenes : "+rec);
+                if (rec>1 || rec == 0) msgExit("Actualizadas " + rec + " imágenes");
+                else if(rec==1) msgExit("Actualizada " + rec + " imagen");
             } else {
                 lblInfo.setText(fstr);
                 mu.msgbox("Ocurrio error : \n"+fstr+" ("+reccnt+") " + ferr);

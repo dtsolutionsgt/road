@@ -110,13 +110,15 @@ public class Precio {
 		// total
 		stot=pr*cant;stot=mu.round(stot,ndec);
 		if (imp>0) impval=stot-tsimp; else impval=0;
-		descmon=(double) (stot*desc/100);descmon=mu.round(descmon,ndec);
+		descmon=(double) (stot*desc/100);
+		descmon=mu.round(descmon,ndec);
 		tot=stot-descmon;
 
 		if (cant>0) prec=(double) (tot/cant); else prec=pr;
 
 		try {
-			sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
+			sprec=ffrmprec.format(prec);
+			sprec=sprec.replace(",",".");
 			pprec=Double.parseDouble(sprec);
 			precdoc=mu.round(pprec,ndec);
 		} catch (Exception e) {

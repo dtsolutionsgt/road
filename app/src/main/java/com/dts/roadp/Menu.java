@@ -273,7 +273,7 @@ public class Menu extends PBase {
 			switch (menuid) {
 
 				case 1:
-
+					getWSURLs();
 					if (rutapos) {
 						Intent intentp = new Intent(this, CliPos.class);
 						startActivity(intentp);
@@ -303,6 +303,7 @@ public class Menu extends PBase {
 					break;
 
 				case 2:  // Comunicacion
+					getWSURLs();
 					gl.findiaactivo=false;
 					gl.tipo = 0;
 					gl.autocom = 0;
@@ -1887,6 +1888,30 @@ public class Menu extends PBase {
 
 		return (cantstock + cantbolsa + cantcan > 0);
 	}
+
+
+
+	public void getWSURLs() {
+		Cursor dt;
+
+		try {
+
+			sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			gl.URLLocal= dt.getString(0);
+			gl.URLRemoto=dt.getString(1);
+
+			if (gl.URLLocal.isEmpty()) msgbox("No existe configuración para transferencia de datos");
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox(e.getMessage());
+		}
+
+	}
+
 
 	//endregion
 

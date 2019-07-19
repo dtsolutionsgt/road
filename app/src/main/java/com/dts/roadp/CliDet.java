@@ -429,6 +429,14 @@ public class CliDet extends PBase {
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
 			gl.clitipo = DT.getString(16);
 
+
+			sql="SELECT RUTA FROM P_CLIRUTA WHERE CLIENTE='"+cod+"'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			gl.rutasup=DT.getString(0);
+
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox(e.getMessage());

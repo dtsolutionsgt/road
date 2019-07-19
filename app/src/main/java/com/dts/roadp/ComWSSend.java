@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -17,7 +18,7 @@ public class ComWSSend extends PBase {
     private WebService ws;
     private clsDataBuilder dbld;
 
-    private String URL="",senv,fprog;
+    private String URL="";
     private int pcount=0;
 
     @Override
@@ -32,7 +33,7 @@ public class ComWSSend extends PBase {
 
         dbld = new clsDataBuilder(this);
 
-        Handler mtimer = new Handler();
+         Handler mtimer = new Handler();
         Runnable mrunner=new Runnable() {
             @Override
             public void run() {
@@ -40,10 +41,14 @@ public class ComWSSend extends PBase {
             }
         };
         mtimer.postDelayed(mrunner,500);
+
     }
 
     //region Events
 
+    public void doSend(View view) {
+         //initSession();
+    }
 
     //endregion
 
@@ -52,7 +57,7 @@ public class ComWSSend extends PBase {
     private void initSession() {
         Cursor dt;
 
-        if (!getWSURL())  return;
+        if (!getWSURL()) return;
 
         try {
             pcount=0;
@@ -60,7 +65,8 @@ public class ComWSSend extends PBase {
             dt=Con.OpenDT(sql);
 
             if (dt.getCount()>0) {
-                dt.moveToFirst();pcount = dt.getInt(0);
+                dt.moveToFirst();
+                pcount = dt.getInt(0);
             } else {
                 pcount=0;
             }
@@ -85,7 +91,7 @@ public class ComWSSend extends PBase {
         Runnable mrunner=new Runnable() {
             @Override
             public void run() {
-                sendData();;
+                sendData();
             }
         };
         mtimer.postDelayed(mrunner,200);
@@ -161,20 +167,18 @@ public class ComWSSend extends PBase {
 
         try {
 
-            sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='"+gl.ruta+"'";
+            sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA";
             dt=Con.OpenDT(sql);
 
             if (dt.getCount()>0){
                 dt.moveToFirst();
 
-                if (gl.isOnWifi==1) {
-                    URL = dt.getString(0);
-                }else if(gl.isOnWifi==2){
-                    URL = dt.getString(1);
-                }
+                URL = dt.getString(1);
+                if (gl.isOnWifi==1) URL = dt.getString(0);
 
                 if (URL.isEmpty()) {
-                    msgExit("No hay configurada ruta para transferencia de datos");return false;
+                    msgExit("No existe configuración para transferencia de datos");
+                    return false;
                 }
             }
 
@@ -194,7 +198,7 @@ public class ComWSSend extends PBase {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
         dialog.setTitle("Envío de pedidos");
-        dialog.setMessage(msg);
+        dialog.setMessage(msg+"\nURL:"+URL);
 
         dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {

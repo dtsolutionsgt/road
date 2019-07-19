@@ -44,6 +44,8 @@
             android:layout_marginStart="15dp"
             android:layout_marginBottom="20dp"
             android:adjustViewBounds="true"
+            android:clickable="true"
+            android:onClick="doSend"
             android:src="@drawable/cloud_upload" />
 
         <TextView

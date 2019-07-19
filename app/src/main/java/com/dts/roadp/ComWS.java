@@ -862,7 +862,9 @@ public class ComWS extends PBase {
 	}
 
 	public void doPedidos(View view) {
-		startActivity(new Intent(this,ComWSSend.class));
+		//getWSURL();
+		//if (!gl.URLtemp.isEmpty())
+			startActivity(new Intent(this,ComWSSend.class));
 	}
 
 	private void setHandlers() {
@@ -3194,7 +3196,7 @@ public class ComWS extends PBase {
 				return true;
 			}
 
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
@@ -4776,9 +4778,9 @@ public class ComWS extends PBase {
 					URL = DT.getString(1);
 				}
 
-				//URL=wsurl;
+				gl.URLtemp=URL;
 
-				if (URL!=null && !URL.equalsIgnoreCase("")){
+				if (!URL.isEmpty()){
 					txtWS.setText(URL);
 				}else{
 					toast("No hay configurada ruta para transferencia de datos");
@@ -4797,7 +4799,7 @@ public class ComWS extends PBase {
 		}
 		
 	}
-	
+
 	private boolean setComParams() {
 		String ss;
 		

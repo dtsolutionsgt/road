@@ -811,6 +811,32 @@ public class Clientes extends PBase {
 		}
 	}
 
+	public void doSSend(View view) {
+	    //gl.URLtemp="http://192.168.1.137/wsAndr/wsAndr.asmx";
+
+		if (getWSURL()) startActivity(new Intent(this,ComWSSend.class));
+	}
+
+	private void msgAskSend(String msg) {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle("Pedido");
+		dialog.setMessage("¿" + msg + "?");
+
+		dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				startActivity(new Intent(Clientes.this,ComWSSend.class));
+			}
+		});
+
+		dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {}
+		});
+
+		dialog.show();
+
+	}
+
 	private void borraCliNuevo() {
 		try {
 			db.beginTransaction();
@@ -903,6 +929,38 @@ public class Clientes extends PBase {
 
 	}
 
+	private void enviaPedido() {
+		if (gl.tolsuper && gl.tolpedsend) {
+			gl.tolpedsend=false;
+
+			//if (getWSURL())
+			    startActivity(new Intent(this,ComWSSend.class));
+
+			//msgAskSend("Enviar pedido");
+		}
+	}
+
+	public boolean getWSURL() {
+
+		try {
+			if (gl.isOnWifi == 1) {
+				gl.URLtemp = gl.URLLocal;
+			} else {
+				gl.URLtemp = gl.URLRemoto;
+			}
+
+			if (gl.URLtemp.isEmpty()) {
+				msgbox("No existe configuración para transferencia de datos");
+				return false;
+			}
+
+			return true;
+		} catch (Exception e) {
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			mu.msgbox(e.getMessage());
+			return false;
+		}
+	}
 
 	// Activity Events
 	
@@ -910,6 +968,7 @@ public class Clientes extends PBase {
 		try{
 			super.onResume();
 			listItems();
+			enviaPedido();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

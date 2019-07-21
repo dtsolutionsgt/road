@@ -61,7 +61,7 @@ public class FacturaRes extends PBase {
 
 	private long fecha,fechae;
 	private int fcorel,clidia,media;
-	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt,corelNC,consprod,lotelote;
+	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt,corelNC,consprod;//lotelote Coloqué esta variable en comentario
 	private int cyear, cmonth, cday, dweek,stp=0,brw=0,notaC,impres;
 
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
@@ -1007,7 +1007,7 @@ public class FacturaRes extends PBase {
 
 			    vprod=dt.getString(0);
 				vumstock=dt.getString(13);
-				vcant=dt.getDouble(1);
+				vcant=dt.getDouble(1);//#CKFK 20190720 Aquí debo guardar la cantidad por la unidad de medida del stock no por la unidad de medida de venta
 				vpeso=dt.getDouble(8);
 				vfactor=vpeso/(vcant*factpres);
 				vumventa=dt.getString(11);
@@ -1016,18 +1016,21 @@ public class FacturaRes extends PBase {
 					rebajaStockUM(vprod, vumstock, vcant, vfactor, vumventa,factpres,peso);
 				}
 
-				ins.init("D_FACTURAD_LOTES");
+				//#CKFK 20190720 Coloqué esto en comentario porque los valores de esta tabla se deben de guardar por lotes
+				/*
+                ins.init("D_FACTURAD_LOTES");
 
-				ins.add("COREL",corel);
-				ins.add("PRODUCTO",vprod);
-				ins.add("LOTE",lotelote );
-				ins.add("CANTIDAD",vcant);
-				ins.add("PESO",vpeso);
-				ins.add("UMSTOCK",vumstock);
-				ins.add("UMPESO",gl.umpeso);
-				ins.add("UMVENTA",vumventa);
+                ins.add("COREL",corel);
+                ins.add("PRODUCTO",vprod);
+                ins.add("LOTE",lotelote );
+                ins.add("CANTIDAD",vcant);
+                ins.add("PESO",vpeso);
+                ins.add("UMSTOCK",vumstock);
+                ins.add("UMPESO",gl.umpeso);
+                ins.add("UMVENTA",vumventa);
 
-				db.execSQL(ins.sql());
+                db.execSQL(ins.sql());
+                */
 
 				dt.moveToNext();
 			}
@@ -1403,7 +1406,7 @@ public class FacturaRes extends PBase {
 				ins.add("CANTM",dt.getDouble(1));
 				ins.add("PESO",pesoapl);
 				ins.add("plibra",dt.getDouble(3));
-				ins.add("LOTE",lote );lotelote=lote;
+				ins.add("LOTE",lote );//lotelote=lote; #CKFK 20190720 Coloqué esto en comentario porque debo guardar el lote del stock
 
 				ins.add("DOCUMENTO",doc);
 				ins.add("FECHA",dt.getInt(6));
@@ -1418,7 +1421,6 @@ public class FacturaRes extends PBase {
 				db.execSQL(ins.sql());
 
 				// Factura lotes
-				/*
 				factlote=factpres;if (factlote<1) factlote=1/factlote;
 
 				try {
@@ -1444,7 +1446,6 @@ public class FacturaRes extends PBase {
 					db.execSQL(sql);
 					//mu.msgbox(e.getMessage()+"\n"+ins.sql());
 				}
-				*/
 
 				if (actcant<=0) return;
 

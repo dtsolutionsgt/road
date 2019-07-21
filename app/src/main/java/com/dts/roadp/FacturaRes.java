@@ -1117,7 +1117,13 @@ public class FacturaRes extends PBase {
 
 			//region D_STOCKB_DEV
 
-			sql="INSERT INTO D_FACTURA_BARRA SELECT * FROM P_STOCKB WHERE BARRA IN (SELECT BARRA FROM T_BARRA)";
+			//#CKFK 20190720 Modifiqué la información que se guarda en D_FACTURA_BARRA y en D_STOCKB_DEV porque se estaban
+			//guardando las barras sin repesaje.
+			sql=" INSERT INTO D_FACTURA_BARRA "+
+				" SELECT  S.RUTA, B.BARRA, S.CODIGO, S.CANT, S.COREL, S.PRECIO, B.PESO, S.DOCUMENTO, " +
+				" S.FECHA, S.ANULADO, S.CENTRO, S.STATUS, S.ENVIADO, S.CODIGOLIQUIDACION, " +
+				" S.COREL_D_MOV, S.UNIDADMEDIDA, S.DOC_ENTREGA " +
+				" FROM P_STOCKB S INNER JOIN T_BARRA B ON S.BARRA = B.BARRA ";
 			db.execSQL(sql);
 
 			sql="UPDATE D_FACTURA_BARRA SET Corel='"+corel+"' WHERE Corel=''";
@@ -1125,7 +1131,7 @@ public class FacturaRes extends PBase {
 
 			try {
 
-				sql="SELECT BARRA,CODIGO,PESO FROM P_STOCKB WHERE BARRA IN (SELECT BARRA FROM T_BARRA)";
+				sql="SELECT BARRA,CODIGO,PESO FROM T_BARRA ";
 				dt=Con.OpenDT(sql);
 
 				if (dt.getCount()>0) dt.moveToFirst();

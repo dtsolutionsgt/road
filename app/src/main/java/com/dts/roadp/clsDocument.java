@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class clsDocument {
 
-	public String nombre,numero,serie,ruta,vendedor,cliente,nit,tipo,ref;
+	public String nombre,numero,serie,ruta,vendedor,cliente,nit,tipo,ref,medidapeso;
 	public String resol,resfecha,resvence,resrango,fsfecha,modofact;
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;

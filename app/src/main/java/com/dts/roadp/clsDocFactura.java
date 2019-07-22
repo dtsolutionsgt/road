@@ -360,8 +360,7 @@ public class clsDocFactura extends clsDocument {
 
 	protected boolean detailToledano() {
 		itemData item;
-		String ss;
-
+		String ss, umm;
 
 		rep.add("CODIGO   DESCRIPCION        UM  CANT");
 		rep.add("       KGS    PRECIO           VALOR");
@@ -382,7 +381,13 @@ public class clsDocFactura extends clsDocument {
 			} else {
 
 				ss = rep.ltrim(item.cod + " " + item.nombre, prw - 10);
-				ss = ss + rep.rtrim(item.ums, 4) + " " + rep.rtrim(frmdecimal(item.cant, 2), 5);
+				if(item.um.equalsIgnoreCase(medidapeso)) {
+					umm=item.ums;
+				} else {
+					umm=item.um;
+				}
+
+				ss = ss + rep.rtrim(umm, 4) + " " + rep.rtrim(frmdecimal(item.cant, 2), 5);
 				rep.add(ss);
 				ss = rep.rtrim(frmdecimal(item.peso, decimp), 10) + " " + rep.rtrim(frmdecimal(item.prec, 2), 8);
 				ss = rep.ltrim(ss, prw - 10);

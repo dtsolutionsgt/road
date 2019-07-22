@@ -96,6 +96,7 @@ public class Anulacion extends PBase {
 		doc=new clsDocAnul(this,prn.prw,"");
 
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
+		fdoc.medidapeso=gl.umpeso;
 	}
 
 	
@@ -323,6 +324,7 @@ public class Anulacion extends PBase {
 
 				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
 				fdoc.deviceid =gl.numSerie;
+				fdoc.medidapeso=gl.umpeso;
 				fdoc.buildPrint(itemid, 3, "TOL");
 
 				String corelNotaCred=tieneNotaCredFactura(itemid);
@@ -1043,7 +1045,7 @@ public class Anulacion extends PBase {
 
 					fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
 					fdoc.deviceid =gl.numSerie;
-
+					fdoc.medidapeso=gl.umpeso;
 					fdoc.buildPrint(corelFactura, 3, "TOL"); prn.printnoask(printclose,"print.txt");
 				}
 

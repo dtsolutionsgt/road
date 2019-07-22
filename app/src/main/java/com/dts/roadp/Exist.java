@@ -230,7 +230,7 @@ public class Exist extends PBase {
 					"FROM P_STOCKB INNER JOIN P_PRODUCTO ON P_STOCKB.CODIGO=P_PRODUCTO.CODIGO ";
 			if (vF.length() > 0) sql = sql + "AND ((P_PRODUCTO.DESCLARGA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
 			sql += "GROUP BY P_STOCKB.CODIGO, P_PRODUCTO.DESCLARGA ";
-			sql += "ORDER BY P_PRODUCTO.DESCLARGA";
+			sql += "ORDER BY P_STOCK.CODIGO";
 
 			dp = Con.OpenDT(sql);
 

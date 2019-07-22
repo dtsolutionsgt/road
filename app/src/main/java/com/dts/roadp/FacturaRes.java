@@ -61,7 +61,7 @@ public class FacturaRes extends PBase {
 
 	private long fecha,fechae;
 	private int fcorel,clidia,media;
-	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt,corelNC,consprod;//lotelote Coloqué esta variable en comentario
+	private String itemid,cliid,corel,sefect,fserie,desc1,svuelt,corelNC,consprod,lotelote;
 	private int cyear, cmonth, cday, dweek,stp=0,brw=0,notaC,impres;
 
 	private double dmax,dfinmon,descpmon,descg,descgmon,descgtotal,tot,stot0,stot,descmon,totimp,totperc,credito;
@@ -254,7 +254,8 @@ public class FacturaRes extends PBase {
 		prn_nc=new printer(this,printclose,gl.validimp);
 
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(cliid),gl.codCliNuevo,gl.peModal);
-		fdoc.deviceid =gl.numSerie;
+		fdoc.deviceid =gl.numSerie;fdoc.medidapeso=gl.umpeso;
+
 
 		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 		fdev.deviceid =gl.numSerie;
@@ -999,7 +1000,11 @@ public class FacturaRes extends PBase {
 				ins.add("VAL1",dt.getDouble(9));
 				ins.add("VAL2",dt.getString(10));
 				ins.add("UMVENTA",dt.getString(11));
-				ins.add("FACTOR",dt.getDouble(12));
+				if (dt.getString(11).equalsIgnoreCase("KG")) {
+					ins.add("FACTOR",1);
+				} else {
+					if (dt.getDouble(12)!=0) ins.add("FACTOR",1/dt.getDouble(12));else ins.add("FACTOR",1);
+				}
 				ins.add("UMSTOCK",dt.getString(13));ss=dt.getString(13);
 				ins.add("UMPESO",gl.umpeso); //#HS_20181120_1625 Se agrego el valor gl.umpeso anteriormente estaba ""
 
@@ -1016,21 +1021,20 @@ public class FacturaRes extends PBase {
 					rebajaStockUM(vprod, vumstock, vcant, vfactor, vumventa,factpres,peso);
 				}
 
-				//#CKFK 20190720 Coloqué esto en comentario porque los valores de esta tabla se deben de guardar por lotes
-				/*
-                ins.init("D_FACTURAD_LOTES");
+				if (!app.prodBarra(vprod)) {
+					ins.init("D_FACTURAD_LOTES");
 
-                ins.add("COREL",corel);
-                ins.add("PRODUCTO",vprod);
-                ins.add("LOTE",lotelote );
-                ins.add("CANTIDAD",vcant);
-                ins.add("PESO",vpeso);
-                ins.add("UMSTOCK",vumstock);
-                ins.add("UMPESO",gl.umpeso);
-                ins.add("UMVENTA",vumventa);
+					ins.add("COREL", corel);
+					ins.add("PRODUCTO", vprod);
+					ins.add("LOTE", lotelote);
+					ins.add("CANTIDAD", vcant);
+					ins.add("PESO", vpeso);
+					ins.add("UMSTOCK", vumstock);
+					ins.add("UMPESO", gl.umpeso);
+					ins.add("UMVENTA", vumventa);
 
-                db.execSQL(ins.sql());
-                */
+					db.execSQL(ins.sql());
+				}
 
 				dt.moveToNext();
 			}
@@ -1406,7 +1410,7 @@ public class FacturaRes extends PBase {
 				ins.add("CANTM",dt.getDouble(1));
 				ins.add("PESO",pesoapl);
 				ins.add("plibra",dt.getDouble(3));
-				ins.add("LOTE",lote );//lotelote=lote; #CKFK 20190720 Coloqué esto en comentario porque debo guardar el lote del stock
+				ins.add("LOTE",lote );lotelote=lote;
 
 				ins.add("DOCUMENTO",doc);
 				ins.add("FECHA",dt.getInt(6));
@@ -1421,6 +1425,7 @@ public class FacturaRes extends PBase {
 				db.execSQL(ins.sql());
 
 				// Factura lotes
+				/*
 				factlote=factpres;if (factlote<1) factlote=1/factlote;
 
 				try {
@@ -1448,6 +1453,7 @@ public class FacturaRes extends PBase {
 				}
 
 				if (actcant<=0) return;
+				*/
 
 				dt.moveToNext();
 			}

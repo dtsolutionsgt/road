@@ -268,7 +268,7 @@ public class Producto extends PBase {
 					if (!mu.emptystr(famid)){
 						if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
 					}
-					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
+					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO='" + vF + "')) ";
 					sql+="UNION ";
 
 					sql+="SELECT DISTINCT P_PRODUCTO.CODIGO, P_PRODUCTO.DESCCORTA, P_PRODPRECIO.UNIDADMEDIDA " +
@@ -278,7 +278,7 @@ public class Producto extends PBase {
 					if (!mu.emptystr(famid)){
 						if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
 					}
-					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
+					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO='" + vF + "')) ";
 					sql+="UNION ";
 					sql+="SELECT DISTINCT P_PRODUCTO.CODIGO,P_PRODUCTO.DESCCORTA,''  " +
 							"FROM P_PRODUCTO "  +
@@ -286,7 +286,7 @@ public class Producto extends PBase {
 					if (!mu.emptystr(famid)){
 						if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
 					}
-					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
+					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO='" + vF + "')) ";
 
 					if (ordPorNombre) {
 						sql += "ORDER BY P_PRODUCTO.DESCCORTA";
@@ -360,16 +360,16 @@ public class Producto extends PBase {
 		
 		if (prodtipo==1) dispUmCliente();
 
-		if (cantidad==1) {
+	if (cantidad==1) {
 
 			itemid = vItem.Cod;
 			prname = vItem.Desc;
 			gl.um = vItem.um;
 			gl.pprodname = prname;
 
-			appProd();
+			if (!app.prodBarra(itemid)) appProd();
 		}
-		
+
 	}
 	
 	private void appProd(){

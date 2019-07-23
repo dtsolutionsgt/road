@@ -33,8 +33,8 @@ public class ProdCant extends PBase {
 	
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant;
-	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
-	private boolean pexist,esdecimal,porpeso,esbarra;
+	private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
+	private boolean pexist,esdecimal,porpeso,esbarra,idle=true;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +69,8 @@ public class ProdCant extends PBase {
 		gl.gstr="";
 
         paramProd();
+
+		txtPeso.setEnabled(validaRango());
 
 		showData();
 		
@@ -147,11 +149,9 @@ public class ProdCant extends PBase {
 		try{
 			txtCant.addTextChangedListener(new TextWatcher() {
 
-				public void afterTextChanged(Editable s) {
-				}
+				public void afterTextChanged(Editable s) {}
 
-				public void beforeTextChanged(CharSequence s, int start,int count, int after) {
-					 }
+				public void beforeTextChanged(CharSequence s, int start,int count, int after) { }
 
 				public void onTextChanged(CharSequence s, int start,int before, int count) {
 					setCant(true);
@@ -328,6 +328,12 @@ public class ProdCant extends PBase {
 			idisp=getDisp();
 		} else {
 		}
+
+		prec=prc.precio(prodid,1,nivel,um,gl.umpeso,0,um);
+		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
+			if (prc.precioespecial>0) prec=prc.precioespecial;
+		}
+
 
 		idisp=mu.trunc(idisp);
 
@@ -533,6 +539,12 @@ public class ProdCant extends PBase {
 				else ppeso = pesoprom * cant;
 			}
 
+			if (porpeso && gl.rutatipo.equalsIgnoreCase("V")) {
+				if (!checkLimits(ppeso,cant*umfactor)) {
+					return;
+				}
+			}
+
 			gl.dval = cant;
 			gl.dpeso = ppeso;
 			gl.um = upres;
@@ -602,22 +614,34 @@ public class ProdCant extends PBase {
 	private int setCant(boolean mode){
 		double cu=0.0,tv,corig,cround,fruni,frcant,adcant,vpeso=0,opeso;
 		boolean ajust=false;
+
+		//if (!idle) return 0;
 		
 		lblTot.setText("***");
-		if (mode) txtPeso.setText("0");
-
+		if (mode) {
+			txtPeso.setText("0");peso=0;
+		} else {
+			try {
+				if (!txtPeso.getText().toString().trim().isEmpty()){
+					ss=txtPeso.getText().toString();
+					peso=Double.parseDouble(ss);
+				} else {
+					cant=-1;peso=0;return -1;
+				}
+				if (peso<=0) throw new Exception();
+			} catch (Exception e) {
+				cant=-1;peso=0;return -1;
+			}
+		}
 		cu=0;
 
 		try {
-
-			if (txtCant.getText().toString().trim()!=""){
+			if (!txtCant.getText().toString().trim().isEmpty()){
 				cu=Double.parseDouble(txtCant.getText().toString());
 			}
-
 			cant=cu;corig=cant;cround=Math.floor(cant);
 			esdecimal=(corig!=cround)?true:false;
 			cant=mu.round(cant,deccant);
-
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -642,9 +666,11 @@ public class ProdCant extends PBase {
 		}
 
 		cant = mu.round(cant, gl.peDecImp);
+
 		if (porpeso) {
+
 			if (gl.rutatipo.equalsIgnoreCase("V")){
-				prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, umfactor * cant,um);
+				prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, peso,um);
 				if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, umfactor * cant)) {
 					if (prc.precioespecial > 0) prec = prc.precioespecial;
 				}
@@ -660,7 +686,8 @@ public class ProdCant extends PBase {
 		try {
 			if (cant<0)	lblCant.setText(""); else lblCant.setText(String.valueOf(cant));
 			if (porpeso) {
-                tv=prec*cant;
+                //tv=prec*cant;
+				tv=prec*peso;
             } else {
                 tv=prec*cant;
             }
@@ -677,9 +704,9 @@ public class ProdCant extends PBase {
 			umfactor=(umfactor==1 || umfactor==0?pesoprom:umfactor);
 		}
 
-		opeso=umfactor*cant;
+		opeso=cant*umfactor;
 		try {
-			tv=umfactor*cant;
+			tv=peso;
 			lblCantPeso.setText(mu.frmdecimal(tv,gl.peDecImp)+" "+gl.umpeso);
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -700,9 +727,11 @@ public class ProdCant extends PBase {
 
 		}
 
+		/*
 		if (porpeso && gl.rutatipo.equalsIgnoreCase("V")) {
 			if (!checkLimits(vpeso,opeso)) return 2;
 		}
+		*/
 
 		if (ajust) {
 			msgAskAjust("Cantidad ajustada a : "+mu.frmdecimal(cant, gl.peDecImp)+". ¿Aplicar?");
@@ -724,9 +753,7 @@ public class ProdCant extends PBase {
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount() == 0) {
-				toast("No está definido rango de repesaje para el producto, no se podrá modificar el peso");
-				//#EJC20190226: Si no está definido repesaje no se puede modificar el peso según observación de Carolina se debe dejar vender.
-				txtPeso.setEnabled(false);
+				//toast("No está definido rango de repesaje para el producto, no se podrá modificar el peso");
 				return true;
 			}
 
@@ -755,6 +782,32 @@ public class ProdCant extends PBase {
 		return true;
 	}
 
+	private boolean validaRango() {
+
+		Cursor dt;
+		double pmin,pmax;
+		String ss;
+
+		try {
+
+			sql="SELECT PORCMINIMO,PORCMAXIMO FROM P_PORCMERMA WHERE PRODUCTO='"+prodid+"'";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount() == 0) {
+				return false;
+			} else {
+				return true;
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return true;
+	}
+
+
 	private void setPrecio() {
 	    double cu,tv,corig,cround,fruni,frcant,adcant,ppeso=0;
 
@@ -774,7 +827,8 @@ public class ProdCant extends PBase {
 
         try {
 			if (porpeso) {
-				tv=prec*ppeso;
+				//tv=prec*ppeso;
+				tv=prec;
 			} else {
 				tv=prec*cant;
 			}
@@ -801,12 +855,13 @@ public class ProdCant extends PBase {
 			double ub;
 
 			ub=c;
+			idle=false;
 			if (ub>0) txtCant.setText(frmdec.format(ub));
+			idle=true;
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
 	}
 	
 	private double getDispInv(){

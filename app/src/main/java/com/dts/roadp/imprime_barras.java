@@ -20,6 +20,7 @@ public class imprime_barras extends PBase{
 
     private Spinner spin;
     private ListView list;
+    private  Button btnPrint;
 
     private ArrayList<clsBarras> items = new ArrayList<clsBarras>();
 
@@ -49,6 +50,7 @@ public class imprime_barras extends PBase{
 
         list = (ListView) findViewById(R.id.listBars);
         spin = (Spinner) findViewById(R.id.spinner9);
+        btnPrint=(Button) findViewById(R.id.btnprint);
 
         app = new AppMethods(this, gl, Con, db);
         gl.validimp=app.validaImpresora();
@@ -128,7 +130,7 @@ public class imprime_barras extends PBase{
         String icode,iname;
 
         spincode.add("0");
-        spinlist.add("Seleccione una producto ....");
+        spinlist.add("Seleccione un producto ....");
 
         try{
 
@@ -214,7 +216,10 @@ public class imprime_barras extends PBase{
         try{
 
             if (barlist.size()>0){
+               // btnPrint.setVisibility(View.INVISIBLE);
+                mu.toast("Imprimiendo barras...");
                 prn.printBarra(barlist);
+               // btnPrint.setVisibility(View.VISIBLE);
             }else{
                 mu.msgbox("No hay barras para imprimir.");
             }

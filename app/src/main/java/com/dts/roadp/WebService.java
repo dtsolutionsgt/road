@@ -3,22 +3,23 @@ package com.dts.roadp;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.os.AsyncTask;
-
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
-
 import java.util.ArrayList;
 
 public class WebService {
 
     public Cursor openDTCursor;
-    public String openDTResult;
+    public String scalarValue;
+    //public String openDTResult;
+    public clsDataBuilder sqls;
 
     public String  error="";
-    public Boolean status;
+    public Boolean errflag,status;
 
     // private
 
@@ -26,9 +27,9 @@ public class WebService {
 
     private ArrayList<String> results=new ArrayList<String>();
 
-    private String URL,sql;
+
+    private String URL,sql,scalsql;
     private int mode;
-    private boolean errflag;
 
     // OpenDT
     private int odt_rows,odt_cols;
@@ -36,10 +37,12 @@ public class WebService {
     private final String NAMESPACE ="http://tempuri.org/";
     private String METHOD_NAME;
 
-    public WebService(PBase Parent,String Url) {
+    public WebService(PBase Parent, String Url) {
         parent=Parent;
         URL=Url;
         mode=0;
+
+        sqls = new clsDataBuilder(Parent.getBaseContext());
     }
 
     public void openDT(String SQL) {
@@ -48,19 +51,26 @@ public class WebService {
         execute();
     }
 
+    public void commit() {
+        mode=2;
+        execute();
+    }
+
+    public void commitScalar(String SQL) {
+        mode=3;
+        scalsql=SQL;
+        execute();
+    }
+
     //region OpenDT
 
     private void processOpenDT() {
-        errflag = false;
-        OpenDT(sql);
-    }
-
-    public void OpenDT(String sql) {
         String str;
         int rc;
 
-        METHOD_NAME = "getDT";
+        errflag = false;
 
+        METHOD_NAME = "getDT";
         results.clear();
 
         try {
@@ -94,7 +104,7 @@ public class WebService {
 
                     if (i==1) odt_rows = Integer.parseInt(str);
                     if (i==2) odt_cols=Integer.parseInt(str);
-                 }
+                }
             }
 
             createCursor();
@@ -154,9 +164,155 @@ public class WebService {
         }
     }
 
-
     //endregion
 
+    //region Commit
+
+    private int commitSQL() {
+        String resp,ssql,ss;
+
+        errflag = false;
+
+        METHOD_NAME = "Commit";
+
+        if (sqls.size()==0) return 1;
+
+        ssql = "";
+        for (int i = 0; i < sqls.size(); i++) {
+            ss = sqls.items.get(i);
+            ssql=ssql+ss+"\n";
+        }
+
+        try {
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            PropertyInfo param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("SQL");
+            param.setValue(ssql);
+
+            request.addProperty(param);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+            resp = response.toString();
+
+            if (resp.equalsIgnoreCase("#")) {
+                return 1;
+            } else {
+                errflag=true;
+                error=resp;
+                return 0;
+            }
+        } catch (Exception e) {
+            errflag=true;
+            error=e.getMessage();
+            return 0;
+        }
+
+    }
+
+    private int commitToScalar(String sql) {
+        String resp,ssql,ss,str;
+        int rc;
+
+        errflag = false;
+
+        scalarValue="";
+
+        METHOD_NAME = "Commit";
+
+        if (sqls.size()==0) return 1;
+
+        ssql = "";
+        for (int i = 0; i < sqls.size(); i++) {
+            ss = sqls.items.get(i);
+            ssql=ssql+ss+"\n";
+        }
+
+        try {
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            PropertyInfo param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("SQL");
+            param.setValue(ssql);
+
+            request.addProperty(param);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+            resp = response.toString();
+
+            if (!resp.equalsIgnoreCase("#")) {
+                errflag=true;
+                error=resp;
+                return 0;
+            }
+
+
+            METHOD_NAME = "getDT";
+            results.clear();
+
+            request = new SoapObject(NAMESPACE, METHOD_NAME);
+            envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("SQL");
+            param.setValue(sql);
+
+            request.addProperty(param);
+            envelope.setOutputSoapObject(request);
+
+            transport = new HttpTransportSE(URL);
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapObject resSoap = (SoapObject) envelope.getResponse();
+            SoapObject result = (SoapObject) envelope.bodyIn;
+
+            rc = resSoap.getPropertyCount() - 1;
+
+            for (int i = 0; i < rc; i++) {
+                str = ((SoapObject) result.getProperty(0)).getPropertyAsString(i);
+
+                if (i == 0) {
+                    if (!str.equalsIgnoreCase("#")) throw new Exception(str);
+                } else {
+                    results.add(str);
+
+                    if (i == 1) odt_rows = Integer.parseInt(str);
+                    if (i == 2) odt_cols = Integer.parseInt(str);
+                    if (i == 3) scalarValue=str;
+
+                }
+            }
+
+            return 1;
+        } catch (Exception e) {
+            errflag=true;
+            error=e.getMessage();
+            return 0;
+        }
+
+    }
+
+    //endregion
 
     //region WebService Core
 
@@ -173,6 +329,12 @@ public class WebService {
             switch (mode) {
                 case 1:
                     processOpenDT();break;
+                case 2:
+                    if (commitSQL()==0) throw new Exception(error);
+                    break;
+                case 3:
+                    if (commitToScalar(scalsql)==0) throw new Exception(error);
+                    break;
             }
 
             status=errflag;
@@ -186,7 +348,7 @@ public class WebService {
         status=!errflag;
         //
         try {
-            parent.wsCallBack(errflag,error);
+            parent.wsCallBack(mode,errflag,error);
         } catch (Exception e) {
         }
     }

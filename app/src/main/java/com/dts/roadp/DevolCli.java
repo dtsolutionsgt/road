@@ -94,7 +94,7 @@ public class DevolCli extends PBase {
 		prn=new printer(this,printexit,gl.validimp);
 
 		fdevol=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-		fdevol.deviceid =gl.deviceId;
+		fdevol.deviceid =gl.numSerie;
 	}
 
 
@@ -197,25 +197,25 @@ public class DevolCli extends PBase {
 			
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
-				  
-			  vItem = clsCls.new clsCFDV();
-			  
-			  vItem.Cod=DT.getString(0);
-			  vItem.Desc=DT.getString(3);
-			  vItem.Valor=DT.getString(2);
-			  s=mu.frmdec(DT.getDouble(1));
-			  vItem.Fecha=s;
-			  vItem.id=DT.getInt(4);
 
-            cntprd = cntprd+1;
-            cntunis = cntunis + Double.parseDouble(s);
-            cntkgs = mu.round(cntkgs + DT.getDouble(5),gl.peDec);
-            cntotl = mu.round(cntotl + DT.getDouble(6),2);
+				vItem = clsCls.new clsCFDV();
 
-			  items.add(vItem);	
+				vItem.Cod = DT.getString(0);
+				vItem.Desc = DT.getString(3);
+				vItem.Valor = DT.getString(2);
+				s = mu.frmdec(DT.getDouble(1));
+				vItem.Fecha = s;
+				vItem.id = DT.getInt(4);
 
-			 // vItem.Cod = gl.CodDev;
-			  DT.moveToNext();
+				cntprd = cntprd + 1;
+				cntunis = cntunis + Double.parseDouble(s);
+				cntkgs = mu.round(cntkgs + DT.getDouble(5), gl.peDec);
+				cntotl = mu.round(cntotl + DT.getDouble(6), 2);
+
+				items.add(vItem);
+
+			 	// vItem.Cod = gl.CodDev;
+			  	DT.moveToNext();
 			}
 
             lblCantProds.setText(String.valueOf(cntprd));
@@ -556,39 +556,6 @@ public class DevolCli extends PBase {
 		   	mu.msgbox(e.getMessage());
 		}
 	}
-
-/*	private void msgAskSave(String msg) {
-
-		try{
-
-			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-			dialog.setTitle(R.string.app_name);
-			dialog.setMessage("¿" + msg + "?");
-
-			dialog.setIcon(R.drawable.ic_quest);
-
-			dialog.setCancelable(false);
-
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					createDoc();
-				}
-			});
-
-			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					closekeyb();
-				}
-			});
-
-			dialog.show();
-
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-	}*/
 
 	private void createDoc(){
 

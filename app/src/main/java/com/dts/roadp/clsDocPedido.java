@@ -74,7 +74,7 @@ public class clsDocPedido extends clsDocument {
 		}
 
 		rep.empty();
-		rep.add("Serial : "+deviceid);
+		rep.add("No. Serie : "+deviceid);
 		rep.empty();
 
 		return super.buildFooter();

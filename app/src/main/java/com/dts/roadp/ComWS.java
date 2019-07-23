@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,6 +25,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -56,9 +58,10 @@ public class ComWS extends PBase {
 	private ProgressBar barInfo;
 	private EditText txtRuta, txtWS, txtEmp;
 	private ImageView imgRec, imgEnv, imgExis,imgEnvM;
-	private RelativeLayout ralBack, relExist, relPrecio, relStock;
+	private RelativeLayout ralBack, relExist, relPrecio, relStock,relPedidos;
     private TextView lblUser,lblPassword,txtVersion;
     private EditText txtUser, txtPassword;
+    private CheckBox cbSuper;
 
 	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
 	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs;
@@ -80,7 +83,7 @@ public class ComWS extends PBase {
 	private clsLicence lic;
 	private clsFinDia claseFindia;
     private DateUtils DU;
-    private String jsonWS;
+    private String jsonWS,updCxC;
 	private CryptUtil cu=new CryptUtil();
 
 	protected PowerManager.WakeLock wakeLock;
@@ -95,7 +98,7 @@ public class ComWS extends PBase {
 	private int scon, running, pflag, stockflag, conflag;
 	private String ftext, slsync, senv, gEmpresa, ActRuta, mac,rootdir;
 	private String fsql, fsqli, fsqlf, strliqid;
-	private boolean rutapos, ftflag, esvacio, liqid;
+	private boolean rutapos, ftflag, esvacio, liqid,cargasuper;
 
 	private final String NAMESPACE = "http://tempuri.org/";
 	private String METHOD_NAME, URL;
@@ -141,6 +144,9 @@ public class ComWS extends PBase {
 		relExist = (RelativeLayout) findViewById(R.id.relExist);
 		relPrecio = (RelativeLayout) findViewById(R.id.relPrecio);
 		relStock = (RelativeLayout) findViewById(R.id.relStock);
+		relPedidos = (RelativeLayout) findViewById(R.id.relPedidos);relPedidos.setVisibility(View.INVISIBLE);
+
+		cbSuper = (CheckBox) findViewById(R.id.checkBox8);
 
 		isbusy = 0;
 
@@ -157,14 +163,6 @@ public class ComWS extends PBase {
 
 		txtVersion.setText(gl.parFechaVer);
 
-		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
-		if (gl.debug) {
-			if (mu.emptystr(txtRuta.getText().toString())) {
-				txtRuta.setText("2024-5");
-				txtEmp.setText("03");
-				txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
-			}
-		}
 
 		if(gl.ruta.isEmpty()){
 			ruta = txtRuta.getText().toString();
@@ -199,6 +197,20 @@ public class ComWS extends PBase {
 
 		getWSURL();
 
+		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
+		if (gl.debug) {
+			if (mu.emptystr(txtRuta.getText().toString())) {
+				txtRuta.setText("2024-5");
+				txtEmp.setText("03");
+			}
+
+			txtWS.setText("http://200.46.46.104:8001/RDC7_SAP_PRD_ANDR/wsAndr.asmx");
+
+			//txtRuta.setText("8001-1");
+			//txtEmp.setText("03");
+			txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
+		}
+
 		mac = getMac();
 		fsql = du.univfechasql(du.getActDate());
 		fsqli = du.univfechasql(du.ffecha00(du.getActDate())) + " 00:00:00";
@@ -222,6 +234,12 @@ public class ComWS extends PBase {
 
 		setHandlers();
 
+		if (gl.modoadmin) {
+			relPedidos.setVisibility(View.VISIBLE);
+		} else {
+			if (gl.tolsuper) relPedidos.setVisibility(View.VISIBLE);
+		}
+
 		try {
 			final PowerManager pm = (PowerManager) getSystemService(this.POWER_SERVICE);
 			this.wakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "myapp:mywakelocktag");
@@ -229,6 +247,8 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"wakeLock");
 		}
+
+
 	}
 
 	//region Events
@@ -239,6 +259,12 @@ public class ComWS extends PBase {
 			toastcent("Por favor, espere que se termine la tarea actual.");
 			return;
 		}
+
+		if (gl.modoadmin) {
+            cargasuper=cbSuper.isChecked();
+        } else {
+            cargasuper=gl.tolsuper;
+        }
 
 		if(gl.ruta.isEmpty()){
 			ruta = txtRuta.getText().toString();
@@ -299,11 +325,11 @@ public class ComWS extends PBase {
 			}
 
 			if (gl.banderafindia) {
-				if (!puedeComunicar()) {
-					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
-					return;
+					if (!puedeComunicar()) {
+						mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+						return;
+					}
 				}
-			}
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -835,6 +861,11 @@ public class ComWS extends PBase {
 		startActivity(new Intent(this,ComWSFotos.class));
 	}
 
+	public void doPedidos(View view) {
+		//getWSURL();
+		//if (!gl.URLtemp.isEmpty())
+			startActivity(new Intent(this,ComWSSend.class));
+	}
 
 	private void setHandlers() {
 		ralBack.setOnTouchListener(new SwipeListener(this) {
@@ -866,7 +897,6 @@ public class ComWS extends PBase {
 					keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
 				}
 			}catch (Exception e){
-
 			}
 
 			isbusy = 1;
@@ -1045,29 +1075,34 @@ public class ComWS extends PBase {
 
 				case "P_RUTA":
 					if (rc==1){
+						borraDatos();
 						throw new Exception("La ruta ingresada no es válida, ruta: " + ruta + ", no se puede continuar la carga de datos");
 					}
 					break;
 
 				case "P_CLIENTE":
                     if (rc==1){
+						borraDatos();
                         throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
                     }
                 break;
 
                 case "P_PRODUCTO":
                     if (rc==1){
+						borraDatos();
                         throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
                     }
                 break;
                 case "P_PRODPRECIO":
                     if (rc==1){
+						borraDatos();
                         throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
                     }
                     break;
                 case "P_COREL":
                     if (rc==1 && gl.rutatipo.equals("V")){
-                        throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+						borraDatos();
+                        throw new Exception("No hay correlativos definidos para esta ruta:" + ActRuta + ", no se puede continuar la carga de datos");
                     }
                     break;
             }
@@ -1575,15 +1610,16 @@ public class ComWS extends PBase {
 			procesaRuta();
 
 			listItems.clear();
-			if (!AddTable("P_NIVELPRECIO")) return false;
+			if (!AddTable("P_COREL")) return false;
 			if (!AddTable("P_CLIENTE")) return false;
-			if (!AddTable("P_CLIENTE_FACHADA")) return false;
+			if (!AddTable("P_PRODUCTO")) return false;
+			if (!AddTable("P_PRODPRECIO")) return false;
+			if (!AddTable("P_NIVELPRECIO")) return false;
+			//if (!AddTable("P_CLIENTE_FACHADA")) return false;
 			if (!AddTable("P_CLIRUTA")) return false;
 			if (!AddTable("P_CLIDIR")) return false;
-			if (!AddTable("P_PRODUCTO")) return false;
 			if (!AddTable("P_FACTORCONV")) return false;
 			if (!AddTable("P_LINEA")) return false;
-			if (!AddTable("P_PRODPRECIO")) return false;
 			if (!AddTable("TMP_PRECESPEC")) return false;
 			if (!AddTable("P_DESCUENTO")) return false;
 			if (!AddTable("P_EMPRESA")) return false;
@@ -1595,7 +1631,6 @@ public class ComWS extends PBase {
 			if (!AddTable("P_CODDEV")) return false;
 			if (!AddTable("P_CODNOLEC")) return false;
 			if (!AddTable("P_NIVELPRECIO")) return false;
-			if (!AddTable("P_COREL")) return false;
 			if (!AddTable("P_CORELNC")) return false;
 			if (!AddTable("P_CORRELREC")) return false;
 			if (!AddTable("P_CORREL_OTROS")) return false;
@@ -1617,6 +1652,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_HANDHELD")) return false;
             if (!AddTable("P_TRANSERROR")) return false;
 			if (!AddTable("P_GLOBPARAM")) return false;
+			if (!AddTable("P_CONFIGBARRA")) return false;
 
 			licResult=checkLicence(licSerial);
 			licResultRuta=checkLicenceRuta(licRuta);
@@ -1640,6 +1676,7 @@ public class ComWS extends PBase {
 
 			// Mercadeo
 
+			/*
 			if (!AddTable("P_MEREQTIPO")) return false;
 			if (!AddTable("P_MEREQUIPO")) return false;
 			if (!AddTable("P_MERESTADO")) return false;
@@ -1647,11 +1684,9 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MERRESP")) return false;
 			if (!AddTable("P_MERMARCACOMP")) return false;
 			if (!AddTable("P_MERPRODCOMP")) return false;
-
-
+			*/
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(),idbg, fstr);
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(),idbg, fstr);
 			return false;
 		}
 
@@ -1685,7 +1720,9 @@ public class ComWS extends PBase {
 
 				try {
 					writer.write(sql);writer.write("\r\n");
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					Log.d("M", "Write Something happend there " + e.getMessage());
+				}
 
 				try {
 					dbT = ConT.getWritableDatabase();
@@ -1705,9 +1742,10 @@ public class ComWS extends PBase {
 						SystemClock.sleep(20);
 					}
 				} catch (Exception e) {
+					Log.e("z", e.getMessage());
+					ferr += " " +e.getMessage();
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-					Log.e("z", e.getMessage());
 				}
 			}
 
@@ -1719,8 +1757,6 @@ public class ComWS extends PBase {
 			encodeLicence();
 			encodeLicenceRuta();
 
-			fechaCarga();
-
             SetStatusRecToTrans("1");
 
 			dbT.setTransactionSuccessful();
@@ -1729,6 +1765,7 @@ public class ComWS extends PBase {
 			fprog = "Documento de inventario recibido en BOF...";
 			wsRtask.onProgressUpdate();
 
+			fechaCarga();
 			Actualiza_Documentos();
 
 			fprog = "Fin de actualización";
@@ -1752,8 +1789,6 @@ public class ComWS extends PBase {
 			return true;
 
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fprog = "Actualización incompleta";
 			wsRtask.onProgressUpdate();
 
@@ -1761,15 +1796,19 @@ public class ComWS extends PBase {
 			try {
 				ConT.close();
 			} catch (Exception ee) {
-				addlog(new Object() {
-				}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+				sstr = e.getMessage();
+				ferr += " " + sstr;
 			}
 
 			sstr = e.getMessage();
-			ferr = sstr + "\n" + sql;
+			ferr += " " + sstr + "\n" + sql;
 			esql = sql;
 
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), ferr, esql);
+
 			return false;
+
 		}
 
 	}
@@ -1899,6 +1938,32 @@ public class ComWS extends PBase {
 			}
 		}
 
+	}
+
+	private boolean borraDatos(){
+
+		try {
+
+			db.beginTransaction();
+
+			sql="DELETE FROM P_RUTA";db.execSQL(sql);
+			sql="DELETE FROM P_PRODUCTO";db.execSQL(sql);
+			sql="DELETE FROM P_COREL";db.execSQL(sql);
+			sql="DELETE FROM P_PARAMEXT";db.execSQL(sql);
+			sql="DELETE FROM P_PRODPRECIO";db.execSQL(sql);
+			sql="DELETE FROM P_CLIENTE";db.execSQL(sql);
+
+			db.setTransactionSuccessful();
+			db.endTransaction();
+
+		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			db.endTransaction();
+			//mu.msgbox("Error : " + e.getMessage());
+			return false;
+		}
+
+		return true;
 	}
 
 	//#EJC20181120: Inserta los documentos que bajaron a la HH
@@ -2128,20 +2193,46 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
+		//23-7-2019 se adiciono la opcion de clientes por supervisor en base de las rutas
 		if (TN.equalsIgnoreCase("P_CLIRUTA")) {
-			SQL = "SELECT RUTA,CLIENTE,SEMANA,DIA,SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'";
+		    if (!cargasuper) {
+                SQL = "SELECT RUTA,CLIENTE,SEMANA,DIA,SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'";
+            } else {
+                SQL = "SELECT DISTINCT RUTA,CLIENTE,1 AS SEMANA,1 AS DIA,1 AS SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA IN ( " +
+                      "SELECT DISTINCT RUTA FROM VENDEDORES WHERE Codigo IN ( " +
+                      "SELECT VENDEDOR FROM P_RUTA WHERE CODIGO='"+ActRuta+"'))";
+            }
 			return SQL;
 		}
 
 		if (TN.equalsIgnoreCase("P_CLIENTE")) {
-			SQL = " SELECT CODIGO,NOMBRE,BLOQUEADO,TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL, ";
-			SQL += "NIVELPRECIO,MEDIAPAGO,LIMITECREDITO,DIACREDITO,DESCUENTO,BONIFICACION, ";
-			SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
-			SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
-			SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
-			SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
-			SQL += "FROM P_CLIENTE ";
-			SQL += "WHERE (CODIGO IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') )) ";
+
+            if (!cargasuper) {
+
+                SQL = " SELECT CODIGO,NOMBRE,BLOQUEADO,TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL, ";
+                SQL += "NIVELPRECIO,MEDIAPAGO,LIMITECREDITO,DIACREDITO,DESCUENTO,BONIFICACION, ";
+                SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
+                SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
+                SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
+                SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
+                SQL += "FROM P_CLIENTE ";
+                SQL += "WHERE (CODIGO IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') )) ";
+
+            } else {
+
+                SQL = " SELECT CODIGO,NOMBRE,BLOQUEADO,TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL, ";
+                SQL += "NIVELPRECIO,MEDIAPAGO,LIMITECREDITO,DIACREDITO,DESCUENTO,BONIFICACION, ";
+                SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
+                SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
+                SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
+                SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
+                SQL += "FROM P_CLIENTE WHERE CODIGO IN ( ";
+                SQL += "SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA IN ( ";
+                SQL += "SELECT DISTINCT RUTA FROM VENDEDORES WHERE Codigo IN ( ";
+                SQL += "SELECT VENDEDOR FROM P_RUTA WHERE CODIGO='"+ActRuta+"'))) ";
+
+            }
+
 			return SQL;
 		}
 
@@ -2166,20 +2257,35 @@ public class ComWS extends PBase {
 	   */
 
 		if (TN.equalsIgnoreCase("P_PRODUCTO")) {
-			SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
-			SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, ISNULL(DESCUENTO,'N') AS DESCUENTO, ISNULL(BONIFICACION,'N') AS BONIFICACION, ";
-			SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN, ";
-			SQL += "VIDEO,VENTA_POR_PESO,ES_PROD_BARRA,UNID_INV,VENTA_POR_PAQUETE,VENTA_POR_FACTOR_CONV,ES_SERIALIZADO,PARAM_CADUCIDAD, ";
-			SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
-			SQL += "FROM P_PRODUCTO WHERE ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
-			" OR CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "'))" +
-			" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "') AND EMPRESA = '" + gl.emp + "') OR UNIDMED='CAN' )" +
-			" AND CODIGO IN ( " +
-			" SELECT CODIGO FROM P_PRODPRECIO WHERE (NIVEL IN ( SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE " +
-			" WHERE (CODIGO IN ( SELECT DISTINCT CLIENTE FROM DS_PEDIDO WHERE (RUTA ='" + ActRuta + "') AND (BANDERA='D')))))OR " +
-			" NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE  " +
-			" WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "')))" +
-			" OR TIENE_VINETA_O_TUBO = 1 ";
+
+			if (!cargasuper) {
+
+				SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
+				SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, ISNULL(DESCUENTO,'N') AS DESCUENTO, ISNULL(BONIFICACION,'N') AS BONIFICACION, ";
+				SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN, ";
+				SQL += "VIDEO,VENTA_POR_PESO,ES_PROD_BARRA,UNID_INV,VENTA_POR_PAQUETE,VENTA_POR_FACTOR_CONV,ES_SERIALIZADO,PARAM_CADUCIDAD, ";
+				SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
+				SQL += "FROM P_PRODUCTO WHERE (ES_VENDIBLE=1) AND ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
+						" OR CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "'))" +
+						" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "') AND EMPRESA = '" + gEmpresa + "') OR UNIDMED='CAN' )" +
+						" AND CODIGO IN ( " +
+						" SELECT CODIGO FROM P_PRODPRECIO WHERE (NIVEL IN ( SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE " +
+						" WHERE (CODIGO IN ( SELECT DISTINCT CLIENTE FROM DS_PEDIDO WHERE (RUTA ='" + ActRuta + "') AND (BANDERA='D')))))OR " +
+						" NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE  " +
+						" WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "')))" +
+						" OR TIENE_VINETA_O_TUBO = 1 ";
+
+			} else {
+
+				SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
+				SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, ISNULL(DESCUENTO,'N') AS DESCUENTO, ISNULL(BONIFICACION,'N') AS BONIFICACION, ";
+				SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN, ";
+				SQL += "VIDEO,VENTA_POR_PESO,ES_PROD_BARRA,UNID_INV,VENTA_POR_PAQUETE,VENTA_POR_FACTOR_CONV,ES_SERIALIZADO,PARAM_CADUCIDAD, ";
+				SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
+				SQL += "FROM P_PRODUCTO WHERE (ES_VENDIBLE=1) ";
+
+			}
+
 			return SQL;
 		}
 
@@ -2202,20 +2308,32 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_PRODPRECIO")) {
+			if (!cargasuper) {
+				SQL = "SELECT CODIGO,NIVEL,PRECIO,UNIDADMEDIDA FROM P_PRODPRECIO ";
+				SQL += " WHERE ( (CODIGO IN ( SELECT CODIGO FROM P_PRODUCTO WHERE (LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE RUTA='" + ActRuta + "')) ) ) ";
+				SQL += " OR  (CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "')) ) ";
+				SQL += " AND (NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "')))";
+			} else {
+				SQL = "SELECT CODIGO,NIVEL,PRECIO,UNIDADMEDIDA FROM P_PRODPRECIO ";
+			}
 
-			SQL = "SELECT CODIGO,NIVEL,PRECIO,UNIDADMEDIDA FROM P_PRODPRECIO ";
-			SQL += " WHERE ( (CODIGO IN ( SELECT CODIGO FROM P_PRODUCTO WHERE (LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE RUTA='" + ActRuta + "')) ) ) ";
-			SQL += " OR  (CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "')) ) ";
-			SQL += " AND (NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'))) ";
 			return SQL;
 		}
 
 		if (TN.equalsIgnoreCase("TMP_PRECESPEC")) {
-			SQL = "SELECT CODIGO,VALOR,PRODUCTO,PRECIO,UNIDADMEDIDA FROM TMP_PRECESPEC ";
-			SQL += " WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') ";
+
+			if (!cargasuper) {
+				SQL =  "SELECT CODIGO,VALOR,PRODUCTO,PRECIO,UNIDADMEDIDA FROM TMP_PRECESPEC ";
+				SQL += " WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') ";
+			} else {
+				SQL =  "SELECT CODIGO,VALOR,PRODUCTO,PRECIO,UNIDADMEDIDA FROM TMP_PRECESPEC ";
+				SQL += "WHERE (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') AND ";
+				SQL += "RUTA IN (SELECT DISTINCT RUTA FROM VENDEDORES WHERE Codigo IN ( ";
+				SQL += "SELECT VENDEDOR FROM P_RUTA WHERE CODIGO='" + ActRuta + "')) ";
+			}
+
 			return SQL;
 		}
-
 
 		if (TN.equalsIgnoreCase("P_DESCUENTO")) {
 			SQL = "SELECT  CLIENTE,CTIPO,PRODUCTO,PTIPO,TIPORUTA,RANGOINI,RANGOFIN,DESCTIPO,VALOR,GLOBDESC,PORCANT,dbo.AndrDateIni(FECHAINI),dbo.AndrDateFin(FECHAFIN),CODDESC,NOMBRE ";
@@ -2326,11 +2444,10 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
-
 		if (TN.equalsIgnoreCase("P_BONLIST")) {
 			SQL = "SELECT CODIGO,PRODUCTO,CANT,CANTMIN,NOMBRE FROM P_BONLIST "+
 				  "	WHERE CODIGO IN (SELECT LISTA FROM P_BONIF WHERE TIPOLISTA in (1,2) "+
-				  "	AND DATEDIFF(D, FECHAINI,GETDATE()) >=0 AND DATEDIFF(D,GETDATE(), FECHAFIN) >=0  AND EMP = '" + gl.emp +"')";
+				  "	AND DATEDIFF(D, FECHAINI,GETDATE()) >=0 AND DATEDIFF(D,GETDATE(), FECHAFIN) >=0  AND EMP = '" + gEmpresa +"')";
 			return SQL;
 		}
 
@@ -2386,9 +2503,16 @@ public class ComWS extends PBase {
             SQL = " SELECT IDTRANSERROR, TRANSERROR FROM P_TRANSERROR";
             return SQL;
         }
-		//#CKFK_20190522 Agregué tabla P_GLOBPARAM
+
+        //#CKFK_20190707 Agregué tabla P_GLOBPARAM
 		if (TN.equalsIgnoreCase("P_GLOBPARAM")) {
 			SQL = " SELECT EMPID, COMSERVER, FTPSERVER, VERFACTURA, VERPEDIDO, VERCOBRO, VALORN1 FROM P_GLOBPARAM";
+			return SQL;
+		}
+
+		//#CKFK_20190522 Agregué tabla P_CONFIGBARRA
+		if (TN.equalsIgnoreCase("P_CONFIGBARRA")) {
+			SQL = " SELECT IDCONFIGBARRA, LONGITUDBARRA, PREFIJO FROM P_CONFIGBARRA";
 			return SQL;
 		}
 
@@ -2860,7 +2984,7 @@ public class ComWS extends PBase {
 			isbusy = 0;
 			comparaCorrel();
 
-			paramsExtrasGlob();
+			otrosParametros();
 
 			if (ftflag) msgbox(ftmsg);
 		} catch (Exception e){
@@ -2926,15 +3050,23 @@ public class ComWS extends PBase {
 	//region WS Envio Methods
 
 	private boolean sendData() {
+		int rslv;
 
 		errflag = false;
+
+		if (getTest()==0) return false;
 
 		senv = "Envío terminado \n \n";
 
 		if (gl.peModal.equalsIgnoreCase("TOL")) {
-			if (!validaLiquidacion()) {
+			rslv=validaLiquidacion();
+			if (rslv!=1) {
 				liqid = false;
-				senv = "La liquidación no está cerrada, no se puede enviar datos";
+				if (rslv==0) {
+					senv = "La liquidación no está cerrada, no se puede enviar datos";
+				} else {
+					senv = "No se puede determinar estado de la liquidación.";
+				}
 				return false;
 			} else {
 				liqid = true;
@@ -2951,88 +3083,88 @@ public class ComWS extends PBase {
 			envioFacturas();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			envioPedidos();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			envioNotasCredito();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			envioNotasDevolucion();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			envioCobros();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			envioDepositos();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			envio_D_MOV();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			envioCli();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			envioAtten();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			envioCoord();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			envioSolicitud();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
             envioRating();
             if (!fstr.equals("Sync OK")){
                 dbld.savelog();
-                return true;
+                return false;
             }
 
 			updateAcumulados();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 			updateInventario();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			if (!update_Corel_GrandTotal()){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			envioFinDia();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
-				return true;
+				return false;
 			}
 
 			listaFachada();
@@ -3042,22 +3174,36 @@ public class ComWS extends PBase {
 
 			//#CKFK 20190429 Saqué esto de envioFinDia para que se guarde bien el log y luego se realice el envío.
 			if (!envioparcial){
-				if (commitSQL() == 1) {
-					errflag=false;
+
+				if (getTest()==1) scon=1;
+
+				if (scon==1) {
+					if (commitSQL() == 1) {
+						errflag=false;
+						return true;
+					} else {
+						errflag=true;
+						fterr += "\n" + sstr;
+						return false;
+					}
 				} else {
 					errflag=true;
-					fterr += "\n" + sstr;
+					fstr="No se puede conectar al web service : "+sstr;
+					fterr += "\n" + fstr;
+					return false;
 				}
+			} else {
+				return true;
 			}
 
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
-		return errflag;
+		return true;
 	}
 
-	private boolean validaLiquidacion() {
+	private int validaLiquidacion() {
 		Cursor DT;
 		String ss;
 
@@ -3067,9 +3213,7 @@ public class ComWS extends PBase {
 
 			AddTableVL("P_LIQUIDACION");
 
-			if (listItems.size() < 2) {
-				return true;
-			}
+			if (listItems.size() < 2) return 1;
 
 			sql = listItems.get(0);
 			db.execSQL(sql);
@@ -3084,16 +3228,16 @@ public class ComWS extends PBase {
 				DT.moveToFirst();
 				ss = DT.getString(0);
 				if (ss.equalsIgnoreCase("Cerrada")) {
-					return true;
+					return 1;
 				} else {
-					return false;
+					return 0;
 				}
 			} else {
-				return false;
+				return 1;
 			}
 		} catch (Exception e) {
 			strliqid = e.getMessage();
-			return false;
+			return -1;
 		}
 	}
 
@@ -3154,7 +3298,8 @@ public class ComWS extends PBase {
 					dbld.insert("D_BONIFFALT", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_REL_PROD_BON", "WHERE COREL='" + cor + "'");
 
-					dbld.add("UPDATE P_COREL SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");
+					dbld.add("UPDATE P_COREL SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "' " +
+							"AND CORELULT<" + ccorel);
 
 					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
@@ -3166,9 +3311,10 @@ public class ComWS extends PBase {
 							fterr += "\nFactura : " + sstr;
 							dbg = sstr;
 						}
-					}else pc += 1;
+					} else pc += 1;
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3188,8 +3334,8 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			errflag = true;
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 			dbg = fstr;
 		}
@@ -3260,6 +3406,7 @@ public class ComWS extends PBase {
 					}else pc += 1;
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					//fterr+="\n"+e.getMessage();
@@ -3268,6 +3415,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3323,7 +3471,8 @@ public class ComWS extends PBase {
 					dbld.insert("D_COBROD_SR", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_COBROP", "WHERE COREL='" + cor + "'");
 
-					dbld.add("UPDATE P_CORRELREC SET Actual=" + corult + "  WHERE RUTA='" + fruta + "'");
+					dbld.add("UPDATE P_CORRELREC SET Actual=" + corult + "  WHERE RUTA='" + fruta + "' " +
+							"AND Actual<"+corult);
 
 					if (envioparcial && !esEnvioManual){
 						if (commitSQL() == 1) {
@@ -3337,6 +3486,7 @@ public class ComWS extends PBase {
 					}else pc += 1;
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					//fterr+="\n"+e.getMessage();
@@ -3346,6 +3496,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3364,7 +3515,7 @@ public class ComWS extends PBase {
 
 	public void envioNotasCredito() {
 		Cursor DT;
-		String cor, fruta;
+		String cor, fruta="";
 		int i, pc = 0, pcc = 0, ccorel;
 
 		try {
@@ -3395,14 +3546,14 @@ public class ComWS extends PBase {
 						wsStask.onProgressUpdate();
 					}
 
-
 					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_NOTACRED", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_NOTACREDD", "WHERE COREL='" + cor + "'");
 
-					dbld.add("UPDATE P_CORELNC SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");
-					dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'NC'");
+					//dbld.add("UPDATE P_CORELNC SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");
+					dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'NC' " +
+							"AND ACTUAL<" + ccorel);
 
 					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
@@ -3410,11 +3561,13 @@ public class ComWS extends PBase {
 							db.execSQL(sql);
 							pc += 1;
 						} else {
+							errflag=true;
 							fterr += "\n" + sstr;
 						}
 					}else pc += 1;
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3424,6 +3577,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3465,7 +3619,6 @@ public class ComWS extends PBase {
 				fruta = DT.getString(1);
 
 				try {
-
 					i += 1;
 					fprog = "Nota de devolución " + i;
 					if (!esEnvioManual){
@@ -3483,11 +3636,13 @@ public class ComWS extends PBase {
 							db.execSQL(sql);
 							pc += 1;
 						} else {
+							errflag = true;
 							fterr += "\n" + sstr;
 						}
 					}else pc += 1;
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3504,12 +3659,20 @@ public class ComWS extends PBase {
 				ccorel = DT.getInt(0);
 				serie = DT.getString(1);
 
-				dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND SERIE = '"+serie +"' AND TIPO = 'D' " +
+				//dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND SERIE = '"+serie +"' AND TIPO = 'D' " +
+				//		" AND ACTUAL =< "+ccorel+1);
+
+				dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'D' " +
 						" AND ACTUAL < "+ccorel);
+				//updCxC="UPDATE P_CORREL_OTROS SET ACTUAL="+ccorel+ "  WHERE RUTA='"+fruta+"' AND TIPO='D' " ;
+
+				//ss = "exec actualizaCorelDev '" + gl.ruta + "'," + ccorel;
+				//dbld.add(ss);
 
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3519,9 +3682,9 @@ public class ComWS extends PBase {
 		//if (envioparcial) {
 		if (pc != pcc) {
 			int pf = pcc - pc;
-			senv += "Notas crédito : " + pc + " , NO ENVIADO : " + pf + "\n";
+			senv += "Notas devolución : " + pc + " , NO ENVIADO : " + pf + "\n";
 		} else {
-			senv += "Notas crédito : " + pc + "\n";
+			senv += "Notas devolución : " + pc + "\n";
 		}
 		//}
 	}
@@ -3568,11 +3731,13 @@ public class ComWS extends PBase {
 							db.execSQL(sql);
 							pc += 1;
 						} else {
+							errflag = true;
 							fterr += "\n" + sstr;
 						}
 					}else pc += 1;
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3582,6 +3747,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3682,11 +3848,13 @@ public class ComWS extends PBase {
 							pc += 1;
 
 						} else {
+							errflag = true;
 							fterr += "\n" + sstr;
 						}
 					}
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3696,6 +3864,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3762,6 +3931,7 @@ public class ComWS extends PBase {
 
 							pc += 1;
 						} else {
+							errflag = true;
 							fterr += "\n" + sstr;
 						}
 					}
@@ -3824,11 +3994,13 @@ public class ComWS extends PBase {
 							sql = "UPDATE D_ATENCION SET STATCOM='S' WHERE (RUTA='" + cor + "') AND (FECHA=" + fecha + ") AND (HORALLEG='" + hora + "') ";
 							db.execSQL(sql);
 						} else {
-							//fterr+="\n"+sstr;
+							errflag = true;
+							fterr+="\n"+sstr;
 						}
 					}
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					//fterr+="\n"+e.getMessage();
@@ -3838,6 +4010,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3880,11 +4053,13 @@ public class ComWS extends PBase {
 							sql = "UPDATE D_CLICOORD SET STATCOM='S' WHERE (CODIGO='" + cod + "') AND (STAMP=" + stp + ") ";
 							db.execSQL(sql);
 						} else {
+							errflag = true;
 							fterr += "\n" + sstr;
 						}
 					}
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3894,6 +4069,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -3944,11 +4120,13 @@ public class ComWS extends PBase {
 							db.execSQL(sql);
 							pc += 1;
 						} else {
+							errflag = true;
 							fterr += "\n" + sstr;
 						}
 					}
 
 				} catch (Exception e) {
+					errflag = true;
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3958,6 +4136,7 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -4005,6 +4184,7 @@ public class ComWS extends PBase {
 			}else pc = 3;
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -4060,11 +4240,12 @@ public class ComWS extends PBase {
                             sql = "UPDATE D_RATING SET STATCOM='S' WHERE IDRATING='" + id + "'";
                             db.execSQL(sql);
                         }else{
-                            fterr += "\n" + sstr;
+                          fterr += "\n" + sstr;
                         }
                     }
 
                 } catch (Exception e) {
+					errflag = true;
                     addlog(new Object() {
                     }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
                     fterr += "\n" + e.getMessage();
@@ -4074,6 +4255,7 @@ public class ComWS extends PBase {
             }
 
         } catch (Exception e) {
+			errflag = true;
             addlog(new Object() {
             }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
             fstr = e.getMessage();
@@ -4109,12 +4291,14 @@ public class ComWS extends PBase {
 			dbld.add(ss);
 
 			if (envioparcial && !esEnvioManual) {
-				//fterr=ss+"\n";
-				rslt = commitSQL();
-				//fterr=fterr+rslt+"\n";
+				if (commitSQL() == 0) {
+					fterr += "\n" + sstr;
+					errflag = true;
+				}
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -4139,11 +4323,14 @@ public class ComWS extends PBase {
 			dbld.add(ss);
 
 			if (envioparcial && !esEnvioManual) {
-				rslt = commitSQL();
-				fterr = fterr + rslt + "\n";
+				if (commitSQL() == 0) {
+					fterr += "\n" + sstr;
+					errflag = true;
+				}
 			}
 
 		} catch (Exception e) {
+			errflag = true;
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -4295,7 +4482,8 @@ public class ComWS extends PBase {
 	
 	public void wsSendExecute(){
 
-		running=1;fstr="No connect";scon=0;
+		running=1;scon=0;
+		fstr="Envio incompleto  ";
         errflag=false;
 
 		try {
@@ -4307,8 +4495,6 @@ public class ComWS extends PBase {
 
 				if (!sendData()) {
 					fstr="Envio incompleto : "+sstr;
-				} else {
-
 				}
 			} else {
 				fstr="No se puede conectar al web service : "+sstr;
@@ -4357,6 +4543,7 @@ public class ComWS extends PBase {
 					}
 				}
 
+				fstr="Envio completo ";
 				msgResultEnvio(senv);
 
 			} else {
@@ -4489,11 +4676,11 @@ public class ComWS extends PBase {
 		
 		try {
 			conflag=0;
-					
+
 			dbld.clear();
 			dbld.add("DELETE FROM P_DOC_ENVIADOS_HH WHERE DOCUMENTO='"+docstock+"'");
 			dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('"+docstock+"','"+ActRuta+"','"+univdate+"',1)");
-			dbld.add("UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parNumVer +"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'");
+			dbld.add("UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parNumVer +"',ARQUITECTURA='ANDR', FECHAVERSION='"+gl.parFechaVer +"' WHERE CODIGO='" + gl.ruta + "'");
 			dbld.add("INSERT INTO P_BITACORA_VERSIONHH (RUTA,FECHA,NUMVERSION,ARQUITECTURA) " +
 					"VALUES('"+gl.ruta+"','"+ du.univfechaseg() +"','"+gl.parNumVer +"','ANDR')");
 
@@ -4591,9 +4778,9 @@ public class ComWS extends PBase {
 					URL = DT.getString(1);
 				}
 
-				//URL=wsurl;
+				gl.URLtemp=URL;
 
-				if (URL!=null && !URL.equalsIgnoreCase("")){
+				if (!URL.isEmpty()){
 					txtWS.setText(URL);
 				}else{
 					toast("No hay configurada ruta para transferencia de datos");
@@ -4612,7 +4799,7 @@ public class ComWS extends PBase {
 		}
 		
 	}
-	
+
 	private boolean setComParams() {
 		String ss;
 		
@@ -4783,7 +4970,7 @@ public class ComWS extends PBase {
 				relStock.setVisibility(View.INVISIBLE);
 
 				//Si entra en modo administración, habilita los botones y se va
-				if (gl.modoadmin) {
+				if (gl.modoadmin || gl.debug) {
 
 					txtRuta.setEnabled(true);
 					txtWS.setEnabled(true);
@@ -4970,11 +5157,12 @@ public class ComWS extends PBase {
 		    }
 	}
 	
-	private void paramsExtrasGlob() {
+	private void otrosParametros() {
 		try {
 			AppMethods app=new AppMethods(this,gl,Con,db);
 			app.parametrosExtra();
 			app.parametrosGlobales();
+			app.parametrosBarras();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			msgbox(e.getMessage());
@@ -5094,7 +5282,7 @@ public class ComWS extends PBase {
 			dialog.setMessage(msg);
 			dialog.setIcon(R.drawable.ic_quest);
 
-			dialog.setPositiveButton("Envio correcto", new DialogInterface.OnClickListener() {
+			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which)
 				{
 					startActivity(new Intent(ComWS.this,rating.class));

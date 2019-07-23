@@ -161,7 +161,7 @@
                 android:layout_alignTop="@+id/textView39"
                 android:layout_alignParentEnd="true"
                 android:layout_marginRight="10dp"
-                android:text="PRECIO" />
+                android:text="TOTAL" />
 
             <TextView
                 android:id="@+id/textView41"

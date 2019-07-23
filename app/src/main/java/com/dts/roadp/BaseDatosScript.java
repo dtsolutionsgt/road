@@ -110,6 +110,7 @@ public class BaseDatosScript {
 					"[SUCURSAL] TEXT NOT NULL,"+
 					"[ID_DESPACHO] INTEGER NOT NULL,"+
 					"[ID_FACTURACION] INTEGER NOT NULL,"+
+					"[RUTASUPER] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);
@@ -1975,6 +1976,15 @@ public class BaseDatosScript {
 				  "[VALORN1] REAL NOT NULL,"+
 				  "PRIMARY KEY ([EMPID])"+
 				  ");";
+			database.execSQL(vSQL);
+
+			//#CKFK 20190619 Agregué la tabla P_CONFIGBARRA para poder configurar la lectura de las barras
+			vSQL = "CREATE TABLE [P_CONFIGBARRA](" +
+					"[IDCONFIGBARRA] INT NOT NULL," +
+					"[LONGITUDBARRA] INT NOT NULL," +
+					"[PREFIJO] TEXT NOT NULL,"+
+					"PRIMARY KEY ([IDCONFIGBARRA])"+
+					");";
 			database.execSQL(vSQL);
 
 			return 1;

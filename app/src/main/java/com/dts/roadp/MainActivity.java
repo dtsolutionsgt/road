@@ -41,8 +41,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.4.12 / ";
-    private String parFechaVer = "30-Jun-2019";
+    private String parNumVer = "9.4.42 / ";
+    private String parFechaVer = "15-Jul-2019";
     private String parTipoVer = "ROAD PRD";
 
     @Override
@@ -123,6 +123,8 @@ public class MainActivity extends PBase {
 
             txtUser.requestFocus();
 
+            gl.tolsuper=false;
+
             initSession();
 
             if (!validaLicencia()) {
@@ -134,15 +136,16 @@ public class MainActivity extends PBase {
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
             if (gl.debug) {
-                txtUser.setText("00105192");
-                txtPass.setText("105192EDG");
+                txtUser.setText("00103790");
+                txtPass.setText("04");
+
+                txtUser.setText("00100979");
+                txtPass.setText("123456");
             }
 
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-            msgbox(new Object() {
-            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
     }
@@ -408,9 +411,9 @@ public class MainActivity extends PBase {
             AppMethods app = new AppMethods(this, gl, Con, db);
             app.parametrosExtra();
             app.parametrosGlobales();
+            app.parametrosBarras();
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             msgbox(e.getMessage());
         }
 
@@ -435,11 +438,6 @@ public class MainActivity extends PBase {
         String usr, pwd, dpwd;
 
         try {
-
-            /*if (fecha > 1905310000) {
-                msgAskLic("¡Su licencia expiró!");
-                return false;
-            }*/
 
             usr = txtUser.getText().toString().trim();
             pwd = txtPass.getText().toString().trim();
@@ -487,6 +485,13 @@ public class MainActivity extends PBase {
             gl.vend = usr;
             gl.vnivel = DT.getInt(2);
             gl.vnivprec = DT.getInt(3);
+
+            gl.tolsuper=false;
+            if (gl.peModal.equalsIgnoreCase("TOL")) {
+                if (gl.vnivel==2){
+                    gl.tolsuper=true;
+                }
+            }
 
             return true;
 
@@ -769,6 +774,7 @@ public class MainActivity extends PBase {
             lic = dt.getString(0);
             licruta = dt.getString(1);
 
+            if (!gl.debug ) {
 
             if (mu.emptystr(lic)) {
                 toastlong("El dispositivo no tiene licencia válida de handheld");
@@ -779,7 +785,6 @@ public class MainActivity extends PBase {
                 toastlong("El dispositivo no tiene licencia válida de ruta");
                 return false;
             }
-
 
             if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) {
                return true;
@@ -800,9 +805,12 @@ public class MainActivity extends PBase {
                 return false;
             }
 
+            } else {
+                return true;
+            }
+
         } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
             mu.msgbox(new Object() {
             }.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
         }

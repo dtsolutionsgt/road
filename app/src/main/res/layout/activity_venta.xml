@@ -49,9 +49,12 @@
         <TextView
             android:id="@+id/txtRoadTit"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@+id/imgTitLogo"
             android:layout_toRightOf="@+id/imgRoadTit"
+            android:gravity="center"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:text="ROAD"
@@ -286,7 +289,7 @@
             android:focusable="auto"
             android:inputType="textPersonName"
             android:text="Name"
-            android:textColor="#1A8AC6"
+            android:textColor="#FFFFFF"
             android:textSize="10sp" />
     </RelativeLayout>
 

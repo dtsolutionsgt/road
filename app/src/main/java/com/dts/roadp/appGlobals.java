@@ -11,9 +11,9 @@ import java.util.ArrayList;
 
 public class appGlobals extends Application {
 
-	public String ruta,rutanom,sucur,rutatipo,rutatipog,vend,vendnom,gstr,gstr2,prod,um,umpres,umstock,cliente,clitipo;
+	public String ruta,rutanom,rutasup,sucur,rutatipo,rutatipog,vend,vendnom,gstr,gstr2,prod,um,umpres,umstock,cliente,clitipo;
 	public String ubas,emp, empnom,imgpath,umpeso,lotedf,impresora, tipoImpresora, codSupervisor, ayudante, ayudanteID, vehiculo, vehiculoID;
-	public String wsURL,bonprodid,bonbarid,bonbarprod,pprodname,contrib,ateninistr,tcorel;
+	public String wsURL,bonprodid,bonbarid,bonbarprod,pprodname,contrib,ateninistr,tcorel,URLtemp,URLLocal,URLRemoto;
 	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,vnivel,vnivprec,media;
 	public int autocom,pagomodo,filtrocli,prdlgmode;
 	public long nuevaFecha,atentini;
@@ -21,7 +21,7 @@ public class appGlobals extends Application {
 	public boolean CellCom,closeDevBod;
 	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra, parNumVer, parFechaVer, parTipoVer;
 	public int tiponcredito,validarCred,gpsdist;
-    public boolean vcredito,vcheque,vchequepost,validimp;
+    public boolean vcredito,vcheque,vchequepost,validimp,tolsuper=false,tolpedsend;
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
 	public int mpago;
@@ -30,7 +30,7 @@ public class appGlobals extends Application {
 	public String cuentaCliNuevo, codCliNuevo;
 
 	//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true por defecto estará en false
-	public boolean debug=false;
+	public boolean debug=true;
 
 	//Devolución Cliente
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;
@@ -44,7 +44,7 @@ public class appGlobals extends Application {
 	public String peModal,peMon,peFormatoFactura,CodDev;
 	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec,endPrint;
 	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre;
-	public boolean peImprFactCorrecta;
+	public boolean peImprFactCorrecta, pTransBarra;
 	public int peDec,peDecCant,peDecImp,peLimiteGPS,peMargenGPS,peVentaGps;
 	
 	// Descuentos
@@ -63,7 +63,7 @@ public class appGlobals extends Application {
 	public double gpspx,gpspy,gpscpx,gpscpy,gpscdist;
 	
 	//Id de Dispositivo Móvil
-	public String deviceId,devicename;
+	public String deviceId,devicename,numSerie;
 
 	// Epson
 	
@@ -80,5 +80,9 @@ public class appGlobals extends Application {
 
 	//Comunicación con WS
 	public int isOnWifi = 0;
+
+	//Parámetros configuración barra
+	public int pLongitudBarra;
+	public String pPrefijoBarra;
 
 }

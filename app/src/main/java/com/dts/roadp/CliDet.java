@@ -53,7 +53,7 @@ public class CliDet extends PBase {
 	private Exist Existencia = new Exist();
 	private String cod,tel, Nombre, NIT, sgp1, sgp2;
 	private String imagenbase64,path,fechav;
-	private Boolean imgPath, imgDB, ventaGPS,flagGPS=true,permiteVenta=true;
+	private Boolean imgPath, imgDB, ventaGPS,flagGPS=true,permiteVenta=true,clicred;
 	private double gpx,gpy,credito,clim,cused,cdisp,cred;
 	private int nivel,browse,merc,rangoGPS,modoGPS;
 	private boolean porcentaje = false;
@@ -96,7 +96,6 @@ public class CliDet extends PBase {
 		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
 
 		app = new AppMethods(this, gl, Con, db);
-		credito=gl.credito;
 
 		cod=gl.cliente;
 
@@ -124,6 +123,7 @@ public class CliDet extends PBase {
 
 		showData();
 		calcCredit();
+		credito=gl.credito;
 
 		browse=0;
 		merc=1;
@@ -366,7 +366,7 @@ public class CliDet extends PBase {
 	
 	private void showData() {
 		Cursor DT;
-		int uvis;
+		int uvis,dcred;
 		String contr,sgps="0.00000000 , 0.00000000";
 		
 		lblNom.setText("");lblRep.setText("");
@@ -411,9 +411,13 @@ public class CliDet extends PBase {
 
 			if(gl.media != 4){
 				lblClientePago.setText("CONTADO");
+				if (gl.peModal.equalsIgnoreCase("TOL")) clicred=false;
 			}else if(gl.media == 4){
 				lblClientePago.setText("CRÉDITO");
+				if (gl.peModal.equalsIgnoreCase("TOL")) clicred=true;
 			}
+
+			dcred=DT.getInt(17);
 
 			clim=DT.getDouble(5);
 						
@@ -424,6 +428,14 @@ public class CliDet extends PBase {
 			gl.vcheque = DT.getString(14).equalsIgnoreCase("S");
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
 			gl.clitipo = DT.getString(16);
+
+
+			sql="SELECT RUTA FROM P_CLIRUTA WHERE CLIENTE='"+cod+"'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			gl.rutasup=DT.getString(0);
+
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -446,6 +458,8 @@ public class CliDet extends PBase {
 			cdisp=clim-cused;if (cdisp<0) cdisp=0;
 			gl.credito=cdisp;
 
+			if (!gl.peModal.equalsIgnoreCase("TOL")) clicred=gl.credito>0;
+
 			lblCLim.setText(mu.frmcur(clim));
 			lblCUsed.setText(mu.frmcur(cused));
 			lblCDisp.setText(mu.frmcur(cdisp));
@@ -456,8 +470,10 @@ public class CliDet extends PBase {
 			}
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				lblCobro.setVisibility(View.VISIBLE);
-				imgCobro.setVisibility(View.VISIBLE);
+				if (!esClienteNuevo()){
+					lblCobro.setVisibility(View.VISIBLE);
+					imgCobro.setVisibility(View.VISIBLE);
+				}
 			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -905,6 +921,7 @@ public class CliDet extends PBase {
 
 	private void setDevType(String tdev) {
 		try{
+			gl.dvbrowse=0;
 			gl.devtipo=tdev;
 			Intent intent = new Intent(this,DevolCli.class);
 			startActivity(intent);
@@ -934,11 +951,34 @@ public class CliDet extends PBase {
 			//if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
 			if (flag) relD.setVisibility(View.VISIBLE);else relD.setVisibility(View.GONE);
 
-		}catch (Exception ex)
-		{
+			if (esClienteNuevo()){
+				imgDevol.setVisibility(View.INVISIBLE);
+				lblDevol.setVisibility(View.INVISIBLE);
+				imgCobro.setVisibility(View.INVISIBLE);
+				lblCobro.setVisibility(View.INVISIBLE);
+			}else{
+				imgDevol.setVisibility(View.VISIBLE);
+				lblDevol.setVisibility(View.VISIBLE);
+				imgCobro.setVisibility(View.VISIBLE);
+				lblCobro.setVisibility(View.VISIBLE);
+			}
+
+		}catch (Exception ex) 	{
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
 			Log.d("habilitaOpciones_err", ex.getMessage());
 		}
+
+		if (gl.tolsuper) {
+			relV.setVisibility(View.GONE);
+			relP.setVisibility(View.VISIBLE);
+			relD.setVisibility(View.GONE);
+
+			imgDevol.setVisibility(View.INVISIBLE);
+			lblDevol.setVisibility(View.INVISIBLE);
+			imgCobro.setVisibility(View.INVISIBLE);
+			lblCobro.setVisibility(View.INVISIBLE);
+		}
+
 	}
 
 	protected void toastcent(String msg) {
@@ -961,6 +1001,23 @@ public class CliDet extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
+	}
+
+	private boolean esClienteNuevo() {
+		Cursor dt;
+		String sql = "";
+
+		try {
+			sql="SELECT * FROM D_CLINUEVO WHERE CODIGO='"+cod+"'";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return false;
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return true;
 	}
 
 	//endregion
@@ -1084,8 +1141,11 @@ public class CliDet extends PBase {
 			chknc.setText("Nota de crédito");
 			chkncv.setText("Nota de crédito con venta");
 
-			layout.addView(chknc);
-			layout.addView(chkncv);
+            chknc.setChecked(false);
+            chkncv.setChecked(false);
+
+			if (clicred)layout.addView(chknc);
+			if (!clicred) layout.addView(chkncv);
 
 			alert.setView(layout);
 
@@ -1102,6 +1162,7 @@ public class CliDet extends PBase {
 						//toast("Seleccione accion a realizar");
 						closekeyb();
 						layout.removeAllViews();
+
 						msgAskTipoDev();
 					}
 				}
@@ -1175,8 +1236,6 @@ public class CliDet extends PBase {
 
 	//endregion
 
-
-
 	//region Activity Events
 
 	@Override
@@ -1188,6 +1247,7 @@ public class CliDet extends PBase {
 			if (gl.closeCliDet) super.finish();
 
 			calcCredit();
+			habilitaOpciones();
 
 			if (browse==1) {
 				browse=0;

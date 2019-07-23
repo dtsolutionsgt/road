@@ -167,7 +167,7 @@
             android:layout_alignBottom="@+id/textView2"
             android:layout_toRightOf="@+id/txtRuta"
             android:padding="5dp"
-            android:text="Empresa"
+            android:text="Emp"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
@@ -180,6 +180,18 @@
             android:nextFocusLeft="@id/txtRuta"
             android:nextFocusDown="@id/txtWS"
             android:singleLine="true" />
+
+        <CheckBox
+            android:id="@+id/checkBox8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="false"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="0dp"
+            android:layout_toEndOf="@+id/txtEmp"
+            android:text="Sup" />
     </RelativeLayout>
 
     <Button
@@ -478,5 +490,41 @@
         android:layout_toEndOf="@+id/imageView6"
         android:onClick="askSendManual"
         android:src="@drawable/enviaarchivosmanual" />
+
+    <RelativeLayout
+        android:id="@+id/relPedidos"
+        android:layout_width="88dp"
+        android:layout_height="113dp"
+        android:layout_alignTop="@id/textView1"
+        android:layout_alignBottom="@id/textView1"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="false"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="0dp"
+        android:clickable="true"
+        android:onClick="doPedidos">
+
+        <TextView
+            android:id="@+id/textView85"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp"
+            android:gravity="center_horizontal"
+            android:text="Pedidos"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <ImageView
+            android:id="@+id/imageView25"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/textView85"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:padding="5dp"
+            android:src="@drawable/devolucion" />
+    </RelativeLayout>
 
 </RelativeLayout>

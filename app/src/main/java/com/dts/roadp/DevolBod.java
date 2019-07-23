@@ -427,7 +427,6 @@ public class DevolBod extends PBase {
 			db.execSQL(sql);
 			
 			sql="SELECT CODIGO,CANT,CANTM FROM P_STOCK";
-				
 			DT=Con.OpenDT(sql);
 			if (DT.getCount()==0) {return;}
 				
@@ -532,8 +531,7 @@ public class DevolBod extends PBase {
 		}
 
 			
-	}	
-
+	}
 	
 	private boolean hasProducts(){
 		Cursor DT;

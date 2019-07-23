@@ -873,6 +873,68 @@ public class AppMethods {
 
 	}
 
+	public String impresTipo_Ruta() {
+		Cursor dt;
+		String prnid;
+
+		try {
+
+			sql="SELECT IDIMPRESORA FROM P_RUTA";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			prnid=dt.getString(0);
+
+			sql="SELECT MARCA FROM P_IMPRESORA WHERE IDIMPRESORA='"+prnid+"'";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return "SIN IMPRESORA";
+			dt.moveToFirst();
+
+			return dt.getString(0);
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			return "SIN IMPRESORA";
+		}
+	}
+
+	public String getPrintId() {
+		Cursor dt;
+		String prnid;
+
+		try {
+
+			sql="SELECT prn FROM Params";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			prnid=dt.getString(0);
+
+			return prnid;
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			return "";
+		}
+	}
+
+	public String getPrintId_Ruta() {
+		Cursor dt;
+		String prnid;
+
+		try {
+
+			sql="SELECT IDIMPRESORA FROM P_RUTA";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			prnid=dt.getString(0);
+
+			return prnid;
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			return "";
+		}
+	}
+
 	public String impresTipo() {
 		Cursor dt;
 		String prnid;

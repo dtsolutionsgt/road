@@ -213,7 +213,7 @@ public class ComWS extends PBase {
 		fsqli = du.univfechasql(du.ffecha00(du.getActDate())) + " 00:00:00";
 		fsqlf = du.univfechasql(du.ffecha24(du.getActDate())) + " 23:59:59";
 
-		parImprID="0";
+		parImprID= clsAppM.getPrintId();
 
 		lic = new clsLicence(this);
 
@@ -302,10 +302,13 @@ public class ComWS extends PBase {
 				return;
 			}
 
-			if (!validaLicencia()) {
-				mu.msgbox("Licencia inválida!");
-				return;
-			}
+
+			if (!gl.debug) {
+                if (!validaLicencia()) {
+                    mu.msgbox("Licencia inválida!");
+                    return;
+                }
+            }
 
 			if (gl.banderafindia) {
 					if (!puedeComunicar()) {
@@ -344,10 +347,12 @@ public class ComWS extends PBase {
                 return;
             }
 
-            if (!validaLicencia()) {
-                mu.msgbox("Licencia inválida!");
-                return;
-            }
+			if (!gl.debug) {
+				if (!validaLicencia()) {
+					mu.msgbox("Licencia inválida!");
+					return;
+				}
+			}
 
             if (gl.banderafindia) {
                 if (!puedeComunicar()) {
@@ -2910,6 +2915,8 @@ public class ComWS extends PBase {
 
 			otrosParametros();
 
+			confImpresora();
+
 			if (ftflag) msgbox(ftmsg);
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -2917,6 +2924,17 @@ public class ComWS extends PBase {
 
 		if (!validaLicencia()) restartApp();
 
+	}
+
+	private void confImpresora(){
+		try {
+
+			sql="UPDATE Params SET prn='"+clsAppM.getPrintId_Ruta()+"',prnserie='"+clsAppM.impresTipo_Ruta()+"' ";
+			db.execSQL(sql);
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
 	}
 
 	private class AsyncCallRec extends AsyncTask<String, Void, Void> {
@@ -2978,7 +2996,10 @@ public class ComWS extends PBase {
 
 		errflag = false;
 
-		if (getTest()==0) return false;
+		if (getTest()==0){
+			errflag=true;
+			return false;
+		}
 
 		senv = "Envío terminado \n \n";
 
@@ -2991,6 +3012,7 @@ public class ComWS extends PBase {
 				} else {
 					senv = "No se puede determinar estado de la liquidación.";
 				}
+				errflag=true;
 				return false;
 			} else {
 				liqid = true;
@@ -3086,6 +3108,7 @@ public class ComWS extends PBase {
 			}
 
 			envioFinDia();
+
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
 				return false;

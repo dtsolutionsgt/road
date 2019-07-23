@@ -2193,6 +2193,7 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
+
 		//23-7-2019 se adiciono la opcion de clientes por supervisor en base de las rutas
 		if (TN.equalsIgnoreCase("P_CLIRUTA")) {
 		    if (!cargasuper) {

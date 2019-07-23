@@ -43,7 +43,7 @@ public class PedidoRes extends PBase {
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
 	private ListAdaptTotals adapter;
 	
-	private Runnable printcallback,printclose;
+	private Runnable printcallback,printclose,printexit;
 	
 	private clsDescGlob clsDesc;
 	private printer prn;
@@ -72,6 +72,7 @@ public class PedidoRes extends PBase {
 		spinList = (Spinner) findViewById(R.id.spinner1);
 		
 		cliid=gl.cliente;
+		gl.tolpedsend=false;
 		
 		setActDate();
 		fechae=fecha;lblFecha.setText(du.sfecha(fechae));
@@ -99,11 +100,18 @@ public class PedidoRes extends PBase {
 		
 		printclose= new Runnable() {
 		    public void run() {
-		    	PedidoRes.super.finish();
+
 		    }
 		};
+
+		printexit= new Runnable() {
+			public void run() {
+				gl.tolpedsend=true;
+				PedidoRes.super.finish();
+			}
+		};
 		
-		prn=new printer(this,printclose,gl.validimp);
+		prn=new printer(this,printexit,gl.validimp);
 		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp, "");
 		pdoc.deviceid =gl.numSerie;
 	}
@@ -297,6 +305,7 @@ public class PedidoRes extends PBase {
 			gl.closeVenta=true;
 
 			if (!gl.impresora.equalsIgnoreCase("S")) {
+				gl.tolpedsend=true;
 				super.finish();
 			}
 		}catch (Exception e){
@@ -334,7 +343,11 @@ public class PedidoRes extends PBase {
 			ins.add("ANULADO","N");
 			ins.add("FECHA",du.getActDateTime());
 			ins.add("EMPRESA",gl.emp);
-			ins.add("RUTA",gl.ruta);
+			if (gl.tolsuper) {
+				ins.add("RUTA",gl.rutasup);ins.add("RUTASUPER",gl.ruta);
+			}else {
+				ins.add("RUTA",gl.ruta);ins.add("RUTASUPER","");
+			}
 			ins.add("VENDEDOR",gl.vend);
 			ins.add("CLIENTE",gl.cliente);
 			ins.add("KILOMETRAJE",0);
@@ -670,7 +683,7 @@ public class PedidoRes extends PBase {
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 
-					impres++;toast("Impres "+impres);
+					impres++;
 
 					try {
 						sql="UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
@@ -689,12 +702,14 @@ public class PedidoRes extends PBase {
 						}
 
 						gl.brw=0;
+						gl.tolpedsend=true;
+						finish();
 
 					} else {
 						String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 						pdoc.buildPrint(corel,1,vModo);
 
-						prn.printask(printclose);
+						prn.printask(printcallback);
 
 					}
 				}
@@ -703,8 +718,9 @@ public class PedidoRes extends PBase {
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					//singlePrint();
-					//prn.printask(printcallback);
-					finish();
+					prn.printask(printcallback);
+					//if (gl.tolsuper) startActivity(new Intent(PedidoRes.this,ComWSSend.class));
+					//finish();
 				}
 			});
 

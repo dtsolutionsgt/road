@@ -691,6 +691,7 @@ public class Pago extends PBase {
 		double tp=totalPago();
 
 		try{
+
 			monto=saldo-tp;
 			if (monto<0) monto=0;
 			monto=mu.round2(monto);

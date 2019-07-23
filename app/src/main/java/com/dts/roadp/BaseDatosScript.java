@@ -110,6 +110,7 @@ public class BaseDatosScript {
 					"[SUCURSAL] TEXT NOT NULL,"+
 					"[ID_DESPACHO] INTEGER NOT NULL,"+
 					"[ID_FACTURACION] INTEGER NOT NULL,"+
+					"[RUTASUPER] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);

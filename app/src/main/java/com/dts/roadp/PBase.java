@@ -60,11 +60,14 @@ public class PBase extends Activity {
 	}
 	
 	// Web service call back
-	
+	public void wsCallBack(int callmode, Boolean throwing, String errmsg) throws Exception {
+		if (throwing) throw new Exception(errmsg);
+	}
+
 	protected void wsCallBack(Boolean throwing,String errmsg) throws Exception {
 		if (throwing) throw new Exception(errmsg);
 	}
-	
+
 	// Aux
 	
 	protected void closekeyb(){

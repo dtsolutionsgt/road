@@ -490,7 +490,7 @@ public class AppMethods {
 			return  umm.equalsIgnoreCase(gl.umpeso);
 
         } catch (Exception e) {
-            toast(e.getMessage());
+            //toast(e.getMessage());
             return false;
         }
     }

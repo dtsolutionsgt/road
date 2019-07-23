@@ -95,8 +95,7 @@ public class printEpson extends printBase{
 
 	// Private
 	
-	private boolean loadFile()
-	{
+	private boolean loadFile() 	{
 
 		File ffile;
 		BufferedReader dfile;

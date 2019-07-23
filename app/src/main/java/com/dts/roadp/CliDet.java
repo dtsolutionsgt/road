@@ -429,6 +429,14 @@ public class CliDet extends PBase {
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
 			gl.clitipo = DT.getString(16);
 
+
+			sql="SELECT RUTA FROM P_CLIRUTA WHERE CLIENTE='"+cod+"'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			gl.rutasup=DT.getString(0);
+
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox(e.getMessage());
@@ -955,11 +963,22 @@ public class CliDet extends PBase {
 				lblCobro.setVisibility(View.VISIBLE);
 			}
 
-		}catch (Exception ex)
-		{
+		}catch (Exception ex) 	{
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
 			Log.d("habilitaOpciones_err", ex.getMessage());
 		}
+
+		if (gl.tolsuper) {
+			relV.setVisibility(View.GONE);
+			relP.setVisibility(View.VISIBLE);
+			relD.setVisibility(View.GONE);
+
+			imgDevol.setVisibility(View.INVISIBLE);
+			lblDevol.setVisibility(View.INVISIBLE);
+			imgCobro.setVisibility(View.INVISIBLE);
+			lblCobro.setVisibility(View.INVISIBLE);
+		}
+
 	}
 
 	protected void toastcent(String msg) {
@@ -1228,6 +1247,7 @@ public class CliDet extends PBase {
 			if (gl.closeCliDet) super.finish();
 
 			calcCredit();
+			habilitaOpciones();
 
 			if (browse==1) {
 				browse=0;

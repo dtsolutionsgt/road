@@ -174,7 +174,6 @@ public class Venta extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 
 	public void doFocus(View view) {
@@ -460,6 +459,7 @@ public class Venta extends PBase {
 		double tt;
 		int ii;
 
+
 		items.clear();tot=0;ttimp=0;ttperc=0;selidx=-1;ii=0;
 
 		try {
@@ -536,7 +536,6 @@ public class Venta extends PBase {
 			tot=mu.round(tot,2);
 			lblTot.setText(mu.frmcur(tot));
 		}
-
 
 		if (selidx>-1) {
 			adapter.setSelectedIndex(selidx);
@@ -768,6 +767,7 @@ public class Venta extends PBase {
 		}
 
 		gl.umstock=app.umStock(prodid);
+
 
 		try {
 

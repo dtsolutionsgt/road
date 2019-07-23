@@ -343,7 +343,11 @@ public class PedidoRes extends PBase {
 			ins.add("ANULADO","N");
 			ins.add("FECHA",du.getActDateTime());
 			ins.add("EMPRESA",gl.emp);
-			if (gl.tolsuper)ins.add("RUTA",gl.rutasup);else ins.add("RUTA",gl.ruta);
+			if (gl.tolsuper) {
+				ins.add("RUTA",gl.rutasup);ins.add("RUTASUPER",gl.ruta);
+			}else {
+				ins.add("RUTA",gl.ruta);ins.add("RUTASUPER","");
+			}
 			ins.add("VENDEDOR",gl.vend);
 			ins.add("CLIENTE",gl.cliente);
 			ins.add("KILOMETRAJE",0);

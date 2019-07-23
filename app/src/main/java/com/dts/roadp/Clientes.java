@@ -934,8 +934,9 @@ public class Clientes extends PBase {
 			gl.tolpedsend=false;
 
 			//if (getWSURL())
-			    startActivity(new Intent(this,ComWSSend.class));
-
+			Intent intent=new Intent(this,ComWSSend.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+			startActivity(intent);
 			//msgAskSend("Enviar pedido");
 		}
 	}

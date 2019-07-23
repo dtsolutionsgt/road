@@ -8,6 +8,7 @@
     tools:context=".ComWSSend">
 
     <RelativeLayout
+        android:id="@+id/relSend"
         android:layout_width="match_parent"
         android:layout_height="95dp"
         android:layout_alignParentStart="false"

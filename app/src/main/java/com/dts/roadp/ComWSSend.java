@@ -7,12 +7,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
 public class ComWSSend extends PBase {
 
     private TextView lbl1;
+    private RelativeLayout relSend;
     private ProgressBar pbar;
 
     private WebService ws;
@@ -30,10 +32,11 @@ public class ComWSSend extends PBase {
 
         lbl1 = (TextView) findViewById(R.id.textView72);lbl1.setText("Enviando . . .");
         pbar = (ProgressBar) findViewById(R.id.progressBar5);
+        relSend = (RelativeLayout) findViewById(R.id.relSend);relSend.setVisibility(View.VISIBLE);
 
         dbld = new clsDataBuilder(this);
 
-         Handler mtimer = new Handler();
+        Handler mtimer = new Handler();
         Runnable mrunner=new Runnable() {
             @Override
             public void run() {
@@ -78,6 +81,7 @@ public class ComWSSend extends PBase {
         }
 
         if (pcount==0) {
+            relSend.setVisibility(View.INVISIBLE);
             finish();return;
         }
 
@@ -152,6 +156,7 @@ public class ComWSSend extends PBase {
             } else {
                 toast("Enviados "+pcount+" pedidos.");
             }
+            relSend.setVisibility(View.INVISIBLE);
             finish();
         } catch (Exception e) {
             msgExit("Error de envio : " + e.getMessage());
@@ -202,6 +207,7 @@ public class ComWSSend extends PBase {
 
         dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
+                relSend.setVisibility(View.INVISIBLE);
                 finish();
             }
         });

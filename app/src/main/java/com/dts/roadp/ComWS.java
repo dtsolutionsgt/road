@@ -2194,7 +2194,6 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_CLIRUTA")) {
-
 		    if (!cargasuper) {
                 SQL = "SELECT RUTA,CLIENTE,SEMANA,DIA,SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'";
             } else {

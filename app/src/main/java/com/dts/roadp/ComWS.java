@@ -201,13 +201,10 @@ public class ComWS extends PBase {
 		if (gl.debug) {
 			if (mu.emptystr(txtRuta.getText().toString())) {
 				txtRuta.setText("2024-5");
+				//txtRuta.setText("8001-1");
 				txtEmp.setText("03");
+				txtWS.setText("http://200.46.46.104:8001/RDC7_SAP_PRD_ANDR/wsAndr.asmx");
 			}
-
-			txtWS.setText("http://200.46.46.104:8001/RDC7_SAP_PRD_ANDR/wsAndr.asmx");
-
-			//txtRuta.setText("8001-1");
-			//txtEmp.setText("03");
 			txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}
 
@@ -259,12 +256,6 @@ public class ComWS extends PBase {
 			toastcent("Por favor, espere que se termine la tarea actual.");
 			return;
 		}
-
-		if (gl.modoadmin) {
-            cargasuper=cbSuper.isChecked();
-        } else {
-            cargasuper=gl.tolsuper;
-        }
 
 		if(gl.ruta.isEmpty()){
 			ruta = txtRuta.getText().toString();
@@ -1024,7 +1015,7 @@ public class ComWS extends PBase {
 
 	//endregion
 
-	//region Common Web Service Methods
+	//region Web Service Methods
 
 	public int fillTable(String value, String delcmd) {
 
@@ -1564,6 +1555,46 @@ public class ComWS extends PBase {
 		return 0;
 	}
 
+	public int rutaSupervisor(String ruta) {
+		int rc;
+		String s, ss;
+
+		METHOD_NAME = "RutaSupervisor";
+		sstr = "OK";
+
+		try {
+
+			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+			envelope.dotNet = true;
+
+			PropertyInfo param = new PropertyInfo();
+			param.setType(String.class);
+			param.setName("Ruta");
+			param.setValue(ruta);
+			request.addProperty(param);
+
+			envelope.setOutputSoapObject(request);
+
+			HttpTransportSE transport = new HttpTransportSE(URL);
+			transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+			s = response.toString();
+
+			if (s.equalsIgnoreCase("S")) {
+				return 1;
+			} else if (s.equalsIgnoreCase("N")) {
+				return 0;
+			} else {
+				sstr = s;return 0;
+			}
+		} catch (Exception e) {
+			sstr = e.getMessage();
+			return 0;
+		}
+	}
+
 	//endregion
 
 	//region WS Recepcion Methods
@@ -1606,6 +1637,8 @@ public class ComWS extends PBase {
 		scomp = 0;idbg = "";stockflag = 0;ftmsg = "";ftflag = false;rrs="...";
 
 		try {
+
+			cargasuper=rutaSupervisor(ActRuta)==1;
 
 			if (!AddTable("P_PARAMEXT")) return false;
 			procesaParamsExt();

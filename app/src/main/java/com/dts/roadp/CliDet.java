@@ -42,7 +42,7 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 public class CliDet extends PBase {
 
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
-	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago;
+	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago,lblRuta;
 	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol,imgRoadTit;
 	private RadioButton chknc,chkncv;
@@ -81,6 +81,7 @@ public class CliDet extends PBase {
 		lblCDisp= (TextView) findViewById(R.id.lblCDisp);
 		lblCantDias = (TextView) findViewById(R.id.lblCantDias);
 		lblClientePago = (TextView) findViewById(R.id.lblClientePago);
+		lblRuta = (TextView) findViewById(R.id.lblRuta);
 
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
@@ -429,13 +430,12 @@ public class CliDet extends PBase {
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
 			gl.clitipo = DT.getString(16);
 
-
 			sql="SELECT RUTA FROM P_CLIRUTA WHERE CLIENTE='"+cod+"'";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 
 			gl.rutasup=DT.getString(0);
-
+			lblRuta.setText("Ruta: "+gl.rutasup);
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -932,8 +932,7 @@ public class CliDet extends PBase {
 	}
 
 	private void habilitaOpciones() {
-		try
-		{
+		try {
 			String rt;
 			boolean flag;
 
@@ -969,14 +968,10 @@ public class CliDet extends PBase {
 		}
 
 		if (gl.tolsuper) {
-			relV.setVisibility(View.GONE);
 			relP.setVisibility(View.VISIBLE);
-			relD.setVisibility(View.GONE);
-
-			imgDevol.setVisibility(View.INVISIBLE);
-			lblDevol.setVisibility(View.INVISIBLE);
-			imgCobro.setVisibility(View.INVISIBLE);
-			lblCobro.setVisibility(View.INVISIBLE);
+			//relV.setVisibility(View.GONE);relD.setVisibility(View.GONE);
+			//imgDevol.setVisibility(View.INVISIBLE);lblDevol.setVisibility(View.INVISIBLE);
+			//imgCobro.setVisibility(View.INVISIBLE);lblCobro.setVisibility(View.INVISIBLE);
 		}
 
 	}

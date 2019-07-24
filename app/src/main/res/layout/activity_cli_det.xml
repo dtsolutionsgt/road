@@ -31,6 +31,17 @@
             android:textSize="18sp" />
 
         <TextView
+            android:id="@+id/lblRuta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/relGPS"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="5dp"
+            android:text="Ruta"
+            android:textSize="18sp" />
+
+        <TextView
             android:id="@+id/lblNom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -68,7 +79,7 @@
             android:layout_below="@+id/lblPres"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="68dp"
             android:layout_weight="1"
             android:width="0dip"
             android:clickable="true"
@@ -110,6 +121,7 @@
             android:textSize="18sp" />
 
         <RelativeLayout
+            android:id="@+id/relGPS"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_above="@+id/lblProd"

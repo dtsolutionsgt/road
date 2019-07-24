@@ -969,9 +969,9 @@ public class CliDet extends PBase {
 
 		if (gl.tolsuper) {
 			relP.setVisibility(View.VISIBLE);
-			//relV.setVisibility(View.GONE);relD.setVisibility(View.GONE);
-			//imgDevol.setVisibility(View.INVISIBLE);lblDevol.setVisibility(View.INVISIBLE);
-			//imgCobro.setVisibility(View.INVISIBLE);lblCobro.setVisibility(View.INVISIBLE);
+			relV.setVisibility(View.GONE);relD.setVisibility(View.GONE);
+			imgDevol.setVisibility(View.INVISIBLE);lblDevol.setVisibility(View.INVISIBLE);
+			imgCobro.setVisibility(View.INVISIBLE);lblCobro.setVisibility(View.INVISIBLE);
 		}
 
 	}

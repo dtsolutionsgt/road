@@ -1167,7 +1167,6 @@ public class Venta extends PBase {
 					factorconv=gl.umfactor;
 				}
 
-
 				ins.add("FACTOR",factorconv);
 				ins.add("UMSTOCK",uunistock);
 

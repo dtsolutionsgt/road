@@ -994,17 +994,23 @@ public class FacturaRes extends PBase {
 				ins.add("IMP",dt.getDouble(3));
 				ins.add("DES",dt.getDouble(4));
 				ins.add("DESMON",dt.getDouble(5));
-				ins.add("TOTAL",dt.getDouble(6));
+				ins.add("TOTAL",mu.round2(dt.getDouble(6)));
 				ins.add("PRECIODOC",dt.getDouble(7));
-				ins.add("PESO",dt.getDouble(8));
+				ins.add("PESO",mu.round(dt.getDouble(8),3));
 				ins.add("VAL1",dt.getDouble(9));
 				ins.add("VAL2",dt.getString(10));
 				ins.add("UMVENTA",dt.getString(11));
+
+				/*
 				if (dt.getString(11).equalsIgnoreCase("KG")) {
 					ins.add("FACTOR",1);
 				} else {
 					if (dt.getDouble(12)!=0) ins.add("FACTOR",1/dt.getDouble(12));else ins.add("FACTOR",1);
 				}
+				*/
+
+				ins.add("FACTOR",dt.getDouble(12));
+
 				ins.add("UMSTOCK",dt.getString(13));ss=dt.getString(13);
 				ins.add("UMPESO",gl.umpeso); //#HS_20181120_1625 Se agrego el valor gl.umpeso anteriormente estaba ""
 

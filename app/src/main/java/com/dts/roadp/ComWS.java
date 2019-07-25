@@ -1258,7 +1258,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1302,7 +1302,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
@@ -1353,7 +1353,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
@@ -1391,7 +1391,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
 
@@ -1433,7 +1433,7 @@ public class ComWS extends PBase {
 
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1471,7 +1471,7 @@ public class ComWS extends PBase {
 
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1509,7 +1509,7 @@ public class ComWS extends PBase {
 
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();

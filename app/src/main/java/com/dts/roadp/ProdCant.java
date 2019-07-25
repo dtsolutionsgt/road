@@ -545,6 +545,8 @@ public class ProdCant extends PBase {
 				}
 			}
 
+			ppeso=mu.round(ppeso,3);
+
 			gl.dval = cant;
 			gl.dpeso = ppeso;
 			gl.um = upres;

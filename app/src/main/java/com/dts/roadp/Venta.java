@@ -998,7 +998,7 @@ public class Venta extends PBase {
 
 	private int barraBolsa() {
 		Cursor dt;
-		double ppeso=0,pprecdoc=0,factbolsa;
+		double ppeso=0,pprecdoc=0,factbolsa,factorconv;
 		String uum,umven,uunistock;
 		boolean isnew=true;
 
@@ -1039,20 +1039,6 @@ public class Venta extends PBase {
 				factbolsa=app.factorPres(prodid,umven,um);
 				cant=cant*factbolsa;
 
-				//if (sinimp) precdoc=precsin; else precdoc=prec;
-				/*
-				if (prodPorPeso(prodid)) {
-					prec = prctr.precio(prodid, cant, nivel, um, gl.umpeso, ppeso,umven);
-					if (prctr.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,ppeso)) {
-						if (prctr.precioespecial>0) prec=prctr.precioespecial;
-					}
-				} else {
-					prec = prctr.precio(prodid, cant, nivel, um, gl.umpeso, 0,umven);
-					if (prctr.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,0)) {
-						if (prctr.precioespecial>0) prec=prctr.precioespecial;
-					}
-				}   */
-
 				if (prodPorPeso(prodid)) {
 					prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, ppeso,umven);
 					if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,uum,gl.umpeso,ppeso)) {
@@ -1065,7 +1051,6 @@ public class Venta extends PBase {
 					}
 				}
 
-				//if (prodPorPeso(prodid)) prec=mu.round2(prec/ppeso);
 				if (prodPorPeso(prodid)) prec=mu.round2(prec);
 
 				if (prec==0){
@@ -1080,6 +1065,7 @@ public class Venta extends PBase {
 				if (factbolsa>1) prodtot = cant*prec;
 				if (prodPorPeso(prodid)) prodtot=mu.round2(prec*ppeso);
 
+				//region T_BARRA
 				try {
 
 					ins.init("T_BARRA");
@@ -1151,6 +1137,8 @@ public class Venta extends PBase {
 					}
 				}
 
+				//endregion
+
 				prec=mu.round(prec,2);
 				prodtot=mu.round(prodtot,2);
 
@@ -1159,7 +1147,7 @@ public class Venta extends PBase {
 				ins.add("EMPRESA",emp);
 
 				if (prodPorPeso(prodid)) {
-					ins.add("UM",gl.umpeso);//ins.add("UM",gl.umpeso);
+					ins.add("UM",gl.umpeso);
 				} else {
 					if (factbolsa==1) ins.add("UM",umven);else ins.add("UM",umven);
 				}
@@ -1167,17 +1155,20 @@ public class Venta extends PBase {
 				ins.add("CANT",cant);
 
 				if (prodPorPeso(prodid)) uunistock=um; else uunistock=umven;
+
 				if (prodid.equalsIgnoreCase("0006") || prodid.equalsIgnoreCase("0629") || prodid.equalsIgnoreCase("0747") ) {
 					Double stfact;
 
 					uunistock=um;
 					umven=app.umVenta(prodid);
 					stfact=app.factorPres(prodid,uunistock,umven);
-					ins.add("FACTOR",stfact);
+					factorconv=stfact;
 				} else {
-					ins.add("FACTOR",gl.umfactor);
+					factorconv=gl.umfactor;
 				}
 
+
+				ins.add("FACTOR",factorconv);
 				ins.add("UMSTOCK",uunistock);
 
 				if (prodPorPeso(prodid)) {
@@ -1230,6 +1221,8 @@ public class Venta extends PBase {
 			}
 
 	}
+
+
 
 	private int barraBolsaTrans() {
 		Cursor dt;

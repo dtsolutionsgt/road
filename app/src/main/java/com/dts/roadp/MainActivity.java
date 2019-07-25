@@ -139,8 +139,8 @@ public class MainActivity extends PBase {
                 txtUser.setText("00103790");
                 txtPass.setText("04");
 
-                txtUser.setText("00100979");
-                txtPass.setText("123456");
+                //txtUser.setText("00100979");
+                //txtPass.setText("123456");
             }
 
         } catch (Exception e) {

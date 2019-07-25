@@ -452,7 +452,6 @@ public class AppMethods {
 
 	}
 
-
 	public boolean esClienteNuevo(String cod) {
 		Cursor DT;
 		boolean clienteNuevo=false;
@@ -598,9 +597,6 @@ public class AppMethods {
 						db.execSQL(sql);
 
 					}
-
-
-
 				}
 
 				dt.moveToNext();
@@ -741,7 +737,14 @@ public class AppMethods {
 		try {
 			String sql = "SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE CODIGO='" + cod + "' AND NIVEL="+gl.nivel;
 			DT = Con.OpenDT(sql);
-			DT.moveToFirst();
+			if (DT.getCount()>0) {
+				DT.moveToFirst();
+
+			} else {
+				sql="SELECT UNIDBAS FROM P_PRODUCTO WHERE CODIGO='"+cod+"'";
+				DT = Con.OpenDT(sql);
+				DT.moveToFirst();
+			}
 
 			umm=DT.getString(0);
 			return  umm;

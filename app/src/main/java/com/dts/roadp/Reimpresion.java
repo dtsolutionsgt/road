@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +23,7 @@ public class Reimpresion extends PBase {
 
 	private ListView listView;
 	private TextView lblTipo;
+	private ImageView imgPrint;
 	
 	private ArrayList<clsClasses.clsCFDV> items= new ArrayList<clsClasses.clsCFDV>();
 	private ListAdaptCFDV adapter;
@@ -66,10 +69,14 @@ public class Reimpresion extends PBase {
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		lblTipo= (TextView) findViewById(R.id.lblFecha);
+		imgPrint=(ImageView) findViewById(R.id.imgPrint);
 
 		app = new AppMethods(this, gl, Con, db);
 		gl.validimp=app.validaImpresora();
 		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+
+		if (!gl.debug)imgPrint.setVisibility(View.INVISIBLE);
+		else imgPrint.setVisibility(View.VISIBLE);
 
 		tipo=gl.tipo;
 		itemid="*";
@@ -189,6 +196,15 @@ public class Reimpresion extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
+	}
+
+	public void printTxt(View view){
+
+		try{
+			prn.printask(printcallback);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 
 	private void setHandlers(){

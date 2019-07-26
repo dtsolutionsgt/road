@@ -196,7 +196,7 @@ public class PBase extends Activity {
 				active = 0;
 			}
 	    } catch (Exception e) {
-	    	mu.msgbox(e.getMessage());
+	    	//mu.msgbox(e.getMessage());
 	    	active= 0;
 	    }
 	}			

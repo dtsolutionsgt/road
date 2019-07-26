@@ -75,7 +75,9 @@ public class clsBonFiltro {
 			CSubCanal = DT.getString(4);
 			CSucursal = DT.getString(5);
 			NivelPrec = DT.getInt(6);
-			
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 		   	return ;
 	    }
@@ -138,7 +140,9 @@ public class clsBonFiltro {
 					DT.moveToNext();i+=1;
 				}	
 			}
-			
+
+			if(DT!=null) DT.close();
+
 			ival=i;
 			
 		} catch (Exception e) {
@@ -197,15 +201,15 @@ public class clsBonFiltro {
 					DT.moveToNext();i+=1;
 				}	
 			}
-			
+
+			if(DT!=null) DT.close();
 			ival=i;
 			
 		} catch (Exception e) {
 			estr=e.getMessage();
 			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_LONG).show();
 	    }		
-		
-			  	    
+
 	}
 	
 	
@@ -218,7 +222,11 @@ public class clsBonFiltro {
 			vSQL="SELECT BONIFICACION FROM P_CLIENTE WHERE CODIGO='"+cliid+"'";
            	DT=Con.OpenDT(vSQL);
 			DT.moveToFirst();
-			if (DT.getString(0).equalsIgnoreCase("N")) return false;
+			if (DT.getString(0).equalsIgnoreCase("N")) {
+				if(DT!=null) DT.close();
+				return false;
+			}
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 		   	return false;
 	    }		
@@ -228,11 +236,15 @@ public class clsBonFiltro {
 	private void opendb() {
 		try {
 			db = Con.getWritableDatabase();
-		 	Con.vDatabase =db;
-			active=1;	
-	    } catch (Exception e) {
-	    	active= 0;
-	    }
+			if (db!= null) {
+				Con.vDatabase=db;
+				active=1;
+			} else {
+				active = 0;
+			}
+		} catch (Exception e) {
+			active= 0;
+		}
 	}		
 
 	private void closedb(){

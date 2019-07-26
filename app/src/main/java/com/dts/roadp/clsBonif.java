@@ -30,13 +30,12 @@ public class clsBonif {
 		
 		prodid=producto;cant=cantidad;monto=montoventa;
 
-		/*
 		try {
 			active=0;
 			Con = new BaseDatos(context);
 			opendb();
 		} catch (Exception e) {
-		}*/
+		}
 
 	    MU=new MiscUtils(context);
 		
@@ -118,7 +117,9 @@ public class clsBonif {
 				}
 				
 				DT.moveToNext();
-			}	
+			}
+
+			if(DT!=null) DT.close();
 			
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
@@ -179,12 +180,15 @@ public class clsBonif {
 				}
 				
 				DT.moveToNext();
-			}	
+			}
+
+			if(DT!=null) DT.close();
 			
 		} catch (Exception e) {
-		   	MU.msgbox(e.getMessage());
-	    }	
-		
+			MU.msgbox(e.getMessage());
+	    }
+
+
 	}
 	
 	private void listaDescMultCant() {
@@ -250,8 +254,8 @@ public class clsBonif {
 				}
 
 				DT.moveToNext();
-			}	
-			
+			}
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }
@@ -320,8 +324,9 @@ public class clsBonif {
 				}
 
 				DT.moveToNext();
-			}	
-			
+			}
+
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }	
@@ -344,7 +349,8 @@ public class clsBonif {
 			lineaid=DT.getString(1);
 			slineaid=DT.getString(2);
 			marcaid=DT.getString(3);
-			
+
+			if(DT!=null) DT.close();
 			return true;
 			
 		} catch (Exception e) {
@@ -356,11 +362,15 @@ public class clsBonif {
  	private void opendb() {
 		try {
 			db = Con.getWritableDatabase();
-		 	Con.vDatabase =db;
-			active=1;	
-	    } catch (Exception e) {
-	    	active= 0;
-	    }
+			if (db!= null) {
+				Con.vDatabase=db;
+				active=1;
+			} else {
+				active = 0;
+			}
+		} catch (Exception e) {
+			active= 0;
+		}
 	}		
 	
 }

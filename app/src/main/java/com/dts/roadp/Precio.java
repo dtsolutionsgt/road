@@ -76,6 +76,9 @@ public class Precio {
 		String sprec="";
 	
 		try {
+
+			opendb();
+
 			if (ppeso>0) {
 				sql="SELECT PRECIO FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+nivel+") AND (UNIDADMEDIDA='"+umpeso+"') ";
 			} else {
@@ -167,6 +170,8 @@ public class Precio {
 		String sprec="";
 	
 		try {
+
+			opendb();
 
 			sql="SELECT PRECIO FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+nivel+") AND (UNIDADMEDIDA='"+um+"') ";
            	DT=Con.OpenDT(sql);
@@ -290,6 +295,9 @@ public class Precio {
 
 		pr=0;
 		try {
+
+			opendb();
+
 			if (ppeso>0) {
 				sql=" SELECT PRECIO,CODIGO,VALOR FROM TMP_PRECESPEC "+
 					" WHERE (PRODUCTO='"+prodid+"') AND (UNIDADMEDIDA='"+umpeso+"') "+
@@ -408,11 +416,15 @@ public class Precio {
  	private void opendb() {
 		try {
 			db = Con.getWritableDatabase();
-		 	Con.vDatabase =db;
-			active=1;	
-	    } catch (Exception e) {
-	    	active= 0;
-	    }
+			if (db!= null) {
+				Con.vDatabase=db;
+				active=1;
+			} else {
+				active = 0;
+			}
+		} catch (Exception e) {
+				active= 0;
+		}
 	}		
 
 }

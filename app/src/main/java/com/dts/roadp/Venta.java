@@ -878,23 +878,15 @@ public class Venta extends PBase {
 
 				opendb();
 
-				//db.beginTransaction();
-
 				if (barraBonif()) {
 					toastlong("¡La barra es parte de bonificacion!");
-					//db.setTransactionSuccessful();
-					//db.endTransaction();
 					txtBarra.setText("");return;
-				}else{
-					//db.endTransaction();
 				}
 
 				bbolsa=barraBolsa();
 				if (bbolsa==1) {
-
 					txtBarra.setText("");
 					listItems();
-
 					return;
 				} else if (bbolsa==-1) {
 					toast("Barra vendida");

@@ -42,7 +42,7 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 public class CliDet extends PBase {
 
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
-	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago,lblRuta;
+	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago,lblRuta,lblRuta2;
 	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol,imgRoadTit;
 	private EditText txtRuta;
@@ -83,6 +83,7 @@ public class CliDet extends PBase {
 		lblCantDias = (TextView) findViewById(R.id.lblCantDias);
 		lblClientePago = (TextView) findViewById(R.id.lblClientePago);
 		lblRuta = (TextView) findViewById(R.id.lblRuta);lblRuta.setVisibility(View.INVISIBLE);
+		lblRuta2 = (TextView) findViewById(R.id.lblRuta2);lblRuta2.setVisibility(View.INVISIBLE);
 		txtRuta = (EditText) findViewById(R.id.txtRuta);txtRuta.setVisibility(View.INVISIBLE);
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
@@ -294,6 +295,10 @@ public class CliDet extends PBase {
 			mu.msgbox("inputFachada: " + e.getMessage());
 		}
 
+	}
+
+	public void rutaHelp(View view) {
+        mostraRutaSupervisor();
 	}
 
 	@Override
@@ -671,8 +676,6 @@ public class CliDet extends PBase {
 
 	//endregion
 
-	//endregion
-
 	//region  Aux
 
 	private void doVenta(){
@@ -981,6 +984,7 @@ public class CliDet extends PBase {
 
 			lblRuta.setVisibility(View.VISIBLE);
 			txtRuta.setVisibility(View.VISIBLE);
+			lblRuta2.setVisibility(View.VISIBLE);
 		}
 
 	}
@@ -1047,6 +1051,28 @@ public class CliDet extends PBase {
 		}
 
 		return true;
+	}
+
+	private void mostraRutaSupervisor() {
+		Cursor dt;
+		String ss="";
+
+		try {
+			sql="SELECT RUTA FROM P_CLIRUTA WHERE (CLIENTE='"+cod+"') ORDER BY RUTA";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0) {
+				dt.moveToFirst();
+				while (!dt.isAfterLast()) {
+					ss+=dt.getString(0)+"\n";
+					dt.moveToNext();
+				}
+			}
+			toast(ss);
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
 	}
 
 	//endregion

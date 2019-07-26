@@ -23,6 +23,7 @@ public class Tablas extends PBase {
 
     private GridView grid,dgrid;
     private Spinner spin,spinf;
+    private TextView lblCant;
     private ProgressBar pbar;
     private EditText txt1;
 
@@ -49,6 +50,7 @@ public class Tablas extends PBase {
         spin = (Spinner) findViewById(R.id.spinner);
         pbar=(ProgressBar) findViewById(R.id.progressBar3);pbar.setVisibility(View.INVISIBLE);
         txt1 = (EditText) findViewById(R.id.editText1);
+        lblCant = (TextView) findViewById(R.id.textView86);lblCant.setText("");
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -88,7 +90,7 @@ public class Tablas extends PBase {
 
                         scod = spinlist.get(position);
                         if (!scod.equalsIgnoreCase(" ")) {
-                            txt1.setText("");
+                            //txt1.setText("");
                             processTable();
                         }
                     } catch (Exception e) {
@@ -223,6 +225,8 @@ public class Tablas extends PBase {
         String n,flt,ss = "";
         int cc=1,j;
 
+        lblCant.setText("");
+
         try {
             ss="SELECT ";
 
@@ -274,6 +278,7 @@ public class Tablas extends PBase {
         try {
             dt=Con.OpenDT(ss);
             if (dt.getCount()==0) {
+                lblCant.setText("0");
                 pbar.setVisibility(View.INVISIBLE);return;
             }
 
@@ -290,6 +295,7 @@ public class Tablas extends PBase {
                 }
                 dt.moveToNext();
             }
+            lblCant.setText(""+dt.getCount());
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
         }

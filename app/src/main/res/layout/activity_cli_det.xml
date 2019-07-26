@@ -37,7 +37,7 @@
             android:layout_above="@id/relGPS"
             android:layout_alignParentStart="true"
             android:layout_marginStart="12dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="8dp"
             android:text="Ruta"
             android:textSize="18sp" />
 
@@ -187,6 +187,23 @@
             android:ems="10"
             android:inputType="textPersonName"
             android:text="Name" />
+
+        <TextView
+            android:id="@+id/lblRuta2"
+            android:layout_width="32dp"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/txtRuta"
+            android:layout_alignBottom="@+id/txtRuta"
+            android:layout_alignParentEnd="false"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toEndOf="@+id/txtRuta"
+            android:background="@drawable/frame_btn"
+            android:clickable="true"
+            android:gravity="center"
+            android:onClick="rutaHelp"
+            android:text=" ? "
+            android:textSize="18sp" />
 
     </RelativeLayout>
 

@@ -79,7 +79,7 @@
             android:layout_below="@+id/lblPres"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="68dp"
+            android:layout_marginBottom="80dp"
             android:layout_weight="1"
             android:width="0dip"
             android:clickable="true"
@@ -173,6 +173,20 @@
             android:layout_marginBottom="15dp"
             android:text="Teléfono :"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/txtRuta"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/relGPS"
+            android:layout_alignParentEnd="false"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="13dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toEndOf="@+id/lblRuta"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Name" />
 
     </RelativeLayout>
 

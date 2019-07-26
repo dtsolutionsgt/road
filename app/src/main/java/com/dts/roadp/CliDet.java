@@ -45,6 +45,7 @@ public class CliDet extends PBase {
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago,lblRuta;
 	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol,imgRoadTit;
+	private EditText txtRuta;
 	private RadioButton chknc,chkncv;
 
 	private PhotoViewAttacher zoomFoto;
@@ -81,8 +82,8 @@ public class CliDet extends PBase {
 		lblCDisp= (TextView) findViewById(R.id.lblCDisp);
 		lblCantDias = (TextView) findViewById(R.id.lblCantDias);
 		lblClientePago = (TextView) findViewById(R.id.lblClientePago);
-		lblRuta = (TextView) findViewById(R.id.lblRuta);
-
+		lblRuta = (TextView) findViewById(R.id.lblRuta);lblRuta.setVisibility(View.INVISIBLE);
+		txtRuta = (EditText) findViewById(R.id.txtRuta);txtRuta.setVisibility(View.INVISIBLE);
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
 
@@ -435,7 +436,9 @@ public class CliDet extends PBase {
 			DT.moveToFirst();
 
 			gl.rutasup=DT.getString(0);
-			lblRuta.setText("Ruta: "+gl.rutasup);
+			lblRuta.setText("Ruta: ");
+			txtRuta.setText(gl.rutasup);
+
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -670,7 +673,7 @@ public class CliDet extends PBase {
 
 	//endregion
 
-	//region  Misc
+	//region  Aux
 
 	private void doVenta(){
 
@@ -691,6 +694,11 @@ public class CliDet extends PBase {
 	private void doPreventa() {
 		try{
 			gl.rutatipo="P";
+
+			if (gl.tolsuper) {
+				if (!validaRutaSupervisor()) return;
+			}
+
 			runVenta();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -836,8 +844,6 @@ public class CliDet extends PBase {
 	public void sendSMS(View view){
 		String to=tel;
 
-		//to="59393195";
-
 		if (to.length()==0) {
 			msgbox("Número incorrecto ");return;
 		}
@@ -972,6 +978,9 @@ public class CliDet extends PBase {
 			relV.setVisibility(View.GONE);relD.setVisibility(View.GONE);
 			imgDevol.setVisibility(View.INVISIBLE);lblDevol.setVisibility(View.INVISIBLE);
 			imgCobro.setVisibility(View.INVISIBLE);lblCobro.setVisibility(View.INVISIBLE);
+
+			lblRuta.setVisibility(View.VISIBLE);
+			txtRuta.setVisibility(View.VISIBLE);
 		}
 
 	}
@@ -1007,6 +1016,31 @@ public class CliDet extends PBase {
 			dt=Con.OpenDT(sql);
 			if (dt.getCount()==0) return false;
 
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return true;
+	}
+
+	private boolean validaRutaSupervisor() {
+		Cursor dt;
+		String ruta=txtRuta.getText().toString();
+
+		if (ruta.isEmpty()) {
+			msgbox("Falta definir la ruta");return false;
+		}
+
+		try {
+			sql="SELECT * FROM P_CLIRUTA WHERE (CLIENTE='"+cod+"') AND (RUTA='"+ruta+"') COLLATE NOCASE";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) {
+				msgbox("Ruta incorrecta");return false;
+			}
+
+			gl.rutasup=ruta;
+			return true;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());

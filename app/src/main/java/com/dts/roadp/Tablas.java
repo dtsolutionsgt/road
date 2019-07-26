@@ -244,7 +244,7 @@ public class Tablas extends PBase {
             ss=ss+" FROM "+tn;
 
             flt=txt1.getText().toString();
-            if (!mu.emptystr(flt)) ss=ss+" WHERE "+flt;
+            if (!mu.emptystr(flt)) ss=ss+" WHERE "+flt+" COLLATE NOCASE";
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

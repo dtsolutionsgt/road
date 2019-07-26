@@ -1153,23 +1153,7 @@ public class Venta extends PBase {
 
 			ins.add("CANT", cant);
 
-			//if (prodPorPeso(prodid)) uunistock=um; else	uunistock=umven;
-
 			uunistock = DameUnidadMinimaVenta(prodid);
-
-				/*
-				if (prodid.equalsIgnoreCase("0006") || prodid.equalsIgnoreCase("0629") || prodid.equalsIgnoreCase("0747") ) {
-                    Double stfact;
-
-                    uunistock=um;
-                    umven=app.umVenta(prodid);
-                    stfact=app.factorPres(prodid,uunistock,umven);
-                    factorconv=stfact;
-                } else {
-                    factorconv=gl.umfactor;
-                }
-                */
-
 			factorconv = DameProporcionVenta(prodid, gl.cliente, gl.nivel);
 
 			ins.add("FACTOR", factorconv);
@@ -1209,7 +1193,7 @@ public class Venta extends PBase {
 
 			actualizaTotalesBarra();
 
-			if (isnew) validaBarraBon();
+			//if (isnew) validaBarraBon();
 
 			//db.setTransactionSuccessful();
 			//db.endTransaction();

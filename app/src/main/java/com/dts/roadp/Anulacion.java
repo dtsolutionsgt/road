@@ -99,7 +99,6 @@ public class Anulacion extends PBase {
 		fdoc.medidapeso=gl.umpeso;
 	}
 
-	
 	//region Events
 	
 	public void anulDoc(View view){

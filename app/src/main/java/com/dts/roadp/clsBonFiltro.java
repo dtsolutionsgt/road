@@ -64,6 +64,8 @@ public class clsBonFiltro {
 		String  CTipoNeg,CTipo,CSubTipo,CCanal,CSubCanal,CSucursal;
 		
 		try {
+
+			opendb();
 			vSQL="SELECT TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL,SUCURSAL,NIVELPRECIO FROM P_CLIENTE WHERE CODIGO='"+cliid+"'";
            	DT=Con.OpenDT(vSQL);
 			DT.moveToFirst();
@@ -210,15 +212,18 @@ public class clsBonFiltro {
 			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_LONG).show();
 	    }		
 
-	}
-	
-	
-	// Aux
-	
-	private boolean validaPermisos(){
-		Cursor DT;
-	
-		try {
+		}
+
+
+		// Aux
+
+		private boolean validaPermisos(){
+			Cursor DT;
+
+			try {
+
+				opendb();
+
 			vSQL="SELECT BONIFICACION FROM P_CLIENTE WHERE CODIGO='"+cliid+"'";
            	DT=Con.OpenDT(vSQL);
 			DT.moveToFirst();

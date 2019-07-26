@@ -51,6 +51,8 @@ public class clsBonif {
 		double dval=0;
 		
 		items.clear();
+
+		opendb();
 		
 		if (!validaPermisos()) return false;
 		
@@ -70,6 +72,9 @@ public class clsBonif {
 		double val;
 		
 		try {
+
+			opendb();
+
 			vSQL="SELECT PRODUCTO,PTIPO,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
 				 "FROM T_BONIF WHERE  ("+cant+">=RANGOINI) AND ("+cant+"<=RANGOFIN) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='U') AND (TIPOBON='R') AND (GLOBBON='N') AND (PORCANT='S')";
@@ -134,6 +139,9 @@ public class clsBonif {
 		double val;
 		
 		try {
+
+			opendb();
+
 			vSQL="SELECT PRODUCTO,PTIPO,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
 				 "FROM T_BONIF WHERE  ("+monto+">=RANGOINI) AND ("+monto+"<=RANGOFIN) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='V') AND (TIPOBON='R') AND (GLOBBON='N') AND (PORCANT='N')";
@@ -198,6 +206,9 @@ public class clsBonif {
 		double val,mcant,mul;
 		
 		try {
+
+			opendb();
+
 			vSQL="SELECT PRODUCTO,PTIPO,RANGOINI,RANGOFIN,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
 				 "FROM T_BONIF WHERE ("+cant+">=RANGOINI) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='U') AND (TIPOBON='M') AND (GLOBBON='N') AND (PORCANT='S')";
@@ -269,6 +280,9 @@ public class clsBonif {
 		double val,mcant,mul;
 		
 		try {
+
+			opendb();
+
 			vSQL="SELECT PRODUCTO,PTIPO,RANGOINI,RANGOFIN,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
 				 "FROM T_BONIF WHERE ("+monto+">=RANGOINI) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='V') AND (TIPOBON='M') AND (GLOBBON='N') AND (PORCANT='N')";
@@ -340,6 +354,9 @@ public class clsBonif {
 		Cursor DT;
 		
 		try {
+
+			opendb();
+
 			vSQL="SELECT BONIFICACION,LINEA,SUBLINEA,MARCA FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	DT=Con.OpenDT(vSQL);
 			DT.moveToFirst();

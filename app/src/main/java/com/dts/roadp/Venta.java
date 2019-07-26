@@ -517,6 +517,7 @@ public class Venta extends PBase {
 				}
 			}
 
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
@@ -743,6 +744,8 @@ public class Venta extends PBase {
 
 			umb=dt.getString(0);
 			fact=dt.getDouble(1);
+
+			if(dt!=null) dt.close();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			umb=um;fact=1;

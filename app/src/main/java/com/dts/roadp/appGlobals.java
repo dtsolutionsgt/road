@@ -30,7 +30,7 @@ public class appGlobals extends Application {
 	public String cuentaCliNuevo, codCliNuevo;
 
 	//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true por defecto estará en false
-	public boolean debug=true;
+	public boolean debug=false;
 
 	//Devolución Cliente
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;

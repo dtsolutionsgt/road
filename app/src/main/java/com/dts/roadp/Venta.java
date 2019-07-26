@@ -1738,9 +1738,15 @@ public class Venta extends PBase {
 
 	private int cantFalt() {
 		try {
+			opendb();
+
 			sql="SELECT PRODID FROM T_BONIFFALT WHERE PRODUCTO='"+prodid+"'";
 			Cursor dt=Con.OpenDT(sql);
-			return dt.getCount();
+
+			int cant=dt.getCount();
+
+			if(dt!=null) dt.close();
+			return cant;
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1768,6 +1774,8 @@ public class Venta extends PBase {
 					sql="DELETE FROM T_BONIFFALT WHERE CANT=0";
 					db.execSQL(sql);
 
+					if(dt!=null) dt.close();
+
 				} else {
 
 					sql = "SELECT BARRA FROM T_BARRA_BONIF WHERE (PRODUCTO='"+prodid+"') ";
@@ -1780,10 +1788,14 @@ public class Venta extends PBase {
 						sql = "DELETE FROM T_BARRA_BONIF WHERE (PRODUCTO='"+prodid+"') AND (BARRA='"+barra+"') ";
 						db.execSQL(sql);
 					}
+
+					if(dt!=null) dt.close();
 				}
 			}
 
 			reportBonif();
+
+
 
 			if (bc>0) msgbox("Las barra devueltas : \n"+sbarra);
 

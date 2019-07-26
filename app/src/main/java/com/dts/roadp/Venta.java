@@ -1260,20 +1260,27 @@ public class Venta extends PBase {
 
     public String DameUnidadMinimaVenta(String vProd )  {
         Cursor dt;
+        String ss;
 
         try {
             sql = "SELECT UNIDBAS FROM P_PRODUCTO WHERE (CODIGO='"+vProd+"') AND (ES_PROD_BARRA=0)";
             dt = Con.OpenDT(sql);
             if (dt.getCount()>0) {
                 dt.moveToFirst();
-                return dt.getString(0);
+                ss=dt.getString(0);
+				if(dt!=null) dt.close();
+
+                return ss;
             }
 
             sql="SELECT UM_SALIDA FROM P_PRODUCTO WHERE (CODIGO='"+vProd+"') AND (ES_PROD_BARRA=1)";
             dt = Con.OpenDT(sql);
             if (dt.getCount()>0) {
                 dt.moveToFirst();
-                return dt.getString(0);
+				ss=dt.getString(0);
+				if (dt!=null) dt.close();
+
+				return ss;
             } else {
                 return "";
             }
@@ -1285,11 +1292,15 @@ public class Venta extends PBase {
 
     public boolean EsUnidadSuperior(String vUM,String vProd )  {
         Cursor dt;
+        int cnt;
 
         try {
             sql = "SELECT * FROM P_FACTORCONV WHERE (UNIDADSUPERIOR='"+vUM+"') AND (PRODUCTO='"+vProd+"') AND (UNIDADSUPERIOR<>'"+gl.umpeso+"')";
             dt = Con.OpenDT(sql);
-            return (dt.getCount()>0);
+            cnt=dt.getCount();
+			if (dt!=null) dt.close();
+
+            return (cnt>0);
         } catch (Exception e) {
             msgbox(e.getMessage());
             return false;
@@ -1298,13 +1309,17 @@ public class Venta extends PBase {
 
     public double DameFactor(String vUM,String vProd) {
         Cursor dt;
+        double val;
 
         try {
             sql = "SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (UNIDADSUPERIOR='"+vUM+"')  AND (PRODUCTO='"+vProd+"')";
             dt = Con.OpenDT(sql);
             if(dt.getCount()>0) {
                 dt.moveToFirst();
-                return dt.getDouble(0);
+                val=dt.getDouble(0);
+				if (dt!=null) dt.close();
+
+                return val;
             } else {
                 return 0;
             }

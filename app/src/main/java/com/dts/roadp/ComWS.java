@@ -249,6 +249,9 @@ public class ComWS extends PBase {
 			return;
 		}
 
+		lblRec.setVisibility(View.INVISIBLE);
+		imgRec.setVisibility(View.INVISIBLE);
+
 		if(gl.ruta.isEmpty()){
 			ruta = txtRuta.getText().toString();
 			gl.ruta=ruta;
@@ -297,15 +300,20 @@ public class ComWS extends PBase {
 	public void askSend(View view) {
 
 		try {
+
 			if (isbusy == 1) {
 				toastcent("Por favor, espere que se termine la tarea actual.");
 				return;
 			}
 
+			lblEnv.setVisibility(View.INVISIBLE);
+			imgEnv.setVisibility(View.INVISIBLE);
 
 			if (!gl.debug) {
                 if (!validaLicencia()) {
                     mu.msgbox("Licencia inválida!");
+					lblEnv.setVisibility(View.VISIBLE);
+					imgEnv.setVisibility(View.VISIBLE);
                     return;
                 }
             }
@@ -313,6 +321,8 @@ public class ComWS extends PBase {
 			if (gl.banderafindia) {
 					if (!puedeComunicar()) {
 						mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+						lblEnv.setVisibility(View.VISIBLE);
+						imgEnv.setVisibility(View.VISIBLE);
 						return;
 					}
 				}
@@ -328,7 +338,12 @@ public class ComWS extends PBase {
 				}
 			});
 
-			dialog.setNegativeButton("Cancelar", null);
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					lblEnv.setVisibility(View.VISIBLE);
+					imgEnv.setVisibility(View.VISIBLE);
+				}
+			});
 
 			dialog.show();
 		} catch (Exception e) {
@@ -347,9 +362,14 @@ public class ComWS extends PBase {
                 return;
             }
 
+			lblEnvM.setVisibility(View.INVISIBLE);
+            imgEnvM.setVisibility(View.INVISIBLE);
+
 			if (!gl.debug) {
 				if (!validaLicencia()) {
 					mu.msgbox("Licencia inválida!");
+					lblEnvM.setVisibility(View.VISIBLE);
+					imgEnvM.setVisibility(View.VISIBLE);
 					return;
 				}
 			}
@@ -357,6 +377,8 @@ public class ComWS extends PBase {
             if (gl.banderafindia) {
                 if (!puedeComunicar()) {
                     mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+					lblEnvM.setVisibility(View.VISIBLE);
+					imgEnvM.setVisibility(View.VISIBLE);
                     return;
                 }
             }
@@ -372,7 +394,12 @@ public class ComWS extends PBase {
                 }
             });
 
-            dialog.setNegativeButton("Cancelar", null);
+            dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					lblEnvM.setVisibility(View.VISIBLE);
+					imgEnvM.setVisibility(View.VISIBLE);
+				}
+			});
 
             dialog.show();
 
@@ -588,20 +615,28 @@ public class ComWS extends PBase {
 
                     if (mu.emptystr(usr)) {
                         toast("Usuario incorrecto.");
+						lblEnvM.setVisibility(View.VISIBLE);
+						imgEnvM.setVisibility(View.VISIBLE);
                         return;
                     }
 
                     if (mu.emptystr(pwd)) {
                         toast("Contraseña incorrecta.");
+						lblEnvM.setVisibility(View.VISIBLE);
+						imgEnvM.setVisibility(View.VISIBLE);
 						return;
                     }
 
 					dtCorrectos = validaDatos(usr,pwd);
 
+					lblEnvM.setVisibility(View.VISIBLE);
+					imgEnvM.setVisibility(View.VISIBLE);
+
                     if (dtCorrectos){
 						askSendContinue();
 					}else{
 						layout.removeAllViews();
+
 						return;
 					}
 
@@ -611,6 +646,8 @@ public class ComWS extends PBase {
             alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     layout.removeAllViews();
+					lblEnvM.setVisibility(View.VISIBLE);
+					imgEnvM.setVisibility(View.VISIBLE);
                 }
             });
 
@@ -766,6 +803,8 @@ public class ComWS extends PBase {
 		try {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
+			relExist.setVisibility(View.INVISIBLE);
+
 			dialog.setTitle("Existencias bodega");
 			dialog.setMessage("¿Actualizar existencias?");
 
@@ -775,7 +814,12 @@ public class ComWS extends PBase {
 				}
 			});
 
-			dialog.setNegativeButton("Cancelar", null);
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					relExist.setVisibility(View.VISIBLE);
+				}
+			});
+
 
 			dialog.show();
 		} catch (Exception e) {
@@ -794,6 +838,8 @@ public class ComWS extends PBase {
 		try {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
+			relPrecio.setVisibility(View.INVISIBLE);
+
 			dialog.setTitle("Precios");
 			dialog.setMessage("¿Actualizar precios?");
 
@@ -803,7 +849,11 @@ public class ComWS extends PBase {
 				}
 			});
 
-			dialog.setNegativeButton("Cancelar", null);
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					relPrecio.setVisibility(View.VISIBLE);
+				}
+			});
 
 			dialog.show();
 		} catch (Exception e) {
@@ -822,6 +872,8 @@ public class ComWS extends PBase {
 		try {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
+			relStock.setVisibility(View.INVISIBLE);
+
 			dialog.setTitle("Recarga de inventario");
 			dialog.setMessage("¿Recargar inventario?");
 
@@ -831,7 +883,12 @@ public class ComWS extends PBase {
 				}
 			});
 
-			dialog.setNegativeButton("Cancelar", null);
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					relStock.setVisibility(View.VISIBLE);
+				}
+			});
+
 
 			dialog.show();
 		} catch (Exception e) {
@@ -933,6 +990,7 @@ public class ComWS extends PBase {
 		try {
 			super.finish();
 			startActivity(new Intent(this, ComWSExist.class));
+			relExist.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -944,6 +1002,7 @@ public class ComWS extends PBase {
 		try {
 			super.finish();
 			startActivity(new Intent(this, ComWSPrec.class));
+			relPrecio.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -955,6 +1014,7 @@ public class ComWS extends PBase {
 		try {
 			super.finish();
 			startActivity(new Intent(this, ComWSRec.class));
+			relStock.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -1030,7 +1090,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
@@ -2881,6 +2941,10 @@ public class ComWS extends PBase {
 
 		barInfo.setVisibility(View.INVISIBLE);
 		lblParam.setVisibility(View.INVISIBLE);
+
+		lblRec.setVisibility(View.VISIBLE);
+		imgRec.setVisibility(View.VISIBLE);
+
 		running = 0;
 
 		try {
@@ -4458,6 +4522,10 @@ public class ComWS extends PBase {
 				
 		barInfo.setVisibility(View.INVISIBLE);
 		lblParam.setVisibility(View.INVISIBLE);
+
+		lblEnv.setVisibility(View.VISIBLE);
+		imgEnv.setVisibility(View.VISIBLE);
+
 		running=0;
 		
 		//senv="Envio completo\n";
@@ -5343,8 +5411,12 @@ public class ComWS extends PBase {
 				}
 			});
 
-			dialog.setNegativeButton("Cancelar", null);
-
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					lblRec.setVisibility(View.VISIBLE);
+					imgRec.setVisibility(View.VISIBLE);
+				}
+			});
 			dialog.show();
 
 		}catch (Exception e){

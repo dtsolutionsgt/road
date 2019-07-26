@@ -1193,7 +1193,7 @@ public class Venta extends PBase {
 
 			actualizaTotalesBarra();
 
-			//if (isnew) validaBarraBon();
+			if (isnew) validaBarraBon();
 
 			//db.setTransactionSuccessful();
 			//db.endTransaction();
@@ -1680,7 +1680,7 @@ public class Venta extends PBase {
 
 		bcant=cantBolsa();
 		boncant=cantBonif();
-		bfaltcant=cantFalt();
+		if (boncant>0) bfaltcant=cantFalt();else bfaltcant=0;
 
 		clsBonif = new clsBonif(this, prodid, bcant, 0);
 		if (clsBonif.tieneBonif()) {

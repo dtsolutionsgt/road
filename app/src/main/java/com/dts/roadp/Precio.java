@@ -85,6 +85,8 @@ public class Precio {
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			pr=DT.getDouble(0);
+
+			if(DT!=null) DT.close();
 			
 		} catch (Exception e) {
 			pr=0;
@@ -94,6 +96,8 @@ public class Precio {
 				DT=Con.OpenDT(sql);
 				DT.moveToFirst();
 				pr=DT.getDouble(0);
+
+				if(DT!=null) DT.close();
 			} catch (Exception ee) {
 				pr=0;
 			}
@@ -169,6 +173,7 @@ public class Precio {
 			DT.moveToFirst();
 							  
 			pr=DT.getDouble(0);
+			if(DT!=null) DT.close();
 			
 		} catch (Exception e) {
 			pr=0;
@@ -264,9 +269,10 @@ public class Precio {
 					im3=0;
 				}	
 				
-			}			
-			
-			
+			}
+
+			if(DT!=null) DT.close();
+
 			imv=im1+im2+im3;
 			
 			return imv;
@@ -321,6 +327,8 @@ public class Precio {
 					dt.moveToNext();
 				}
 			}
+
+			if(dt!=null) dt.close();
 
 		} catch (Exception e) {
 			pr=0;

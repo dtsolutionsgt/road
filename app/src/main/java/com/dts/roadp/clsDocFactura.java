@@ -41,7 +41,8 @@ public class clsDocFactura extends clsDocument {
 		super.loadHeadData(corel);
 		
 		nombre="FACTURA";
-		
+
+
 		try {
 			sql=" SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2,IMPRES, ANULADO " +
 				" FROM D_FACTURA WHERE COREL='"+corel+"'";

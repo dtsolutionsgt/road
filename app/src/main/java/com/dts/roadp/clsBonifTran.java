@@ -74,7 +74,6 @@ public class clsBonifTran {
 				 "FROM T_BONIF WHERE  ("+cant+">=RANGOINI) AND ("+cant+"<=RANGOFIN) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='U') AND (TIPOBON='R') AND (GLOBBON='N') AND (PORCANT='S')";
 			DT=Con.OpenDT(sql);
-		
 			
 			if (DT.getCount()==0) return;
 			
@@ -117,8 +116,10 @@ public class clsBonifTran {
 				}
 				
 				DT.moveToNext();
-			}	
-			
+			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }	
@@ -178,8 +179,10 @@ public class clsBonifTran {
 				}
 				
 				DT.moveToNext();
-			}	
-			
+			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }	
@@ -249,8 +252,10 @@ public class clsBonifTran {
 				}
 
 				DT.moveToNext();
-			}	
-			
+			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }
@@ -319,8 +324,10 @@ public class clsBonifTran {
 				}
 
 				DT.moveToNext();
-			}	
-			
+			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }	
@@ -343,7 +350,9 @@ public class clsBonifTran {
 			lineaid=DT.getString(1);
 			slineaid=DT.getString(2);
 			marcaid=DT.getString(3);
-			
+
+			if(DT!=null) DT.close();
+
 			return true;
 			
 		} catch (Exception e) {

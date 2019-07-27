@@ -69,8 +69,7 @@ public class clsBonifGlobTipo {
 				 "FROM T_BONIF WHERE  ("+cant+">=RANGOINI) AND ("+cant+"<=RANGOFIN) "+
 				 "AND (PTIPO="+tipo+") AND (TIPOBON='R') AND (GLOBBON='S') AND (PORCANT='S')";
 			DT=Con.OpenDT(vSQL);
-		
-			
+
 			if (DT.getCount()==0) return;
 			
 			DT.moveToFirst();
@@ -110,14 +109,13 @@ public class clsBonifGlobTipo {
 					item.valor=val;
 					
 					items.add(item);
-					
-					
-					//Toast.makeText(cont,tipo+" )) "+item.tipolista+ "   "+item.lista+"  // "+item.valor, Toast.LENGTH_SHORT).show();
 				}
 				
 				DT.moveToNext();
-			}	
-			
+			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }
@@ -168,21 +166,19 @@ public class clsBonifGlobTipo {
 					item.cantexact=DT.getString(6);
 					item.globbon="S";
 					item.porcant=DT.getString(7);
-					
 					item.tipolista=DT.getInt(3);
 					item.tipocant=DT.getString(4);
-					
 					item.valor=val;
 					
 					items.add(item);
 					
-					
-					//Toast.makeText(cont,tipo+" )) "+item.tipolista+ "   "+item.lista+"  // "+item.valor, Toast.LENGTH_SHORT).show();
 				}
 				
 				DT.moveToNext();
-			}	
-			
+			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }
@@ -231,7 +227,6 @@ public class clsBonifGlobTipo {
 						val=0;
 					}
 
-
 					item=clsCls.new clsBonifItem();
 
 					item.prodid=idid;
@@ -239,18 +234,18 @@ public class clsBonifGlobTipo {
 					item.cantexact=DT.getString(6);
 					item.globbon="S";
 					item.porcant=DT.getString(9);
-
 					item.tipolista=DT.getInt(3);
 					item.tipocant=DT.getString(6);
-
 					item.valor=val;
 
 					items.add(item);
 				}
 
 				DT.moveToNext();
-			}	
-			
+			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }
@@ -306,18 +301,18 @@ public class clsBonifGlobTipo {
 					item.cantexact=DT.getString(6);
 					item.globbon="S";
 					item.porcant=DT.getString(9);
-
 					item.tipolista=DT.getInt(3);
 					item.tipocant=DT.getString(6);
-
 					item.valor=val;
 
 					items.add(item);
 				}
 
 				DT.moveToNext();
-			}	
-			
+			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }

@@ -25,9 +25,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 
 public class MainActivity extends PBase {
@@ -95,6 +98,7 @@ public class MainActivity extends PBase {
     }
 
     private void startApplication() {
+        File ffile;
 
         try {
             super.InitBase();
@@ -115,6 +119,20 @@ public class MainActivity extends PBase {
 
             lblVer.setText(gl.parTipoVer + " Version " + gl.parNumVer + gl.parFechaVer);
 
+            try {
+
+                File file1 = new File(Environment.getExternalStorageDirectory(), "/debug.txt");
+                ffile = new File(file1.getPath());
+                if (ffile.exists()) {
+                    gl.debug=true;
+                }else {
+                    gl.debug=false;
+                }
+
+            } catch (Exception e) {
+                gl.debug=false;
+            }
+
             // DB VERSION
             dbVers = new BaseDatosVersion(this, db, Con);
             dbVers.checkVersion(1);
@@ -134,11 +152,8 @@ public class MainActivity extends PBase {
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
             if (gl.debug) {
-                txtUser.setText("00103790");
-                txtPass.setText("04");
-
-                txtUser.setText("00100993");
-                txtPass.setText("2613");
+                txtUser.setText("00103790");txtPass.setText("04");
+               // txtUser.setText("00100993");txtPass.setText("2613");
             }
 
         } catch (Exception e) {
@@ -754,6 +769,10 @@ public class MainActivity extends PBase {
         Cursor dt;
         String lic, lickey, licruta, rutaencrypt;
         Integer msgLic = 0;
+
+        if (gl.debug) {
+            return true;
+        }
 
         try {
 

@@ -203,7 +203,7 @@ public class ComWS extends PBase {
 
 			//txtRuta.setText("8001-1");
 			//txtEmp.setText("03");
-			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
+			txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}
 
 
@@ -2860,6 +2860,11 @@ public class ComWS extends PBase {
 		Cursor dt;
 		String lic,lickey,licruta,rutaencrypt;
 		Integer msgLic=0;
+
+		if (gl.debug) {
+			return true;
+		}
+
 
 		try {
 			lickey=cu.encrypt(gl.deviceId);

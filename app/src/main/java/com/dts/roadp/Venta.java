@@ -597,7 +597,7 @@ public class Venta extends PBase {
 			} catch (Exception e) {
 				mu.msgbox(e.getMessage());
 				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-			}finally {
+			} finally {
 				if(DT!=null) DT.close();
 			}
 
@@ -1601,6 +1601,7 @@ public class Venta extends PBase {
 				gl.gstr=dt.getString(0);gl.um="UN";
 				processItem();
 				if(dt!=null) dt.close();
+
 				return true;
 			}
 
@@ -1659,15 +1660,13 @@ public class Venta extends PBase {
 			sql="SELECT PRODUCTO FROM T_BARRA_BONIF WHERE (BARRA='"+barcode+"')";
 			dt=Con.OpenDT(sql);
 
-			//return dt.getCount()>0;
+			boolean rslt=dt.getCount()>0;
 
-			if (dt!=null)return dt.getCount()>0;
-			else return false;
+			if(dt!=null) dt.close();
+
+			return rslt;
 
 		} catch (Exception e) {
-			Log.d("Error en barraBonif",e.getMessage());
-			//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			//msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			return false;
 		}
 		//return true;
@@ -1702,7 +1701,11 @@ public class Venta extends PBase {
 		try {
 			sql="SELECT BARRA FROM T_BARRA WHERE CODIGO='"+prodid+"'";
 			Cursor dt=Con.OpenDT(sql);
-			return dt.getCount();
+
+			int cant=dt.getCount();
+			if(dt!=null) dt.close();
+
+			return cant;
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			return 0;
@@ -1713,7 +1716,11 @@ public class Venta extends PBase {
 		try {
 			sql="SELECT BARRA FROM T_BARRA_BONIF WHERE PRODUCTO='"+prodid+"'";
 			Cursor dt=Con.OpenDT(sql);
-			return dt.getCount();
+
+			int cant=dt.getCount();
+			if(dt!=null) dt.close();
+
+			return cant;
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1731,6 +1738,7 @@ public class Venta extends PBase {
 			int cant=dt.getCount();
 
 			if(dt!=null) dt.close();
+
 			return cant;
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -1776,11 +1784,11 @@ public class Venta extends PBase {
 
 					if(dt!=null) dt.close();
 				}
+
+				if(dt!=null) dt.close();
 			}
 
 			reportBonif();
-
-
 
 			if (bc>0) msgbox("Las barra devueltas : \n"+sbarra);
 
@@ -1836,6 +1844,9 @@ public class Venta extends PBase {
 				}
 				DT.moveToNext();
 			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());return;
@@ -2010,18 +2021,17 @@ public class Venta extends PBase {
 		try {
 
 			sql="SELECT COORX,COORY FROM P_CLIENTE WHERE CODIGO='"+cliid+"'";
-
 			opendb();
 
            	DT=Con.OpenDT(sql);
-
-           	if (DT.getCount()>0)
-           	{
+           	if (DT.getCount()>0)            	{
 				DT.moveToFirst();
 
 				cpx=DT.getDouble(0);
 				cpy=DT.getDouble(1);
 			}
+
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    }
@@ -2273,10 +2283,10 @@ public class Venta extends PBase {
 
 			if(DT.getCount()>0){
 				DT.moveToFirst();
-
 				tiposcan=DT.getString(0);
 			}
-			
+
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			tiposcan="*";msgbox(e.getMessage());
@@ -2306,6 +2316,7 @@ public class Venta extends PBase {
 			String sim=DT.getString(0);
 			sinimp=sim.equalsIgnoreCase("S");
 
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			sinimp=false;
@@ -2385,7 +2396,11 @@ public class Venta extends PBase {
 			sql="SELECT PRODUCTO FROM T_VENTA";
 			DT=Con.OpenDT(sql);
 
-			return DT.getCount()>0;
+			boolean rslt=DT.getCount()>0;
+
+			if(DT!=null) DT.close();
+
+			return rslt;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
@@ -2410,7 +2425,11 @@ public class Venta extends PBase {
 		try {
 			sql="SELECT SALDO FROM P_COBRO WHERE CLIENTE='"+cliid+"'";
 			DT=Con.OpenDT(sql);
-			if (DT.getCount()>0) return true;
+
+			boolean rslt=DT.getCount()>0;
+			if(DT!=null) DT.close();
+
+			if (rslt) return true;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
@@ -2429,6 +2448,8 @@ public class Venta extends PBase {
 			sql="SELECT CODIGO FROM P_PRODPRECIO WHERE NIVEL="+np;
 			DT=Con.OpenDT(sql);
 			if (DT.getCount()==0) msgbox("No existen los precios para nivel de precio del cliente");
+
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
@@ -2453,7 +2474,10 @@ public class Venta extends PBase {
 		try {
 			sql="SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE (P_CLIRUTA.DIA ="+dweek+") ";
 			DT=Con.OpenDT(sql);
+
 			clidia=DT.getCount();
+
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			clidia=0;

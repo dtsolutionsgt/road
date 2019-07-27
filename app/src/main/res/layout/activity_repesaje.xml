@@ -19,19 +19,6 @@
         app:layout_editor_absoluteX="0dp"
         app:layout_editor_absoluteY="0dp">
 
-        <ImageView
-            android:id="@+id/imageView17"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="19dp"
-            android:clickable="true"
-            android:onClick="doCalc"
-            android:src="@drawable/calc"
-            android:visibility="invisible" />
-
         <TextView
             android:id="@+id/textView46"
             android:layout_width="70dp"

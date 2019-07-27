@@ -209,15 +209,12 @@ public class clsDocFactura extends clsDocument {
 			DT.moveToFirst();
 			
 			add2=add2+" - "+DT.getString(0);
+
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 	    }
-		
-		//Toast.makeText(cont,"Percep "+percep+"  Sinimp "+sinimp, Toast.LENGTH_SHORT).show();
-		
-		//cliente=val;
-		
+
 		return true;
-		
 	}
 
 	private boolean esPendientePago(String corel){
@@ -225,16 +222,14 @@ public class clsDocFactura extends clsDocument {
 		boolean vPendiente=false;
 		Cursor DT;
 
-		try{
-
+		try {
 			sql = "SELECT DOCUMENTO FROM P_COBRO WHERE DOCUMENTO = '"+ corel + "'";
 			DT=Con.OpenDT(sql);
 
-			if(DT.getCount() > 0){
-				vPendiente=true;
-			}
+			if(DT.getCount() > 0) vPendiente=true;
 
-		}catch(Exception ex){
+			if(DT!=null) DT.close();
+		} catch(Exception ex){
 			Toast.makeText(cont,"esPendientePago : "+ex.getMessage(), Toast.LENGTH_LONG).show();
 		}
 
@@ -307,8 +302,6 @@ public class clsDocFactura extends clsDocument {
                 items.add(item);
                 DT.moveToNext();
             }
-
-			if(DT!=null) DT.close();
 
 			try {
 				sql = "SELECT D_BONIF.PRODUCTO,P_PRODUCTO.DESCLARGA AS NOMBRE,D_BONIF.CANT, D_BONIF.UMVENTA, D_BONIF.CANT*D_BONIF.FACTOR AS TPESO " +
@@ -643,7 +636,11 @@ public class clsDocFactura extends clsDocument {
 			DT = Con.OpenDT(sql);
 			DT.moveToFirst();
 
-			return  DT.getInt(0)==1;
+			boolean rslt=DT.getInt(0)==1;
+
+			if(DT!=null) DT.close();
+
+			return  rslt;
 		} catch (Exception e) {
 			//toast(e.getMessage());
 			return false;

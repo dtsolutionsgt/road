@@ -154,6 +154,9 @@ public class clsDataBuilder {
 						  
 			    DT.moveToNext();
 			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			err=e.getMessage();//return false;
 			throw new RuntimeException(err);

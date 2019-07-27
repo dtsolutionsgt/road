@@ -62,7 +62,11 @@
         android:layout_above="@+id/relbotpan"
         android:layout_below="@+id/imgImg"
         android:layout_centerHorizontal="true"
-        android:layout_margin="5dp" >
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="#FA895C">
 
     </ListView>
 

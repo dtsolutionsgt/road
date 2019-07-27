@@ -445,42 +445,41 @@ public class CliNuevo extends PBase {
 	
 	private void fillSpinner(){
 		Cursor DT;
-				  
+
 		try {
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				sql="SELECT Codigo,Nombre FROM P_NIVELPRECIO WHERE NOMBRE = 'GENERALES'";
-			}else{
-				sql="SELECT Codigo,Nombre FROM P_NIVELPRECIO ORDER BY Codigo";
+				sql = "SELECT Codigo,Nombre FROM P_NIVELPRECIO WHERE NOMBRE = 'GENERALES'";
+			} else {
+				sql = "SELECT Codigo,Nombre FROM P_NIVELPRECIO ORDER BY Codigo";
 			}
 
-			DT=Con.OpenDT(sql);
-					
+			DT = Con.OpenDT(sql);
+
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
-					  
-			  spincode.add(DT.getString(0));
-			  spinlist.add(DT.getString(1));
-			  
-			  DT.moveToNext();
+
+				spincode.add(DT.getString(0));
+				spinlist.add(DT.getString(1));
+
+				DT.moveToNext();
 			}
 
-	/*	} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox(e.getMessage());
-	    }*/
-					
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, spinlist);
-		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			
-		spinList.setAdapter(dataAdapter);
-			
-		///try {
+			if(DT!=null) DT.close();
+
+			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinlist);
+			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+			spinList.setAdapter(dataAdapter);
+
 			spinList.setSelection(0);
+
+
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 			mu.msgbox(e.getMessage());
-	    }
+		}
 		
 	}		
 	

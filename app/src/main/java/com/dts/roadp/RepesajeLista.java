@@ -84,7 +84,6 @@ public class RepesajeLista extends PBase {
                         Object lvObj = listView.getItemAtPosition(position);
                         clsClasses.clsCD vItem = (clsClasses.clsCD) lvObj;
 
-                       // prodid = vItem.Cod;
                         adapter.setSelectedIndex(position);
 
                     } catch (Exception e) {
@@ -120,7 +119,6 @@ public class RepesajeLista extends PBase {
 
         try {
             sql = "SELECT PESO,TOTAL FROM T_VENTA WHERE PRODUCTO='"+prodid+"' ";
-
             dt = Con.OpenDT(sql);
             dt.moveToFirst();
 
@@ -135,6 +133,8 @@ public class RepesajeLista extends PBase {
             lblCant.setText("1");
             lblPrec.setText(mu.frmdecimal(dt.getDouble(0),gl.peDecImp));
             lblTot.setText(mu.frmdecimal(dt.getDouble(1),2));
+
+            if(dt!=null) dt.close();
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -173,6 +173,8 @@ public class RepesajeLista extends PBase {
                 dt.moveToNext();
             }
 
+            if(dt!=null) dt.close();
+
             lblCant.setText(""+items.size());
             lblPrec.setText(mu.frmdecimal(tpeso,gl.peDecImp));
             lblTot.setText(mu.frmdecimal(tprec,2));
@@ -207,7 +209,6 @@ public class RepesajeLista extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
 
     }
 

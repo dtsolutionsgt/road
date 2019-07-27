@@ -121,8 +121,10 @@ public class clsBonifGlob {
 				iid=DT.getString(0);
 				codes.add(iid);
 				DT.moveToNext();
-			}	
-			
+			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }			
@@ -158,7 +160,9 @@ public class clsBonifGlob {
 			
 			cnt=DT.getDouble(0);
 			monto=DT.getDouble(1);
-			
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }	

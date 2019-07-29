@@ -292,6 +292,31 @@ public class clsDataBuilder {
 		}
 	}
 
+	public void savelog(String flogname) {
+		String s;
+		FileWriter ffile;
+		BufferedWriter fwriter;
+		flogname =  Environment.getExternalStorageDirectory()+"/"+flogname;
+
+		if (sendlog.size()==0) return ;
+
+		try {
+
+			ffile=new FileWriter(flogname,false);
+			fwriter = new BufferedWriter(ffile);
+
+			for (int i = 0; i < sendlog.size(); i++) {
+				s=sendlog.get(i);
+				fwriter.write(s);
+				fwriter.write("\r\n");
+			}
+
+			fwriter.close();
+
+		} catch(Exception e){
+			return;
+		}
+	}
 
 	// Private
 	

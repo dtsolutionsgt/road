@@ -3360,7 +3360,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("facturas.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 					dbg = e.getMessage();
@@ -3380,7 +3383,10 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+
+            dbld.savelog("facturas.txt");
+
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 			dbg = fstr;
 		}
@@ -3452,7 +3458,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("pedidos.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					//fterr+="\n"+e.getMessage();
 				}
@@ -3463,7 +3472,10 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {
+
+            dbld.savelog("pedidos.txt");
+
+            addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -3534,7 +3546,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("cobros.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					//fterr+="\n"+e.getMessage();
 				}
@@ -3546,7 +3561,10 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {
+
+            dbld.savelog("cobros.txt");
+
+            addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -3617,7 +3635,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("notascredito.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 				}
@@ -3629,7 +3650,10 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {
+
+            dbld.savelog("notascredito.txt");
+
+            addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -3694,7 +3718,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("notasdevolucion.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 				}
@@ -3726,7 +3753,10 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {
+
+            dbld.savelog("notasdevolucion.txt");
+
+            addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -3791,7 +3821,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("depositos.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 				}
@@ -3803,7 +3836,10 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {
+
+            dbld.savelog("depositos.txt");
+
+            addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -3912,7 +3948,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("inventario.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 				}
@@ -3924,7 +3963,10 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {
+
+            dbld.savelog("inventarios.txt");
+
+            addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}

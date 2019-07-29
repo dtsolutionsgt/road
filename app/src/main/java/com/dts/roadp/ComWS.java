@@ -33,6 +33,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -318,14 +319,14 @@ public class ComWS extends PBase {
                 }
             }
 
-			if (gl.banderafindia) {
-					if (!puedeComunicar()) {
-						mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
-						lblEnv.setVisibility(View.VISIBLE);
-						imgEnv.setVisibility(View.VISIBLE);
-						return;
-					}
-				}
+            if (gl.banderafindia) {
+                if (!puedeComunicar()) {
+                    mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+                    lblEnv.setVisibility(View.VISIBLE);
+                    imgEnv.setVisibility(View.VISIBLE);
+                    return;
+                }
+            }
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -962,11 +963,20 @@ public class ComWS extends PBase {
 	}
 
 	private void runSend() {
+		int dia=du.dayofweek(du.getActDate());
 
 		try {
 			if (isbusy == 1) return;
 
 			if (!setComParams()) return;
+
+			try {
+				File f1 = new File(Environment.getExternalStorageDirectory() + "/road.db");
+				File f2 = new File(Environment.getExternalStorageDirectory() + "/road"+dia+".db");
+				FileUtils.copyFile(f1, f2);
+			} catch (Exception e) {
+				msgbox("No se puede generar respaldo : "+e.getMessage());
+			}
 
 			isbusy = 1;
 
@@ -979,8 +989,7 @@ public class ComWS extends PBase {
 			wsStask.execute();
 
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
 
@@ -5563,7 +5572,6 @@ public class ComWS extends PBase {
 
 		return  vGetStatusRec;
 	}
-
 
 	//endregion
 

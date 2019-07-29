@@ -493,8 +493,6 @@ public class MainActivity extends PBase {
             DT.moveToFirst();
             dpwd = DT.getString(1);
 
-            if(DT!=null) DT.close();
-
             if (!pwd.equalsIgnoreCase(dpwd)) {
                 mu.msgbox("Contraseña incorrecta !");
                 return false;
@@ -504,6 +502,8 @@ public class MainActivity extends PBase {
             gl.vend = usr;
             gl.vnivel = DT.getInt(2);
             gl.vnivprec = DT.getInt(3);
+
+            if(DT!=null) DT.close();
 
             return true;
 

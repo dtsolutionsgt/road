@@ -167,15 +167,21 @@ public class CliGPS extends PBase {
 						bmp = BitmapFactory.decodeStream(in);
 						in.close();
 					} catch (Exception e) {
+						return null;
 					}
 
 					return bmp;
 				}
 
 				protected void onPostExecute(Bitmap bmp) {
-					if (bmp != null) {
-						imgMap.setImageBitmap(bmp);
-					} else {
+
+					try {
+						if (bmp != null) {
+							imgMap.setImageBitmap(bmp);
+						} else {
+							imgMap.setImageResource(R.drawable.blank48);
+						}
+					} catch (Exception e) {
 						imgMap.setImageResource(R.drawable.blank48);
 					}
 
@@ -251,7 +257,7 @@ public class CliGPS extends PBase {
 				handler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						showStaticMap();
+						//showStaticMap();
 					}
 				}, 500);
 			}

@@ -371,6 +371,8 @@ public class Cobro extends PBase {
 
 			}
 
+			if(DT!=null) DT.close();
+
 			adapter=new ListAdaptCobro(this,items);adapter.cursym=gl.peMon;
 			listView.setAdapter(adapter);
 
@@ -443,9 +445,9 @@ public class Cobro extends PBase {
 
 					DTFecha.moveToPosition(i);
 				}
-
-
 			}
+
+			if(DT!=null) DT.close();
 
 			if(gl.vcredito){
 				if(gl.facturaVen<0) gl.facturaVen=0;
@@ -815,6 +817,8 @@ public class Cobro extends PBase {
 				db.endTransaction();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
@@ -846,6 +850,7 @@ public class Cobro extends PBase {
 				crr=gl.ruta+"_"+mu.getCorelBase();
 			}
 
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -944,12 +949,13 @@ public class Cobro extends PBase {
 
 				}
 
+				if(DT!=null) DT.close();
+
 				return true;
 
 			}else  {
 				return  false;
 			}
-
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1177,6 +1183,8 @@ public class Cobro extends PBase {
 				tp=0;
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			tp=0;
@@ -1223,6 +1231,8 @@ public class Cobro extends PBase {
 			ci=DT.getInt(1);
 			cf=DT.getInt(2);
 			ca=DT.getInt(3);
+
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

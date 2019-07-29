@@ -718,6 +718,8 @@ public class ComWSPrec extends PBase {
                 URL = DT.getString(1);
             }
 
+            if(DT!=null) DT.close();
+
             //URL=wsurl;
             if (URL!=null && !URL.equalsIgnoreCase("")){
                 txtWS.setText(URL);

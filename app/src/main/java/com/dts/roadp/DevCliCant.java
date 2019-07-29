@@ -376,7 +376,6 @@ public class DevCliCant extends PBase {
 				lblDesc.setText(prodid + " " + DT.getString(7));
 			}
 
-
 			if (prodPorPeso(prodid)) {
 				precioventa = prc.precio(prodid, cant, gl.nivel, um, gl.umpeso, gl.dpeso,um);
 				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
@@ -441,6 +440,8 @@ public class DevCliCant extends PBase {
 				}
 
 			}
+
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -524,9 +525,10 @@ public class DevCliCant extends PBase {
 			  
 			  DT.moveToNext();
 			}
-					
-		} catch (SQLException e) {
 
+			if(DT!=null) DT.close();
+
+		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		} catch (Exception e) {
@@ -586,6 +588,8 @@ public class DevCliCant extends PBase {
 			if (gl.tiponcredito == 1) {
 				txtPrecio.setEnabled(true);
 			}
+
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -670,11 +674,11 @@ public class DevCliCant extends PBase {
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()>0){
-
 				dt.moveToFirst();
 				um=dt.getString(0);
-
 			}
+
+			if(dt!=null) dt.close();
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

@@ -393,6 +393,8 @@ public class PedidoRes extends PBase {
 			    DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 			db.setTransactionSuccessful();
 			db.endTransaction();
 			 
@@ -585,6 +587,9 @@ public class PedidoRes extends PBase {
 			DT.moveToFirst();
 			
 			spname.add(DT.getString(0));
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			spname.add("");txtDir.setText("");
@@ -602,6 +607,9 @@ public class PedidoRes extends PBase {
 			  spname.add(DT.getString(0));
 			  DT.moveToNext();
 			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
@@ -655,6 +663,7 @@ public class PedidoRes extends PBase {
 			sql="SELECT ITEM FROM T_BONITEM";
            	DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) imgBon.setVisibility(View.VISIBLE);
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    }			

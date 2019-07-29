@@ -111,6 +111,8 @@ public class ayudante_vehiculo extends PBase {
 
             }
 
+            if(DT!=null) DT.close();
+
             adapter=new ListAdaptAyudante(this,items);
             listAyu.setAdapter(adapter);
 
@@ -150,6 +152,8 @@ public class ayudante_vehiculo extends PBase {
             }
 
         }
+
+        if(DT!=null) DT.close();
 
         adapter1=new ListAdaptVehiculo(this,items1);
         listVehi.setAdapter(adapter1);

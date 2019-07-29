@@ -396,6 +396,8 @@ public class MainActivity extends PBase {
                 msgbox("¡No se pudo cargar configuración de la empresa!");
             }
 
+            if(DT!=null) DT.close();
+
         } catch (Exception e) {
             msgbox("¡No se pudo cargar configuración de la empresa!");
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -490,6 +492,9 @@ public class MainActivity extends PBase {
 
             DT.moveToFirst();
             dpwd = DT.getString(1);
+
+            if(DT!=null) DT.close();
+
             if (!pwd.equalsIgnoreCase(dpwd)) {
                 mu.msgbox("Contraseña incorrecta !");
                 return false;
@@ -524,6 +529,8 @@ public class MainActivity extends PBase {
             }else{
                 gl.codSupervisor = "";
             }
+
+            if(DT!=null) DT.close();
 
         } catch (Exception e) {
             addlog(new Object() {
@@ -770,9 +777,7 @@ public class MainActivity extends PBase {
         String lic, lickey, licruta, rutaencrypt;
         Integer msgLic = 0;
 
-        if (gl.debug) {
-            return true;
-        }
+        if (gl.debug) return true;
 
         try {
 
@@ -785,36 +790,36 @@ public class MainActivity extends PBase {
             lic = dt.getString(0);
             licruta = dt.getString(1);
 
-            if (!gl.debug ) {
+            if (!gl.debug) {
 
-            if (mu.emptystr(lic)) {
-                toastlong("El dispositivo no tiene licencia válida de handheld");
-                return false;
-            }
+                if (mu.emptystr(lic)) {
+                    toastlong("El dispositivo no tiene licencia válida de handheld");
+                    return false;
+                }
 
-            if (mu.emptystr(licruta)) {
-                toastlong("El dispositivo no tiene licencia válida de ruta");
-                return false;
-            }
+                if (mu.emptystr(licruta)) {
+                    toastlong("El dispositivo no tiene licencia válida de ruta");
+                    return false;
+                }
 
-            if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) {
-               return true;
-            }
+                if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) {
+                    return true;
+                }
 
-            if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)) {
-                toastlong("El dispositivo no tiene licencia válida de handheld, ni de ruta");
-                return false;
-            }
+                if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)) {
+                    toastlong("El dispositivo no tiene licencia válida de handheld, ni de ruta");
+                    return false;
+                }
 
-            if (!lic.equalsIgnoreCase(lickey)) {
-                toastlong("El dispositivo no tiene licencia válida de handheld");
-                return false;
-            }
+                if (!lic.equalsIgnoreCase(lickey)) {
+                    toastlong("El dispositivo no tiene licencia válida de handheld");
+                    return false;
+                }
 
-            if (!licruta.equalsIgnoreCase(rutaencrypt)) {
-                toastlong("El dispositivo no tiene licencia válida de ruta");
-                return false;
-            }
+                if (!licruta.equalsIgnoreCase(rutaencrypt)) {
+                    toastlong("El dispositivo no tiene licencia válida de ruta");
+                    return false;
+                }
 
             } else {
                 return true;
@@ -822,8 +827,7 @@ public class MainActivity extends PBase {
 
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            mu.msgbox(new Object() {
-            }.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
         }
 
         return false;

@@ -1194,6 +1194,8 @@ public class Menu extends PBase {
 					newflag=true;
 				}
 
+				if(dt!=null) dt.close();
+
 			} catch (Exception e) {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 				msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -1314,6 +1316,8 @@ public class Menu extends PBase {
 				DT=Con.OpenDT(sql);
 				DT.moveToFirst();
 				coract=DT.getInt(0);
+
+				if(DT!=null) DT.close();
 			} catch (Exception e) {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 				mu.msgbox(e.getMessage());
@@ -1657,10 +1661,12 @@ public class Menu extends PBase {
 					DT.moveToNext();
 				}
 
-			}else if(DT.getCount() == 0){
+			} else if(DT.getCount() == 0){
 				listIDVehiculo.add("");
 				listVehiculo.add("No hay ayudantes disponibles");
 			}
+
+			if(DT!=null) DT.close();
 
 			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listAyudante);
 			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -1691,10 +1697,12 @@ public class Menu extends PBase {
 					listVehiculo.add(DT.getString(1) + "-" + DT.getString(2));
 					DT.moveToNext();
 				}
-			}else if(DT.getCount() == 0){
+			} else if(DT.getCount() == 0){
 				listIDVehiculo.add("");
 				listVehiculo.add("No hay vehiculos disponibles");
 			}
+
+			if(DT!=null) DT.close();
 
 			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listVehiculo);
 			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -1781,6 +1789,9 @@ public class Menu extends PBase {
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			prwd=DT.getInt(0);
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			prwd=32;
@@ -1800,6 +1811,9 @@ public class Menu extends PBase {
 			
 			gl.boldep=DT.getInt(0);
 			gl.depparc=DT.getInt(1)==1;
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			gl.boldep=0;
@@ -1823,7 +1837,9 @@ public class Menu extends PBase {
 				
 			if (prtipo.equalsIgnoreCase("DATAMAX")) prid=1;
 			if (prtipo.equalsIgnoreCase("EPSON")) prid=2;
-			
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			prid=0;
@@ -1882,6 +1898,8 @@ public class Menu extends PBase {
 			sql = "SELECT IFNULL(SUM(CANT),0) FROM D_CXC E INNER JOIN D_CXCD D ON  E.COREL = D.COREL WHERE E.ANULADO = 'N'";
 			dt = Con.OpenDT(sql);
 			cantcan = dt.getLong(0);
+
+			if(dt!=null) dt.close();
 
 		} catch (Exception e) {
 			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);

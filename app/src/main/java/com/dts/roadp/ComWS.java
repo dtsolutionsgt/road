@@ -682,12 +682,12 @@ public class ComWS extends PBase {
                 return false;
             }
 
+			if(DT!=null) DT.close();
 
 			correctos = true;
 
          }catch (Exception e){
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             return false;
         }
 
@@ -1630,6 +1630,8 @@ public class ComWS extends PBase {
 				val = "N";
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -1907,6 +1909,9 @@ public class ComWS extends PBase {
 				dt = Con.OpenDT(sql);
 				dt.moveToFirst();
 				gl.peModal = dt.getString(0).toUpperCase();
+
+				if(dt!=null) dt.close();
+
 			} catch (Exception e) {
 				gl.peModal = "-";
 			}
@@ -1967,6 +1972,9 @@ public class ComWS extends PBase {
 				dt = Con.OpenDT(sql);
 				dt.moveToFirst();
 				val = dt.getString(0);
+
+				if(dt!=null) dt.close();
+
 			} catch (Exception e) {
 				val = "V";
 			}
@@ -2074,6 +2082,9 @@ public class ComWS extends PBase {
 			}
 
 			DT1.close();
+
+			if(DT1!=null) DT1.close();
+
 
 		} catch (Exception ex) {
 			vActualizaFD = false;
@@ -2631,6 +2642,9 @@ public class ComWS extends PBase {
 				DT.moveToFirst();
 				ss = DT.getString(0);
 				if (ss.equalsIgnoreCase("T")) ss = "V";
+
+				if(DT!=null) DT.close();
+
 			} catch (Exception e) {
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -2723,6 +2737,8 @@ public class ComWS extends PBase {
 				}
 
 			}
+
+			if(dt!=null) dt.close();
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -2824,6 +2840,8 @@ public class ComWS extends PBase {
 				dt.moveToNext();
 			}
 
+			if(dt!=null) dt.close();
+
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
@@ -2876,6 +2894,8 @@ public class ComWS extends PBase {
 			lic=dt.getString(0);
 			licruta=dt.getString(1);
 			String ss=cu.decrypt(licruta);
+
+			if(dt!=null) dt.close();
 
 			if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) return true;
 			else if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)){msgLic=1;}
@@ -3430,6 +3450,8 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
 			addlog(new Object() {
@@ -3511,6 +3533,8 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
 			addlog(new Object() {
@@ -3591,6 +3615,8 @@ public class ComWS extends PBase {
 
 				DT.moveToNext();
 			}
+
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			errflag = true;
@@ -3687,6 +3713,8 @@ public class ComWS extends PBase {
 
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
 			addlog(new Object() {
@@ -3762,6 +3790,8 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
 			addlog(new Object() {
@@ -3793,6 +3823,8 @@ public class ComWS extends PBase {
 				DT.moveToFirst();
 				cor = DT.getString(0);
 			}
+
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -3879,6 +3911,8 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
 			addlog(new Object() {
@@ -3961,6 +3995,8 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -4025,6 +4061,8 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
 			addlog(new Object() {
@@ -4083,6 +4121,8 @@ public class ComWS extends PBase {
 
 				DT.moveToNext();
 			}
+
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			errflag = true;
@@ -4150,6 +4190,8 @@ public class ComWS extends PBase {
 
 				DT.moveToNext();
 			}
+
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			errflag = true;
@@ -4269,6 +4311,8 @@ public class ComWS extends PBase {
 
                 DT.moveToNext();
             }
+
+			if(DT!=null) DT.close();
 
         } catch (Exception e) {
 			errflag = true;
@@ -4456,6 +4500,8 @@ public class ComWS extends PBase {
 					DT.moveToNext();
 
 				}
+
+				if(DT!=null) DT.close();
 
 				json2.put("P_CLIENTE_FACHADA",json_Array);
 
@@ -4660,6 +4706,9 @@ public class ComWS extends PBase {
 				} else {
 					docstock = "";
 				}
+
+				if(dt!=null) dt.close();
+
 			} catch (Exception e) {
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -4808,6 +4857,8 @@ public class ComWS extends PBase {
 
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//MU.msgbox(e.getMessage());
@@ -4865,6 +4916,8 @@ public class ComWS extends PBase {
             	cnt=DT.getInt(0);
             }
 
+			if(DT!=null) DT.close();
+
             if (cnt>0) {
 				st=pps+" "+cnt;
 				sp=sp+st+", ";
@@ -4898,6 +4951,8 @@ public class ComWS extends PBase {
 				crl=DT.getInt(0);
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}	
@@ -4917,6 +4972,8 @@ public class ComWS extends PBase {
 				DT.moveToFirst();
 				serie = DT.getString(0);
 			}
+
+			if(DT!=null) DT.close();
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -4943,6 +5000,8 @@ public class ComWS extends PBase {
 				}
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -4959,6 +5018,9 @@ public class ComWS extends PBase {
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
             rslt=DT.getInt(0);
+
+			if(DT!=null) DT.close();
+
         } catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             rslt=0;
@@ -5482,19 +5544,21 @@ public class ComWS extends PBase {
 		Cursor DT;
 		String vGetStatusRec = "";
 
-		try 			{
-				sql = "SELECT PARAM2 FROM P_RUTA ";
-				DT = Con.OpenDT(sql);
+		try {
+			sql = "SELECT PARAM2 FROM P_RUTA ";
+			DT = Con.OpenDT(sql);
 
-				if (DT.getCount()> 0) 				{
-					DT.moveToFirst();
-					vGetStatusRec = DT.getString(0);
-				}
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
+				vGetStatusRec = DT.getString(0);
 			}
 
-		catch (Exception ex) {
-				Log.d("GetStatusRec","Something happend here " + ex.getMessage());
-				msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+ " " + ex.getMessage());
+			if(DT!=null) DT.close();
+
+		} catch (Exception ex) {
+			Log.d("GetStatusRec", "Something happend here " + ex.getMessage());
+			msgbox(new Object() {
+			}.getClass().getEnclosingMethod().getName() + " " + ex.getMessage());
 		}
 
 		return  vGetStatusRec;

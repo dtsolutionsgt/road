@@ -77,6 +77,8 @@ public class BonBarra extends PBase {
             peso=dt.getDouble(1);
             bon=dt.getString(2);
 
+            if(dt!=null) dt.close();
+
             txtBarra.setText("");txtBarra.requestFocus();
 
             if (!bon.equalsIgnoreCase(bonid)) {
@@ -213,6 +215,8 @@ public class BonBarra extends PBase {
             dt.moveToFirst();
             nom=dt.getString(0);
 
+            if(dt!=null) dt.close();
+
             prodname=bonid+" -"+nom;
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -222,10 +226,17 @@ public class BonBarra extends PBase {
     }
 
     private int barraVenta(String barra) {
+        int rslt;
+
         try {
             sql="SELECT BARRA FROM T_BARRA WHERE BARRA='"+barra+"'";
             Cursor dt=Con.OpenDT(sql);
-            if (dt.getCount()>0) return 1;else return 0;
+
+            if(dt!=null) dt.close();
+
+            if (dt.getCount()>0) rslt=1 ;else rslt= 0;
+
+            return rslt;
         } catch (Exception e) {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -234,10 +245,17 @@ public class BonBarra extends PBase {
     }
 
     private int barraBonif(String barra) {
+        int rslt;
+
         try {
             sql="SELECT BARRA FROM T_BARRA_BONIF WHERE BARRA='"+barra+"'";
             Cursor dt=Con.OpenDT(sql);
-            if (dt.getCount()>0) return 1;else return 0;
+
+           if(dt!=null) dt.close();
+
+            if (dt.getCount()>0) rslt=1 ;else rslt= 0;
+
+            return rslt;
         } catch (Exception e) {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -246,10 +264,16 @@ public class BonBarra extends PBase {
     }
 
     private int cantBon() {
+        int rslt;
+
         try {
             sql="SELECT BARRA FROM T_BARRA_BONIF WHERE PRODUCTO='"+gl.bonbarprod+"'";
             Cursor dt=Con.OpenDT(sql);
-            return dt.getCount();
+
+            rslt=dt.getCount();
+            if(dt!=null) dt.close();
+
+            return rslt;
         } catch (Exception e) {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -258,10 +282,16 @@ public class BonBarra extends PBase {
     }
 
     private int cantFalt() {
+        int rslt;
+
         try {
             sql="SELECT PRODID FROM T_BONIFFALT WHERE PRODUCTO='"+gl.bonbarprod+"'";
             Cursor dt=Con.OpenDT(sql);
-            return dt.getCount();
+
+            rslt=dt.getCount();
+            if(dt!=null) dt.close();
+
+            return rslt;
         } catch (Exception e) {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

@@ -152,6 +152,8 @@ public class BonVenta extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage()+"\n"+sql);

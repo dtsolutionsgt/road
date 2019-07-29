@@ -137,8 +137,14 @@ public class Deposito extends PBase {
 				if (DT.getCount()==0) {
 					if (tef>0){
 					msgbox("Por favor realice el desglose antes de continuar.");
+
+					if(DT!=null) DT.close();
+
 					return;}
 				}
+
+				if(DT!=null) DT.close();
+
 			}
 
 			msgAskSave("Guardar depósito");
@@ -425,7 +431,9 @@ public class Deposito extends PBase {
 			 
 				DT.moveToNext();
 			}
-				
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}		
@@ -593,6 +601,8 @@ public class Deposito extends PBase {
 					//db.execSQL(sql);
 				}
 
+				if(DT!=null) DT.close();
+
 			}
 
 			db.execSQL("UPDATE FinDia SET val3=0");
@@ -652,7 +662,9 @@ public class Deposito extends PBase {
 			  
 			  DT.moveToNext();
 			}
-					
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());

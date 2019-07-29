@@ -596,6 +596,9 @@ public class Producto extends PBase {
 			  
 			  DT.moveToNext();
 			}
+
+            if(DT!=null) DT.close();
+
 					
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

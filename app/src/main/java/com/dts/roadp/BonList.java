@@ -208,8 +208,6 @@ public class BonList extends PBase {
 			}
 			
 			DT=Con.OpenDT(sql);
-			//mu.msgbox("Regs. "+DT.getCount());
-			
 			DT.moveToFirst();
 			
 			while (!DT.isAfterLast()) {
@@ -240,6 +238,8 @@ public class BonList extends PBase {
 			 
 			  DT.moveToNext();
 			}
+
+			if(DT!=null) DT.close();
 
 			adapter=new ListAdaptBonif(this,items);
 			listView.setAdapter(adapter);
@@ -294,6 +294,9 @@ public class BonList extends PBase {
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			iidx=DT.getInt(0);
+
+			if(DT!=null) DT.close();
+
 			iidx++;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -755,6 +758,8 @@ public class BonList extends PBase {
 			DT.moveToFirst();
 			sdisp=DT.getDouble(0);
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			sdisp=0;
@@ -776,6 +781,9 @@ public class BonList extends PBase {
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			sdisp=DT.getDouble(0);
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			sdisp=25;

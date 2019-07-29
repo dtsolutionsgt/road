@@ -169,6 +169,8 @@ public class comWSLic extends PBase {
             lic = dt.getString(0);
             licruta = dt.getString(1);
 
+           if(dt!=null) dt.close();
+
             if (!mu.emptystr(lic)){
                 if (lic.equalsIgnoreCase(lickey) ) {
                     licenciaHH=true;
@@ -781,6 +783,8 @@ public class comWSLic extends PBase {
                     URL = DT.getString(1);
                 }
 
+                if(DT!=null) DT.close();
+
                 //URL=wsurl;
                 if (URL!=null && !URL.equalsIgnoreCase("")){
                     txtWS.setText(URL);
@@ -846,6 +850,8 @@ public class comWSLic extends PBase {
                 DT.moveToFirst();
                 cnt=DT.getInt(0);
             }
+
+            if(DT!=null) DT.close();
 
             if (cnt>0) {
                 st=pps+" "+cnt;

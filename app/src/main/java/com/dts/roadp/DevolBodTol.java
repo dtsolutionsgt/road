@@ -255,6 +255,8 @@ public class DevolBodTol extends PBase {
                 dp.moveToNext();
             }
 
+            if(dp!=null) dp.close();
+
             lblTot.setText("Cant : " + mu.frmdecno(valt)+" Peso : "+ mu.round(pesot,gl.peDec)+" "+gl.umpeso);
 
         } catch (Exception e) {

@@ -415,12 +415,48 @@ public class AppMethods {
 			dt.moveToFirst();
 
 			val=dt.getString(0);
-			if (emptystr(val)) gl.pTransBarra =false;
-
-			gl.pTransBarra =val.equalsIgnoreCase("S");
+			if (emptystr(val)) {
+				gl.pTransBarra =false;
+			}else{
+				gl.pTransBarra =val.equalsIgnoreCase("S");
+			}
 
 		} catch (Exception e) {
 			gl.pTransBarra =false;
+		}
+
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=22";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) {
+				gl.pMostrarCodigoCliente =true;
+			}else{
+				gl.pMostrarCodigoCliente =val.equalsIgnoreCase("S");
+			}
+
+		} catch (Exception e) {
+			gl.pMostrarCodigoCliente =true;
+		}
+
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=23";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) {
+				gl.pMostrarRazonNoAten =false;
+			}else{
+				gl.pMostrarRazonNoAten =val.equalsIgnoreCase("S");
+			}
+
+		} catch (Exception e) {
+			gl.pMostrarRazonNoAten =false;
 		}
 	}
 

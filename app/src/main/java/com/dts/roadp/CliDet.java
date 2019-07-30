@@ -41,7 +41,7 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 public class CliDet extends PBase {
 
-	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
+	private TextView lblNom, lblNit,lblDir,lblAten,lblTel,lblGPS;
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago;
 	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol,imgRoadTit;
@@ -69,7 +69,7 @@ public class CliDet extends PBase {
 		addlog("CliDet",""+du.getActDateTime(),gl.vend);
 		
 		lblNom= (TextView) findViewById(R.id.lblNom);
-		lblRep= (TextView) findViewById(R.id.lblPres);
+		lblNit = (TextView) findViewById(R.id.lblPres);
 		lblDir= (TextView) findViewById(R.id.lblDir);
 		lblAten= (TextView) findViewById(R.id.lblCant);
 		lblTel= (TextView) findViewById(R.id.lblTel);
@@ -369,7 +369,8 @@ public class CliDet extends PBase {
 		int uvis,dcred;
 		String contr,sgps="0.00000000 , 0.00000000";
 		
-		lblNom.setText("");lblRep.setText("");
+		lblNom.setText("");
+		lblNit.setText("");
 		lblDir.setText("");lblAten.setText("");lblTel.setText("");
 		tel="";
 		
@@ -382,7 +383,7 @@ public class CliDet extends PBase {
 			DT.moveToFirst();
 							  
 			lblNom.setText(cod + " - " + DT.getString(0));
-			lblRep.setText(DT.getString(12));
+			lblNit.setText(DT.getString(12));
 			lblDir.setText(DT.getString(2));
 			lblCantDias.setText(DT.getString(17));
 
@@ -741,7 +742,7 @@ public class CliDet extends PBase {
 
 	public void showDir(View view) {
 		try{
-			//mu.msgbox(lblDir.getText().toString() + "\n" + lblRep.getText().toString());
+			//mu.msgbox(lblDir.getText().toString() + "\n" + lblNit.getText().toString());
 			msgAskEditCliente();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -765,15 +766,15 @@ public class CliDet extends PBase {
 
 			final TextView lblNit = new TextView(this);
 			lblNit.setTextSize(10);
-			lblNit.setText("NIT:");
+			lblNit.setText("RUC:");
 
 			final EditText editNombre = new EditText(this);
 			editNombre.setInputType(InputType.TYPE_CLASS_TEXT);
-			editNombre.setText(lblDir.getText().toString());
+			editNombre.setText(lblNom.getText().toString());
 
 			final EditText editNit = new EditText(this);
 			editNit.setInputType(InputType.TYPE_CLASS_TEXT);
-			editNit.setText(lblRep.getText().toString());
+			editNit.setText(this.lblNit.getText().toString());
 
 			layout.addView(lblNombre);
 			layout.addView(editNombre);
@@ -808,6 +809,9 @@ public class CliDet extends PBase {
 		Cursor DT;
 		try {
 			db.execSQL("INSERT INTO D_FACTURAF(COREL, NOMBRE, NIT, DIRECCION) VALUES('"+corel+"','"+NombreEdit+"','"+NitEdit+"','')");
+			db.execSQL("UPDATE P_CLIENTE SET NOMBRE = '" + NombreEdit + "', NIT = '" + NitEdit + "' WHERE CODIGO = '" + cod + "'");
+			lblNom.setText(NombreEdit);
+			lblNit.setText(NitEdit);
 			mu.msgbox("Registro actualizado");
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

@@ -1040,7 +1040,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
@@ -1176,7 +1176,7 @@ public class ComWS extends PBase {
 			*/
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
@@ -1268,7 +1268,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1313,7 +1313,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
@@ -1364,7 +1364,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
 
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
@@ -1402,7 +1402,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
 
@@ -1444,7 +1444,7 @@ public class ComWS extends PBase {
 
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1482,7 +1482,7 @@ public class ComWS extends PBase {
 
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1520,7 +1520,7 @@ public class ComWS extends PBase {
 
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1611,6 +1611,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_PRODUCTO")) return false;
 			if (!AddTable("P_PRODPRECIO")) return false;
 			if (!AddTable("P_NIVELPRECIO")) return false;
+			if (!AddTable("P_TIPONEG")) return false;
 			if (!AddTable("P_CLIENTE_FACHADA")) return false;
 			if (!AddTable("P_CLIRUTA")) return false;
 			if (!AddTable("P_CLIDIR")) return false;
@@ -1626,7 +1627,6 @@ public class ComWS extends PBase {
 			if (!AddTable("P_CODATEN")) return false;
 			if (!AddTable("P_CODDEV")) return false;
 			if (!AddTable("P_CODNOLEC")) return false;
-			if (!AddTable("P_NIVELPRECIO")) return false;
 			if (!AddTable("P_CORELNC")) return false;
 			if (!AddTable("P_CORRELREC")) return false;
 			if (!AddTable("P_CORREL_OTROS")) return false;
@@ -1714,20 +1714,43 @@ public class ComWS extends PBase {
 			prn = 0;jj = 0;
 			Log.d("M", "So far so good");
 
-			dbT.beginTransaction();
+			try{
+                for (int i = 0; i < rc; i++) {
 
-			for (int i = 0; i < rc; i++) {
+                    sql = listItems.get(i);
+                    esql = sql;
+                    sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
+                    sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
+                    sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
+
+                    try {
+                        writer.write(sql);
+                        writer.write("\r\n");
+                    } catch (Exception e) {
+                        Log.d("M", "Write Something happend there " + e.getMessage());
+                    }
+                }
+
+                writer.close();
+
+            }catch (Exception ex){
+                Log.d("M", "Write Something happend there " + ex.getMessage());
+            }
+
+            dbT.beginTransaction();
+
+            for (int i = 0; i < rc; i++) {
 
 				sql = listItems.get(i);esql = sql;
 				sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
 				sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
                 sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
 
-				try {
+				/*try {
 					writer.write(sql);writer.write("\r\n");
 				} catch (Exception e) {
 					Log.d("M", "Write Something happend there " + e.getMessage());
-				}
+				}*/
 
 				try {
 					dbT = ConT.getWritableDatabase();
@@ -1782,13 +1805,6 @@ public class ComWS extends PBase {
 				ConT.close();
 			} catch (Exception e) {
 				//addlog(new Object() {	}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-			}
-
-			try {
-				writer.close();
-			} catch (Exception e) {
-				//addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-				//msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
 			}
 
 			return true;
@@ -2338,6 +2354,11 @@ public class ComWS extends PBase {
 
 		if (TN.equalsIgnoreCase("P_NIVELPRECIO")) {
 			SQL = "SELECT CODIGO, NOMBRE, ISNULL(DECIMALES,0) AS DECIMALES FROM P_NIVELPRECIO ";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_TIPONEG")) {
+			SQL = "SELECT CODIGO, NOMBRE FROM P_TIPONEG ";
 			return SQL;
 		}
 

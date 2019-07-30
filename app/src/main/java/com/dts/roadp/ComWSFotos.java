@@ -76,7 +76,7 @@ public class ComWSFotos extends PBase {
 
         lblParam= (TextView) findViewById(R.id.lblProd);
         lblInfo= (TextView) findViewById(R.id.lblETipo);
-        lblAct= (TextView) findViewById(R.id.textView5);lblAct.setVisibility(View.INVISIBLE);
+        lblAct= (TextView) findViewById(R.id.lblTipo);lblAct.setVisibility(View.INVISIBLE);
         barInfo= (ProgressBar) findViewById(R.id.progressBar2);
         txtRuta= (EditText) findViewById(R.id.txtRuta);txtRuta.setEnabled(false);
         txtWS= (EditText) findViewById(R.id.txtWS);txtWS.setEnabled(false);

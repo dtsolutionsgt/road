@@ -42,11 +42,15 @@ public class ProdCant extends PBase {
 	private TextView lblNuevoPrecio, lblPrecioMinimo;
 
 	private Precio prc;
-	
+
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant, modifprecio;
 	private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0, costo=0, nuevoprecio=0;
 	private boolean pexist,esdecimal,porpeso,esbarra,idle=true;
+
+	private String URL;
+
+	private WebService ws;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,14 +80,17 @@ public class ProdCant extends PBase {
 
 		}
 
+		URL=getURL();
+
+		ws=new WebService(ProdCant.this,URL);
+
 		prodid=gl.prod;lblCodProd.setText(prodid);
 		um=gl.um;
 		nivel=gl.nivel;
 		rutatipo=gl.rutatipo;
 
 		if (rutatipo.equalsIgnoreCase("V")) imgUpd.setVisibility(View.INVISIBLE);
-		imgUpd.setVisibility(View.INVISIBLE);
-		
+
 		prc=new Precio(this,mu,gl.peDec);
 		if (rutatipo.equalsIgnoreCase("V")) {
 			getDisp();
@@ -114,11 +121,11 @@ public class ProdCant extends PBase {
 		showData();
 
 		showkeyb();
-		
+
 	}
 
 	//region Events
-	
+
 	public void sendCant(View view) {
 		try{
 			if (setCant(false)<1) applyCant();
@@ -126,7 +133,7 @@ public class ProdCant extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	}
-	
+
 	public void showPromo(View view){
 		try{
 			gl.gstr=prodid;
@@ -138,7 +145,7 @@ public class ProdCant extends PBase {
 		}
 
 	}
-	
+
 	public void showPic(View view){
 		try{
 			gl.gstr=proddesc;
@@ -150,7 +157,7 @@ public class ProdCant extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	}
-	
+
 	public void doDelete(View view) {
 		try{
 			msgAskDel("Borrar producto");
@@ -159,7 +166,7 @@ public class ProdCant extends PBase {
 		}
 
 	}
-		
+
 	public void askExist(View view) {
 
 		try{
@@ -170,8 +177,7 @@ public class ProdCant extends PBase {
 
 			dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					browse=1;
-					startActivity(new Intent(ProdCant.this,ComWSExist.class));
+					DameInventario();
 				}
 			});
 
@@ -182,9 +188,9 @@ public class ProdCant extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
+
 	}
-	
+
  	private void setHandlers(){
 
 		try{
@@ -430,7 +436,51 @@ public class ProdCant extends PBase {
 
         txtPeso.setText(mu.frmdecimal(ippeso, gl.peDecImp));
 	}
-	
+
+	private double DameInventario() {
+
+		try {
+
+			sql=" SELECT SUM(CANTIDAD) AS CANTIDAD " +
+			" FROM I_EXISTENCIAS E INNER JOIN P_PRODUCTO P ON E.CODPRODUCTO = P.CODIGO " +
+			" WHERE CODPRODUCTO = '" + prodid + "' AND P.PRODUCTO_PADRE = '' " +
+			" GROUP BY CODPRODUCTO " +
+			" UNION " +
+			" SELECT ROUND(SUM(CANTIDAD), " +
+			" (SELECT P1.FACTOR_PADRE FROM P_PRODUCTO P1 WHERE P1.CODIGO = '" + prodid + "' ),0) AS CANTIDAD  " +
+			" FROM I_EXISTENCIAS E INNER JOIN P_PRODUCTO P ON E.CODPRODUCTO = P.CODIGO " +
+			" WHERE  E.CODPRODUCTO IN (SELECT P1.PRODUCTO_PADRE  " +
+			" FROM P_PRODUCTO P1 WHERE P1.CODIGO = '" + prodid + "' ) " +
+			" GROUP BY E.CODPRODUCTO";
+
+			ws.openDT(sql);
+
+		} catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
+		return 0;
+	}
+
+	@Override
+	protected void wsCallBack(Boolean throwing,String errmsg) {
+
+		try {
+			super.wsCallBack(throwing, errmsg);
+
+			ws.openDTCursor.moveToFirst();
+
+			double vValor= ws.openDTCursor.getDouble(0);
+
+			toast("Existencia " + vValor);
+
+			lblDisp.setText("Disponible: " + vValor);
+
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+		}
+	}
+
 	private double getDisp() {
 
 		Cursor dt;
@@ -698,7 +748,9 @@ public class ProdCant extends PBase {
 				} else {
 					cant=-1;peso=0;return -1;
 				}
-				if (peso<=0) throw new Exception();
+				if(gl.usarpeso){
+					if (peso<=0) throw new Exception();
+				}
 			} catch (Exception e) {
 				cant=-1;peso=0;return -1;
 			}
@@ -881,7 +933,6 @@ public class ProdCant extends PBase {
 		return true;
 	}
 
-
 	private void setPrecio() {
 	    double cu,tv,corig,cround,fruni,frcant,adcant,ppeso=0;
 
@@ -1009,6 +1060,21 @@ public class ProdCant extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("1-"+ e.getMessage());
+		}
+	}
+
+	public String getURL() {
+		Cursor DT;
+
+		try {
+			sql = "SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='" + gl.ruta + "'";
+			DT = Con.OpenDT(sql);
+
+			DT.moveToFirst();
+			return DT.getString(0);
+
+		} catch (Exception e) {
+			return "*";
 		}
 	}
 

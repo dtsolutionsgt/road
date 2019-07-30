@@ -16,7 +16,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -66,7 +65,7 @@ public class LicRegis extends PBase {
 		lblInfo= (TextView) findViewById(R.id.lblETipo);
 		lblParam= (TextView) findViewById(R.id.lblProd);
 		lblMac= (TextView) findViewById(R.id.textView1);
-		lblDevName= (TextView) findViewById(R.id.textView5);
+		lblDevName= (TextView) findViewById(R.id.lblTipo);
 		barInfo= (ProgressBar) findViewById(R.id.progressBar2);
 		txtRuta= (EditText) findViewById(R.id.txtRuta);
 		txtWS= (EditText) findViewById(R.id.txtWS);

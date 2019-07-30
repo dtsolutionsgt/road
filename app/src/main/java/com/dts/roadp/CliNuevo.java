@@ -34,12 +34,17 @@ public class CliNuevo extends PBase {
 
 	private EditText txtNom, txtDir, txtTel, txtNit;
 	private Spinner spinList;
+	private Spinner spinListTN;
 	private CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7;
 
 	private ArrayList<String> spincode = new ArrayList<String>();
 	private ArrayList<String> spinlist = new ArrayList<String>();
 
+	private ArrayList<String> spincodeTipo = new ArrayList<String>();
+	private ArrayList<String> spinlistTipo = new ArrayList<String>();
+
 	private int nivel = 0;
+	private int tipocli = 0;
 	private int d1, d2, d3, d4, d5, d6, d7;
 
 	// Location
@@ -69,6 +74,7 @@ public class CliNuevo extends PBase {
 		txtDir = (EditText) findViewById(R.id.txtCNDir);
 		txtTel = (EditText) findViewById(R.id.txtCNTel);
 		txtNit = (EditText) findViewById(R.id.txtCNNit);
+		spinListTN = (Spinner) findViewById(R.id.spnTipoCliente);
 
 		cb1 = (CheckBox) findViewById(R.id.checkBox1);
 		cb2 = (CheckBox) findViewById(R.id.checkBox2);
@@ -79,6 +85,7 @@ public class CliNuevo extends PBase {
 		cb7 = (CheckBox) findViewById(R.id.checkBox7);
 
 		fillSpinner();
+		fillSpinnerTC();
 		setHandlers();
 
 		locationListener = new LocationListener() {
@@ -170,6 +177,35 @@ public class CliNuevo extends PBase {
 
 		});
 
+		spinListTN.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+				TextView spinlabel;
+				String scod;
+
+				try {
+
+					spinlabel = (TextView) parentView.getChildAt(0);
+					spinlabel.setTextColor(Color.BLACK);
+					spinlabel.setPadding(5, 0, 0, 0);
+					spinlabel.setTextSize(16);
+
+					scod = spincode.get(position);
+					tipocli = Integer.parseInt(scod);
+
+				} catch (Exception e) {
+					tipocli = 0;
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(), "");
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parentView) {
+				return;
+			}
+
+		});
+
 	}
 
 	private void saveData() {
@@ -194,7 +230,7 @@ public class CliNuevo extends PBase {
 			ins.add("DIRECCION", txtDir.getText().toString() + "");
 			ins.add("TELEFONO", txtTel.getText().toString() + "");
 			ins.add("NIT", txtNit.getText().toString() + "");
-			ins.add("TIPONEG", "");
+			ins.add("TIPONEG", tipocli);
 			ins.add("NIVPRECIO", nivel);
 
 			ins.add("DIA1", valToStr(d1));
@@ -482,8 +518,47 @@ public class CliNuevo extends PBase {
 			mu.msgbox(e.getMessage());
 	    }
 		
-	}		
-	
+	}
+
+	private void fillSpinnerTC(){
+		Cursor DT;
+
+		try {
+
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				sql="SELECT CODIGO,NOMBRE FROM P_TIPONEG ";
+			}
+
+			DT=Con.OpenDT(sql);
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				spincodeTipo.add(DT.getString(0));
+				spinlistTipo.add(DT.getString(1));
+
+				DT.moveToNext();
+			}
+
+	/*	} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		   	mu.msgbox(e.getMessage());
+	    }*/
+
+			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, spinlist);
+			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+			spinListTN.setAdapter(dataAdapter);
+
+			///try {
+			spinListTN.setSelection(0);
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox(e.getMessage());
+		}
+
+	}
+
 	private boolean checkValues(){
 		final Calendar c = Calendar.getInstance();
 		int sc,dw;

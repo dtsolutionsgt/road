@@ -400,7 +400,7 @@
             android:src="@drawable/act_stock" />
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/lblTipo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/imageView1"

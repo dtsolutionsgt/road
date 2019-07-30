@@ -1230,6 +1230,13 @@ public class BaseDatosScript {
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);
+
+			vSQL="CREATE TABLE [P_TIPONEG] ("+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[NOMBRE] TEXT NOT NULL,"+
+					"PRIMARY KEY ([CODIGO])"+
+					");";
+			database.execSQL(vSQL);
 			
 
 			vSQL="CREATE TABLE [P_LINEA] ("+

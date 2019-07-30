@@ -188,7 +188,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView1"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/textView5"
+        android:layout_below="@+id/lblTipo"
         android:ems="10"
         android:maxLength="50"
         android:textStyle="bold" />
@@ -204,7 +204,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/lblTipo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/editText2"

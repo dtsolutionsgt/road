@@ -29,6 +29,8 @@ import android.widget.TextView;
 
 import com.dts.roadp.clsClasses.clsCDB;
 
+import org.apache.commons.lang.ObjectUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -304,9 +306,10 @@ public class Clientes extends PBase {
 
 	public void listItems() {
 		Cursor DT;
+		Cursor DT2;
 		clsCDB vItem;
 		int vP;
-		String id, filt, ss;
+		String id, filt, ss, razonNoAten;
 
 		items.clear();
 
@@ -389,6 +392,23 @@ public class Clientes extends PBase {
 					ss = DT.getString(0);
 					vItem.Desc = DT.getString(1);
 					vItem.Bandera = DT.getInt(2);
+					razonNoAten="";
+
+					if (vItem.Bandera!=-1 & vItem.Bandera!=0){
+						sql = "SELECT NOMBRE FROM P_CODATEN WHERE CODIGO = '" + vItem.Bandera + "'" ;
+						DT2 = Con.OpenDT(sql);
+
+						if (DT2.getCount() > 0) {
+							DT2.moveToFirst();
+							razonNoAten=DT2.getString(0);
+						}
+
+						if (DT2!=null) DT2.close();
+
+					}
+
+					vItem.RazNoAten = razonNoAten;
+
 					vItem.Adds = "";
 					vItem.coorx = DT.getDouble(3);
 					vItem.coory = DT.getDouble(4);
@@ -427,7 +447,7 @@ public class Clientes extends PBase {
 			mu.msgbox(e.getMessage());
 		}
 
-		adapter = new ListAdaptCliList(this, items);
+		adapter = new ListAdaptCliList(this, items,gl.pMostrarRazonNoAten, gl.pMostrarCodigoCliente);
 		listView.setAdapter(adapter);
 
 		if (selidx > -1) {
@@ -550,7 +570,7 @@ public class Clientes extends PBase {
 
 		Collections.sort(items, new distanceComparator());
 
-		adapter = new ListAdaptCliList(this, items);
+		adapter = new ListAdaptCliList(this, items, gl.pMostrarRazonNoAten, gl.pMostrarCodigoCliente);
 		listView.setAdapter(adapter);
 
 		adapter.setSelectedIndex(0);

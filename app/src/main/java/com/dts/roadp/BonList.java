@@ -55,7 +55,7 @@ public class BonList extends PBase {
 		
 		listView =  (ListView) findViewById(R.id.listView1);
 		relMonto =  (RelativeLayout) findViewById(R.id.relMonto);
-		lblMonto =  (TextView) findViewById(R.id.textView5);
+		lblMonto =  (TextView) findViewById(R.id.lblTipo);
 		lblFalta =  (TextView) findViewById(R.id.lblSel);
 		lblTipo =  (TextView) findViewById(R.id.textView2);
 		lblMarg =  (TextView) findViewById(R.id.textView8);

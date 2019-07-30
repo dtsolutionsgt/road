@@ -30,13 +30,13 @@ public class clsBonif {
 		
 		prodid=producto;cant=cantidad;monto=montoventa;
 
-		/*
+
 		try {
 			active=0;
 			Con = new BaseDatos(context);
 			opendb();
 		} catch (Exception e) {
-		}*/
+		}
 
 	    MU=new MiscUtils(context);
 		
@@ -218,7 +218,8 @@ public class clsBonif {
 				}
 				
 				if (val>0) {				
-					mcant=cant-DT.getDouble(2)+1;
+					//mcant=cant-DT.getDouble(2)+1;
+					mcant=cant;
 					mul=DT.getDouble(3);
 
 					if (mul>0) {
@@ -333,7 +334,8 @@ public class clsBonif {
 	
  	private boolean validaPermisos(){
 		Cursor DT;
-		
+		String vSQL = "";
+
 		try {
 			vSQL="SELECT BONIFICACION,LINEA,SUBLINEA,MARCA FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	DT=Con.OpenDT(vSQL);

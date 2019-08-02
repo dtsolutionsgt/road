@@ -7,7 +7,7 @@
     <ImageView
         android:id="@+id/imgNext"
         android:layout_width="match_parent"
-        android:layout_height="96dp"
+        android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:minHeight="96dp"

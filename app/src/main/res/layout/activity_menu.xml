@@ -33,7 +33,7 @@
             android:textColor="#1A8AC6" />
 
         <ImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/imgDevol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"

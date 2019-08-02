@@ -985,6 +985,15 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+			vSQL= "CREATE TABLE [D_MODIFICACIONES]("+
+					"[RUTA] TEXT NOT NULL,"+
+					"[MODIFICACION] TEXT NOT NULL,"+
+					"[FECHA] INTEGER NOT NULL,"+
+					"[STATCOM] TEXT NOT NULL,"+
+					"PRIMARY KEY ([RUTA],[FECHA])"+
+					");";
+			database.execSQL(vSQL);
+
 			return 1;
 		} catch (SQLiteException e) {
 		   	msgbox(e.getMessage());

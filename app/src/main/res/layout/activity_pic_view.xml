@@ -6,7 +6,7 @@
     tools:context=".PicView">
 
     <ImageView
-        android:id="@+id/imgImg"
+        android:id="@+id/imgTel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"

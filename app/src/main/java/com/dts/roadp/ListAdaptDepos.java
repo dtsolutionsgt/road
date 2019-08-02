@@ -3,8 +3,6 @@ package com.dts.roadp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import com.dts.roadp.clsClasses.clsCDB;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -67,7 +65,7 @@ public class ListAdaptDepos extends BaseAdapter {
 			holder.lblCod  = (TextView) convertView.findViewById(R.id.lblETipo);
 			holder.lblDesc = (TextView) convertView.findViewById(R.id.lblCFact);
 			holder.lblTot = (TextView) convertView.findViewById(R.id.lblDVTot);
-			holder.imgBand = (ImageView) convertView.findViewById(R.id.imgImg);
+			holder.imgBand = (ImageView) convertView.findViewById(R.id.imgTel);
 			
 			convertView.setTag(holder);
 		} else {

@@ -68,7 +68,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="5dp"
-        android:layout_toStartOf="@+id/imgImg"
+        android:layout_toStartOf="@+id/imgTel"
         android:background="@layout/spinner_style" />
 
     <RelativeLayout
@@ -173,7 +173,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/lblSel"
-            android:layout_alignRight="@+id/imgPFoto"
+            android:layout_alignRight="@+id/imgWhatsApp"
             android:layout_marginRight="46dp"
             android:text="Medium Text"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -192,7 +192,7 @@
             android:textSize="18sp" />
 
         <ImageView
-            android:id="@+id/imgPFoto"
+            android:id="@+id/imgWhatsApp"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignBottom="@+id/lblBU"
@@ -252,7 +252,7 @@
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/imgImg"
+        android:id="@+id/imgTel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/relRoad"

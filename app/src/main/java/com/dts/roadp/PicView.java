@@ -22,7 +22,7 @@ public class PicView extends PBase {
 		super.InitBase();
 		addlog("PicView",""+du.getActDateTime(),gl.vend);
 		
-		imgImg=(ImageView) findViewById(R.id.imgImg);
+		imgImg=(ImageView) findViewById(R.id.imgTel);
 		
 		this.setTitle(((appGlobals) vApp).gstr);
 		imgpath=((appGlobals) vApp).imgpath;

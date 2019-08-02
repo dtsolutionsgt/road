@@ -226,8 +226,8 @@ public class Deposito extends PBase {
 
 		try{
 			listView   = (ListView)  dialog.findViewById(R.id.listView1);
-			btnSave    = (ImageView) dialog.findViewById(R.id.imageView2);
-			btnCancel  = (ImageView) dialog.findViewById(R.id.imageView1);
+			btnSave    = (ImageView) dialog.findViewById(R.id.imgCobro);
+			btnCancel  = (ImageView) dialog.findViewById(R.id.imgDevol);
 			btnSelAll  = (ImageView) dialog.findViewById(R.id.imageView10);
 			btnSelNone = (ImageView) dialog.findViewById(R.id.imageView11);
 

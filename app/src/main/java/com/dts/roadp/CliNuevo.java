@@ -190,7 +190,7 @@ public class CliNuevo extends PBase {
 					spinlabel.setPadding(5, 0, 0, 0);
 					spinlabel.setTextSize(16);
 
-					scod = spincode.get(position);
+					scod = spincodeTipo.get(position);
 					tipocli = Integer.parseInt(scod);
 
 				} catch (Exception e) {
@@ -491,6 +491,13 @@ public class CliNuevo extends PBase {
 			}
 
 			DT=Con.OpenDT(sql);
+
+			if (DT.getCount()==0){
+
+				if (DT!=null) DT.close();
+				sql="SELECT Codigo,Nombre FROM P_NIVELPRECIO ORDER BY Codigo";
+				DT=Con.OpenDT(sql);
+			}
 					
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
@@ -545,7 +552,7 @@ public class CliNuevo extends PBase {
 		   	mu.msgbox(e.getMessage());
 	    }*/
 
-			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, spinlist);
+			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, spinlistTipo);
 			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 			spinListTN.setAdapter(dataAdapter);

@@ -81,7 +81,7 @@
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/ImageView01"
+        android:id="@+id/imgPreventa"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_alignParentLeft="true"
@@ -92,7 +92,7 @@
         android:src="@drawable/prev48" />
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/imgDevol"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_alignParentRight="true"
@@ -171,8 +171,8 @@
         android:id="@+id/editText1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/imageView1"
-        android:layout_below="@+id/ImageView01"
+        android:layout_alignRight="@+id/imgDevol"
+        android:layout_below="@+id/imgPreventa"
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/textView4"
         android:ems="10"

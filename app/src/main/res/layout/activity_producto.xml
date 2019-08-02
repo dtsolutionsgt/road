@@ -173,7 +173,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/lblProd"
         android:layout_alignLeft="@+id/spinner1"
-        android:layout_toLeftOf="@+id/imageView1"
+        android:layout_toLeftOf="@+id/imgDevol"
         android:ems="10"
         android:singleLine="true">
 
@@ -181,7 +181,7 @@
     </EditText>
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/imgDevol"
         android:layout_width="48dp"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/editText1"
@@ -197,10 +197,10 @@
 
     <TextView
         android:id="@+id/textView27"
-        android:layout_width="153dp"
+        android:layout_width="wrap_content"
         android:layout_height="32dp"
-        android:layout_alignParentStart="false"
         android:layout_below="@+id/lblProd"
+        android:layout_alignParentStart="false"
         android:layout_marginStart="30dp"
         android:layout_marginTop="5dp"
         android:layout_toLeftOf="@+id/textView29"
@@ -208,12 +208,14 @@
         android:clickable="true"
         android:gravity="center"
         android:onClick="porCodigo"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
         android:text="Ordenar por codigo"
         android:textSize="12sp" />
 
     <TextView
         android:id="@+id/textView28"
-        android:layout_width="139dp"
+        android:layout_width="wrap_content"
         android:layout_height="31dp"
         android:layout_below="@+id/lblProd"
         android:layout_marginTop="5dp"
@@ -222,6 +224,8 @@
         android:clickable="true"
         android:gravity="center"
         android:onClick="porNombre"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
         android:text="Ordenar por nombre"
         android:textSize="12sp" />
 

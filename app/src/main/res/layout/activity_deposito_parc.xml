@@ -171,7 +171,7 @@
             android:visibility="invisible" />
 
         <ImageView
-            android:id="@+id/imgPFoto"
+            android:id="@+id/imgWhatsApp"
             android:layout_width="64dp"
             android:layout_height="42dp"
             android:layout_alignParentRight="true"
@@ -214,7 +214,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/lblCFact"
-            android:layout_alignRight="@+id/imgPFoto"
+            android:layout_alignRight="@+id/imgWhatsApp"
             android:layout_alignBottom="@+id/lblCFact"
             android:layout_toRightOf="@+id/lblCFact"
             android:ems="10"
@@ -240,7 +240,7 @@
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/imgImg"
+        android:id="@+id/imgTel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

@@ -141,7 +141,7 @@
         android:layout_height="80dp"
         android:layout_above="@+id/relbotpan"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/imageView1"
+        android:layout_below="@+id/imgDevol"
         android:layout_margin="10dp"
         android:background="@layout/frame_rect" >
 
@@ -151,12 +151,12 @@
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="5dp"
-            android:layout_toLeftOf="@+id/imgImg" >
+            android:layout_toLeftOf="@+id/imgTel" >
 
         </ListView>
 
         <ImageView
-            android:id="@+id/imgImg"
+            android:id="@+id/imgTel"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignParentRight="true"
@@ -209,7 +209,7 @@
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/imgDevol"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_below="@+id/relativeLayout2"
@@ -221,7 +221,7 @@
         android:src="@drawable/mas" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/imgCobro"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_alignParentRight="true"

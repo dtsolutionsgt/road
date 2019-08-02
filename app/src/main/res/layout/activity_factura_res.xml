@@ -7,7 +7,7 @@
     tools:context=".PedidoRes">
 
     <ImageView
-        android:id="@+id/imgPFoto"
+        android:id="@+id/imgWhatsApp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -36,8 +36,8 @@
             android:layout_marginStart="-5dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
-            android:layout_toStartOf="@+id/imageView2"
-            android:layout_toEndOf="@+id/imageView1"
+            android:layout_toStartOf="@+id/imgCobro"
+            android:layout_toEndOf="@+id/imgDevol"
             android:clickable="true"
             android:contentDescription="TODO"
             android:onClick="pendientePago"
@@ -48,8 +48,8 @@
             android:id="@+id/lblCVence2"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/imageView1"
-            android:layout_alignRight="@+id/imageView1"
+            android:layout_below="@+id/imgDevol"
+            android:layout_alignRight="@+id/imgDevol"
             android:layout_alignParentLeft="true"
             android:layout_marginStart="-14dp"
             android:layout_marginLeft="114dp"
@@ -67,7 +67,7 @@
             tools:ignore="OnClick" />
 
         <ImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/imgDevol"
             android:layout_width="128dp"
             android:layout_height="48dp"
             android:layout_alignParentStart="true"
@@ -79,7 +79,7 @@
             tools:ignore="OnClick" />
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/imgCobro"
             android:layout_width="128dp"
             android:layout_height="48dp"
             android:layout_alignParentTop="true"
@@ -95,8 +95,8 @@
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/imageView2"
-            android:layout_alignLeft="@+id/imageView2"
+            android:layout_below="@+id/imgCobro"
+            android:layout_alignLeft="@+id/imgCobro"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginEnd="0dp"
@@ -140,8 +140,8 @@
             android:id="@+id/lblCVence"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/imageView1"
-            android:layout_alignRight="@+id/imageView1"
+            android:layout_below="@+id/imgDevol"
+            android:layout_alignRight="@+id/imgDevol"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_marginStart="0dp"
@@ -182,10 +182,10 @@
         android:id="@+id/TextView01"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/imgPFoto"
+        android:layout_alignBottom="@+id/imgWhatsApp"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/imgPFoto"
-        android:layout_toRightOf="@+id/imageView5"
+        android:layout_toLeftOf="@+id/imgWhatsApp"
+        android:layout_toRightOf="@+id/imgWaze"
         android:gravity="center"
         android:paddingLeft="10dp"
         android:paddingBottom="3dp"
@@ -209,7 +209,7 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/imageView4"
+        android:layout_below="@+id/imgVenta"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
@@ -246,7 +246,7 @@
         android:textColor="#FFFFFF" />
 
     <ImageView
-        android:id="@+id/imageView4"
+        android:id="@+id/imgVenta"
         android:layout_width="wrap_content"
         android:layout_height="2dp"
         android:layout_alignTop="@+id/lblFact"
@@ -256,7 +256,7 @@
         android:src="@drawable/sepgray" />
 
     <ImageView
-        android:id="@+id/imageView5"
+        android:id="@+id/imgWaze"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -273,7 +273,7 @@
         android:layout_width="260dp"
         android:layout_height="wrap_content"
         android:layout_above="@+id/relativeLayout1"
-        android:layout_below="@+id/imgPFoto"
+        android:layout_below="@+id/imgWhatsApp"
         android:layout_alignParentLeft="false"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="5dp"

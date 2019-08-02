@@ -36,7 +36,7 @@
                 android:visibility="invisible" />
 
             <ImageView
-                android:id="@+id/imageView2"
+                android:id="@+id/imgCobro"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@+id/imageView2"
+                android:layout_toLeftOf="@+id/imgCobro"
                 android:gravity="center_horizontal"
                 android:paddingTop="3dp"
                 android:text="Total"
@@ -80,7 +80,7 @@
                 android:layout_alignBaseline="@+id/textView4"
                 android:layout_alignBottom="@+id/textView4"
                 android:layout_alignParentRight="true"
-                android:layout_toRightOf="@+id/imageView2"
+                android:layout_toRightOf="@+id/imgCobro"
                 android:gravity="center_horizontal"
                 android:text="Falta"
                 android:textAppearance="?android:attr/textAppearanceMedium"
@@ -114,7 +114,7 @@
         </RelativeLayout>
 
         <ImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/imgDevol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -128,9 +128,9 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/imageView1"
+            android:layout_alignTop="@+id/imgDevol"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/imageView1"
+            android:layout_toLeftOf="@+id/imgDevol"
             android:gravity="center_vertical|center_horizontal"
             android:text="BONIFICACIÓN"
             android:textColor="#000000"
@@ -143,7 +143,7 @@
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
             android:layout_above="@+id/relMonto"
-            android:layout_below="@+id/imageView1"
+            android:layout_below="@+id/imgDevol"
             android:layout_alignParentLeft="true"
             android:layout_margin="10dp"></ListView>
 

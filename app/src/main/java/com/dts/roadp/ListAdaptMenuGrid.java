@@ -16,14 +16,15 @@ import android.widget.TextView;
 public class ListAdaptMenuGrid extends BaseAdapter {
 	private static ArrayList<clsMenu> items;
 	
-	private int selectedIndex;
-	
+	private int selectedIndex, ancho = 0;
+
 	private LayoutInflater l_Inflater;
 
-	public ListAdaptMenuGrid(Context context, ArrayList<clsMenu> results) {
+	public ListAdaptMenuGrid(Context context, ArrayList<clsMenu> results, int pAncho) {
 		items = results;
 		l_Inflater = LayoutInflater.from(context);
 		selectedIndex = -1;
+		ancho = pAncho;
 	}
 
 	public void setSelectedIndex(int ind) {
@@ -57,14 +58,19 @@ public class ListAdaptMenuGrid extends BaseAdapter {
 			
 			holder.imgEst = (ImageView) convertView.findViewById(R.id.imgNext);
 			holder.lblName = (TextView) convertView.findViewById(R.id.lblTrat);
-		
+
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-			
+
 		holder.lblName.setText(items.get(position).Name);
-			
+
+		ViewGroup.LayoutParams layoutParams = holder.imgEst.getLayoutParams();
+		layoutParams.width = ancho;
+		layoutParams.height = ancho;
+		holder.imgEst.setLayoutParams(layoutParams);
+
 		holder.imgEst.setImageResource(R.drawable.blank256);
 		
 		if (items.get(position).Icon==1) holder.imgEst.setImageResource(R.drawable.pedidos_3);
@@ -90,6 +96,8 @@ public class ListAdaptMenuGrid extends BaseAdapter {
 		
 		return convertView;
 	}
+
+
 
 	static class ViewHolder {
 		ImageView imgEst;

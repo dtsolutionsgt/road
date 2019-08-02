@@ -59,11 +59,11 @@
         android:id="@+id/lblFecha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/imgImg"
+        android:layout_alignBottom="@+id/imgTel"
         android:layout_alignLeft="@+id/listView1"
         android:layout_alignParentTop="false"
         android:layout_below="@+id/relRoad"
-        android:layout_toLeftOf="@+id/imgImg"
+        android:layout_toLeftOf="@+id/imgTel"
         android:gravity="center_vertical|center_horizontal"
         android:paddingTop="5dp"
         android:text="Medium Text"
@@ -76,14 +76,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/relbotpan"
-        android:layout_below="@+id/imgImg"
+        android:layout_below="@+id/imgTel"
         android:layout_centerHorizontal="true"
         android:layout_margin="5dp" >
 
     </ListView>
 
     <ImageView
-        android:id="@+id/imgImg"
+        android:id="@+id/imgTel"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_alignParentRight="true"

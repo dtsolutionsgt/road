@@ -41,8 +41,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.5.3 / ";
-    private String parFechaVer = "19-Jul-2019";
+    private String parNumVer = "9.5.4 / ";
+    private String parFechaVer = "30-Jul-2019";
     private String parTipoVer = "ROAD PRD";
 
     @Override
@@ -416,6 +416,10 @@ public class MainActivity extends PBase {
         try {
             File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos");
             directory.mkdirs();
+            File directory1 = new File(Environment.getExternalStorageDirectory() + "/RoadFachadas");
+            directory1.mkdirs();
+            File directory2 = new File(Environment.getExternalStorageDirectory() + "/RoadFachadas");
+            directory2.mkdirs();
         } catch (Exception e) {
         }
 

@@ -59,7 +59,7 @@
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/imgCobro"
         android:layout_width="200dp"
         android:layout_height="300dp"
         android:layout_above="@+id/TextView01"

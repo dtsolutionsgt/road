@@ -92,11 +92,10 @@
 
         <EditText
             android:id="@+id/editText1"
-            android:layout_width="262dp"
+            android:layout_width="670dp"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_alignStart="@+id/rel008"
-            android:layout_marginStart="62dp"
+            android:layout_marginStart="20dp"
             android:layout_toLeftOf="@+id/imageView"
             android:ems="10"
             android:inputType="textPersonName"

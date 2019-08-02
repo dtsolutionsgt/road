@@ -10,7 +10,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
@@ -18,6 +20,7 @@ import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,9 +33,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.text.NumberFormat;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
@@ -43,8 +52,8 @@ public class CliDet extends PBase {
 
 	private TextView lblNom, lblNit,lblDir,lblAten,lblTel,lblGPS;
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago;
-	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
-	private ImageView imgCobro,imgDevol,imgRoadTit;
+	private RelativeLayout relV,relP,relD,relCamara, rlContentVenta;//#HS_20181213 relCamara
+	private ImageView imgCobro,imgDevol,imgRoadTit, imgTel, imgWhatsApp, imgWaze, imgVenta, imgPreventa, imgDespacho, imgCamara, imgMap;
 	private RadioButton chknc,chkncv;
 
 	private PhotoViewAttacher zoomFoto;
@@ -59,6 +68,7 @@ public class CliDet extends PBase {
 	private boolean porcentaje = false;
 	private byte[] imagenBit;
 
+	private double latitude=0, longitude=0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,10 +100,19 @@ public class CliDet extends PBase {
 		relP=(RelativeLayout) findViewById(R.id.relPreventa);
 		relD=(RelativeLayout) findViewById(R.id.relDespacho);
 		relCamara=(RelativeLayout) findViewById(R.id.relCamara);
+		rlContentVenta=(RelativeLayout) findViewById(R.id.rlContentVenta);
 		
-		imgCobro= (ImageView) findViewById(R.id.imageView2);
-		imgDevol= (ImageView) findViewById(R.id.imageView1);
+		imgCobro= (ImageView) findViewById(R.id.imgCobro);
+		imgDevol= (ImageView) findViewById(R.id.imgDevol);
 		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
+		imgTel= (ImageView) findViewById(R.id.imgTel);
+		imgWhatsApp= (ImageView) findViewById(R.id.imgWhatsApp);
+		imgWaze= (ImageView) findViewById(R.id.imgWaze);
+		imgVenta = (ImageView) findViewById(R.id.imgVenta);
+		imgPreventa= (ImageView) findViewById(R.id.imgPreventa);
+		imgDespacho= (ImageView) findViewById(R.id.imgDespacho);
+		imgCamara= (ImageView) findViewById(R.id.imgCamara);
+		imgMap= (ImageView) findViewById(R.id.imgMap);
 
 		app = new AppMethods(this, gl, Con, db);
 
@@ -120,6 +139,8 @@ public class CliDet extends PBase {
 			lblDevol.setVisibility(View.INVISIBLE);
 			imgDevol.setVisibility(View.INVISIBLE);
 		}*/
+
+		resizeButtons();
 
 		showData();
 		calcCredit();
@@ -405,9 +426,14 @@ public class CliDet extends PBase {
 			}
 
 			//#CKFK 20190619 Cambié las coordenadas que se le envían al Waze, en lugar de X,Y le estoy enviando Y,X
+			latitude= DT.getDouble(9);
+			longitude =DT.getDouble(10);
+
 			sgps=mu.frmgps(DT.getDouble(10))+ " , "+ mu.frmgps(DT.getDouble(9));
 			lblGPS.setText(sgps);
-			
+
+			showStaticMap();
+
 			gl.media=DT.getInt(11);
 
 			if(gl.media != 4){
@@ -661,6 +687,123 @@ public class CliDet extends PBase {
 
 	//endregion
 
+	//region Aux
+
+	public void resizeButtons(){
+		try {
+
+			Display screensize = getWindowManager().getDefaultDisplay();
+
+			Point size = new Point();
+			screensize.getSize(size);
+
+			int width = (int)(size.x/7);
+
+			ViewGroup.LayoutParams layoutParams = imgTel.getLayoutParams();
+			layoutParams.width = width;
+			layoutParams.height = width;
+			imgTel.setLayoutParams(layoutParams);
+
+			ViewGroup.LayoutParams layoutParams1 = imgWaze.getLayoutParams();
+			layoutParams1.width = width;
+			layoutParams1.height = width;
+			imgWaze.setLayoutParams(layoutParams1);
+
+			ViewGroup.LayoutParams layoutParams2 = imgWhatsApp.getLayoutParams();
+			layoutParams2.width = width;
+			layoutParams2.height = width;
+			imgWhatsApp.setLayoutParams(layoutParams2);
+
+			ViewGroup.LayoutParams layoutParams3 = imgCobro.getLayoutParams();
+			layoutParams3.width = width ;
+			layoutParams3.height = width;
+			imgCobro.setLayoutParams(layoutParams3);
+
+			ViewGroup.LayoutParams layoutParams4 = imgDevol.getLayoutParams();
+			layoutParams4.width = width;
+			layoutParams4.height = width;
+			imgDevol.setLayoutParams(layoutParams4);
+
+			ViewGroup.LayoutParams layoutParams5 = imgVenta.getLayoutParams();
+			layoutParams5.height = width+30;
+			imgVenta.setLayoutParams(layoutParams5);
+
+			ViewGroup.LayoutParams layoutParams6 = imgPreventa.getLayoutParams();
+			layoutParams6.height = width+30;
+			imgPreventa.setLayoutParams(layoutParams6);
+
+			ViewGroup.LayoutParams layoutParams7 = imgDespacho.getLayoutParams();
+			layoutParams7.height = width+30;
+			imgDespacho.setLayoutParams(layoutParams7);
+
+			ViewGroup.LayoutParams layoutParams8 = imgCamara.getLayoutParams();
+			layoutParams8.height = width+30;
+			imgCamara.setLayoutParams(layoutParams8);
+
+			ViewGroup.LayoutParams layoutParams9 = rlContentVenta.getLayoutParams();
+			layoutParams9.width = width;
+			rlContentVenta.setLayoutParams(layoutParams9);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	private void showStaticMap() {
+
+		try {
+
+			if (latitude == 0 && longitude == 0) {
+				//toastcent("¡Posición desconocida, no se puede mostrar mapa!");
+				imgMap.setImageResource(R.drawable.blank48);
+				return;
+			}
+			final String URL = "https://maps.googleapis.com/maps/api/staticmap?" +
+					"center=" + latitude + "," + longitude + "&" +
+					"zoom=16&size=400x400&" +
+					"markers=color:red%7Clabel:C%7C" + latitude + "," + longitude + "&" +
+					"key=AIzaSyAeDWYjkjRi9vQVk7ITRgvAzV3ktpWyhP0";
+
+			AsyncTask<Void, Void, Bitmap> setImageFromUrl = new AsyncTask<Void, Void, Bitmap>() {
+
+				@Override
+				protected Bitmap doInBackground(Void... params) {
+					Bitmap bmp = null;
+					HttpClient httpclient = new DefaultHttpClient();
+					HttpGet request = new HttpGet(URL);
+
+					InputStream in = null;
+					try {
+						HttpResponse response = httpclient.execute(request);
+						in = response.getEntity().getContent();
+						bmp = BitmapFactory.decodeStream(in);
+						in.close();
+					} catch (Exception e) {
+					}
+
+					return bmp;
+				}
+
+				protected void onPostExecute(Bitmap bmp) {
+					if (bmp != null) {
+						imgMap.setImageBitmap(bmp);
+					} else {
+						imgMap.setImageResource(R.drawable.blank48);
+					}
+
+				}
+
+			};
+
+			setImageFromUrl.execute();
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(), "");
+		}
+
+	}
+
 	//endregion
 
 	//region  Misc
@@ -770,7 +913,7 @@ public class CliDet extends PBase {
 
 			final EditText editNombre = new EditText(this);
 			editNombre.setInputType(InputType.TYPE_CLASS_TEXT);
-			editNombre.setText(lblNom.getText().toString());
+			editNombre.setText(gl.fnombre);
 
 			final EditText editNit = new EditText(this);
 			editNit.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -807,9 +950,18 @@ public class CliDet extends PBase {
 
 	private void ActualizarCliente(String corel, String NombreEdit, String NitEdit){
 		Cursor DT;
+		String updatecli = "";
+		long fecha=du.getActDateTime();
+
 		try {
 			db.execSQL("INSERT INTO D_FACTURAF(COREL, NOMBRE, NIT, DIRECCION) VALUES('"+corel+"','"+NombreEdit+"','"+NitEdit+"','')");
-			db.execSQL("UPDATE P_CLIENTE SET NOMBRE = '" + NombreEdit + "', NIT = '" + NitEdit + "' WHERE CODIGO = '" + cod + "'");
+
+			updatecli = "UPDATE P_CLIENTE SET NOMBRE = '" + NombreEdit + "', NIT = '" + NitEdit + "' WHERE CODIGO = '" + cod + "'";
+
+			db.execSQL(updatecli);
+
+			db.execSQL("INSERT INTO D_MODIFICACIONES(RUTA, MODIFICACION, FECHA, STATCOM) VALUES('"+gl.ruta+	"','"+updatecli+"','"+fecha+"','N'");
+
 			lblNom.setText(NombreEdit);
 			lblNit.setText(NitEdit);
 			mu.msgbox("Registro actualizado");

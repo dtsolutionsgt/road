@@ -59,7 +59,7 @@ public class CliGPS extends PBase {
 		lblPos = (TextView) findViewById(R.id.textView3);
 		lblGPS = (TextView) findViewById(R.id.textView1);
 
-		imgMap = (ImageView) findViewById(R.id.imageView2);
+		imgMap = (ImageView) findViewById(R.id.imgCobro);
 		pbar = (ProgressBar) findViewById(R.id.progressBar1);
 
 		initSession();
@@ -140,7 +140,7 @@ public class CliGPS extends PBase {
 
 		try {
 			if (latitude == 0 && longitude == 0) {
-				toastcent("¡Posición desconicida, no se puede mostrar mapa!");
+				toastcent("¡Posición desconocida, no se puede mostrar mapa!");
 				imgMap.setImageResource(R.drawable.blank48);
 				return;
 			}

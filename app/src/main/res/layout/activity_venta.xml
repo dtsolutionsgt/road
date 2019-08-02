@@ -79,7 +79,7 @@
         android:src="@drawable/next48" />
 
     <ImageView
-        android:id="@+id/imgPFoto"
+        android:id="@+id/imgWhatsApp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -100,7 +100,7 @@
         android:layout_alignParentBottom="false"
         android:layout_marginBottom="5dp"
         android:layout_toLeftOf="@+id/imgNext"
-        android:layout_toRightOf="@+id/imgPFoto"
+        android:layout_toRightOf="@+id/imgWhatsApp"
         android:background="@layout/blue_strip"
         android:clickable="true"
         android:onClick="doFocus">
@@ -142,7 +142,7 @@
         android:layout_alignParentTop="false"
         android:layout_marginLeft="2dp"
         android:layout_marginTop="2dp"
-        android:layout_toLeftOf="@+id/imgImg"
+        android:layout_toLeftOf="@+id/imgTel"
         android:background="@layout/frame_rect">
 
         <TextView
@@ -222,7 +222,7 @@
     </ListView>
 
     <ImageView
-        android:id="@+id/imgImg"
+        android:id="@+id/imgTel"
         android:layout_width="wrap_content"
         android:layout_height="36dp"
         android:layout_above="@+id/listView1"

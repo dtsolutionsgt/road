@@ -12,6 +12,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -22,8 +23,9 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.text.InputType;
-import android.util.Base64;
+import com.dts.roadp.Base64;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -51,6 +53,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
+
+
 
 public class ComWS extends PBase {
 
@@ -138,12 +142,14 @@ public class ComWS extends PBase {
 
 		imgEnv = (ImageView) findViewById(R.id.imageView6);
         imgEnvM = (ImageView) findViewById(R.id.imageView23);
-		imgRec = (ImageView) findViewById(R.id.imageView5);
+		imgRec = (ImageView) findViewById(R.id.imgWaze);
 
 		ralBack = (RelativeLayout) findViewById(R.id.relwsmail);
 		relExist = (RelativeLayout) findViewById(R.id.relExist);
 		relPrecio = (RelativeLayout) findViewById(R.id.relPrecio);
 		relStock = (RelativeLayout) findViewById(R.id.relStock);
+
+		resizeButtons();
 
 		isbusy = 0;
 
@@ -704,6 +710,8 @@ public class ComWS extends PBase {
 			envioSolicitud();
 
             envioRating();
+
+			//envioModifCliente();
 
 			updateAcumulados();
 
@@ -1423,6 +1431,61 @@ public class ComWS extends PBase {
 
 	}
 
+    public int sendFoto(String transid,String firmaid) {
+        String fname,resstr="";
+
+        fname=firmaid;
+
+        METHOD_NAME = "saveImageROAD";
+
+        try {
+
+            Bitmap bmp = BitmapFactory.decodeFile(fname);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.PNG,100, out);
+            byte[] imagebyte = out.toByteArray();
+            String strBase64 = Base64.encodeBytes(imagebyte);
+
+            int iv1=strBase64.length();
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            PropertyInfo param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("transid");
+            param.setValue(transid);
+            request.addProperty(param);
+
+            PropertyInfo param2 = new PropertyInfo();
+            param2.setType(String.class);
+            param2.setName("imgdata");
+            param2.setValue(strBase64);
+            request.addProperty(param2);
+
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL,60000);
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+            resstr = response.toString();
+
+            if (resstr.equalsIgnoreCase("#")) {
+                return 1;
+            } else {
+                throw new Exception(resstr);
+            }
+        } catch (Exception e) {
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(),"");
+            errflag=true;
+        }
+
+        return 0;
+    }
+
 	public int checkLicence(String serial) {
 		int rc;
 		String s, ss;
@@ -1492,59 +1555,6 @@ public class ComWS extends PBase {
 
 			sstr = s;
 			return 0;
-		} catch (Exception e) {
-			sstr = e.getMessage();
-		}
-
-		return 0;
-	}
-
-	public int guardaImagen(String idprod) {
-		int rc;
-		String s, ss,resstr;
-
-		METHOD_NAME = "getImage";
-		sstr = "OK";
-
-		try {
-
-			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
-			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-			envelope.dotNet = true;
-
-			PropertyInfo param = new PropertyInfo();
-			param.setType(String.class);
-			param.setName("idprod");
-			param.setValue(idprod);
-			request.addProperty(param);
-
-			envelope.setOutputSoapObject(request);
-
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
-			transport.call(NAMESPACE + METHOD_NAME, envelope);
-
-			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
-
-			resstr = response.toString();
-
-			try {
-				//byte[] imgbytes = resstr.getBytes();
-
-				byte[] imgbytes=Base64.decode(resstr, Base64.DEFAULT);
-
-				int bs=imgbytes.length;
-
-				FileOutputStream fos = new FileOutputStream(rootdir+"0006.jpg");
-                BufferedOutputStream outputStream = new BufferedOutputStream(fos);
-                outputStream.write(imgbytes);
-                outputStream.close();
-
-			} catch (Exception ee) {
-				sstr = ee.getMessage();return 0;
-			}
-
-			sstr =""+resstr.length();
-			return resstr.length();
 		} catch (Exception e) {
 			sstr = e.getMessage();
 		}
@@ -3150,6 +3160,12 @@ public class ComWS extends PBase {
                 return false;
             }
 
+			/*envioModifCliente();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return false;
+			}*/
+
 			updateAcumulados();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
@@ -4084,6 +4100,67 @@ public class ComWS extends PBase {
 
 	}
 
+	public void envioModifCliente() {
+		Cursor DT;
+		String ruta, ss, cadena;
+		int stp;
+		double px, py;
+		long fechaM;
+		fprog = " ";
+
+		if (!esEnvioManual){
+			wsStask.onProgressUpdate();
+		}
+
+		try {
+			sql = "SELECT RUTA, MODIFICACION,FECHA FROM D_MODIFICACIONES WHERE STATCOM='N'";
+			DT = Con.OpenDT(sql);
+			if (DT.getCount() == 0) return;
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				ruta = DT.getString(0);
+				cadena = DT.getString(1);
+				fechaM = DT.getLong(2);
+
+				try {
+
+					if (envioparcial) dbld.clear();
+
+					dbld.add(cadena);
+					ss = "INSERT INTO D_MODIFICACIONES VALUES('" + ruta + "','" + cadena + "','" + fechaM + "')";
+					dbld.add(ss);
+
+					if (envioparcial && !esEnvioManual) {
+						if (commitSQL() == 1) {
+							sql = "UPDATE D_MODIFICACIONES SET STATCOM='S' WHERE (ruta='" + ruta + "') AND (fecha='" + fechaM + "') ";
+							db.execSQL(sql);
+						} else {
+							errflag = true;
+							fterr += "\n" + sstr;
+						}
+					}
+
+				} catch (Exception e) {
+					errflag = true;
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					fterr += "\n" + e.getMessage();
+				}
+
+				DT.moveToNext();
+			}
+
+		} catch (Exception e) {
+			errflag = true;
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+		}
+
+	}
+
 	public void envioSolicitud() {
 		Cursor DT;
 		String cor;
@@ -4161,7 +4238,7 @@ public class ComWS extends PBase {
 
 	public void envioFinDia() {
 
-		int pc = 0, pcc=3;
+		int pc = 0, pcc=1;
 
 		fprog = " ";
 		if (!esEnvioManual){
@@ -4407,9 +4484,6 @@ public class ComWS extends PBase {
 
 		Cursor DT;
 		String codigo, imagen64,strImagen;
-		JSONObject json = new JSONObject();
-		JSONObject json2 = new JSONObject();
-		JSONArray json_Array = new JSONArray();
 
 		System.setProperty("line.separator","\r\n");
 
@@ -4430,35 +4504,15 @@ public class ComWS extends PBase {
 
 					if(archivo.exists()){
 
-						/*LO CONVIERTE A BASE64*/
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						Bitmap bitmap = BitmapFactory.decodeFile(paht);
-						bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-						byte[] imageBytes = baos.toByteArray();
-						imagen64 = Base64.encodeToString(imageBytes,Base64.NO_PADDING);
-
-						json = new JSONObject();
-						json.put("CODIGO",codigo);
-						json.put("IMAGEN",imagen64);
-						json_Array.put(json);
-
+						if (sendFoto(codigo, paht)==1) {
+							String pathNew = (Environment.getExternalStorageDirectory() + "/RoadFachadas/" + codigo + ".jpg");
+							File archivoNew = new File(pathNew);
+							archivo.renameTo(archivoNew);
+						}
 					}
 
 					DT.moveToNext();
-
 				}
-
-				json2.put("P_CLIENTE_FACHADA",json_Array);
-
-			}
-
-			jsonWS = json2.toString();
-
-			//#HS_20181221 Se envian las fotos.
-			if(envioFachada() == 1){
-				String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos");
-				File archivo = new File(paht);
-				EliminarArchivos(archivo);
 			}
 
 		}catch (Exception e){
@@ -4751,7 +4805,52 @@ public class ComWS extends PBase {
 	//endregion
 	
 	//region Aux
-	
+
+	private void resizeButtons(){
+		try {
+
+			Display screensize = getWindowManager().getDefaultDisplay();
+
+			Point size = new Point();
+			screensize.getSize(size);
+
+			int width = (int)(size.x/5);
+
+			ViewGroup.LayoutParams layoutParams = imgEnv.getLayoutParams();
+			layoutParams.width = width;
+			layoutParams.height = width;
+			imgEnv.setLayoutParams(layoutParams);
+
+			ViewGroup.LayoutParams layoutParams1 = imgEnvM.getLayoutParams();
+			layoutParams1.width = width;
+			layoutParams1.height = width;
+			imgEnvM.setLayoutParams(layoutParams1);
+
+			ViewGroup.LayoutParams layoutParams2 = imgRec.getLayoutParams();
+			layoutParams2.width = width;
+			layoutParams2.height = width;
+			imgRec.setLayoutParams(layoutParams2);
+
+			ViewGroup.LayoutParams layoutParams3 = relPrecio.getLayoutParams();
+			layoutParams3.width = width ;
+			layoutParams3.height = width+30;
+			relPrecio.setLayoutParams(layoutParams3);
+
+			ViewGroup.LayoutParams layoutParams4 = relExist.getLayoutParams();
+			layoutParams4.width = width;
+			layoutParams4.height = width+30;
+			relExist.setLayoutParams(layoutParams4);
+
+			ViewGroup.LayoutParams layoutParams5 = relStock.getLayoutParams();
+			layoutParams5.width = width;
+			layoutParams5.height = width+30;
+			relStock.setLayoutParams(layoutParams5);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void comManual(View view) {
 		try{
 			Intent intent = new Intent(this,ComDrop.class);

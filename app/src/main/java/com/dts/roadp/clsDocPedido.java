@@ -32,7 +32,7 @@ public class clsDocPedido extends clsDocument {
 
 		rep.line();
 		rep.add("CODIGO   DESCRIPCION                ");
-		rep.add("CANT  UM   KGS   PRECIO        VALOR");
+		rep.add("CANT    UM   KGS   PRECIO     VALOR ");
 		rep.line();
 		//rep.empty();
 		
@@ -41,7 +41,7 @@ public class clsDocPedido extends clsDocument {
 			rep.add(item.cod + " " + item.nombre);
 			//rep.add3lrr(rep.rtrim(""+item.cant,5),item.prec,item.tot);
 
-			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um,6);
+			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um.substring(0,3),6);
 			cp=frmdecimal(0,decimp)+" "+rep.ltrim(item.ump,3);
 			
 			rep.add3fact(cu+" "+cp,item.prec,item.tot);

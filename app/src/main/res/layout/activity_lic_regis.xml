@@ -24,10 +24,10 @@
             android:id="@+id/txtRoadTit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/ImageView01"
+            android:layout_alignBottom="@+id/imgPreventa"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/ImageView01"
+            android:layout_toLeftOf="@+id/imgPreventa"
             android:gravity="center_vertical"
             android:paddingLeft="5dp"
             android:text="Registro de dispositivo"
@@ -35,7 +35,7 @@
             android:textColor="#1A8AC6" />
 
         <ImageView
-            android:id="@+id/ImageView01"
+            android:id="@+id/imgPreventa"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"

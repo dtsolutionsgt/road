@@ -68,7 +68,7 @@ public class ListAdaptCobro extends BaseAdapter {
 			holder.lblFIni  = (TextView) convertView.findViewById(R.id.lblPag);
 			holder.lblFFin = (TextView) convertView.findViewById(R.id.lblCVence);
 			
-			holder.imgBand = (ImageView) convertView.findViewById(R.id.imgImg);
+			holder.imgBand = (ImageView) convertView.findViewById(R.id.imgTel);
 			
 			convertView.setTag(holder);
 		} else {

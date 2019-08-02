@@ -89,7 +89,7 @@
     </EditText>
 
     <ImageView
-        android:id="@+id/imgImg"
+        android:id="@+id/imgTel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="false"
@@ -105,11 +105,11 @@
         android:src="@drawable/next48" />
 
     <ImageView
-        android:id="@+id/ImageView01"
+        android:id="@+id/imgPreventa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignTop="@+id/imgImg"
+        android:layout_alignTop="@+id/imgTel"
         android:clickable="true"
         android:onClick="doTestPrint"
         android:paddingBottom="10dp"
@@ -148,7 +148,7 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/ImageView01"
+        android:layout_below="@+id/imgPreventa"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:background="@layout/frame_btn"

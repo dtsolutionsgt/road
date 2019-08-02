@@ -17,6 +17,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -35,9 +36,12 @@ public class PedidoRes extends PBase {
 
 	private ListView listView;
 	private EditText txtDir;
+	private EditText txtReferencia;
 	private TextView lblFecha;
 	private ImageView imgBon;
+	private ImageView imgSave;
 	private Spinner spinList;
+	private ProgressBar pgSave;
 	
 	private List<String> spname = new ArrayList<String>();
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
@@ -66,9 +70,15 @@ public class PedidoRes extends PBase {
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		txtDir = (EditText) findViewById(R.id.txtMonto);
+		txtReferencia = (EditText) findViewById(R.id.txtReferencia);
 		lblFecha = (TextView) findViewById(R.id.lblpSaldo);
-		imgBon = (ImageView) findViewById(R.id.imageView1);
-		
+		imgBon = (ImageView) findViewById(R.id.imgDevol);
+		imgSave = (ImageView) findViewById(R.id.imgWhatsApp);
+		pgSave = (ProgressBar) findViewById(R.id.pgSave);
+
+		pgSave.setVisibility(View.INVISIBLE);
+		imgSave.setVisibility(View.VISIBLE);
+
 		spinList = (Spinner) findViewById(R.id.spinner1);
 		
 		cliid=gl.cliente;
@@ -276,6 +286,10 @@ public class PedidoRes extends PBase {
  	private void finishOrder(){
 
 		try{
+
+			pgSave.setVisibility(View.VISIBLE);
+			imgSave.setVisibility(View.INVISIBLE);
+
 			if (!saveOrder()) return;
 
 			clsBonifSave bonsave=new clsBonifSave(this,corel,"P");
@@ -350,7 +364,7 @@ public class PedidoRes extends PBase {
 			ins.add("IMPRES",0);
 			ins.add("ADD1",gl.media);//Se está guardando aquí la media de pago del cliente ya que La gran Fortuna lo necesita
 			ins.add("ADD2","");
-			ins.add("ADD3","");
+			ins.add("ADD3",txtReferencia.getText().toString());
 			ins.add("STATPROC","");
 			ins.add("RECHAZADO",0);
 			ins.add("RAZON_RECHAZADO","");  // valor de percepcion 0 o xxx.xx
@@ -628,6 +642,7 @@ public class PedidoRes extends PBase {
 
 			dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
+
 					finishOrder();
 				}
 			});

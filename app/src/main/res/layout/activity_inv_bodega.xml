@@ -11,14 +11,14 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginTop="10dp"
-        android:layout_toLeftOf="@+id/imageView1"
+        android:layout_toLeftOf="@+id/imgDevol"
         android:layout_toRightOf="@+id/textView1" >
 
         <requestFocus />
     </EditText>
 
     <ImageView
-        android:id="@+id/imgPFoto"
+        android:id="@+id/imgWhatsApp"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_alignParentRight="true"
@@ -53,10 +53,10 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/imgDevol"
         android:layout_width="48dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/imgPFoto"
+        android:layout_alignBottom="@+id/imgWhatsApp"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/txtMonto"
         android:adjustViewBounds="true"

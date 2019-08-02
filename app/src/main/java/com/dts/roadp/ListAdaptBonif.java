@@ -3,8 +3,6 @@ package com.dts.roadp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import com.dts.roadp.clsClasses.clsCDB;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -65,7 +63,7 @@ public class ListAdaptBonif extends BaseAdapter {
 			holder.lblDesc = (TextView) convertView.findViewById(R.id.textView1);
 			holder.lblTot = (TextView) convertView.findViewById(R.id.textView3);
 			holder.lblPrec = (TextView) convertView.findViewById(R.id.textView4);
-			holder.imgBand = (ImageView) convertView.findViewById(R.id.imageView1);
+			holder.imgBand = (ImageView) convertView.findViewById(R.id.imgDevol);
 			
 			convertView.setTag(holder);
 		} else {

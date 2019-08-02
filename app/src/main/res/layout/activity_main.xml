@@ -169,7 +169,7 @@
         android:background="@layout/blue_strip" >
 
         <ImageView
-            android:id="@+id/imgPFoto"
+            android:id="@+id/imgWhatsApp"
             android:layout_width="42dp"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
@@ -181,7 +181,7 @@
             android:src="@drawable/sincronizar_blanco" />
 
         <ImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/imgDevol"
             android:layout_width="24dp"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -198,7 +198,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@+id/imageView1"
+            android:layout_toLeftOf="@+id/imgDevol"
             android:clickable="true"
             android:gravity="center_vertical"
             android:onClick="doRegister"

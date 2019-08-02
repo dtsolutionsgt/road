@@ -273,7 +273,7 @@
         android:textStyle="bold" />
 
     <ImageView
-        android:id="@+id/imgImg"
+        android:id="@+id/imgTel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/imgNext"
@@ -329,7 +329,7 @@
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/imgPFoto"
+        android:id="@+id/imgWhatsApp"
         android:layout_width="wrap_content"
         android:layout_height="287dp"
         android:layout_above="@+id/relbotpan"
@@ -347,10 +347,10 @@
         android:src="@drawable/fotos_neg" />
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/imgDevol"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_below="@+id/imageView2"
+        android:layout_below="@+id/imgCobro"
         android:layout_alignParentRight="true"
         android:layout_marginTop="20dp"
         android:layout_marginRight="5dp"
@@ -360,7 +360,7 @@
         android:src="@drawable/act_stock" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/imgCobro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/imgNext"

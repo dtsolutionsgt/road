@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_margin="10dp"
-        android:layout_toLeftOf="@+id/imageView1" >
+        android:layout_toLeftOf="@+id/imgDevol" >
 
         <TextView
             android:id="@+id/lblFact"
@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView3"
         android:layout_marginLeft="29dp"
-        android:layout_toLeftOf="@+id/imageView1"
+        android:layout_toLeftOf="@+id/imgDevol"
         android:layout_toRightOf="@+id/lblDVTot"
         android:ems="10"
         android:maxLength="24" />
@@ -72,22 +72,22 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView3"
         android:layout_below="@+id/txtCNTel"
+        android:layout_alignLeft="@+id/textView3"
         android:paddingTop="5dp"
-        android:text="NIT"
+        android:text="RUC"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText
         android:id="@+id/txtCNNit"
-        android:layout_width="275dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/txtCNTel"
         android:layout_alignTop="@+id/textView4"
         android:layout_marginLeft="2dp"
         android:layout_marginTop="5dp"
         android:layout_marginRight="-33dp"
-        android:layout_toLeftOf="@+id/imageView1"
+        android:layout_toLeftOf="@+id/imgDevol"
         android:ems="10"
         android:maxLength="24" />
 
@@ -117,12 +117,13 @@
 
     <Spinner
         android:id="@+id/spinner1"
-        android:layout_width="275dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/txtCNNit"
         android:layout_alignTop="@+id/lblTipo"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="-41dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="-38dp"
         android:background="@layout/spinner_style"
         android:paddingRight="10dp" />
 
@@ -132,6 +133,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/spinner1"
         android:layout_alignTop="@+id/lblTipo"
+        android:layout_alignParentEnd="true"
         android:layout_marginLeft="3dp"
         android:layout_marginTop="0dp"
         android:background="@layout/spinner_style"
@@ -153,7 +155,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:text="Lu " />
+            android:text="L" />
 
         <CheckBox
             android:id="@+id/checkBox2"
@@ -161,7 +163,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/checkBox1"
-            android:text="Ma" />
+            android:text="M" />
 
         <CheckBox
             android:id="@+id/checkBox3"
@@ -169,7 +171,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/checkBox2"
-            android:text="Mi" />
+            android:text="M" />
 
         <CheckBox
             android:id="@+id/checkBox4"
@@ -177,7 +179,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/checkBox3"
-            android:text="Ju" />
+            android:text="J" />
 
         <CheckBox
             android:id="@+id/checkBox5"
@@ -185,17 +187,18 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/checkBox4"
-            android:text="Vi" />
+            android:text="V" />
 
         <CheckBox
             android:id="@+id/checkBox6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="257dp"
-            android:layout_marginTop="1dp"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="0dp"
             android:layout_toRightOf="@id/checkBox5"
-            android:text="Sa" />
+            android:text="S" />
 
         <CheckBox
             android:id="@+id/checkBox7"
@@ -203,7 +206,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
             android:layout_toRightOf="@+id/checkBox6"
-            android:text="Do" />
+            android:text="D" />
 
     </RelativeLayout>
 
@@ -219,7 +222,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/imgDevol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

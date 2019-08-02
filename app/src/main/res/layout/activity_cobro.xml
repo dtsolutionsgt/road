@@ -24,7 +24,7 @@
         android:text="Sin Ref" />
 
     <ImageView
-        android:id="@+id/imgImg"
+        android:id="@+id/imgTel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -38,7 +38,7 @@
         android:src="@drawable/next48" />
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/imgDevol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -52,9 +52,9 @@
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignTop="@+id/imageView2"
+        android:layout_alignTop="@+id/imgCobro"
         android:layout_margin="5dp"
-        android:layout_toRightOf="@+id/imageView1"
+        android:layout_toRightOf="@+id/imgDevol"
         android:background="@layout/frame_rect"
         android:clickable="true"
         android:gravity="center"
@@ -67,7 +67,7 @@
         android:id="@+id/textView4"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/imageView2"
+        android:layout_alignTop="@+id/imgCobro"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="5dp"
@@ -83,7 +83,7 @@
         android:textSize="14sp" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/imgCobro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -95,7 +95,7 @@
         android:id="@+id/listView1"
         android:layout_width="wrap_content"
         android:layout_height="447dp"
-        android:layout_above="@+id/imageView1"
+        android:layout_above="@+id/imgDevol"
         android:layout_below="@+id/relLey"
         android:layout_alignParentRight="true"
         android:layout_marginLeft="5dp"

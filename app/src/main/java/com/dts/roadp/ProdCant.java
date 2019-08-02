@@ -45,7 +45,7 @@ public class ProdCant extends PBase {
 
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant, modifprecio;
-	private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0, costo=0, nuevoprecio=0;
+	private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0, costo=0, nuevoprecio=0, precioMinimo = 0;
 	private boolean pexist,esdecimal,porpeso,esbarra,idle=true;
 
 	private String URL;
@@ -275,7 +275,7 @@ public class ProdCant extends PBase {
 		try {
 							
 			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO,PESO_PROMEDIO,FACTORCONV, "+
-                "COSTO, MODIF_PRECIO "+
+                "COSTO, MODIF_PRECIO, PRECIO_VINETA_O_TUBO "+
 				"FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	dt=Con.OpenDT(sql);
 			dt.moveToFirst();
@@ -292,6 +292,7 @@ public class ProdCant extends PBase {
 
             costo=dt.getDouble(11);
             modifprecio=dt.getInt(12);
+			precioMinimo=dt.getDouble(13);
 
             //#CKFK 20190612 Modificar el formato del label para que al hacer clic pueda ingresar el nuevo precio
             if (modifprecio==1){
@@ -719,9 +720,9 @@ public class ProdCant extends PBase {
 			lblCantPeso=(TextView) findViewById(R.id.textView21);lblCantPeso.setText("");lblCantPeso.setVisibility(View.INVISIBLE);
 			lblCodProd=(TextView) findViewById(R.id.txtRoadTit);
 			cmdModifPrecio=(Button) findViewById(R.id.cmdModifPrecio);
-			imgProd=(ImageView) findViewById(R.id.imgPFoto);
-			imgUpd=(ImageView) findViewById(R.id.imageView1);
-			imgDel=(ImageView) findViewById(R.id.imageView2);
+			imgProd=(ImageView) findViewById(R.id.imgWhatsApp);
+			imgUpd=(ImageView) findViewById(R.id.imgDevol);
+			imgDel=(ImageView) findViewById(R.id.imgCobro);
 			lblUltPrecio=(TextView) findViewById(R.id.lblUltPrecio);
 			txtUltPrecio=(TextView) findViewById(R.id.txtUltPrecio);
 		}catch (Exception e){
@@ -1252,7 +1253,7 @@ public class ProdCant extends PBase {
 			lblPrecioMinimo.setTypeface(lblPrecioMinimo.getTypeface(), Typeface.BOLD_ITALIC);
 			lblPrecioMinimo.setGravity(Gravity.CENTER);
 			lblPrecioMinimo.setTextColor(Color.rgb(51,131,55));
-			lblPrecioMinimo.setText("Precio mínimo: " + mu.frmcur(costo));
+			lblPrecioMinimo.setText("Precio mínimo: " + mu.frmcur(precioMinimo));
 
 			lblNuevoPrecio.setTypeface(lblPrecioMinimo.getTypeface(), Typeface.BOLD_ITALIC);
 			lblNuevoPrecio.setTextSize(20);
@@ -1263,7 +1264,7 @@ public class ProdCant extends PBase {
             //Limita cantidad de decimales para los EditText.
             txtNuevoPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(2)});
 			txtNuevoPrecio.setTextSize(20);
-			txtNuevoPrecio.setText(mu.frmcur_sm(costo));
+			txtNuevoPrecio.setText(mu.frmcur_sm(precioMinimo));
 			txtNuevoPrecio.selectAll();
 
 			layout.addView(lblPrecioMinimo);
@@ -1284,7 +1285,7 @@ public class ProdCant extends PBase {
 					if(nuevoprecio==0){
                         mu.toast("El precio debe ser mayor que 0");
 						ModificarPrecio(view);
-                    }else if (nuevoprecio < costo) {
+                    }else if (nuevoprecio < precioMinimo) {
                         mu.toast("El precio debe ser mayor o igual que el precio mínimo");
 						ModificarPrecio(view);
                     } else {

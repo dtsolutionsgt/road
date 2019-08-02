@@ -6,7 +6,7 @@
     tools:context=".DevolCli" >
 
     <ImageView
-        android:id="@+id/imgImg"
+        android:id="@+id/imgTel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/imgNext"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/imgImg"
+        android:layout_below="@+id/imgTel"
         android:paddingBottom="10dp"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"

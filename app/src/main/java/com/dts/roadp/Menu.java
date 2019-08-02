@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -212,7 +214,14 @@ public class Menu extends PBase {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			}
 
-			adaptergrid=new ListAdaptMenuGrid(this, items);
+			Display screensize = getWindowManager().getDefaultDisplay();
+
+			Point size = new Point();
+			screensize.getSize(size);
+
+			int height = (int)(size.y/5);
+
+			adaptergrid=new ListAdaptMenuGrid(this, items, height);
 			gridView.setAdapter(adaptergrid);
 			adaptergrid.setSelectedIndex(selIdx);
 

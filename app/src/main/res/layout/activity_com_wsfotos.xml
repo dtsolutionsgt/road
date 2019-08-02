@@ -55,14 +55,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/imageView4"
+            android:layout_toRightOf="@+id/imgVenta"
             android:paddingLeft="5dp"
             android:text="Imagenes de productos"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#1A8AC6" />
 
         <ImageView
-            android:id="@+id/imageView4"
+            android:id="@+id/imgVenta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -243,7 +243,7 @@
         android:id="@+id/progressBar2"
         android:layout_width="87dp"
         android:layout_height="73dp"
-        android:layout_above="@+id/ImageView02"
+        android:layout_above="@+id/imgDespacho"
         android:layout_below="@+id/btnRec2"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="24dp"

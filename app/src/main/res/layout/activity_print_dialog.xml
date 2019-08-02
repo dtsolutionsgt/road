@@ -15,7 +15,7 @@
         android:background="@layout/frame_fill_white">
 
         <ImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/imgDevol"
             android:layout_width="128dp"
             android:layout_height="128dp"
             android:layout_alignParentTop="false"

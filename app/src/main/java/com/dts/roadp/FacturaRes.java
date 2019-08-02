@@ -33,7 +33,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class FacturaRes extends PBase {
 
@@ -88,11 +87,11 @@ public class FacturaRes extends PBase {
 		lblCash = (TextView) findViewById(R.id.textView4);
 
 		imgBon = (ImageView) findViewById(R.id.imageView6);
-		imgMPago = (ImageView) findViewById(R.id.imageView1);
+		imgMPago = (ImageView) findViewById(R.id.imgDevol);
 		imgCred = (ImageView) findViewById(R.id.imageView3);
 		imgPend = (ImageView) findViewById(R.id.imageView12);
-		imgCash = (ImageView) findViewById(R.id.imageView2);
-		imgBack = (ImageView) findViewById(R.id.imageView5);
+		imgCash = (ImageView) findViewById(R.id.imgCobro);
+		imgBack = (ImageView) findViewById(R.id.imgWaze);
 
 		contadoCheck = (CheckBox) findViewById(R.id.checkContado);
 		rl_facturares=(RelativeLayout)findViewById(R.id.relativeLayout1);rl_facturares.setVisibility(View.VISIBLE);

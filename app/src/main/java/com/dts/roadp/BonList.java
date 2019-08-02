@@ -59,7 +59,7 @@ public class BonList extends PBase {
 		lblFalta =  (TextView) findViewById(R.id.lblSel);
 		lblTipo =  (TextView) findViewById(R.id.textView2);
 		lblMarg =  (TextView) findViewById(R.id.textView8);
-		imgComp =  (ImageView) findViewById(R.id.imageView2);
+		imgComp =  (ImageView) findViewById(R.id.imgCobro);
 		imgAdd =  (ImageView) findViewById(R.id.imageView3);
 		
 		rutatipo=gl.rutatipo;

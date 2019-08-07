@@ -312,7 +312,6 @@ public class ComWS extends PBase {
 				return;
 			}
 
-
 			if (!gl.debug) {
                 if (!validaLicencia()) {
                     mu.msgbox("Licencia inválida!");
@@ -321,11 +320,11 @@ public class ComWS extends PBase {
             }
 
 			if (gl.banderafindia) {
-					if (!puedeComunicar()) {
-						mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
-						return;
-					}
+				if (!puedeComunicar()) {
+					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+					return;
 				}
+			}
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -1079,10 +1078,12 @@ public class ComWS extends PBase {
 					break;
 
 				case "P_CLIENTE":
-                    if (rc==1){
-						borraDatos();
-                        throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
-                    }
+					if (!cargasuper) {
+						if (rc==1){
+							borraDatos();
+							throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+						}
+					}
                 break;
 
                 case "P_PRODUCTO":

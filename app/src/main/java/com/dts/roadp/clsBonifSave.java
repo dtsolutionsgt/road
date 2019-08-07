@@ -123,6 +123,9 @@ public class clsBonifSave {
 
 				dt.moveToNext();ii++;
 			}
+
+			if(dt!=null) dt.close();
+
 		} catch (Exception e) {
 		}	
 	}
@@ -157,6 +160,9 @@ public class clsBonifSave {
 				
 				dt.moveToNext();ii++;
 			}
+
+			if(dt!=null) dt.close();
+
 		} catch (Exception e) {
 		}			
 	}
@@ -175,6 +181,9 @@ public class clsBonifSave {
 				
 				dt.moveToNext();
 			}
+
+			if(dt!=null) dt.close();
+
 		} catch (Exception e) {
 		}			
 	}
@@ -209,7 +218,9 @@ public class clsBonifSave {
 				
 				dt.moveToNext();
 			}
-			
+
+			if(dt!=null) dt.close();
+
 		} catch (Exception e) {
 		}			
 	}
@@ -277,6 +288,8 @@ public class clsBonifSave {
 				
 		    DT.moveToNext();
 		}
+
+		if(DT!=null) DT.close();
 
 	}
 	

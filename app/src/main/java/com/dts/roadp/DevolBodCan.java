@@ -310,6 +310,8 @@ public class DevolBodCan extends PBase {
 
                 dp.moveToNext();
 
+                if(dt!=null) dt.close();
+
             }
 
             lblTot.setText("Cant : " + mu.frmdecno(valt)+" Peso : "+ mu.round(pesot,gl.peDec)+" "+gl.umpeso);
@@ -511,6 +513,8 @@ public class DevolBodCan extends PBase {
             db.setTransactionSuccessful();
             db.endTransaction();
 
+            if(DT!=null) DT.close();
+
             createDoc();
 
         } catch (Exception e) {
@@ -629,6 +633,8 @@ public class DevolBodCan extends PBase {
                 vtieneCanasta = DT.getString(0);
             }
 
+            if(DT!=null) DT.close();
+
         }catch (Exception ex){
             mu.msgbox("Ocurrió un error "+ex.getMessage());
         }
@@ -650,6 +656,8 @@ public class DevolBodCan extends PBase {
                 DT.moveToFirst();
                 vtienePaseante = DT.getString(0);
             }
+
+            if(DT!=null) DT.close();
 
         }catch (Exception ex){
             mu.msgbox("Ocurrió un error "+ex.getMessage());
@@ -701,6 +709,8 @@ public class DevolBodCan extends PBase {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
             return false;
         }
+
+        if(dt!=null) dt.close();
 
         return (cantstock+cantbolsa+cantcan>0);
     }

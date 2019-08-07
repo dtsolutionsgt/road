@@ -242,7 +242,8 @@ public class ProdCant extends PBase {
 			if (pesoprom==0) pesoprom = dt.getDouble(9);
 
 			if (dt.getString(8).equalsIgnoreCase("P")) pexist=true; else pexist=false;
-			
+
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		    mu.msgbox("1-"+ e.getMessage());
@@ -253,6 +254,8 @@ public class ProdCant extends PBase {
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			deccant=dt.getInt(0);
+
+			if(dt!=null) dt.close();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			deccant=0;
@@ -312,10 +315,12 @@ public class ProdCant extends PBase {
 				icant=dt.getDouble(0);
 				ippeso=dt.getDouble(1);
 			}
+
+			if(dt!=null) dt.close();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			icant=0;ippeso=0;
-	    }	
+	    }
 
 		if (icant>0) {
 			parseCant(icant);
@@ -545,6 +550,8 @@ public class ProdCant extends PBase {
 				}
 			}
 
+			ppeso=mu.round(ppeso,3);
+
 			gl.dval = cant;
 			gl.dpeso = ppeso;
 			gl.um = upres;
@@ -762,6 +769,8 @@ public class ProdCant extends PBase {
 			pmin = opeso - dt.getDouble(0) * opeso / 100;
 			pmax = opeso + dt.getDouble(1) * opeso / 100;
 
+			if(dt!=null) dt.close();
+
 			if (vpeso<pmin) {
 				ss="El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por debajo de los porcentajes permitidos," +
 						" minimo : "+mu.frmdecimal(pmin, gl.peDecImp)+", no se puede aplicar.";
@@ -871,7 +880,12 @@ public class ProdCant extends PBase {
 			sql="SELECT CANT FROM P_STOCKINV WHERE CODIGO='"+prodid+"'";
            	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-			return DT.getDouble(0);
+
+			double disp=DT.getDouble(0);
+
+			if(DT!=null) DT.close();
+
+			return disp;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return 0;

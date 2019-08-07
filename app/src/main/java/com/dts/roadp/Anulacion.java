@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -36,7 +38,7 @@ public class Anulacion extends PBase {
 	private AppMethods app;
 	
 	private int tipo,depparc,fcorel;	
-	private String selid,itemid,fserie,fres;
+	private String selid,itemid,fserie,fres,scor;
 	private boolean modoapr=false;
 
 	// impresion nota credito
@@ -99,7 +101,6 @@ public class Anulacion extends PBase {
 		fdoc.medidapeso=gl.umpeso;
 	}
 
-	
 	//region Events
 	
 	public void anulDoc(View view){
@@ -108,7 +109,11 @@ public class Anulacion extends PBase {
 				mu.msgbox("Debe seleccionar un documento.");return;
 			}
 
-			msgAsk("Anular documento");
+			if (tipo==3) {
+				inputValor();
+			} else {
+				msgAsk("Anular documento");
+			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -243,6 +248,7 @@ public class Anulacion extends PBase {
 					if (tipo==2) vItem.Desc+=" - "+DT.getString(4);
 					
 					if (tipo==3) {
+						vItem.flag=DT.getInt(4);
 						sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);;
 					}else if(tipo==1||tipo==6){
 						sf=DT.getString(0);
@@ -270,7 +276,10 @@ public class Anulacion extends PBase {
 					DT.moveToNext();
 				}	
 			}
-			
+
+			if(DT!=null) DT.close();
+
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox(e.getMessage());
@@ -464,6 +473,8 @@ public class Anulacion extends PBase {
 			}
 
 			//ImpresionFactura();
+
+			if(dt!=null) dt.close();
 
 			vAnulFactura=true;
 
@@ -1614,6 +1625,52 @@ public class Anulacion extends PBase {
 			return false;
 	    }
 	}
+
+
+	private void inputValor() {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		int cor;
+
+		cor=sitem.flag;
+		cor=cor % 1000;
+		scor=""+cor;
+		if (cor<10) {
+			scor="00"+scor;
+		} else if (cor<10) {
+			scor="0"+scor;
+		}
+
+		alert.setTitle("Ingrese valor : "+scor);
+
+		final EditText input = new EditText(this);
+		alert.setView(input);
+
+		input.setInputType(InputType.TYPE_CLASS_NUMBER );
+		input.setText("");
+		input.requestFocus();
+
+		alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				try {
+					String s=input.getText().toString();
+					if (s.equalsIgnoreCase(scor)) {
+						msgAsk("Anular factura");
+					} else {
+						msgbox("Valor incorrecto");
+					}
+				} catch (Exception e) {
+					mu.msgbox("Valor incorrecto");return;
+				}
+			}
+		});
+
+		alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {}
+		});
+
+		alert.show();
+	}
+
 
 	//endregion
 

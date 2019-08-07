@@ -60,8 +60,6 @@ public class Repesaje extends PBase {
         lblOPeso= (TextView) findViewById(R.id.textView59);
         lblOCant= (TextView) findViewById(R.id.textView60);
 
-        prepareCalculator();
-
         prodid=gl.gstr;
 
         app = new AppMethods(this, gl, Con, db);
@@ -87,7 +85,6 @@ public class Repesaje extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
     }
 
     public void doDelete(View view) {
@@ -96,7 +93,6 @@ public class Repesaje extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
     }
 
     public void doApply(View view) {
@@ -124,11 +120,6 @@ public class Repesaje extends PBase {
     }
 
     public void doCalc(View view) {
-        try{
-            openCalculator();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
 
     }
 
@@ -245,6 +236,8 @@ public class Repesaje extends PBase {
             opeso=DT.getDouble(0);
             ocant=DT.getDouble(2);
 
+            if(DT!=null) DT.close();
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());
@@ -257,7 +250,6 @@ public class Repesaje extends PBase {
         try {
 
             sql = "SELECT PRECIO FROM T_VENTA WHERE PRODUCTO='"+prodid+"' ";
-
             DT = Con.OpenDT(sql);
 
             if(DT.getCount()>0){
@@ -265,7 +257,8 @@ public class Repesaje extends PBase {
                 tprecio=DT.getDouble(0);
             }
 
-        } catch (Exception e) {
+            if(DT!=null) DT.close();
+         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());
         }
@@ -288,6 +281,7 @@ public class Repesaje extends PBase {
             opeso=DT.getDouble(3);
             ocant=DT.getDouble(2);
 
+            if(DT!=null) DT.close();
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox(e.getMessage());
@@ -437,6 +431,8 @@ public class Repesaje extends PBase {
             sql="UPDATE T_VENTA SET TOTAL="+ttotal+",PESO="+tpeso+" WHERE PRODUCTO='"+prodid+"'";
             db.execSQL(sql);
 
+            if(dt!=null) dt.close();
+
             finish();
             toastcent("Repesaje aplicado");
         } catch (Exception e) {
@@ -452,74 +448,6 @@ public class Repesaje extends PBase {
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
             return false;
-        }
-    }
-
-    //endregion
-
-    //region Calculator
-
-    private void prepareCalculator() {
-        try{
-            items =new  ArrayList<HashMap<String,Object>>();
-            Handler mtimer = new Handler();
-            Runnable mrunner=new Runnable() {
-                @Override
-                public void run() {
-                    listPackages();
-                }
-            };
-            mtimer.postDelayed(mrunner,500);
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-    }
-
-    private void listPackages() {
-        try{
-            pm = getPackageManager();
-            packs = pm.getInstalledPackages(0);
-            for (PackageInfo pi : packs) {
-                HashMap<String, Object> map = new HashMap<String, Object>();
-                map.put("appName", pi.applicationInfo.loadLabel(pm));
-                map.put("packageName", pi.packageName);
-                items.add(map);
-            }
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-    }
-
-    private void openCalculator() {
-        int d = 0;
-
-        try {
-            if (items.size() >= 1) {
-                int j = 0;
-                for (j = 0; j < items.size(); j++) {
-                    String AppName = (String) items.get(j).get("appName");
-                    if (AppName.matches("Calculator")) {
-                        d = j;
-                        break;
-                    }
-                }
-                String packageName = (String) items.get(d).get("packageName");
-
-                Intent itt = pm.getLaunchIntentForPackage(packageName);
-                if (itt != null) {
-                    startActivity(itt);
-                } else {
-                    toast("No se puede abrir calculadora");
-                }
-            } else {
-                toast("No se puede abrir calculadora");
-            }
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-            msgbox(new Object() {
-            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
     }
 
@@ -640,6 +568,7 @@ public class Repesaje extends PBase {
                 msgbox(ss);return false;
             }
 
+            if(dt!=null) dt.close();
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());

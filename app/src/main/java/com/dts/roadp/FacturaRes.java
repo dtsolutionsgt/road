@@ -235,7 +235,8 @@ public class FacturaRes extends PBase {
 				}
 
 				askPrint();
-		    }
+
+			}
 		};
 
 		printclose= new Runnable() {
@@ -255,7 +256,6 @@ public class FacturaRes extends PBase {
 
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(cliid),gl.codCliNuevo,gl.peModal);
 		fdoc.deviceid =gl.numSerie;fdoc.medidapeso=gl.umpeso;
-
 
 		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 		fdev.deviceid =gl.numSerie;
@@ -994,17 +994,23 @@ public class FacturaRes extends PBase {
 				ins.add("IMP",dt.getDouble(3));
 				ins.add("DES",dt.getDouble(4));
 				ins.add("DESMON",dt.getDouble(5));
-				ins.add("TOTAL",dt.getDouble(6));
+				ins.add("TOTAL",mu.round2(dt.getDouble(6)));
 				ins.add("PRECIODOC",dt.getDouble(7));
-				ins.add("PESO",dt.getDouble(8));
+				ins.add("PESO",mu.round(dt.getDouble(8),3));
 				ins.add("VAL1",dt.getDouble(9));
 				ins.add("VAL2",dt.getString(10));
 				ins.add("UMVENTA",dt.getString(11));
+
+				/*
 				if (dt.getString(11).equalsIgnoreCase("KG")) {
 					ins.add("FACTOR",1);
 				} else {
 					if (dt.getDouble(12)!=0) ins.add("FACTOR",1/dt.getDouble(12));else ins.add("FACTOR",1);
 				}
+				*/
+
+				ins.add("FACTOR",dt.getDouble(12));
+
 				ins.add("UMSTOCK",dt.getString(13));ss=dt.getString(13);
 				ins.add("UMPESO",gl.umpeso); //#HS_20181120_1625 Se agrego el valor gl.umpeso anteriormente estaba ""
 
@@ -1325,6 +1331,8 @@ public class FacturaRes extends PBase {
 			upd.add("BANDERA",0);
 			upd.Where("CLIENTE='"+cliid+"'");
 			db.execSQL(upd.SQL());
+
+			if(dt!=null) dt.close();
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1695,7 +1703,11 @@ public class FacturaRes extends PBase {
 
                 totimp=DT.getDouble(2);
 
-                return DT.getDouble(0);
+                double rslt=DT.getDouble(0);
+
+				if(DT!=null) DT.close();
+
+                return rslt;
             }else {
 			    return 0;
             }
@@ -1717,57 +1729,62 @@ public class FacturaRes extends PBase {
 
 		try {
 
-			sql="SELECT SERIE,CORELULT,CORELINI,CORELFIN FROM P_COREL WHERE RUTA='"+gl.ruta+"'";
-			DT=Con.OpenDT(sql);
+			sql = "SELECT SERIE,CORELULT,CORELINI,CORELFIN FROM P_COREL WHERE RUTA='" + gl.ruta + "'";
+			DT = Con.OpenDT(sql);
 
-			if(DT.getCount()>0){
-                DT.moveToFirst();
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
 
-                fserie=DT.getString(0);
-                ca1=DT.getInt(1);
-                ci=DT.getInt(2);
-                cf=DT.getInt(3);
-            }else  {
-                fcorel=0;fserie="";
-                mu.msgbox("No esta definido correlativo de factura. No se puede continuar con la venta.\n");
-                return;
-            }
+				fserie = DT.getString(0);
+				ca1 = DT.getInt(1);
+				ci = DT.getInt(2);
+				cf = DT.getInt(3);
+			} else {
+				fcorel = 0;
+				fserie = "";
+				mu.msgbox("No esta definido correlativo de factura. No se puede continuar con la venta.\n");
+				return;
+			}
 
 
-			sql="SELECT MAX(COREL) FROM D_FACT_LOG WHERE RUTA='"+gl.ruta+"' AND SERIE='"+fserie+"'";
-			DT=Con.OpenDT(sql);
+			sql = "SELECT MAX(COREL) FROM D_FACT_LOG WHERE RUTA='" + gl.ruta + "' AND SERIE='" + fserie + "'";
+			DT = Con.OpenDT(sql);
 
-			if (DT.getCount()>0){
+			if (DT.getCount() > 0) {
 
-                DT.moveToFirst();
+				DT.moveToFirst();
 
-                ca2=DT.getInt(0);
+				ca2 = DT.getInt(0);
 
-            }else {
-                ca2=0;
-            }
+			} else {
+				ca2 = 0;
+			}
 
-		ca=ca1;if (ca2>ca) ca=ca2;
-		fcorel=ca+1;
+			if (DT != null) DT.close();
 
-		if (fcorel>cf) {
-			mu.msgbox("Se ha acabado el talonario de facturas. No se puede continuar con la venta.");
-			fcorel=0;return;
+			ca = ca1;
+			if (ca2 > ca) ca = ca2;
+			fcorel = ca + 1;
+
+			if (fcorel > cf) {
+				mu.msgbox("Se ha acabado el talonario de facturas. No se puede continuar con la venta.");
+				fcorel = 0;
+				return;
+			}
+
+			//#HS_20181128_1602 Cambie el texto del mensaje.
+			if (fcorel == cf) mu.msgbox("Esta es la última factura disponible.");
+
+			lblFact.setText("Factura : " + fserie + " - " + fcorel);
+
+			s = "Talonario : " + fcorel + " / " + cf + "\n";
+			s = s + "Disponible : " + (cf - fcorel);
+			lblTalon.setText(s);
+
+		} catch (Exception e) {
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			mu.msgbox("assignCorel: " + e.getMessage());
 		}
-
-		//#HS_20181128_1602 Cambie el texto del mensaje.
-		if (fcorel==cf) mu.msgbox("Esta es la última factura disponible.");
-
-		lblFact.setText("Factura : "+fserie+" - "+fcorel);
-
-		s="Talonario : "+fcorel+" / "+cf+"\n";
-		s=s+"Disponible : "+(cf-fcorel);
-		lblTalon.setText(s);
-
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("assignCorel: " + e.getMessage());
-        }
 
 	}
 
@@ -1779,11 +1796,14 @@ public class FacturaRes extends PBase {
 			sql="SELECT TIPO FROM P_PRODUCTO WHERE CODIGO='"+prcodd+"'";
            	DT=Con.OpenDT(sql);
 
-           	if(DT.getCount()>0){
+           	if (DT.getCount()>0){
 
                 DT.moveToFirst();
 
-                return DT.getString(0).equalsIgnoreCase("P");
+                boolean rslt=DT.getString(0).equalsIgnoreCase("P");
+				if(DT!=null) DT.close();
+
+                return rslt;
             }else {
            	    return false;
             }
@@ -2266,47 +2286,44 @@ public class FacturaRes extends PBase {
 
 		try {
 
-			sql="SELECT SUM(VALOR) FROM T_PAGO";
-			DT=Con.OpenDT(sql);
+			sql = "SELECT SUM(VALOR) FROM T_PAGO";
+			DT = Con.OpenDT(sql);
 
-			if(DT.getCount()>0){
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
+				tpago = DT.getDouble(0);
+			} else {
+				tpago = 0;
+			}
 
-                DT.moveToFirst();
+			s = mu.frmcur(tpago);
 
-                tpago=DT.getDouble(0);
+			if (gl.dvbrowse != 0) {
+				if (gl.brw > 0) {
+					lblPago.setText("Pago COMPLETO.\n" + s);
+					pago = true;
+					pagocompleto = true;
+					//if (rutapos) askSavePos(); else askSave();
+					finishOrder();
+				}
+			} else {
+				if (tpago < tot) {
+					lblPago.setText("Pago incompleto.\n" + s);
+					pago = false;
+				} else {
+					lblPago.setText("Pago COMPLETO.\n" + s);
+					pago = true;
+					pagocompleto = true;
+					//if (rutapos) askSavePos(); else askSave();
+					finishOrder();
+				}
+			}
 
-            }else  {
-			    tpago=0;
-            }
-
-		s=mu.frmcur(tpago);
-
-        if (gl.dvbrowse!=0){
-            if (gl.brw>0){
-                lblPago.setText("Pago COMPLETO.\n"+s);
-                pago=true;
-				pagocompleto=true;
-                //if (rutapos) askSavePos(); else askSave();
-                finishOrder();
-            }
-        }	else{
-            if (tpago<tot) {
-                lblPago.setText("Pago incompleto.\n"+s);
-                pago=false;
-            } else {
-                lblPago.setText("Pago COMPLETO.\n"+s);
-                pago=true;
-				pagocompleto=true;
-                //if (rutapos) askSavePos(); else askSave();
-                finishOrder();
-            }
-        }
-
-        } catch (Exception e) 		{
-			Log.d("Un_Elol","Factura_Vaca checkpago" + e.getMessage());
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox( e.getMessage());
-        }
+		} catch (Exception e) {
+			Log.d("Un_Elol", "Factura_Vaca checkpago" + e.getMessage());
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			mu.msgbox(e.getMessage());
+		}
 
 	}
 
@@ -2529,6 +2546,8 @@ public class FacturaRes extends PBase {
 			sql="SELECT ITEM FROM T_BONITEM";
            	DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) imgBon.setVisibility(View.VISIBLE);
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 	    }
@@ -2548,6 +2567,7 @@ public class FacturaRes extends PBase {
             }else {
                 clidia=0;
             }
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

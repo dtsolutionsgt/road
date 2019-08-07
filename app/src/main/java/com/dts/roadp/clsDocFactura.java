@@ -41,7 +41,8 @@ public class clsDocFactura extends clsDocument {
 		super.loadHeadData(corel);
 		
 		nombre="FACTURA";
-		
+
+
 		try {
 			sql=" SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2,IMPRES, ANULADO " +
 				" FROM D_FACTURA WHERE COREL='"+corel+"'";
@@ -209,15 +210,12 @@ public class clsDocFactura extends clsDocument {
 			DT.moveToFirst();
 			
 			add2=add2+" - "+DT.getString(0);
+
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 	    }
-		
-		//Toast.makeText(cont,"Percep "+percep+"  Sinimp "+sinimp, Toast.LENGTH_SHORT).show();
-		
-		//cliente=val;
-		
+
 		return true;
-		
 	}
 
 	private boolean esPendientePago(String corel){
@@ -225,16 +223,14 @@ public class clsDocFactura extends clsDocument {
 		boolean vPendiente=false;
 		Cursor DT;
 
-		try{
-
+		try {
 			sql = "SELECT DOCUMENTO FROM P_COBRO WHERE DOCUMENTO = '"+ corel + "'";
 			DT=Con.OpenDT(sql);
 
-			if(DT.getCount() > 0){
-				vPendiente=true;
-			}
+			if(DT.getCount() > 0) vPendiente=true;
 
-		}catch(Exception ex){
+			if(DT!=null) DT.close();
+		} catch(Exception ex){
 			Toast.makeText(cont,"esPendientePago : "+ex.getMessage(), Toast.LENGTH_LONG).show();
 		}
 
@@ -300,14 +296,13 @@ public class clsDocFactura extends clsDocument {
                 item.peso = DT.getDouble(10);
 				item.ums = DT.getString(11);
 				item.fact = DT.getDouble(12);
+				item.esbarra=prodBarra(item.cod);
 
                 if (sinimp) item.tot = item.tot - item.imp;
 
                 items.add(item);
                 DT.moveToNext();
             }
-
-			if(DT!=null) DT.close();
 
 			try {
 				sql = "SELECT D_BONIF.PRODUCTO,P_PRODUCTO.DESCLARGA AS NOMBRE,D_BONIF.CANT, D_BONIF.UMVENTA, D_BONIF.CANT*D_BONIF.FACTOR AS TPESO " +
@@ -359,6 +354,41 @@ public class clsDocFactura extends clsDocument {
 	}
 
 	protected boolean detailToledano() {
+		itemData item;
+		String ss, umm;
+		double ccant;
+
+		rep.add("CODIGO   DESCRIPCION        UM  CANT");
+		rep.add("       KGS    PRECIO           VALOR");
+		rep.line();
+
+		for (int i = 0; i <items.size(); i++) {
+			item = items.get(i);
+
+			ss = rep.ltrim(item.cod + " " + item.nombre, prw - 10);
+			if (item.um.equalsIgnoreCase(medidapeso)) {
+				umm = item.ums;
+			} else {
+				umm = item.um;
+			}
+
+			if (item.esbarra) ccant = item.cant * item.fact;else ccant = item.cant;
+
+			ss = ss + rep.rtrim(umm, 4) + " " + rep.rtrim(frmdecimal(ccant, 2), 5);
+			rep.add(ss);
+			ss = rep.rtrim(frmdecimal(item.peso, decimp), 10) + " " + rep.rtrim(frmdecimal(item.prec, 2), 8);
+			ss = rep.ltrim(ss, prw - 10);
+			ss = ss + " " + rep.rtrim(frmdecimal(item.tot, 2), 9);
+			rep.add(ss);
+
+		}
+
+		rep.line();
+
+		return true;
+	}
+
+	protected boolean inactivo_detailToledano() {
 		itemData item;
 		String ss, umm;
 
@@ -596,7 +626,27 @@ public class clsDocFactura extends clsDocument {
 	private class itemData {
 		public String cod,nombre,um,ump,ums;
 		public double cant,peso,prec,imp,descper,desc,tot,fact;
+		public boolean esbarra;
 	}
-	
-	
+
+	public boolean prodBarra(String cod) {
+		Cursor DT;
+
+		try {
+			String sql = "SELECT ES_PROD_BARRA FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+			DT = Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			boolean rslt=DT.getInt(0)==1;
+
+			if(DT!=null) DT.close();
+
+			return  rslt;
+		} catch (Exception e) {
+			//toast(e.getMessage());
+			return false;
+		}
+	}
+
+
 }

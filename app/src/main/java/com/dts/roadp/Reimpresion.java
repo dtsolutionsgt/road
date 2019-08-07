@@ -11,6 +11,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,7 +25,7 @@ public class Reimpresion extends PBase {
 	private ListView listView;
 	private TextView lblTipo;
 	private ImageView imgPrint;
-	
+
 	private ArrayList<clsClasses.clsCFDV> items= new ArrayList<clsClasses.clsCFDV>();
 	private ListAdaptCFDV adapter;
 	private clsClasses.clsCFDV selitem;
@@ -69,7 +70,10 @@ public class Reimpresion extends PBase {
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		lblTipo= (TextView) findViewById(R.id.lblFecha);
-		imgPrint=(ImageView) findViewById(R.id.imgPrint);
+        imgPrint= (ImageView) findViewById(R.id.imgPrint);
+
+        if (gl.debug) imgPrint.setVisibility(View.VISIBLE);
+        else imgPrint.setVisibility(View.INVISIBLE);
 
 		app = new AppMethods(this, gl, Con, db);
 		gl.validimp=app.validaImpresora();
@@ -600,6 +604,14 @@ public class Reimpresion extends PBase {
 			mu.msgbox(e.getMessage());
 		}
 	}
+
+	public void prnTxt(View view){
+	    try{
+            prn.printask(printcallback);
+        }catch (Exception ex){
+	        msgbox("Ocurrió un error imprimiendo la factura");
+        }
+    }
 
 	//CM_20190506: Valida si tiene cantastas y devolución
 

@@ -761,7 +761,7 @@ public class ComWSExist extends PBase {
 			} catch (Exception e) {
 				if (scon==0){
 					fstr="No se puede conectar al web service : "+sstr;
-					lblInfo.setText(fstr);
+					//lblInfo.setText(fstr);
 				}
 				msgbox(fstr);
 			}
@@ -827,6 +827,8 @@ public class ComWSExist extends PBase {
 			}else if(gl.isOnWifi==2){
 				URL = DT.getString(1);
 			}
+
+			if(DT!=null) DT.close();
 
 			//URL=wsurl;
 			if (URL!=null && !URL.equalsIgnoreCase("")){

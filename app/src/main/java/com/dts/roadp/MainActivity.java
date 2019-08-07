@@ -25,9 +25,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 
 public class MainActivity extends PBase {
@@ -41,9 +44,9 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.4.47 / ";
-    private String parFechaVer = "24-Jul-2019";
-    private String parTipoVer = "ROAD QA";
+    private String parNumVer = "9.4.50 / ";
+    private String parFechaVer = "27-Jul-2019";
+    private String parTipoVer = "ROAD Carlos";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +98,7 @@ public class MainActivity extends PBase {
     }
 
     private void startApplication() {
+        File ffile;
 
         try {
             super.InitBase();
@@ -114,6 +118,20 @@ public class MainActivity extends PBase {
             imgLogo = (ImageView) findViewById(R.id.imgNext);
 
             lblVer.setText(gl.parTipoVer + " Version " + gl.parNumVer + gl.parFechaVer);
+
+            try {
+
+                File file1 = new File(Environment.getExternalStorageDirectory(), "/debug.txt");
+                ffile = new File(file1.getPath());
+                if (ffile.exists()) {
+                    gl.debug=true;
+                }else {
+                    gl.debug=false;
+                }
+
+            } catch (Exception e) {
+                gl.debug=false;
+            }
 
             // DB VERSION
             dbVers = new BaseDatosVersion(this, db, Con);
@@ -136,9 +154,11 @@ public class MainActivity extends PBase {
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
             if (gl.debug) {
-                txtUser.setText("00103790");txtPass.setText("04");
+                txtUser.setText("00103790");
+                txtPass.setText("04");
 
-                txtUser.setText("00100979");txtPass.setText("123456");
+                //txtUser.setText("00100993");
+                //txtPass.setText("2613");
             }
 
         } catch (Exception e) {
@@ -381,6 +401,8 @@ public class MainActivity extends PBase {
                 msgbox("¡No se pudo cargar configuración de la empresa!");
             }
 
+            if(DT!=null) DT.close();
+
         } catch (Exception e) {
             msgbox("¡No se pudo cargar configuración de la empresa!");
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -474,6 +496,7 @@ public class MainActivity extends PBase {
 
             DT.moveToFirst();
             dpwd = DT.getString(1);
+
             if (!pwd.equalsIgnoreCase(dpwd)) {
                 mu.msgbox("Contraseña incorrecta !");
                 return false;
@@ -483,13 +506,6 @@ public class MainActivity extends PBase {
             gl.vend = usr;
             gl.vnivel = DT.getInt(2);
             gl.vnivprec = DT.getInt(3);
-
-            gl.tolsuper=false;
-            if (gl.peModal.equalsIgnoreCase("TOL")) {
-                if (gl.vnivel==2){
-                    gl.tolsuper=true;
-                }
-            }
 
             return true;
 
@@ -515,6 +531,8 @@ public class MainActivity extends PBase {
             }else{
                 gl.codSupervisor = "";
             }
+
+            if(DT!=null) DT.close();
 
         } catch (Exception e) {
             addlog(new Object() {
@@ -761,6 +779,8 @@ public class MainActivity extends PBase {
         String lic, lickey, licruta, rutaencrypt;
         Integer msgLic = 0;
 
+        if (gl.debug) return true;
+
         try {
 
             lickey = cu.encrypt(gl.deviceId);
@@ -772,36 +792,36 @@ public class MainActivity extends PBase {
             lic = dt.getString(0);
             licruta = dt.getString(1);
 
-            if (!gl.debug ) {
+            if (!gl.debug) {
 
-            if (mu.emptystr(lic)) {
-                toastlong("El dispositivo no tiene licencia válida de handheld");
-                return false;
-            }
+                if (mu.emptystr(lic)) {
+                    toastlong("El dispositivo no tiene licencia válida de handheld");
+                    return false;
+                }
 
-            if (mu.emptystr(licruta)) {
-                toastlong("El dispositivo no tiene licencia válida de ruta");
-                return false;
-            }
+                if (mu.emptystr(licruta)) {
+                    toastlong("El dispositivo no tiene licencia válida de ruta");
+                    return false;
+                }
 
-            if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) {
-               return true;
-            }
+                if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) {
+                    return true;
+                }
 
-            if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)) {
-                toastlong("El dispositivo no tiene licencia válida de handheld, ni de ruta");
-                return false;
-            }
+                if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)) {
+                    toastlong("El dispositivo no tiene licencia válida de handheld, ni de ruta");
+                    return false;
+                }
 
-            if (!lic.equalsIgnoreCase(lickey)) {
-                toastlong("El dispositivo no tiene licencia válida de handheld");
-                return false;
-            }
+                if (!lic.equalsIgnoreCase(lickey)) {
+                    toastlong("El dispositivo no tiene licencia válida de handheld");
+                    return false;
+                }
 
-            if (!licruta.equalsIgnoreCase(rutaencrypt)) {
-                toastlong("El dispositivo no tiene licencia válida de ruta");
-                return false;
-            }
+                if (!licruta.equalsIgnoreCase(rutaencrypt)) {
+                    toastlong("El dispositivo no tiene licencia válida de ruta");
+                    return false;
+                }
 
             } else {
                 return true;
@@ -809,8 +829,7 @@ public class MainActivity extends PBase {
 
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            mu.msgbox(new Object() {
-            }.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
         }
 
         return false;

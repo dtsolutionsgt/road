@@ -149,6 +149,8 @@ public class ComWSFotos extends PBase {
                 dt.moveToNext();
             }
 
+            if(dt!=null) dt.close();
+
             isbusy=1;
 
             barInfo.setVisibility(View.VISIBLE);barInfo.invalidate();
@@ -430,6 +432,8 @@ public class ComWSFotos extends PBase {
             }else if(gl.isOnWifi==2){
                 URL = DT.getString(1);
             }
+
+            if(DT!=null) DT.close();
 
            // URL=wsurl;
             if (URL!=null && URL.equalsIgnoreCase("")){

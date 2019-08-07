@@ -147,6 +147,9 @@ public class printer {
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			prw=DT.getInt(0);
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			prw=32;
 		}		

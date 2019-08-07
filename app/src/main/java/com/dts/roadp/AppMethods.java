@@ -52,7 +52,6 @@ public class AppMethods {
 
 	//Función para saber la cantidad de registros en una tabla
 	public int getDocCount(String ss,String pps) {
-
 		Cursor DT;
 		int cnt =0;
 		String st;
@@ -67,6 +66,7 @@ public class AppMethods {
 				sp=sp+st+"\n";
 			}
 
+			if(DT!=null) DT.close();
 			return cnt;
 		} catch (Exception e) {
 			//mu.msgbox(sql+"\n"+e.getMessage());
@@ -131,11 +131,8 @@ public class AppMethods {
 		} catch (Exception e) {
 
 		}
-
 		return cnt;
-
 	}
-
 
 	// Public
 	
@@ -401,6 +398,7 @@ public class AppMethods {
 		} catch (Exception e) {
 			gl.pTransBarra =false;
 		}
+
 	}
 
 	public void parametrosBarras() {
@@ -422,6 +420,7 @@ public class AppMethods {
 				gl.pPrefijoBarra ="0";
 			}
 
+			if(dt!=null) dt.close();
 		} catch (Exception e) {
 			toast("Ocurrió un error obteniendo los valores de P_CONFIGBARRA" + e.getMessage());
 		}
@@ -446,6 +445,7 @@ public class AppMethods {
 				gl.codCliNuevo ="";
 			}
 
+			if(dt!=null) dt.close();
 		} catch (Exception e) {
 			toast("Ocurrió un error obteniendo los valores de clientes nuevos" + e.getMessage());
 		}
@@ -463,12 +463,12 @@ public class AppMethods {
 
 			clienteNuevo=(DT.getCount()>0);
 
+			if(DT!=null) DT.close();
 		}catch(Exception e){
 			msgbox("Ocurrió un error en la función esClienteNuevo " + e.getMessage());
 		}
 
 		return clienteNuevo;
-
 	}
 
     // Productos
@@ -502,7 +502,9 @@ public class AppMethods {
             DT = Con.OpenDT(sql);
             DT.moveToFirst();
 
-            return  DT.getInt(0)==1;
+            boolean rslt=DT.getInt(0)==1;
+			if(DT!=null) DT.close();
+            return  rslt;
         } catch (Exception e) {
             //toast(e.getMessage());
             return false;
@@ -517,7 +519,10 @@ public class AppMethods {
 			String sql = "SELECT VENTA_POR_PESO FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
 			DT = Con.OpenDT(sql);
 			DT.moveToFirst();
-			return  DT.getInt(0)==1;
+
+			boolean rslt=DT.getInt(0)==1;
+			if(DT!=null) DT.close();
+			return  rslt;
 		} catch (Exception e) {
 			toast(e.getMessage());
 			return false;
@@ -602,6 +607,8 @@ public class AppMethods {
 				dt.moveToNext();
 			}
 
+			if(dt!=null) dt.close();
+
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
@@ -623,8 +630,6 @@ public class AppMethods {
 			DT.moveToFirst();
 			sumaPesoB=DT.getDouble(0);
 		}
-
-		DT.close();
 
 		sql = " SELECT IFNULL(SUM(S.PESO),0) AS PESOTOT " +
 		      " FROM P_STOCK_PALLET S, P_PRODUCTO P " +
@@ -662,7 +667,7 @@ public class AppMethods {
 			sumaPeso+=DT.getDouble(0);
 		}
 
-		DT.close();
+		if(DT!=null) DT.close();
 
 		sumaPeso = sumaPeso + sumaPesoB;
 
@@ -723,7 +728,7 @@ public class AppMethods {
 			sumaCant+=DT.getDouble(0);
 		}
 
-		DT.close();
+		if(DT!=null) DT.close();
 
 		sumaCant = sumaCant + sumaCantB;
 
@@ -747,6 +752,9 @@ public class AppMethods {
 			}
 
 			umm=DT.getString(0);
+
+			if(DT!=null) DT.close();
+
 			return  umm;
 		} catch (Exception e) {
 			toast(e.getMessage());
@@ -768,7 +776,8 @@ public class AppMethods {
 				if (pesoprom==0) pesoprom = DT.getDouble(0);
 			}
 
-		} catch (Exception e) {
+			if(DT!=null) DT.close();
+			} catch (Exception e) {
 			toast(e.getMessage());
 		}
 
@@ -791,6 +800,8 @@ public class AppMethods {
 			DT.moveToFirst();
 			umm=DT.getString(0);
 
+			if(DT!=null) DT.close();
+
 			return  umm;
 		} catch (Exception e) {
 			//toast(e.getMessage());
@@ -806,7 +817,10 @@ public class AppMethods {
 			DT = Con.OpenDT(sql);
 			DT.moveToFirst();
 
-			return  DT.getDouble(0);
+			double val=DT.getDouble(0);
+			if(DT!=null) DT.close();
+
+			return  val;
 		} catch (Exception e) {
 			toast(e.getMessage());
 			return 0;
@@ -830,7 +844,10 @@ public class AppMethods {
 
 			DT.moveToFirst();
 
-			return  DT.getDouble(0);
+			double val=DT.getDouble(0);
+			if(DT!=null) DT.close();
+
+			return  val;
 		} catch (Exception e) {
 			return 1;
 		}
@@ -868,6 +885,8 @@ public class AppMethods {
 
 				dt.moveToNext();
 			}
+
+			if(dt!=null) dt.close();
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
@@ -892,7 +911,10 @@ public class AppMethods {
 			if (dt.getCount()==0) return "SIN IMPRESORA";
 			dt.moveToFirst();
 
-			return dt.getString(0);
+			String ss=dt.getString(0);
+			if(dt!=null) dt.close();
+
+			return ss;
 
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -910,6 +932,8 @@ public class AppMethods {
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			prnid=dt.getString(0);
+
+			if(dt!=null) dt.close();
 
 			return prnid;
 
@@ -929,6 +953,8 @@ public class AppMethods {
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			prnid=dt.getString(0);
+
+			if(dt!=null) dt.close();
 
 			return prnid;
 
@@ -954,7 +980,10 @@ public class AppMethods {
 			if (dt.getCount()==0) return "SIN IMPRESORA";
 			dt.moveToFirst();
 
-			return dt.getString(0);
+			String ss=dt.getString(0);
+			if(dt!=null) dt.close();
+
+			return ss;
 
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -979,7 +1008,10 @@ public class AppMethods {
 			if (dt.getCount()==0) return " #### ";
 			dt.moveToFirst();
 
-			return cu.decrypt(dt.getString(0));
+			String ss=dt.getString(0);
+			if(dt!=null) dt.close();
+
+			return cu.decrypt(ss);
 
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -998,6 +1030,8 @@ public class AppMethods {
 
 			DT.moveToFirst();
 			ff=DT.getLong(0);
+
+			if(DT!=null) DT.close();
 
 			return ff;
 		} catch (Exception e) {
@@ -1018,6 +1052,8 @@ public class AppMethods {
 
 				devol = (dt.getString(0).equals("S")?true:false);
 			}
+
+			if(dt!=null) dt.close();
 
 		} catch (Exception e) {
 			msgbox("Ocurrió un error obteniendo el estado de comunicación de la devolución "+e.getMessage());

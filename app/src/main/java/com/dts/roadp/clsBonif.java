@@ -30,13 +30,12 @@ public class clsBonif {
 		
 		prodid=producto;cant=cantidad;monto=montoventa;
 
-		/*
 		try {
 			active=0;
 			Con = new BaseDatos(context);
 			opendb();
 		} catch (Exception e) {
-		}*/
+		}
 
 	    MU=new MiscUtils(context);
 		
@@ -52,6 +51,8 @@ public class clsBonif {
 		double dval=0;
 		
 		items.clear();
+
+		opendb();
 		
 		if (!validaPermisos()) return false;
 		
@@ -71,6 +72,9 @@ public class clsBonif {
 		double val;
 		
 		try {
+
+			opendb();
+
 			vSQL="SELECT PRODUCTO,PTIPO,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
 				 "FROM T_BONIF WHERE  ("+cant+">=RANGOINI) AND ("+cant+"<=RANGOFIN) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='U') AND (TIPOBON='R') AND (GLOBBON='N') AND (PORCANT='S')";
@@ -118,7 +122,9 @@ public class clsBonif {
 				}
 				
 				DT.moveToNext();
-			}	
+			}
+
+			if(DT!=null) DT.close();
 			
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
@@ -133,6 +139,9 @@ public class clsBonif {
 		double val;
 		
 		try {
+
+			opendb();
+
 			vSQL="SELECT PRODUCTO,PTIPO,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
 				 "FROM T_BONIF WHERE  ("+monto+">=RANGOINI) AND ("+monto+"<=RANGOFIN) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='V') AND (TIPOBON='R') AND (GLOBBON='N') AND (PORCANT='N')";
@@ -179,12 +188,15 @@ public class clsBonif {
 				}
 				
 				DT.moveToNext();
-			}	
+			}
+
+			if(DT!=null) DT.close();
 			
 		} catch (Exception e) {
-		   	MU.msgbox(e.getMessage());
-	    }	
-		
+			MU.msgbox(e.getMessage());
+	    }
+
+
 	}
 	
 	private void listaDescMultCant() {
@@ -194,6 +206,9 @@ public class clsBonif {
 		double val,mcant,mul;
 		
 		try {
+
+			opendb();
+
 			vSQL="SELECT PRODUCTO,PTIPO,RANGOINI,RANGOFIN,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
 				 "FROM T_BONIF WHERE ("+cant+">=RANGOINI) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='U') AND (TIPOBON='M') AND (GLOBBON='N') AND (PORCANT='S')";
@@ -250,8 +265,8 @@ public class clsBonif {
 				}
 
 				DT.moveToNext();
-			}	
-			
+			}
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }
@@ -265,6 +280,9 @@ public class clsBonif {
 		double val,mcant,mul;
 		
 		try {
+
+			opendb();
+
 			vSQL="SELECT PRODUCTO,PTIPO,RANGOINI,RANGOFIN,VALOR,TIPOLISTA,TIPOCANT,LISTA,CANTEXACT,PORCANT "+
 				 "FROM T_BONIF WHERE ("+monto+">=RANGOINI) "+
 				 "AND (PTIPO<4) AND (TIPOCANT='V') AND (TIPOBON='M') AND (GLOBBON='N') AND (PORCANT='N')";
@@ -320,8 +338,9 @@ public class clsBonif {
 				}
 
 				DT.moveToNext();
-			}	
-			
+			}
+
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 		   	MU.msgbox(e.getMessage());
 	    }	
@@ -335,6 +354,9 @@ public class clsBonif {
 		Cursor DT;
 		
 		try {
+
+			opendb();
+
 			vSQL="SELECT BONIFICACION,LINEA,SUBLINEA,MARCA FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	DT=Con.OpenDT(vSQL);
 			DT.moveToFirst();
@@ -344,7 +366,8 @@ public class clsBonif {
 			lineaid=DT.getString(1);
 			slineaid=DT.getString(2);
 			marcaid=DT.getString(3);
-			
+
+			if(DT!=null) DT.close();
 			return true;
 			
 		} catch (Exception e) {
@@ -356,11 +379,15 @@ public class clsBonif {
  	private void opendb() {
 		try {
 			db = Con.getWritableDatabase();
-		 	Con.vDatabase =db;
-			active=1;	
-	    } catch (Exception e) {
-	    	active= 0;
-	    }
+			if (db!= null) {
+				Con.vDatabase=db;
+				active=1;
+			} else {
+				active = 0;
+			}
+		} catch (Exception e) {
+			active= 0;
+		}
 	}		
 	
 }

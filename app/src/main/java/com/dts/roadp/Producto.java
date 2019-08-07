@@ -348,7 +348,7 @@ public class Producto extends PBase {
 
 			if(DT!=null) DT.close();
 		} catch (Exception e) {
-		   //	mu.msgbox( e.getMessage());
+		    //	mu.msgbox( e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			Log.d("prods",e.getMessage());
 	    }
@@ -360,7 +360,7 @@ public class Producto extends PBase {
 		
 		if (prodtipo==1) dispUmCliente();
 
-	if (cantidad==1) {
+		if (cantidad==1) {
 
 			itemid = vItem.Cod;
 			prname = vItem.Desc;
@@ -596,6 +596,9 @@ public class Producto extends PBase {
 			  
 			  DT.moveToNext();
 			}
+
+            if(DT!=null) DT.close();
+
 					
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

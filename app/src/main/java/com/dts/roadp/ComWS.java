@@ -34,6 +34,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -203,8 +204,12 @@ public class ComWS extends PBase {
 				txtRuta.setText("2024-5");
 				//txtRuta.setText("8001-1");
 				txtEmp.setText("03");
-				txtWS.setText("http://200.46.46.104:8001/RDC7_SAP_PRD_ANDR/wsAndr.asmx");
 			}
+
+			txtWS.setText("http://200.46.46.104:8001/RDC7_SAP_PRD_ANDR/wsAndr.asmx");
+
+			//txtRuta.setText("8001-1");
+			//txtEmp.setText("03");
 			txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}
 
@@ -259,6 +264,9 @@ public class ComWS extends PBase {
 			return;
 		}
 
+		lblRec.setVisibility(View.INVISIBLE);
+		imgRec.setVisibility(View.INVISIBLE);
+
 		if(gl.ruta.isEmpty()){
 			ruta = txtRuta.getText().toString();
 			gl.ruta=ruta;
@@ -307,24 +315,28 @@ public class ComWS extends PBase {
 	public void askSend(View view) {
 
 		try {
+
 			if (isbusy == 1) {
 				toastcent("Por favor, espere que se termine la tarea actual.");
 				return;
 			}
 
+
 			if (!gl.debug) {
                 if (!validaLicencia()) {
                     mu.msgbox("Licencia inválida!");
+					lblEnv.setVisibility(View.VISIBLE);
+					imgEnv.setVisibility(View.VISIBLE);
                     return;
                 }
             }
 
 			if (gl.banderafindia) {
-				if (!puedeComunicar()) {
-					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
-					return;
+					if (!puedeComunicar()) {
+						mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+						return;
+					}
 				}
-			}
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -337,7 +349,12 @@ public class ComWS extends PBase {
 				}
 			});
 
-			dialog.setNegativeButton("Cancelar", null);
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					lblEnv.setVisibility(View.VISIBLE);
+					imgEnv.setVisibility(View.VISIBLE);
+				}
+			});
 
 			dialog.show();
 		} catch (Exception e) {
@@ -356,9 +373,14 @@ public class ComWS extends PBase {
                 return;
             }
 
+			lblEnvM.setVisibility(View.INVISIBLE);
+            imgEnvM.setVisibility(View.INVISIBLE);
+
 			if (!gl.debug) {
 				if (!validaLicencia()) {
 					mu.msgbox("Licencia inválida!");
+					lblEnvM.setVisibility(View.VISIBLE);
+					imgEnvM.setVisibility(View.VISIBLE);
 					return;
 				}
 			}
@@ -366,6 +388,8 @@ public class ComWS extends PBase {
             if (gl.banderafindia) {
                 if (!puedeComunicar()) {
                     mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+					lblEnvM.setVisibility(View.VISIBLE);
+					imgEnvM.setVisibility(View.VISIBLE);
                     return;
                 }
             }
@@ -381,7 +405,12 @@ public class ComWS extends PBase {
                 }
             });
 
-            dialog.setNegativeButton("Cancelar", null);
+            dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					lblEnvM.setVisibility(View.VISIBLE);
+					imgEnvM.setVisibility(View.VISIBLE);
+				}
+			});
 
             dialog.show();
 
@@ -597,20 +626,28 @@ public class ComWS extends PBase {
 
                     if (mu.emptystr(usr)) {
                         toast("Usuario incorrecto.");
+						lblEnvM.setVisibility(View.VISIBLE);
+						imgEnvM.setVisibility(View.VISIBLE);
                         return;
                     }
 
                     if (mu.emptystr(pwd)) {
                         toast("Contraseña incorrecta.");
+						lblEnvM.setVisibility(View.VISIBLE);
+						imgEnvM.setVisibility(View.VISIBLE);
 						return;
                     }
 
 					dtCorrectos = validaDatos(usr,pwd);
 
+					lblEnvM.setVisibility(View.VISIBLE);
+					imgEnvM.setVisibility(View.VISIBLE);
+
                     if (dtCorrectos){
 						askSendContinue();
 					}else{
 						layout.removeAllViews();
+
 						return;
 					}
 
@@ -620,6 +657,8 @@ public class ComWS extends PBase {
             alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     layout.removeAllViews();
+					lblEnvM.setVisibility(View.VISIBLE);
+					imgEnvM.setVisibility(View.VISIBLE);
                 }
             });
 
@@ -654,12 +693,12 @@ public class ComWS extends PBase {
                 return false;
             }
 
+			if(DT!=null) DT.close();
 
 			correctos = true;
 
          }catch (Exception e){
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             return false;
         }
 
@@ -775,6 +814,8 @@ public class ComWS extends PBase {
 		try {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
+			relExist.setVisibility(View.INVISIBLE);
+
 			dialog.setTitle("Existencias bodega");
 			dialog.setMessage("¿Actualizar existencias?");
 
@@ -784,7 +825,12 @@ public class ComWS extends PBase {
 				}
 			});
 
-			dialog.setNegativeButton("Cancelar", null);
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					relExist.setVisibility(View.VISIBLE);
+				}
+			});
+
 
 			dialog.show();
 		} catch (Exception e) {
@@ -803,6 +849,8 @@ public class ComWS extends PBase {
 		try {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
+			relPrecio.setVisibility(View.INVISIBLE);
+
 			dialog.setTitle("Precios");
 			dialog.setMessage("¿Actualizar precios?");
 
@@ -812,7 +860,11 @@ public class ComWS extends PBase {
 				}
 			});
 
-			dialog.setNegativeButton("Cancelar", null);
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					relPrecio.setVisibility(View.VISIBLE);
+				}
+			});
 
 			dialog.show();
 		} catch (Exception e) {
@@ -831,6 +883,8 @@ public class ComWS extends PBase {
 		try {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
+			relStock.setVisibility(View.INVISIBLE);
+
 			dialog.setTitle("Recarga de inventario");
 			dialog.setMessage("¿Recargar inventario?");
 
@@ -840,7 +894,12 @@ public class ComWS extends PBase {
 				}
 			});
 
-			dialog.setNegativeButton("Cancelar", null);
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					relStock.setVisibility(View.VISIBLE);
+				}
+			});
+
 
 			dialog.show();
 		} catch (Exception e) {
@@ -920,11 +979,20 @@ public class ComWS extends PBase {
 	}
 
 	private void runSend() {
+		int dia=du.dayofweek(du.getActDate());
 
 		try {
 			if (isbusy == 1) return;
 
 			if (!setComParams()) return;
+
+			try {
+				File f1 = new File(Environment.getExternalStorageDirectory() + "/road.db");
+				File f2 = new File(Environment.getExternalStorageDirectory() + "/road"+dia+".db");
+				FileUtils.copyFile(f1, f2);
+			} catch (Exception e) {
+				msgbox("No se puede generar respaldo : "+e.getMessage());
+			}
 
 			isbusy = 1;
 
@@ -937,8 +1005,7 @@ public class ComWS extends PBase {
 			wsStask.execute();
 
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
 
@@ -948,6 +1015,7 @@ public class ComWS extends PBase {
 		try {
 			super.finish();
 			startActivity(new Intent(this, ComWSExist.class));
+			relExist.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -959,6 +1027,7 @@ public class ComWS extends PBase {
 		try {
 			super.finish();
 			startActivity(new Intent(this, ComWSPrec.class));
+			relPrecio.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -970,6 +1039,7 @@ public class ComWS extends PBase {
 		try {
 			super.finish();
 			startActivity(new Intent(this, ComWSRec.class));
+			relStock.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -1045,7 +1115,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
@@ -1275,7 +1345,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1319,7 +1389,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
@@ -1370,7 +1440,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
@@ -1408,7 +1478,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
 
@@ -1450,7 +1520,7 @@ public class ComWS extends PBase {
 
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1488,7 +1558,7 @@ public class ComWS extends PBase {
 
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1526,7 +1596,7 @@ public class ComWS extends PBase {
 
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL);
+			HttpTransportSE transport = new HttpTransportSE(URL,60000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1626,6 +1696,8 @@ public class ComWS extends PBase {
 			} else {
 				val = "N";
 			}
+
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -1907,6 +1979,9 @@ public class ComWS extends PBase {
 				dt = Con.OpenDT(sql);
 				dt.moveToFirst();
 				gl.peModal = dt.getString(0).toUpperCase();
+
+				if(dt!=null) dt.close();
+
 			} catch (Exception e) {
 				gl.peModal = "-";
 			}
@@ -1967,6 +2042,9 @@ public class ComWS extends PBase {
 				dt = Con.OpenDT(sql);
 				dt.moveToFirst();
 				val = dt.getString(0);
+
+				if(dt!=null) dt.close();
+
 			} catch (Exception e) {
 				val = "V";
 			}
@@ -2074,6 +2152,9 @@ public class ComWS extends PBase {
 			}
 
 			DT1.close();
+
+			if(DT1!=null) DT1.close();
+
 
 		} catch (Exception ex) {
 			vActualizaFD = false;
@@ -2683,6 +2764,9 @@ public class ComWS extends PBase {
 				DT.moveToFirst();
 				ss = DT.getString(0);
 				if (ss.equalsIgnoreCase("T")) ss = "V";
+
+				if(DT!=null) DT.close();
+
 			} catch (Exception e) {
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -2775,6 +2859,8 @@ public class ComWS extends PBase {
 				}
 
 			}
+
+			if(dt!=null) dt.close();
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -2876,6 +2962,8 @@ public class ComWS extends PBase {
 				dt.moveToNext();
 			}
 
+			if(dt!=null) dt.close();
+
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
@@ -2913,6 +3001,11 @@ public class ComWS extends PBase {
 		String lic,lickey,licruta,rutaencrypt;
 		Integer msgLic=0;
 
+		if (gl.debug) {
+			return true;
+		}
+
+
 		try {
 			lickey=cu.encrypt(gl.deviceId);
 			rutaencrypt=cu.encrypt(gl.ruta);
@@ -2923,6 +3016,8 @@ public class ComWS extends PBase {
 			lic=dt.getString(0);
 			licruta=dt.getString(1);
 			String ss=cu.decrypt(licruta);
+
+			if(dt!=null) dt.close();
 
 			if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) return true;
 			else if (!lic.equalsIgnoreCase(lickey) && !licruta.equalsIgnoreCase(rutaencrypt)){msgLic=1;}
@@ -2993,6 +3088,10 @@ public class ComWS extends PBase {
 
 		barInfo.setVisibility(View.INVISIBLE);
 		lblParam.setVisibility(View.INVISIBLE);
+
+		lblRec.setVisibility(View.VISIBLE);
+		imgRec.setVisibility(View.VISIBLE);
+
 		running = 0;
 
 		try {
@@ -3374,7 +3473,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("facturas.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 					dbg = e.getMessage();
@@ -3394,7 +3496,10 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+
+            dbld.savelog("facturas.txt");
+
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 			dbg = fstr;
 		}
@@ -3466,16 +3571,24 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("pedidos.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					//fterr+="\n"+e.getMessage();
 				}
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {
+
+            dbld.savelog("pedidos.txt");
+
+            addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -3546,7 +3659,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("cobros.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					//fterr+="\n"+e.getMessage();
 				}
@@ -3554,9 +3670,14 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {
+
+            dbld.savelog("cobros.txt");
+
+            addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -3627,7 +3748,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("notascredito.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 				}
@@ -3635,9 +3759,14 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {
+
+            dbld.savelog("notascredito.txt");
+
+            addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -3702,7 +3831,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("notasdevolucion.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 				}
@@ -3730,9 +3862,14 @@ public class ComWS extends PBase {
 
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {
+
+            dbld.savelog("notasdevolucion.txt");
+
+            addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -3797,7 +3934,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("depositos.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 				}
@@ -3805,9 +3945,14 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {
+
+            dbld.savelog("depositos.txt");
+
+            addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -3836,6 +3981,8 @@ public class ComWS extends PBase {
 				DT.moveToFirst();
 				cor = DT.getString(0);
 			}
+
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -3914,7 +4061,10 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
-					addlog(new Object() {
+
+                    dbld.savelog("inventario.txt");
+
+                    addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 				}
@@ -3922,9 +4072,14 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
-			addlog(new Object() {
+
+            dbld.savelog("inventarios.txt");
+
+            addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -4004,6 +4159,8 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -4068,6 +4225,8 @@ public class ComWS extends PBase {
 				DT.moveToNext();
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			errflag = true;
 			addlog(new Object() {
@@ -4126,6 +4285,8 @@ public class ComWS extends PBase {
 
 				DT.moveToNext();
 			}
+
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			errflag = true;
@@ -4193,6 +4354,8 @@ public class ComWS extends PBase {
 
 				DT.moveToNext();
 			}
+
+			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			errflag = true;
@@ -4312,6 +4475,8 @@ public class ComWS extends PBase {
 
                 DT.moveToNext();
             }
+
+			if(DT!=null) DT.close();
 
         } catch (Exception e) {
 			errflag = true;
@@ -4500,6 +4665,8 @@ public class ComWS extends PBase {
 
 				}
 
+				if(DT!=null) DT.close();
+
 				json2.put("P_CLIENTE_FACHADA",json_Array);
 
 			}
@@ -4570,6 +4737,10 @@ public class ComWS extends PBase {
 				
 		barInfo.setVisibility(View.INVISIBLE);
 		lblParam.setVisibility(View.INVISIBLE);
+
+		lblEnv.setVisibility(View.VISIBLE);
+		imgEnv.setVisibility(View.VISIBLE);
+
 		running=0;
 		
 		//senv="Envio completo\n";
@@ -4699,6 +4870,9 @@ public class ComWS extends PBase {
 				} else {
 					docstock = "";
 				}
+
+				if(dt!=null) dt.close();
+
 			} catch (Exception e) {
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -4847,6 +5021,8 @@ public class ComWS extends PBase {
 
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//MU.msgbox(e.getMessage());
@@ -4904,6 +5080,8 @@ public class ComWS extends PBase {
             	cnt=DT.getInt(0);
             }
 
+			if(DT!=null) DT.close();
+
             if (cnt>0) {
 				st=pps+" "+cnt;
 				sp=sp+st+", ";
@@ -4937,6 +5115,8 @@ public class ComWS extends PBase {
 				crl=DT.getInt(0);
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}	
@@ -4956,6 +5136,8 @@ public class ComWS extends PBase {
 				DT.moveToFirst();
 				serie = DT.getString(0);
 			}
+
+			if(DT!=null) DT.close();
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -4982,6 +5164,8 @@ public class ComWS extends PBase {
 				}
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -4998,6 +5182,9 @@ public class ComWS extends PBase {
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
             rslt=DT.getInt(0);
+
+			if(DT!=null) DT.close();
+
         } catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             rslt=0;
@@ -5455,8 +5642,12 @@ public class ComWS extends PBase {
 				}
 			});
 
-			dialog.setNegativeButton("Cancelar", null);
-
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					lblRec.setVisibility(View.VISIBLE);
+					imgRec.setVisibility(View.VISIBLE);
+				}
+			});
 			dialog.show();
 
 		}catch (Exception e){
@@ -5517,24 +5708,25 @@ public class ComWS extends PBase {
 		Cursor DT;
 		String vGetStatusRec = "";
 
-		try 			{
-				sql = "SELECT PARAM2 FROM P_RUTA ";
-				DT = Con.OpenDT(sql);
+		try {
+			sql = "SELECT PARAM2 FROM P_RUTA ";
+			DT = Con.OpenDT(sql);
 
-				if (DT.getCount()> 0) 				{
-					DT.moveToFirst();
-					vGetStatusRec = DT.getString(0);
-				}
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
+				vGetStatusRec = DT.getString(0);
 			}
 
-		catch (Exception ex) {
-				Log.d("GetStatusRec","Something happend here " + ex.getMessage());
-				msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+ " " + ex.getMessage());
+			if(DT!=null) DT.close();
+
+		} catch (Exception ex) {
+			Log.d("GetStatusRec", "Something happend here " + ex.getMessage());
+			msgbox(new Object() {
+			}.getClass().getEnclosingMethod().getName() + " " + ex.getMessage());
 		}
 
 		return  vGetStatusRec;
 	}
-
 
 	//endregion
 

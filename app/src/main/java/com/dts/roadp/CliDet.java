@@ -290,6 +290,8 @@ public class CliDet extends PBase {
 				Toast.makeText(this,"Fachada no disponible",Toast.LENGTH_LONG).show();
 			}
 
+			if(DT!=null) DT.close();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("inputFachada: " + e.getMessage());
@@ -435,6 +437,8 @@ public class CliDet extends PBase {
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
 			gl.clitipo = DT.getString(16);
 
+			if(DT!=null) DT.close();
+
 			sql="SELECT RUTA FROM P_CLIRUTA WHERE CLIENTE='"+cod+"'";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
@@ -506,6 +510,9 @@ public class CliDet extends PBase {
 			tpg=DT.getDouble(0);
 			
 			cu=tsal-tpg;
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	cu=0;mu.msgbox(e.getMessage());
@@ -579,7 +586,9 @@ public class CliDet extends PBase {
 				porcentaje = true;
 				msgAskVenta();
 			}
-			
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("No esta definido correlativo de factura. No se puede continuar con la venta.\n"); //+e.getMessage());
@@ -609,13 +618,15 @@ public class CliDet extends PBase {
 
 			if(archivo.exists()){
 				imgRoadTit.setImageURI(Uri.fromFile(archivo));
-			}else if(imgDB == true){
+			} else if (imgDB == true){
 				byte[] btImagen = Base64.decode(imagenbase64, Base64.DEFAULT);
 				Bitmap bitm = BitmapFactory.decodeByteArray(btImagen,0,btImagen.length);
 				imgRoadTit.setImageBitmap(redimensionarImagen(bitm,200,200));
-			}else{
+			} else {
 				imgRoadTit.setImageResource(R.drawable.cliente);
 			}
+
+			if(DT!=null) DT.close();
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

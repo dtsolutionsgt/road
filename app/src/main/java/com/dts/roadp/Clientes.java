@@ -324,12 +324,8 @@ public class Clientes extends PBase {
 			if (DT.getCount() > 0) {
 				DT.moveToFirst();
 				for (int i = 0; i < DT.getCount(); i++) {
-					//	try {
 					cobros.add(DT.getString(0));
 					DT.moveToNext();
-				/*	} catch (Exception e) {
-						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-					}*/
 				}
 			}
 
@@ -344,18 +340,14 @@ public class Clientes extends PBase {
 					"   FROM D_FACTURA AS D_FACTURA_1 INNER JOIN " +
 					"   D_FACTURAP ON D_FACTURA_1.COREL=D_FACTURAP.COREL))";
 
-
 			DT = Con.OpenDT(sql);
 
 			if (DT.getCount() > 0) {
 				DT.moveToFirst();
 				for (int i = 0; i < DT.getCount(); i++) {
-					//	try {
 					ss = DT.getString(0);
 					if (!ppago.contains(ss)) ppago.add(ss);
 					DT.moveToNext();
-				/*	} catch (Exception e) {
-					}*/
 				}
 			}
 
@@ -426,6 +418,8 @@ public class Clientes extends PBase {
 				spinList.setSelection(0);
 			}
 
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -463,6 +457,9 @@ public class Clientes extends PBase {
 			Location.distanceBetween(cx,cy,latitude,longitude, results);
 
 			gl.gpsdist=(int) results[0];
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			gl.gpsdist=-1;
 		}
@@ -477,8 +474,7 @@ public class Clientes extends PBase {
 			intent = new Intent(this, CliDet.class);
 			startActivity(intent);
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
 	}
@@ -514,6 +510,9 @@ public class Clientes extends PBase {
 
 			txtFiltro.setText("");
 			txtFiltro.requestFocus();
+
+			if(dt!=null) dt.close();
+
 		} catch (Exception e) {
 			msgbox(new Object() {
 			}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
@@ -716,7 +715,9 @@ public class Clientes extends PBase {
 			sql="SELECT * FROM D_FACTURA WHERE CLIENTE='"+selid+"'";
 			dt=Con.OpenDT(sql);
 			if (dt.getCount()>0) return false;
-		
+
+			if(dt!=null) dt.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -733,7 +734,9 @@ public class Clientes extends PBase {
 			sql="SELECT * FROM D_CLINUEVO WHERE CODIGO='"+selid+"' AND STATCOM='N'";
 			dt=Con.OpenDT(sql);
 			if (dt.getCount()==0) return false;
-		
+
+			if(dt!=null) dt.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -871,18 +874,14 @@ public class Clientes extends PBase {
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 
-			//	try {
-					code=String.valueOf(DT.getInt(0));
-					name=DT.getString(1);
+				code = String.valueOf(DT.getInt(0));
+				name = DT.getString(1);
 
-					listcode.add(code);
-					listname.add(name);
-			/*	} catch (Exception e) {
-					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-					mu.msgbox(e.getMessage());
-				}*/
+				listcode.add(code);
+				listname.add(name);
 				DT.moveToNext();
 			}
+			if(DT!=null) DT.close();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox( e.getMessage());return;

@@ -13,7 +13,7 @@ public class clsClasses {
 	}
 	
 	public class clsCFDV {
-		public int id;
+		public int id,flag;
 		public String Cod,Desc,Fecha,Valor,Sid;
 		public double val;
 	}

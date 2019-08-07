@@ -195,6 +195,8 @@ public class Exist extends PBase {
 			if (Con != null){
 				DT = Con.OpenDT(sql);
 				cantb = DT.getCount();
+
+				if(DT!=null) DT.close();
 			}else {
 				cantb = 0;
 			}
@@ -350,6 +352,9 @@ public class Exist extends PBase {
 
 				dp.moveToNext();
 			}
+
+			if(dp!=null) dp.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
@@ -443,6 +448,9 @@ public class Exist extends PBase {
 
 				DT.moveToNext();
 			}
+
+			if(DT!=null) DT.close();
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());

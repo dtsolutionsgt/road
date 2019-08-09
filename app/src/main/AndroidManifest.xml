@@ -31,7 +31,8 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ListAdaptProductoGrid"></activity>
+        <activity android:name=".comWSFotosCli"></activity>
+        <activity android:name=".ListAdaptProductoGrid" />
         <activity android:name=".gridproducto" />
         <activity android:name=".list_view_barras" />
         <activity android:name=".imprime_barras" />

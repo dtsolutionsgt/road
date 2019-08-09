@@ -711,7 +711,7 @@ public class ComWS extends PBase {
 
             envioRating();
 
-			//envioModifCliente();
+			envioModifCliente();
 
 			updateAcumulados();
 
@@ -865,6 +865,10 @@ public class ComWS extends PBase {
 
 	public void doFotos(View view) {
 		startActivity(new Intent(this,ComWSFotos.class));
+	}
+
+	public void doFotosCli(View view) {
+		startActivity(new Intent(this,comWSFotosCli.class));
 	}
 
 	private void setHandlers() {
@@ -1442,7 +1446,7 @@ public class ComWS extends PBase {
 
             Bitmap bmp = BitmapFactory.decodeFile(fname);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            bmp.compress(Bitmap.CompressFormat.PNG,100, out);
+            bmp.compress(Bitmap.CompressFormat.PNG,75, out);
             byte[] imagebyte = out.toByteArray();
             String strBase64 = Base64.encodeBytes(imagebyte);
 
@@ -1622,7 +1626,6 @@ public class ComWS extends PBase {
 			if (!AddTable("P_PRODPRECIO")) return false;
 			if (!AddTable("P_NIVELPRECIO")) return false;
 			if (!AddTable("P_TIPONEG")) return false;
-			if (!AddTable("P_CLIENTE_FACHADA")) return false;
 			if (!AddTable("P_CLIRUTA")) return false;
 			if (!AddTable("P_CLIDIR")) return false;
 			if (!AddTable("P_FACTORCONV")) return false;
@@ -3160,11 +3163,11 @@ public class ComWS extends PBase {
                 return false;
             }
 
-			/*envioModifCliente();
+			envioModifCliente();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
 				return false;
-			}*/
+			}
 
 			updateAcumulados();
 			if (!fstr.equals("Sync OK")){
@@ -3860,6 +3863,8 @@ public class ComWS extends PBase {
 							" FROM D_MOV E INNER JOIN D_MOVDB D ON E.COREL = D.COREL" +
 							" WHERE E.COREL = '" + cor + "'");
 
+					pc += 1;
+
 					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_MOV SET STATCOM='S' WHERE COREL='" + cor + "'";
@@ -4083,9 +4088,9 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
+					fterr += "\n" + e.getMessage();
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-					fterr += "\n" + e.getMessage();
 				}
 
 				DT.moveToNext();
@@ -4129,6 +4134,7 @@ public class ComWS extends PBase {
 					if (envioparcial) dbld.clear();
 
 					dbld.add(cadena);
+					cadena = cadena.replace("'","''");
 					ss = "INSERT INTO D_MODIFICACIONES VALUES('" + ruta + "','" + cadena + "','" + fechaM + "')";
 					dbld.add(ss);
 
@@ -4499,15 +4505,21 @@ public class ComWS extends PBase {
 
 					codigo = DT.getString(0);
 
-					String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + codigo + ".jpg");
+					String paht = (Environment.getExternalStorageDirectory() + "/RoadFachadas/" + codigo + ".jpg");
 					File archivo = new File(paht);
 
 					if(archivo.exists()){
 
 						if (sendFoto(codigo, paht)==1) {
-							String pathNew = (Environment.getExternalStorageDirectory() + "/RoadFachadas/" + codigo + ".jpg");
+
+							String pathNew = (Environment.getExternalStorageDirectory() + "/RoadClientes/" + codigo + ".jpg");
 							File archivoNew = new File(pathNew);
-							archivo.renameTo(archivoNew);
+
+							if(!archivoNew.exists()) {
+								archivo.renameTo(archivoNew);
+							}
+
+							archivo.delete();
 						}
 					}
 

@@ -47,6 +47,7 @@ import java.text.NumberFormat;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
+import static org.apache.commons.io.FileUtils.copyFile;
 
 public class CliDet extends PBase {
 
@@ -265,7 +266,7 @@ public class CliDet extends PBase {
 		//	try {
 
 				Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-				File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+				File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFachadas/" + cod + ".jpg");
 				intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
 				startActivityForResult(intento1,codResult);
 
@@ -287,7 +288,7 @@ public class CliDet extends PBase {
 		imgDB = false; imgPath=false;
 		try {
 
-			path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+			path = (Environment.getExternalStorageDirectory() + "/RoadClientes/" + cod + ".jpg");
 			File archivo = new File(path);
 
 			sql = "SELECT IMAGEN FROM P_CLIENTE_FACHADA WHERE CODIGO ='"+ cod +"'";
@@ -323,18 +324,17 @@ public class CliDet extends PBase {
 			try {
 
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-				Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
+				String paht = (Environment.getExternalStorageDirectory() + "/RoadFachadas/" + cod + ".jpg");
 
-				bitmap1 = redimensionarImagen(bitmap1, 640, 360);
+				resizeFoto(paht);
 
-				FileOutputStream out = new FileOutputStream(paht);
-				bitmap1.compress(Bitmap.CompressFormat.JPEG, 50, out);
-				out.flush();
-				out.close();
-
-				File archivo = new File(path);
+				File archivo = new File(paht);
 				imgRoadTit.setImageURI(Uri.fromFile(archivo));
+
+				String pathNew = (Environment.getExternalStorageDirectory() + "/RoadClientes/" + cod + ".jpg");
+				File archivoNew = new File(pathNew);
+				copyFile(archivo, archivoNew);
+
 			}catch (Exception e){
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				//mu.msgbox("onActivityResult: " + e.getMessage());
@@ -607,7 +607,7 @@ public class CliDet extends PBase {
 		imgDB = false;
 		try {
 
-			path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+			path = (Environment.getExternalStorageDirectory() + "/RoadClientes/" + cod + ".jpg");
 			File archivo = new File(path);
 
 			sql = "SELECT IMAGEN FROM P_CLIENTE_FACHADA WHERE CODIGO ='"+ cod +"'";
@@ -749,6 +749,22 @@ public class CliDet extends PBase {
 		}
 	}
 
+	private void resizeFoto(String fname ) {
+		try {
+
+			File file = new File(fname);
+
+			Bitmap bitmap = BitmapFactory.decodeFile(fname);
+			bitmap=mu.scaleBitmap(bitmap,640,360);
+			FileOutputStream out = new FileOutputStream(file);
+			bitmap.compress(Bitmap.CompressFormat.JPEG,80,out);
+
+			out.flush();
+			out.close();
+		} catch (Exception e) {
+			msgbox("No se logró procesar la foto. Por favor tome la foto nuevamente.");
+		}
+	}
 
 	private void showStaticMap() {
 
@@ -951,16 +967,19 @@ public class CliDet extends PBase {
 	private void ActualizarCliente(String corel, String NombreEdit, String NitEdit){
 		Cursor DT;
 		String updatecli = "";
-		long fecha=du.getActDateTime();
+		String updateclitbl = "";
+		String fecha=du.univfechaseg();
 
 		try {
 			db.execSQL("INSERT INTO D_FACTURAF(COREL, NOMBRE, NIT, DIRECCION) VALUES('"+corel+"','"+NombreEdit+"','"+NitEdit+"','')");
 
 			updatecli = "UPDATE P_CLIENTE SET NOMBRE = '" + NombreEdit + "', NIT = '" + NitEdit + "' WHERE CODIGO = '" + cod + "'";
-
 			db.execSQL(updatecli);
 
-			db.execSQL("INSERT INTO D_MODIFICACIONES(RUTA, MODIFICACION, FECHA, STATCOM) VALUES('"+gl.ruta+	"','"+updatecli+"','"+fecha+"','N'");
+			updateclitbl = "UPDATE P_CLIENTE SET NOMBRE = ''" + NombreEdit + "'', NIT = ''" + NitEdit + "'' WHERE CODIGO = ''" + cod + "''";
+			sql = "INSERT INTO D_MODIFICACIONES(RUTA, MODIFICACION, FECHA, STATCOM) VALUES('"+gl.ruta+	"','"+updateclitbl+"','"+fecha+"','N')";
+
+			db.execSQL(sql);
 
 			lblNom.setText(NombreEdit);
 			lblNit.setText(NitEdit);

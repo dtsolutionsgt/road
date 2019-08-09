@@ -242,13 +242,13 @@
 
     <ImageView
         android:id="@+id/imageView6"
-        android:layout_width="168dp"
-        android:layout_height="168dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_below="@id/lblProd"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="false"
         android:layout_marginLeft="0dp"
-        android:layout_marginTop="61dp"
+        android:layout_marginTop="97dp"
         android:layout_marginRight="10dp"
         android:adjustViewBounds="true"
         android:clickable="true"
@@ -325,31 +325,49 @@
         android:gravity="center">
 
         <TextView
-            android:id="@+id/textView9"
+            android:id="@+id/textView85"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
+            android:layout_alignStart="@id/imageView4"
+            android:layout_alignEnd="@id/imageView4"
+            android:layout_alignParentBottom="true"
             android:gravity="center_horizontal"
-            android:paddingRight="10dp"
-            android:text="DTSolutions"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:text="Imagen Cli"
+            android:textColor="@android:color/background_light"
+            android:textSize="10sp" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="57dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="288dp"
+            android:adjustViewBounds="true"
+            android:onClick="doFotosCli"
+            android:paddingTop="3dp"
+            android:paddingBottom="10dp"
+            android:src="@drawable/fotos" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:clickable="true"
+            android:onClick="doFotos"
+            android:paddingTop="3dp"
+            android:paddingBottom="10dp"
+            android:src="@drawable/fotos" />
 
         <TextView
             android:id="@+id/txtVersion"
-            android:layout_width="wrap_content"
-            android:layout_height="22dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="87dp"
-            android:layout_marginTop="11dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="16dp"
-            android:layout_toStartOf="@+id/textView9"
+            android:layout_width="275dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="14dp"
+            android:layout_toEndOf="@id/imageView2"
             android:enabled="true"
             android:gravity="center"
             android:textColor="#FFFFFF"
@@ -363,7 +381,7 @@
             android:layout_alignEnd="@+id/imageView19"
             android:layout_alignParentBottom="true"
             android:gravity="center_horizontal"
-            android:text="Imagenes"
+            android:text="Imagen Prod"
             android:textColor="#FFFFFF"
             android:textSize="10sp" />
 
@@ -394,16 +412,19 @@
 
     <RelativeLayout
         android:id="@+id/relExist"
-        android:layout_width="212dp"
-        android:layout_height="189dp"
-        android:layout_above="@+id/relativeLayout1">
+        android:layout_width="128dp"
+        android:layout_height="149dp"
+        android:layout_above="@+id/relativeLayout1"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/relPrecio">
 
         <ImageView
             android:id="@+id/imgDevol"
-            android:layout_width="240dp"
-            android:layout_height="168dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_above="@id/lblTipo"
             android:layout_alignParentTop="false"
+            android:layout_centerInParent="true"
             android:clickable="true"
             android:onClick="askExist"
             android:src="@drawable/act_stock" />
@@ -423,16 +444,18 @@
 
     <RelativeLayout
         android:id="@+id/relPrecio"
-        android:layout_width="202dp"
-        android:layout_height="189dp"
+        android:layout_width="121dp"
+        android:layout_height="152dp"
         android:layout_above="@+id/relativeLayout1"
         android:layout_centerHorizontal="true">
 
         <ImageView
             android:id="@+id/ImageView03"
-            android:layout_width="240dp"
-            android:layout_height="168dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_above="@id/TextView01"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="false"
             android:clickable="true"
             android:onClick="askPrecios"
             android:src="@drawable/cobro" />
@@ -451,17 +474,24 @@
 
     <RelativeLayout
         android:id="@+id/relStock"
-        android:layout_width="214dp"
-        android:layout_height="189dp"
+        android:layout_width="117dp"
+        android:layout_height="155dp"
         android:layout_above="@+id/relativeLayout1"
-        android:layout_alignParentRight="true">
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_toRightOf="@id/relPrecio">
 
         <ImageView
             android:id="@+id/ImageView04"
-            android:layout_width="240dp"
-            android:layout_height="168dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_alignWithParentIfMissing="true"
             android:layout_above="@id/lblPend"
             android:layout_alignParentTop="false"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="3dp"
             android:clickable="true"
             android:onClick="askRecarga"
             android:src="@drawable/inventario48" />

@@ -3,6 +3,10 @@ package com.dts.roadp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.widget.Toast;
 
 import java.text.DecimalFormat;
@@ -285,6 +289,50 @@ public class MiscUtils {
 		v=Math.floor(v);
 
 		return v;
+	}
+
+	public Bitmap scaleBitmap(Bitmap bm, int size1, int size2) {
+		Bitmap bms;
+		Matrix matrix;
+		int imw,imh;
+		double bmw,bmh,z1,z2,z3,z4,zm1,zm2,zm;
+
+		try {
+			bmw=bm.getWidth();
+			bmh=bm.getHeight();
+
+			z1=bmw/size1;
+			z2=bmh/size2;
+			zm1=Math.max(z1,z2);
+			z3=bmw/size2;
+			z4=bmh/size1;
+			zm2=Math.max(z3,z4);
+			zm=Math.min(zm1,zm2);
+
+			imw=(int) (bmw/zm);
+			imh=(int) (bmh/zm);
+
+			Bitmap scaledBitmap = Bitmap.createBitmap(imw,imh,Bitmap.Config.RGB_565);
+
+			float scaleX = imw / (float) bm.getWidth();
+			float scaleY = imh / (float) bm.getHeight();
+			float pivotX = 0;
+			float pivotY = 0;
+
+			Matrix scaleMatrix = new Matrix();
+			scaleMatrix.setScale(scaleX, scaleY, pivotX, pivotY);
+
+			Canvas canvas = new Canvas(scaledBitmap);
+			canvas.setMatrix(scaleMatrix);
+			canvas.drawBitmap(bm, 0, 0, new Paint(Paint.FILTER_BITMAP_FLAG));
+
+			return scaledBitmap;
+		} catch (Exception e) {
+			String ee=e.getMessage();
+			return null;
+		}
+
+
 	}
 	
 }

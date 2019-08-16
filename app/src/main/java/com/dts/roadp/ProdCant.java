@@ -31,8 +31,8 @@ public class ProdCant extends PBase {
 	
 	private Precio prc;
 	
-	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
-	private int nivel,browse=0,deccant;
+	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact,umini;
+	private int nivel,browse=0,deccant,prevfact=1;
 	private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
 	private boolean pexist,esdecimal,porpeso,esbarra,idle=true;
 	
@@ -214,10 +214,13 @@ public class ProdCant extends PBase {
 		double ippeso=0;
 
 		try {
+
 			sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
 			dt=Con.OpenDT(sql);
-			dt.moveToFirst();			
-			um=dt.getString(0);ubas=um;umfact=um;
+			dt.moveToFirst();
+			um=dt.getString(0);umini=um;
+            if (rutatipo.equalsIgnoreCase("P")) um=DameUnidadMinimaVenta(prodid);
+			ubas=um;umfact=um;
 			lblBU.setText(ubas);gl.ubas=ubas;upres=ubas;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -299,6 +302,11 @@ public class ProdCant extends PBase {
 
 		lblPrec.setText("Precio: "+mu.frmcur(0));
 
+		if (rutatipo.equalsIgnoreCase("P") && (prec==0)){
+			prec=precioPreventaPres();
+			prec=prec*prevfact;
+		}
+
 		if (prec==0) {
 			hidekeyb();
 			msgSinPrecio("El producto no tiene definido precio");return;
@@ -334,11 +342,12 @@ public class ProdCant extends PBase {
 		} else {
 		}
 
+		/*
 		prec=prc.precio(prodid,1,nivel,um,gl.umpeso,0,um);
 		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
 			if (prc.precioespecial>0) prec=prc.precioespecial;
 		}
-
+		*/
 
 		idisp=mu.trunc(idisp);
 
@@ -510,6 +519,17 @@ public class ProdCant extends PBase {
 		double ppeso = 0;
 
 		try {
+
+			/*
+			if (rutatipo.equalsIgnoreCase("V")) {
+				if (peso<=0) {
+					mu.msgbox("Peso incorrecto");
+					txtCant.requestFocus();
+					return;
+				}
+			}
+			*/
+
 			if (cant < 0) {
 				mu.msgbox("Cantidad incorrecta");
 				txtCant.requestFocus();
@@ -560,11 +580,17 @@ public class ProdCant extends PBase {
 			gl.umfactor = umfactor;
 			gl.prectemp = prec;
 
+			if (rutatipo.equalsIgnoreCase("P")) {
+				gl.um=um;
+				gl.umpres = um;
+				gl.precprev=prec*prevfact;
+				gl.prectemp=gl.precprev;
+			}
+
 			hidekeyb();
 			super.finish();
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
 	}
@@ -633,11 +659,14 @@ public class ProdCant extends PBase {
 					ss=txtPeso.getText().toString();
 					peso=Double.parseDouble(ss);
 				} else {
-					cant=-1;peso=0;return -1;
+					cant=-1;peso=0;return 2;
 				}
-				if (peso<=0) throw new Exception();
+
+				if (rutatipo.equalsIgnoreCase("V")) {
+					if (peso<=0) throw new Exception();
+				}
 			} catch (Exception e) {
-				cant=-1;peso=0;return -1;
+				cant=-1;peso=0;return 2;
 			}
 		}
 		cu=0;
@@ -650,9 +679,12 @@ public class ProdCant extends PBase {
 			esdecimal=(corig!=cround)?true:false;
 			cant=mu.round(cant,deccant);
 
+			if (cant<=0) {
+				mu.msgbox("Cantidad incorrecta");return 2;
+			}
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			cant=-1;return -1;
+			cant=-1;mu.msgbox("Cantidad incorrecta");return 2;
 		}
 
 		// ajuste a unidades menores
@@ -682,12 +714,16 @@ public class ProdCant extends PBase {
 					if (prc.precioespecial > 0) prec = prc.precioespecial;
 				}
 			}
-
 		} else {
 			prec = prc.precio(prodid, 0, nivel, um, gl.umpeso, 0,um);
 			if (prc.existePrecioEspecial(prodid, 1, gl.cliente, gl.clitipo, um, gl.umpeso, 0)) {
 				if (prc.precioespecial > 0) prec = prc.precioespecial;
 			}
+		}
+
+		if (rutatipo.equalsIgnoreCase("P") && (prec==0)){
+			prec=precioPreventaPres();
+			prec=prec*prevfact;
 		}
 
 		try {
@@ -734,11 +770,13 @@ public class ProdCant extends PBase {
 
 		}
 
-		/*
-		if (porpeso && gl.rutatipo.equalsIgnoreCase("V")) {
+		//if (porpeso && gl.rutatipo.equalsIgnoreCase("V")) {
+		//	if (!checkLimits(vpeso,opeso)) return 2;
+		//}
+
+		if (porpeso ) {
 			if (!checkLimits(vpeso,opeso)) return 2;
 		}
-		*/
 
 		if (ajust) {
 			msgAskAjust("Cantidad ajustada a : "+mu.frmdecimal(cant, gl.peDecImp)+". ¿Aplicar?");
@@ -815,7 +853,6 @@ public class ProdCant extends PBase {
 
 		return true;
 	}
-
 
 	private void setPrecio() {
 	    double cu,tv,corig,cround,fruni,frcant,adcant,ppeso=0;
@@ -915,6 +952,79 @@ public class ProdCant extends PBase {
     private void forceClose() {
         super.finish();
     }
+
+    public String DameUnidadMinimaVenta(String vProd )  {
+        Cursor dt;
+        String ss;
+
+        try {
+            sql = "SELECT UNIDBAS FROM P_PRODUCTO WHERE (CODIGO='"+vProd+"') AND (ES_PROD_BARRA=0)";
+            dt = Con.OpenDT(sql);
+            if (dt.getCount()>0) {
+                dt.moveToFirst();
+                ss=dt.getString(0);
+                if(dt!=null) dt.close();
+
+                return ss;
+            }
+
+            sql="SELECT UM_SALIDA FROM P_PRODUCTO WHERE (CODIGO='"+vProd+"') AND (ES_PROD_BARRA=1)";
+            dt = Con.OpenDT(sql);
+            if (dt.getCount()>0) {
+                dt.moveToFirst();
+                ss=dt.getString(0);
+                if (dt!=null) dt.close();
+
+                return ss;
+            } else {
+                return "";
+            }
+        } catch (Exception e) {
+            msgbox("Ocurrió un error obteniendo la unidad mínima de venta "+e.getMessage());
+            return "";
+        }
+    }
+
+    private double precioPreventaPres() {
+		double pp=0;
+
+		pp=prc.precio(prodid,1,nivel,umini,gl.umpeso,0,umini);
+		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
+			if (prc.precioespecial>0) pp=prc.precioespecial;
+		}
+
+		if (porpeso)
+		prevfact=(int) factorPres(prodid,um,umini);
+
+		return pp;
+	}
+
+	public double factorPres(String cod,String umventa,String umstock) {
+		Cursor DT;
+		String sql;
+
+		try {
+			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
+					"WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+umventa+"') AND (UNIDADMINIMA='"+umstock+"')";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount()==0) {
+				sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
+						"WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+umventa+"')";
+				DT = Con.OpenDT(sql);
+			}
+
+			DT.moveToFirst();
+
+			double val=DT.getDouble(0);
+			if(DT!=null) DT.close();
+
+			return  val;
+		} catch (Exception e) {
+			return 1;
+		}
+	}
+
 
 	//endregion
 

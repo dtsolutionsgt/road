@@ -101,7 +101,8 @@ public class Producto extends PBase {
 	}
 
     private void setHandlers() {
-		try{
+
+		try {
 			listView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -117,11 +118,10 @@ public class Producto extends PBase {
 
 							case  1:
 
-								if (prodBarra(item.Cod)) {
+								if (prodBarra(item.Cod) && gl.rutatipo.equalsIgnoreCase("V") ) {
 									toastcent("Producto tipo barra, no se puede ingresar la cantidad");
 									finish();return;
 								}
-
 						}
 
 						itemid = item.Cod;
@@ -149,7 +149,7 @@ public class Producto extends PBase {
 
 						adapter.setSelectedIndex(position);
 
-						if (prodBarra(item.Cod)) {
+						if (prodBarra(item.Cod) && gl.rutatipo.equalsIgnoreCase("V")) {
 							toastcent("Producto tipo barra, no se puede ingresar la cantidad");
 							finish();return true;
 						}

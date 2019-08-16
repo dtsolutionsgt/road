@@ -458,6 +458,8 @@ public class Clientes extends PBase {
 
 			gl.gpsdist=(int) results[0];
 
+			if (gl.tolsuper) spinList.setVisibility(View.INVISIBLE);
+
 			if(DT!=null) DT.close();
 
 		} catch (Exception e) {

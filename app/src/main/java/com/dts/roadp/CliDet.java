@@ -986,6 +986,8 @@ public class CliDet extends PBase {
 			Log.d("habilitaOpciones_err", ex.getMessage());
 		}
 
+		//relP.setVisibility(View.VISIBLE);
+
 		if (gl.tolsuper) {
 			relP.setVisibility(View.VISIBLE);
 			relV.setVisibility(View.GONE);relD.setVisibility(View.GONE);

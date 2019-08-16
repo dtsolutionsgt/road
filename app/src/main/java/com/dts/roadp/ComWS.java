@@ -210,7 +210,7 @@ public class ComWS extends PBase {
 
 			//txtRuta.setText("8001-1");
 			//txtEmp.setText("03");
-			txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
+			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}
 
 		mac = getMac();

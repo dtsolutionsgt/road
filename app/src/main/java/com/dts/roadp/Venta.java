@@ -459,7 +459,6 @@ public class Venta extends PBase {
 		double tt;
 		int ii;
 
-
 		items.clear();tot=0;ttimp=0;ttperc=0;selidx=-1;ii=0;
 
 		try {
@@ -488,7 +487,12 @@ public class Venta extends PBase {
 					item.imp=DT.getDouble(6);
 					item.percep=DT.getDouble(7);
 					//if (prodPorPeso(item.Cod)) 	item.um=DT.getString(10); else item.um=app.umVenta(item.Cod);
-                    item.um=DameUnidadMinimaVenta(item.Cod);
+
+                    if (rutatipo.equalsIgnoreCase("V")) {
+                        item.um=DameUnidadMinimaVenta(item.Cod);
+                    } else {
+                        item.um=DT.getString(8);//app.umVenta(item.Cod);
+                    }
 
                     item.Peso=DT.getDouble(9);
 					item.precio=DT.getDouble(11);
@@ -567,6 +571,7 @@ public class Venta extends PBase {
 			browse=2;
 
 			gl.prod=prodid;
+			gl.precprev=0;
 			Intent intent = new Intent(this,ProdCant.class);
 			startActivity(intent);
 		}catch (Exception e){
@@ -614,7 +619,11 @@ public class Venta extends PBase {
 			db.execSQL(sql);
 
 			desc = 0;
-			prodPrecio();
+			if (rutatipo.equalsIgnoreCase("V")) {
+				prodPrecio();
+			} else {
+				prec=gl.precprev;
+			}
 
 			prec = mu.round(prec, 2);
 			gl.bonprodcant = cant;
@@ -676,10 +685,18 @@ public class Venta extends PBase {
 			imp = prc.imp;
 			impval = prc.impval;
 			descmon = prc.descmon;
+
+			if (rutatipo.equalsIgnoreCase("P")) {
+				prec=gl.precprev;
+				prc.precdoc=prec;
+				prc.tot=mu.round2(prec*cant);
+			}
+
 			tot = prc.tot;
 			prodtot = tot;
 			totsin = prc.totsin;
 			percep = 0;
+
 
 			//Toast.makeText(this,"Impval : "+impval+" , prec sin : "+precsin+" tot sin  "+totsin, Toast.LENGTH_LONG).show();
 
@@ -769,7 +786,6 @@ public class Venta extends PBase {
 
 		gl.umstock=app.umStock(prodid);
 
-
 		try {
 
             double factorconv=DameProporcionVenta(prodid,gl.cliente,gl.nivel);
@@ -789,12 +805,20 @@ public class Venta extends PBase {
 			}
 			if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
 			ins.add("FACTOR",factorconv);
-			if (porpeso) ins.add("PRECIO",gl.prectemp); else ins.add("PRECIO",prec);
+			if (porpeso) {
+				ins.add("PRECIO",gl.prectemp);
+			} else {
+				ins.add("PRECIO",prec);
+			}
 			ins.add("IMP",impval);
 			ins.add("DES",desc);
 			ins.add("DESMON",descmon);
 			ins.add("TOTAL",prodtot);
-			if (porpeso) ins.add("PRECIODOC",gl.prectemp); else ins.add("PRECIODOC",precdoc);
+			if (porpeso) {
+				ins.add("PRECIODOC",gl.prectemp);
+			} else {
+				ins.add("PRECIODOC",precdoc);
+			}
 			ins.add("PESO",peso);
 			ins.add("VAL1",0);
 			ins.add("VAL2","");
@@ -864,7 +888,7 @@ public class Venta extends PBase {
 	private void addBarcode() 	{
 		int bbolsa;
 
-		if (!isDialogBarraShowed) 	{
+ 		if (!isDialogBarraShowed) 	{
 
 			if (barcode.length()>gl.pLongitudBarra){
 
@@ -874,7 +898,7 @@ public class Venta extends PBase {
 				gl.barra=barcode.substring(1,18);
 				barcode=gl.barra;
 
-			}else{
+			} else {
 				gl.barra=barcode;
 			}
 
@@ -887,24 +911,25 @@ public class Venta extends PBase {
 					txtBarra.setText("");return;
 				}
 
-				bbolsa=barraBolsa();
-				if (bbolsa==1) {
-					txtBarra.setText("");
-					listItems();
-					return;
-				} else if (bbolsa==-1) {
-					toast("Barra vendida");
-					return;
-				}
 
+                if (rutatipo.equalsIgnoreCase("V")) {
+                    bbolsa=barraBolsa();
+                    if (bbolsa==1) {
+                        txtBarra.setText("");
+                        listItems();
+                        return;
+                    } else if (bbolsa==-1) {
+                        toast("Barra vendida");
+                        return;
+                    }
+                }
 
 				//db.beginTransaction();
-
 				if (barraProducto()) {
 					txtBarra.setText("");
 					//db.beginTransaction();
 					return;
-				}else{
+				} else {
 					//db.beginTransaction();
 				}
 

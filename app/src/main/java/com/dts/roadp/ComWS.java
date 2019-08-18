@@ -1445,43 +1445,48 @@ public class ComWS extends PBase {
         try {
 
             Bitmap bmp = BitmapFactory.decodeFile(fname);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            bmp.compress(Bitmap.CompressFormat.PNG,75, out);
-            byte[] imagebyte = out.toByteArray();
-            String strBase64 = Base64.encodeBytes(imagebyte);
 
-            int iv1=strBase64.length();
+            if (bmp != null){
 
-            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
-            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-            envelope.dotNet = true;
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				bmp.compress(Bitmap.CompressFormat.PNG,75, out);
+				byte[] imagebyte = out.toByteArray();
+				String strBase64 = Base64.encodeBytes(imagebyte);
 
-            PropertyInfo param = new PropertyInfo();
-            param.setType(String.class);
-            param.setName("transid");
-            param.setValue(transid);
-            request.addProperty(param);
+				int iv1=strBase64.length();
 
-            PropertyInfo param2 = new PropertyInfo();
-            param2.setType(String.class);
-            param2.setName("imgdata");
-            param2.setValue(strBase64);
-            request.addProperty(param2);
+				SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+				SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+				envelope.dotNet = true;
 
-            envelope.setOutputSoapObject(request);
+				PropertyInfo param = new PropertyInfo();
+				param.setType(String.class);
+				param.setName("transid");
+				param.setValue(transid);
+				request.addProperty(param);
 
-            HttpTransportSE transport = new HttpTransportSE(URL,60000);
-            transport.call(NAMESPACE + METHOD_NAME, envelope);
+				PropertyInfo param2 = new PropertyInfo();
+				param2.setType(String.class);
+				param2.setName("imgdata");
+				param2.setValue(strBase64);
+				request.addProperty(param2);
 
-            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+				envelope.setOutputSoapObject(request);
 
-            resstr = response.toString();
+				HttpTransportSE transport = new HttpTransportSE(URL,60000);
+				transport.call(NAMESPACE + METHOD_NAME, envelope);
 
-            if (resstr.equalsIgnoreCase("#")) {
-                return 1;
-            } else {
-                throw new Exception(resstr);
-            }
+				SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+				resstr = response.toString();
+
+				if (resstr.equalsIgnoreCase("#")) {
+					return 1;
+				} else {
+					throw new Exception(resstr);
+				}
+			}
+
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(),"");
             errflag=true;
@@ -3147,6 +3152,7 @@ public class ComWS extends PBase {
 				dbld.savelog();
 				return false;
 			}
+
 			envioCoord();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
@@ -3191,10 +3197,10 @@ public class ComWS extends PBase {
 				return false;
 			}
 
-			listaFachada();
-
 			dbld.savelog();
 			dbld.saveArchivo(du.getActDateStr());
+
+            listaFachada();
 
 			//#CKFK 20190429 Saqué esto de envioFinDia para que se guarde bien el log y luego se realice el envío.
 			if (!envioparcial){

@@ -94,7 +94,15 @@ public class ListAdaptCliList extends BaseAdapter {
 		if (cobro==1) holder.imgCobro.setImageResource(R.drawable.cobro48);else holder.imgCobro.setImageResource(R.drawable.blank24);
 		if (ppago==1) holder.imgPPago.setImageResource(R.drawable.pago_pend);else holder.imgPPago.setImageResource(R.drawable.blank24);
 
-		if(selectedIndex!= -1 && position == selectedIndex) {
+        if (pMostrarRazonNoAten){
+            if(!holder.lblRazNoAten.getText().equals("")){
+                holder.lblRazNoAten.setBackgroundColor(Color.rgb(248,160,165));
+            }else{
+                holder.lblRazNoAten.setBackgroundColor(Color.rgb(255,255,255));
+            }
+        }
+
+        if(selectedIndex!= -1 && position == selectedIndex) {
 			convertView.setBackgroundColor(Color.rgb(26,138,198));
         } else {
         	convertView.setBackgroundColor(Color.TRANSPARENT);

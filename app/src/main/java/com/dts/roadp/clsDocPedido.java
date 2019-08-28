@@ -11,7 +11,8 @@ import android.widget.Toast;
 public class clsDocPedido extends clsDocument {
 
 	private ArrayList<itemData> items= new ArrayList<itemData>();
-	
+	private ArrayList<clsDocPedido.itemData> bons= new ArrayList<clsDocPedido.itemData>();
+
 	private double tot,desc,imp,stot,percep;
 	private boolean sinimp;
 	private String 	contrib;
@@ -72,6 +73,9 @@ public class clsDocPedido extends clsDocument {
 			}		
 			rep.addtotsp("TOTAL A PAGAR", tot);			
 		}
+
+		rep.empty();
+		bonificaciones();
 
 		rep.empty();
 		rep.add("No. Serie : "+deviceid);
@@ -237,12 +241,13 @@ public class clsDocPedido extends clsDocument {
 	
 	protected boolean loadDocData(String corel) {
 		Cursor DT;
-		itemData item;
+		itemData item,bon;
 		
 		loadHeadData(corel);
 		
 		items.clear();
-		
+		bons.clear();
+
 		try {
 			sql="SELECT D_PEDIDOD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_PEDIDOD.CANT,D_PEDIDOD.PRECIODOC," +
 				"D_PEDIDOD.IMP, D_PEDIDOD.DES,D_PEDIDOD.DESMON, D_PEDIDOD.TOTAL, D_PEDIDOD.UMVENTA, D_PEDIDOD.UMPESO " +
@@ -273,12 +278,78 @@ public class clsDocPedido extends clsDocument {
 				
 				items.add(item);	
 				DT.moveToNext();					
-			}				
-			
+			}
+
+
+			if(DT!=null) DT.close();
+
+			try {
+				sql = "SELECT D_BONIF.PRODUCTO,P_PRODUCTO.DESCLARGA AS NOMBRE,D_BONIF.CANT, D_BONIF.UMVENTA, D_BONIF.CANT*D_BONIF.FACTOR AS TPESO " +
+						"FROM D_BONIF INNER JOIN P_PRODUCTO ON D_BONIF.PRODUCTO = P_PRODUCTO.CODIGO " +
+						"WHERE (D_BONIF.COREL='" + corel + "')";
+				sql += "UNION ";
+				sql += "SELECT D_BONIF_BARRA.PRODUCTO,P_PRODUCTO.DESCLARGA AS NOMBRE,COUNT(D_BONIF_BARRA.BARRA) AS CANT, D_BONIF_BARRA.UMSTOCK, SUM(D_BONIF_BARRA.PESO) AS TPESO " +
+						"FROM D_BONIF_BARRA INNER JOIN P_PRODUCTO ON D_BONIF_BARRA.PRODUCTO = P_PRODUCTO.CODIGO " +
+						"WHERE (D_BONIF_BARRA.COREL='" + corel + "') " +
+						"GROUP BY D_BONIF_BARRA.PRODUCTO,P_PRODUCTO.DESCLARGA,D_BONIF_BARRA.UMVENTA ";
+				sql += "ORDER BY NOMBRE ";
+
+				DT=Con.OpenDT(sql);
+				if (DT.getCount()>0) DT.moveToFirst();
+
+				while (!DT.isAfterLast()) {
+
+					bon = new clsDocPedido.itemData();
+
+					bon.cod = DT.getString(0);
+					bon.nombre = DT.getString(1);
+					bon.cant = DT.getDouble(2);
+					bon.um = DT.getString(3);
+					bon.peso = DT.getDouble(4);
+
+					bons.add(bon);
+					DT.moveToNext();
+				}
+
+				if(DT!=null) DT.close();
+			} catch (Exception e) {
+				Toast.makeText(cont,"Impresion bonif : "+e.getMessage(), Toast.LENGTH_LONG).show();
+			}
+
 		} catch (Exception e) {
 	    }		
 		
 		return true;
+	}
+
+	// Bonificaciones
+	private void bonificaciones() {
+		clsDocPedido.itemData item;
+		String ss;
+
+		if (bons.size()==0) return;
+
+		rep.line();
+		rep.add("----   B O N I F I C A C I O N  ----");
+		rep.line();
+		rep.add("CODIGO   DESCRIPCION        UM  CANT");
+		rep.add("       KGS    ");
+		rep.line();
+
+		for (int i = 0; i <bons.size(); i++) {
+
+			item=bons.get(i);
+
+			ss=rep.ltrim(item.cod+" "+item.nombre,prw-10);
+			ss=ss+rep.rtrim(item.um,4)+" "+rep.rtrim(frmdecimal(item.cant,2),5);
+			rep.add(ss);
+			ss=rep.rtrim(frmdecimal(item.peso,2),10);
+			ss=rep.ltrim(ss,prw-10);
+			rep.add(ss);
+
+		}
+
+		rep.line();
 	}
 
 	
@@ -299,7 +370,7 @@ public class clsDocPedido extends clsDocument {
 	
 	private class itemData {
 		public String cod,nombre,um,ump;
-		public double cant,prec,imp,descper,desc,tot;
+		public double cant,prec,imp,descper,desc,tot, peso;
 	}
 	
 	

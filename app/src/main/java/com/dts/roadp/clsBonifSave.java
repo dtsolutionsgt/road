@@ -31,9 +31,9 @@ public class clsBonifSave {
 
 
 		active=0;
-		//Con = new BaseDatos(context);
-	    //opendb();
-	    //ins=Con.Ins;upd=Con.Upd;
+		Con = new BaseDatos(context);
+	    opendb();
+	    ins=Con.Ins;upd=Con.Upd;
 	    
 	    mu=new MiscUtils(context);	
 	}
@@ -42,16 +42,16 @@ public class clsBonifSave {
 
 		if (loadItems()) {
 
-			//saveDBonif();
+			saveDBonif();
 			saveDRelProdBon();
 			if (venped.equalsIgnoreCase("V")) saveDBonifLotes();
 	
 		}
 
-		//saveDBonifFalt();
+		if (venped.equalsIgnoreCase("V")) saveDBonifFalt();
 		
 		try {
-			//Con.close();
+			Con.close();
 		} catch (Exception e) {
 		}
 		

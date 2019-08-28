@@ -399,7 +399,7 @@ public class PedidoRes extends PBase {
 				ins.add("UMVENTA",DT.getString(11));
 				ins.add("FACTOR",DT.getDouble(12));
 				ins.add("UMSTOCK",DT.getString(13));
-				ins.add("UMPESO","");
+				ins.add("UMPESO",gl.umpeso);
 			
 			    db.execSQL(ins.sql());
 				
@@ -419,9 +419,15 @@ public class PedidoRes extends PBase {
 		}
 		
 		try {
+
 			upd.init("P_CLIRUTA");
 			upd.add("BANDERA",0);
-			upd.Where("CLIENTE='"+cliid+"' AND DIA="+dweek);
+
+			if (gl.tolsuper) {
+				upd.Where("CLIENTE='"+cliid+"'");
+			}else{
+				upd.Where("CLIENTE='"+cliid+"' AND DIA="+dweek);
+			}
 	
 			db.execSQL(upd.SQL());
 		} catch (SQLException e) {
@@ -489,7 +495,13 @@ public class PedidoRes extends PBase {
 			ins.add("CLIPORDIA",0);
 			ins.add("CODOPER","X");
 			ins.add("COREL",corel);
-			
+
+			ins.add("CoorX",gl.gpspx);
+			ins.add("CoorY",gl.gpspy);
+			ins.add("CliCoorX",gl.gpscpx);
+			ins.add("CliCoorY",gl.gpscpy);
+			ins.add("Dist",gl.gpscdist);
+
 			ins.add("SCANNED",gl.escaneo);
 			ins.add("STATCOM","N");
 			ins.add("LLEGO_COMPETENCIA_ANTES",0);

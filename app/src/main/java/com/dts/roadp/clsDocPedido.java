@@ -137,14 +137,18 @@ public class clsDocPedido extends clsDocument {
 	    }	
 		
 		try {
+
 			sql="SELECT RESOL,FECHARES,FECHAVIG,SERIE,CORELINI,CORELFIN FROM P_COREL";
-			DT=Con.OpenDT(sql);	
-			DT.moveToFirst();
-			
-			resol="Resolucion No. : "+DT.getString(0);
-			ff=DT.getInt(1);resfecha="De Fecha : "+sfecha(ff);
-			ff=DT.getInt(2);resvence="Resolucion vence : "+sfecha(ff);
-			resrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
+			DT=Con.OpenDT(sql);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+
+				resol="Resolucion No. : "+DT.getString(0);
+				ff=DT.getInt(1);resfecha="De Fecha : "+sfecha(ff);
+				ff=DT.getInt(2);resvence="Resolucion vence : "+sfecha(ff);
+				resrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
+			}
 			
 		} catch (Exception e) {
 			Toast.makeText(cont,"Ped head 2 : "+e.getMessage(), Toast.LENGTH_SHORT).show();return false;

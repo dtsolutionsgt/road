@@ -35,7 +35,8 @@ public class ProdCant extends PBase {
 	private int nivel,browse=0,deccant,prevfact=1;
 	private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
 	private boolean pexist,esdecimal,porpeso,esbarra,idle=true;
-	
+	private AppMethods app;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,6 +57,8 @@ public class ProdCant extends PBase {
 		
 		prc=new Precio(this,mu,gl.peDec);
 		getDisp();
+
+		app = new AppMethods(this, gl, Con, db);
 
 		setHandlers();
 
@@ -219,7 +222,9 @@ public class ProdCant extends PBase {
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			um=dt.getString(0);umini=um;
-            if (rutatipo.equalsIgnoreCase("P")) um=DameUnidadMinimaVenta(prodid);
+            if (rutatipo.equalsIgnoreCase("P")) {
+            	if (app.prodBarra(prodid)) um=DameUnidadMinimaVenta(prodid);
+			}
 			ubas=um;umfact=um;
 			lblBU.setText(ubas);gl.ubas=ubas;upres=ubas;
 		} catch (Exception e) {
@@ -931,8 +936,6 @@ public class ProdCant extends PBase {
 
     private void paramProd() {
         try {
-            AppMethods app = new AppMethods(this, gl, Con, db);
-
             porpeso=app.ventaPeso(prodid);
             esbarra=app.prodBarra(prodid);
         } catch (Exception e) {
@@ -988,13 +991,16 @@ public class ProdCant extends PBase {
     private double precioPreventaPres() {
 		double pp=0;
 
-		pp=prc.precio(prodid,1,nivel,umini,gl.umpeso,0,umini);
-		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
-			if (prc.precioespecial>0) pp=prc.precioespecial;
-		}
 
-		if (porpeso)
-		prevfact=(int) factorPres(prodid,um,umini);
+			pp=prc.precio(prodid,1,nivel,umini,gl.umpeso,0,umini);
+			if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
+				if (prc.precioespecial>0) pp=prc.precioespecial;
+			}
+
+			if (porpeso)
+				prevfact=(int) factorPres(prodid,um,umini);
+
+		//um=umini;
 
 		return pp;
 	}
@@ -1002,22 +1008,27 @@ public class ProdCant extends PBase {
 	public double factorPres(String cod,String umventa,String umstock) {
 		Cursor DT;
 		String sql;
+		double val;
 
 		try {
-			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
-					"WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+umventa+"') AND (UNIDADMINIMA='"+umstock+"')";
-			DT = Con.OpenDT(sql);
-
-			if (DT.getCount()==0) {
+			if (!umini.equals(gl.umpeso)){
 				sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
-						"WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+umventa+"')";
+						"WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+umventa+"') AND (UNIDADMINIMA='"+umstock+"')";
 				DT = Con.OpenDT(sql);
+
+				if (DT.getCount()==0) {
+					sql="SELECT FACTORCONVERSION FROM P_FACTORCONV " +
+							"WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+umventa+"')";
+					DT = Con.OpenDT(sql);
+				}
+
+				DT.moveToFirst();
+
+				val=DT.getDouble(0);
+				if(DT!=null) DT.close();
+			}else{
+				val=1;
 			}
-
-			DT.moveToFirst();
-
-			double val=DT.getDouble(0);
-			if(DT!=null) DT.close();
 
 			return  val;
 		} catch (Exception e) {

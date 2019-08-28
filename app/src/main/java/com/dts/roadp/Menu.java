@@ -102,7 +102,13 @@ public class Menu extends PBase {
 
 			try {
 				if (gl.peModal.equalsIgnoreCase("TOL")){
+
 					gl.numSerie = getNumSerie();
+
+					if (gl.numSerie.equals("")){
+						gl.numSerie = gl.deviceId;
+					}
+
 				}else{
 					gl.numSerie = gl.deviceId;
 				}

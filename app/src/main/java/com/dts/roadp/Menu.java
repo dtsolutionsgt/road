@@ -1834,6 +1834,9 @@ public class Menu extends PBase {
 				
 			if (prtipo.equalsIgnoreCase("DATAMAX")) prid=1;
 			if (prtipo.equalsIgnoreCase("EPSON")) prid=2;
+			if (prtipo.equalsIgnoreCase("ZEBRA CPCL")) prid=3;
+			if (prtipo.equalsIgnoreCase("ZPL")) prid=4;
+			if (prtipo.equalsIgnoreCase("APEX")) prid=5;
 			
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

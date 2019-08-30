@@ -219,7 +219,9 @@ public class UtilPrint extends PBase {
 			s="SIN IMPRESORA"; spincode.add(s); if (prtipo.equalsIgnoreCase(s)) sp=0;
 			s="DATAMAX";       spincode.add(s); if (prtipo.equalsIgnoreCase(s)) sp=1;
 			s="ZEBRA CPCL";    spincode.add(s); if (prtipo.equalsIgnoreCase(s)) sp=2;
-							
+			s="EPSON";    spincode.add(s); if (prtipo.equalsIgnoreCase(s)) sp=4;
+			s="APEX";    spincode.add(s); if (prtipo.equalsIgnoreCase(s)) sp=5;
+
 			ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, spincode);
 			dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 				

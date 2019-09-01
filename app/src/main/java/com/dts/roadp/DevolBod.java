@@ -59,7 +59,7 @@ public class DevolBod extends PBase {
 			((appGlobals) vApp).tipo=1;
 			browse=1;
 
-			Intent intent = new Intent(this,Exist.class);
+			Intent intent = new Intent(this,exist.class);
 			startActivity(intent);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

@@ -321,7 +321,7 @@ public class RecargaAuto extends PBase {
 					doExit();
 
 					((appGlobals) vApp).tipo=0;
-					Intent intent = new Intent(RecargaAuto.this,Exist.class);
+					Intent intent = new Intent(RecargaAuto.this,exist.class);
 					startActivity(intent);
 				}
 			});

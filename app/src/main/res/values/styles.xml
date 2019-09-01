@@ -16,11 +16,20 @@
     <style name="AppTheme" parent="android:Theme.Holo.Light">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
-    
+
     <!-- Spinner Style -->
-    <style name="SpinnerBold" parent="@android:style/Widget.TextView" >
-    <item name="android:textSize" >8dp</item>
-    <item name="android:textStyle" >bold</item>
+    <style name="SpinnerBold" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">8dp</item>
+        <item name="android:textStyle">bold</item>
     </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

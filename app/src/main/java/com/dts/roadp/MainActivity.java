@@ -45,8 +45,8 @@ public class MainActivity extends PBase {
     private String cs1, cs2, cs3, barcode;
 
 
-    private String parNumVer = "9.4.53 / ";
-    private String parFechaVer = "27-Ago-2019";
+    private String parNumVer = "9.4.54 / ";
+    private String parFechaVer = "31-Ago-2019";
     private String parTipoVer = "ROAD PRD SUP";
 
     @Override

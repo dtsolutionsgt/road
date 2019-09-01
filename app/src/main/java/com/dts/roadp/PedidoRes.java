@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -38,6 +39,7 @@ public class PedidoRes extends PBase {
 	private TextView lblFecha;
 	private ImageView imgBon;
 	private Spinner spinList;
+	private ImageView btnSave;
 	
 	private List<String> spname = new ArrayList<String>();
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
@@ -70,12 +72,14 @@ public class PedidoRes extends PBase {
 		imgBon = (ImageView) findViewById(R.id.imageView1);
 		
 		spinList = (Spinner) findViewById(R.id.spinner1);
+		btnSave = (ImageView) findViewById(R.id.imgPFoto);
 		
 		cliid=gl.cliente;
 		gl.tolpedsend=false;
 		
 		setActDate();
-		fechae=fecha;lblFecha.setText(du.sfecha(fechae));
+		fechae=fecha;
+		lblFecha.setText(du.sfecha(fechae));
 		dweek=mu.dayofweek();
 		
 		clsDesc=new clsDescGlob(this);
@@ -228,7 +232,6 @@ public class PedidoRes extends PBase {
 				
 				tot=stot+totimp-descmon+totperc;
 				tot=mu.round2(tot);
-								
 				
 				item = clsCls.new clsCDB();
 				item.Cod="Subtotal";item.Desc=mu.frmcur(stot);item.Bandera=0;
@@ -284,7 +287,19 @@ public class PedidoRes extends PBase {
  	private void finishOrder(){
 
 		try{
-			if (!saveOrder()) return;
+
+			fecha=du.cfechaSinHora(Integer.parseInt(lblFecha.getText().toString().substring(8,10)),
+					Integer.parseInt(lblFecha.getText().toString().substring(3,5)),
+                    Integer.parseInt(lblFecha.getText().toString().substring(0,2)));
+
+			if (!fechaValida()){
+				mu.msgbox("La fecha de entrega ingresada no es válida, no se puede guardar el pedido");
+				return;
+			}
+
+			if (!saveOrder()) {
+				return;
+			}
 
 			clsBonifSave bonsave=new clsBonifSave(this,corel,"P");
 
@@ -294,6 +309,8 @@ public class PedidoRes extends PBase {
 			bonsave.emp=gl.emp;
 
 			bonsave.save();
+
+			btnSave.setVisibility(View.INVISIBLE);
 
 			if (gl.impresora.equalsIgnoreCase("S")) {
 				String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
@@ -309,6 +326,7 @@ public class PedidoRes extends PBase {
 				super.finish();
 			}
 		}catch (Exception e){
+			mu.msgbox("Error " + e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
@@ -368,7 +386,7 @@ public class PedidoRes extends PBase {
 			ins.add("RECHAZADO",0);
 			ins.add("RAZON_RECHAZADO","");  // valor de percepcion 0 o xxx.xx
 			ins.add("INFORMADO",0);
-			ins.add("SUCURSAL","");
+			ins.add("SUCURSAL",gl.sucur);
 			ins.add("ID_DESPACHO",0);
 			ins.add("ID_FACTURACION",0);
 		
@@ -522,6 +540,7 @@ public class PedidoRes extends PBase {
 		/*DialogFragment newFragment = new DatePickerFragment();
 	    //newFragment.show(getSupportFragmentManager(), "datePicker");*/
 			obtenerFecha();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -541,6 +560,7 @@ public class PedidoRes extends PBase {
 			},anio, mes, dia);
 
 			recogerFecha.show();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -557,9 +577,7 @@ public class PedidoRes extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
-	
 	
 	// Aux
 	
@@ -654,6 +672,7 @@ public class PedidoRes extends PBase {
 	public void askSave(View view) {
 
 		try{
+
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle("Road");
@@ -668,13 +687,33 @@ public class PedidoRes extends PBase {
 			dialog.setNegativeButton("Salir", null);
 
 			dialog.show();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
 			
 	}	
-	
+
+	public  boolean fechaValida(){
+		boolean vFechaValida = false;
+
+		try{
+
+			if (fecha<du.getFechaActual()){
+				vFechaValida= false;
+			}else{
+				fechae=fecha;
+				vFechaValida= true;
+			}
+
+		}catch (Exception e){
+			mu.msgbox("Ocurrió un error " + e.getMessage());
+		}
+
+		return  vFechaValida;
+	}
+
 	public void setDate(){
 		lblFecha.setText(du.sfecha(fecha));
 	}

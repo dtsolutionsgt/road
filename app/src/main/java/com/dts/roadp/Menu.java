@@ -49,7 +49,6 @@ public class Menu extends PBase {
 	private boolean rutapos,horizpos;
 	
 	private final int mRequestCode = 1001;
-	private Exist Existencia = new Exist();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 	{
@@ -289,6 +288,8 @@ public class Menu extends PBase {
 						//Asigna conexión actual al siguiente activity.
 
 						//#HS_201811 Verifica si hay existencias disponibles.
+						exist Existencia=new exist();
+
 						Existencia.Con = Con;
 						cantidad = Existencia.CantExistencias();
 
@@ -1131,7 +1132,7 @@ public class Menu extends PBase {
 	private void menuExist() {
 		try{
 			gl.tipo=0;
-			Intent intent = new Intent(this,Exist.class);
+			Intent intent = new Intent(this,exist.class);
 			startActivity(intent);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

@@ -32,6 +32,10 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".exist"
+            android:label="@string/title_activity_exist"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
@@ -191,13 +195,6 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateVisible" />
-        <activity
-            android:name=".Exist"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_exist"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name=".DevolBod"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -454,8 +451,6 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
             android:windowSoftInputMode="stateAlwaysHidden" />
-
-
     </application>
 
 </manifest>

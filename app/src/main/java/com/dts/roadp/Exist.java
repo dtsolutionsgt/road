@@ -48,6 +48,9 @@ public class Exist extends PBase {
 		setContentView(R.layout.activity_exist);
 		
 		super.InitBase();
+
+
+		/*
 		addlog("Exist",""+du.getActDateTime(),gl.vend);
 		
 		tipo=((appGlobals) vApp).tipo;
@@ -81,9 +84,10 @@ public class Exist extends PBase {
 		
 		prn=new printer(this,printclose,gl.validimp);
 		doc=new clsDocExist(this,prn.prw,"");
-
+*/
 		/*int cant = CantExistencias();
 		Toast.makeText(this, "Cantidad." + cant, Toast.LENGTH_SHORT).show();*/
+
 
 }
 

@@ -51,7 +51,7 @@ public class Menu extends PBase {
 	private boolean rutapos,horizpos;
 	
 	private final int mRequestCode = 1001;
-	private Exist Existencia = new Exist();
+	private Exist Existencia;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 	{
@@ -140,6 +140,7 @@ public class Menu extends PBase {
 				gl.ayudanteID="";gl.vehiculoID="";
 			}
 
+			Existencia = new Exist();
 			//#CKFK 20190423 Quité esta validación de configuración de impresora
 			//ConfImpresora();
 

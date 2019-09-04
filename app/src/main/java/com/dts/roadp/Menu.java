@@ -1,5 +1,6 @@
 package com.dts.roadp;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -51,7 +52,6 @@ public class Menu extends PBase {
 	private boolean rutapos,horizpos;
 	
 	private final int mRequestCode = 1001;
-	private Exist Existencia;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 	{
@@ -140,10 +140,6 @@ public class Menu extends PBase {
 				gl.ayudanteID="";gl.vehiculoID="";
 			}
 
-			Existencia = new Exist();
-			//#CKFK 20190423 Quité esta validación de configuración de impresora
-			//ConfImpresora();
-
 		}catch (Exception e) 		{
 			Log.e("Mnu", e.getMessage());
 		}
@@ -162,7 +158,7 @@ public class Menu extends PBase {
 		}
 
 	}
-	
+
 	public void listItems() {
 		try{
 			clsMenu item;
@@ -241,7 +237,7 @@ public class Menu extends PBase {
 
 
 	}
-		
+
 	public void setHandlers(){
 	    try{
 			gridView.setOnItemClickListener(new OnItemClickListener() {
@@ -264,13 +260,13 @@ public class Menu extends PBase {
 	}
 
 	private void showMenuItem() {
-		int prtype;
+		int prtype =-1;
 		boolean epssetflag = false;
 		Float cantidad;
 		//toast("menu id : "+menuid);
 
-		try{
-			prtype = getPrinterType();
+	    try{
+			//prtype = getPrinterType();
 			if (prtype == 2) {
 				if (gl.mPrinterSet) epssetflag = false;
 				else epssetflag = true;
@@ -299,8 +295,7 @@ public class Menu extends PBase {
 						//Asigna conexión actual al siguiente activity.
 
 						//#HS_201811 Verifica si hay existencias disponibles.
-						Existencia.Con = Con;
-						cantidad = Existencia.CantExistencias();
+					    cantidad = CantExistencias();
 
 						//#HS_20181206 Verifica el usuario si es DTS.
 						if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")){
@@ -361,7 +356,7 @@ public class Menu extends PBase {
 							showVoidMenuVenta();
 						} else {
 							if (rutatipo.equalsIgnoreCase("T")) {
-								showVoidMenuTodo();
+							showVoidMenuTodo();
 							} else {
 								if (rutatipo.equalsIgnoreCase("V")) showVoidMenuVenta();
 								else showVoidMenuPreventa();
@@ -374,7 +369,7 @@ public class Menu extends PBase {
 				case 5:  // Consultas
 
 					//#HS_20181206 Verifica el usuario si es DTS.
-					if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
+				    if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
 						mu.msgbox("No puede realizar esta acción");
 					}else {
 						showConsMenu();
@@ -405,7 +400,7 @@ public class Menu extends PBase {
 						if (rutatipo.equalsIgnoreCase("P")) {
 							showInvMenuPreventa();
 						} else {
-							showInvMenuVenta();
+					     	showInvMenuVenta();
 						}
 					}
 
@@ -428,7 +423,7 @@ public class Menu extends PBase {
 					break;
 
 				case 10:  // Cambio usuario
-					askCambUsuario();
+				    askCambUsuario();
 					break;
 
 				case 11:	// Inicio día
@@ -440,15 +435,13 @@ public class Menu extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
-
 	}
 
 	//endregion
 
 	//region Reimpresion
-	
+
+
 	public void showPrintMenuTodo() {
 
 		try{
@@ -503,7 +496,7 @@ public class Menu extends PBase {
 		}
 
 	}
-	
+
 	public void showPrintMenuVenta() {
 
 		try{
@@ -556,7 +549,7 @@ public class Menu extends PBase {
 		}
 
 	}
-	
+
 	public void showPrintMenuVentaApr() {
 
 		try{
@@ -609,7 +602,7 @@ public class Menu extends PBase {
 		}
 
 	}
-	
+
 	public void showPrintMenuPreventa() {
 
 		try{
@@ -656,7 +649,7 @@ public class Menu extends PBase {
 		}
 
 	}
-	
+
 	public void menuImprDoc(int doctipo) {
 		try{
 			gl.tipo=doctipo;
@@ -1015,7 +1008,7 @@ public class Menu extends PBase {
 				public void onClick(DialogInterface dialog, int item) {
 					String mt=selitems[item];
 
-					if (mt.equalsIgnoreCase("Existencias")) menuExist();
+				    if (mt.equalsIgnoreCase("Existencias")) menuExist();
 					if (mt.equalsIgnoreCase("Devolucion a bodega")) menuDevBod();
 					if (mt.equalsIgnoreCase("Recarga manual")) menuRecarga();
 					if (mt.equalsIgnoreCase("Aceptar Inventario")) menuRecargaAuto();
@@ -1132,18 +1125,17 @@ public class Menu extends PBase {
 		}
 
 	}
-	
+
 	private void menuExist() {
-		try{
+	   try{
 			gl.tipo=0;
 			Intent intent = new Intent(this,Exist.class);
 			startActivity(intent);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
-	
+
 	private void menuRecarga() {
 
 		try{
@@ -1253,7 +1245,7 @@ public class Menu extends PBase {
 	//endregion
 
 	//region Utilerias
-	
+
 	public void showInvMenuUtils() {
 		try{
 			final AlertDialog Dialog;
@@ -1305,10 +1297,10 @@ public class Menu extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	}		
-	
+	}
+
 	private void menuConfImpres() {
-		try{
+	    try{
 			Intent intent = new Intent(this,UtilPrint2.class);
 			startActivity(intent);
 		}catch (Exception e){
@@ -1433,6 +1425,40 @@ public class Menu extends PBase {
 
 	}
 
+	public float CantExistencias() {
+		Cursor DT;
+		float cantidad=0,cantb=0;
+
+		try {
+
+			sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.CANT,P_STOCK.CANTM,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
+					"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
+			if (Con != null){
+				DT = Con.OpenDT(sql);
+				cantidad = DT.getCount();
+			}else {
+				cantidad = 0;
+			}
+
+			sql = "SELECT BARRA FROM P_STOCKB";
+			if (Con != null){
+				DT = Con.OpenDT(sql);
+				cantb = DT.getCount();
+
+				if(DT!=null) DT.close();
+			}else {
+				cantb = 0;
+			}
+
+			cantidad=cantidad+cantb;
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			return 0;
+		}
+
+		return cantidad;
+	}
+
 	//endregion
 
 	//region Supervisor ayudante
@@ -1497,13 +1523,12 @@ public class Menu extends PBase {
 
 		try{
 
-			/*inputAyudanteVehiculo();
+			//inputAyudanteVehiculo();
 
 			getlistAyudante();
 			getlistVehiculo();
 			getAyudante();
 			getVehiculo();
-            */
 
             startActivity(new Intent(this,ayudante_vehiculo.class));
 
@@ -1554,8 +1579,6 @@ public class Menu extends PBase {
 		}
 
 	}
-
-
 
 	private void getAyudante(){
 
@@ -1781,7 +1804,7 @@ public class Menu extends PBase {
 	}
 
 	//endregion
-
+/*
 	//region Aux
 	
 	private void setPrintWidth() {
@@ -1801,7 +1824,8 @@ public class Menu extends PBase {
 		gl.prw=prwd;
 		
 	}
-	
+*/
+
 	private void getDepTipo() {
 		Cursor DT;
 		
@@ -1819,7 +1843,7 @@ public class Menu extends PBase {
 		}
 		
 	}	
-		
+/*
 	private int getPrinterType() {
 		Cursor DT;
 		String prtipo;
@@ -1847,6 +1871,7 @@ public class Menu extends PBase {
 		return prid;
 				
 	}
+*/
 
 	public void doWSTest(View view) {
 		startActivity(new Intent(Menu.this,WSTest.class));
@@ -1881,6 +1906,7 @@ public class Menu extends PBase {
 		return numSerie;
 	}
 
+
 	private boolean tieneDevolucionTOL() {
 		Cursor dt;
 		long cantcan = 0, cantstock = 0, cantbolsa = 0;
@@ -1909,13 +1935,14 @@ public class Menu extends PBase {
 
 	//endregion
 
+
 	//region Activity Events
 	
 	@Override
  	protected void onResume() {
 		try{
 			super.onResume();
-			setPrintWidth();
+			//setPrintWidth();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -1933,4 +1960,5 @@ public class Menu extends PBase {
 	}
 
 	//endregion
+
 }

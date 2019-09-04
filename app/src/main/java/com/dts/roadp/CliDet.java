@@ -60,7 +60,6 @@ public class CliDet extends PBase {
 	private PhotoViewAttacher zoomFoto;
 	private AppMethods app;
 
-	private Exist Existencia = new Exist();
 	private String cod,tel, Nombre, NIT, sgp1, sgp2;
 	private String imagenbase64,path,fechav;
 	private Boolean imgPath, imgDB, ventaGPS,flagGPS=true,permiteVenta=true,clicred;
@@ -861,11 +860,10 @@ public class CliDet extends PBase {
 	}
 
 	public void VerificaCantidad(){
-		Float cantidad;
+		Float cantidad = 0.0f;
 		gl.rutatipo="V";
-		//Asigna conexión actual a la forma de Existencias.
-		Existencia.Con = Con;
-		cantidad = Float.valueOf(Existencia.CantExistencias());
+
+		cantidad = Float.valueOf(CantExistencias());
 
 		try{
 			if(cantidad == 0){
@@ -881,6 +879,40 @@ public class CliDet extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
+	}
+
+	public float CantExistencias() {
+		Cursor DT;
+		float cantidad=0,cantb=0;
+
+		try {
+
+			sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.CANT,P_STOCK.CANTM,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
+					"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
+			if (Con != null){
+				DT = Con.OpenDT(sql);
+				cantidad = DT.getCount();
+			}else {
+				cantidad = 0;
+			}
+
+			sql = "SELECT BARRA FROM P_STOCKB";
+			if (Con != null){
+				DT = Con.OpenDT(sql);
+				cantb = DT.getCount();
+
+				if(DT!=null) DT.close();
+			}else {
+				cantb = 0;
+			}
+
+			cantidad=cantidad+cantb;
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			return 0;
+		}
+
+		return cantidad;
 	}
 
 	private void runVenta() {

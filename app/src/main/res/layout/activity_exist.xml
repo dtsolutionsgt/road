@@ -63,7 +63,7 @@
         android:layout_alignParentTop="false"
         android:layout_below="@+id/relRoad"
         android:layout_marginTop="10dp"
-        android:layout_toLeftOf="@+id/imgPreventa"
+        android:layout_toLeftOf="@+id/ImageView01"
         android:maxLines="1" >
 
         <requestFocus />
@@ -80,7 +80,7 @@
     </ListView>
 
     <ImageView
-        android:id="@+id/imgDevol"
+        android:id="@+id/imageView1"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_below="@+id/relRoad"
@@ -96,7 +96,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/listView1"
-        android:layout_toLeftOf="@+id/imgDevol"
+        android:layout_toLeftOf="@+id/imageView1"
         android:paddingLeft="5dp"
         android:paddingRight="10dp"
         android:text=" ( 0 )"
@@ -104,7 +104,7 @@
         android:textSize="14sp" />
 
     <ImageView
-        android:id="@+id/imgPreventa"
+        android:id="@+id/ImageView01"
         android:layout_width="48dp"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/txtMonto"

@@ -1,5 +1,6 @@
 package com.dts.roadp;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -21,7 +22,7 @@ public class Reimpresion extends PBase {
 
 	private ListView listView;
 	private TextView lblTipo;
-	
+
 	private ArrayList<clsClasses.clsCFDV> items= new ArrayList<clsClasses.clsCFDV>();
 	private ListAdaptCFDV adapter;
 	private clsClasses.clsCFDV selitem;
@@ -32,7 +33,7 @@ public class Reimpresion extends PBase {
 	private printer  prn_can,prn_paseante;
 	private Runnable printclose,printcallback,printvoid;
 	public  clsRepBuilder rep;
-	
+
 	private clsDocFactura fdoc;
 	private clsDocMov mdoc;
 	private clsDocDepos ddoc;
@@ -60,10 +61,10 @@ public class Reimpresion extends PBase {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_reimpresion);
-	
+
 		super.InitBase();
 		addlog("Reimpresion",""+du.getActDateTime(),gl.vend);
-		
+
 		listView = (ListView) findViewById(R.id.listView1);
 		lblTipo= (TextView) findViewById(R.id.lblFecha);
 
@@ -73,7 +74,7 @@ public class Reimpresion extends PBase {
 
 		tipo=gl.tipo;
 		itemid="*";
-		
+
 		setHandlers();
 		listItems();
 
@@ -143,38 +144,36 @@ public class Reimpresion extends PBase {
 		};
 
 		switch (tipo) {
-		case 0:
-			docPed = new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp,"");
-			lblTipo.setText("Pedido");break;
-		case 1:
-			cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.numSerie, "");
-			lblTipo.setText("Recibo");break;	
-		case 2:  
-			ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
-			lblTipo.setText("Deposito");break;
-		case 3:  
-			fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
-			lblTipo.setText("Factura");break;
-		case 4:  
-			mdoc=new clsDocMov(this,prn.prw,"Recarga",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
-			lblTipo.setText("Recarga");break;
-		case 5:  
-			mdoc=new clsDocMov(this,prn.prw,"Dvolucion a bodega",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
-			lblTipo.setText("Devolución a bodega");break;
-		case 6:  
-			fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-			fdev.deviceid =gl.numSerie;
-			lblTipo.setText("Nota Crédito");break;
-			
-		case 99:  
-			lblTipo.setText("Cierre de día");break;
-		}		
-			
+			case 0:
+				docPed = new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp,"");
+				lblTipo.setText("Pedido");break;
+			case 1:
+				cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.numSerie, "");
+				lblTipo.setText("Recibo");break;
+			case 2:
+				ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
+				lblTipo.setText("Deposito");break;
+			case 3:
+				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
+				lblTipo.setText("Factura");break;
+			case 4:
+				mdoc=new clsDocMov(this,prn.prw,"Recarga",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
+				lblTipo.setText("Recarga");break;
+			case 5:
+				mdoc=new clsDocMov(this,prn.prw,"Dvolucion a bodega",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
+				lblTipo.setText("Devolución a bodega");break;
+			case 6:
+				fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+				fdev.deviceid =gl.numSerie;
+				lblTipo.setText("Nota Crédito");break;
+
+			case 99:
+				lblTipo.setText("Cierre de día");break;
+		}
 	}
-	
-	
+
 	// Events
-	
+
 	public void printDoc(View view){
 
 		try{
@@ -229,7 +228,6 @@ public class Reimpresion extends PBase {
 						adapter.setSelectedIndex(position);
 
 						printDocument();
-						//printDoc(view);
 					} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 						mu.msgbox( e.getMessage());
@@ -247,33 +245,33 @@ public class Reimpresion extends PBase {
 
 	public void listItems() {
 		Cursor DT;
-		clsClasses.clsCFDV vItem;	
+		clsClasses.clsCFDV vItem;
 		int vP,f;
 		double val;
 		String id,sf,sval,tm;
-			
+
 		items.clear();
-		
+
 		selidx=-1;vP=0;
-		
+
 		try {
-				
+
 			if (tipo==0) {
 				sql="SELECT D_PEDIDO.COREL,P_CLIENTE.NOMBRE,D_PEDIDO.FECHA,D_PEDIDO.TOTAL "+
-					 "FROM D_PEDIDO INNER JOIN P_CLIENTE ON D_PEDIDO.CLIENTE=P_CLIENTE.CODIGO "+
-					 "WHERE (D_PEDIDO.ANULADO='N') AND (D_PEDIDO.STATCOM='N') ORDER BY D_PEDIDO.COREL DESC ";	
+						"FROM D_PEDIDO INNER JOIN P_CLIENTE ON D_PEDIDO.CLIENTE=P_CLIENTE.CODIGO "+
+						"WHERE (D_PEDIDO.ANULADO='N') AND (D_PEDIDO.STATCOM='N') ORDER BY D_PEDIDO.COREL DESC ";
 			}
-			
+
 			if (tipo==1) {
 				sql="SELECT D_COBRO.COREL,P_CLIENTE.NOMBRE,D_COBRO.FECHA,D_COBRO.TOTAL "+
-					 "FROM D_COBRO INNER JOIN P_CLIENTE ON D_COBRO.CLIENTE=P_CLIENTE.CODIGO "+
-					 "WHERE (D_COBRO.ANULADO='N') AND (D_COBRO.DEPOS<>'S') ORDER BY D_COBRO.COREL DESC ";	
+						"FROM D_COBRO INNER JOIN P_CLIENTE ON D_COBRO.CLIENTE=P_CLIENTE.CODIGO "+
+						"WHERE (D_COBRO.ANULADO='N') AND (D_COBRO.DEPOS<>'S') ORDER BY D_COBRO.COREL DESC ";
 			}
-			
+
 			if (tipo==2) {
 				sql="SELECT D_DEPOS.COREL,P_BANCO.NOMBRE,D_DEPOS.FECHA,D_DEPOS.TOTAL,D_DEPOS.CUENTA "+
-					 "FROM D_DEPOS INNER JOIN P_BANCO ON D_DEPOS.BANCO=P_BANCO.CODIGO "+
-					 "WHERE (D_DEPOS.ANULADO='N') ORDER BY D_DEPOS.COREL DESC ";	
+						"FROM D_DEPOS INNER JOIN P_BANCO ON D_DEPOS.BANCO=P_BANCO.CODIGO "+
+						"WHERE (D_DEPOS.ANULADO='N') ORDER BY D_DEPOS.COREL DESC ";
 			}
 
 			if (tipo == 3) {
@@ -287,23 +285,23 @@ public class Reimpresion extends PBase {
 							"WHERE AND (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC LIMIT 1";
 				}
 			}
-				
+
 			if (tipo==4 || tipo==5) {
 				tm="R";if (tipo==5) tm="D";
 				sql="SELECT COREL,COREL,FECHA,0 AS TOTAL "+
-					 "FROM D_MOV WHERE (TIPO='"+tm+"') AND (ANULADO='N')  ORDER BY COREL DESC ";	
+						"FROM D_MOV WHERE (TIPO='"+tm+"') AND (ANULADO='N')  ORDER BY COREL DESC ";
 			}
-			
+
 			if (tipo==6) {
 				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.NOMBRE,D_NOTACRED.SERIE,D_NOTACRED.TOTAL,D_NOTACRED.CORELATIVO,D_NOTACRED.IMPRES "+
-					 "FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
-					 "WHERE (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC";
+						"FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
+						"WHERE (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC";
 			}
-			
+
 			if (tipo<99) {
-				
+
 				DT=Con.OpenDT(sql);
-	
+
 				if (DT.getCount()>0) {
 
 					DT.moveToFirst();
@@ -315,7 +313,7 @@ public class Reimpresion extends PBase {
 
 						vItem.Cod=DT.getString(0);
 						vItem.Desc=DT.getString(1);
-						if (tipo==2) vItem.Desc+=" - "+DT.getString(4);	
+						if (tipo==2) vItem.Desc+=" - "+DT.getString(4);
 
 						if (tipo==3) {
 							sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);;
@@ -328,7 +326,7 @@ public class Reimpresion extends PBase {
 						vItem.Fecha=sf;
 
 						val=DT.getDouble(3);sval=""+val;
-						vItem.Valor=sval;	  
+						vItem.Valor=sval;
 
 						if (tipo==4 || tipo==5) {
 							vItem.Valor="";
@@ -342,20 +340,20 @@ public class Reimpresion extends PBase {
 							} else {
 								if (DT.getInt(5)<=1) items.add(vItem);
 							}
-						} else {	
-							items.add(vItem);	
+						} else {
+							items.add(vItem);
 						}
-	
+
 						if (id.equalsIgnoreCase(selid)) selidx=vP;
 						vP+=1;
 
-						DT.moveToNext();					
+						DT.moveToNext();
 
-					}	
+					}
 				}
 
-			} else {	
-				
+			} else {
+
 				if (tipo==99) {
 
 					vItem =clsCls.new clsCFDV();
@@ -363,27 +361,27 @@ public class Reimpresion extends PBase {
 					vItem.Cod="";
 					vItem.Desc="";
 					vItem.Fecha="Ultimo Cierre de dia";
-					vItem.Valor="";	  
+					vItem.Valor="";
 
-					items.add(vItem);				
-				}		
+					items.add(vItem);
+				}
 			}
-			
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox("listItems: "+ e.getMessage());
-	    }
-			 
+			mu.msgbox("listItems: "+ e.getMessage());
+		}
+
 		adapter=new ListAdaptCFDV(this, items);
 		listView.setAdapter(adapter);
-		
+
 		if (selidx>-1) {
 			adapter.setSelectedIndex(selidx);
 			listView.setSelection(selidx);
 		}
-	    	    
+
 	}
-	
+
 	private void printDocument() {
 
 		try{
@@ -415,7 +413,7 @@ public class Reimpresion extends PBase {
 		}
 
 	}
-	
+
 	private void imprPedido() {
 		try{
 
@@ -430,9 +428,9 @@ public class Reimpresion extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-		
+
 	}
-	
+
 	private void imprRecibo() {
 		try {
 			if(prn.isEnabled()){
@@ -461,9 +459,9 @@ public class Reimpresion extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox(e.getMessage());
-		}	
+		}
 	}
-	
+
 	private void imprFactura() {
 		Cursor dt;
 		int impr;
@@ -483,7 +481,7 @@ public class Reimpresion extends PBase {
 
 			if(prn.isEnabled()){
 				if (fdoc.buildPrint(itemid,impr,gl.peFormatoFactura))
-				    prn.printask(printcallback);
+					prn.printask(printcallback);
 
 			}else if(!prn.isEnabled()){
 				fdoc.buildPrint(itemid,impr,gl.peFormatoFactura);
@@ -491,8 +489,8 @@ public class Reimpresion extends PBase {
 				corelNC=getCorelNotaCred(itemid);
 
 				if (!corelNC.isEmpty()){
-					/*fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
-					fdev.deviceid =gl.numSerie;*/
+					//fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+					//fdev.deviceid =gl.numSerie;
 
 					fdev.buildPrint(corelNC, 1, "TOL");
 					toast("Reimpresion de factura y nota de credito generada");
@@ -505,8 +503,8 @@ public class Reimpresion extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox(e.getMessage());
 		}
-	}	
-	
+	}
+
 	private void imprRecarga() {
 		try {
 			if(prn.isEnabled()){
@@ -641,11 +639,11 @@ public class Reimpresion extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox(e.getMessage());
 		}
-	}	
-	
-	
+	}
+
+
 	// Ultima factura + nota credito
-	
+
 	private void imprUltFactura() {
 		Cursor dt;
 		String id,serie;
@@ -659,13 +657,13 @@ public class Reimpresion extends PBase {
 			if (dt.getCount()==0) {
 				msgbox("¡No existe ninguna factura elegible para reimpresion!");return;
 			}
-			
+
 			dt.moveToFirst();
-			
+
 			id=dt.getString(0);
 			serie=dt.getString(2);
-			corel=dt.getInt(3);		
-			
+			corel=dt.getInt(3);
+
 			if (dt.getInt(1)>1) {
 				msgbox("¡La factura "+serie+" - "+corel+" no se puede imprimir porque ya fue reimpresa anteriormente!");return;
 			}
@@ -712,7 +710,7 @@ public class Reimpresion extends PBase {
 		}
 
 	}
-	
+
 	private void imprUltNotaCredito() {
 		Cursor dt;
 		String id,serie;
@@ -781,8 +779,8 @@ public class Reimpresion extends PBase {
 		try{
 
 			sql = "SELECT F.COREL, F.ASIGNACION, N.COREL "+
-				  "FROM D_FACTURA F INNER JOIN D_NOTACRED N ON F.COREL = N.FACTURA "+
-				  "WHERE N.COREL = '"+vCorel+"'";
+					"FROM D_FACTURA F INNER JOIN D_NOTACRED N ON F.COREL = N.FACTURA "+
+					"WHERE N.COREL = '"+vCorel+"'";
 
 			DT=Con.OpenDT(sql);
 
@@ -821,7 +819,7 @@ public class Reimpresion extends PBase {
 		try{
 
 			sql = "SELECT N.COREL FROM D_FACTURA F  INNER JOIN D_NOTACRED N ON F.COREL = N.FACTURA "+
-				  "WHERE F.COREL = '" + vCorel + "'";
+					"WHERE F.COREL = '" + vCorel + "'";
 			DT=Con.OpenDT(sql);
 
 			if (DT.getCount()>0){
@@ -837,34 +835,34 @@ public class Reimpresion extends PBase {
 	}
 
 	// Aprofam
-	
+
 	private void aprNotePrn(String corel) {
-		
+
 		aprLoadHeadData(corel);
-		
+
 		try {
-			
+
 			rep=new clsRepBuilder(this,prn.prw,true,gl.peMon,gl.peDecImp, "");
-			
+
 			buildHeader(corel,1);
-			
+
 			rep.line();
 			rep.empty();
 			rep.addc("NOTA CREDITO");
 			rep.empty();
 			rep.line();
 			rep.empty();
-				
+
 			rep.add("Factura serie : "+pfser+" numero : "+pfcor);
-			rep.add("Monto total : "+mu.frmdec(ptot));			
+			rep.add("Monto total : "+mu.frmdec(ptot));
 			rep.empty();
 			rep.line();
 			rep.empty();
 			rep.empty();
 			rep.empty();
-				
+
 			rep.save();
-			
+
 			prn.printask();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -875,83 +873,83 @@ public class Reimpresion extends PBase {
 	private boolean aprLoadHeadData(String corel) {
 		Cursor DT;
 		int ff;
-					
+
 		try {
 			sql="SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,SERIEFACT,CORELFACT FROM D_NOTACRED WHERE COREL='"+corel+"'";
-			DT=Con.OpenDT(sql);	
+			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-			
+
 			pserie=DT.getString(0);
 			pnumero=""+DT.getInt(1);
 			pruta=DT.getString(2);
-			
+
 			pvend=DT.getString(3);
-			pcli=DT.getString(4);		
+			pcli=DT.getString(4);
 			ptot=DT.getDouble(5);
-			
+
 			pfser=DT.getString(6);
 			pfcor=DT.getString(7);
-	
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(e.getMessage());return false;
-	    }	
-		
+		}
+
 		try {
 			sql="SELECT RESOL,FECHARES,FECHAVIG,SERIE,CORELINI,CORELFIN FROM P_COREL";
-			DT=Con.OpenDT(sql);	
+			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-			
+
 			presol="Resolucion No. : "+DT.getString(0);
 			ff=DT.getInt(1);presfecha="De Fecha : "+du.sfecha(ff);
-			ff=DT.getInt(2);presvence="Resolucion vence : "+du.sfecha(ff);		
+			ff=DT.getInt(2);presvence="Resolucion vence : "+du.sfecha(ff);
 			presrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
-			
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			Toast.makeText(this,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
-	    }	
-		
-			try {
+		}
+
+		try {
 			sql="SELECT NOMBRE FROM P_VENDEDOR  WHERE CODIGO='"+pvend+"'";
-			DT=Con.OpenDT(sql);	
+			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-			
+
 			pvendedor=DT.getString(0);
 		} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			pvendedor=pvend;
-	    }	
-		
+		}
+
 		try {
 			sql="SELECT NOMBRE,PERCEPCION,TIPO_CONTRIBUYENTE,DIRECCION FROM P_CLIENTE WHERE CODIGO='"+pcli+"'";
-			DT=Con.OpenDT(sql);	
+			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-			
-			pcliente=DT.getString(0);       		
+
+			pcliente=DT.getString(0);
 			pclicod=pcli;
 			pclidir=DT.getString(3);
-			
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			pcliente=pcli;
-	    }	
-		
-			
+		}
+
+
 		return true;
-		
+
 	}
 
 	private boolean buildHeader(String corel,int reimpres) {
 
 		lines.clear();
 
-		try {	
+		try {
 			loadHeadLines();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			msgbox(e.getMessage());return false;
-		}		
+		}
 
 		saveHeadLines(reimpres);
 
@@ -1049,11 +1047,11 @@ public class Reimpresion extends PBase {
 
 		return l;
 	}
-	
+
 	private boolean loadHeadLines() {
-		Cursor DT;	
+		Cursor DT;
 		String s;
-		
+
 		try {
 			sql="SELECT TEXTO FROM P_ENCABEZADO_REPORTESHH ORDER BY CODIGO";
 			DT=Con.OpenDT(sql);
@@ -1061,8 +1059,8 @@ public class Reimpresion extends PBase {
 
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
-				s=DT.getString(0);	
-				lines.add(s);	
+				s=DT.getString(0);
+				lines.add(s);
 				DT.moveToNext();
 			}
 
@@ -1070,12 +1068,12 @@ public class Reimpresion extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			msgbox(e.getMessage());return false;
-		}				
+		}
 	}
 
-	
+
 	// Aux
-	
+
 	private void msgAsk(String msg) {
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -1149,18 +1147,17 @@ public class Reimpresion extends PBase {
 	}
 
 	private String androidid() {
-	    String uniqueID="";
-        try {
-            uniqueID = Settings.Secure.getString(getContentResolver(),
-                    Settings.Secure.ANDROID_ID);
-        } catch (Exception e) {
+		String uniqueID="";
+		try {
+			uniqueID = Settings.Secure.getString(getContentResolver(),
+					Settings.Secure.ANDROID_ID);
+		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-            uniqueID="0000000000";
-        }
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			uniqueID="0000000000";
+		}
 
 		return uniqueID;
 	}
-
 
 }

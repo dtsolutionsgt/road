@@ -61,7 +61,6 @@ public class printer {
 		} catch (Exception e) {
 			Toast.makeText(cont, "Printer : " + e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
-
 	}
 
 	public void printask(Runnable callBackHook)
@@ -127,7 +126,7 @@ public class printer {
 			if (ptipo.equalsIgnoreCase("EPSON")) prid=2;
 			if (ptipo.equalsIgnoreCase("ZEBRA CPCL")) prid=3;
 			if (ptipo.equalsIgnoreCase("ZPL")) prid=4;
-			if (ptipo.equalsIgnoreCase("APEX")) prid=5;
+			//if (ptipo.equalsIgnoreCase("APEX")) prid=5;
 		}
 			
 		setPrinterClass();
@@ -160,7 +159,7 @@ public class printer {
 			if (prtipo.equalsIgnoreCase("EPSON")) prid=2;
 			if (prtipo.equalsIgnoreCase("ZEBRA CPCL")) prid=3;
 			if (prtipo.equalsIgnoreCase("ZPL")) prid=4;
-			if (prtipo.equalsIgnoreCase("APEX")) prid=5;
+			//if (prtipo.equalsIgnoreCase("APEX")) prid=5;
 
 			setPrinterClass();
 				
@@ -190,11 +189,14 @@ public class printer {
 				prn.printclose=printclose;
 				prn.prwidth=prw;
 				break;
-			case 5:
-				prn=new printApex(cont,prpar,validprint);
-				prn.printclose=printclose;
-				prn.prwidth=prw;
-				break;
+			//case 5:
+				//prn=new printApex(cont,prpar,validprint);
+				//prn.printclose=printclose;
+				//prn.prwidth=prw;
+				//prn=new printZebraZPL(cont,prpar,validprint);
+				//prn.printclose=printclose;
+				//prn.prwidth=prw;
+				//break;
 		}	
 	}
 	
@@ -212,7 +214,6 @@ public class printer {
 		 	Con.vDatabase =db;
 	    } catch (Exception e) {
 	    }
-	}	
-	
+	}
 	
 }

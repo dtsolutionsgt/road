@@ -593,5 +593,4 @@ public class clsDocFactura extends clsDocument {
 		public double cant,peso,prec,imp,descper,desc,tot,fact;
 	}
 	
-	
 }

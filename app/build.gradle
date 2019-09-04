@@ -27,7 +27,6 @@ android {
 }
 
 dependencies {
-    implementation files('libs/DO_AndroidSDK_v2.5.0.aar')
     implementation files('libs/android-core-3.1.0.jar')
     implementation files('libs/apache-commons-lang.jar')
     implementation files('libs/commons-io-2.4.jar')

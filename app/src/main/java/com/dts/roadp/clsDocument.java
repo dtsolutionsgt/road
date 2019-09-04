@@ -14,31 +14,31 @@ import java.util.ArrayList;
 
 public class clsDocument {
 
-	public String nombre,numero,serie,ruta,vendedor,cliente,nit,tipo,ref;
+	public String nombre,numero,serie,ruta,vendedor,cliente,nit,tipo,ref,medidapeso;
 	public String resol,resfecha,resvence,resrango,fsfecha,modofact;
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;
 	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod,docdesglose;
 	public int ffecha,pendiente,diacred,condicionPago;
-	
+
 	protected android.database.sqlite.SQLiteDatabase db;
 	protected BaseDatos Con;
 	protected String sql;
-	
+
 	protected ArrayList<String> lines= new ArrayList<String>();
-	
+
 	protected Context cont;
 	protected DateUtils DU;
 	protected DecimalFormat decfrm;
-	
+
 	protected String clicod,clidir,pemodo,vendcod;
 
 	protected int prw;
-	
+
 	public clsDocument(Context context,int printwidth,String cursym,int decimpres, String archivo) {
 		cont=context;
 		prw=printwidth;
-		
+
 		rep=new clsRepBuilder(cont,prw,true,cursym,decimpres, archivo);
 		DU=new DateUtils();
 		decfrm = new DecimalFormat("#,##0.00");
@@ -50,20 +50,20 @@ public class clsDocument {
 
 		modofact="*";
 		rep.clear();
-				
+
 		if (!buildHeader(corel,reimpres)) return false;
 		if (!buildDetail()) return false;
 		if (!buildFooter()) return false;
-		
+
 		if (!rep.save()) return false;
-		
+
 		return true;
 	}
 
 	public boolean buildPrint(String corel,int reimpres,String modo) {
 		int flag;
 
-        modofact=modo;
+		modofact=modo;
 		rep.clear();
 
 		try{
@@ -159,95 +159,95 @@ public class clsDocument {
 	}
 
 	public boolean buildPrint(String corel,int reimpres,BaseDatos pCon,android.database.sqlite.SQLiteDatabase pdb ) {
-		
+
 		rep.clear();
-				
+
 		if (!buildHeader(corel,reimpres,pCon,pdb)) return false;
 		if (!buildDetail()) return false;
 		if (!buildFooter()) return false;
-		
+
 		if (!rep.save()) return false;
-		
+
 		return true;
 	}
-	
+
 	public boolean buildPrintExt(String corel,int reimpres,String modo) {
-		
+
 		pemodo=modo;
-		
+
 		rep.clear();
-		
+
 		if (!buildHeader(corel,0)) return false;
 		if (!buildDetail()) return false;
 		if (!buildFooter()) return false;
-		
+
 		if (!buildHeader(corel,reimpres)) return false;
 		if (!buildDetail()) return false;
 		if (!buildFooter()) return false;
-		
+
 		if (!rep.save()) return false;
-		
+
 		return true;
 	}
-	
+
 	public boolean buildPrintSimple(String corel,int reimpres) {
-		
+
 		rep.clear();
-		
+
 		if (!buildFooter()) return false;
-		
+
 		if (!rep.save()) return false;
-		
+
 		return true;
 	}
 
 
 	// Methods Prototypes
-	
+
 	protected boolean buildDetail() {
 		return true;
 	}
-	
+
 	protected boolean buildFooter() {
-		
+
 		return true;
-	}	
-	
+	}
+
 	protected boolean loadDocData(String corel) {
 		return true;
 	}
-	
+
 	protected boolean loadHeadData(String corel) {
 		nombre="";numero="";serie="";ruta="";vendedor="";cliente="";
-		
+
 		return true;
 	}
 
-    protected void saveHeadLines(int reimpres) {
-        String s;
+	protected void saveHeadLines(int reimpres) {
+		String s;
 		String mPago,dPago;
 
-        rep.empty();rep.empty();
+		rep.empty();rep.empty();
 
-        for (int i = 0; i <lines.size(); i++) 		{
+		for (int i = 0; i <lines.size(); i++) 		{
 
-            s=lines.get(i);
-            s=encabezado(s);
+			s=lines.get(i);
+			s=encabezado(s);
 
-            if (docpedido) {
-                s=s.replace("Factura serie","Pedido");
-                s=s.replace("numero : 0","");
-            }
+			if (docpedido) {
+				s=s.replace("Factura serie","Pedido");
+				s=s.replace("numero : 0","");
+			}
 
-            if (docrecibo) s=s.replace("Factura","Recibo");
+			if (docrecibo) s=s.replace("Factura","Recibo");
 
-            if(docdevolucion) s=s.replace("Factura","Recibo");
+			if(docdevolucion) s=s.replace("Factura","Recibo");
 
 			if(doccanastabod){
 				s=s.replace("Factura","Recibo");
 			}
 
-            //if (residx==1) {
+			//if (residx==1) {
 
             /*    residx=0;
             }*/
@@ -264,14 +264,14 @@ public class clsDocument {
 					rep.add(resrango);
 				}
 			}
-        }
-
-        if (!emptystr(nit)) {
-        	rep.add("RUC : "+nit);
 		}
 
-        if (!emptystr(clidir)) rep.add("Dir : "+clidir);
-        if(docfactura){
+		if (!emptystr(nit)) {
+			rep.add("RUC : "+nit);
+		}
+
+		if (!emptystr(clidir)) rep.add("Dir : "+clidir);
+		if(docfactura){
 			if(condicionPago==4){
 
 				mPago= "Credito";
@@ -292,18 +292,18 @@ public class clsDocument {
 		rep.add("Fecha : "+fsfecha);
 		rep.add("");
 
-        //if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
+		//if (!emptystr(clicod)) rep.add("Codigo: "+clicod);
 
-       if (!modofact.equalsIgnoreCase("TOL")){
-		   if (!emptystr(add1)) {
-			   rep.add("");
+		if (!modofact.equalsIgnoreCase("TOL")){
+			if (!emptystr(add1)) {
+				rep.add("");
 				rep.add(add1);
 				if (!emptystr(add2)) rep.add(add2);
 				rep.add("");
 			}
-        }
+		}
 
-        if (docfactura && !(modofact.equalsIgnoreCase("TOL"))){
+		if (docfactura && !(modofact.equalsIgnoreCase("TOL"))){
 
 			rep.add("");
 			if (docfactura && (reimpres==1)) rep.add("-------  R E I M P R E S I O N  -------");
@@ -320,7 +320,7 @@ public class clsDocument {
 
 		}else if ((docdevolucion || docpedido) && !(modofact.equalsIgnoreCase("TOL"))){
 
-            //CKFK 2019-04-23 Consultar con Aaron
+			//CKFK 2019-04-23 Consultar con Aaron
 			rep.add("");
 			if ((docdevolucion && (reimpres==1)) || (docpedido && (reimpres==1))) rep.add("-------  R E I M P R E S I O N  -------");
 			if ((docdevolucion && (reimpres==2)) || (docpedido && (reimpres==2))) rep.add("------  C O P I A  ------");
@@ -335,30 +335,30 @@ public class clsDocument {
 			rep.add("");
 		}
 
-    }
+	}
 
-    protected String encabezado(String l) {
-        String s,lu,a;
-        int idx;
+	protected String encabezado(String l) {
+		String s,lu,a;
+		int idx;
 
-        //residx=0;
+		//residx=0;
 		if (emptystr(l)) return "";
-        //lu=l.toUpperCase().trim();
-        lu=l.trim();
+		//lu=l.toUpperCase().trim();
+		lu=l.trim();
 
-        if (lu.length()==1 && lu.equalsIgnoreCase("N")) {
-            s=nombre;s=rep.ctrim(s);return s;
-        }
+		if (lu.length()==1 && lu.equalsIgnoreCase("N")) {
+			s=nombre;s=rep.ctrim(s);return s;
+		}
 
-        if (l.indexOf("dd-MM-yyyy")>=0) {
-            s=DU.sfecha(DU.getActDateTime());
-            l=l.replace("dd-MM-yyyy",s);return l;
-        }
+		if (l.indexOf("dd-MM-yyyy")>=0) {
+			s=DU.sfecha(DU.getActDateTime());
+			l=l.replace("dd-MM-yyyy",s);return l;
+		}
 
-        if (l.indexOf("HH:mm:ss")>=0) {
-            s=DU.shora(DU.getActDateTime());
-            l=l.replace("HH:mm:ss",s);return l;
-        }
+		if (l.indexOf("HH:mm:ss")>=0) {
+			s=DU.shora(DU.getActDateTime());
+			l=l.replace("HH:mm:ss",s);return l;
+		}
 
 		if (l.indexOf("@Numero") >=0) {
 
@@ -375,11 +375,11 @@ public class clsDocument {
 				numero = StringUtils.right(str + numero, Integer.parseInt(temp));
 
 				if (!numero.isEmpty()){
-                    int ctemp1= Integer.parseInt(numero);
-                    if (ctemp1==0) numero = StringUtils.leftPad("", ctemp);
-                }
+					int ctemp1= Integer.parseInt(numero);
+					if (ctemp1==0) numero = StringUtils.leftPad("", ctemp);
+				}
 
-            }
+			}
 
 			if (!numero.isEmpty()) {
 				if (l.length() > index + numero.length() ){
@@ -410,10 +410,10 @@ public class clsDocument {
 
 			numero = StringUtils.right(str + numero, Integer.parseInt(temp));
 
-            if (!numero.isEmpty()){
-                int ctemp1= Integer.parseInt(numero);
-                if (ctemp1==0) numero = StringUtils.leftPad("", ctemp);
-            }
+			if (!numero.isEmpty()){
+				int ctemp1= Integer.parseInt(numero);
+				if (ctemp1==0) numero = StringUtils.leftPad("", ctemp);
+			}
 
 			if ((l.length()) > index + serie.length() + numero.length()) {
 				l = l.substring(0, index) + serie + numero + l.substring(index + 1 + serie.length() + numero.length());
@@ -427,7 +427,7 @@ public class clsDocument {
 		}
 
 		idx=l.indexOf("@Serie");
-        if (idx>=0) {
+		if (idx>=0) {
 
 			if (!serie.isEmpty()) {
 				if (l.length() > idx + serie.length()) {
@@ -442,50 +442,50 @@ public class clsDocument {
 				l = StringUtils.replace(l,"@Serie","");
 			}
 
-        }
+		}
 
 		if ((l.indexOf("No.:")>=0) && (l.trim().length()==4)) {
 			l = StringUtils.replace(l,"No.:","@@");
 			l=l.trim();
 		}
 
-        idx=lu.indexOf("@Vendedor");
-        if (idx>=0) {
-        	rep.addc("");
-            if (emptystr(vendedor)) return "@@";
-            l=l.replace("@Vendedor",vendcod+" - "+vendedor);return l;
-        }
+		idx=lu.indexOf("@Vendedor");
+		if (idx>=0) {
+			rep.addc("");
+			if (emptystr(vendedor)) return "@@";
+			l=l.replace("@Vendedor",vendcod+" - "+vendedor);return l;
+		}
 
-        idx=lu.indexOf("@Ruta");
-        if (idx>=0) {
-            if (emptystr(ruta)) return "@@";
-            l=l.replace("@Ruta",ruta);return l;
-        }
+		idx=lu.indexOf("@Ruta");
+		if (idx>=0) {
+			if (emptystr(ruta)) return "@@";
+			l=l.replace("@Ruta",ruta);return l;
+		}
 
-        idx=lu.indexOf("@Cliente");
-        if (idx>=0) {
-            if (emptystr(cliente)) return "@@";
-            if(l.length()>20){
+		idx=lu.indexOf("@Cliente");
+		if (idx>=0) {
+			if (emptystr(cliente)) return "@@";
+			if(l.length()>20){
 				l=l.replace("@Cliente",clicod+" - "+cliente);
 				return l;
 			}
-            l=l.replace("@Cliente",clicod+" - "+rep.ltrim(cliente, 20));return l;
-        }
+			l=l.replace("@Cliente",clicod+" - "+rep.ltrim(cliente, 20));return l;
+		}
 
-        return l;
-    }
+		return l;
+	}
 
 
-    // Private
+	// Private
 
 	private boolean buildHeader(String corel,int reimpres) {
-		
+
 		lines.clear();
-		
+
 		try {
 			Con = new BaseDatos(cont);
 			opendb();
-			
+
 			if (!corel.equalsIgnoreCase("0")) {
 				loadDocData(corel);
 				loadHeadData(corel);
@@ -494,29 +494,29 @@ public class clsDocument {
 			loadHeadLines();
 
 			try {
-				Con.close();   
+				Con.close();
 			} catch (Exception e1) {
 
 			}
-			
+
 		} catch (Exception e) {
 			setAddlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			Toast.makeText(cont,"buildheader: "+e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 		}
 
 		saveHeadLines(reimpres);
-		
+
 		return true;
 	}
 
 	private boolean buildHeader(String corel,int reimpres,BaseDatos pCon,android.database.sqlite.SQLiteDatabase pdb) {
-		
+
 		lines.clear();
-		
+
 		try {
-				
+
 			Con=pCon;db=pdb;
-			
+
 			if (!corel.equalsIgnoreCase("0")) {
 				loadDocData(corel);
 				loadHeadData(corel);
@@ -527,18 +527,18 @@ public class clsDocument {
 		} catch (Exception e) {
 			setAddlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
-		}		
+		}
 
 		return true;
 	}
 
-	
+
 	// Aux
-	
+
 	private boolean loadHeadLines() {
-		Cursor DT;	
+		Cursor DT;
 		String s,sucur;
-		
+
 		try {
 
 			sql = "SELECT SUCURSAL FROM P_RUTA";
@@ -553,8 +553,8 @@ public class clsDocument {
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 
-				s=DT.getString(0);	
-				lines.add(s);	
+				s=DT.getString(0);
+				lines.add(s);
 
 				DT.moveToNext();
 			}
@@ -566,7 +566,7 @@ public class clsDocument {
 			return false;
 		}
 	}
-	
+
 	public boolean emptystr(String s){
 		if (s==null || s.isEmpty()) {
 			return true;
@@ -574,20 +574,20 @@ public class clsDocument {
 			return false;
 		}
 	}
-	
+
 	public String sfecha(int f) {
 		int vy,vm,vd;
 		String s;
-		
+
 		vy=(int) f/100000000;f=f % 100000000;
 		vm=(int) f/1000000;f=f % 1000000;
 		vd=(int) f/10000;f=f % 10000;
-		
+
 		s="";
-		if (vd>9) { s=s+String.valueOf(vd)+"-";} else {s=s+"0"+String.valueOf(vd)+"-";}  
-		if (vm>9) { s=s+String.valueOf(vm)+"-20";} else {s=s+"0"+String.valueOf(vm)+"-20";}  
-		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);} 
-		
+		if (vd>9) { s=s+String.valueOf(vd)+"-";} else {s=s+"0"+String.valueOf(vd)+"-";}
+		if (vm>9) { s=s+String.valueOf(vm)+"-20";} else {s=s+"0"+String.valueOf(vm)+"-20";}
+		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
+
 		return s;
 	}
 
@@ -617,27 +617,27 @@ public class clsDocument {
 
 		return sh+":"+sm;
 	}
-	
+
 	public String frmdecimal(double val,int ndec) {
 		String ss="",ff="#,##0.";
-		DecimalFormat ffrmint = new DecimalFormat("#,##0"); 
-		
-		if (ndec<=0) {		
+		DecimalFormat ffrmint = new DecimalFormat("#,##0");
+
+		if (ndec<=0) {
 			ss=ffrmint.format((int) val);return ss;
 		}
-		
+
 		for (int i = 1; i <ndec+1; i++) {
 			ff=ff+"0";
 		}
-		
+
 		DecimalFormat decim = new DecimalFormat(ff);
 		ss=decim.format(val);
-		
+
 		return ss;
 	}
 
 	public void toast(String msg) {
-		Toast.makeText(cont,msg, Toast.LENGTH_SHORT).show();	
+		Toast.makeText(cont,msg, Toast.LENGTH_SHORT).show();
 	}
 
 	public void setAddlog(String methodname,String msg,String info) {
@@ -662,15 +662,15 @@ public class clsDocument {
 	}
 
 	private void opendb() {
-		
+
 		try {
 			db = Con.getWritableDatabase();
-		 	Con.vDatabase =db;
-	    } catch (Exception e) {
-	    	//Toast.makeText(cont,"Opendb "+e.getMessage(), Toast.LENGTH_LONG).show();
+			Con.vDatabase =db;
+		} catch (Exception e) {
+			//Toast.makeText(cont,"Opendb "+e.getMessage(), Toast.LENGTH_LONG).show();
 			setAddlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 
 		}
-	}	
-		
+	}
+
 }

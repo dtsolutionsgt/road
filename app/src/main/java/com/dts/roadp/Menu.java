@@ -266,7 +266,7 @@ public class Menu extends PBase {
 		//toast("menu id : "+menuid);
 
 	    try{
-			//prtype = getPrinterType();
+			prtype = getPrinterType();
 			if (prtype == 2) {
 				if (gl.mPrinterSet) epssetflag = false;
 				else epssetflag = true;
@@ -1804,7 +1804,7 @@ public class Menu extends PBase {
 	}
 
 	//endregion
-/*
+
 	//region Aux
 	
 	private void setPrintWidth() {
@@ -1824,7 +1824,6 @@ public class Menu extends PBase {
 		gl.prw=prwd;
 		
 	}
-*/
 
 	private void getDepTipo() {
 		Cursor DT;
@@ -1843,7 +1842,7 @@ public class Menu extends PBase {
 		}
 		
 	}	
-/*
+
 	private int getPrinterType() {
 		Cursor DT;
 		String prtipo;
@@ -1871,7 +1870,6 @@ public class Menu extends PBase {
 		return prid;
 				
 	}
-*/
 
 	public void doWSTest(View view) {
 		startActivity(new Intent(Menu.this,WSTest.class));
@@ -1942,7 +1940,7 @@ public class Menu extends PBase {
  	protected void onResume() {
 		try{
 			super.onResume();
-			//setPrintWidth();
+			setPrintWidth();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

@@ -290,6 +290,15 @@ public class PedidoRes extends PBase {
 			pgSave.setVisibility(View.VISIBLE);
 			imgSave.setVisibility(View.INVISIBLE);
 
+			fecha=du.cfechaSinHora(Integer.parseInt(lblFecha.getText().toString().substring(8,10)),
+					Integer.parseInt(lblFecha.getText().toString().substring(3,5)),
+					Integer.parseInt(lblFecha.getText().toString().substring(0,2)));
+
+			if (!fechaValida()){
+				mu.msgbox("La fecha de entrega ingresada no es válida, no se puede guardar el pedido");
+				return;
+			}
+
 			if (!saveOrder()) return;
 
 			clsBonifSave bonsave=new clsBonifSave(this,corel,"P");
@@ -730,7 +739,26 @@ public class PedidoRes extends PBase {
 		}
 
 			
-	}	
+	}
+
+	public  boolean fechaValida(){
+		boolean vFechaValida = false;
+
+		try{
+
+			if (fecha<du.getFechaActual()){
+				vFechaValida= false;
+			}else{
+				fechae=fecha;
+				vFechaValida= true;
+			}
+
+		}catch (Exception e){
+			mu.msgbox("Ocurrió un error " + e.getMessage());
+		}
+
+		return  vFechaValida;
+	}
 
 
 	// Activity Events

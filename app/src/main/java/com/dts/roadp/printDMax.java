@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import datamaxoneil.connection.Connection_Bluetooth;
 import datamaxoneil.printer.Document;
 import datamaxoneil.printer.DocumentEZ;
+import datamaxoneil.printer.DocumentExPCL_PP;
 import datamaxoneil.printer.ParametersEZ;
 
 // 00:17:AC:15:EC:C3
@@ -28,15 +29,17 @@ public class printDMax extends printBase {
 	private appGlobals appG;
 	private PBase clsPBase;
 	private boolean validprint;
+	private int prIdTipo;
 
 	private ArrayList<String> lines = new ArrayList<String>();
 	private ArrayList<Document> documentlist = new  ArrayList<Document>();
 	
-	public printDMax(Context context,String printerMAC,boolean validprinter) {
+	public printDMax(Context context,String printerMAC,boolean validprinter, int pridTipo) {
 		super(context,printerMAC);
 		validprint=validprinter;
 		appG = new appGlobals();
 		clsPBase=new PBase();
+		prIdTipo=pridTipo;
 	}
 	
 	
@@ -155,18 +158,38 @@ public class printDMax extends printBase {
 		}			
 		
 		try {
-			docLP.clear();
-			
-			while ((ss = dfile.readLine()) != null) {
+
+			if(prIdTipo==1){
+
+				docLP.clear();
+
+				while ((ss = dfile.readLine()) != null) {
 					docLP.writeText(ss);
+				}
+
+				docLP.writeText("");
+				docLP.writeText("");
+
+				dfile.close();
+
+				printData = docLP.getDocumentData();
+
+			}else if(prIdTipo==5){
+
+				documentExPCL_pp.clear();
+
+				while ((ss = dfile.readLine()) != null) {
+					documentExPCL_pp.writeText(ss, 2450, 0);
+				}
+
+				documentExPCL_pp.writeText("", 2450, 0);
+				documentExPCL_pp.writeText("", 2450, 0);
+
+				dfile.close();
+
+				printData = documentExPCL_pp.getDocumentData();
+
 			}
-			
-			docLP.writeText("");
-			docLP.writeText("");
-			
-			dfile.close();	
-				       
-	        printData = docLP.getDocumentData();
 
 			return true;
 
@@ -195,17 +218,20 @@ public class printDMax extends printBase {
 
 			ccnt=lines.size();
 
-			for (int i = 0; i <ccnt; i++) {
-				docEZ = new DocumentEZ("MF204");
-				txt="";
-				ss=lines.get(i);
-				txt=lines.get(i);
-				paramEZ.setHorizontalMultiplier(2);
-				paramEZ.setVerticalMultiplier(14);
-				docEZ.writeText(txt, 120, 30);
-				docEZ.writeBarCode("BC128",ss,40,20,paramEZ);
-                documentlist.add(docEZ);
+			if(prIdTipo==1){
 
+				for (int i = 0; i <ccnt; i++) {
+					docEZ = new DocumentEZ("MF204");
+					txt="";
+					ss=lines.get(i);
+					txt=lines.get(i);
+					paramEZ.setHorizontalMultiplier(2);
+					paramEZ.setVerticalMultiplier(14);
+					docEZ.writeText(txt, 120, 30);
+					docEZ.writeBarCode("BC128",ss,40,20,paramEZ);
+					documentlist.add(docEZ);
+
+				}
 			}
 
 			return true;

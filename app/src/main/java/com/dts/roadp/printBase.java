@@ -7,8 +7,10 @@ import java.util.ArrayList;
 
 import datamaxoneil.connection.ConnectionBase;
 import datamaxoneil.printer.DocumentEZ;
+import datamaxoneil.printer.DocumentExPCL_PP;
 import datamaxoneil.printer.DocumentLP;
 import datamaxoneil.printer.ParametersEZ;
+import datamaxoneil.printer.ParametersExPCL_PP;
 
 public class printBase {
 
@@ -25,6 +27,9 @@ public class printBase {
 	protected DocumentLP docLP = new DocumentLP("!");
     protected DocumentEZ docEZ = new DocumentEZ("MF204");
     protected ParametersEZ paramEZ = new ParametersEZ();
+
+	protected DocumentExPCL_PP documentExPCL_pp = new DocumentExPCL_PP(DocumentExPCL_PP.PaperWidth.PaperWidth_384);
+	protected ParametersExPCL_PP parametersExPCL_pp = new ParametersExPCL_PP();
 
 	protected Thread prthread;
 	protected Handler handler = new Handler(); 

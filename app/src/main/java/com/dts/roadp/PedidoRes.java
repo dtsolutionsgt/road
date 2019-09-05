@@ -703,7 +703,7 @@ public class PedidoRes extends PBase {
 			if (fecha<du.getFechaActual()){
 				vFechaValida= false;
 			}else{
-				fechae=fecha;
+				fechae=fecha * 10000;
 				vFechaValida= true;
 			}
 

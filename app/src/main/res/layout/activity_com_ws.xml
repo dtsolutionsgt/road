@@ -141,11 +141,12 @@
             android:id="@+id/txtWS"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/txtRuta"
+            android:layout_below="@+id/TextView01"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
+            android:layout_marginTop="40dp"
             android:ems="10"
-            android:hint="http://172.16.10.9/rdc7_sap_qas_andr/wsandr.asmx"
+            android:hint="http://172.16.10.9/rdc7_sap_prd_andr/wsandr.asmx"
             android:nextFocusForward="@id/txtEmp"
             android:text="http://172.16.10.9/rdc7_sap_prd_andr/wsandr.asmx" />
 

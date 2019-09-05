@@ -60,9 +60,9 @@ public class ComWS extends PBase {
 	private EditText txtRuta, txtWS, txtEmp;
 	private ImageView imgRec, imgEnv, imgExis,imgEnvM;
 	private RelativeLayout ralBack, relExist, relPrecio, relStock,relPedidos;
-    private TextView lblUser,lblPassword,txtVersion;
-    private EditText txtUser, txtPassword;
-    private CheckBox cbSuper;
+	private TextView lblUser,lblPassword,txtVersion;
+	private EditText txtUser, txtPassword;
+	private CheckBox cbSuper;
 
 	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
 	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs;
@@ -83,8 +83,8 @@ public class ComWS extends PBase {
 	private clsDataBuilder dbld;
 	private clsLicence lic;
 	private clsFinDia claseFindia;
-    private DateUtils DU;
-    private String jsonWS,updCxC;
+	private DateUtils DU;
+	private String jsonWS,updCxC;
 	private CryptUtil cu=new CryptUtil();
 
 	protected PowerManager.WakeLock wakeLock;
@@ -116,7 +116,7 @@ public class ComWS extends PBase {
 		addlog("ComWS", "" + du.getActDateTime(), gl.vend);
 
 		System.setProperty("line.separator", "\r\n");
-        rootdir=Environment.getExternalStorageDirectory()+"/RoadFotos/";
+		rootdir=Environment.getExternalStorageDirectory()+"/RoadFotos/";
 
 		dbld = new clsDataBuilder(this);
 		claseFindia = new clsFinDia(this);
@@ -135,10 +135,10 @@ public class ComWS extends PBase {
 
 		lblRec = (TextView) findViewById(R.id.btnRec);
 		lblEnv = (TextView) findViewById(R.id.btnSend);
-        lblEnvM = (TextView) findViewById(R.id.btnSenHand);
+		lblEnvM = (TextView) findViewById(R.id.btnSenHand);
 
 		imgEnv = (ImageView) findViewById(R.id.imageView6);
-        imgEnvM = (ImageView) findViewById(R.id.imageView23);
+		imgEnvM = (ImageView) findViewById(R.id.imageView23);
 		imgRec = (ImageView) findViewById(R.id.imageView5);
 
 		ralBack = (RelativeLayout) findViewById(R.id.relwsmail);
@@ -155,12 +155,12 @@ public class ComWS extends PBase {
 		lblParam.setText("");
 		barInfo.setVisibility(View.INVISIBLE);
 
-        lblUser = new TextView(this,null);
-        lblPassword = new TextView(this,null);
+		lblUser = new TextView(this,null);
+		lblPassword = new TextView(this,null);
 		//txtVersion=new TextView(this, null);
 
-        txtUser = new EditText(this,null);
-        txtPassword = new EditText(this,null);
+		txtUser = new EditText(this,null);
+		txtPassword = new EditText(this,null);
 
 		txtVersion.setText(gl.parFechaVer);
 
@@ -323,20 +323,20 @@ public class ComWS extends PBase {
 
 
 			if (!gl.debug) {
-                if (!validaLicencia()) {
-                    mu.msgbox("Licencia inválida!");
+				if (!validaLicencia()) {
+					mu.msgbox("Licencia inválida!");
 					lblEnv.setVisibility(View.VISIBLE);
 					imgEnv.setVisibility(View.VISIBLE);
-                    return;
-                }
-            }
+					return;
+				}
+			}
 
 			if (gl.banderafindia) {
-					if (!puedeComunicar()) {
-						mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
-						return;
-					}
+				if (!puedeComunicar()) {
+					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+					return;
 				}
+			}
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -365,16 +365,16 @@ public class ComWS extends PBase {
 
 	}
 
-    public void askSendManual(View view) {
+	public void askSendManual(View view) {
 
-        try {
-            if (isbusy == 1) {
-                toastcent("Por favor, espere que se termine la tarea actual.");
-                return;
-            }
+		try {
+			if (isbusy == 1) {
+				toastcent("Por favor, espere que se termine la tarea actual.");
+				return;
+			}
 
 			lblEnvM.setVisibility(View.INVISIBLE);
-            imgEnvM.setVisibility(View.INVISIBLE);
+			imgEnvM.setVisibility(View.INVISIBLE);
 
 			if (!gl.debug) {
 				if (!validaLicencia()) {
@@ -385,42 +385,42 @@ public class ComWS extends PBase {
 				}
 			}
 
-            if (gl.banderafindia) {
-                if (!puedeComunicar()) {
-                    mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+			if (gl.banderafindia) {
+				if (!puedeComunicar()) {
+					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
 					lblEnvM.setVisibility(View.VISIBLE);
 					imgEnvM.setVisibility(View.VISIBLE);
-                    return;
-                }
-            }
+					return;
+				}
+			}
 
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
-            dialog.setTitle("Envio");
-            dialog.setMessage("¿Va a realizar la COMUNICACIÓN MANUAL, está seguro?");
+			dialog.setTitle("Envio");
+			dialog.setMessage("¿Va a realizar la COMUNICACIÓN MANUAL, está seguro?");
 
-            dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    DatosSupervisor();
-                }
-            });
+			dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					DatosSupervisor();
+				}
+			});
 
-            dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					lblEnvM.setVisibility(View.VISIBLE);
 					imgEnvM.setVisibility(View.VISIBLE);
 				}
 			});
 
-            dialog.show();
+			dialog.show();
 
-        } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-        }
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
 
 
-    }
+	}
 
 	public void askSendContinue() {
 
@@ -570,80 +570,80 @@ public class ComWS extends PBase {
 
 	}
 
-    private void DatosSupervisor() {
+	private void DatosSupervisor() {
 
-        try{
+		try{
 
-            final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-            alert.setTitle("Envío");
+			alert.setTitle("Envío");
 
-            final LinearLayout layout   = new LinearLayout(this);
-            layout.setOrientation(LinearLayout.VERTICAL);
+			final LinearLayout layout   = new LinearLayout(this);
+			layout.setOrientation(LinearLayout.VERTICAL);
 
-            if(lblUser.getParent()!= null){
-                ((ViewGroup) lblUser.getParent()).removeView(lblUser);
-            }
+			if(lblUser.getParent()!= null){
+				((ViewGroup) lblUser.getParent()).removeView(lblUser);
+			}
 
-            if(lblPassword.getParent()!= null){
-                ((ViewGroup) lblPassword.getParent()).removeView(lblPassword);
-            }
+			if(lblPassword.getParent()!= null){
+				((ViewGroup) lblPassword.getParent()).removeView(lblPassword);
+			}
 
-            if(txtUser.getParent()!= null){
-                ((ViewGroup) txtUser.getParent()).removeView(txtUser);
-            }
+			if(txtUser.getParent()!= null){
+				((ViewGroup) txtUser.getParent()).removeView(txtUser);
+			}
 
-            if(txtPassword.getParent()!= null){
-                ((ViewGroup) txtPassword.getParent()).removeView(txtPassword);
-            }
+			if(txtPassword.getParent()!= null){
+				((ViewGroup) txtPassword.getParent()).removeView(txtPassword);
+			}
 
-            lblUser.setText("Usuario: ");
-            lblPassword.setText("Contraseña: ");
+			lblUser.setText("Usuario: ");
+			lblPassword.setText("Contraseña: ");
 			txtPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
 			txtUser.setText("");
 			txtPassword.setText("");
 
-            layout.addView(lblUser);
-            layout.addView(txtUser);
+			layout.addView(lblUser);
+			layout.addView(txtUser);
 			layout.addView(lblPassword);
-            layout.addView(txtPassword);
+			layout.addView(txtPassword);
 
-            alert.setView(layout);
+			alert.setView(layout);
 
-            showkeyb();
-            alert.setCancelable(false);
-            alert.create();
+			showkeyb();
+			alert.setCancelable(false);
+			alert.create();
 
-            alert.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
+			alert.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
 
-                    String usr, pwd;
+					String usr, pwd;
 					boolean dtCorrectos;
 
-                    usr = txtUser.getText().toString().trim();
-                    pwd = txtPassword.getText().toString().trim();
+					usr = txtUser.getText().toString().trim();
+					pwd = txtPassword.getText().toString().trim();
 
-                    if (mu.emptystr(usr)) {
-                        toast("Usuario incorrecto.");
-						lblEnvM.setVisibility(View.VISIBLE);
-						imgEnvM.setVisibility(View.VISIBLE);
-                        return;
-                    }
-
-                    if (mu.emptystr(pwd)) {
-                        toast("Contraseña incorrecta.");
+					if (mu.emptystr(usr)) {
+						toast("Usuario incorrecto.");
 						lblEnvM.setVisibility(View.VISIBLE);
 						imgEnvM.setVisibility(View.VISIBLE);
 						return;
-                    }
+					}
+
+					if (mu.emptystr(pwd)) {
+						toast("Contraseña incorrecta.");
+						lblEnvM.setVisibility(View.VISIBLE);
+						imgEnvM.setVisibility(View.VISIBLE);
+						return;
+					}
 
 					dtCorrectos = validaDatos(usr,pwd);
 
 					lblEnvM.setVisibility(View.VISIBLE);
 					imgEnvM.setVisibility(View.VISIBLE);
 
-                    if (dtCorrectos){
+					if (dtCorrectos){
 						askSendContinue();
 					}else{
 						layout.removeAllViews();
@@ -651,60 +651,63 @@ public class ComWS extends PBase {
 						return;
 					}
 
-                }
-            });
+				}
+			});
 
-            alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    layout.removeAllViews();
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					layout.removeAllViews();
 					lblEnvM.setVisibility(View.VISIBLE);
 					imgEnvM.setVisibility(View.VISIBLE);
-                }
-            });
+				}
+			});
 
-            alert.show();
+			alert.show();
 
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 
-    }
+	}
 
-    private boolean validaDatos(String user,String psw){
+	private boolean validaDatos(String user,String psw){
 
-        Cursor DT;
-	    boolean correctos=false;
-        String dpsw;
-	    try{
+		Cursor DT;
+		boolean correctos=false;
+		String dpsw;
+		try{
 
+			if(gl.tolsuper){
+				sql = "SELECT NOMBRE,CLAVE,NIVEL,NIVELPRECIO FROM P_VENDEDOR WHERE CODIGO='" + user + "' AND NIVEL=2";
+			}else{
+				sql = "SELECT NOMBRE,CLAVE,NIVEL,NIVELPRECIO FROM P_VENDEDOR WHERE CODIGO='" + user + "' AND NIVEL=1";
+			}
+			DT = Con.OpenDT(sql);
 
-            sql = "SELECT NOMBRE,CLAVE,NIVEL,NIVELPRECIO FROM P_VENDEDOR WHERE CODIGO='" + user + "' AND NIVEL=1";
-            DT = Con.OpenDT(sql);
-
-            if (DT.getCount() == 0) {
-               mu.msgbox("Usuario incorrecto !");
+			if (DT.getCount() == 0) {
+				mu.msgbox("Usuario incorrecto !");
 				return false;
-            }
+			}
 
-            DT.moveToFirst();
-            dpsw = DT.getString(1);
-            if (!psw.equalsIgnoreCase(dpsw)) {
+			DT.moveToFirst();
+			dpsw = DT.getString(1);
+			if (!psw.equalsIgnoreCase(dpsw)) {
 				mu.msgbox("Contraseña incorrecta !");
-                return false;
-            }
+				return false;
+			}
 
 			if(DT!=null) DT.close();
 
 			correctos = true;
 
-         }catch (Exception e){
-            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-            return false;
-        }
+		}catch (Exception e){
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			return false;
+		}
 
-        return  correctos;
+		return  correctos;
 
-    }
+	}
 
 	private boolean sendDataManual() {
 
@@ -741,7 +744,7 @@ public class ComWS extends PBase {
 
 			envioSolicitud();
 
-            envioRating();
+			envioRating();
 
 			updateAcumulados();
 
@@ -766,7 +769,7 @@ public class ComWS extends PBase {
 	}
 
 	private void Eliminatablas(){
-        boolean Eliminadas = false;
+		boolean Eliminadas = false;
 		try{
 
 			claseFindia.updateFinDia(du.getActDate());
@@ -776,8 +779,8 @@ public class ComWS extends PBase {
 			Eliminadas = claseFindia.eliminarTablasD();
 
 			if (Eliminadas){
-			    mu.msgbox("Envío de datos correcto");
-            }
+				mu.msgbox("Envío de datos correcto");
+			}
 
 			visibilidadBotones();
 
@@ -920,7 +923,7 @@ public class ComWS extends PBase {
 	public void doPedidos(View view) {
 		//getWSURL();
 		//if (!gl.URLtemp.isEmpty())
-			startActivity(new Intent(this,ComWSSend.class));
+		startActivity(new Intent(this,ComWSSend.class));
 	}
 
 	private void setHandlers() {
@@ -1137,8 +1140,8 @@ public class ComWS extends PBase {
 			// 	idbg=idbg+" RC ="+rc+"---";
 			//}
 
-            tabla=delcmd.substring(12);
-            switch (tabla){
+			tabla=delcmd.substring(12);
+			switch (tabla){
 
 				case "P_RUTA":
 					if (rc==1){
@@ -1154,27 +1157,27 @@ public class ComWS extends PBase {
 							throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
 						}
 					}
-                break;
+					break;
 
-                case "P_PRODUCTO":
-                    if (rc==1){
+				case "P_PRODUCTO":
+					if (rc==1){
 						borraDatos();
-                        throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
-                    }
-                break;
-                case "P_PRODPRECIO":
-                    if (rc==1){
+						throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+					}
+					break;
+				case "P_PRODPRECIO":
+					if (rc==1){
 						borraDatos();
-                        throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
-                    }
-                    break;
-                case "P_COREL":
-                    if (rc==1 && gl.rutatipo.equals("V")){
+						throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+					}
+					break;
+				case "P_COREL":
+					if (rc==1 && gl.rutatipo.equals("V")){
 						borraDatos();
-                        throw new Exception("No hay correlativos definidos para esta ruta:" + ActRuta + ", no se puede continuar la carga de datos");
-                    }
-                    break;
-            }
+						throw new Exception("No hay correlativos definidos para esta ruta:" + ActRuta + ", no se puede continuar la carga de datos");
+					}
+					break;
+			}
 
 			for (int i = 0; i < rc; i++) {
 				String str = "";
@@ -1611,9 +1614,9 @@ public class ComWS extends PBase {
 				int bs=imgbytes.length;
 
 				FileOutputStream fos = new FileOutputStream(rootdir+"0006.jpg");
-                BufferedOutputStream outputStream = new BufferedOutputStream(fos);
-                outputStream.write(imgbytes);
-                outputStream.close();
+				BufferedOutputStream outputStream = new BufferedOutputStream(fos);
+				outputStream.write(imgbytes);
+				outputStream.close();
 
 			} catch (Exception ee) {
 				sstr = ee.getMessage();return 0;
@@ -1763,7 +1766,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MUNI")) return false;
 			if (!AddTable("P_VEHICULO")) return false;
 			if (!AddTable("P_HANDHELD")) return false;
-            if (!AddTable("P_TRANSERROR")) return false;
+			if (!AddTable("P_TRANSERROR")) return false;
 			if (!AddTable("P_GLOBPARAM")) return false;
 			if (!AddTable("P_CONFIGBARRA")) return false;
 
@@ -1829,7 +1832,7 @@ public class ComWS extends PBase {
 				sql = listItems.get(i);esql = sql;
 				sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
 				sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
-                sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
+				sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
 
 				try {
 					writer.write(sql);writer.write("\r\n");
@@ -1870,7 +1873,7 @@ public class ComWS extends PBase {
 			encodeLicence();
 			encodeLicenceRuta();
 
-            SetStatusRecToTrans("1");
+			SetStatusRecToTrans("1");
 
 			dbT.setTransactionSuccessful();
 			dbT.endTransaction();
@@ -2169,7 +2172,7 @@ public class ComWS extends PBase {
 		Cursor DT1;
 		int vCorelZ = 0;
 		float vGrandTotal = 0;
-        String vNumPlaca;
+		String vNumPlaca;
 
 		boolean vActualizaFD = true;
 
@@ -2182,7 +2185,7 @@ public class ComWS extends PBase {
 
 				DT1.moveToFirst();
 
-                vNumPlaca = DT1.getString(0);
+				vNumPlaca = DT1.getString(0);
 				vCorelZ = DT1.getInt(1);
 				vGrandTotal = DT1.getFloat(2);
 
@@ -2317,43 +2320,43 @@ public class ComWS extends PBase {
 
 		//23-7-2019 se adiciono la opcion de clientes por supervisor en base de las rutas
 		if (TN.equalsIgnoreCase("P_CLIRUTA")) {
-		    if (!cargasuper) {
-                SQL = "SELECT RUTA,CLIENTE,SEMANA,DIA,SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'";
-            } else {
-                SQL = "SELECT DISTINCT RUTA,CLIENTE,1 AS SEMANA,1 AS DIA,1 AS SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA IN ( " +
-                      "SELECT DISTINCT RUTA FROM VENDEDORES WHERE Codigo IN ( " +
-                      "SELECT VENDEDOR FROM P_RUTA WHERE CODIGO='"+ActRuta+"'))";
-            }
+			if (!cargasuper) {
+				SQL = "SELECT RUTA,CLIENTE,SEMANA,DIA,SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "'";
+			} else {
+				SQL = "SELECT DISTINCT RUTA,CLIENTE,1 AS SEMANA,1 AS DIA,1 AS SECUENCIA,-1 AS BANDERA FROM P_CLIRUTA WHERE RUTA IN ( " +
+						"SELECT DISTINCT RUTA FROM VENDEDORES WHERE Codigo IN ( " +
+						"SELECT VENDEDOR FROM P_RUTA WHERE CODIGO='"+ActRuta+"'))";
+			}
 			return SQL;
 		}
 
 		if (TN.equalsIgnoreCase("P_CLIENTE")) {
 
-            if (!cargasuper) {
+			if (!cargasuper) {
 
-                SQL = " SELECT CODIGO,NOMBRE,BLOQUEADO,TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL, ";
-                SQL += "NIVELPRECIO,MEDIAPAGO,LIMITECREDITO,DIACREDITO,DESCUENTO,BONIFICACION, ";
-                SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
-                SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
-                SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
-                SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
-                SQL += "FROM P_CLIENTE ";
-                SQL += "WHERE (CODIGO IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') )) ";
+				SQL = " SELECT CODIGO,NOMBRE,BLOQUEADO,TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL, ";
+				SQL += "NIVELPRECIO,MEDIAPAGO,LIMITECREDITO,DIACREDITO,DESCUENTO,BONIFICACION, ";
+				SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
+				SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
+				SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
+				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
+				SQL += "FROM P_CLIENTE ";
+				SQL += "WHERE (CODIGO IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') )) ";
 
-            } else {
+			} else {
 
-                SQL = " SELECT CODIGO,NOMBRE,BLOQUEADO,TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL, ";
-                SQL += "NIVELPRECIO,MEDIAPAGO,LIMITECREDITO,DIACREDITO,DESCUENTO,BONIFICACION, ";
-                SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
-                SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
-                SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
-                SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
-                SQL += "FROM P_CLIENTE WHERE CODIGO IN ( ";
-                SQL += "SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA IN ( ";
-                SQL += "SELECT DISTINCT RUTA FROM VENDEDORES WHERE Codigo IN ( ";
-                SQL += "SELECT VENDEDOR FROM P_RUTA WHERE CODIGO='"+ActRuta+"'))) ";
+				SQL = " SELECT CODIGO,NOMBRE,BLOQUEADO,TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL, ";
+				SQL += "NIVELPRECIO,MEDIAPAGO,LIMITECREDITO,DIACREDITO,DESCUENTO,BONIFICACION, ";
+				SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
+				SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
+				SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
+				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
+				SQL += "FROM P_CLIENTE WHERE CODIGO IN ( ";
+				SQL += "SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA IN ( ";
+				SQL += "SELECT DISTINCT RUTA FROM VENDEDORES WHERE Codigo IN ( ";
+				SQL += "SELECT VENDEDOR FROM P_RUTA WHERE CODIGO='"+ActRuta+"'))) ";
 
-            }
+			}
 
 			return SQL;
 		}
@@ -2470,13 +2473,13 @@ public class ComWS extends PBase {
 
 		if (TN.equalsIgnoreCase("P_RUTA")) {
 			SQL = "SELECT CODIGO, NOMBRE, ACTIVO, VENDEDOR, VENTA, FORANIA, SUCURSAL, TIPO, SUBTIPO, " +
-				  "BODEGA, SUBBODEGA, DESCUENTO, BONIF, KILOMETRAJE, IMPRESION, RECIBOPROPIO, CELULAR, RENTABIL, OFERTA, " +
-				  "PERCRENT, PASARCREDITO, TECLADO, EDITDEVPREC, EDITDESC, PARAMS, SEMANA, OBJANO, OBJMES, SYNCFOLD, WLFOLD, " +
-				  "FTPFOLD, EMAIL, LASTIMP, LASTCOM, LASTEXP, IMPSTAT, EXPSTAT, COMSTAT, PARAM1, " +
-			 	  "PARAM2, PESOLIM, INTERVALO_MAX, LECTURAS_VALID, INTENTOS_LECT, HORA_INI, HORA_FIN, " +
-				  "APLICACION_USA, PUERTO_GPS, ES_RUTA_OFICINA, DILUIR_BON, PREIMPRESION_FACTURA, MODIFICAR_MEDIA_PAGO, " +
-				  "IDIMPRESORA, NUMVERSION,0 AS FECHAVERSION, ARQUITECTURA " +
-				  "FROM P_RUTA WHERE CODIGO = '" + ActRuta + "'";
+					"BODEGA, SUBBODEGA, DESCUENTO, BONIF, KILOMETRAJE, IMPRESION, RECIBOPROPIO, CELULAR, RENTABIL, OFERTA, " +
+					"PERCRENT, PASARCREDITO, TECLADO, EDITDEVPREC, EDITDESC, PARAMS, SEMANA, OBJANO, OBJMES, SYNCFOLD, WLFOLD, " +
+					"FTPFOLD, EMAIL, LASTIMP, LASTCOM, LASTEXP, IMPSTAT, EXPSTAT, COMSTAT, PARAM1, " +
+					"PARAM2, PESOLIM, INTERVALO_MAX, LECTURAS_VALID, INTENTOS_LECT, HORA_INI, HORA_FIN, " +
+					"APLICACION_USA, PUERTO_GPS, ES_RUTA_OFICINA, DILUIR_BON, PREIMPRESION_FACTURA, MODIFICAR_MEDIA_PAGO, " +
+					"IDIMPRESORA, NUMVERSION,0 AS FECHAVERSION, ARQUITECTURA " +
+					"FROM P_RUTA WHERE CODIGO = '" + ActRuta + "'";
 			return SQL;
 		}
 
@@ -2568,8 +2571,8 @@ public class ComWS extends PBase {
 
 		if (TN.equalsIgnoreCase("P_BONLIST")) {
 			SQL = "SELECT CODIGO,PRODUCTO,CANT,CANTMIN,NOMBRE FROM P_BONLIST "+
-				  "	WHERE CODIGO IN (SELECT LISTA FROM P_BONIF WHERE TIPOLISTA in (1,2) "+
-				  "	AND DATEDIFF(D, FECHAINI,GETDATE()) >=0 AND DATEDIFF(D,GETDATE(), FECHAFIN) >=0  AND EMP = '" + gEmpresa +"')";
+					"	WHERE CODIGO IN (SELECT LISTA FROM P_BONIF WHERE TIPOLISTA in (1,2) "+
+					"	AND DATEDIFF(D, FECHAINI,GETDATE()) >=0 AND DATEDIFF(D,GETDATE(), FECHAFIN) >=0  AND EMP = '" + gEmpresa +"')";
 			return SQL;
 		}
 
@@ -2614,19 +2617,19 @@ public class ComWS extends PBase {
 
 		//#CKFK_20190319 Agregué tabla P_IMPRESORA
 		if (TN.equalsIgnoreCase("P_IMPRESORA")) {
-              SQL = " SELECT IDIMPRESORA, NUMSERIE, MARCA, ISNULL(CREADA,'') AS CREADA, " +
-                    " ISNULL(MODIFICADA,'') AS MODIFICADA, " +
-                    "0 AS FECHA_CREADA,0 AS FECHA_MODIFICADA,MACADDRESS FROM P_IMPRESORA";
+			SQL = " SELECT IDIMPRESORA, NUMSERIE, MARCA, ISNULL(CREADA,'') AS CREADA, " +
+					" ISNULL(MODIFICADA,'') AS MODIFICADA, " +
+					"0 AS FECHA_CREADA,0 AS FECHA_MODIFICADA,MACADDRESS FROM P_IMPRESORA";
 			return SQL;
 		}
 
-        //#CKFK_20190522 Agregué tabla P_TRANSERROR
-        if (TN.equalsIgnoreCase("P_TRANSERROR")) {
-            SQL = " SELECT IDTRANSERROR, TRANSERROR FROM P_TRANSERROR";
-            return SQL;
-        }
+		//#CKFK_20190522 Agregué tabla P_TRANSERROR
+		if (TN.equalsIgnoreCase("P_TRANSERROR")) {
+			SQL = " SELECT IDTRANSERROR, TRANSERROR FROM P_TRANSERROR";
+			return SQL;
+		}
 
-        //#CKFK_20190707 Agregué tabla P_GLOBPARAM
+		//#CKFK_20190707 Agregué tabla P_GLOBPARAM
 		if (TN.equalsIgnoreCase("P_GLOBPARAM")) {
 			SQL = " SELECT EMPID, COMSERVER, FTPSERVER, VERFACTURA, VERPEDIDO, VERCOBRO, VALORN1 FROM P_GLOBPARAM";
 			return SQL;
@@ -2890,7 +2893,7 @@ public class ComWS extends PBase {
 				db.execSQL("UPDATE D_ATENCION SET STATCOM='S'");
 				db.execSQL("UPDATE D_CLICOORD SET STATCOM='S'");
 				db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
-                db.execSQL("UPDATE D_RATING SET STATCOM='S'");
+				db.execSQL("UPDATE D_RATING SET STATCOM='S'");
 				db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
 				db.execSQL("UPDATE FINDIA SET VAL5=0, VAL4=0,VAL3=0, VAL2=0");
 				db.setTransactionSuccessful();
@@ -2924,7 +2927,7 @@ public class ComWS extends PBase {
 			db.execSQL("UPDATE D_CLICOORD SET STATCOM='S'");
 			db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
 			db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
-            db.execSQL("UPDATE D_RATING SET STATCOM='S'");
+			db.execSQL("UPDATE D_RATING SET STATCOM='S'");
 			db.execSQL("UPDATE P_RUTA SET PARAM2 = ''");
 			db.setTransactionSuccessful();
 			db.endTransaction();
@@ -3296,11 +3299,11 @@ public class ComWS extends PBase {
 				dbld.savelog();
 				return false;
 			}
-            envioRating();
-            if (!fstr.equals("Sync OK")){
-                dbld.savelog();
-                return false;
-            }
+			envioRating();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				return false;
+			}
 
 			updateAcumulados();
 			if (!fstr.equals("Sync OK")){
@@ -3474,9 +3477,9 @@ public class ComWS extends PBase {
 				} catch (Exception e) {
 					errflag = true;
 
-                    dbld.savelog("facturas.txt");
+					dbld.savelog("facturas.txt");
 
-                    addlog(new Object() {
+					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 					dbg = e.getMessage();
@@ -3497,21 +3500,21 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			errflag = true;
 
-            dbld.savelog("facturas.txt");
+			dbld.savelog("facturas.txt");
 
-            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 			dbg = fstr;
 		}
 
 		//#CKFK 20190325 Sea el envío parcial o no se deben mostrar las facturas comunicadas
 		//if (envioparcial) {
-			if (pc != pcc) {
-				int pf = pcc - pc;
-				senv += "Facturas : " + pc + " , NO ENVIADO : " + pf + "\n";
-			} else {
-				senv += "Facturas : " + pc + "\n";
-			}
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Facturas : " + pc + " , NO ENVIADO : " + pf + "\n";
+		} else {
+			senv += "Facturas : " + pc + "\n";
+		}
 		//}
 
 	}
@@ -3572,9 +3575,9 @@ public class ComWS extends PBase {
 				} catch (Exception e) {
 					errflag = true;
 
-                    dbld.savelog("pedidos.txt");
+					dbld.savelog("pedidos.txt");
 
-                    addlog(new Object() {
+					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					//fterr+="\n"+e.getMessage();
 				}
@@ -3586,21 +3589,21 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			errflag = true;
 
-            dbld.savelog("pedidos.txt");
+			dbld.savelog("pedidos.txt");
 
-            addlog(new Object() {
+			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
 
 		//#CKFK 20190325 Sea el envío parcial o no se deben mostrar las facturas comunicadas
 		//if (envioparcial) {
-			if (pc != pcc) {
-				int pf = pcc - pc;
-				senv += "Pedidos : " + pc + " , NO ENVIADO : " + pf + "\n";
-			} else {
-				senv += "Pedidos : " + pc + "\n";
-			}
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Pedidos : " + pc + " , NO ENVIADO : " + pf + "\n";
+		} else {
+			senv += "Pedidos : " + pc + "\n";
+		}
 		//}
 	}
 
@@ -3660,9 +3663,9 @@ public class ComWS extends PBase {
 				} catch (Exception e) {
 					errflag = true;
 
-                    dbld.savelog("cobros.txt");
+					dbld.savelog("cobros.txt");
 
-                    addlog(new Object() {
+					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					//fterr+="\n"+e.getMessage();
 				}
@@ -3675,21 +3678,21 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			errflag = true;
 
-            dbld.savelog("cobros.txt");
+			dbld.savelog("cobros.txt");
 
-            addlog(new Object() {
+			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
 
 		//#CKFK 20190325 Sea el envío parcial o no se deben mostrar las facturas comunicadas
 		//if (envioparcial) {
-			if (pc != pcc) {
-				int pf = pcc - pc;
-				senv += "Cobros : " + pc + " , NO ENVIADO : " + pf + " \n";
-			} else {
-				senv += "Cobros : " + pc + "\n";
-			}
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Cobros : " + pc + " , NO ENVIADO : " + pf + " \n";
+		} else {
+			senv += "Cobros : " + pc + "\n";
+		}
 		//}
 	}
 
@@ -3749,9 +3752,9 @@ public class ComWS extends PBase {
 				} catch (Exception e) {
 					errflag = true;
 
-                    dbld.savelog("notascredito.txt");
+					dbld.savelog("notascredito.txt");
 
-                    addlog(new Object() {
+					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 				}
@@ -3764,21 +3767,21 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			errflag = true;
 
-            dbld.savelog("notascredito.txt");
+			dbld.savelog("notascredito.txt");
 
-            addlog(new Object() {
+			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
 
 		//#CKFK 20190325 Sea el envío parcial o no se deben mostrar las facturas comunicadas
 		//if (envioparcial) {
-			if (pc != pcc) {
-				int pf = pcc - pc;
-				senv += "Notas crédito : " + pc + " , NO ENVIADO : " + pf + "\n";
-			} else {
-				senv += "Notas crédito : " + pc + "\n";
-			}
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Notas crédito : " + pc + " , NO ENVIADO : " + pf + "\n";
+		} else {
+			senv += "Notas crédito : " + pc + "\n";
+		}
 		//}
 	}
 
@@ -3832,9 +3835,9 @@ public class ComWS extends PBase {
 				} catch (Exception e) {
 					errflag = true;
 
-                    dbld.savelog("notasdevolucion.txt");
+					dbld.savelog("notasdevolucion.txt");
 
-                    addlog(new Object() {
+					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 				}
@@ -3867,9 +3870,9 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			errflag = true;
 
-            dbld.savelog("notasdevolucion.txt");
+			dbld.savelog("notasdevolucion.txt");
 
-            addlog(new Object() {
+			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -3935,9 +3938,9 @@ public class ComWS extends PBase {
 				} catch (Exception e) {
 					errflag = true;
 
-                    dbld.savelog("depositos.txt");
+					dbld.savelog("depositos.txt");
 
-                    addlog(new Object() {
+					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 				}
@@ -3950,21 +3953,21 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			errflag = true;
 
-            dbld.savelog("depositos.txt");
+			dbld.savelog("depositos.txt");
 
-            addlog(new Object() {
+			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
 
 		//#CKFK 20190325 Sea el envío parcial o no se deben mostrar las facturas comunicadas
 		//if (envioparcial) {
-			if (pc != pcc) {
-				int pf = pcc - pc;
-				senv += "Depósitos : " + pc + " , NO ENVIADO : " + pf + " \n";
-			} else {
-				senv += "Depósitos : " + pc + "\n";
-			}
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Depósitos : " + pc + " , NO ENVIADO : " + pf + " \n";
+		} else {
+			senv += "Depósitos : " + pc + "\n";
+		}
 		//}
 	}
 
@@ -4062,9 +4065,9 @@ public class ComWS extends PBase {
 				} catch (Exception e) {
 					errflag = true;
 
-                    dbld.savelog("inventario.txt");
+					dbld.savelog("inventario.txt");
 
-                    addlog(new Object() {
+					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
 				}
@@ -4077,9 +4080,9 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			errflag = true;
 
-            dbld.savelog("inventarios.txt");
+			dbld.savelog("inventarios.txt");
 
-            addlog(new Object() {
+			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 		}
@@ -4390,9 +4393,9 @@ public class ComWS extends PBase {
 			if (envioparcial) dbld.clear();
 
 			ss = "UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parNumVer +"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'";
-            dbld.add(ss);
+			dbld.add(ss);
 
-            dbld.add("DELETE FROM D_REPFINDIA WHERE RUTA='" + gl.ruta + "'");
+			dbld.add("DELETE FROM D_REPFINDIA WHERE RUTA='" + gl.ruta + "'");
 			dbld.insert("D_REPFINDIA", "WHERE (LINEA>=0)");
 
 			if (envioparcial && !esEnvioManual) {
@@ -4421,71 +4424,71 @@ public class ComWS extends PBase {
 	}
 
 	//#CKFK 20190522 Función creada para enviar los rating
-    public void envioRating() {
-        Cursor DT;
-        String ruta, vendedor, comentario, fecha;
-        int id, idtranserror;
-        float rating;
+	public void envioRating() {
+		Cursor DT;
+		String ruta, vendedor, comentario, fecha;
+		int id, idtranserror;
+		float rating;
 
-        if (!esEnvioManual){
-            wsStask.onProgressUpdate();
-        }
+		if (!esEnvioManual){
+			wsStask.onProgressUpdate();
+		}
 
-        try {
-            sql = " SELECT IDRATING, RUTA, VENDEDOR, RATING, COMENTARIO, IDTRANSERROR, FECHA, STATCOM " +
-                  " FROM D_RATING WHERE STATCOM='N'";
-            DT = Con.OpenDT(sql);
-            if (DT.getCount() == 0) return;
+		try {
+			sql = " SELECT IDRATING, RUTA, VENDEDOR, RATING, COMENTARIO, IDTRANSERROR, FECHA, STATCOM " +
+					" FROM D_RATING WHERE STATCOM='N'";
+			DT = Con.OpenDT(sql);
+			if (DT.getCount() == 0) return;
 
-            DT.moveToFirst();
-            while (!DT.isAfterLast()) {
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
 
-                id = DT.getInt(0);
-                ruta = DT.getString(1);
-                vendedor = DT.getString(2);
-                rating = DT.getFloat(3);
-                comentario = DT.getString(4);
-                idtranserror=DT.getInt(5);
-                fecha=DT.getString(6);
+				id = DT.getInt(0);
+				ruta = DT.getString(1);
+				vendedor = DT.getString(2);
+				rating = DT.getFloat(3);
+				comentario = DT.getString(4);
+				idtranserror=DT.getInt(5);
+				fecha=DT.getString(6);
 
-                try {
+				try {
 
-                    if (envioparcial) dbld.clear();
+					if (envioparcial) dbld.clear();
 
-                    ss = "INSERT INTO D_RATING (RUTA, VENDEDOR, RATING, COMENTARIO, IDTRANSERROR, FECHA, STATCOM)"+
-                         " VALUES('" + ruta +"','" + vendedor +"'," + rating +",'" + comentario +"'," +
-                         "" + idtranserror +",'" + fecha +"','N')";
-                    dbld.add(ss);
+					ss = "INSERT INTO D_RATING (RUTA, VENDEDOR, RATING, COMENTARIO, IDTRANSERROR, FECHA, STATCOM)"+
+							" VALUES('" + ruta +"','" + vendedor +"'," + rating +",'" + comentario +"'," +
+							"" + idtranserror +",'" + fecha +"','N')";
+					dbld.add(ss);
 
-                    if (envioparcial && !esEnvioManual) {
-                        if (commitSQL() == 1) {
-                            sql = "UPDATE D_RATING SET STATCOM='S' WHERE IDRATING='" + id + "'";
-                            db.execSQL(sql);
-                        }else{
-                          fterr += "\n" + sstr;
-                        }
-                    }
+					if (envioparcial && !esEnvioManual) {
+						if (commitSQL() == 1) {
+							sql = "UPDATE D_RATING SET STATCOM='S' WHERE IDRATING='" + id + "'";
+							db.execSQL(sql);
+						}else{
+							fterr += "\n" + sstr;
+						}
+					}
 
-                } catch (Exception e) {
+				} catch (Exception e) {
 					errflag = true;
-                    addlog(new Object() {
-                    }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-                    fterr += "\n" + e.getMessage();
-                }
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					fterr += "\n" + e.getMessage();
+				}
 
-                DT.moveToNext();
-            }
+				DT.moveToNext();
+			}
 
 			if(DT!=null) DT.close();
 
-        } catch (Exception e) {
+		} catch (Exception e) {
 			errflag = true;
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            fstr = e.getMessage();
-        }
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+		}
 
-    }
+	}
 
 	public void updateInventario() {
 		DU = new DateUtils();
@@ -4591,24 +4594,24 @@ public class ComWS extends PBase {
 
 	public void addItem(String nombre,int env,int pend) {
 		clsClasses.clsEnvio item;
-		
+
 		try {
 			item=clsCls.new clsEnvio();
-			
+
 			item.Nombre=nombre;
 			item.env=env;
 			item.pend=pend;
-			
+
 			items.add(item);
-			
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 	}
-	
+
 	public void updateLicencePush() {
 		String ss;
-		
+
 		try {
 			ss=listItems.get(1);
 			if (mu.emptystr(ss)) return;
@@ -4705,12 +4708,12 @@ public class ComWS extends PBase {
 	//endregion
 
 	//region WS Envio Handling Methods
-	
+
 	public void wsSendExecute(){
 
 		running=1;scon=0;
 		fstr="Envio incompleto  ";
-        errflag=false;
+		errflag=false;
 
 		try {
 
@@ -4725,16 +4728,16 @@ public class ComWS extends PBase {
 			} else {
 				fstr="No se puede conectar al web service : "+sstr;
 			}
-					
+
 		} catch (Exception e) {
 			scon=0;
 			fstr="No se puede conectar al web service. "+e.getMessage();
 			Log.d("E", fstr + sstr);
 		}
 	}
-			
+
 	public void wsSendFinished(){
-				
+
 		barInfo.setVisibility(View.INVISIBLE);
 		lblParam.setVisibility(View.INVISIBLE);
 
@@ -4742,19 +4745,19 @@ public class ComWS extends PBase {
 		imgEnv.setVisibility(View.VISIBLE);
 
 		running=0;
-		
+
 		//senv="Envio completo\n";
 
 		try{
-            if (scon==0) {
-                lblInfo.setText(fstr);writeErrLog(fstr);
-                mu.msgbox(fstr);
+			if (scon==0) {
+				lblInfo.setText(fstr);writeErrLog(fstr);
+				mu.msgbox(fstr);
 				lblInfo.setText(fstr);
 				isbusy = 0;
 				barInfo.setVisibility(View.INVISIBLE);
 				addlog("Envío", fterr + " " + fstr, esql);
 				return;
-            }
+			}
 
 			if (!errflag) {
 				lblInfo.setText(" ");
@@ -4778,8 +4781,8 @@ public class ComWS extends PBase {
 
 			} else {
 				lblInfo.setText(fterr);
-                isbusy = 0;
-                barInfo.setVisibility(View.INVISIBLE);
+				isbusy = 0;
+				barInfo.setVisibility(View.INVISIBLE);
 				mu.msgbox("Ocurrió error : \n" + fterr );
 				addlog("Envío", fterr, esql);
 				return;
@@ -4787,15 +4790,15 @@ public class ComWS extends PBase {
 
 			if(envioparcial){
 
-                findiaactivo=gl.findiaactivo;
-                if (ultimoCierreFecha()==du.getActDate()) findiaactivo=true;
+				findiaactivo=gl.findiaactivo;
+				if (ultimoCierreFecha()==du.getActDate()) findiaactivo=true;
 
-                if (findiaactivo) {
-                    FinDia();
-                    claseFindia.eliminarTablasD();
-                }
+				if (findiaactivo) {
+					FinDia();
+					claseFindia.eliminarTablasD();
+				}
 
-            }
+			}
 
 			visibilidadBotones();
 			//if (!errflag) ComWS.super.finish();
@@ -4808,11 +4811,11 @@ public class ComWS extends PBase {
 
 
 	}
-			
+
 	private class AsyncCallSend extends AsyncTask<String, Void, Void> {
 
 		@Override
-	    protected Void doInBackground(String... params) {
+		protected Void doInBackground(String... params) {
 
 			try {
 				Looper.prepare();
@@ -4824,11 +4827,11 @@ public class ComWS extends PBase {
 				}
 			}
 
-	        return null;
-	    }
-	 
-	    @Override
-	    protected void onPostExecute(Void result) {
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
 			try {
 				wsSendFinished();
 				Looper.loop();
@@ -4836,22 +4839,22 @@ public class ComWS extends PBase {
 				Log.d("onPostExecute", e.getMessage());
 			}
 		}
-	 
-        @Override
-        protected void onPreExecute() {
-    		try {
-    		} catch (Exception e) {}
-        }
 
-        @Override
-        protected void onProgressUpdate(Void... values) {
-    		try {
-    			lblInfo.setText(fprog);
-    		} catch (Exception e) { }
-        }
-	 
-    }
-	
+		@Override
+		protected void onPreExecute() {
+			try {
+			} catch (Exception e) {}
+		}
+
+		@Override
+		protected void onProgressUpdate(Void... values) {
+			try {
+				lblInfo.setText(fprog);
+			} catch (Exception e) { }
+		}
+
+	}
+
 	//endregion
 
 	//region WS Confirm Methods
@@ -4900,13 +4903,13 @@ public class ComWS extends PBase {
 	}
 
 	//endregion
-	
+
 	//region WS Confirm Handling Methods
 
 	public void wsConfirmExecute(){
 		String univdate=du.univfecha(du.getActDate());
 		isbusy=1;
-		
+
 		try {
 			conflag=0;
 
@@ -4918,7 +4921,7 @@ public class ComWS extends PBase {
 					"VALUES('"+gl.ruta+"','"+ du.univfechaseg() +"','"+gl.parNumVer +"','ANDR')");
 
 			if (commitSQL()==1) conflag=1; else conflag=0;
-					
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			fterr+="\n"+e.getMessage();
@@ -4972,12 +4975,12 @@ public class ComWS extends PBase {
 			} catch (Exception e) {}
 		}
 
-	}	
+	}
 
 	//endregion
-	
+
 	//region Aux
-	
+
 	public void comManual(View view) {
 		try{
 			Intent intent = new Intent(this,ComDrop.class);
@@ -4987,7 +4990,7 @@ public class ComWS extends PBase {
 		}
 
 	}
-	
+
 	public void getWSURL() {
 		Cursor DT;
 		String wsurl;
@@ -4996,7 +4999,7 @@ public class ComWS extends PBase {
 			txtRuta.setText(ruta);
 			txtEmp.setText(gEmpresa);
 		}
-		
+
 		try {
 
 			sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='"+ruta+"'";
@@ -5032,12 +5035,12 @@ public class ComWS extends PBase {
 			//txtWS.setText("");
 
 		}
-		
+
 	}
 
 	private boolean setComParams() {
 		String ss;
-		
+
 		ss=txtRuta.getText().toString().trim();
 
 		try{
@@ -5066,7 +5069,7 @@ public class ComWS extends PBase {
 
 	private int getDocCount(String ss,String pps) {
 
-	    Cursor DT;
+		Cursor DT;
 		int cnt = 0;
 		String st;
 
@@ -5075,14 +5078,14 @@ public class ComWS extends PBase {
 			sql=ss;
 			DT=Con.OpenDT(sql);
 
-            if (DT.getCount()>0){
+			if (DT.getCount()>0){
 				DT.moveToFirst();
-            	cnt=DT.getInt(0);
-            }
+				cnt=DT.getInt(0);
+			}
 
 			if(DT!=null) DT.close();
 
-            if (cnt>0) {
+			if (cnt>0) {
 				st=pps+" "+cnt;
 				sp=sp+st+", ";
 			}
@@ -5092,20 +5095,20 @@ public class ComWS extends PBase {
 			//mu.msgbox(sql+"\n"+e.getMessage());
 		}
 
-        return cnt;
+		return cnt;
 
-    }
+	}
 
 	private String getMac() {
 		WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 		WifiInfo info = manager.getConnectionInfo();
 		return info.getMacAddress();
 	}
-	
+
 	private int ultCorel() {
 		Cursor DT;
 		int crl = 0;
-		
+
 		try {
 			sql="SELECT CORELULT FROM P_COREL";
 			DT=Con.OpenDT(sql);
@@ -5119,8 +5122,8 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}	
-		
+		}
+
 		return crl;
 	}
 	//#HS_20181129_1006 Agregue funcion para obtener la serie.
@@ -5157,7 +5160,7 @@ public class ComWS extends PBase {
 			DT=Con.OpenDT(sql);
 
 			if(DT.getCount()>0){
-                DT.moveToFirst();
+				DT.moveToFirst();
 				fecha=DT.getInt(0);
 				if (fecha==0) 				{
 					fecha = 1001010000 ;//#HS_20181129_0945 Cambie los valores de fecha porque deben se yymmdd hhmm
@@ -5173,236 +5176,236 @@ public class ComWS extends PBase {
 		return fecha;
 	}
 
-    private int ultimoCierreFecha() {
-        Cursor DT;
-        int rslt=0;
+	private int ultimoCierreFecha() {
+		Cursor DT;
+		int rslt=0;
 
-        try {
-            sql="SELECT val1 FROM FinDia";
-            DT=Con.OpenDT(sql);
-            DT.moveToFirst();
-            rslt=DT.getInt(0);
+		try {
+			sql="SELECT val1 FROM FinDia";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+			rslt=DT.getInt(0);
 
 			if(DT!=null) DT.close();
 
-        } catch (Exception e) {
+		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            rslt=0;
-        }
+			rslt=0;
+		}
 
-        return rslt;
-    }
+		return rslt;
+	}
 
 	private void visibilidadBotones() {
 		Cursor dt;
 
 		boolean recep=false;
-		
+
 		esvacio=false;
 
-			try{
-				try {
-					sql="SELECT * FROM P_RUTA";
-					dt=Con.OpenDT(sql);
-					esvacio=dt.getCount()==0;
-				} catch (Exception e) {
-					//msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-					esvacio=true;
+		try{
+			try {
+				sql="SELECT * FROM P_RUTA";
+				dt=Con.OpenDT(sql);
+				esvacio=dt.getCount()==0;
+			} catch (Exception e) {
+				//msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+				esvacio=true;
+			}
+
+			//Inicializa estos layout en invisible
+			relExist.setVisibility(View.INVISIBLE);
+			relPrecio.setVisibility(View.INVISIBLE);
+			relStock.setVisibility(View.INVISIBLE);
+
+			//Si entra en modo administración, habilita los botones y se va
+			if (gl.modoadmin || gl.debug) {
+
+				txtRuta.setEnabled(true);
+				txtWS.setEnabled(true);
+				txtEmp.setEnabled(true);
+
+				if (esvacio) {
+					lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+					lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
+					lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
 				}
 
-				//Inicializa estos layout en invisible
-				relExist.setVisibility(View.INVISIBLE);
-				relPrecio.setVisibility(View.INVISIBLE);
-				relStock.setVisibility(View.INVISIBLE);
+				return;
+			}
 
-				//Si entra en modo administración, habilita los botones y se va
-				if (gl.modoadmin || gl.debug) {
+			//#HS_20181121_0910 Se creó la funcion Get_Fecha_Inventario().
+			if (!esvacio){
+				int fc=Get_Fecha_Inventario();
+				recep=fc==du.getActDate();
+			}
 
-					txtRuta.setEnabled(true);
-					txtWS.setEnabled(true);
-					txtEmp.setEnabled(true);
+			//Invisible botón y texto de envío
+			lblEnv.setVisibility(View.INVISIBLE);
+			imgEnv.setVisibility(View.INVISIBLE);
 
-					if (esvacio) {
-						lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
-                        lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
+			//Invisible botón y texto de envío manual
+			lblEnvM.setVisibility(View.INVISIBLE);
+			imgEnvM.setVisibility(View.INVISIBLE);
+
+			//Invisible botón y texto de recepción
+			lblRec.setVisibility(View.INVISIBLE);
+			imgRec.setVisibility(View.INVISIBLE);
+
+			//Tiene documentos
+			boolean TieneFact,TienePedidos,TieneCobros,TieneDevol,YaComunico, TieneInventario, TieneOtros;
+
+			if (!envioparcial){
+				TieneFact = (clsAppM.getDocCountTipo("Facturas",false)>0?true:false);
+				TienePedidos = (clsAppM.getDocCountTipo("Pedidos",false)>0?true:false);
+				TieneCobros = (clsAppM.getDocCountTipo("Cobros",false)>0?true:false);
+				TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",false)>0?true:false);
+				YaComunico=(claseFindia.getComunicacion() == 2?true:false);
+				TieneInventario=(clsAppM.getDocCountTipo("Inventario",false)>0?true:false);
+			}else{
+				TieneFact = (clsAppM.getDocCountTipo("Facturas",true)>0?true:false);
+				TienePedidos = (clsAppM.getDocCountTipo("Pedidos",true)>0?true:false);
+				TieneCobros = (clsAppM.getDocCountTipo("Cobros",true)>0?true:false);
+				TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",true)>0?true:false);
+				YaComunico=(claseFindia.getComunicacion() == 2?true:false);
+				TieneInventario=(clsAppM.getDocCountTipo("Inventario",true)>0?true:false);
+			}
+
+			if (gl.peModal.equalsIgnoreCase("TOL"))
+			{
+				if(claseFindia.yaHizoFindeDia())
+				{
+					if (YaComunico)
+					{
+						if ((rutatipo.equalsIgnoreCase("V") && !TieneInventario) || (!rutatipo.equalsIgnoreCase("V")))
+						{
+							lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
+							lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+							lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
+							if (StringUtils.equals(GetStatusRec(),"1"))
+							{
+								relExist.setVisibility(gl.peBotInv && !TieneFact?View.VISIBLE:View.INVISIBLE);
+								relStock.setVisibility(gl.peBotStock && TieneFact?View.VISIBLE:View.INVISIBLE);
+								relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+							}
+							else
+							{
+								relExist.setVisibility(View.INVISIBLE);
+								relStock.setVisibility(View.INVISIBLE);
+								relPrecio.setVisibility(View.INVISIBLE);
+							}
+						}
+						else if ((rutatipo.equalsIgnoreCase("V") && TieneInventario &&
+								(TieneFact || TieneCobros || TieneDevol || TienePedidos)) ||
+								(!rutatipo.equalsIgnoreCase("V")))
+						{
+							lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
+							lblEnv.setVisibility(View.VISIBLE); imgEnv.setVisibility(View.VISIBLE);
+							lblEnvM.setVisibility(View.VISIBLE);imgEnvM.setVisibility(View.VISIBLE);
+							relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+							relExist.setVisibility(View.INVISIBLE);
+							relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+						}
+					}
+				}
+				else
+				{
+					if ((!YaComunico) &&  !(TieneFact || TienePedidos) && !TieneCobros && !TieneDevol)
+					{
 						lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
+						lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+						lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
+						if (StringUtils.equals(GetStatusRec(),"1"))
+						{
+							relExist.setVisibility(gl.peBotInv && !TieneFact?View.VISIBLE:View.INVISIBLE);
+							relStock.setVisibility(gl.peBotStock && TieneFact?View.VISIBLE:View.INVISIBLE);
+							relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+						}
+						else
+						{
+							relExist.setVisibility(View.INVISIBLE);
+							relStock.setVisibility(View.INVISIBLE);
+							relPrecio.setVisibility(View.INVISIBLE);
+						}
+					}
+					else
+					{
+						if (YaComunico)
+						{
+							lblRec.setVisibility(View.VISIBLE);	imgRec.setVisibility(View.VISIBLE);
+							lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+							lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
+
+							if (StringUtils.equals(GetStatusRec(),"1"))
+							{
+								relExist.setVisibility(gl.peBotInv?View.VISIBLE:View.INVISIBLE);
+								relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+								relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+							}
+							else
+							{
+								relExist.setVisibility(View.INVISIBLE);
+								relStock.setVisibility(View.INVISIBLE);
+								relPrecio.setVisibility(View.INVISIBLE);
+							}
+						}
+						else
+						{
+							lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
+							lblEnv.setVisibility(View.VISIBLE);imgEnv.setVisibility(View.VISIBLE);
+							lblEnvM.setVisibility(View.VISIBLE);imgEnvM.setVisibility(View.VISIBLE);
+							relExist.setVisibility(View.INVISIBLE);
+							relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+							relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+						}
+					}
+				}
+			}
+			else
+			{
+				if(((rutatipo.equalsIgnoreCase("V")) || (rutatipo.equalsIgnoreCase("D")) && !TieneInventario)
+						||((!rutatipo.equalsIgnoreCase("V")) && (!rutatipo.equalsIgnoreCase("D"))))
+				{
+
+					lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
+					lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
+					lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
+
+					if (StringUtils.equals(GetStatusRec(),"1"))
+					{
+						relExist.setVisibility(gl.peBotInv?View.VISIBLE:View.INVISIBLE);
+						relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+						relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
+					}
+					else
+					{
+						relExist.setVisibility(View.INVISIBLE);
+						relStock.setVisibility(View.INVISIBLE);
+						relPrecio.setVisibility(View.INVISIBLE);
 					}
 
-					return;
 				}
-
-				//#HS_20181121_0910 Se creó la funcion Get_Fecha_Inventario().
-				if (!esvacio){
-					int fc=Get_Fecha_Inventario();
-					recep=fc==du.getActDate();
-				}
-
-				//Invisible botón y texto de envío
-				lblEnv.setVisibility(View.INVISIBLE);
-				imgEnv.setVisibility(View.INVISIBLE);
-
-                //Invisible botón y texto de envío manual
-                lblEnvM.setVisibility(View.INVISIBLE);
-                imgEnvM.setVisibility(View.INVISIBLE);
-
-				//Invisible botón y texto de recepción
-				lblRec.setVisibility(View.INVISIBLE);
-				imgRec.setVisibility(View.INVISIBLE);
-
-				//Tiene documentos
-				boolean TieneFact,TienePedidos,TieneCobros,TieneDevol,YaComunico, TieneInventario, TieneOtros;
-
-                if (!envioparcial){
-                    TieneFact = (clsAppM.getDocCountTipo("Facturas",false)>0?true:false);
-                    TienePedidos = (clsAppM.getDocCountTipo("Pedidos",false)>0?true:false);
-                    TieneCobros = (clsAppM.getDocCountTipo("Cobros",false)>0?true:false);
-                    TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",false)>0?true:false);
-                    YaComunico=(claseFindia.getComunicacion() == 2?true:false);
-                    TieneInventario=(clsAppM.getDocCountTipo("Inventario",false)>0?true:false);
-                }else{
-                    TieneFact = (clsAppM.getDocCountTipo("Facturas",true)>0?true:false);
-                    TienePedidos = (clsAppM.getDocCountTipo("Pedidos",true)>0?true:false);
-                    TieneCobros = (clsAppM.getDocCountTipo("Cobros",true)>0?true:false);
-                    TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",true)>0?true:false);
-                    YaComunico=(claseFindia.getComunicacion() == 2?true:false);
-                    TieneInventario=(clsAppM.getDocCountTipo("Inventario",true)>0?true:false);
-                }
-
-				if (gl.peModal.equalsIgnoreCase("TOL"))
-                    {
-                        if(claseFindia.yaHizoFindeDia())
-                            {
-                                if (YaComunico)
-                                {
-                                    if ((rutatipo.equalsIgnoreCase("V") && !TieneInventario) || (!rutatipo.equalsIgnoreCase("V")))
-                                        {
-                                            lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
-                                            lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
-                                            lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
-											if (StringUtils.equals(GetStatusRec(),"1"))
-												{
-													relExist.setVisibility(gl.peBotInv && !TieneFact?View.VISIBLE:View.INVISIBLE);
-													relStock.setVisibility(gl.peBotStock && TieneFact?View.VISIBLE:View.INVISIBLE);
-													relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
-												}
-											else
-												{
-													relExist.setVisibility(View.INVISIBLE);
-													relStock.setVisibility(View.INVISIBLE);
-													relPrecio.setVisibility(View.INVISIBLE);
-												}
-                                        }
-                                    else if ((rutatipo.equalsIgnoreCase("V") && TieneInventario &&
-                                            (TieneFact || TieneCobros || TieneDevol || TienePedidos)) ||
-                                            (!rutatipo.equalsIgnoreCase("V")))
-                                        {
-                                            lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
-                                            lblEnv.setVisibility(View.VISIBLE); imgEnv.setVisibility(View.VISIBLE);
-                                            lblEnvM.setVisibility(View.VISIBLE);imgEnvM.setVisibility(View.VISIBLE);
-                                            relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
-                                            relExist.setVisibility(View.INVISIBLE);
-                                            relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
-                                        }
-                                }
-                            }
-                        else
-                            {
-                                if ((!YaComunico) &&  !(TieneFact || TienePedidos) && !TieneCobros && !TieneDevol)
-                                    {
-                                        lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
-                                        lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
-                                        lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
-										if (StringUtils.equals(GetStatusRec(),"1"))
-											{
-												relExist.setVisibility(gl.peBotInv && !TieneFact?View.VISIBLE:View.INVISIBLE);
-												relStock.setVisibility(gl.peBotStock && TieneFact?View.VISIBLE:View.INVISIBLE);
-												relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
-											}
-										else
-											{
-												relExist.setVisibility(View.INVISIBLE);
-												relStock.setVisibility(View.INVISIBLE);
-												relPrecio.setVisibility(View.INVISIBLE);
-											}
-                                    }
-                                else
-                                    {
-                                        if (YaComunico)
-                                            {
-                                                lblRec.setVisibility(View.VISIBLE);	imgRec.setVisibility(View.VISIBLE);
-                                                lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
-                                                lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
-
-												if (StringUtils.equals(GetStatusRec(),"1"))
-													{
-														relExist.setVisibility(gl.peBotInv?View.VISIBLE:View.INVISIBLE);
-														relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
-														relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
-													}
-												else
-													{
-														relExist.setVisibility(View.INVISIBLE);
-														relStock.setVisibility(View.INVISIBLE);
-														relPrecio.setVisibility(View.INVISIBLE);
-													}
-                                            }
-										else
-                                            {
-                                                lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
-                                                lblEnv.setVisibility(View.VISIBLE);imgEnv.setVisibility(View.VISIBLE);
-                                                lblEnvM.setVisibility(View.VISIBLE);imgEnvM.setVisibility(View.VISIBLE);
-												relExist.setVisibility(View.INVISIBLE);
-												relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
-												relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
-                                            }
-                                    }
-                            }
-                    }
 				else
-                    {
-                        if(((rutatipo.equalsIgnoreCase("V")) || (rutatipo.equalsIgnoreCase("D")) && !TieneInventario)
-                                ||((!rutatipo.equalsIgnoreCase("V")) && (!rutatipo.equalsIgnoreCase("D"))))
-                            {
+				{
+					if (((((rutatipo.equalsIgnoreCase("V")) || (rutatipo.equalsIgnoreCase("D")))&& TieneInventario
+							&& (TieneFact || TieneCobros || TienePedidos) || TieneDevol)) ||((!rutatipo.equalsIgnoreCase("V"))
+							&& (!rutatipo.equalsIgnoreCase("D"))))
+					{
+						lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
+						lblEnv.setVisibility(View.VISIBLE);imgEnv.setVisibility(View.VISIBLE);
+						lblEnvM.setVisibility(View.VISIBLE);imgEnvM.setVisibility(View.VISIBLE);
+						relExist.setVisibility(View.INVISIBLE);
+						relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
+						relPrecio.setVisibility(View.INVISIBLE);
+					}
+				}
+			}
 
-                            	lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
-								lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
-                                lblEnvM.setVisibility(View.INVISIBLE);imgEnvM.setVisibility(View.INVISIBLE);
-
-								if (StringUtils.equals(GetStatusRec(),"1"))
-									{
-										relExist.setVisibility(gl.peBotInv?View.VISIBLE:View.INVISIBLE);
-										relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
-										relPrecio.setVisibility(gl.peBotPrec?View.VISIBLE:View.INVISIBLE);
-									}
-                                else
-									{
-										relExist.setVisibility(View.INVISIBLE);
-										relStock.setVisibility(View.INVISIBLE);
-										relPrecio.setVisibility(View.INVISIBLE);
-									}
-
-                            }
-                        else
-                            {
-                                if (((((rutatipo.equalsIgnoreCase("V")) || (rutatipo.equalsIgnoreCase("D")))&& TieneInventario
-                                && (TieneFact || TieneCobros || TienePedidos) || TieneDevol)) ||((!rutatipo.equalsIgnoreCase("V"))
-                                        && (!rutatipo.equalsIgnoreCase("D"))))
-                                    {
-                                        lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
-										lblEnv.setVisibility(View.VISIBLE);imgEnv.setVisibility(View.VISIBLE);
-                                        lblEnvM.setVisibility(View.VISIBLE);imgEnvM.setVisibility(View.VISIBLE);
-                                        relExist.setVisibility(View.INVISIBLE);
-										relStock.setVisibility(gl.peBotStock?View.VISIBLE:View.INVISIBLE);
-                                        relPrecio.setVisibility(View.INVISIBLE);
-                                    }
-                            }
-                    }
-
-			}catch (Exception e) {
-			    addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(), sql);
-		    }
+		}catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(), sql);
+		}
 	}
-	
+
 	private void otrosParametros() {
 		try {
 			AppMethods app=new AppMethods(this,gl,Con,db);
@@ -5450,29 +5453,29 @@ public class ComWS extends PBase {
 	}
 
 	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
-    public boolean ExistenDatosSinEnviar(){
+	public boolean ExistenDatosSinEnviar(){
 
-        try {
+		try {
 
-            int cantFact,CantPedidos,CantCobros,CantDevol,CantInventario;
+			int cantFact,CantPedidos,CantCobros,CantDevol,CantInventario;
 
-            clsAppM = new AppMethods(this, gl, Con, db);
+			clsAppM = new AppMethods(this, gl, Con, db);
 
-            cantFact = clsAppM.getDocCountTipo("Facturas",true);
-            CantPedidos = clsAppM.getDocCountTipo("Pedidos",true);
-            CantCobros = clsAppM.getDocCountTipo("Cobros",true);
-            CantDevol = clsAppM.getDocCountTipo("Devoluciones",true);
-            CantInventario = clsAppM.getDocCountTipo("Inventario",true);
+			cantFact = clsAppM.getDocCountTipo("Facturas",true);
+			CantPedidos = clsAppM.getDocCountTipo("Pedidos",true);
+			CantCobros = clsAppM.getDocCountTipo("Cobros",true);
+			CantDevol = clsAppM.getDocCountTipo("Devoluciones",true);
+			CantInventario = clsAppM.getDocCountTipo("Inventario",true);
 
-           return  ((cantFact>0) || (CantCobros>0) || (CantDevol>0) || (CantPedidos>0) || (CantInventario>0));
+			return  ((cantFact>0) || (CantCobros>0) || (CantDevol>0) || (CantPedidos>0) || (CantInventario>0));
 
-        } catch (Exception e) {
+		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			msgbox(e.getMessage());
-            return false;
-        }
+			return false;
+		}
 
-    };
+	};
 
 	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
 	public boolean ExisteInventario(){
@@ -5694,15 +5697,15 @@ public class ComWS extends PBase {
 
 	}
 
-    public void SetStatusRecToTrans(String estado)    {
-        try         {
-            sql = "UPDATE P_RUTA SET PARAM2='" + StringUtils.trim(estado) + "'";
-            dbT.execSQL(sql);
-        } catch (Exception ex)  {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+ " " + ex.getMessage());
-        }
-    }
+	public void SetStatusRecToTrans(String estado)    {
+		try         {
+			sql = "UPDATE P_RUTA SET PARAM2='" + StringUtils.trim(estado) + "'";
+			dbT.execSQL(sql);
+		} catch (Exception ex)  {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+ " " + ex.getMessage());
+		}
+	}
 
 	public String GetStatusRec() 	{
 		Cursor DT;
@@ -5731,7 +5734,7 @@ public class ComWS extends PBase {
 	//endregion
 
 	//region Activity Events
-	
+
 	@Override
 	public void onBackPressed() {
 		try{

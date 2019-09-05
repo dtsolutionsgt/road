@@ -115,6 +115,20 @@ public class MainActivity extends PBase {
 
             lblVer.setText(gl.parTipoVer + " Version " + gl.parNumVer + gl.parFechaVer);
 
+            try {
+
+                File file1 = new File(Environment.getExternalStorageDirectory(), "/debug.txt");
+                File ffile = new File(file1.getPath());
+                if (ffile.exists()) {
+                    gl.debug=true;
+                }else {
+                    gl.debug=false;
+                }
+
+            } catch (Exception e) {
+                gl.debug=false;
+            }
+
             // DB VERSION
             dbVers = new BaseDatosVersion(this, db, Con);
             dbVers.checkVersion(1);

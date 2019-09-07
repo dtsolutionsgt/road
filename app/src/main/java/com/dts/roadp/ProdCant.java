@@ -640,7 +640,7 @@ public class ProdCant extends PBase {
 			lblCantPeso=(TextView) findViewById(R.id.textView21);lblCantPeso.setText("");lblCantPeso.setVisibility(View.INVISIBLE);
 			lblCodProd=(TextView) findViewById(R.id.txtRoadTit);
 			imgProd=(ImageView) findViewById(R.id.imgPFoto);
-			imgUpd=(ImageView) findViewById(R.id.imageView1);
+			imgUpd=(ImageView) findViewById(R.id.ImageView1);
 			imgDel=(ImageView) findViewById(R.id.imageView2);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

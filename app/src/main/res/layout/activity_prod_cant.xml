@@ -313,7 +313,7 @@
         android:src="@drawable/fotos_neg" />
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/ImageView1"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_above="@+id/imgPFoto"

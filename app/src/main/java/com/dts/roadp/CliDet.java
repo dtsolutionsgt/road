@@ -1070,7 +1070,7 @@ public class CliDet extends PBase {
 		String ss="";
 
 		try {
-			sql="SELECT RUTA FROM P_CLIRUTA WHERE (CLIENTE='"+cod+"') ORDER BY RUTA";
+			sql="SELECT DISTINCT RUTA FROM P_CLIRUTA WHERE (CLIENTE='"+cod+"') AND RUTA <> '"+"' ORDER BY RUTA";
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()>0) {

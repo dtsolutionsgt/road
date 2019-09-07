@@ -1845,8 +1845,8 @@ public class ComWS extends PBase {
 					dbT.execSQL(sql);
 				} catch (Exception e) {
 					Log.d("M", "Something happend there " + e.getMessage());
-					addlog(new Object() {
-					}.getClass().getEnclosingMethod().getName(), e.getMessage() + "EJC", "Yo fui " + sql);
+					/*addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage() + "EJC", "Yo fui " + sql);*/
 					Log.e("z", e.getMessage());
 				}
 
@@ -1860,8 +1860,8 @@ public class ComWS extends PBase {
 				} catch (Exception e) {
 					Log.e("z", e.getMessage());
 					ferr += " " +e.getMessage();
-					addlog(new Object() {
-					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					/*addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);*/
 				}
 			}
 
@@ -1893,6 +1893,7 @@ public class ComWS extends PBase {
 				ConT.close();
 			} catch (Exception e) {
 				//addlog(new Object() {	}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+				Log.e("Error", e.getMessage());
 			}
 
 			try {
@@ -1900,6 +1901,7 @@ public class ComWS extends PBase {
 			} catch (Exception e) {
 				//addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 				//msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+				Log.e("Error", e.getMessage());
 			}
 
 			return true;
@@ -2451,7 +2453,7 @@ public class ComWS extends PBase {
 				SQL =  "SELECT CODIGO,VALOR,PRODUCTO,PRECIO,UNIDADMEDIDA FROM TMP_PRECESPEC ";
 				SQL += " WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') ";
 			} else {
-				SQL =  "SELECT CODIGO,VALOR,PRODUCTO,PRECIO,UNIDADMEDIDA FROM TMP_PRECESPEC ";
+				SQL =  "SELECT DISTINCT CODIGO,VALOR,PRODUCTO,PRECIO,UNIDADMEDIDA FROM TMP_PRECESPEC ";
 				SQL += "WHERE (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') AND ";
 				SQL += "RUTA IN (SELECT DISTINCT RUTA FROM VENDEDORES WHERE Codigo IN ( ";
 				SQL += "SELECT VENDEDOR FROM P_RUTA WHERE CODIGO='" + ActRuta + "')) ";

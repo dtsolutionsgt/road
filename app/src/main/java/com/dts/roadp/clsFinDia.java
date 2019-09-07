@@ -292,6 +292,7 @@ public class clsFinDia extends PBase{
             msgbox("updateImprimioCierreZ: " + e.getMessage());
         }
     }
+
     //#CKFK 20190305 Creé esta función para actualizar el val8 en la tabla FinDia
     public void updateGrandTotalCorelZ(double valor, int corel){
         try{

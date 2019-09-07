@@ -778,46 +778,47 @@ public class Menu extends PBase {
 	public void showVoidMenuPreventa() {
 
 		try{
+            final AlertDialog Dialog;
+            final String[] selitems = {"Pedido","Recibo","Deposito", "Nota crédito"};
 
-		}catch (Exception e){final AlertDialog Dialog;
-			final String[] selitems = {"Pedido","Recibo","Deposito", "Nota crédito"};
+            menudlg = new AlertDialog.Builder(this);
+            menudlg.setIcon(R.drawable.anulacion48);
+            menudlg.setTitle("Anulación");
 
-			menudlg = new AlertDialog.Builder(this);
-			menudlg.setIcon(R.drawable.anulacion48);
-			menudlg.setTitle("Anulaci�n");
+            menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
 
-			menudlg.setItems(selitems, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int item) {
+                    switch (item) {
+                        case 0:
+                            gl.tipo=0;break;
+                        case 1:
+                            gl.tipo=1;break;
+                        case 2:
+                            gl.tipo=2;break;
+                        case 3:
+                            gl.tipo=6;break;
+                    }
 
-					switch (item) {
-						case 0:
-							gl.tipo=0;break;
-						case 1:
-							gl.tipo=1;break;
-						case 2:
-							gl.tipo=2;break;
-						case 3:
-							gl.tipo=6;break;
-					}
+                    menuAnulDoc();
+                    dialog.cancel();
+                }
+            });
 
-					menuAnulDoc();
-					dialog.cancel();
-				}
-			});
+            menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
 
-			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.cancel();
-				}
-			});
+            Dialog = menudlg.create();
+            Dialog.show();
 
-			Dialog = menudlg.create();
-			Dialog.show();
+            Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+            nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+            nbutton.setTextColor(Color.WHITE);
 
-			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
-			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 

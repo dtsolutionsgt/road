@@ -582,7 +582,7 @@ public class FinDia extends PBase {
                 }
 
                 //#CKFK 20190304 Agregué validación para verificar si ya se realizó la impresión del depósito.
-                if (gl.sinimp) {
+                if (gl.impresora.equalsIgnoreCase("N")) {
                     claseFinDia.updateImpDeposito(3);
                 } else {
                     if (claseFinDia.getImpresionDeposito() <1) {
@@ -648,7 +648,7 @@ public class FinDia extends PBase {
             File f2 = new File(Environment.getExternalStorageDirectory() + "/print.txt");
             FileUtils.copyFile(f1, f2);
 
-            if (!gl.sinimp) {
+            if (gl.impresora.equalsIgnoreCase("S")) {
                 if (prn.isEnabled())  {
                     final Handler shandler = new Handler();
                     shandler.postDelayed(new Runnable() {
@@ -659,6 +659,8 @@ public class FinDia extends PBase {
                         }
                     }, 2000);
                 }
+            }else{
+                claseFinDia.updateImprimioCierreZ(7);
             }
 
             vImprime=true;

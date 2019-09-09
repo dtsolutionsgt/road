@@ -32,7 +32,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".exist"
+            android:name=".Exist"
             android:label="@string/title_activity_exist"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity

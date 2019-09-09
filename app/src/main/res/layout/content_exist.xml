@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".exist"
+    tools:context=".Exist"
     tools:showIn="@layout/activity_exist">
 
 </android.support.constraint.ConstraintLayout>

@@ -307,6 +307,7 @@ public class ComWS extends PBase {
 				msgAskConfirmaRecibido();
 			}
 		} else {
+			claseFindia.eliminarTablasD();
 			msgAskConfirmaRecibido();
 		}
 

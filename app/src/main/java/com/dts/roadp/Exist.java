@@ -22,7 +22,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 
-public class exist extends PBase {
+public class Exist extends PBase {
 
     private ListView listView;
     private EditText txtFilter;
@@ -76,15 +76,15 @@ public class exist extends PBase {
 
         printclose= new Runnable() {
             public void run() {
-                exist.super.finish();
+                Exist.super.finish();
             }
         };
 
         prn=new printer(this,printclose,gl.validimp);
         doc=new clsDocExist(this,prn.prw,"");
 
-		float cant = CantExistencias();
-		Toast.makeText(this, "Cantidad." + cant, Toast.LENGTH_SHORT).show();
+        float cant = CantExistencias();
+        Toast.makeText(this, "Cantidad." + cant, Toast.LENGTH_SHORT).show();
 
     }
 

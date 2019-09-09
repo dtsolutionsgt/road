@@ -26,7 +26,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class DevCliCant extends PBase {
-	
+
 	private EditText txtCant,lblPrec,txtLote,txtkgs,txtPrecio;
 	private RelativeLayout rlCant;
 	private TextView lblDesc,lblBU,lblPrecVenta;
@@ -34,13 +34,13 @@ public class DevCliCant extends PBase {
 	private CheckBox chkTieneLote;
 
 	private AppMethods app;
-	
+
 	private ArrayList<String> spincode= new ArrayList<String>();
 	private ArrayList<String> spinlist = new ArrayList<String>();
 
 	private ArrayList<Double> cmbumfact= new ArrayList<Double>();
 	private ArrayList<String> cmbumlist = new ArrayList<String>();
-	
+
 	private String prodid,estado,razon,devrazon,raz;
 	private double cant,icant,factor=0.0,precioventa=0.0,pesoprom=0.0,clcpeso=0.0;
 	private  String um="", ummin="",umcambiar="";
@@ -53,12 +53,12 @@ public class DevCliCant extends PBase {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_dev_cli_cant);
-		
+
 		super.InitBase();
 		addlog("DevCliCant",""+du.getActDateTime(),gl.vend);
-		
+
 		setControls();
-		
+
 		prodid=gl.prod;
 		estado=gl.devtipo;
 		raz=gl.devrazon;
@@ -68,7 +68,7 @@ public class DevCliCant extends PBase {
 		prc=new Precio(this,mu,2);
 
 		gl.dval=-1;
-		
+
 		showkeyb();
 
 		app = new AppMethods(this, gl, Con, db);
@@ -87,19 +87,19 @@ public class DevCliCant extends PBase {
 
 		setHandlers();
 
-        txtkgs.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		txtkgs.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 		txtCant.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 		txtPrecio.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
 		//Limita cantidad de decimales para los EditText.
-        txtPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(2)});
-       //txtCant.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(gl.peDec)});
-        txtkgs.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(gl.peDec)});
+		txtPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(2)});
+		//txtCant.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(gl.peDec)});
+		txtkgs.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(gl.peDec)});
 
 	}
 
 	// Events
-	
+
 	public void sendCant(View view) {
 
 		try{
@@ -187,18 +187,18 @@ public class DevCliCant extends PBase {
 			gl.dvpreclista = mu.round(gl.dvpreclista,2);
 			//hidekeyb();
 			super.finish();
-			
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
+
 	}
-	
+
 	// Main
-	
+
 	private void setHandlers(){
-		
+
 		try{
 			spin.setOnItemSelectedListener(new OnItemSelectedListener() {
 				@Override
@@ -364,14 +364,14 @@ public class DevCliCant extends PBase {
 		String ubas;
 
 		int ex=0;
-		
+
 		try {
 
 			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,PESO_PROMEDIO,UNID_INV "+
-				 " FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
-           	DT=Con.OpenDT(sql);
+					" FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
+			DT=Con.OpenDT(sql);
 
-           	if (DT.getCount()>0){
+			if (DT.getCount()>0){
 				DT.moveToFirst();
 				ubas=DT.getString(9);
 				pesoprom = DT.getDouble(8);
@@ -450,11 +450,11 @@ public class DevCliCant extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			icant=0;
-	    }
+		}
 
-	    if (estado.equals("B")){
-	        spin.setEnabled(false);
-        }
+		if (estado.equals("B")){
+			spin.setEnabled(false);
+		}
 
 	}
 
@@ -487,10 +487,10 @@ public class DevCliCant extends PBase {
 			cant=Double.parseDouble(txtCant.getText().toString());
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			cant=-1; 
+			cant=-1;
 		}
 	}
-	
+
 	private void parseCant(double c) {
 		try{
 			DecimalFormat frmdec = new DecimalFormat("#####");
@@ -505,29 +505,29 @@ public class DevCliCant extends PBase {
 	}
 
 	// Aux
-	
+
 	private void fillSpinner(){
 		Cursor DT;
 		String icode,iname;
-			
+
 		spincode.add("0");
 		spinlist.add("Seleccione una razón ....");
-		  
+
 		try {
-				
+
 			sql="SELECT CODIGO,DESCRIPCION FROM P_CODDEV WHERE ESTADO='"+estado+"'  ORDER BY DESCRIPCION";
 			DT=Con.OpenDT(sql);
-					
+
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
-					  
-			  icode=DT.getString(0);
-			  iname=DT.getString(1);
-				  
-			  spincode.add(icode);
-			  spinlist.add(iname);
-			  
-			  DT.moveToNext();
+
+				icode=DT.getString(0);
+				iname=DT.getString(1);
+
+				spincode.add(icode);
+				spinlist.add(iname);
+
+				DT.moveToNext();
 			}
 
 			if(DT!=null) DT.close();
@@ -538,22 +538,22 @@ public class DevCliCant extends PBase {
 		} catch (Exception e) {
 
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		   	mu.msgbox( e.getMessage());
-	    }
-					
+			mu.msgbox( e.getMessage());
+		}
+
 		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, spinlist);
 		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			
+
 		spin.setAdapter(dataAdapter);
-			
+
 		try {
 			spin.setSelection(0);
 		} catch (Exception e) {
 
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			spin.setSelection(0);
-	    }
-		
+		}
+
 	}
 
 	private void fillcmbUM() {
@@ -605,20 +605,20 @@ public class DevCliCant extends PBase {
 	private void setSpinVal(String vc){
 		int pos=0;
 		String s;
-		
+
 		for(int i = 0; i < spincode.size(); i++ ) {
 			s=spincode.get(i);
 			if (s.equalsIgnoreCase(vc)) {
 				pos=i;break;
 			}
-		}	
-		
+		}
+
 		try {
 			spin.setSelection(pos);
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			spin.setSelection(0);
-	    }
+		}
 	}
 
 	public void setComboValor(String um){
@@ -708,7 +708,7 @@ public class DevCliCant extends PBase {
 			}else {
 
 				sql = " SELECT UM_SALIDA FROM P_PRODUCTO "+
-				" WHERE CODIGO = '" + prodid + "' AND ES_PROD_BARRA = 1 ";
+						" WHERE CODIGO = '" + prodid + "' AND ES_PROD_BARRA = 1 ";
 				dt=Con.OpenDT(sql);
 
 				if (dt.getCount()>0){
@@ -781,14 +781,14 @@ public class DevCliCant extends PBase {
 		}
 	}
 
-    @Override
-    public void onBackPressed() {
-        try{
-            super.onBackPressed();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
+	@Override
+	public void onBackPressed() {
+		try{
+			super.onBackPressed();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 
-    }
+	}
 
 }

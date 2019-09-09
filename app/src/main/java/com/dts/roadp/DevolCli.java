@@ -21,7 +21,7 @@ public class DevolCli extends PBase {
 
 	private ListView listView;
 	private TextView lblCantProds,lblCantUnd,lblCantKgs,lblCantTotal;
-	
+
 	private ArrayList<clsClasses.clsCFDV> items= new ArrayList<clsClasses.clsCFDV>();
 	private ListAdaptDevCli adapter;
 	private clsClasses.clsCFDV selitem;
@@ -42,28 +42,28 @@ public class DevolCli extends PBase {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_devol_cli);
-		
+
 		super.InitBase();
 		addlog("DevolCli",""+du.getActDateTime(),gl.vend);
-		
+
 		listView = (ListView) findViewById(R.id.listView1);
-        lblCantProds = (TextView) findViewById(R.id.lblCantProds);
-        lblCantUnd = (TextView) findViewById(R.id.lblCantUnd);
-        lblCantKgs = (TextView) findViewById(R.id.lblCantKgs);
-        lblCantTotal = (TextView) findViewById(R.id.lblCantTotal);
+		lblCantProds = (TextView) findViewById(R.id.lblCantProds);
+		lblCantUnd = (TextView) findViewById(R.id.lblCantUnd);
+		lblCantKgs = (TextView) findViewById(R.id.lblCantKgs);
+		lblCantTotal = (TextView) findViewById(R.id.lblCantTotal);
 
 		emp=gl.emp;
 		estado=gl.devtipo;
 		cliid=gl.cliente;
 
 		app = new AppMethods(this, gl, Con, db);
-		
+
 		setHandlers();
-		
+
 		browse=0;
 		fecha=du.getActDateTime();
 		gl.devrazon="0";
-		
+
 		clearData();
 
 		printcallback= new Runnable() {
@@ -86,8 +86,8 @@ public class DevolCli extends PBase {
 
 		printclose= new Runnable() {
 			public void run() {
-			limpiavariables_devol();
-			DevolCli.super.finish();
+				limpiavariables_devol();
+				DevolCli.super.finish();
 			}
 		};
 
@@ -99,7 +99,7 @@ public class DevolCli extends PBase {
 
 
 	// Events
-	
+
 	public void showProd(View view) {
 		try{
 
@@ -112,8 +112,8 @@ public class DevolCli extends PBase {
 			mu.msgbox("showProd:  " + e.getMessage());
 		}
 
-	}	
-	
+	}
+
 	public void finishDevol(View view){
 		try{
 			if (!hasProducts()) {
@@ -129,7 +129,7 @@ public class DevolCli extends PBase {
 
 
 	// Main
-	
+
 	private void setHandlers(){
 
 		try{
@@ -137,14 +137,14 @@ public class DevolCli extends PBase {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
 
-						Object lvObj = listView.getItemAtPosition(position);
-						clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
+					Object lvObj = listView.getItemAtPosition(position);
+					clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
 
-						adapter.setSelectedIndex(position);
+					adapter.setSelectedIndex(position);
 
-                        prodid = vItem.Cod;
+					prodid = vItem.Cod;
 
-						updCant(vItem.id);
+					updCant(vItem.id);
 
 				}
 			});
@@ -170,31 +170,31 @@ public class DevolCli extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("setHandlers: " + e.getMessage());
 		}
-	    
+
 	}
-	
+
 	private void listItems(){
 		Cursor DT;
-		clsClasses.clsCFDV vItem;	
+		clsClasses.clsCFDV vItem;
 		String s;
 
-        cntprd = 0;
-        cntunis = 0;
-        cntkgs = 0;
-        cntotl = 0;
+		cntprd = 0;
+		cntunis = 0;
+		cntkgs = 0;
+		cntotl = 0;
 
 		items.clear();
-		
+
 		try {
-			
+
 			sql="SELECT T_CxCD.CODIGO, T_CxCD.CANT, P_CODDEV.DESCRIPCION, P_PRODUCTO.DESCCORTA, T_CxCD.ITEM,T_CxCD.PESO,T_CxCD.TOTAL "+
-			     " FROM T_CxCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_CxCD.CODIGO "+
-				 " LEFT JOIN P_CODDEV ON (P_CODDEV.CODIGO=T_CxCD.CODDEV AND P_CODDEV.ESTADO='"+estado+"') "+
-			     " ORDER BY P_PRODUCTO.DESCCORTA";
-			
+					" FROM T_CxCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_CxCD.CODIGO "+
+					" LEFT JOIN P_CODDEV ON (P_CODDEV.CODIGO=T_CxCD.CODDEV AND P_CODDEV.ESTADO='"+estado+"') "+
+					" ORDER BY P_PRODUCTO.DESCCORTA";
+
 			DT=Con.OpenDT(sql);
 			if (DT.getCount()==0) {return;}
-			
+
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 
@@ -214,24 +214,24 @@ public class DevolCli extends PBase {
 
 				items.add(vItem);
 
-			 	// vItem.Cod = gl.CodDev;
-			  	DT.moveToNext();
+				// vItem.Cod = gl.CodDev;
+				DT.moveToNext();
 			}
 
-            lblCantProds.setText(String.valueOf(cntprd));
-            lblCantUnd.setText(String.valueOf(cntunis));
-            lblCantKgs.setText(String.valueOf(cntkgs));
-            lblCantTotal.setText(mu.frmcur(cntotl));
+			lblCantProds.setText(String.valueOf(cntprd));
+			lblCantUnd.setText(String.valueOf(cntunis));
+			lblCantKgs.setText(String.valueOf(cntkgs));
+			lblCantTotal.setText(mu.frmcur(cntotl));
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox( e.getMessage());
-	    }
-			 
+			mu.msgbox( e.getMessage());
+		}
+
 		adapter=new ListAdaptDevCli(this,items);
 		listView.setAdapter(adapter);
 	}
-	
+
 	private void processItem(){
 
 		try{
@@ -248,12 +248,12 @@ public class DevolCli extends PBase {
 		}
 
 	}
-	
+
 	private void setCant(){
 		try{
 			browse=2;
 
-          	itempos=-1;
+			itempos=-1;
 			((appGlobals) vApp).prod=prodid;
 			Intent intent = new Intent(this,DevCliCant.class);
 			startActivity(intent);
@@ -262,7 +262,7 @@ public class DevolCli extends PBase {
 		}
 
 	}
-	
+
 	private void updCant(int item){
 		Cursor DT;
 		String prid,rz;
@@ -273,21 +273,21 @@ public class DevolCli extends PBase {
 
 			if(DT.getCount()==0) return;
 
-			DT.moveToFirst();	
-			
+			DT.moveToFirst();
+
 			prid=DT.getString(0);
 			rz=DT.getString(1);
 
 
-		browse=2;
-		
-		itempos=item;
-		gl.prod=prid;
-		gl.devrazon=rz;
-		//((appGlobals) vApp).dval=pcant;
+			browse=2;
 
-		Intent intent = new Intent(this,DevCliCant.class);
-		startActivity(intent);
+			itempos=item;
+			gl.prod=prid;
+			gl.devrazon=rz;
+			//((appGlobals) vApp).dval=pcant;
+
+			Intent intent = new Intent(this,DevCliCant.class);
+			startActivity(intent);
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -295,7 +295,7 @@ public class DevolCli extends PBase {
 		}
 
 	}
-	
+
 	private void processCant(){
 		double cnt;
 		String raz;
@@ -314,41 +314,41 @@ public class DevolCli extends PBase {
 		}
 
 	}
-	
+
 	private void addItem(String raz){
 		Cursor DT;
 		int id;
-		
+
 		try {
 			sql="DELETE FROM T_CxCD WHERE item="+itempos;
 			db.execSQL(sql);
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-		
+
 		try {
 			sql="DELETE FROM T_CxCD WHERE CODIGO='"+prodid+"' AND CODDEV='"+raz+"'";
 			db.execSQL(sql);
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-		
+
 		try {
-			sql="SELECT MAX(Item) FROM T_CxCD";	
+			sql="SELECT MAX(Item) FROM T_CxCD";
 			DT=Con.OpenDT(sql);
-			DT.moveToFirst();	
+			DT.moveToFirst();
 			id=DT.getInt(0);
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			id=0;
-		}	
-		
+		}
+
 		id+=1;
-		
+
 		try {
-			
+
 			ins.init("T_CxCD");
-			
+
 			ins.add("Item",id);
 			ins.add("CODIGO",prodid);
 			ins.add("CANT",cant);
@@ -360,20 +360,20 @@ public class DevolCli extends PBase {
 			ins.add("PESO",gl.dvpeso);
 			ins.add("FECHA_CAD",0);
 			ins.add("LOTE",gl.dvlote);
-            ins.add("UMVENTA",gl.dvumventa);
-            ins.add("UMSTOCK",gl.dvumstock);
-            ins.add("UMPESO",gl.dvumpeso);
-            ins.add("FACTOR",gl.dvfactor);
-            ins.add("POR_PESO",(gl.dvporpeso?"S":"N"));
+			ins.add("UMVENTA",gl.dvumventa);
+			ins.add("UMSTOCK",gl.dvumstock);
+			ins.add("UMPESO",gl.dvumpeso);
+			ins.add("FACTOR",gl.dvfactor);
+			ins.add("POR_PESO",(gl.dvporpeso?"S":"N"));
 			ins.add("TIENE_LOTE",gl.tienelote);
 
-	    	db.execSQL(ins.sql());
-	    	
+			db.execSQL(ins.sql());
+
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
-		}	
-		
+		}
+
 		try {
 			sql="DELETE FROM T_CxCD WHERE CANT=0";
 			db.execSQL(sql);
@@ -381,16 +381,16 @@ public class DevolCli extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
-		
+
 		listItems();
-				
+
 	}
-	
+
 	private void saveDevol(){
 		Cursor DT;
 		String corel,pcod;
 		Double pcant;
-		
+
 		gl.dvcorreld = obtienecorrel("D");
 		gl.dvcorrelnc = obtienecorrel("NC");
 
@@ -401,159 +401,159 @@ public class DevolCli extends PBase {
 
 		try {
 
-		    if (gl.tiponcredito==1){
+			if (gl.tiponcredito==1){
 
-                db.beginTransaction();
+				db.beginTransaction();
 
-                ins.init("D_CxC");
+				ins.init("D_CxC");
 
-                ins.add("COREL",gl.dvcorreld);
-                ins.add("RUTA",gl.ruta);
-                ins.add("CLIENTE",gl.cliente);
-                ins.add("FECHA",fecha);
-                ins.add("ANULADO","N");
-                ins.add("EMPRESA",gl.emp);
-                ins.add("TIPO",estado);
-                ins.add("REFERENCIA","Ninguna");
-                ins.add("IMPRES",0);
-                ins.add("STATCOM","N");
-                ins.add("VENDEDOR",gl.vend);
-                ins.add("TOTAL",cntotl);
-                ins.add("SUPERVISOR",gl.codSupervisor);
-                ins.add("AYUDANTE",gl.ayudanteID);
-                ins.add("CODIGOLIQUIDACION",0);
-                ins.add("ESTADO","S");
+				ins.add("COREL",gl.dvcorreld);
+				ins.add("RUTA",gl.ruta);
+				ins.add("CLIENTE",gl.cliente);
+				ins.add("FECHA",fecha);
+				ins.add("ANULADO","N");
+				ins.add("EMPRESA",gl.emp);
+				ins.add("TIPO",estado);
+				ins.add("REFERENCIA","Ninguna");
+				ins.add("IMPRES",0);
+				ins.add("STATCOM","N");
+				ins.add("VENDEDOR",gl.vend);
+				ins.add("TOTAL",cntotl);
+				ins.add("SUPERVISOR",gl.codSupervisor);
+				ins.add("AYUDANTE",gl.ayudanteID);
+				ins.add("CODIGOLIQUIDACION",0);
+				ins.add("ESTADO","S");
 
-                db.execSQL(ins.sql());
+				db.execSQL(ins.sql());
 
-                ins.init("D_NOTACRED");
+				ins.init("D_NOTACRED");
 
-                ins.add("COREL",gl.dvcorrelnc);
-                ins.add("ANULADO","N");
-                ins.add("FECHA",fecha);
-                ins.add("RUTA",gl.ruta);
-                ins.add("VENDEDOR",gl.vend);
-                ins.add("CLIENTE",gl.cliente);
-                ins.add("TOTAL",cntotl);
-                ins.add("FACTURA",gl.dvcorreld);
-                ins.add("SERIE","0");
-                ins.add("CORELATIVO",gl.dvactualnc);
-                ins.add("STATCOM","N");
-                ins.add("CODIGOLIQUIDACION",0);
-                ins.add("RESOLNC","N");
-                ins.add("SERIEFACT",0);
-                ins.add("CORELFACT",0);
-                ins.add("IMPRES",0);
+				ins.add("COREL",gl.dvcorrelnc);
+				ins.add("ANULADO","N");
+				ins.add("FECHA",fecha);
+				ins.add("RUTA",gl.ruta);
+				ins.add("VENDEDOR",gl.vend);
+				ins.add("CLIENTE",gl.cliente);
+				ins.add("TOTAL",cntotl);
+				ins.add("FACTURA",gl.dvcorreld);
+				ins.add("SERIE","0");
+				ins.add("CORELATIVO",gl.dvactualnc);
+				ins.add("STATCOM","N");
+				ins.add("CODIGOLIQUIDACION",0);
+				ins.add("RESOLNC","N");
+				ins.add("SERIEFACT",0);
+				ins.add("CORELFACT",0);
+				ins.add("IMPRES",0);
 
-                db.execSQL(ins.sql());
+				db.execSQL(ins.sql());
 
-                sql="SELECT Item,CODIGO,CANT,CODDEV,TOTAL,PRECIO,PRECLISTA,REF,PESO,LOTE,UMVENTA,UMSTOCK,UMPESO,FACTOR,POR_PESO FROM T_CxCD WHERE CANT>0";
-                DT=Con.OpenDT(sql);
+				sql="SELECT Item,CODIGO,CANT,CODDEV,TOTAL,PRECIO,PRECLISTA,REF,PESO,LOTE,UMVENTA,UMSTOCK,UMPESO,FACTOR,POR_PESO FROM T_CxCD WHERE CANT>0";
+				DT=Con.OpenDT(sql);
 
-                DT.moveToFirst();
-                while (!DT.isAfterLast()) {
+				DT.moveToFirst();
+				while (!DT.isAfterLast()) {
 
-                    pcod=DT.getString(1);
-                    pcant=DT.getDouble(2);
+					pcod=DT.getString(1);
+					pcant=DT.getDouble(2);
 
-                    ins.init("D_CxCD");
+					ins.init("D_CxCD");
 
-                    ins.add("COREL",gl.dvcorreld);
-                    ins.add("ITEM",DT.getInt(0));
-                    ins.add("CODIGO",DT.getString(1));
-                    ins.add("CANT",DT.getDouble(2));
-                    ins.add("CODDEV",DT.getString(3));
-                    ins.add("ESTADO",estado);
-                    ins.add("TOTAL",DT.getDouble(4));
-                    ins.add("PRECIO",DT.getDouble(5));
-                    ins.add("PRECLISTA",DT.getDouble(6));
-                    ins.add("REF",DT.getString(7));
-                    ins.add("PESO",DT.getDouble(8));
-                    ins.add("FECHA_CAD",0);
-                    ins.add("LOTE",DT.getString(9));
-                    ins.add("UMVENTA",DT.getString(10));
-                    ins.add("UMSTOCK",DT.getString(11));
-                    ins.add("UMPESO",DT.getString(12));
-                    ins.add("FACTOR",DT.getDouble(13));
-                    db.execSQL(ins.sql());
+					ins.add("COREL",gl.dvcorreld);
+					ins.add("ITEM",DT.getInt(0));
+					ins.add("CODIGO",DT.getString(1));
+					ins.add("CANT",DT.getDouble(2));
+					ins.add("CODDEV",DT.getString(3));
+					ins.add("ESTADO",estado);
+					ins.add("TOTAL",DT.getDouble(4));
+					ins.add("PRECIO",DT.getDouble(5));
+					ins.add("PRECLISTA",DT.getDouble(6));
+					ins.add("REF",DT.getString(7));
+					ins.add("PESO",DT.getDouble(8));
+					ins.add("FECHA_CAD",0);
+					ins.add("LOTE",DT.getString(9));
+					ins.add("UMVENTA",DT.getString(10));
+					ins.add("UMSTOCK",DT.getString(11));
+					ins.add("UMPESO",DT.getString(12));
+					ins.add("FACTOR",DT.getDouble(13));
+					db.execSQL(ins.sql());
 
-                    ins.init("D_NOTACREDD");
+					ins.init("D_NOTACREDD");
 
-                    ins.add("COREL",gl.dvcorrelnc);
-                    ins.add("PRODUCTO",DT.getString(1));
-                    ins.add("PRECIO_ORIG",DT.getDouble(5));
-                    ins.add("PRECIO_ACT",0);
-                    ins.add("CANT",DT.getDouble(2));
-                    ins.add("PESO",DT.getDouble(8));
-                    ins.add("POR_PRESO", DT.getString(14));
-                    ins.add("UMVENTA",DT.getString(10));
-                    ins.add("UMSTOCK",DT.getString(11));
-                    ins.add("UMPESO",DT.getString(12));
-                    ins.add("FACTOR",DT.getDouble(13));
-                    db.execSQL(ins.sql());
+					ins.add("COREL",gl.dvcorrelnc);
+					ins.add("PRODUCTO",DT.getString(1));
+					ins.add("PRECIO_ORIG",DT.getDouble(5));
+					ins.add("PRECIO_ACT",0);
+					ins.add("CANT",DT.getDouble(2));
+					ins.add("PESO",DT.getDouble(8));
+					ins.add("POR_PRESO", DT.getString(14));
+					ins.add("UMVENTA",DT.getString(10));
+					ins.add("UMSTOCK",DT.getString(11));
+					ins.add("UMPESO",DT.getString(12));
+					ins.add("FACTOR",DT.getDouble(13));
+					db.execSQL(ins.sql());
 
-                    if (!gl.peModal.equalsIgnoreCase("TOL")) {
+					if (!gl.peModal.equalsIgnoreCase("TOL")) {
 
-                        try {
-                            sql="INSERT INTO P_STOCK VALUES ('"+pcod+"',0,0,0)";
-                            db.execSQL(sql);
-                        } catch (Exception e) {
-                            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-                        }
+						try {
+							sql="INSERT INTO P_STOCK VALUES ('"+pcod+"',0,0,0)";
+							db.execSQL(sql);
+						} catch (Exception e) {
+							addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+						}
 
-                        if (estado.equalsIgnoreCase("M")) {
-                            sql="UPDATE P_STOCK SET CANTM=CANTM+"+pcant+" WHERE CODIGO='"+pcod+"'";
-                        } else {
-                            sql="UPDATE P_STOCK SET CANT=CANT+"+pcant+" WHERE CODIGO='"+pcod+"'";
-                        }
-                        db.execSQL(sql);
+						if (estado.equalsIgnoreCase("M")) {
+							sql="UPDATE P_STOCK SET CANTM=CANTM+"+pcant+" WHERE CODIGO='"+pcod+"'";
+						} else {
+							sql="UPDATE P_STOCK SET CANT=CANT+"+pcant+" WHERE CODIGO='"+pcod+"'";
+						}
+						db.execSQL(sql);
 
-                    }
+					}
 
-                    DT.moveToNext();
-                }
+					DT.moveToNext();
+				}
 
-                sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactuald+" WHERE RUTA='"+gl.ruta+"' AND TIPO='D'";
-                db.execSQL(sql);
+				sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactuald+" WHERE RUTA='"+gl.ruta+"' AND TIPO='D'";
+				db.execSQL(sql);
 
-                sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactualnc+" WHERE RUTA='"+gl.ruta+"' AND TIPO='NC'";
-                db.execSQL(sql);
+				sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactualnc+" WHERE RUTA='"+gl.ruta+"' AND TIPO='NC'";
+				db.execSQL(sql);
 
-                db.setTransactionSuccessful();
+				db.setTransactionSuccessful();
 
-                db.endTransaction();
+				db.endTransaction();
 
-                Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();
 
 				sql="DELETE FROM T_CxCD";
 				db.execSQL(sql);
 
-                gl.closeCliDet = true;
-                gl.closeVenta = true;
+				gl.closeCliDet = true;
+				gl.closeVenta = true;
 
 				createDoc();
 				//msgAskSave("Aplicar pago y crear un recibo");
 
-            }else{
+			}else{
 
-                try{
+				try{
 
-                    Intent i = new Intent(this, CliDet.class);
-                    gl.dvbrowse=3;
-                    gl.dvdispventa = cntotl;
-                    gl.dvestado = estado;
-                    startActivity(i);
+					Intent i = new Intent(this, CliDet.class);
+					gl.dvbrowse=3;
+					gl.dvdispventa = cntotl;
+					gl.dvestado = estado;
+					startActivity(i);
 
-                }catch (Exception e){
-                    addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-                }
+				}catch (Exception e){
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				}
 
-            }
+			}
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
-		   	mu.msgbox(e.getMessage());
+			mu.msgbox(e.getMessage());
 		}
 	}
 
@@ -571,13 +571,13 @@ public class DevolCli extends PBase {
 				//#CKFK 20190401 09:47AM Agregué la funcionalidad de enviar el nombre del archivo a imprimir
 				prn.printask(printcallback, "printnc.txt");
 
-            }else if(!prn.isEnabled()){
+			}else if(!prn.isEnabled()){
 
-                fdevol.buildPrint(gl.dvcorrelnc,0,vModo);
-                limpiavariables_devol();
-                DevolCli.super.finish();
+				fdevol.buildPrint(gl.dvcorrelnc,0,vModo);
+				limpiavariables_devol();
+				DevolCli.super.finish();
 
-            }
+			}
 
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -609,41 +609,41 @@ public class DevolCli extends PBase {
 		}
 	}
 
-	// Aux 
+	// Aux
 
-    private String obtienecorrel(String tipo){
-	    String correl="";
-        Cursor DT;
+	private String obtienecorrel(String tipo){
+		String correl="";
+		Cursor DT;
 
-	    try{
-            sql="SELECT SERIE,ACTUAL+1,FINAL,INICIAL FROM P_CORREL_OTROS WHERE RUTA='"+gl.ruta+"' AND TIPO='"+tipo+"'";
-            DT=Con.OpenDT(sql);
+		try{
+			sql="SELECT SERIE,ACTUAL+1,FINAL,INICIAL FROM P_CORREL_OTROS WHERE RUTA='"+gl.ruta+"' AND TIPO='"+tipo+"'";
+			DT=Con.OpenDT(sql);
 
-            if(DT.getCount()>0){
+			if(DT.getCount()>0){
 
-                DT.moveToFirst();
+				DT.moveToFirst();
 
-                correl=DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)), 6);
+				correl=DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)), 6);
 
-                if (tipo.equals("D")){
-                    gl.dvactuald = String.valueOf(DT.getInt(1));
-                }else{
-                    gl.dvactualnc = String.valueOf(DT.getInt(1));
-                }
+				if (tipo.equals("D")){
+					gl.dvactuald = String.valueOf(DT.getInt(1));
+				}else{
+					gl.dvactualnc = String.valueOf(DT.getInt(1));
+				}
 
-            }else{
+			}else{
 
-                correl=gl.ruta+"_"+mu.getCorelBase();
+				correl=gl.ruta+"_"+mu.getCorelBase();
 
-            }
+			}
 
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-	    }
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
 
-        return  correl;
+		return  correl;
 
-    }
+	}
 
 	private void clearData(){
 		try {
@@ -651,9 +651,9 @@ public class DevolCli extends PBase {
 			db.execSQL(sql);
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}	
+		}
 	}
-	
+
 	private void msgAskExit(String msg) {
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -682,9 +682,9 @@ public class DevolCli extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
-	}	
-	
+
+	}
+
 	private void msgAskComplete(String msg) {
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -713,7 +713,7 @@ public class DevolCli extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
+
 	}
 
 	private void msgAskDel(String msg) {
@@ -799,25 +799,25 @@ public class DevolCli extends PBase {
 
 	private boolean hasProducts(){
 		Cursor DT;
-		
+
 		try {
-			sql="SELECT CODIGO FROM T_CxCD";	
+			sql="SELECT CODIGO FROM T_CxCD";
 			DT=Con.OpenDT(sql);
-				
+
 			return DT.getCount()>0;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
-		}	
+		}
 	}
-	
+
 	private void doExit(){
 		try{
 
-            limpiavariables_devol();
+			limpiavariables_devol();
 
-            sql="DELETE FROM T_CxCD";
-            db.execSQL(sql);
+			sql="DELETE FROM T_CxCD";
+			db.execSQL(sql);
 
 			DevolCli.super.finish();
 		}catch (Exception e){
@@ -852,7 +852,7 @@ public class DevolCli extends PBase {
 	}
 
 	// Activity Events
-	
+
 	@Override
 	protected void onResume() {
 		try{
@@ -876,7 +876,7 @@ public class DevolCli extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	
+
 	}
 
 	@Override

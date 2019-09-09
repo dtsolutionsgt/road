@@ -5,12 +5,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class RecargaAuto extends PBase {
@@ -321,7 +319,7 @@ public class RecargaAuto extends PBase {
 					doExit();
 
 					((appGlobals) vApp).tipo=0;
-					Intent intent = new Intent(RecargaAuto.this,exist.class);
+					Intent intent = new Intent(RecargaAuto.this, Exist.class);
 					startActivity(intent);
 				}
 			});

@@ -51,7 +51,7 @@ public class CliDet extends PBase {
 	private PhotoViewAttacher zoomFoto;
 	private AppMethods app;
 
-	private exist Existencia = new exist();
+	private Exist Existencia = new Exist();
 	private String cod,tel, Nombre, NIT, sgp1, sgp2;
 	private String imagenbase64,path,fechav;
 	private Boolean imgPath, imgDB, ventaGPS,flagGPS=true,permiteVenta=true,clicred;

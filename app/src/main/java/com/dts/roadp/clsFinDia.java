@@ -329,7 +329,7 @@ public class clsFinDia extends PBase{
         }
     }
 
-    //#HS_20181127_1052 Agregue funcion que elimina los datos de las tablas D.
+    //#HS_20181127_1052 Agregué funcion que elimina los datos de las tablas D.
     public boolean eliminarTablasD(){
         Cursor DT;
         String corel;

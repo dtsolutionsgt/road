@@ -1775,9 +1775,7 @@ public class ComWS extends PBase {
 					dbT.execSQL(sql);
 				} catch (Exception e) {
 					ferr += " " +e.getMessage();
-					Log.d("M", "Something happend there " + e.getMessage());
-					addlog(new Object() {
-					}.getClass().getEnclosingMethod().getName(), e.getMessage() + "EJC", "Yo fui " + sql);
+					Log.d("M", "Something happend there " + e.getMessage() + "EJC" + " Yo fui " + sql);
 					Log.e("z", e.getMessage());
 				}
 

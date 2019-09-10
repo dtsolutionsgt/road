@@ -51,7 +51,6 @@ public class CliDet extends PBase {
 	private PhotoViewAttacher zoomFoto;
 	private AppMethods app;
 
-	private Exist Existencia = new Exist();
 	private String cod,tel, Nombre, NIT, sgp1, sgp2;
 	private String imagenbase64,path,fechav;
 	private Boolean imgPath, imgDB, ventaGPS,flagGPS=true,permiteVenta=true,clicred;
@@ -60,15 +59,15 @@ public class CliDet extends PBase {
 	private boolean porcentaje = false;
 	private byte[] imagenBit;
 
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_cli_det);
-		
+
 		super.InitBase();
 		addlog("CliDet",""+du.getActDateTime(),gl.vend);
-		
+
 		lblNom= (TextView) findViewById(R.id.lblNom);
 		lblRep= (TextView) findViewById(R.id.lblPres);
 		lblDir= (TextView) findViewById(R.id.lblDir);
@@ -76,7 +75,7 @@ public class CliDet extends PBase {
 		lblTel= (TextView) findViewById(R.id.lblTel);
 		lblGPS= (TextView) findViewById(R.id.textView2);
 		lblCobro= (TextView) findViewById(R.id.textView6);
-		lblDevol= (TextView) findViewById(R.id.textView3);		 
+		lblDevol= (TextView) findViewById(R.id.textView3);
 		lblCLim= (TextView) findViewById(R.id.lblCLim);
 		lblCUsed= (TextView) findViewById(R.id.lblCUsed);
 		lblCDisp= (TextView) findViewById(R.id.lblCDisp);
@@ -88,12 +87,12 @@ public class CliDet extends PBase {
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
 
-	//	relMain=(RelativeLayout) findViewById(R.id.relclimain);
+		//	relMain=(RelativeLayout) findViewById(R.id.relclimain);
 		relV=(RelativeLayout) findViewById(R.id.relVenta);
 		relP=(RelativeLayout) findViewById(R.id.relPreventa);
 		relD=(RelativeLayout) findViewById(R.id.relDespacho);
 		relCamara=(RelativeLayout) findViewById(R.id.relCamara);
-		
+
 		imgCobro= (ImageView) findViewById(R.id.imageView2);
 		imgDevol= (ImageView) findViewById(R.id.imageView1);
 		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
@@ -244,12 +243,12 @@ public class CliDet extends PBase {
 			StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
 			StrictMode.setVmPolicy(builder.build());
 
-		//	try {
+			//	try {
 
-				Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-				File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-				intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
-				startActivityForResult(intento1,codResult);
+			Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+			File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+			intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
+			startActivityForResult(intento1,codResult);
 
 		/*	}catch (Exception e){
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -300,7 +299,7 @@ public class CliDet extends PBase {
 	}
 
 	public void rutaHelp(View view) {
-        mostraRutaSupervisor();
+		mostraRutaSupervisor();
 	}
 
 	@Override
@@ -371,24 +370,24 @@ public class CliDet extends PBase {
 	//endregion
 
 	//region Main
-	
+
 	private void showData() {
 		Cursor DT;
 		int uvis,dcred;
 		String contr,sgps="0.00000000 , 0.00000000";
-		
+
 		lblNom.setText("");lblRep.setText("");
 		lblDir.setText("");lblAten.setText("");lblTel.setText("");
 		tel="";
-		
+
 		try {
 
 			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
-				"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO "+
-				"FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
-           	DT=Con.OpenDT(sql);
+					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO "+
+					"FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
+			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-							  
+
 			lblNom.setText(cod + " - " + DT.getString(0));
 			lblRep.setText(DT.getString(12));
 			lblDir.setText(DT.getString(2));
@@ -397,24 +396,24 @@ public class CliDet extends PBase {
 			tel=DT.getString(4);
 			lblTel.setText(DT.getString(4));
 			uvis=DT.getInt(3);
-			
+
 			nivel=DT.getInt(6);
 			gl.nivel=nivel;
 			gl.percepcion=DT.getDouble(7);
-			
+
 			contr=""+DT.getString(8);
 			gl.contrib=contr;
-			
+
 			if (uvis<=0) {
 				lblAten.setText("");
-			} else {	
+			} else {
 				lblAten.setText(du.sfecha(uvis));
 			}
 
 			//#CKFK 20190619 Cambié las coordenadas que se le envían al Waze, en lugar de X,Y le estoy enviando Y,X
 			sgps=mu.frmgps(DT.getDouble(10))+ " , "+ mu.frmgps(DT.getDouble(9));
 			lblGPS.setText(sgps);
-			
+
 			gl.media=DT.getInt(11);
 
 			if(gl.media != 4){
@@ -428,7 +427,7 @@ public class CliDet extends PBase {
 			dcred=DT.getInt(17);
 
 			clim=DT.getDouble(5);
-						
+
 			gl.fnombre=DT.getString(0);
 			gl.fnit=DT.getString(12);
 			gl.fdir=DT.getString(2);
@@ -450,11 +449,11 @@ public class CliDet extends PBase {
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox(e.getMessage());
-	    }
-		
+			mu.msgbox(e.getMessage());
+		}
+
 	}
-		
+
 	private void calcCredit() {
 
 
@@ -490,36 +489,36 @@ public class CliDet extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-				
+
 	}
-	
+
 	private double getUsedCred(){
 		Cursor DT;
 		double tpg,tsal,cu=0;
-	
+
 		try {
 			sql="SELECT SUM(SALDO) FROM P_COBRO WHERE (CLIENTE='"+cod+"')";
-           	DT=Con.OpenDT(sql);
+			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			tsal=DT.getDouble(0);
-	
-			
+
+
 			sql="SELECT SUM(TOTAL) FROM D_COBRO WHERE (ANULADO='N') AND (CLIENTE='"+cod+"')";
-           	DT=Con.OpenDT(sql);
+			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			tpg=DT.getDouble(0);
-			
+
 			cu=tsal-tpg;
 
 			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	cu=0;mu.msgbox(e.getMessage());
-	    }	
+			cu=0;mu.msgbox(e.getMessage());
+		}
 		return cu;
 	}
-	
+
 	private void initVenta(){
 
 		try{
@@ -533,7 +532,7 @@ public class CliDet extends PBase {
 		}
 
 	}
-	
+
 	private boolean validaVenta() {
 		Cursor DT;
 		int ci,cf,ca1,ca2;
@@ -541,13 +540,13 @@ public class CliDet extends PBase {
 		double dd;
 		boolean resguardo=false;
 
-		
+
 		try {
 			sql="SELECT SERIE,CORELULT,CORELINI,CORELFIN,FECHAVIG,RESGUARDO FROM P_COREL ";
 			DT=Con.OpenDT(sql);
-				
+
 			DT.moveToFirst();
-			
+
 			ca1=DT.getInt(1);
 			ci=DT.getInt(2);
 			cf=DT.getInt(3);
@@ -576,10 +575,10 @@ public class CliDet extends PBase {
 				mu.msgbox("Se han terminado los correlativos de facturas. No se puede continuar con la venta.");
 				return false;
 			}
-			
+
 			dd=cf-ci;dd=0.75*dd;
 			ca2=ci+((int) dd);
-			
+
 			if (ca1>ca2) {
 				//toastcent("Queda menos que 25% de talonario de facturas.");
 				//#HS_20181129_1040 agregue nuevo tipo de mensaje
@@ -593,10 +592,10 @@ public class CliDet extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("No esta definido correlativo de factura. No se puede continuar con la venta.\n"); //+e.getMessage());
 			return false;
-		}	
-					
+		}
+
 		return true;
-		
+
 	}
 
 	private void miniFachada(){
@@ -640,13 +639,13 @@ public class CliDet extends PBase {
 
 	public Bitmap redimensionarImagen(Bitmap mBitmap, float newWidth, float newHeigth){
 
-			int width = mBitmap.getWidth();
-			int height = mBitmap.getHeight();
-			float scaleWidth = ((float) newWidth) / width;
-			float scaleHeight = ((float) newHeigth) / height;
-			Matrix matrix = new Matrix();
-			matrix.postScale(scaleWidth, scaleHeight);
-			return Bitmap.createBitmap(mBitmap, 0, 0, width, height, matrix, false);
+		int width = mBitmap.getWidth();
+		int height = mBitmap.getHeight();
+		float scaleWidth = ((float) newWidth) / width;
+		float scaleHeight = ((float) newHeigth) / height;
+		Matrix matrix = new Matrix();
+		matrix.postScale(scaleWidth, scaleHeight);
+		return Bitmap.createBitmap(mBitmap, 0, 0, width, height, matrix, false);
 
 	}
 
@@ -733,8 +732,7 @@ public class CliDet extends PBase {
 		Float cantidad;
 		gl.rutatipo="V";
 		//Asigna conexión actual a la forma de Existencias.
-		Existencia.Con = Con;
-		cantidad = Float.valueOf(Existencia.CantExistencias());
+		cantidad = Float.valueOf(CantExistencias());
 
 		try{
 			if(cantidad == 0){
@@ -923,7 +921,7 @@ public class CliDet extends PBase {
 				String url = "waze://?ll="+sgps;
 				//"waze://?ll=14.6017278,-90.5236343";
 				//"waze://?ll=14.586997,-90.513685";
-						Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( url ) );
+				Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( url ) );
 				startActivity( intent );
 			}else{
 				msgbox("El cliente no tiene definidas las coordenadas GPS");
@@ -1087,6 +1085,39 @@ public class CliDet extends PBase {
 
 	}
 
+	public float CantExistencias() {
+		Cursor DT;
+		float cantidad=0,cantb=0;
+
+		try {
+
+			sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.CANT,P_STOCK.CANTM,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
+					"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
+			if (Con != null){
+				DT = Con.OpenDT(sql);
+				cantidad = DT.getCount();
+			}else {
+				cantidad = 0;
+			}
+
+			sql = "SELECT BARRA FROM P_STOCKB";
+			if (Con != null){
+				DT = Con.OpenDT(sql);
+				cantb = DT.getCount();
+
+				if(DT!=null) DT.close();
+			}else {
+				cantb = 0;
+			}
+
+			cantidad=cantidad+cantb;
+		} catch (Exception e) {
+			return 0;
+		}
+
+		return cantidad;
+	}
+
 	//endregion
 
 	//region Dialogs
@@ -1208,8 +1239,8 @@ public class CliDet extends PBase {
 			chknc.setText("Nota de crédito");
 			chkncv.setText("Nota de crédito con venta");
 
-            chknc.setChecked(false);
-            chkncv.setChecked(false);
+			chknc.setChecked(false);
+			chkncv.setChecked(false);
 
 			if (clicred)layout.addView(chknc);
 			if (!clicred) layout.addView(chkncv);

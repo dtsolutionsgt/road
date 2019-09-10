@@ -664,25 +664,25 @@ public class Cobro extends PBase {
 				DT.moveToFirst();
 				tpago=DT.getDouble(0);
 
-                  ins.init("D_COBRO");
-                  ins.add("COREL",corel);
-                  ins.add("ANULADO","N");
-                  ins.add("FECHA",fecha);
-                  ins.add("EMPRESA",gl.emp);
-                  ins.add("RUTA",gl.ruta);
-                  ins.add("VENDEDOR",gl.vend);
-                  ins.add("CLIENTE",gl.cliente);
-                  ins.add("KILOMETRAJE",0);
-                  ins.add("TOTAL",tpago);
-                  ins.add("DEPOS","");
-                  ins.add("CORELC","");
-                  ins.add("BANDERA","");
-                  ins.add("STATCOM","N");
-                  ins.add("CALCOBJ","N");
-                  ins.add("IMPRES",0);
-                  ins.add("CODIGOLIQUIDACION",0);
-                  ins.add("SERIE",fserie);
-                  ins.add("CORELATIVO",fcorel);
+				ins.init("D_COBRO");
+				ins.add("COREL",corel);
+				ins.add("ANULADO","N");
+				ins.add("FECHA",fecha);
+				ins.add("EMPRESA",gl.emp);
+				ins.add("RUTA",gl.ruta);
+				ins.add("VENDEDOR",gl.vend);
+				ins.add("CLIENTE",gl.cliente);
+				ins.add("KILOMETRAJE",0);
+				ins.add("TOTAL",tpago);
+				ins.add("DEPOS","");
+				ins.add("CORELC","");
+				ins.add("BANDERA","");
+				ins.add("STATCOM","N");
+				ins.add("CALCOBJ","N");
+				ins.add("IMPRES",0);
+				ins.add("CODIGOLIQUIDACION",0);
+				ins.add("SERIE",fserie);
+				ins.add("CORELATIVO",fcorel);
 
 				db.execSQL(ins.sql());
 
@@ -760,14 +760,14 @@ public class Cobro extends PBase {
 						DT.moveToNext();
 					}
 
-                      // Ultimo corel
-                      sql="UPDATE P_CORRELREC SET ACTUAL="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";
-                      db.execSQL(sql);
-                  }
+					// Ultimo corel
+					sql="UPDATE P_CORRELREC SET ACTUAL="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";
+					db.execSQL(sql);
+				}
 
-                  db.setTransactionSuccessful();
-                  db.endTransaction();
-              }else{
+				db.setTransactionSuccessful();
+				db.endTransaction();
+			}else{
 
 				db.beginTransaction();
 

@@ -288,10 +288,8 @@ public class Menu extends PBase {
 						//Asigna conexión actual al siguiente activity.
 
 						//#HS_201811 Verifica si hay existencias disponibles.
-						Exist Existencia=new Exist();
 
-						Existencia.Con = Con;
-						cantidad = Existencia.CantExistencias();
+						cantidad = CantExistencias();
 
 						//#HS_20181206 Verifica el usuario si es DTS.
 						if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")){
@@ -1432,6 +1430,39 @@ public class Menu extends PBase {
 		}
 
 
+	}
+
+	public float CantExistencias() {
+		Cursor DT;
+		float cantidad=0,cantb=0;
+
+		try {
+
+			sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.CANT,P_STOCK.CANTM,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
+					"FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
+			if (Con != null){
+				DT = Con.OpenDT(sql);
+				cantidad = DT.getCount();
+			}else {
+				cantidad = 0;
+			}
+
+			sql = "SELECT BARRA FROM P_STOCKB";
+			if (Con != null){
+				DT = Con.OpenDT(sql);
+				cantb = DT.getCount();
+
+				if(DT!=null) DT.close();
+			}else {
+				cantb = 0;
+			}
+
+			cantidad=cantidad+cantb;
+		} catch (Exception e) {
+			return 0;
+		}
+
+		return cantidad;
 	}
 
 	//endregion

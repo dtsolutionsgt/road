@@ -24,43 +24,43 @@ import java.util.ArrayList;
 
 
 public class Deposito extends PBase {
-	
+
 	private Spinner  spinBanco;
 	private EditText txtBol;
 	private TextView lblEf,lblCheq,lblTot,lblBol;
-	
+
 	private ListView listView;
 	private ImageView btnSave,btnCancel,btnSelAll,btnSelNone;
 
-    private ArrayList<clsClasses.clsDepos> items = new ArrayList<clsClasses.clsDepos>();
+	private ArrayList<clsClasses.clsDepos> items = new ArrayList<clsClasses.clsDepos>();
 	private ListAdaptDepos adapter;
 	private clsClasses.clsDepos selitem;
 	private clsFinDia claseFinDia;
 	private DateUtils claseDateUtils;
-	
+
 	private ArrayList<String> spincode= new ArrayList<String>();
 	private ArrayList<String> spinname = new ArrayList<String>();
 	private ArrayList<String> spincuenta = new ArrayList<String>();
-	
+
 	private Runnable printcallback,printclose;
 	private printer prn;
 	private clsDocDepos ddoc;
-	
+
 	private String bancoid="",cuenta="",bol,corel;
 	private int boldep;
 	private double tef,tcheq,ttot;
 	private boolean depparc; //#HS_20181120_1625 Se cambio el tipo a la variable de entero a boolean.
 
 	private AppMethods app;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_deposito);
-		
+
 		super.InitBase();
 		addlog("Deposito",""+du.getActDateTime(),gl.vend);
-		
+
 		spinBanco = (Spinner) findViewById(R.id.spinner1);
 		txtBol = (EditText) findViewById(R.id.txtBoleta);
 		lblEf = (TextView) findViewById(R.id.lblpSaldo);lblEf.setText(mu.frmcur(0));
@@ -69,34 +69,34 @@ public class Deposito extends PBase {
 		lblBol = (TextView) findViewById(R.id.textView2);
 
 		setHandlers();
-		
-		fillSpinner();		
+
+		fillSpinner();
 		fillDocList();
-		
+
 		if (gl.boldep==0) {
 			//txtBol.setText(du.sfecha(fecha)+" "+du.shora(fecha)+":"+du.sSecond());
 			txtBol.setText("");
 			lblBol.setVisibility(View.INVISIBLE);
 			txtBol.setVisibility(View.INVISIBLE);
-		} else {	
+		} else {
 			txtBol.setText("");
 			lblBol.setVisibility(View.VISIBLE);
 			txtBol.setVisibility(View.VISIBLE);
 		}
-		
+
 		tef=0;tcheq=0;ttot=0;
 		scanValues();
-		
+
 		printcallback= new Runnable() {
-		    public void run() {
+			public void run() {
 				askPrint();
-		    }
+			}
 		};
-		
+
 		printclose= new Runnable() {
-		    public void run() {
-		    	Deposito.super.finish();
-		    }
+			public void run() {
+				Deposito.super.finish();
+			}
 		};
 
 		app = new AppMethods(this, gl, Con, db);
@@ -110,10 +110,10 @@ public class Deposito extends PBase {
 		depparc=gl.depparc;
 
 	}
-	
-	
+
+
 	// Events
-	
+
 	public void listaDoc(View view){
 		try{
 			showDocDialog();
@@ -122,7 +122,7 @@ public class Deposito extends PBase {
 		}
 
 	}
-	
+
 	public void saveDepos(View view){
 		try{
 
@@ -136,11 +136,11 @@ public class Deposito extends PBase {
 
 				if (DT.getCount()==0) {
 					if (tef>0){
-					msgbox("Por favor realice el desglose antes de continuar.");
+						msgbox("Por favor realice el desglose antes de continuar.");
 
-					if(DT!=null) DT.close();
+						if(DT!=null) DT.close();
 
-					return;}
+						return;}
 				}
 
 				if(DT!=null) DT.close();
@@ -166,41 +166,41 @@ public class Deposito extends PBase {
 
 
 	// Main
-	
+
 	private void setHandlers(){
-		    
+
 		spinBanco.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	TextView spinlabel;
-		       	
-		    	try {
-		    		spinlabel=(TextView)parentView.getChildAt(0);
-			    	spinlabel.setTextColor(Color.BLACK);
-			    	spinlabel.setPadding(5, 0, 0, 0);
-			    	spinlabel.setTextSize(18);
-				    
-			    	bancoid=spincode.get(position);
-			    	cuenta=spincuenta.get(position);
-			    	
-		        } catch (Exception e) {
+			@Override
+			public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+				TextView spinlabel;
+
+				try {
+					spinlabel=(TextView)parentView.getChildAt(0);
+					spinlabel.setTextColor(Color.BLACK);
+					spinlabel.setPadding(5, 0, 0, 0);
+					spinlabel.setTextSize(18);
+
+					bancoid=spincode.get(position);
+					cuenta=spincuenta.get(position);
+
+				} catch (Exception e) {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-				   	mu.msgbox( e.getMessage());
-		        }			    	
-		    }
+					mu.msgbox( e.getMessage());
+				}
+			}
 
-		    @Override
-		    public void onNothingSelected(AdapterView<?> parentView) {
-		        return;
-		    }
+			@Override
+			public void onNothingSelected(AdapterView<?> parentView) {
+				return;
+			}
 
-		});	
-			
-	}	
-	
+		});
+
+	}
+
 	private void scanValues(){
 		double val,vef=0,vcheq=0;
-		
+
 		try {
 			for(int i = 0; i < items.size(); i++ ) {
 				selitem=items.get(i);
@@ -208,25 +208,25 @@ public class Deposito extends PBase {
 				vef+=val;
 				val=selitem.Chec*selitem.Bandera;
 				vcheq+=val;
-			}		
+			}
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			return;
 		}
-		
+
 		tef=vef;tcheq=vcheq;ttot=tef+tcheq;
-		
+
 		lblEf.setText(mu.frmcur(tef));
 		lblCheq.setText(mu.frmcur(tcheq));
 		lblTot.setText(mu.frmcur(ttot));
-		
+
 	}
-	
+
 	private void showDocDialog(){
 		final Dialog dialog = new Dialog(this);
 		final String rv;
 		final int rvi;
-		
+
 		dialog.setContentView(R.layout.activity_depos_doc);
 		dialog.setTitle("Documentos pendientes");
 
@@ -313,27 +313,27 @@ public class Deposito extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
-	}	
-	
+
+	}
+
 	private void fillDocList(){
 		Cursor DT,DTD;
-		clsClasses.clsDepos item;	
+		clsClasses.clsDepos item;
 		double val,efect,chec;
 		int nchec;
-		
+
 		items.clear();
-	
+
 		try {
-			
+
 			sql="SELECT D_COBRO.COREL,P_CLIENTE.NOMBRE,D_COBRO.TOTAL "+
-			     "FROM D_COBRO INNER JOIN P_CLIENTE ON P_CLIENTE.CODIGO=D_COBRO.CLIENTE WHERE D_COBRO.DEPOS<>'S' ";
+					"FROM D_COBRO INNER JOIN P_CLIENTE ON P_CLIENTE.CODIGO=D_COBRO.CLIENTE WHERE D_COBRO.DEPOS<>'S' ";
 			DT=Con.OpenDT(sql);
 			//if (DT.getCount()==0) {return;}
-			
+
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
-				
+
 				sql="SELECT SUM(Valor)	FROM D_COBROP WHERE (COREL='"+DT.getString(0)+"') AND  (TIPO='E')";
 				DTD=Con.OpenDT(sql);
 				try {
@@ -343,7 +343,7 @@ public class Deposito extends PBase {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ee.getMessage(),"");
 					efect=0;
 				}
-				
+
 				sql="SELECT SUM(Valor),Count(Valor) FROM D_COBROP WHERE (COREL='"+DT.getString(0)+"') AND  (TIPO='C')";
 				DTD=Con.OpenDT(sql);
 				try {
@@ -353,12 +353,12 @@ public class Deposito extends PBase {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ee.getMessage(),"");
 					chec=0;nchec=0;
 				}
-				
+
 				val=efect+chec;
-				
+
 				if (val>0) {
 					item = clsCls.new clsDepos();
-					
+
 					item.Cod=DT.getString(0);
 					item.Nombre=DT.getString(1);
 					item.Valor=val;
@@ -369,27 +369,27 @@ public class Deposito extends PBase {
 					item.Tipo="C";
 					item.Bandera=1;
 					item.Banco="Cobro";
-					
-					items.add(item);				
+
+					items.add(item);
 				}
-			 
+
 				DT.moveToNext();
 			}
-				
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-		
+
 		try {
-			
+
 			sql="SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.TOTAL,D_FACTURA.SERIE,D_FACTURA.CORELATIVO "+
-			     "FROM D_FACTURA INNER JOIN P_CLIENTE ON P_CLIENTE.CODIGO=D_FACTURA.CLIENTE " +
-			     "WHERE D_FACTURA.ANULADO='N' AND D_FACTURA.DEPOS<>'S' ";
+					"FROM D_FACTURA INNER JOIN P_CLIENTE ON P_CLIENTE.CODIGO=D_FACTURA.CLIENTE " +
+					"WHERE D_FACTURA.ANULADO='N' AND D_FACTURA.DEPOS<>'S' ";
 			DT=Con.OpenDT(sql);
-			
+
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
-				
+
 				sql="SELECT SUM(Valor)	FROM D_FACTURAP WHERE (COREL='"+DT.getString(0)+"') AND  (TIPO='E')";
 				DTD=Con.OpenDT(sql);
 				try {
@@ -399,7 +399,7 @@ public class Deposito extends PBase {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ee.getMessage(),"");
 					efect=0;
 				}
-				
+
 				sql="SELECT SUM(Valor),Count(Valor) FROM D_FACTURAP WHERE (COREL='"+DT.getString(0)+"') AND  (TIPO='C')";
 				DTD=Con.OpenDT(sql);
 				try {
@@ -409,12 +409,12 @@ public class Deposito extends PBase {
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ee.getMessage(),"");
 					chec=0;nchec=0;
 				}
-				
+
 				val=efect+chec;
-				
+
 				if (val>0) {
 					item = clsCls.new clsDepos();
-					
+
 					item.Cod=DT.getString(0);
 					item.Nombre=DT.getString(3)+"-"+DT.getString(4);
 					item.Valor=val;
@@ -425,10 +425,10 @@ public class Deposito extends PBase {
 					item.Tipo="F";
 					item.Bandera=1;
 					item.Banco="Factura";
-					
-					items.add(item);						
+
+					items.add(item);
 				}
-			 
+
 				DT.moveToNext();
 			}
 
@@ -436,10 +436,10 @@ public class Deposito extends PBase {
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}		
-		
+		}
+
 	}
-	
+
 	private boolean saveDoc(){
 		Cursor DT;
 		clsClasses.clsDepos item;
@@ -453,18 +453,18 @@ public class Deposito extends PBase {
 		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
 
 		try {
-			
+
 			for (int i = 0; i < items.size(); i++ ) {
 
 				item=items.get(i);
-				
+
 				if (item.Bandera==1) {
 					tot+=item.Valor;
 					efect+=item.Efect;
 					chec+=item.Chec;
-					nchec+=item.NChec;	
+					nchec+=item.NChec;
 				}
-				
+
 			}
 
 			tot=mu.round(tot,2);
@@ -472,9 +472,9 @@ public class Deposito extends PBase {
 			chec=mu.round(chec,2);
 
 			corel=((appGlobals) vApp).ruta+"_"+mu.getCorelBase();
-			
+
 			db.beginTransaction();
-						
+
 			ins.init("D_DEPOS");
 			ins.add("COREL",corel);
 			ins.add("EMPRESA",((appGlobals) vApp).emp);
@@ -483,33 +483,33 @@ public class Deposito extends PBase {
 			ins.add("BANCO",bancoid);
 			ins.add("CUENTA",cuenta);
 			ins.add("REFERENCIA",txtBol.getText().toString());
-			
+
 			ins.add("TOTAL",tot);
 			ins.add("TOTEFEC",efect);
 			ins.add("TOTCHEQ",chec);
 			ins.add("NUMCHEQ",nchec);
-			
+
 			ins.add("IMPRES",0);
 			ins.add("STATCOM","N");
 			ins.add("ANULADO","N");
 			ins.add("CODIGOLIQUIDACION",0);
-			
-			
+
+
 			db.execSQL(ins.sql());
-			
+
 			for (int i = 0; i < items.size(); i++ ) {
-				
+
 				item=items.get(i);
-				
+
 				if (item.Bandera==1) {
-					
+
 					doc=item.Cod;
-					
+
 					if (item.Efect>0) {
-						
+
 						it+=1;
 						item.Efect=mu.round(item.Efect,2);
-						
+
 						ins.init("D_DEPOSD");
 						ins.add("COREL",corel);
 						ins.add("DOCCOREL",doc);
@@ -520,28 +520,28 @@ public class Deposito extends PBase {
 						ins.add("MONTO",item.Efect);
 						ins.add("BANCO","");
 						ins.add("NUMERO","");
-						
-						db.execSQL(ins.sql());	
-						
+
+						db.execSQL(ins.sql());
+
 					}
-					
-		 			if (item.Tipo.equalsIgnoreCase("F")) {
+
+					if (item.Tipo.equalsIgnoreCase("F")) {
 						sql="SELECT Valor,DESC1,DESC3,CODPAGO FROM D_FACTURAP WHERE (COREL='"+doc+"') AND  (TIPO='C')";
-		 			} else {	
+					} else {
 						sql="SELECT Valor,DESC1,DESC3,CODPAGO FROM D_COBROP WHERE (COREL='"+doc+"') AND  (TIPO='C')";
-		 			}					
+					}
 					DT=Con.OpenDT(sql);
-						
+
 					DT.moveToFirst();
 					while (!DT.isAfterLast()) {
-							
+
 						val=DT.getDouble(0);
 						num=DT.getString(1);
 						banco=DT.getString(2);
 						cp=DT.getInt(3);
-							
+
 						it+=1;
-						
+
 						ins.init("D_DEPOSD");
 						ins.add("COREL",corel);
 						ins.add("DOCCOREL",doc);
@@ -552,22 +552,22 @@ public class Deposito extends PBase {
 						ins.add("MONTO",val);
 						ins.add("BANCO",banco);
 						ins.add("NUMERO",num);
-						
-						db.execSQL(ins.sql());	
-									
+
+						db.execSQL(ins.sql());
+
 						DT.moveToNext();
 					}
-					
-		 			if (item.Tipo.equalsIgnoreCase("F")) {
-		 				sql="UPDATE D_FACTURA SET DEPOS='S' WHERE (COREL='"+doc+"')";
-		 			} else {	
-		 				sql="UPDATE D_COBRO SET DEPOS='S' WHERE (COREL='"+doc+"')";
-		 			}									
-					db.execSQL(sql);	
-					
+
+					if (item.Tipo.equalsIgnoreCase("F")) {
+						sql="UPDATE D_FACTURA SET DEPOS='S' WHERE (COREL='"+doc+"')";
+					} else {
+						sql="UPDATE D_COBRO SET DEPOS='S' WHERE (COREL='"+doc+"')";
+					}
+					db.execSQL(sql);
+
 				} // Bandera==1
-				
-			}	
+
+			}
 
 			//Inserta y válida Desglose de depósito.
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
@@ -578,8 +578,8 @@ public class Deposito extends PBase {
 
 				if (DT.getCount()==0){
 					if (tef>0){msgbox("Por favor realice el desglose antes de continuar.");
-					db.endTransaction();
-					return false;}
+						db.endTransaction();
+						return false;}
 				} else {
 
 					DT.moveToFirst();
@@ -609,17 +609,17 @@ public class Deposito extends PBase {
 
 			db.setTransactionSuccessful();
 			db.endTransaction();
-			
+
 			return true;
-			
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
-		   	mu.msgbox( e.getMessage());return false;
+			mu.msgbox( e.getMessage());return false;
 		}
-				
+
 	}
-	
+
 	private void finishDoc(){
 		claseFinDia = new clsFinDia(this);
 		try{
@@ -645,40 +645,40 @@ public class Deposito extends PBase {
 
 
 	// Aux
-	
+
 	private void fillSpinner(){
 		Cursor DT;
-		  
+
 		try {
 			sql="SELECT CODIGO,NOMBRE,CUENTA FROM P_BANCO WHERE (TIPO='D') AND CUENTA = '"+gl.sucur+"' ORDER BY Nombre,Cuenta";
 			DT=Con.OpenDT(sql);
-					
+
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
-				  
-			  spincode.add(DT.getString(0));
-			  spinname.add(DT.getString(1)+" - "+DT.getString(2));
-			  spincuenta.add(DT.getString(2));
-			  
-			  DT.moveToNext();
+
+				spincode.add(DT.getString(0));
+				spinname.add(DT.getString(1)+" - "+DT.getString(2));
+				spincuenta.add(DT.getString(2));
+
+				DT.moveToNext();
 			}
 
 			if(DT!=null) DT.close();
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		   	mu.msgbox( e.getMessage());
-	    }
-					
+			mu.msgbox( e.getMessage());
+		}
+
 		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, spinname);
 		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			
+
 		spinBanco.setAdapter(dataAdapter);
-			
+
 		bancoid="";
-		
-	}	
-	
+
+	}
+
 	private boolean checkValues(){
 		try{
 			if (ttot==0) {
@@ -700,7 +700,7 @@ public class Deposito extends PBase {
 		}
 		return true;
 	}
-	
+
 	private void msgAskSave(String msg) {
 		try {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -727,9 +727,9 @@ public class Deposito extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
-	}	
-	
+
+	}
+
 	private void msgAskExit(String msg) {
 
 		try{
@@ -757,8 +757,8 @@ public class Deposito extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
-	}	
+
+	}
 
 	private void doExit(){
 		try {
@@ -808,7 +808,7 @@ public class Deposito extends PBase {
 
 
 	// Activity Events
-	
+
 	@Override
 	public void onBackPressed() {
 		try{
@@ -818,6 +818,6 @@ public class Deposito extends PBase {
 		}
 
 	}
-	
-	
+
+
 }

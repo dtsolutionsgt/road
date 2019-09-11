@@ -54,6 +54,7 @@ public class DevolBodCan extends PBase {
         pbar = (ProgressBar) findViewById(R.id.progressBar4);pbar.setVisibility(View.INVISIBLE);
         lblReg = (TextView) findViewById(R.id.textView61);lblReg.setText("");
         lblTit = (TextView) findViewById(R.id.txtRoadTit);lblTit.setText("Devolución de canastas");
+        lblTot = (TextView) findViewById(R.id.textView9);lblTot.setText("0.00");
 
         rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp,"");
 

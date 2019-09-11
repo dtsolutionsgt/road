@@ -106,6 +106,10 @@ public class DevCliCant extends PBase {
 
 			setCant();
 
+			if (umcambiar.equalsIgnoreCase("Seleccione UM....")){
+				mu.msgbox("Debe definir unidad de medida a devolver.");return;
+			}
+
 			if (cant<=0){
 				mu.msgbox("Cantidad incorrecta");return;
 			}

@@ -32,14 +32,13 @@ public class clsDescuento {
 		cont=context;
 		
 		prodid=producto;cant=cantidad;
-		
-		/*
+
 		try {
 			active=0;
 			Con = new BaseDatos(context);
 			opendb();
 		} catch (Exception e) {
-		}*/
+		}
 	    
 	    MU=new MiscUtils(context);
 		

@@ -10,6 +10,15 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.epson.eposdevice.commbox.SendDataListener;
+
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+
 
 public class ComWSSend extends PBase {
 
@@ -20,8 +29,14 @@ public class ComWSSend extends PBase {
     private WebService ws;
     private clsDataBuilder dbld;
 
+    private final String NAMESPACE = "http://tempuri.org/";
+    private String METHOD_NAME;
     private String URL="";
+    private String URL_Remota="";
     private int pcount=0;
+    private String sstr="";
+    private int contador=0;
+    private int scon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +65,7 @@ public class ComWSSend extends PBase {
     //region Events
 
     public void doSend(View view) {
-         //initSession();
+        //initSession();
     }
 
     //endregion
@@ -91,6 +106,8 @@ public class ComWSSend extends PBase {
             lbl1.setText("Enviando "+pcount+" pedidos . . .");
         }
 
+        contador = 0;
+
         Handler mtimer = new Handler();
         Runnable mrunner=new Runnable() {
             @Override
@@ -105,30 +122,31 @@ public class ComWSSend extends PBase {
     private void sendData() {
         Cursor dt;
         String cor;
+        scon = 0;
 
         try {
 
             ws = new WebService(ComWSSend.this, URL);
             dbld.clear();
 
-            sql = "SELECT COREL FROM D_PEDIDO WHERE STATCOM='N'";
-            dt = Con.OpenDT(sql);
+                sql = "SELECT COREL FROM D_PEDIDO WHERE STATCOM='N'";
+                dt = Con.OpenDT(sql);
 
-            dt.moveToFirst();
-            while (!dt.isAfterLast()) {
-                cor = dt.getString(0);
-                dbld.insert("D_PEDIDO", "WHERE COREL='"+cor+"'");
-                dbld.insert("D_PEDIDOD","WHERE COREL='"+cor+"'");
+                dt.moveToFirst();
+                while (!dt.isAfterLast()) {
+                    cor = dt.getString(0);
+                    dbld.insert("D_PEDIDO", "WHERE COREL='"+cor+"'");
+                    dbld.insert("D_PEDIDOD","WHERE COREL='"+cor+"'");
 
-                dt.moveToNext();
-            }
+                    dt.moveToNext();
+                }
 
-            ws.sqls.clear();
-            for (int i = 0; i <dbld.items.size(); i++) {
-                ws.sqls.add(dbld.items.get(i));
-            }
+                ws.sqls.clear();
+                for (int i = 0; i <dbld.items.size(); i++) {
+                    ws.sqls.add(dbld.items.get(i));
+                }
 
-            ws.commit();
+                ws.commit();
 
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -136,6 +154,7 @@ public class ComWSSend extends PBase {
         }
 
     }
+
 
     //endregion
 
@@ -159,7 +178,13 @@ public class ComWSSend extends PBase {
             relSend.setVisibility(View.INVISIBLE);
             finish();
         } catch (Exception e) {
-            msgExit("Error de envio : " + e.getMessage());
+            if (contador==0){
+                contador=1;
+                URL=URL_Remota;
+                sendData();
+            }else{
+                msgExit("Error de envio : " + e.getMessage());
+            }
         }
     }
 
@@ -178,13 +203,18 @@ public class ComWSSend extends PBase {
             if (dt.getCount()>0){
                 dt.moveToFirst();
 
-                URL = dt.getString(1);
-                if (gl.isOnWifi==1) URL = dt.getString(0);
+                URL = dt.getString(0);
+                URL_Remota = dt.getString(1);
 
-                if (URL.isEmpty()) {
-                    msgExit("No existe configuración para transferencia de datos");
+                if (URL.isEmpty()){
+                    URL=URL_Remota;
+                }
+
+                if (URL.isEmpty()){
+                    toast("No existe configuración para transferencia de datos");
                     return false;
                 }
+
             }
 
             return true;

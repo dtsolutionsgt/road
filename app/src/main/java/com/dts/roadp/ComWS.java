@@ -102,7 +102,7 @@ public class ComWS extends PBase {
 	private boolean rutapos, ftflag, esvacio, liqid,cargasuper;
 
 	private final String NAMESPACE = "http://tempuri.org/";
-	private String METHOD_NAME, URL;
+	private String METHOD_NAME, URL, URL_Remota;
 
 	protected PowerManager.WakeLock wakelock;
 
@@ -3078,7 +3078,14 @@ public class ComWS extends PBase {
 
 		try {
 
-			if (getTest() == 1) scon = 1;
+			if (getTest() == 1) {
+				scon = 1;
+			}else{
+				URL=URL_Remota;
+				if (getTest() == 1) {
+					scon = 1;
+				}
+			}
 
 			idbg = idbg + sstr;
 
@@ -3221,8 +3228,13 @@ public class ComWS extends PBase {
 		errflag = false;
 
 		if (getTest()==0){
-			errflag=true;
-			return false;
+
+			URL=URL_Remota;
+
+			if (getTest() == 0) {
+				errflag=true;
+				return false;
+			}
 		}
 
 		senv = "Envío terminado \n \n";
@@ -3346,7 +3358,14 @@ public class ComWS extends PBase {
 			//#CKFK 20190429 Saqué esto de envioFinDia para que se guarde bien el log y luego se realice el envío.
 			if (!envioparcial){
 
-				if (getTest()==1) scon=1;
+				if (getTest() == 1) {
+					scon = 1;
+				}else{
+					URL=URL_Remota;
+					if (getTest() == 1) {
+						scon = 1;
+					}
+				}
 
 				if (scon==1) {
 					if (commitSQL() == 1) {
@@ -4727,7 +4746,14 @@ public class ComWS extends PBase {
 
 		try {
 
-			if (getTest()==1) scon=1;
+			if (getTest() == 1) {
+				scon = 1;
+			}else{
+				URL=URL_Remota;
+				if (getTest() == 1) {
+					scon = 1;
+				}
+			}
 
 			if (scon==1) {
 				fstr="Sync OK";
@@ -5018,18 +5044,17 @@ public class ComWS extends PBase {
 			if (DT.getCount()>0){
 				DT.moveToFirst();
 
-				if (gl.isOnWifi==1) {
-					URL = DT.getString(0);
-				}else if(gl.isOnWifi==2){
-					URL = DT.getString(1);
-				}
+				URL = DT.getString(0);
+				URL_Remota = DT.getString(1);
 
 				gl.URLtemp=URL;
 
 				if (!URL.isEmpty()){
 					txtWS.setText(URL);
+				}else if (!URL_Remota.isEmpty()) {
+					txtWS.setText(URL);
 				}else{
-					toast("No hay configurada ruta para transferencia de datos");
+					toast("No hay configurada URL para transferencia de datos");
 				}
 
 			}
@@ -5038,11 +5063,7 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			//MU.msgbox(e.getMessage());
-			//URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
 			URL="*";txtWS.setText("http://192.168.1.142/wsAndr/wsandr.asmx");
-			//URL="*";txtWS.setText("http://192.168.1.142/wsimagen/baktun1.asmx");
-			//txtWS.setText("");
 
 		}
 

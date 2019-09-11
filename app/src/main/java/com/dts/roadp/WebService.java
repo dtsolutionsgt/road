@@ -28,8 +28,10 @@ public class WebService {
     private ArrayList<String> results=new ArrayList<String>();
 
 
-    private String URL,sql,scalsql;
+    private String sql,scalsql;
     private int mode;
+
+    public String URL;
 
     // OpenDT
     private int odt_rows,odt_cols;
@@ -310,6 +312,40 @@ public class WebService {
             return 0;
         }
 
+    }
+
+    public int getTest() {
+
+        METHOD_NAME = "TestWS";
+
+        try {
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            PropertyInfo param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("Value");
+            param.setValue("OK");
+
+            request.addProperty(param);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL,60000);
+
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+            error = response.toString() + "..";
+
+            return 1;
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+
+        return 0;
     }
 
     //endregion

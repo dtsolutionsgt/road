@@ -2457,7 +2457,7 @@ public class FacturaRes extends PBase {
 					gl.closeCliDet = true;
 					gl.closeVenta = true;
 
-					impres++;toast("Impres "+impres);
+					impres++;
 
 					try {
 						if (!gl.cobroPendiente){

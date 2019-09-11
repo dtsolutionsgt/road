@@ -484,6 +484,7 @@ public class FinDia extends PBase {
         try {
 
             db.beginTransaction();
+
             ins.init("D_MOV");
             ins.add("COREL",corel);
             ins.add("RUTA",((appGlobals) vApp).ruta);
@@ -2539,9 +2540,7 @@ public class FinDia extends PBase {
 
 	//#EJC 20190226 Creé esta función para saber si hay inventario para devolver
     private boolean Tiene_Inventario_Devolucion(){
-
         boolean TieneInvDevol = false;
-
         Cursor DT;
 
         try
@@ -2643,7 +2642,7 @@ public class FinDia extends PBase {
                 claseFinDia.updateDevBodega(5);
             }
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             Log.e("TieneInvDevol",e.getMessage());
         }

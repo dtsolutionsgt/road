@@ -191,8 +191,7 @@ public class clsWSEnvio {
 
         try {
 
-            if (getTest()==1)
-            scon=1;
+            if (getTest()==1) scon=1;
 
             idbg=idbg + sstr;
 

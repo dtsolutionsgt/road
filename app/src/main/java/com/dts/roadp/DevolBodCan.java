@@ -154,7 +154,6 @@ public class DevolBodCan extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
     }
 
     private void setHandlers() {
@@ -736,8 +735,6 @@ public class DevolBodCan extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
-
     }
 
     private void askPrint() {

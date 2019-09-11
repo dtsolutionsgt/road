@@ -208,7 +208,6 @@ public class ComWS extends PBase {
 		}
 
 
-
 		mac = getMac();
 		fsql = du.univfechasql(du.getActDate());
 		fsqli = du.univfechasql(du.ffecha00(du.getActDate())) + " 00:00:00";
@@ -3926,7 +3925,7 @@ public class ComWS extends PBase {
 							" FROM D_MOV E INNER JOIN D_MOVD D ON E.COREL = D.COREL" +
 							" WHERE E.COREL = '" + cor + "'" +
 							" UNION" +
-							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO,D.BARRA, '', 'N', GETDATE(), 1, 'N'" +
+							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO, D.BARRA, '', 'N', GETDATE(), 1, 'N'" +
 							" FROM D_MOV E INNER JOIN D_MOVDB D ON E.COREL = D.COREL" +
 							" WHERE E.COREL = '" + cor + "'");
 
@@ -4914,7 +4913,7 @@ public class ComWS extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//MU.msgbox(e.getMessage());
 			//URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
-			URL="*";txtWS.setText("http://192.168.1.142/wsAndr/wsandr.asmx");
+			URL="*";txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 			//URL="*";txtWS.setText("http://192.168.1.142/wsimagen/baktun1.asmx");
 			//txtWS.setText("");
 

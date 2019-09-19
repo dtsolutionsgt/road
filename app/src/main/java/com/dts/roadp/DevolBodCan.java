@@ -747,6 +747,7 @@ public class DevolBodCan extends PBase {
 
             dialog.setTitle("Road");
             dialog.setMessage("¿Impresión correcta?");
+            dialog.setCancelable(false);
 
             dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {

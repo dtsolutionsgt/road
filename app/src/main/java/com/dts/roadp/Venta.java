@@ -1058,7 +1058,7 @@ public class Venta extends PBase {
 			um = uum;
 			umven = app.umVenta(prodid);
 			factbolsa = app.factorPres(prodid, umven, um);
-			cant = cant * factbolsa;
+			cant = cant; //* factbolsa; Quité la multiplicación por el factor de conversión porque siempre se debe guardar la Unidad de Medida de la barra
 
 			if (prodPorPeso(prodid)) {
 				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, ppeso, umven);
@@ -1082,11 +1082,14 @@ public class Venta extends PBase {
 
 			pprecdoc = prec;
 
-			prodtot = prec;
-			prodtot = mu.round2(prodtot);
+			if (factbolsa > 1) {
+				prodtot = cant * factbolsa * prec;
+			}else{
+                prodtot = prec;
+            }
+			if (prodPorPeso(prodid)) prodtot = prec * ppeso;
 
-			if (factbolsa > 1) prodtot = cant * prec;
-			if (prodPorPeso(prodid)) prodtot = mu.round2(prec * ppeso);
+            prodtot = mu.round2(prodtot);
 
 			//region T_BARRA
 
@@ -1377,7 +1380,7 @@ public class Venta extends PBase {
 			um=uum;
 			umven=app.umVenta(prodid);
 			factbolsa=app.factorPres(prodid,umven,um);
-			cant=cant*factbolsa;
+			cant=cant; //*factbolsa; Quité la multiplicación por factura bolsa
 
 			//if (sinimp) precdoc=precsin; else precdoc=prec;
 
@@ -1396,9 +1399,11 @@ public class Venta extends PBase {
 			if (prodPorPeso(prodid)) prec=mu.round2(prec/ppeso);
 			pprecdoc = prec;
 
-			prodtot = prec;
-
-			if (factbolsa>1) prodtot = cant*prec;
+			if (factbolsa>1) {
+                prodtot = cant*factbolsa*prec;
+            }else{
+                prodtot = prec;
+            }
 			if (prodPorPeso(prodid)) prodtot=mu.round2(prec*ppeso);
 
 			//region T_BARRA
@@ -1590,11 +1595,12 @@ public class Venta extends PBase {
 				pprecio=dt.getDouble(2);
 			}
 
-			if (prodid.equalsIgnoreCase("0006") || prodid.equalsIgnoreCase("0629") || prodid.equalsIgnoreCase("0747") ) {
+			//Puse esto en comentario
+			/*if (prodid.equalsIgnoreCase("0006") || prodid.equalsIgnoreCase("0629") || prodid.equalsIgnoreCase("0747") ) {
 				stfact=ccant;
 				stfact=stfact/unfactor;
 				ccant=(int) stfact;
-			}
+			}*/
 
 			if(dt!=null) dt.close();
 

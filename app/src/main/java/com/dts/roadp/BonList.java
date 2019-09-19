@@ -94,7 +94,6 @@ public class BonList extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 	
 	public void selectProd(View view) {
@@ -112,7 +111,11 @@ public class BonList extends PBase {
 		}
 
 	}
-		
+
+	public void cancelBonif(View view) {
+        msgAskNoApl("¿Está seguro de no aplicar la bonificacion?");
+    }
+
 	private void sethandlers() {
 
 		try{
@@ -145,8 +148,7 @@ public class BonList extends PBase {
 
 		
 	}
-	
-	
+
 	// Main
 	
 	private void showBonList() {
@@ -389,7 +391,7 @@ public class BonList extends PBase {
 
 	
 	}
-	
+
 	private void processNextScreen() {
 		try{
 			if (tipolista<2) {
@@ -682,8 +684,35 @@ public class BonList extends PBase {
 		}
 
 	}
-	
-	private void msgAskDel(String msg) {
+
+    private void msgAskNoApl(String msg) {
+
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle(R.string.app_name);
+            dialog.setMessage(msg);
+
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+
+    }
+
+    private void msgAskDel(String msg) {
 
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);

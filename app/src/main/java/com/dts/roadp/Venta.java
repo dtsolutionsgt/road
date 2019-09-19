@@ -51,7 +51,7 @@ public class Venta extends PBase {
 	private ArrayList<String> lcode = new ArrayList<String>();
 	private ArrayList<String> lname = new ArrayList<String>();
 
-	private int browse;
+	private int browse,val;
 
 	private double cant,desc,mdesc,prec,precsin,imp,impval;
 	private double descmon,tot,totsin,percep,ttimp,ttperc,ttsin,prodtot;
@@ -468,7 +468,7 @@ public class Venta extends PBase {
 			sql="SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, T_VENTA.TOTAL, T_VENTA.CANT, "+
 				"T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, T_VENTA.PESO, T_VENTA.UMSTOCK, T_VENTA.PRECIO  " +
 				 "FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO "+
-				 "ORDER BY P_PRODUCTO.DESCCORTA ";
+				 "ORDER BY T_VENTA.VAL1 ";
 
 			DT=Con.OpenDT(sql);
 
@@ -724,7 +724,7 @@ public class Venta extends PBase {
 	}
 
 	private void addItem(){
-		Cursor dt;
+		Cursor dt,DT;
 		double precdoc,fact,cantbas,peso;
 		String umb;
 
@@ -805,7 +805,20 @@ public class Venta extends PBase {
 			}
 
 			ins.add("PESO",peso);
-			ins.add("VAL1",0);
+
+			try {
+				sql="SELECT MAX(VAL1) FROM T_VENTA";
+				DT=Con.OpenDT(sql);
+
+				if(DT.getCount()==0) val=0; else val = DT.getInt(0) + 1;
+
+				DT.moveToFirst();
+
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			}
+
+			ins.add("VAL1",val);
 			ins.add("VAL2","");
 			ins.add("VAL3",0);
 			ins.add("VAL4","");
@@ -1009,7 +1022,7 @@ public class Venta extends PBase {
 	}
 
 	private int barraBolsa() {
-		Cursor dt;
+		Cursor dt, DT;
 		double ppeso=0,pprecdoc=0,factbolsa;
 		String uum,umven,uunistock;
 		boolean isnew=true;
@@ -1212,6 +1225,19 @@ public class Venta extends PBase {
 				}
 
 				ins.add("PESO",ppeso);
+
+				try {
+					sql="SELECT MAX(VAL1) FROM T_VENTA";
+					DT=Con.OpenDT(sql);
+
+					if(DT.getCount()==0) val=0; else val = DT.getInt(0) + 1;
+
+					DT.moveToFirst();
+
+				} catch (Exception e) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+				}
+
 				ins.add("VAL1",0);
 				ins.add("VAL2","");
 				ins.add("VAL3",0);
@@ -1244,7 +1270,7 @@ public class Venta extends PBase {
 	}
 
 	private int barraBolsaTrans() {
-		Cursor dt;
+		Cursor dt, DT;
 		double ppeso=0,pprecdoc=0,factbolsa;
 		String uum,umven,uunistock;
 		boolean isnew=true;
@@ -1428,6 +1454,19 @@ public class Venta extends PBase {
 			}
 
 			ins.add("PESO",ppeso);
+
+			try {
+				sql="SELECT MAX(VAL1) FROM T_VENTA";
+				DT=Con.OpenDT(sql);
+
+				if(DT.getCount()==0) val=0; else val = DT.getInt(0) + 1;
+
+				DT.moveToFirst();
+
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			}
+
 			ins.add("VAL1",0);
 			ins.add("VAL2","");
 			ins.add("VAL3",0);

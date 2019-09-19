@@ -1058,7 +1058,7 @@ public class Venta extends PBase {
 			um = uum;
 			umven = app.umVenta(prodid);
 			factbolsa = app.factorPres(prodid, umven, um);
-			cant = cant; //* factbolsa; Quité la multiplicación por el factor de conversión porque siempre se debe guardar la Unidad de Medida de la barra
+			cant = cant; //* factbolsa; #CKFK 19-09-2019 Quité la multiplicación por el factor de conversión porque siempre se debe guardar la Unidad de Medida de la barra
 
 			if (prodPorPeso(prodid)) {
 				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, ppeso, umven);
@@ -1082,6 +1082,8 @@ public class Venta extends PBase {
 
 			pprecdoc = prec;
 
+			//#CKFK 18-09-2019 Agregué la siguiente validación, de forma tal que el precio solo se multiplique por la el factbolsa
+			// cuando sea mayor que 1
 			if (factbolsa > 1) {
 				prodtot = cant * factbolsa * prec;
 			}else{
@@ -1380,7 +1382,7 @@ public class Venta extends PBase {
 			um=uum;
 			umven=app.umVenta(prodid);
 			factbolsa=app.factorPres(prodid,umven,um);
-			cant=cant; //*factbolsa; Quité la multiplicación por factura bolsa
+			cant=cant; //*factbolsa; #CKFK 18-09-2019 Quité la multiplicación por factura bolsa
 
 			//if (sinimp) precdoc=precsin; else precdoc=prec;
 
@@ -1399,6 +1401,8 @@ public class Venta extends PBase {
 			if (prodPorPeso(prodid)) prec=mu.round2(prec/ppeso);
 			pprecdoc = prec;
 
+			//#CKFK 19-09-2019 Agregué la siguiente validación, de forma tal que el precio solo se multiplique por la el factbolsa
+			// cuando sea mayor que 1
 			if (factbolsa>1) {
                 prodtot = cant*factbolsa*prec;
             }else{

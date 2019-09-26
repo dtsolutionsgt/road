@@ -123,6 +123,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
                 android:gravity="center_horizontal"
+                android:maxLines="1"
                 android:paddingTop="3dp"
                 android:text="UNI"
                 android:textAppearance="?android:attr/textAppearanceMedium"
@@ -449,7 +450,9 @@
         android:layout_height="27dp"
         android:layout_above="@+id/textView6"
         android:layout_marginLeft="10dp"
-        android:layout_toRightOf="@+id/layPres"
+        android:layout_marginBottom="5dp"
+        android:layout_toEndOf="@+id/checkBox8"
+        android:layout_toRightOf="@id/checkBox8"
         android:text="TextView"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -496,5 +499,15 @@
         android:background="#00EBE7E7"
         android:onClick="ModificarPrecio"
         android:text="Precio" />
+
+    <CheckBox
+        android:id="@+id/checkBox8"
+        android:layout_width="101dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/layPres"
+        android:layout_marginStart="14dp"
+        android:layout_marginBottom="0dp"
+        android:layout_toEndOf="@+id/layPres"
+        android:text="1/2 caja" />
 
 </RelativeLayout>

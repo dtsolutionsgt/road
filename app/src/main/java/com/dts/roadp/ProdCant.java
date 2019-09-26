@@ -45,7 +45,7 @@ public class ProdCant extends PBase {
 
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant, modifprecio;
-	private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0, costo=0, nuevoprecio=0, precioMinimo = 0;
+	private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0, costo=0, nuevoprecio=0, precioMinimo = 0, unimedfact = 0;
 	private boolean pexist,esdecimal,porpeso,esbarra,idle=true;
 
 	private String URL;
@@ -282,7 +282,8 @@ public class ProdCant extends PBase {
 				
 			ubas=dt.getString(0);gl.ubas=ubas;			
 			lblDesc.setText(dt.getString(7));
-			
+			unimedfact= dt.getDouble(2);
+
 			//prodimg=DT.getString(6);
 			prodimg=prodid;
 			proddesc=dt.getString(7);
@@ -786,6 +787,10 @@ public class ProdCant extends PBase {
 			if (adcant!=cant) {
 				ajust=true;cant=adcant;
 			}
+		}
+
+		if (unimedfact!=0){
+			cant=cant*unimedfact;
 		}
 
 		cant = mu.round(cant, gl.peDecImp);

@@ -46,7 +46,7 @@ public class MainActivity extends PBase {
 
     private String parNumVer = "9.4.61 / ";
     private String parFechaVer = "19-09-2019";
-    private String parTipoVer = "ROAD QA";
+    private String parTipoVer = "ROAD PRD";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

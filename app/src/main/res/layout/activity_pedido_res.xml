@@ -76,9 +76,9 @@
         android:layout_below="@id/lblReferencia"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_marginLeft="7dp"
-        android:layout_marginTop="11dp"
-        android:layout_marginRight="13dp"
+        android:layout_marginLeft="9dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginRight="10dp"
         android:maxLength="35"
         android:maxLines="1"
         android:textSize="18sp">

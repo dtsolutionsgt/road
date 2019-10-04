@@ -29,13 +29,13 @@ public class clsBonifSave {
 		corel=corelativo;
 		venped=ventaped;
 
-
 		active=0;
 		Con = new BaseDatos(context);
 		opendb();
 		ins=Con.Ins;upd=Con.Upd;
 
 		mu=new MiscUtils(context);
+
 	}
 
 	public void save() {
@@ -73,6 +73,31 @@ public class clsBonifSave {
 		}
 	}
 
+	public long getFechaPedido(String vCorel) {
+		Cursor DT;
+		long vFecha=0;
+
+		try {
+			sql = " SELECT FECHA " +
+					" FROM D_PEDIDO P " +
+					" WHERE P.COREL = '" + vCorel + "'";
+			DT=Con.OpenDT(sql);
+
+			if (DT.getCount()>0) {
+				DT.moveToFirst();
+				vFecha=DT.getLong(0);
+			}
+
+			if (DT != null)DT.close();
+
+		} catch (Exception e) {
+			return 0;
+		}
+
+		return vFecha;
+
+	}
+
 	private void saveDBonif(){
 		Cursor dt;
 		double cant,prec,cost,tot;
@@ -93,12 +118,18 @@ public class clsBonifSave {
 					prec=dt.getDouble(2);
 					cost=dt.getDouble(3);
 					tot=cant*prec;
-					fecha = fecha * 10000;
 
 					ins.init("D_BONIF");
 
 					ins.add("COREL",corel);
 					ins.add("ITEM",ii);
+
+					if (Long.toString(fecha).length()<10 && Long.toString(fecha).length()==6){
+						fecha = fecha * 10000;
+					}else if (Long.toString(fecha).length()<10 && Long.toString(fecha).length()==1){
+						fecha = getFechaPedido(corel);
+					}
+
 					ins.add("FECHA",fecha);
 					ins.add("ANULADO","N");
 					ins.add("EMPRESA",emp);

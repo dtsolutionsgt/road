@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,6 +37,7 @@ public class ProdCant extends PBase {
 	private TextView lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso,lblPesoUni;
 	private ImageView imgProd,imgUpd,imgDel;
 	private Button cmdModifPrecio;
+	private CheckBox chkMediaCaja;
 
 	//#CKFK 20190613 Objetos creados para poder modificar el precio de un producto
 	private EditText txtNuevoPrecio;
@@ -114,7 +116,7 @@ public class ProdCant extends PBase {
 		gl.dval=-1;
 		gl.gstr="";
 
-        paramProd();
+		paramProd();
 
 		txtPeso.setEnabled(validaRango());
 
@@ -191,7 +193,7 @@ public class ProdCant extends PBase {
 
 	}
 
- 	private void setHandlers(){
+	private void setHandlers(){
 
 		try{
 			txtCant.addTextChangedListener(new TextWatcher() {
@@ -256,7 +258,7 @@ public class ProdCant extends PBase {
 	//endregion
 
 	//region Main
- 	
+
 	private void showData() {
 		Cursor dt;
 		double ippeso=0;
@@ -264,25 +266,31 @@ public class ProdCant extends PBase {
 		try {
 			sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
 			dt=Con.OpenDT(sql);
-			dt.moveToFirst();			
+			dt.moveToFirst();
 			um=dt.getString(0);ubas=um;umfact=um;
 			lblBU.setText(ubas);gl.ubas=ubas;upres=ubas;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("1-"+ e.getMessage());
 		}
-	
+
 		try {
-							
+
 			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO,PESO_PROMEDIO,FACTORCONV, "+
-                "COSTO, MODIF_PRECIO, PRECIO_VINETA_O_TUBO "+
-				"FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
-           	dt=Con.OpenDT(sql);
+					"COSTO, MODIF_PRECIO, PRECIO_VINETA_O_TUBO "+
+					"FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
+			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
-				
-			ubas=dt.getString(0);gl.ubas=ubas;			
+
+			ubas=dt.getString(0);gl.ubas=ubas;
 			lblDesc.setText(dt.getString(7));
 			unimedfact= dt.getDouble(2);
+
+			if (unimedfact!=0){
+				chkMediaCaja.setVisibility(View.VISIBLE);
+			}else{
+				chkMediaCaja.setVisibility(View.INVISIBLE);
+			}
 
 			//prodimg=DT.getString(6);
 			prodimg=prodid;
@@ -291,23 +299,23 @@ public class ProdCant extends PBase {
 			pesoprom = dt.getDouble(10);
 			if (pesoprom==0) pesoprom = dt.getDouble(9);
 
-            costo=dt.getDouble(11);
-            modifprecio=dt.getInt(12);
+			costo=dt.getDouble(11);
+			modifprecio=dt.getInt(12);
 			precioMinimo=dt.getDouble(13);
 
-            //#CKFK 20190612 Modificar el formato del label para que al hacer clic pueda ingresar el nuevo precio
-            if (modifprecio==1){
+			//#CKFK 20190612 Modificar el formato del label para que al hacer clic pueda ingresar el nuevo precio
+			if (modifprecio==1){
 				cmdModifPrecio.setBackgroundColor(Color.rgb(51,181,229));
-            }else{
+			}else{
 				lblPrec.setBackgroundColor(Color.WHITE);
-            }
+			}
 
 			if (dt.getString(8).equalsIgnoreCase("P")) pexist=true; else pexist=false;
-			
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		    mu.msgbox("1-"+ e.getMessage());
-	    }
+			mu.msgbox("1-"+ e.getMessage());
+		}
 
 		try {
 			sql="SELECT DECIMALES FROM P_NIVELPRECIO WHERE CODIGO="+nivel;
@@ -330,7 +338,7 @@ public class ProdCant extends PBase {
 			if (!mu.emptystr(prodimg)) {
 				try {
 					prodimg = Environment.getExternalStorageDirectory()+ "/RoadFotos/"+prodimg+".jpg";
-					File file = new File(prodimg); 
+					File file = new File(prodimg);
 					if (file.exists()) {
 						try {
 							Bitmap bmImg = BitmapFactory.decodeFile(prodimg);
@@ -376,7 +384,7 @@ public class ProdCant extends PBase {
 			hidekeyb();
 			msgSinPrecio("El producto no tiene definido precio");return;
 		}
-		
+
 		if (gl.sinimp) prec=prc.precsin;
 
 		//lblPrec.setText("Precio: "+mu.frmcur(prec));
@@ -404,7 +412,7 @@ public class ProdCant extends PBase {
 		} else {
 			imgDel.setVisibility(View.INVISIBLE);
 		}
-		
+
 		if (rutatipo.equalsIgnoreCase("V")) {
 			idisp=getDisp();
 		} else {
@@ -436,7 +444,7 @@ public class ProdCant extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
-        txtPeso.setText(mu.frmdecimal(ippeso, gl.peDecImp));
+		txtPeso.setText(mu.frmdecimal(ippeso, gl.peDecImp));
 	}
 
 	private double DameInventario() {
@@ -444,16 +452,16 @@ public class ProdCant extends PBase {
 		try {
 
 			sql=" SELECT SUM(CANTIDAD) AS CANTIDAD " +
-			" FROM I_EXISTENCIAS E INNER JOIN P_PRODUCTO P ON E.CODPRODUCTO = P.CODIGO " +
-			" WHERE CODPRODUCTO = '" + prodid + "' AND P.PRODUCTO_PADRE = '' " +
-			" GROUP BY CODPRODUCTO " +
-			" UNION " +
-			" SELECT ROUND(SUM(CANTIDAD), " +
-			" (SELECT P1.FACTOR_PADRE FROM P_PRODUCTO P1 WHERE P1.CODIGO = '" + prodid + "' ),0) AS CANTIDAD  " +
-			" FROM I_EXISTENCIAS E INNER JOIN P_PRODUCTO P ON E.CODPRODUCTO = P.CODIGO " +
-			" WHERE  E.CODPRODUCTO IN (SELECT P1.PRODUCTO_PADRE  " +
-			" FROM P_PRODUCTO P1 WHERE P1.CODIGO = '" + prodid + "' ) " +
-			" GROUP BY E.CODPRODUCTO";
+					" FROM I_EXISTENCIAS E INNER JOIN P_PRODUCTO P ON E.CODPRODUCTO = P.CODIGO " +
+					" WHERE CODPRODUCTO = '" + prodid + "' AND P.PRODUCTO_PADRE = '' " +
+					" GROUP BY CODPRODUCTO " +
+					" UNION " +
+					" SELECT ROUND(SUM(CANTIDAD), " +
+					" (SELECT P1.FACTOR_PADRE FROM P_PRODUCTO P1 WHERE P1.CODIGO = '" + prodid + "' ),0) AS CANTIDAD  " +
+					" FROM I_EXISTENCIAS E INNER JOIN P_PRODUCTO P ON E.CODPRODUCTO = P.CODIGO " +
+					" WHERE  E.CODPRODUCTO IN (SELECT P1.PRODUCTO_PADRE  " +
+					" FROM P_PRODUCTO P1 WHERE P1.CODIGO = '" + prodid + "' ) " +
+					" GROUP BY E.CODPRODUCTO";
 
 			ws.openDT(sql);
 
@@ -489,7 +497,7 @@ public class ProdCant extends PBase {
 		double disp = 0;
 		double umf1 =1;
 		double umf2 =1;
-			
+
 		try {
 
 			pesostock=0;
@@ -517,8 +525,8 @@ public class ProdCant extends PBase {
 				pesostock=0;
 			}
 
-            //#CKFK 20190517 Agregué para que el umfactor sea igual al peso promedio en el pedido y se calcule correctamente
-            if(gl.rutatipo.equalsIgnoreCase("P")){
+			//#CKFK 20190517 Agregué para que el umfactor sea igual al peso promedio en el pedido y se calcule correctamente
+			if(gl.rutatipo.equalsIgnoreCase("P")){
 				umfactor = pesoprom;
 			}
 
@@ -529,9 +537,9 @@ public class ProdCant extends PBase {
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-		
+
 		try {
-			sql="SELECT UNIDADMEDIDA FROM P_STOCK WHERE (CODIGO='"+prodid+"')";	
+			sql="SELECT UNIDADMEDIDA FROM P_STOCK WHERE (CODIGO='"+prodid+"')";
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()>0){
@@ -546,13 +554,13 @@ public class ProdCant extends PBase {
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()>0) {
-				dt.moveToFirst();			
+				dt.moveToFirst();
 				umf1=dt.getDouble(0);
 			} else 	{
 				umf1=1;
 				//#EJC20181127: No mostrar mensaje por versión de aprofam.
 				msgFactor("No existe factor de conversión para "+um);return 0;
-			}	
+			}
 
 			dt.close();
 
@@ -560,7 +568,7 @@ public class ProdCant extends PBase {
 			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+umstock+"')";
 			dt=Con.OpenDT(sql);
 			if (dt.getCount()>0) {
-				dt.moveToFirst();			
+				dt.moveToFirst();
 				umf2=dt.getDouble(0);
 			} else {
 				umf2=1;
@@ -578,9 +586,9 @@ public class ProdCant extends PBase {
 				umfactor=umf2/umf1;
 			}
 			*/
-			
+
 			sql="SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO FROM P_STOCK " +
-				" WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
+					" WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
 			dt=Con.OpenDT(sql);
 
 			if(dt.getCount()>0){
@@ -603,21 +611,21 @@ public class ProdCant extends PBase {
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-	    }
+		}
 
 		return 0;
 	}
 
-	private void delItem(){	
+	private void delItem(){
 		try {
-	    	db.execSQL("DELETE FROM T_VENTA WHERE PRODUCTO='"+prodid+"'");
+			db.execSQL("DELETE FROM T_VENTA WHERE PRODUCTO='"+prodid+"'");
 			db.execSQL("DELETE FROM T_BONITEM WHERE Prodid='"+prodid+"'");
 			gl.dval=0;
-	    	super.finish();
+			super.finish();
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
-		}	
+		}
 	}
 
 	private void applyCant() {
@@ -684,7 +692,7 @@ public class ProdCant extends PBase {
 	//endregion
 
 	//region Update Disp
-	
+
 	public void updDisp(){
 
 		try{
@@ -700,9 +708,9 @@ public class ProdCant extends PBase {
 	}
 
 	//endregion
-	
+
 	//region Aux
-	
+
 	private void setControls() {
 
 		try{
@@ -711,7 +719,7 @@ public class ProdCant extends PBase {
 			lblDesc=(TextView) findViewById(R.id.lblFecha);
 			lblCant=(TextView) findViewById(R.id.lblCant);
 			lblPrec=(TextView) findViewById(R.id.lblPNum);
-            lblDisp=(TextView) findViewById(R.id.lblDisp);
+			lblDisp=(TextView) findViewById(R.id.lblDisp);
 			lblBU=(TextView) findViewById(R.id.lblBU);
 			lblTot=(TextView) findViewById(R.id.textView1);lblTot.setText("");
 			lblDispLbl=(TextView) findViewById(R.id.textView8);
@@ -726,11 +734,12 @@ public class ProdCant extends PBase {
 			imgDel=(ImageView) findViewById(R.id.imgCobro);
 			lblUltPrecio=(TextView) findViewById(R.id.lblUltPrecio);
 			txtUltPrecio=(TextView) findViewById(R.id.txtUltPrecio);
+			chkMediaCaja = (CheckBox) findViewById(R.id.checkBox8); chkMediaCaja.setChecked(false); chkMediaCaja.setVisibility(View.INVISIBLE);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		
+
 	}
 
 	private int setCant(boolean mode){
@@ -738,7 +747,7 @@ public class ProdCant extends PBase {
 		boolean ajust=false;
 
 		//if (!idle) return 0;
-		
+
 		lblTot.setText("***");
 		if (mode) {
 			txtPeso.setText("0");peso=0;
@@ -790,7 +799,9 @@ public class ProdCant extends PBase {
 		}
 
 		if (unimedfact!=0){
-			cant=cant*unimedfact;
+			if (chkMediaCaja.isChecked()){
+				cant=cant+0.5;
+			}
 		}
 
 		cant = mu.round(cant, gl.peDecImp);
@@ -818,18 +829,18 @@ public class ProdCant extends PBase {
 		try {
 			if (cant<0)	lblCant.setText(""); else lblCant.setText(String.valueOf(cant));
 			if (porpeso) {
-                //tv=prec*cant;
+				//tv=prec*cant;
 				tv=prec*peso;
-            } else {
-                tv=prec*cant;
-            }
+			} else {
+				tv=prec*cant;
+			}
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			tv=0;mu.msgbox(e.getMessage());
 		}
 
-        lblTot.setText(mu.frmcur(tv));
+		lblTot.setText(mu.frmcur(tv));
 
 		//#CKFK 20190517 Agregué para que el umfactor sea igual al peso promedio en el pedido y se calcule correctamente
 		if(gl.rutatipo.equalsIgnoreCase("P")){
@@ -896,7 +907,7 @@ public class ProdCant extends PBase {
 
 			if (vpeso<pmin) {
 				ss=" El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por debajo de los porcentajes permitidos," +
-				   " mínimo : "+mu.frmdecimal(pmin, gl.peDecImp)+", no se puede aplicar.";
+						" mínimo : "+mu.frmdecimal(pmin, gl.peDecImp)+", no se puede aplicar.";
 				msgbox(ss);return false;
 			}
 
@@ -940,46 +951,46 @@ public class ProdCant extends PBase {
 	}
 
 	private void setPrecio() {
-	    double cu,tv,corig,cround,fruni,frcant,adcant,ppeso=0;
+		double cu,tv,corig,cround,fruni,frcant,adcant,ppeso=0;
 
-        try {
-            ppeso=Double.parseDouble(txtPeso.getText().toString());
-        } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		try {
+			ppeso=Double.parseDouble(txtPeso.getText().toString());
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 
-            if (porpeso) {
+			if (porpeso) {
 				lblTot.setText("***");
 				if (!mu.emptystr(txtPeso.getText().toString())) mu.msgbox("Peso incorrecto");
 				return;
 			}
-        }
+		}
 
-        //prec=prc.precio(prodid,0,nivel,um,gl.umpeso,ppeso);
+		//prec=prc.precio(prodid,0,nivel,um,gl.umpeso,ppeso);
 
-        try {
+		try {
 			if (porpeso) {
 				//tv=prec*ppeso;
 				tv=prec;
 			} else {
 				tv=prec*cant;
 			}
-        } catch (Exception e) {
+		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            tv=0;mu.msgbox(e.getMessage());
-        }
+			tv=0;mu.msgbox(e.getMessage());
+		}
 
-        lblTot.setText(mu.frmcur(tv));
+		lblTot.setText(mu.frmcur(tv));
 
-        try {
-            tv=umfactor*cant;
-            lblCantPeso.setText(mu.frmdecimal(tv,gl.peDecImp)+" "+gl.umpeso);
-        } catch (Exception e) {
+		try {
+			tv=umfactor*cant;
+			lblCantPeso.setText(mu.frmdecimal(tv,gl.peDecImp)+" "+gl.umpeso);
+		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            lblCantPeso.setText("");
-            mu.msgbox(e.getMessage());
-        }
-    }
-	
+			lblCantPeso.setText("");
+			mu.msgbox(e.getMessage());
+		}
+	}
+
 	private void parseCant(double c) {
 		try{
 			DecimalFormat frmdec = new DecimalFormat("#.####");
@@ -994,46 +1005,46 @@ public class ProdCant extends PBase {
 		}
 
 	}
-	
+
 	private double getDispInv(){
 		Cursor DT;
-		
+
 		try {
 			sql="SELECT CANT FROM P_STOCKINV WHERE CODIGO='"+prodid+"'";
-           	DT=Con.OpenDT(sql);
+			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			return DT.getDouble(0);
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return 0;
-	    }		
+		}
 	}
 
-    private void paramProd() {
-        try {
-            AppMethods app = new AppMethods(this, gl, Con, db);
+	private void paramProd() {
+		try {
+			AppMethods app = new AppMethods(this, gl, Con, db);
 
-            porpeso=app.ventaPeso(prodid);
-            esbarra=app.prodBarra(prodid);
-        } catch (Exception e) {
+			porpeso=app.ventaPeso(prodid);
+			esbarra=app.prodBarra(prodid);
+		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            porpeso=false;esbarra=false;
-            msgbox(e.getMessage());
-        }
+			porpeso=false;esbarra=false;
+			msgbox(e.getMessage());
+		}
 
-        if (porpeso) {
-            txtPeso.setVisibility(View.VISIBLE);
-            lblPesoLbl.setVisibility(View.VISIBLE);
-            lblFactor.setVisibility(View.VISIBLE);
+		if (porpeso) {
+			txtPeso.setVisibility(View.VISIBLE);
+			lblPesoLbl.setVisibility(View.VISIBLE);
+			lblFactor.setVisibility(View.VISIBLE);
 			lblCantPeso.setVisibility(View.VISIBLE);
-        }
-    }
+		}
+	}
 
-    private void forceClose() {
-        super.finish();
-    }
+	private void forceClose() {
+		super.finish();
+	}
 
-    private double getUtimoPrecio(String producto,String cliente){
+	private double getUtimoPrecio(String producto,String cliente){
 		Cursor DT;
 		double ultPrec=0;
 
@@ -1086,7 +1097,7 @@ public class ProdCant extends PBase {
 
 	//endregion
 
-    //region Msg
+	//region Msg
 
 	private void msgSinPrecio(String msg) {
 		try{
@@ -1105,9 +1116,9 @@ public class ProdCant extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
-	}	
-	
+
+	}
+
 	public void msgAskUpd(View view) {
 
 		try{
@@ -1133,9 +1144,9 @@ public class ProdCant extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
-	}	
-	
+
+	}
+
 	private void msgAskDel(String msg) {
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -1210,7 +1221,7 @@ public class ProdCant extends PBase {
 	//endregion
 
 	//region Activity Events
-	
+
 	protected void onResume() {
 
 		try{
@@ -1235,7 +1246,7 @@ public class ProdCant extends PBase {
 
 		try{
 
-            final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 			alert.setTitle("Modificar precio");
 
@@ -1265,9 +1276,9 @@ public class ProdCant extends PBase {
 			lblNuevoPrecio.setGravity(Gravity.CENTER);
 			lblNuevoPrecio.setText("Nuevo precio");
 
-            txtNuevoPrecio.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-            //Limita cantidad de decimales para los EditText.
-            txtNuevoPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(2)});
+			txtNuevoPrecio.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			//Limita cantidad de decimales para los EditText.
+			txtNuevoPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(2)});
 			txtNuevoPrecio.setTextSize(20);
 			txtNuevoPrecio.setText(mu.frmcur_sm(precioMinimo));
 			txtNuevoPrecio.selectAll();
@@ -1285,22 +1296,22 @@ public class ProdCant extends PBase {
 			alert.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 
-				    nuevoprecio=Double.parseDouble((txtNuevoPrecio.getText().toString().isEmpty()?"0.00":txtNuevoPrecio.getText().toString()));
+					nuevoprecio=Double.parseDouble((txtNuevoPrecio.getText().toString().isEmpty()?"0.00":txtNuevoPrecio.getText().toString()));
 
 					if(nuevoprecio==0){
-                        mu.toast("El precio debe ser mayor que 0");
+						mu.toast("El precio debe ser mayor que 0");
 						ModificarPrecio(view);
-                    }else if (nuevoprecio < precioMinimo) {
-                        mu.toast("El precio debe ser mayor o igual que el precio mínimo");
+					}else if (nuevoprecio < precioMinimo) {
+						mu.toast("El precio debe ser mayor o igual que el precio mínimo");
 						ModificarPrecio(view);
-                    } else {
+					} else {
 						lblPrec.setText("Precio: "+mu.frmcur(nuevoprecio));
 						gl.nuevoprecio = nuevoprecio;
 						prec=gl.nuevoprecio;
 						setCant(true);
-                        closekeyb();
-                        layout.removeAllViews();
-                    }
+						closekeyb();
+						layout.removeAllViews();
+					}
 				}
 
 			});

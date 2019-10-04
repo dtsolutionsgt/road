@@ -305,6 +305,9 @@ public class PedidoRes extends PBase {
 
 			bonsave.ruta=gl.ruta;
 			bonsave.cliente=gl.cliente;
+
+			fecha = fecha * 10000;
+
 			bonsave.fecha=fecha;
 			bonsave.emp=gl.emp;
 

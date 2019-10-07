@@ -364,7 +364,18 @@ public class ProdCant extends PBase {
 
 			if(dt.getCount()>0){
 				dt.moveToFirst();
-				icant=dt.getDouble(0);
+
+				double nCant = dt.getDouble(0);
+
+				double parteDecimal = nCant % 1; // Lo que sobra de dividir al número entre 1
+				double parteEntera = nCant - parteDecimal; // Le quitamos la parte decimal usando una resta
+
+				icant=parteEntera;
+
+				if(parteDecimal>0) {
+					chkMediaCaja.setChecked(parteDecimal>0?true:false);
+				}
+
 				ippeso=dt.getDouble(1);
 				gl.nuevoprecio = dt.getDouble(2);;
 			}
@@ -782,7 +793,7 @@ public class ProdCant extends PBase {
 		}
 
 		// ajuste a unidades menores
-		if (esdecimal) {
+		/*if (esdecimal) {
 
 			if (umfactor==0) {
 				//msgbox("Factor de conversion incorrecto");return -1;
@@ -796,7 +807,7 @@ public class ProdCant extends PBase {
 			if (adcant!=cant) {
 				ajust=true;cant=adcant;
 			}
-		}
+		}*/
 
 		if (unimedfact!=0){
 			if (chkMediaCaja.isChecked()){

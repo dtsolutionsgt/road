@@ -165,6 +165,7 @@ public class DateUtils {
 		vm=(long) f/100;f=f % 100;
 		vd=(long) f;
 
+		if (vy<100) vy=2000+vy;
 		s=""+vy;
 		if (vm>9) s=s+vm; else s=s+"0"+vm;
 		if (vd>9) s=s+vd; else s=s+"0"+vd;

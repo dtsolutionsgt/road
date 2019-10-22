@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.Calendar;
+
 public class clsBonifSave {
 
 	public String ruta,cliente,emp;
@@ -130,7 +132,7 @@ public class clsBonifSave {
 						fecha = getFechaPedido(corel);
 					}
 
-					ins.add("FECHA",fecha);
+					ins.add("FECHA",getActDate());
 					ins.add("ANULADO","N");
 					ins.add("EMPRESA",emp);
 					ins.add("RUTA",ruta);
@@ -249,7 +251,31 @@ public class clsBonifSave {
 
 	// Aux
 
-	private void rrebajaStock(String prid,double cant) {
+    public long getActDate(){
+        long f;
+        int cyear,cmonth,cday;
+
+        final Calendar c = Calendar.getInstance();
+        cyear = c.get(Calendar.YEAR);
+        cmonth = c.get(Calendar.MONTH)+1;
+        cday = c.get(Calendar.DAY_OF_MONTH);
+
+        f=cfecha(cyear,cmonth,cday);
+
+        return f;
+    }
+
+    public long cfecha(int year,int month, int day) {
+        long c;
+        c=year % 100;
+        c=c*10000+month*100+day;
+
+        return c*10000;
+    }
+
+
+
+    private void rrebajaStock(String prid,double cant) {
 		Cursor DT;
 		double acant,val,disp,cantapl;
 		String lote,doc,stat;

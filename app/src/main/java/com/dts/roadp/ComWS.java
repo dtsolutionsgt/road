@@ -324,10 +324,12 @@ public class ComWS extends PBase {
 				return;
 			}
 
+			/*
 			if (!validaLicencia()) {
 				mu.msgbox("Licencia inválida!");
 				return;
 			}
+			 */
 
 			if (gl.banderafindia) {
 					if (!puedeComunicar()) {

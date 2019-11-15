@@ -126,11 +126,11 @@ public class clsBonifSave {
 					ins.add("COREL",corel);
 					ins.add("ITEM",ii);
 
-					if (Long.toString(fecha).length()<10 && Long.toString(fecha).length()==6){
+					/*if (Long.toString(fecha).length()<10 && Long.toString(fecha).length()==6){
 						fecha = fecha * 10000;
 					}else if (Long.toString(fecha).length()<10 && Long.toString(fecha).length()==1){
 						fecha = getFechaPedido(corel);
-					}
+					}*/
 
 					ins.add("FECHA",getActDate());
 					ins.add("ANULADO","N");

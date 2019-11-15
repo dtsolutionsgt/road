@@ -62,7 +62,6 @@ public class MainActivity extends PBase {
     }
 
     // Grant permissions
-
     private void grantPermissions() {
 
         try {

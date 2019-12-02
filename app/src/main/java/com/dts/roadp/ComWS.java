@@ -3107,94 +3107,114 @@ public class ComWS extends PBase {
 			envioFacturas();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
 			envioPedidos();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
 			envioNotasCredito();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
 			envioNotasDevolucion();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
 
 			envioCobros();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
 
 			envioDepositos();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
 
 			envio_D_MOV();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
+
 			envioCli();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
 
 			envioAtten();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
 
 			envioCoord();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
+
 			envioSolicitud();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
             envioRating();
             if (!fstr.equals("Sync OK")){
                 dbld.savelog();
-                return false;
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
+				return false;
             }
 
 			envioModifCliente();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
 
 			updateAcumulados();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
+
 			updateInventario();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
 
 			if (!update_Corel_GrandTotal()){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
 
 			envioFinDia();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
 

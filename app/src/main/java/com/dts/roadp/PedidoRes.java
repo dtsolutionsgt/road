@@ -77,11 +77,13 @@ public class PedidoRes extends PBase {
 		cliid=gl.cliente;
 		gl.tolpedsend=false;
 		
-		setActDate();
+		setActDate2();
 		fechae=fecha;
 		lblFecha.setText(du.sfecha(fechae));
+
+		setActDate();
 		dweek=mu.dayofweek();
-		
+
 		clsDesc=new clsDescGlob(this);
 		
 		adjustSpinner();
@@ -578,7 +580,19 @@ public class PedidoRes extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	}
-	
+
+	private void setActDate2(){
+		try{
+			final Calendar c = Calendar.getInstance();
+			c.add(Calendar.DATE,1);
+			cyear = c.get(Calendar.YEAR);
+			cmonth = c.get(Calendar.MONTH)+1;
+			cday = c.get(Calendar.DAY_OF_MONTH);
+			fecha=du.cfecha(cyear,cmonth,cday);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
 	// Aux
 	
 	private void adjustSpinner(){

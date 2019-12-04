@@ -44,8 +44,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.4.62 / ";
-    private String parFechaVer = "18-10-2019";
+    private String parNumVer = "9.4.63 / ";
+    private String parFechaVer = "03-12-2019";
     private String parTipoVer = "ROAD PRD";
 
     @Override

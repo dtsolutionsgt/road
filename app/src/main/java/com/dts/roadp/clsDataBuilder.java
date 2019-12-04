@@ -30,7 +30,7 @@ public class clsDataBuilder {
 	
 	private BufferedWriter writer = null,lwriter = null,writerbk = null,lwriterbk = null;
 	private FileWriter wfile,lfile,wfilebk,lfilebk;
-	private String fname,logname,namefile, codCliNuevo,lognamebk,namefilebk;
+	private String fname,logname,logname2,namefile, codCliNuevo,lognamebk,namefilebk;
 
 	public clsDataBuilder(Context context) {
 		
@@ -52,6 +52,7 @@ public class clsDataBuilder {
 		
 		fname = Environment.getExternalStorageDirectory()+"/SyncFold/rd_data.txt";
 		logname = Environment.getExternalStorageDirectory()+"/roadenvio.txt";
+		logname2 = Environment.getExternalStorageDirectory()+"/roadenvio_bck.txt";
 		namefile = Environment.getExternalStorageDirectory()+"/data.acr";
 
 		lognamebk = Environment.getExternalStorageDirectory()+"/roadenvio"+DU.dayofweek(fechaFactTol(DU.getActDate()))+".txt";
@@ -244,6 +245,30 @@ public class clsDataBuilder {
 		try {
 
 			wfile=new FileWriter(namefile,false);
+			writer = new BufferedWriter(wfile);
+			writer.write("#"+fecha);writer.write("\r\n");
+
+			for (int i = 0; i < items.size(); i++) {
+				s=items.get(i);
+				writer.write(s);writer.write("\r\n");
+			}
+
+			writer.close();
+
+		} catch(Exception e){
+			return 0;
+		}
+
+		return 1;
+	}
+
+	public int saveArchivo_bck(String fecha){
+		String s;
+		if (items.size()==0) {return 1;}
+
+		try {
+
+			wfile=new FileWriter(logname2,false);
 			writer = new BufferedWriter(wfile);
 			writer.write("#"+fecha);writer.write("\r\n");
 

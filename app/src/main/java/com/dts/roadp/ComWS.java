@@ -769,6 +769,61 @@ public class ComWS extends PBase {
 		return errflag;
 	}
 
+	private boolean generaArchivoBck() {
+
+		errflag = false;
+
+		items.clear();
+		dbld.clearlog();
+
+		try {
+
+			esEnvioManual = true;
+
+			envioFacturas();
+
+			envioPedidos();
+
+			envioNotasCredito();
+
+			envioNotasDevolucion();
+
+			envioCobros();
+
+			envioDepositos();
+
+			envio_D_MOV();
+
+			envioCli();
+
+			envioAtten();
+
+			envioCoord();
+
+			envioSolicitud();
+
+			envioRating();
+
+			updateAcumulados();
+
+			updateInventario();
+
+			update_Corel_GrandTotal();
+
+			envioFinDia();
+
+			dbld.saveArchivo_bck(du.getActDateStr());
+
+			errflag = true;
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			esEnvioManual = false;
+		}
+
+		return errflag;
+	}
+
 	private void Eliminatablas(){
 		boolean Eliminadas = false;
 		try{
@@ -3260,86 +3315,113 @@ public class ComWS extends PBase {
 		items.clear();
 		dbld.clearlog();
 
+		generaArchivoBck();
+
+		dbld.clearlog();
+
 		try {
 
 			envioFacturas();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
+
 			envioPedidos();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
+
 			envioNotasCredito();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
+
 			envioNotasDevolucion();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
 
 			envioCobros();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
 
 			envioDepositos();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
 
 			envio_D_MOV();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
+
 			envioCli();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
 
 			envioAtten();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
+
 			envioCoord();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
+
 			envioSolicitud();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
+
 			envioRating();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
 
 			updateAcumulados();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
+
 			updateInventario();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
 
 			if (!update_Corel_GrandTotal()){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
 
@@ -3347,6 +3429,7 @@ public class ComWS extends PBase {
 
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
+				addlog(new Object() {}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
 

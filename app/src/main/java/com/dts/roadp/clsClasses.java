@@ -36,9 +36,9 @@ public class clsClasses {
 	}	
 	
 	public class clsVenta {
-		public String Cod,Nombre,um,val,valp,sdesc;
-		public double Cant,Peso,Prec,Desc,Total,imp,percep, precio;
-		
+		public String Cod,Nombre,um,val,valp,sdesc,ums;
+		public double Cant,Peso,Prec,Desc,Total,imp,percep, precio,factor;
+
 	}
 	
 	public class clsPromoItem {

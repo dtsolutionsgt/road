@@ -462,10 +462,11 @@ public class Venta extends PBase {
 		items.clear();tot=0;ttimp=0;ttperc=0;selidx=-1;ii=0;
 
 		try {
-			sql="SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, T_VENTA.TOTAL, T_VENTA.CANT, "+
-				"T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, T_VENTA.PESO, T_VENTA.UMSTOCK, T_VENTA.PRECIO  " +
-				 "FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO "+
-				 "ORDER BY P_PRODUCTO.DESCCORTA ";
+			sql=" SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, T_VENTA.TOTAL, T_VENTA.CANT, "+
+				" T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, " +
+				" T_VENTA.PESO, T_VENTA.UMSTOCK, T_VENTA.PRECIO, T_VENTA.FACTOR  " +
+				" FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO "+
+				" ORDER BY P_PRODUCTO.DESCCORTA ";
 
 			DT=Con.OpenDT(sql);
 
@@ -486,18 +487,29 @@ public class Venta extends PBase {
 					item.sdesc=mu.frmdec(item.Desc)+" %";
 					item.imp=DT.getDouble(6);
 					item.percep=DT.getDouble(7);
+					item.ums=DT.getString(10);
+					item.um=DT.getString(8);
+					item.factor=DT.getDouble(12);
+
 					//if (prodPorPeso(item.Cod)) 	item.um=DT.getString(10); else item.um=app.umVenta(item.Cod);
 
-                    if (rutatipo.equalsIgnoreCase("V")) {
-                        item.um=DameUnidadMinimaVenta(item.Cod);
-                    } else {
-                        item.um=DT.getString(8);//app.umVenta(item.Cod);
-                    }
+//                    if (rutatipo.equalsIgnoreCase("V")) {
+//                        item.um=DameUnidadMinimaVenta(item.Cod);
+//                    } else {
+//                        item.um=DT.getString(8);//app.umVenta(item.Cod);
+//                    }
+
+					if (item.um.equalsIgnoreCase(gl.umpeso)) {
+						item.um = item.ums;
+					}
 
                     item.Peso=DT.getDouble(9);
 					item.precio=DT.getDouble(11);
 
+					if (app.prodBarra(item.Cod)) item.Cant = item.Cant * item.factor;
+
 					item.val=mu.frmdecimal(item.Cant,gl.peDecImp)+" "+ltrim(item.um,6);
+
 					if (gl.usarpeso) {
 						item.valp=mu.frmdecimal(item.Peso,gl.peDecImp)+" "+ltrim(gl.umpeso,6);
 					} else {
@@ -1055,9 +1067,14 @@ public class Venta extends PBase {
 
 			if (dt != null) dt.close();
 
-			um = uum;
+			//#CKFK 20191204 Modifiqué la forma de obtener la unidad de medida (um)
+			//um = uum;
+			//La um se obtenía antes de la umventa
 			umven = app.umVenta(prodid);
-			factbolsa = app.factorPres(prodid, umven, um);
+			um = (umven==gl.umpeso?uum:umven);
+			factbolsa = DameProporcionVenta(prodid, gl.cliente, gl.nivel);//#CKFK Modifiqué la forma de obtener el factor de conversion
+			// app.factorPres(prodid, umven, um);
+
 			cant = cant; //* factbolsa; #CKFK 19-09-2019 Quité la multiplicación por el factor de conversión porque siempre se debe guardar la Unidad de Medida de la barra
 
 			if (prodPorPeso(prodid)) {

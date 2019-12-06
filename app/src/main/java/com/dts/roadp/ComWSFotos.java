@@ -260,7 +260,7 @@ public class ComWSFotos extends PBase {
 
     private boolean getData() {
         String ims;
-
+        String errorI = "";
         ferr = "";
 
         try {
@@ -271,7 +271,7 @@ public class ComWSFotos extends PBase {
             for (int i = 0; i <reccnt; i++) {
 
                 ims=listItems.get(i);
-                if (guardaImagen(ims)==1) rec++;
+                if (guardaImagen(ims)==1) rec++; else errorI += " " + i + " " + sstr;
 
                 if (i % 5 == 0) {
                     fprog = "Procesando "+(i+1)+" / "+reccnt;
@@ -308,6 +308,10 @@ public class ComWSFotos extends PBase {
             ConT.close();
         } catch (Exception e) {
             addlog(new Object()  {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+        }
+
+        if (!errorI.isEmpty()){
+            addlog(new Object()  {}.getClass().getEnclosingMethod().getName(), errorI, "Error importando imagenes");
         }
 
         return true;

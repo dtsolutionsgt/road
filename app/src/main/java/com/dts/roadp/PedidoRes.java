@@ -432,7 +432,7 @@ public class PedidoRes extends PBase {
 		try {
 			upd.init("P_CLIRUTA");
 			upd.add("BANDERA",0);
-			upd.Where("CLIENTE='"+cliid+"' AND DIA="+dweek);
+			upd.Where("CLIENTE='"+cliid+"'");//AND DIA="+dweek  #CKFK 20191209 quité la condición del día para que siempre se actualice
 	
 			db.execSQL(upd.SQL());
 		} catch (SQLException e) {

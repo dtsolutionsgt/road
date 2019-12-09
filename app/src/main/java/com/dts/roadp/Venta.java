@@ -1850,7 +1850,7 @@ public class Venta extends PBase {
 		{
 			upd.init("P_CLIRUTA");
 			upd.add("BANDERA",cna);
-			upd.Where("CLIENTE='"+cliid+"' AND DIA="+dweek);
+			upd.Where("CLIENTE='"+cliid+"'");// AND DIA="+dweek #CKFK 20191209 Quité la condición del día
 
 			db.execSQL(upd.SQL());
 		} catch (SQLException e) {

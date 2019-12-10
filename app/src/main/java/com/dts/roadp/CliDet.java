@@ -431,7 +431,12 @@ public class CliDet extends PBase {
 			sgps=mu.frmgps(DT.getDouble(10))+ " , "+ mu.frmgps(DT.getDouble(9));
 			lblGPS.setText(sgps);
 
-			showStaticMap();
+			try{
+				showStaticMap();
+			}catch (Exception ex){
+				//Error mostrando el mapa
+			}
+
 
 			gl.media=DT.getInt(11);
 

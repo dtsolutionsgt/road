@@ -449,13 +449,15 @@ public class ProdCant extends PBase {
 			lblDisp.setText("");lblDispLbl.setText("");
 		}
 
+		txtPeso.setText(mu.frmdecimal(ippeso, gl.peDecImp));
+
 		try {
 			txtCant.setSelection(txtCant.getText().length());
+			txtCant.requestFocus();
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
-		txtPeso.setText(mu.frmdecimal(ippeso, gl.peDecImp));
 	}
 
 	private double DameInventario() {

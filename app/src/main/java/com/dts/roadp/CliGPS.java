@@ -157,11 +157,13 @@ public class CliGPS extends PBase {
 				@Override
 				protected Bitmap doInBackground(Void... params) {
 					Bitmap bmp = null;
-					HttpClient httpclient = new DefaultHttpClient();
-					HttpGet request = new HttpGet(URL);
 
-					InputStream in = null;
 					try {
+						HttpClient httpclient = new DefaultHttpClient();
+						HttpGet request = new HttpGet(URL);
+
+						InputStream in = null;
+
 						HttpResponse response = httpclient.execute(request);
 						in = response.getEntity().getContent();
 						bmp = BitmapFactory.decodeStream(in);

@@ -30,6 +30,7 @@ public class clsDocPedido extends clsDocument {
 	protected boolean buildDetail() {
 		itemData item;
 		String cu,cp;
+        String umTemp="";
 
 		rep.line();
 		rep.add("CODIGO   DESCRIPCION                ");
@@ -42,7 +43,9 @@ public class clsDocPedido extends clsDocument {
 			rep.add(item.cod + " " + item.nombre);
 			//rep.add3lrr(rep.rtrim(""+item.cant,5),item.prec,item.tot);
 
-			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um.substring(0,3),6);
+			umTemp = (item.um.length()>2?item.um.substring(0,3):item.um);
+
+			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(umTemp,6);
 			cp=frmdecimal(0,decimp)+" "+rep.ltrim(item.ump,3);
 			
 			rep.add3fact(cu+" "+cp,item.prec,item.tot);

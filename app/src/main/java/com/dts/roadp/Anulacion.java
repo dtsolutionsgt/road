@@ -453,24 +453,24 @@ public class Anulacion extends PBase {
             sql = "UPDATE D_NOTACRED SET ANULADO ='S' WHERE FACTURA ='" + itemid + "'";
             db.execSQL(sql);
 
-            sql = "UPDATE D_CXC SET ANULADO ='S' WHERE REFERENCIA ='" + itemid + "' AND TIPO  = 'N' ";
+            sql = "UPDATE D_CXC SET ANULADO ='S' WHERE REFERENCIA ='" + itemid + "'";
             db.execSQL(sql);
 
 			anulBonif(itemid);
 
 			// Nota credito
-
-			sql="SELECT COREL FROM D_NOTACRED WHERE FACTURA='"+itemid+"'";
-			dt=Con.OpenDT(sql);
-			if (dt.getCount()>0) {
-				dt.moveToFirst();ncred=dt.getString(0);
-
-				sql = "UPDATE D_CXC SET ANULADO='S' WHERE COREL='" + ncred + "' ";
-				db.execSQL(sql);
-
-				sql = "UPDATE D_NOTACRED SET ANULADO='S' WHERE COREL='" + ncred + "'";
-				db.execSQL(sql);
-			}
+//
+//			sql="SELECT COREL FROM D_NOTACRED WHERE FACTURA='"+itemid+"'";
+//			dt=Con.OpenDT(sql);
+//			if (dt.getCount()>0) {
+//				dt.moveToFirst();ncred=dt.getString(0);
+//
+//				sql = "UPDATE D_CXC SET ANULADO='S' WHERE COREL='" + ncred + "' ";
+//				db.execSQL(sql);
+//
+//				sql = "UPDATE D_NOTACRED SET ANULADO='S' WHERE COREL='" + ncred + "'";
+//				db.execSQL(sql);
+//			}
 
 			//ImpresionFactura();
 

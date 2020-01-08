@@ -171,7 +171,7 @@ public class ComWS extends PBase {
 			if (mu.emptystr(txtRuta.getText().toString())) {
 				txtRuta.setText("1");
 				txtEmp.setText("009");
-				txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
+				txtWS.setText("http://190.34.215.189/wsandr/wsandr.asmx");
 			}
 		}
 
@@ -217,11 +217,11 @@ public class ComWS extends PBase {
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
 			if (mu.emptystr(txtRuta.getText().toString())) {
-				txtRuta.setText("2024-5");
-				txtEmp.setText("03");
+				txtRuta.setText("1");
+				txtEmp.setText("009");
 			}
 
-			txtWS.setText("http://200.46.46.104:8001/RDC7_SAP_PRD_ANDR/wsAndr.asmx");
+			txtWS.setText("http://190.34.215.189/wsandr/wsandr.asmx");
 
 			//txtRuta.setText("8001-1");
 			//txtEmp.setText("03");
@@ -3078,7 +3078,15 @@ public class ComWS extends PBase {
 
 		errflag = false;
 
-		if (getTest()==0) return false;
+		if (getTest() == 0) {
+
+			URL = URL_Remota;
+
+			if (getTest() == 0) {
+				errflag = true;
+				return false;
+			}
+		}
 
 		senv = "Envío terminado \n \n";
 

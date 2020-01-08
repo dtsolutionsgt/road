@@ -30,7 +30,7 @@ public class clsDataBuilder {
 	
 	private BufferedWriter writer = null,lwriter = null,writerbk = null,lwriterbk = null;
 	private FileWriter wfile,lfile,wfilebk,lfilebk;
-	private String fname,logname,namefile, codCliNuevo,lognamebk,namefilebk;
+	private String fname,logname,logname2,namefile, codCliNuevo,lognamebk,namefilebk;
 
 	public clsDataBuilder(Context context) {
 		
@@ -289,6 +289,56 @@ public class clsDataBuilder {
 		}
 	}
 
+	public int saveArchivo_bck(String fecha){
+		String s;
+		if (items.size()==0) {return 1;}
+
+		try {
+
+			wfile=new FileWriter(logname2,false);
+			writer = new BufferedWriter(wfile);
+			writer.write("#"+fecha);writer.write("\r\n");
+
+			for (int i = 0; i < items.size(); i++) {
+				s=items.get(i);
+				writer.write(s);writer.write("\r\n");
+			}
+
+			writer.close();
+
+		} catch(Exception e){
+			return 0;
+		}
+
+		return 1;
+	}
+
+
+	public void savelog(String flogname) {
+		String s;
+		FileWriter ffile;
+		BufferedWriter fwriter;
+		flogname =  Environment.getExternalStorageDirectory()+"/"+flogname;
+
+		if (sendlog.size()==0) return ;
+
+		try {
+
+			ffile=new FileWriter(flogname,false);
+			fwriter = new BufferedWriter(ffile);
+
+			for (int i = 0; i < sendlog.size(); i++) {
+				s=sendlog.get(i);
+				fwriter.write(s);
+				fwriter.write("\r\n");
+			}
+
+			fwriter.close();
+
+		} catch(Exception e){
+			return;
+		}
+	}
 
 	// Private
 	

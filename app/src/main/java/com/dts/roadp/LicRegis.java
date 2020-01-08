@@ -48,7 +48,7 @@ public class LicRegis extends PBase {
 	private boolean rutapos;
 	
 	private final String NAMESPACE ="http://tempuri.org/";
-	private String METHOD_NAME,URL;
+	private String METHOD_NAME,URL, URL_Remota;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -413,8 +413,15 @@ public class LicRegis extends PBase {
 		running=1;fstr="No connect";scon=0;
 					
 		try {
-						
-			if (getTest()==1) {scon=1;}
+
+			if (getTest() == 1) {
+				scon = 1;
+			} else {
+				URL = URL_Remota;
+				if (getTest() == 1) {
+					scon = 1;
+				}
+			}
 					
 			if (scon==1) {
 				fstr="Sync OK";	
@@ -517,41 +524,83 @@ public class LicRegis extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
+	}
 
-			
-	}	
-	
 	public void getWSURL() {
 		Cursor DT;
 		String wsurl;
-		
-		txtRuta.setText(ruta);
-		txtEmp.setText(gEmpresa);
-		
-		try {
-			sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='"+ruta+"'";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
-			
-			//if (((appGlobals) vApp).tipo==0) {
-			//	wsurl=DT.getString(1);			
-			//} else {	
-			//	wsurl=DT.getString(0);
-			//}
-			
-			wsurl=DT.getString(0);
-			
-			URL=wsurl;
-			txtWS.setText(URL);
-		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			//MU.msgbox(e.getMessage());
-			URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
-			//txtWS.setText("");
-			return;
+
+		if (!gl.debug) {
+			txtRuta.setText(ruta);
+			txtEmp.setText(gEmpresa);
 		}
-		
+
+		try {
+
+			sql = "SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='" + ruta + "'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
+
+				URL = DT.getString(0);
+				URL_Remota = DT.getString(1);
+
+				gl.URLtemp = URL;
+
+				if (!URL.isEmpty()) {
+					txtWS.setText(URL);
+				} else if (!URL_Remota.isEmpty()) {
+					txtWS.setText(URL);
+				} else {
+					toast("No hay configurada URL para transferencia de datos");
+				}
+
+			}
+
+			if (DT != null) DT.close();
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			URL = "*";
+			txtWS.setText("http://192.168.1.142/wsAndr/wsandr.asmx");
+
+		}
+
 	}
+
+//	public void getWSURL() {
+//		Cursor DT;
+//		String wsurl;
+//
+//		txtRuta.setText(ruta);
+//		txtEmp.setText(gEmpresa);
+//
+//		try {
+//			sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='"+ruta+"'";
+//			DT=Con.OpenDT(sql);
+//			DT.moveToFirst();
+//
+//			//if (((appGlobals) vApp).tipo==0) {
+//			//	wsurl=DT.getString(1);
+//			//} else {
+//			//	wsurl=DT.getString(0);
+//			//}
+//
+//			wsurl=DT.getString(0);
+//
+//			URL=wsurl;
+//			txtWS.setText(URL);
+//		} catch (Exception e) {
+//			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+//			//MU.msgbox(e.getMessage());
+//			URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
+//			//txtWS.setText("");
+//			return;
+//		}
+//
+//	}
 	
 	private boolean setComParams() {
 		String ss;

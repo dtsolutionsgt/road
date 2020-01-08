@@ -52,6 +52,7 @@ public class clsDataBuilder {
 		
 		fname = Environment.getExternalStorageDirectory()+"/SyncFold/rd_data.txt";
 		logname = Environment.getExternalStorageDirectory()+"/roadenvio.txt";
+		logname2 = Environment.getExternalStorageDirectory()+"/roadenvio_bck.txt";
 		namefile = Environment.getExternalStorageDirectory()+"/data.acr";
 
 		lognamebk = Environment.getExternalStorageDirectory()+"/roadenvio"+DU.dayofweek(fechaFactTol(DU.getActDate()))+".txt";

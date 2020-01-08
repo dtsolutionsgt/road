@@ -3244,7 +3244,14 @@ public class ComWS extends PBase {
 			//#CKFK 20190429 Saqué esto de envioFinDia para que se guarde bien el log y luego se realice el envío.
 			if (!envioparcial){
 
-				if (getTest()==1) scon=1;
+				if (getTest() == 1) {
+					scon = 1;
+				} else {
+					URL = URL_Remota;
+					if (getTest() == 1) {
+						scon = 1;
+					}
+				}
 
 				if (scon==1) {
 					if (commitSQL() == 1) {
@@ -3314,9 +3321,7 @@ public class ComWS extends PBase {
 
 			envioFinDia();
 
-			//dbld.saveArchivo_bck(du.getActDateStr());
-
-			errflag = true;
+			dbld.saveArchivo_bck(du.getActDateStr());
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -3443,7 +3448,7 @@ public class ComWS extends PBase {
 				} catch (Exception e) {
 					errflag = true;
 
-					//dbld.savelog("facturas.txt");
+					dbld.savelog("facturas.txt");
 
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -3466,7 +3471,7 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			errflag = true;
 
-			//dbld.savelog("facturas.txt");
+			dbld.savelog("facturas.txt");
 
 			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
@@ -5030,6 +5035,7 @@ public class ComWS extends PBase {
 		}
 
 	}
+
 //
 //	public void getWSURL() {
 //		Cursor DT;
@@ -5357,7 +5363,7 @@ public class ComWS extends PBase {
                                     }
                                 else
                                     {
-                                        if (YaComunico)
+                                        if (YaComunico &&  !(TieneFact || TienePedidos) && !TieneCobros && !TieneDevol)
                                             {
                                                 lblRec.setVisibility(View.VISIBLE);	imgRec.setVisibility(View.VISIBLE);
                                                 lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);

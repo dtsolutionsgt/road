@@ -3278,6 +3278,7 @@ public class ComWS extends PBase {
 
 		return true;
 	}
+
 	private boolean generaArchivoBck() {
 
 		errflag = false;
@@ -3331,7 +3332,6 @@ public class ComWS extends PBase {
 
 		return errflag;
 	}
-
 
 	private int validaLiquidacion() {
 		Cursor DT;
@@ -3415,7 +3415,7 @@ public class ComWS extends PBase {
 						wsStask.onProgressUpdate();
 					}
 
-					if (envioparcial) dbld.clear();
+					if (envioparcial && !esEnvioManual) dbld.clear();
 
 					dbld.insert("D_FACTURA", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_FACTURAD", "WHERE COREL='" + cor + "'");
@@ -3521,7 +3521,7 @@ public class ComWS extends PBase {
 					}
 
 
-					if (envioparcial) dbld.clear();
+                    if (envioparcial && !esEnvioManual) dbld.clear();
 
 					dbld.insert("D_PEDIDO", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_PEDIDOD", "WHERE COREL='" + cor + "'");
@@ -3602,7 +3602,7 @@ public class ComWS extends PBase {
 						wsStask.onProgressUpdate();
 					}
 
-					if (envioparcial) dbld.clear();
+                    if (envioparcial && !esEnvioManual) dbld.clear();
 
 					dbld.insert("D_COBRO", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_COBROD", "WHERE COREL='" + cor + "'");
@@ -3684,7 +3684,7 @@ public class ComWS extends PBase {
 						wsStask.onProgressUpdate();
 					}
 
-					if (envioparcial) dbld.clear();
+                    if (envioparcial && !esEnvioManual) dbld.clear();
 
 					dbld.insert("D_NOTACRED", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_NOTACREDD", "WHERE COREL='" + cor + "'");
@@ -3763,7 +3763,7 @@ public class ComWS extends PBase {
 						wsStask.onProgressUpdate();
 					}
 
-					if (envioparcial) dbld.clear();
+                    if (envioparcial && !esEnvioManual) dbld.clear();
 
 					dbld.insert("D_CXC", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_CXCD", "WHERE COREL='" + cor + "'");
@@ -3858,7 +3858,7 @@ public class ComWS extends PBase {
 						wsStask.onProgressUpdate();
 					}
 
-					if (envioparcial) dbld.clear();
+                    if (envioparcial && !esEnvioManual) dbld.clear();
 
 					dbld.insert("D_DEPOS", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_DEPOSD", "WHERE COREL='" + cor + "'");
@@ -3957,7 +3957,7 @@ public class ComWS extends PBase {
 						wsStask.onProgressUpdate();
 					}
 
-					if (envioparcial) dbld.clear();
+                    if (envioparcial && !esEnvioManual) dbld.clear();
 
 					dbld.insert("D_MOV", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_MOVD", "WHERE COREL='" + cor + "'");
@@ -4125,7 +4125,7 @@ public class ComWS extends PBase {
 
 				try {
 
-					if (envioparcial) dbld.clear();
+                    if (envioparcial && !esEnvioManual) dbld.clear();
 
 					dbld.insert("D_ATENCION", "WHERE (RUTA='" + cor + "') AND (FECHA=" + fecha + ") AND (HORALLEG='" + hora + "') ");
 
@@ -4183,7 +4183,7 @@ public class ComWS extends PBase {
 
 				try {
 
-					if (envioparcial) dbld.clear();
+                    if (envioparcial && !esEnvioManual) dbld.clear();
 
 					ss = "UPDATE P_CLIENTE SET COORX=" + px + ",COORY=" + py + " WHERE (CODIGO='" + cod + "')";
 					dbld.add(ss);
@@ -4243,7 +4243,7 @@ public class ComWS extends PBase {
 
 				try {
 
-					if (envioparcial) dbld.clear();
+                    if (envioparcial && !esEnvioManual) dbld.clear();
 
 					dbld.add(cadena);
 					cadena = cadena.replace("'","''");
@@ -4311,7 +4311,7 @@ public class ComWS extends PBase {
 						wsStask.onProgressUpdate();
 					}
 
-					if (envioparcial) dbld.clear();
+                    if (envioparcial && !esEnvioManual) dbld.clear();
 
 					dbld.insert("D_SOLICINV", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_SOLICINVD", "WHERE COREL='" + cor + "'");
@@ -4367,7 +4367,7 @@ public class ComWS extends PBase {
 
 			pc = 0;
 
-			if (envioparcial) dbld.clear();
+            if (envioparcial && !esEnvioManual) dbld.clear();
 
 			ss = "UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parNumVer +"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'";
             dbld.add(ss);
@@ -4430,7 +4430,7 @@ public class ComWS extends PBase {
 
                 try {
 
-                    if (envioparcial) dbld.clear();
+                    if (envioparcial && !esEnvioManual) dbld.clear();
 
                     ss = "INSERT INTO D_RATING (RUTA, VENDEDOR, RATING, COMENTARIO, IDTRANSERROR, FECHA, STATCOM)"+
                          " VALUES('" + ruta +"','" + vendedor +"'," + rating +",'" + comentario +"'," +
@@ -4475,7 +4475,7 @@ public class ComWS extends PBase {
 
 		try {
 
-			if (envioparcial) dbld.clear();
+            if (envioparcial && !esEnvioManual) dbld.clear();
 
 			ss = " UPDATE P_STOCK SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
 					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA ='" + sFecha + "') AND ENVIADO = 0 " +
@@ -4519,7 +4519,7 @@ public class ComWS extends PBase {
 
 		try {
 
-			if (envioparcial) dbld.clear();
+            if (envioparcial && !esEnvioManual) dbld.clear();
 
 			ss = "exec AcumuladoObjetivos '" + gl.ruta + "'," + oyear + "," + omonth;
 			dbld.add(ss);

@@ -3324,6 +3324,8 @@ public class ComWS extends PBase {
 
 			dbld.saveArchivo_bck(du.getActDateStr());
 
+            esEnvioManual = false;
+
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);

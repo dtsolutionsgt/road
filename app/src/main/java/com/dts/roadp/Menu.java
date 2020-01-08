@@ -1806,7 +1806,28 @@ public class Menu extends PBase {
 	//endregion
 
 	//region Aux
-	
+
+    public void getWSURLs() {
+        Cursor dt;
+
+        try {
+
+            sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+
+            gl.URLLocal= dt.getString(0);
+            gl.URLRemoto=dt.getString(1);
+
+            if (gl.URLLocal.isEmpty()) msgbox("No existe configuración para transferencia de datos");
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox(e.getMessage());
+        }
+
+    }
+
 	private void setPrintWidth() {
 		Cursor DT;
 		int prwd=32;

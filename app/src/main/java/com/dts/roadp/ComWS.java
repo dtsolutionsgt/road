@@ -2953,7 +2953,14 @@ public class ComWS extends PBase {
 
 		try {
 
-			if (getTest() == 1) scon = 1;
+			if (getTest() == 1) {
+				scon = 1;
+			} else {
+				URL = URL_Remota;
+				if (getTest() == 1) {
+					scon = 1;
+				}
+			}
 
 			idbg = idbg + sstr;
 
@@ -3108,6 +3115,9 @@ public class ComWS extends PBase {
 		}
 
 		items.clear();
+
+		generaArchivoBck();
+
 		dbld.clearlog();
 
 		try {
@@ -3261,6 +3271,62 @@ public class ComWS extends PBase {
 
 		return true;
 	}
+	private boolean generaArchivoBck() {
+
+		errflag = false;
+
+		items.clear();
+		dbld.clearlog();
+
+		try {
+
+			esEnvioManual = true;
+
+			envioFacturas();
+
+			envioPedidos();
+
+			envioNotasCredito();
+
+			envioNotasDevolucion();
+
+			envioCobros();
+
+			envioDepositos();
+
+			envio_D_MOV();
+
+			envioCli();
+
+			envioAtten();
+
+			envioCoord();
+
+			envioSolicitud();
+
+			envioRating();
+
+			updateAcumulados();
+
+			updateInventario();
+
+			update_Corel_GrandTotal();
+
+			envioFinDia();
+
+			//dbld.saveArchivo_bck(du.getActDateStr());
+
+			errflag = true;
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			esEnvioManual = false;
+		}
+
+		return errflag;
+	}
+
 
 	private int validaLiquidacion() {
 		Cursor DT;
@@ -3376,6 +3442,9 @@ public class ComWS extends PBase {
 
 				} catch (Exception e) {
 					errflag = true;
+
+					//dbld.savelog("facturas.txt");
+
 					addlog(new Object() {
 					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 					fterr += "\n" + e.getMessage();
@@ -3396,6 +3465,9 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			errflag = true;
+
+			//dbld.savelog("facturas.txt");
+
 			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			fstr = e.getMessage();
 			dbg = fstr;
@@ -4596,7 +4668,14 @@ public class ComWS extends PBase {
 
 		try {
 
-			if (getTest()==1) scon=1;
+			if (getTest() == 1) {
+				scon = 1;
+			} else {
+				URL = URL_Remota;
+				if (getTest() == 1) {
+					scon = 1;
+				}
+			}
 
 			if (scon==1) {
 				fstr="Sync OK";

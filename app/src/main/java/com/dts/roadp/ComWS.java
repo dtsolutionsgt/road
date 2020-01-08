@@ -105,7 +105,7 @@ public class ComWS extends PBase {
 	private boolean rutapos, ftflag, esvacio, liqid;
 
 	private final String NAMESPACE = "http://tempuri.org/";
-	private String METHOD_NAME, URL;
+	private String METHOD_NAME, URL, URL_Remota;
 
 	protected PowerManager.WakeLock wakelock;
 
@@ -4899,52 +4899,96 @@ public class ComWS extends PBase {
 		}
 
 	}
-	
+
 	public void getWSURL() {
 		Cursor DT;
 		String wsurl;
 
-		if(!gl.debug){
+		if (!gl.debug) {
 			txtRuta.setText(ruta);
 			txtEmp.setText(gEmpresa);
 		}
-		
+
 		try {
 
-			sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='"+ruta+"'";
-			DT=Con.OpenDT(sql);
+			sql = "SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='" + ruta + "'";
+			DT = Con.OpenDT(sql);
 
-			if (DT.getCount()>0){
+			if (DT.getCount() > 0) {
 				DT.moveToFirst();
 
-				if (gl.isOnWifi==1) {
-					URL = DT.getString(0);
-				}else if(gl.isOnWifi==2){
-					URL = DT.getString(1);
-				}
+				URL = DT.getString(0);
+				URL_Remota = DT.getString(1);
 
-				//URL=wsurl;
+				gl.URLtemp = URL;
 
-				if (URL!=null && !URL.equalsIgnoreCase("")){
+				if (!URL.isEmpty()) {
 					txtWS.setText(URL);
-				}else{
-					toast("No hay configurada ruta para transferencia de datos");
+				} else if (!URL_Remota.isEmpty()) {
+					txtWS.setText(URL);
+				} else {
+					toast("No hay configurada URL para transferencia de datos");
 				}
 
 			}
 
+			if (DT != null) DT.close();
+
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			//MU.msgbox(e.getMessage());
-			//URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
-			URL="*";txtWS.setText("http://192.168.1.142/wsAndr/wsandr.asmx");
-			//URL="*";txtWS.setText("http://192.168.1.142/wsimagen/baktun1.asmx");
-			//txtWS.setText("");
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			URL = "*";
+			txtWS.setText("http://192.168.1.142/wsAndr/wsandr.asmx");
 
 		}
-		
+
 	}
-	
+//
+//	public void getWSURL() {
+//		Cursor DT;
+//		String wsurl;
+//
+//		if(!gl.debug){
+//			txtRuta.setText(ruta);
+//			txtEmp.setText(gEmpresa);
+//		}
+//
+//		try {
+//
+//			sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='"+ruta+"'";
+//			DT=Con.OpenDT(sql);
+//
+//			if (DT.getCount()>0){
+//				DT.moveToFirst();
+//
+//				if (gl.isOnWifi==1) {
+//					URL = DT.getString(0);
+//				}else if(gl.isOnWifi==2){
+//					URL = DT.getString(1);
+//				}
+//
+//				//URL=wsurl;
+//
+//				if (URL!=null && !URL.equalsIgnoreCase("")){
+//					txtWS.setText(URL);
+//				}else{
+//					toast("No hay configurada ruta para transferencia de datos");
+//				}
+//
+//			}
+//
+//		} catch (Exception e) {
+//			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+//			//MU.msgbox(e.getMessage());
+//			//URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
+//			URL="*";txtWS.setText("http://192.168.1.142/wsAndr/wsandr.asmx");
+//			//URL="*";txtWS.setText("http://192.168.1.142/wsimagen/baktun1.asmx");
+//			//txtWS.setText("");
+//
+//		}
+//
+//	}
+//
 	private boolean setComParams() {
 		String ss;
 		

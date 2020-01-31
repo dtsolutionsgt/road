@@ -109,11 +109,8 @@ public class MiscUtils {
 		
 		val=(double) (100*val);
 		double rslt=Math.round(val);
-		rslt=Math.floor(rslt);
-		
-		ival=(int) rslt;
-		rslt=(double) ival;
-		
+		rslt=Math.round(rslt);
+
 		return (double) (rslt/100);
 	}
 	
@@ -258,10 +255,10 @@ public class MiscUtils {
 		if (ndec>10)return val;
 		
 		if (ndec<0) ndec=0;
-		v=val+0.0001;
+		v=val;
 		pw=Math.pow(10,ndec);
 		v=v*pw;
-		v=Math.floor(v);
+		v=Math.round(v);
 		v=v/pw;
 	
 		return v;

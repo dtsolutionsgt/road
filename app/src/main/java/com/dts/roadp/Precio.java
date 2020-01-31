@@ -39,7 +39,7 @@ public class Precio {
 		
 		costo=0;descmon=0;imp=0;tot=0;
 		
-		ffrmprec = new DecimalFormat("#0.00");
+		ffrmprec = new DecimalFormat("#0.0000000000");
 		
 	}
 
@@ -105,11 +105,12 @@ public class Precio {
 		//percep=0;
 		
 		imp=getImp();
-		pr=pr*(1+imp/100);
+		pr=pr*(1+(imp/100));
 
 		// total
-		stot=pr*cant;stot=mu.round(stot,ndec);
+		stot=pr*cant;//stot=mu.round(stot,ndec);
 		if (imp>0) impval=stot-tsimp; else impval=0;
+
 		descmon=(double) (stot*desc/100);
 		descmon=mu.round(descmon,ndec);
 		tot=stot-descmon;
@@ -131,22 +132,29 @@ public class Precio {
 			sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
 			pprec=Double.parseDouble(sprec);
 			pprec=mu.round(pprec,ndec);
+			//#CKFK 20200127 Modifiqué la forma en que se vuelve a obtener el precio sin impuesto, quité esto precsin=prec/(1+(imp/100));
+			//Y lo metí dentro del try
+			//if (imp==0) precsin=prec; else precsin=prec/(1+(imp/100));
+			if (imp==0) precsin=prec; else precsin=prec - (impval/(cant==0?1:cant));
 		} catch (Exception e) {
 			pprec=prec;
 		}
 		prec=pprec;
 
 		// total
-		stot=prec*cant;stot=mu.round(stot,ndec);
-		if (imp>0) impval=stot-tsimp; else impval=0;
+		stot=prec*cant;
+		//#CKFK 20200127 quité este redondeo porque provocaba que los cálculos sean incorrectos, lo coloqué al final
+		stot=tot;
+		if (imp>0) impval=stot-tsimp; else impval=0;//Aquí los tot y tsimp están redondeados
 		descmon=(double) (stot*desc/100);descmon=mu.round(descmon,ndec);
 		tot=stot-descmon;
+		//#CKFK 20200127 Coloqué aquí el redondeo
+		tot=mu.round(tot,ndec);
 
-		if (imp==0) precsin=prec; else precsin=prec/(1+imp/100);
 		//Toast.makeText(cont,sprec+" - "+pprec+" / "+prec+" prec sin : "+precsin, Toast.LENGTH_SHORT).show();
 		
 		totsin=mu.round(precsin*cant,ndec);
-		if (cant>0) precsin=(double) (totsin/cant);	
+		//if (cant>0) precsin=(double) (totsin/cant);	#CKFK 20200127 ya tengo el precio sin impuesto
 		
 		try {
 			sprec=ffrmprec.format(precsin);sprec=sprec.replace(",",".");
@@ -177,12 +185,14 @@ public class Precio {
 			pr=0;
 	    }	
 		
-		totsin=pr;tsimp=mu.round(totsin,ndec);
+		totsin=pr;
+		tsimp=totsin;//mu.round(totsin,ndec);
 		
 		imp=getImp();
-		pr=pr*(1+imp/100);
-		
-		stot=pr;stot=mu.round(stot,ndec);
+		pr=pr*(1+(imp/100));
+
+		stot=pr;
+		tot=stot;
 		
 		if (imp>0) impval=stot-tsimp; else impval=0;
 		
@@ -190,22 +200,26 @@ public class Precio {
 		
 		tot=stot-descmon;
 		prec=tot;
-			
+
 		try {
+			//#CKFK 20200127 Modifiqué el formato del ffrmprec
 			sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
 			pprec=Double.parseDouble(sprec);
 			pprec=mu.round(pprec,ndec);
+			//#CKFK 20200127 Modifiqué la forma en que se vuelve a obtener el precio sin impuesto, quité esto precsin=prec/(1+(imp/100));
+			//Y lo puse dentro del try
+			//if (imp==0) precsin=prec; else precsin=prec/(1+(imp/100));
+			if (imp==0) precsin=prec; else precsin=prec - (impval/(cant==0?1:cant));
 		} catch (Exception e) {
 			pprec=prec;
 		}
 		prec=pprec;
-		
-		if (imp==0) precsin=prec; else precsin=prec/(1+imp/100);
-		
+
 		totsin=mu.round(precsin,ndec);
 		precsin=totsin;	
 		
 		try {
+			//#CKFK 20200127 Modifiqué el formato del ffrmprec
 			sprec=ffrmprec.format(precsin);sprec=sprec.replace(",",".");
 			pprec=Double.parseDouble(sprec);
 			pprec=mu.round(pprec,ndec);
@@ -327,17 +341,19 @@ public class Precio {
 
                 totsin=pr*cant;tsimp=mu.round(totsin,ndec);
                 imp=0;
-                pr=pr*(1+imp/100);
+                pr=pr*(1+(imp/100));
 
                 // total
-                stot=pr*cant;stot=mu.round(stot,ndec);
+                stot=pr*cant;
                 if (imp>0) impval=stot-tsimp; else impval=0;
                 descmon=(double) (stot*desc/100);descmon=mu.round(descmon,ndec);
                 tot=stot-descmon;
+				tot=mu.round(tot,ndec);
 
                 if (cant>0) prec=(double) (tot/cant); else prec=pr;
 
                 try {
+					//#CKFK 20200127 Modifiqué el formato del ffrmprec
                     sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
                     pprec=Double.parseDouble(sprec);
                     precdoc=mu.round(pprec,ndec);
@@ -348,25 +364,32 @@ public class Precio {
                 if (ppeso>0) prec=prec*ppeso/cant;
 
                 try {
+					//#CKFK 20200127 Modifiqué el formato del ffrmprec
                     sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
                     pprec=Double.parseDouble(sprec);
                     pprec=mu.round(pprec,ndec);
+					//#CKFK 20200127 Modifiqué la forma en que se vuelve a obtener el precio sin impuesto, quité esto precsin=prec/(1+(imp/100));
+					//Y lo metí dentro del try
+					//if (imp==0) precsin=prec; else precsin=prec/(1+(imp/100));
+					if (imp==0) precsin=prec; else precsin=prec - (impval/(cant==0?1:cant));
                 } catch (Exception e) {
                     pprec=prec;
                 }
                 prec=pprec;
 
                 // total
-                stot=prec*cant;stot=mu.round(stot,ndec);
+                stot=prec*cant;
                 if (imp>0) impval=stot-tsimp; else impval=0;
                 descmon=(double) (stot*desc/100);descmon=mu.round(descmon,ndec);
                 tot=stot-descmon;
+				tot=mu.round(tot,ndec);
 
-                if (imp==0) precsin=prec; else precsin=prec/(1+imp/100);
+
                 totsin=mu.round(precsin*cant,ndec);
                 if (cant>0) precsin=(double) (totsin/cant);
 
                 try {
+					//#CKFK 20200127 Modifiqué el formato del ffrmprec
                     sprec=ffrmprec.format(precsin);sprec=sprec.replace(",",".");
                     pprec=Double.parseDouble(sprec);
                     pprec=mu.round(pprec,ndec);

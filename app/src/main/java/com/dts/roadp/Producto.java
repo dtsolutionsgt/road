@@ -447,7 +447,7 @@ public class Producto extends PBase {
 
                             gl.mostrarPedidoSugerido=0;
 
-                            sql=" SELECT CODIGO,DESCCORTA,UNIDBAS,DESCLARGA "+
+                            sql=" SELECT CODIGO,TRIM(DESCCORTA) AS DESCORTA,UNIDBAS,TRIM(DESCLARGA) AS DESCLARGA "+
                                     " FROM P_PRODUCTO INNER JOIN P_CATALOGO_PRODUCTO ON " +
                                     " P_PRODUCTO.CODIGO = P_CATALOGO_PRODUCTO.CODIGO_PRODUCTO WHERE 1=1 ";
                             if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
@@ -460,7 +460,7 @@ public class Producto extends PBase {
 
                             gl.mostrarPedidoSugerido=1;
 
-                            sql=" SELECT P.CODIGO,P.DESCCORTA,P.UNIDBAS,P.DESCLARGA "+
+                            sql=" SELECT P.CODIGO,TRIM(P.DESCCORTA) AS DESCCORTA,P.UNIDBAS,TRIM(P.DESCLARGA) AS DESCLARGA "+
                                     " FROM P_PRODUCTO P INNER JOIN P_PEDSUG PS ON " +
                                     " P.CODIGO = PS.PRODUCTO WHERE CLIENTE = '"+gl.cliente+"'";
                             if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P.LINEA='"+famid+"') ";
@@ -474,7 +474,8 @@ public class Producto extends PBase {
 
                 case 1:  // Venta
 
-                    sql="SELECT DISTINCT P_PRODUCTO.CODIGO, P_PRODUCTO.DESCCORTA,P_PRODPRECIO.UNIDADMEDIDA,P_PRODUCTO.DESCLARGA " +
+                    sql="SELECT DISTINCT P_PRODUCTO.CODIGO, TRIM(P_PRODUCTO.DESCCORTA) AS DESCCORTA,P_PRODPRECIO.UNIDADMEDIDA, " +
+                            "TRIM(P_PRODUCTO.DESCLARGA) AS DESCLARGA " +
                             "FROM P_PRODUCTO INNER JOIN	P_STOCK ON P_STOCK.CODIGO=P_PRODUCTO.CODIGO INNER JOIN " +
                             "P_PRODPRECIO ON (P_STOCK.CODIGO=P_PRODPRECIO.CODIGO)  " +
                             "WHERE (P_STOCK.CANT > 0) AND (P_PRODPRECIO.NIVEL = " + gl.nivel +") AND (P_PRODUCTO.ES_VENDIBLE=1) ";
@@ -484,7 +485,8 @@ public class Producto extends PBase {
                     if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
                     sql+="UNION ";
 
-                    sql+="SELECT DISTINCT P_PRODUCTO.CODIGO, P_PRODUCTO.DESCCORTA, P_PRODPRECIO.UNIDADMEDIDA,P_PRODUCTO.DESCLARGA " +
+                    sql+="SELECT DISTINCT P_PRODUCTO.CODIGO, TRIM(P_PRODUCTO.DESCCORTA) AS DESCCORTA, P_PRODPRECIO.UNIDADMEDIDA, " +
+                            "TRIM(P_PRODUCTO.DESCLARGA) AS DESCLARGA " +
                             "FROM P_PRODUCTO INNER JOIN	P_STOCKB ON P_STOCKB.CODIGO=P_PRODUCTO.CODIGO INNER JOIN " +
                             "P_PRODPRECIO ON (P_STOCKB.CODIGO=P_PRODPRECIO.CODIGO)  " +
                             "WHERE (P_STOCKB.CANT > 0) AND (P_PRODPRECIO.NIVEL = " + gl.nivel +") AND (P_PRODUCTO.ES_VENDIBLE=1) ";
@@ -493,7 +495,7 @@ public class Producto extends PBase {
                     }
                     if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
                     sql+="UNION ";
-                    sql+="SELECT DISTINCT P_PRODUCTO.CODIGO,P_PRODUCTO.DESCCORTA,'',P_PRODUCTO.DESCLARGA  " +
+                    sql+="SELECT DISTINCT P_PRODUCTO.CODIGO,TRIM(P_PRODUCTO.DESCCORTA) AS DESCCORTA,'',TRIM(P_PRODUCTO.DESCLARGA) AS DESCLARGA  " +
                             "FROM P_PRODUCTO "  +
                             "WHERE (P_PRODUCTO.TIPO ='S')  AND (P_PRODUCTO.ES_VENDIBLE=1) ";
                     if (!mu.emptystr(famid)){
@@ -502,7 +504,7 @@ public class Producto extends PBase {
                     if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
 
                     if (ordPorNombre) {
-                        sql += "ORDER BY P_PRODUCTO.DESCCORTA";
+                        sql += "ORDER BY TRIM(P_PRODUCTO.DESCCORTA)";
                     } else {
                         sql += "ORDER BY P_PRODUCTO.CODIGO";
                     }
@@ -512,13 +514,13 @@ public class Producto extends PBase {
                     break;
 
                 case 2: // Mercadeo propio
-                    sql="SELECT CODIGO,DESCCORTA,'',DESCLARGA FROM P_PRODUCTO WHERE 1=1 ";
+                    sql="SELECT CODIGO,TRIM(DESCCORTA) AS DESCCORTA,'',TRIM(DESCLARGA) AS DESCLARGA FROM P_PRODUCTO WHERE 1=1 ";
                     if (!mu.emptystr(famid)){
                         if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
                     }
                     if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
 
-                    if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
+                    if (ordPorNombre) sql+="ORDER BY TRIM(DESCCORTA)"; else sql+="ORDER BY CODIGO";
                     break;
 
                 case 3:  // Mercadeo comp

@@ -774,6 +774,7 @@ public class Venta extends PBase {
 		try {
 
             if (sinimp) precdoc=precsin; else precdoc=prec;
+			if (sinimp) prodtot=(cant*precsin)+ impval;
 
 			ins.init("T_VENTA");
 

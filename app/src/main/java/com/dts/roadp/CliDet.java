@@ -225,6 +225,9 @@ public class CliDet extends PBase {
 	}
 
 	public void showCredit(View viev){
+
+		clsDescFiltro clsDFilt=new clsDescFiltro(this,gl.ruta,gl.cliente);
+
 		if (!permiteVenta) {
 			if (gl.peVentaGps == 1) {
 				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\nPara realizar el cobro debe acercarse más al cliente.");

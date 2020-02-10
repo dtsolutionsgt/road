@@ -535,7 +535,6 @@ public class Producto extends PBase {
             DT=Con.OpenDT(sql);
 
             cantidad = DT.getCount();
-            if (cantidad==0) return;
 
             DT.moveToFirst();
             while (!DT.isAfterLast()) {

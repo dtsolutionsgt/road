@@ -395,7 +395,6 @@ public class Cobro extends PBase {
 	public boolean validaCredito(){
 		Cursor DT;
 		Cursor DTFecha;
-		String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
 		boolean vValida = true;
 
 		try{
@@ -417,11 +416,14 @@ public class Cobro extends PBase {
 					double tot = 0;
 					docfact = DTFecha.getString(0);
 					fechaven = DTFecha.getLong(2);
-					fechav = sfecha(fechaven);
+					fechav = du.sfecha(fechaven);
 
-					if (date.compareTo(fechav) < 0) {
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+					Date strDate = sdf.parse(fechav);
+					if (System.currentTimeMillis() > strDate.getTime()) {
 						gl.facturaVen += 1;
 					}
+
 					sql="SELECT ANULADO,MONTO,PAGO FROM D_COBROD WHERE DOCUMENTO = "+ docfact;
 					DT = Con.OpenDT(sql);
 
@@ -495,14 +497,23 @@ public class Cobro extends PBase {
 				alert.setMessage("Cliente tiene " +gl.facturaVen+ " Facturas vencidas.");
 
 				chkFactura.setText("Pagar Facturas Vencidas");
-				chkContado.setText("Continuar la venta al contado");
+				if(gl.rutatipo.equalsIgnoreCase("P")){
+					chkContado.setVisibility(View.INVISIBLE);
+				}else{
+					chkContado.setVisibility(View.VISIBLE);
+					chkContado.setText("Continuar la venta al contado");
+				}
 
 			} else if(gl.credito<=0){
 
 				alert.setMessage("Cliente no tiene credito actualmente.");
 
 				chkFactura.setText("Pagar Facturas");
-				chkContado.setText("Continuar la venta al contado");
+				if(gl.rutatipo.equalsIgnoreCase("P")){
+					chkContado.setText("Salir");
+				}else{
+					chkContado.setText("Continuar la venta al contado");
+				}
 
 			}
 
@@ -522,10 +533,16 @@ public class Cobro extends PBase {
 						closekeyb();
 						layout.removeAllViews();
 					} else if (chkContado.isChecked()){
-						initVenta();
+						if(gl.rutatipo.equalsIgnoreCase("V")){
+							initVenta();
+						}else{
+							gl.closeVenta=true;
+							finish();
+						}
+
 						layout.removeAllViews();
 					}else{
-						toast("Seleccione accion a realizar");
+						toast("Seleccione acción a realizar");
 						closekeyb();
 						msgAskFact();
 					}
@@ -571,6 +588,10 @@ public class Cobro extends PBase {
 
 			if (saveCobro()) {
 				listItems();
+
+				//Aplica descuento por pronto pago
+
+
 				if (dtipo.equalsIgnoreCase("R")) {
 					if (prn.isEnabled()) {
 						fdocf.buildPrint(crrf,0,gl.peModal);
@@ -1479,9 +1500,21 @@ public class Cobro extends PBase {
 	public void onBackPressed() {
 
 		try{
-			browse=2;
-			onPause();
-			onResume();
+
+			if(gl.banderaCobro){
+				browse=2;
+				onPause();
+				onResume();
+			}else{
+				if (gl.vcredito) {
+					validaCredito();
+				}else{
+					browse=2;
+					onPause();
+					onResume();
+				}
+			}
+
 		}catch (Exception e) {
 			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}

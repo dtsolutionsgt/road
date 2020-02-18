@@ -55,7 +55,7 @@ public class ComWSFotos extends PBase {
     private String gEmpresa;
 
     private final String NAMESPACE ="http://tempuri.org/";
-    private String METHOD_NAME,URL;
+    private String METHOD_NAME,URL,URL_Remota;
 
     private clsDataBuilder dbld;
 
@@ -327,7 +327,14 @@ public class ComWSFotos extends PBase {
 
         try {
 
-            if (getTest()==1) scon=1;
+            if (getTest() == 1) {
+                scon = 1;
+            } else {
+                URL = URL_Remota;
+                if (getTest() == 1) {
+                    scon = 1;
+                }
+            }
 
             idbg=idbg + sstr;
 
@@ -425,38 +432,82 @@ public class ComWSFotos extends PBase {
         }
 
     }
+//
+//    public void getWSURL() {
+//        Cursor DT;
+//        String wsurl;
+//
+//        txtRuta.setText(ruta);
+//        txtEmp.setText(gEmpresa);
+//
+//        try {
+//            sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='"+ruta+"'";
+//            DT=Con.OpenDT(sql);
+//            DT.moveToFirst();
+//
+//            if (gl.isOnWifi==1) {
+//                URL = DT.getString(0);
+//            }else if(gl.isOnWifi==2){
+//                URL = DT.getString(1);
+//            }
+//
+//           // URL=wsurl;
+//            if (URL!=null && !URL.equalsIgnoreCase("")){
+//                txtWS.setText(URL);
+//            }else{
+//                toast("No hay configurada ruta para transferencia de datos");
+//            }
+//
+//        } catch (Exception e) {
+//            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+//            //MU.msgbox(e.getMessage());
+//            URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
+//            //txtWS.setText("");
+//            return;
+//        }
+//
+//    }
 
     public void getWSURL() {
         Cursor DT;
         String wsurl;
 
-        txtRuta.setText(ruta);
-        txtEmp.setText(gEmpresa);
+        if (!gl.debug) {
+            txtRuta.setText(ruta);
+            txtEmp.setText(gEmpresa);
+        }
 
         try {
-            sql="SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='"+ruta+"'";
-            DT=Con.OpenDT(sql);
-            DT.moveToFirst();
 
-            if (gl.isOnWifi==1) {
+            sql = "SELECT WLFOLD,FTPFOLD FROM P_RUTA WHERE CODIGO='" + ruta + "'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+
                 URL = DT.getString(0);
-            }else if(gl.isOnWifi==2){
-                URL = DT.getString(1);
+                URL_Remota = DT.getString(1);
+
+                gl.URLtemp = URL;
+
+                if (!URL.isEmpty()) {
+                    txtWS.setText(URL);
+                } else if (!URL_Remota.isEmpty()) {
+                    txtWS.setText(URL);
+                } else {
+                    toast("No hay configurada URL para transferencia de datos");
+                }
+
             }
 
-           // URL=wsurl;
-            if (URL!=null && !URL.equalsIgnoreCase("")){
-                txtWS.setText(URL);
-            }else{
-                toast("No hay configurada ruta para transferencia de datos");
-            }
+            if (DT != null) DT.close();
 
         } catch (Exception e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            //MU.msgbox(e.getMessage());
-            URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
-            //txtWS.setText("");
-            return;
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            URL = "*";
+            txtWS.setText("http://192.168.1.142/wsAndr/wsandr.asmx");
+
         }
 
     }

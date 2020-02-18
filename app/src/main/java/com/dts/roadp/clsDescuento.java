@@ -24,22 +24,23 @@ public class clsDescuento {
 	private Context cont;
 	
 	private String prodid,lineaid,slineaid,marcaid,canttipo;
-	private double cant,vmax,dmax;
+	private double cant,vmax,dmax,cantDias;
 	private boolean acum;
 	
-	public clsDescuento(Context context,String producto,double cantidad) {
+	public clsDescuento(Context context,String producto,double cantidad, double cantidadDias) {
 		
 		cont=context;
 		
-		prodid=producto;cant=cantidad;
-		
-		/*
+		prodid=producto;
+		cant=cantidad;
+		cantDias = cantidadDias;
+
 		try {
 			active=0;
 			Con = new BaseDatos(context);
 			opendb();
 		} catch (Exception e) {
-		}*/
+		}
 	    
 	    MU=new MiscUtils(context);
 		
@@ -49,23 +50,23 @@ public class clsDescuento {
 	}
 	
 	// Descuento local
-	
+
 	public double getDesc(){
 		double dval=0;
-		
+
 		items.clear();
-		
+
 		if (!validaPermisos()) return 0;
-		
+
 		listaDescRango();
 		listaDescMult();
-		
+
 		dval=descFinal();
 		monto=montoFinal();
-		
+
 		return dval;
 	}
-	
+
 	private double descFinal() {
 		double df=0,dm=0,sd=0;
 		double vd;
@@ -223,9 +224,57 @@ public class clsDescuento {
 		   	MU.msgbox(e.getMessage());
 	    }
 		
-		
 	}
-	
+
+	private void listaDescPP(){
+		Cursor DT;
+		double val;
+
+		try {
+
+			val=0;
+
+			vSQL="SELECT RANGOINI,RANGOFIN,VALOR "+
+				 "FROM T_DESC WHERE ("+cantDias+"<=RANGOINI) "+
+				 "AND (PTIPO=5) AND (DESCTIPO='P') AND (GLOBDESC='S') AND (PORCANT='A')";
+
+			DT=Con.OpenDT(vSQL);
+
+			if (DT.getCount()==0) return;
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				val=DT.getDouble(2);
+
+				if (val>0) {
+					items.add(val);
+				}
+
+				DT.moveToNext();
+			}
+
+			if(DT!=null){
+				DT.close();
+			}
+
+		} catch (Exception e) {
+			MU.msgbox(e.getMessage());
+		}
+
+	}
+
+	public double getDescPP(){
+		double dval=0;
+
+		items.clear();
+
+		listaDescPP();
+
+		dval=descFinal();
+
+		return dval;
+	}
 	
 	// Aux
 	
@@ -261,8 +310,8 @@ public class clsDescuento {
 
 		return true;
 	}
- 	
- 	private void opendb() {
+
+	private void opendb() {
 		try {
 			db = Con.getWritableDatabase();
 		 	Con.vDatabase =db;

@@ -50,7 +50,7 @@ public class Precio {
 		prec=0;costo=0;descmon=0;imp=0;tot=0;precioespecial=0;
 		nuevoprecio=pnuevoprecio;
 
-		clsDescuento clsDesc=new clsDescuento(cont,prodid,cant);
+		clsDescuento clsDesc=new clsDescuento(cont,prodid,cant,0);
 		desc=clsDesc.getDesc();
 
 		if (cant>0) prodPrecio(ppeso);else prodPrecioBase();

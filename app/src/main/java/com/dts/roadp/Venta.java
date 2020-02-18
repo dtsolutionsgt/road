@@ -635,7 +635,7 @@ public class Venta extends PBase {
 
 			// Descuento
 
-			clsDesc = new clsDescuento(this, prodid, cant);
+			clsDesc = new clsDescuento(this, prodid, cant,0);
 			desc = clsDesc.getDesc();
 			mdesc = clsDesc.monto;
 

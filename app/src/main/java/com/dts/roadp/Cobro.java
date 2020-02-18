@@ -30,6 +30,7 @@ public class Cobro extends PBase {
 	private TextView lblSel,lblPag,lblPend;
 
 	private ArrayList<clsClasses.clsCobro> items= new ArrayList<clsClasses.clsCobro>();
+	ArrayList<clsClasses.clsNCPP> docs= new ArrayList<clsClasses.clsNCPP>();
 	private ListAdaptCobro adapter;
 	private clsClasses.clsCobro selitem;
 
@@ -39,7 +40,7 @@ public class Cobro extends PBase {
 	private clsDocFactura fdocf;
 	private AppMethods app;
 
-	private String cliid,cod,itemid,prodid,sefect,corel,fserie,dtipo="",fechav;
+	private String cliid,cod,itemid,prodid,sefect,corel,fserie,dtipo="",fechav,msgDesc="";
 	private double ttot,tsel,tpag,tpagos,tpend,vefect,plim,cred,pg,sal,ssal,total,monto,pago;
 	private boolean peexit;
 	private boolean porcentaje = false, validarCred = false;
@@ -586,11 +587,16 @@ public class Cobro extends PBase {
 				if (!applyPay()) return;
 			}
 
+			//Aplica descuento por pronto pago
+			AplicaDescuentoPP();
+
 			if (saveCobro()) {
+
+				if (!msgDesc.isEmpty()){
+					toast(msgDesc);
+				}
+
 				listItems();
-
-				//Aplica descuento por pronto pago
-
 
 				if (dtipo.equalsIgnoreCase("R")) {
 					if (prn.isEnabled()) {
@@ -639,6 +645,78 @@ public class Cobro extends PBase {
 			mu.msgbox("createDoc: " + e.getMessage());
 		}
 
+	}
+
+	public void AplicaDescuentoPP(){
+
+		Cursor DT;
+		double cantDias=0;
+		clsDescuento clsDesc;
+		clsClasses.clsNCPP vItem;
+		long lfechaE;
+		String sfechaE;
+
+		long segsMilli = 1000;
+		long minsMilli = segsMilli * 60;
+		long horasMilli = minsMilli * 60;
+		long diasMilli = horasMilli * 24;
+		long diferencia;
+
+		try{
+
+			docs.clear();
+			msgDesc="";
+
+			sql="SELECT P.FECHAEMIT, d.DOCUMENTO, p.VALORORIG " +
+				"FROM T_PAGOD d INNER JOIN P_COBRO p ON d.DOCUMENTO = p.DOCUMENTO " +
+				"WHERE (d.PAGO = p.VALORORIG) ";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			for (int i = 0; i < DT.getCount(); i++ ) {
+
+				cantDias=0;
+
+				lfechaE=DT.getLong(0);
+				sfechaE = du.sfecha(lfechaE);
+
+				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+				Date strDate = sdf.parse(sfechaE);
+				diferencia=System.currentTimeMillis() - strDate.getTime();
+
+				cantDias = diferencia / diasMilli;
+
+				clsDesc=new clsDescuento(this,"",0,cantDias);
+				double desc=clsDesc.getDescPP();
+
+				if (desc>0){
+
+					vItem = clsCls.new clsNCPP();
+					vItem.Factura = DT.getString(1);
+					vItem.MontoFact =  DT.getLong(2);
+					vItem.MontoDesc = vItem.MontoFact-(vItem.MontoFact*(desc*100));
+					vItem.PorcDesc =  desc;
+					vItem.MontoFactPago = DT.getLong(2);
+					vItem.Total=vItem.MontoFactPago-vItem.MontoDesc;
+					docs.add(vItem);
+
+					msgDesc += vItem.Factura + ", ";
+				}
+
+				DT.moveToNext();
+			}
+
+			if(DT!=null){
+				DT.close();
+			}
+
+			if (docs.size()>0){
+				msgDesc = "Se le aplicó nota de crédito a los siguientes documentos " + msgDesc.substring(0,msgDesc.length()-2);
+			}
+
+		}catch (Exception ex) {
+         	msgbox("Ocurrió un error obteniendo los descuentos por pronto pago " + ex.getMessage());
+		}
 	}
 
 	public String sfecha(long f) {
@@ -709,7 +787,7 @@ public class Cobro extends PBase {
 
 					// Cobro regular - Documentos
 
-					sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD";
+					sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD ";
 					DT=Con.OpenDT(sql);
 
 					DT.moveToFirst();
@@ -784,8 +862,43 @@ public class Cobro extends PBase {
                       db.execSQL(sql);
                   }
 
-                  db.setTransactionSuccessful();
-                  db.endTransaction();
+				//Guardar las notas de crédito por pronto pago
+				if (docs.size()>0){
+
+					clsClasses.clsNCPP vItem;
+
+					fecha=du.getActDateTime();
+
+					for (int i = 0; i < docs.size(); i++ ) {
+
+						vItem=docs.get(i);
+
+						ins.init("D_NOTACRED_PP");
+
+						ins.add("COREL",corel);
+						ins.add("ANULADO","N");
+						ins.add("FECHA", fecha);
+						ins.add("RUTA",gl.ruta);
+						ins.add("VENDEDOR",gl.vend);
+						ins.add("CLIENTE",gl.cliente);
+						ins.add("TOTAL",vItem.toString());
+						ins.add("FACTURA",vItem.Factura);
+						ins.add("MONTOFACTURA",vItem.MontoFact);
+						ins.add("MONTODESCUENTO",vItem.MontoDesc);
+						ins.add("PORCENTAJEDESC",vItem.PorcDesc);
+						ins.add("MONTOPAGADOFACT",vItem.MontoFactPago);
+						ins.add("STATCOM","N");
+						ins.add("CODIGOLIQUIDACION",0);
+						ins.add("IMPRES",0);
+
+						db.execSQL(ins.sql());
+
+					}
+				}
+
+				db.setTransactionSuccessful();
+				db.endTransaction();
+
               }else{
 
 				db.beginTransaction();

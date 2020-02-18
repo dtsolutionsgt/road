@@ -30,7 +30,6 @@ public class clsBonif {
 		
 		prodid=producto;cant=cantidad;monto=montoventa;
 
-
 		try {
 			active=0;
 			Con = new BaseDatos(context);

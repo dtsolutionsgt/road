@@ -120,4 +120,8 @@ public class clsClasses {
 		public String Cod,DesLarga,DesCorta;
 	}
 
+	public class clsNCPP {
+		public String Factura;
+		public double MontoFact, MontoDesc, PorcDesc, MontoFactPago, Total;
+	}
 }

@@ -397,7 +397,6 @@ public class Cobro extends PBase {
 	public boolean validaCredito(){
 		Cursor DT;
 		Cursor DTFecha;
-		String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
 		boolean vValida = true;
 
 		try{
@@ -419,11 +418,14 @@ public class Cobro extends PBase {
 					double tot = 0;
 					docfact = DTFecha.getString(0);
 					fechaven = DTFecha.getLong(2);
-					fechav = sfecha(fechaven);
+					fechav = du.sfecha(fechaven);
 
-					if (date.compareTo(fechav) < 0) {
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+					Date strDate = sdf.parse(fechav);
+					if (System.currentTimeMillis() > strDate.getTime()) {
 						gl.facturaVen += 1;
 					}
+
 					sql="SELECT ANULADO,MONTO,PAGO FROM D_COBROD WHERE DOCUMENTO = "+ docfact;
 					DT = Con.OpenDT(sql);
 

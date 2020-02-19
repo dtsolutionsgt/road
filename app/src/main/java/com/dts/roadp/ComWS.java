@@ -1243,8 +1243,10 @@ public class ComWS extends PBase {
 				case "CANTDOCPEND":
 					if (rc == 2 && gl.rutatipo.equals("V")) {
 						throw new Exception("Tiene datos pendientes de subir al BOF, va a tener que facturar manual el día de hoy o subir los datos pendientes");
+					}else{
+						throw new Exception("No hay documentos pendientes");
 					}
-					break;
+					//break;
 			}
 
 			for (int i = 0; i < rc; i++) {
@@ -1870,8 +1872,6 @@ public class ComWS extends PBase {
 			if (!AddTable("O_LINEA")) return false;
 
 			// Mercadeo
-
-			/*
 			if (!AddTable("P_MEREQTIPO")) return false;
 			if (!AddTable("P_MEREQUIPO")) return false;
 			if (!AddTable("P_MERESTADO")) return false;
@@ -1879,7 +1879,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MERRESP")) return false;
 			if (!AddTable("P_MERMARCACOMP")) return false;
 			if (!AddTable("P_MERPRODCOMP")) return false;
-			*/
+
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), idbg, fstr);

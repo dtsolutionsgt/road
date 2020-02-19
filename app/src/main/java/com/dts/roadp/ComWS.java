@@ -54,8 +54,6 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
 
-
-
 public class ComWS extends PBase {
 
 	private TextView lblInfo, lblParam, lblRec, lblEnv, lblExis,lblEnvM;

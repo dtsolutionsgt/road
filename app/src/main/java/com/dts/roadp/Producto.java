@@ -524,8 +524,8 @@ public class Producto extends PBase {
                     break;
 
                 case 3:  // Mercadeo comp
-                    sql="SELECT CODIGO,NOMBRE,'' FROM P_MERPRODCOMP WHERE 1=1 ";
-                    if (!mu.emptystr(famid)) {sql=sql+"AND (MARCA='"+famid+"') ";}
+                    sql="SELECT CODIGO,NOMBRE AS DESCCORTA,'' AS UM, '' AS DESCLARGA FROM P_MERPRODCOMP WHERE 1=1 ";
+                   // if (!mu.emptystr(famid)) {sql=sql+"AND (MARCA='"+famid+"') ";}
                     if (vF.length()>0) {sql=sql+"AND ((NOMBRE LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
 
                     if (ordPorNombre) sql+="ORDER BY NOMBRE"; else sql+="ORDER BY CODIGO";

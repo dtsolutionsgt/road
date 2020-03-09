@@ -328,7 +328,6 @@ public class Cobro extends PBase {
 
 
 	// Main
-
 	private void listItems(){
 		Cursor DT;
 		clsClasses.clsCobro vItem;

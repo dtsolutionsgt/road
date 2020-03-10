@@ -359,8 +359,8 @@ public class Cobro extends PBase {
 				vItem.Saldo=ssal;
 				vItem.Pago=pg;
 				vItem.flag=fflag;
-				vItem.fini=du.sfecha(DT.getLong(4));
-				vItem.ffin=du.sfecha(DT.getLong(5));
+				vItem.fini=sfecha(DT.getLong(4));
+				vItem.ffin=sfecha(DT.getLong(5));
 
 				ttot=ttot+DT.getDouble(3);
 				tpag+=pg;
@@ -395,7 +395,6 @@ public class Cobro extends PBase {
 	public boolean validaCredito(){
 		Cursor DT;
 		Cursor DTFecha;
-		String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
 		boolean vValida = true;
 
 		try{
@@ -417,11 +416,14 @@ public class Cobro extends PBase {
 					double tot = 0;
 					docfact = DTFecha.getString(0);
 					fechaven = DTFecha.getLong(2);
-					fechav = sfecha(fechaven);
+					fechav = du.sfecha(fechaven);
 
-					if (date.compareTo(fechav) < 0) {
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+					Date strDate = sdf.parse(fechav);
+					if (System.currentTimeMillis() > strDate.getTime()) {
 						gl.facturaVen += 1;
 					}
+
 					sql="SELECT ANULADO,MONTO,PAGO FROM D_COBROD WHERE DOCUMENTO = "+ docfact;
 					DT = Con.OpenDT(sql);
 
@@ -443,9 +445,9 @@ public class Cobro extends PBase {
 
 					DTFecha.moveToPosition(i);
 				}
-
-
 			}
+
+			if(DT!=null) DT.close();
 
 			if(gl.vcredito){
 				if(gl.facturaVen<0) gl.facturaVen=0;
@@ -471,6 +473,86 @@ public class Cobro extends PBase {
 		}
 		return vValida;
 	}
+
+//	public boolean validaCredito(){
+//		Cursor DT;
+//		Cursor DTFecha;
+//		String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+//		boolean vValida = true;
+//
+//		try{
+//			sql = "SELECT MEDIAPAGO,LIMITECREDITO FROM P_CLIENTE WHERE CODIGO ='"+cod+"'";
+//			DT=Con.OpenDT(sql);
+//			DT.moveToFirst();
+//
+//			medPago=DT.getInt(0);
+//			cred=DT.getInt(1);
+//			gl.facturaVen = 0;
+//
+//			if (medPago == 4) {
+//
+//				sql = "SELECT DOCUMENTO,TIPODOC,FECHAV,SALDO FROM P_COBRO WHERE CLIENTE ='"+cod+"' ORDER BY FECHAV";
+//				DTFecha = Con.OpenDT(sql);
+//				DTFecha.moveToFirst();
+//
+//				for (int i = 0; i != DTFecha.getCount(); i++) {
+//					double tot = 0;
+//					docfact = DTFecha.getString(0);
+//					fechaven = DTFecha.getLong(2);
+//					fechav = sfecha(fechaven);
+//
+//					if (date.compareTo(fechav) < 0) {
+//						gl.facturaVen += 1;
+//					}
+//					sql="SELECT ANULADO,MONTO,PAGO FROM D_COBROD WHERE DOCUMENTO = "+ docfact;
+//					DT = Con.OpenDT(sql);
+//
+//					if(DT.getCount() != 0){
+//
+//						DT.moveToFirst();
+//						anulado = DT.getString(0);
+//						monto = DT.getDouble(1);
+//						pago = DT.getDouble(2);
+//						tot = monto - pago;
+//
+//						if (tot == 0){
+//							if (anulado.equals("N")) {
+//								gl.facturaVen -= 1;
+//							}
+//						}
+//
+//					}
+//
+//					DTFecha.moveToPosition(i);
+//				}
+//
+//
+//			}
+//
+//			if(gl.vcredito){
+//				if(gl.facturaVen<0) gl.facturaVen=0;
+//				if(gl.facturaVen > 0) {
+//					vValida = false;
+//					msgAskFact();
+//				}else if(gl.facturaVen==0 & gl.media==4){
+//					//#AAS - 2019-03-21 - Cuando el credito disponible (gl.credito) del cliente sea  menor que 0 voy a preguntar si quiere hacer la venta al contado
+//					if (gl.credito<=0) {
+//						vValida = false;
+//						msgAskFact();
+//					}
+//				}else{
+//					exit();
+//				}
+//			}else{
+//				exit();
+//			}
+//
+//		}catch (Exception e){
+//			mu.msgbox("validaCredito: "+e.getMessage());
+//			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+//		}
+//		return vValida;
+//	}
 
 	private void  msgAskFact() {
 		try{
@@ -629,8 +711,8 @@ public class Cobro extends PBase {
 		vd=(long) f/10000;f=f % 10000;
 
 		s="";
-		if (vd>9) { s=s+String.valueOf(vd)+"-";} else {s=s+"0"+String.valueOf(vd)+"-";}
-		if (vm>9) { s=s+String.valueOf(vm)+"-";} else {s=s+"0"+String.valueOf(vm)+"-";}
+		if (vd>9) { s=s+String.valueOf(vd)+"/";} else {s=s+"0"+String.valueOf(vd)+"/";}
+		if (vm>9) { s=s+String.valueOf(vm)+"/";} else {s=s+"0"+String.valueOf(vm)+"/";}
 		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
 
 		return s;

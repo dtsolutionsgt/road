@@ -358,8 +358,8 @@ public class Cobro extends PBase {
 				vItem.Saldo=ssal;
 				vItem.Pago=pg;
 				vItem.flag=fflag;
-				vItem.fini=du.sfecha(DT.getLong(4));
-				vItem.ffin=du.sfecha(DT.getLong(5));
+				vItem.fini=sfecha(DT.getLong(4));
+				vItem.ffin=sfecha(DT.getLong(5));
 
 				ttot=ttot+DT.getDouble(3);
 				tpag+=pg;
@@ -417,7 +417,7 @@ public class Cobro extends PBase {
 					double tot = 0;
 					docfact = DTFecha.getString(0);
 					fechaven = DTFecha.getLong(2);
-					fechav = du.sfecha(fechaven);
+					fechav = sfecha(fechaven);
 
 					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 					Date strDate = sdf.parse(fechav);
@@ -632,8 +632,8 @@ public class Cobro extends PBase {
 		vd=(long) f/10000;f=f % 10000;
 
 		s="";
-		if (vd>9) { s=s+String.valueOf(vd)+"-";} else {s=s+"0"+String.valueOf(vd)+"-";}
-		if (vm>9) { s=s+String.valueOf(vm)+"-";} else {s=s+"0"+String.valueOf(vm)+"-";}
+		if (vd>9) { s=s+String.valueOf(vd)+"/";} else {s=s+"0"+String.valueOf(vd)+"/";}
+		if (vm>9) { s=s+String.valueOf(vm)+"/";} else {s=s+"0"+String.valueOf(vm)+"/";}
 		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
 
 		return s;

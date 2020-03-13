@@ -1079,12 +1079,12 @@ public class Venta extends PBase {
 
 			if (prodPorPeso(prodid)) {
 				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, ppeso, umven);
-				if (prc.existePrecioEspecial(prodid, cant, gl.cliente, gl.clitipo, uum, gl.umpeso, ppeso)) {
+				if (prc.existePrecioEspecial(prodid, cant, gl.cliente, gl.clitipo, umven, gl.umpeso, ppeso)) {
 					if (prc.precioespecial > 0) prec = prc.precioespecial;
 				}
 			} else {
 				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0, umven);
-				if (prc.existePrecioEspecial(prodid, cant, gl.cliente, gl.clitipo, uum, gl.umpeso, 0)) {
+				if (prc.existePrecioEspecial(prodid, cant, gl.cliente, gl.clitipo, umven, gl.umpeso, 0)) {
 					if (prc.precioespecial > 0) prec = prc.precioespecial;
 				}
 			}

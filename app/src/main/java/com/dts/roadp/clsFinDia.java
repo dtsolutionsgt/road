@@ -354,6 +354,9 @@ public class clsFinDia extends PBase{
                     sql="DELETE FROM D_FACTURAD_LOTES WHERE COREL='"+corel+"'";db.execSQL(sql);
                     sql="DELETE FROM D_FACTURA_BARRA WHERE COREL='"+corel+"'";db.execSQL(sql);
                     sql="DELETE FROM D_STOCKB_DEV WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_FACTURA_BARRA WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_FACTURA_STOCK WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_FACTURAF WHERE COREL='"+corel+"'";db.execSQL(sql);
 
                     sql = "DELETE FROM D_STOCKB_DEV WHERE COREL='" + corel + "'";db.execSQL(sql);
                     sql = "DELETE FROM D_BONIF WHERE COREL='" + corel + "'";db.execSQL(sql);
@@ -501,6 +504,8 @@ public class clsFinDia extends PBase{
 
             sql="DELETE FROM D_ATENCION";db.execSQL(sql);
             sql="DELETE FROM D_CLICOORD WHERE STATCOM='S'";db.execSQL(sql);
+
+            sql="DELETE FROM D_RATING";db.execSQL(sql);
 
             //#CKFK_20190325 Se modificó para que solo actualizara el CorelZ y no las demás banderas
             corelz++;

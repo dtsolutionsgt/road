@@ -48,8 +48,7 @@ public class DateUtils {
 			
 		return sh+":"+sm;
 	}
-	
-	
+
 	public String geActTimeStr(){
 		long f,ch,cm,cs;
 		String s,ss;
@@ -347,7 +346,7 @@ public class DateUtils {
 
 		f=cfecha(cyear,cmonth,cday);
 		fecha=f+ch*100+cm;
-		
+
 		return fecha;
 	}
 

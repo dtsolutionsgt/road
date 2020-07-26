@@ -51,7 +51,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ComWS extends PBase {
 
@@ -955,7 +958,27 @@ public class ComWS extends PBase {
 
 			dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					runRecarga();
+
+					long vfecha = clsAppM.fechaFactTol(du.getActDate());
+					long aFecha = du.getActDate();
+					String fechav = du.sfecha(vfecha);
+                    String fechaa = du.sfecha(aFecha);
+
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+					Date strDate = null;
+					Date strDatea =null;
+					try {
+						strDate = sdf.parse(fechav);
+						strDatea = sdf.parse(fechaa);
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+					if (strDatea.getTime() == strDate.getTime()) {
+						runRecarga();
+					}else{
+						msgbox("Las recargas de inventario deben corresponnder al mismo día de la carga inicial del inventario");
+					}
 				}
 			});
 
@@ -3545,6 +3568,22 @@ public class ComWS extends PBase {
 		return true;
 	}
 
+	public String sfecha(long f) {
+		long vy,vm,vd;
+		String s;
+
+		vy=(long) f/100000000;f=f % 100000000;
+		vm=(long) f/1000000;f=f % 1000000;
+		vd=(long) f/10000;f=f % 10000;
+
+		s="";
+		if (vd>9) { s=s+String.valueOf(vd)+"/";} else {s=s+"0"+String.valueOf(vd)+"/";}
+		if (vm>9) { s=s+String.valueOf(vm)+"/";} else {s=s+"0"+String.valueOf(vm)+"/";}
+		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
+
+		return s;
+	}
+
 	private int validaLiquidacion() {
 		Cursor DT;
 		String ss;
@@ -5611,6 +5650,7 @@ public class ComWS extends PBase {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 		}
+
 	}
 
 	private void otrosParametros() {

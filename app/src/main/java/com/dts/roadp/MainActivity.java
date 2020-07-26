@@ -44,8 +44,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.4.67 / ";
-    private String parFechaVer = "12-03-2020";
+    private String parNumVer = "9.4.69 / ";
+    private String parFechaVer = "22-04-2020";
     private String parTipoVer = "ROAD PRD";
 
     @Override
@@ -666,6 +666,12 @@ public class MainActivity extends PBase {
             db.execSQL(sql);
             sql = "DELETE FROM D_FACTURAD_LOTES";
             db.execSQL(sql);
+            sql="DELETE FROM D_FACTURA_BARRA";
+            db.execSQL(sql);
+            sql="DELETE FROM D_FACTURA_STOCK";
+            db.execSQL(sql);
+            sql="DELETE FROM D_FACTURAF";
+            db.execSQL(sql);
 
             sql = "DELETE FROM D_PEDIDO";
             db.execSQL(sql);
@@ -694,6 +700,8 @@ public class MainActivity extends PBase {
             sql = "DELETE FROM D_ATENCION";
             db.execSQL(sql);
 
+            sql = "DELETE FROM D_RATING";
+            db.execSQL(sql);
 
             db.setTransactionSuccessful();
             db.endTransaction();

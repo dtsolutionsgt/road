@@ -93,8 +93,8 @@ public class DevolBodTol extends PBase {
     private void listItems() {
         Cursor dt, dp;
         clsClasses.clsExist item,itemm,itemt;
-        String vF,pcod, cod, name, um, ump, sc, scm, sct="", sp, spm, spt="";
-        double val, valm, valt, peso, pesot;
+        String vF,pcod, cod, name, um, ump, sc, scm, sct="", sp, spm, spt="", sct_por_prod, spt_por_prod;
+        double val, valm, valt, peso, pesot, val_tot_prod, peso_tot_prod;
         int icnt;
 
         items.clear(); valt=0;pesot=0;
@@ -183,6 +183,11 @@ public class DevolBodTol extends PBase {
                 item.items=icnt;
                 items.add(item);
 
+                val_tot_prod = 0;
+                sct_por_prod = "";
+                peso_tot_prod = 0;
+                spt_por_prod = "";
+
                 if (dt.getCount() > 0) dt.moveToFirst();
                 while (!dt.isAfterLast()) {
 
@@ -194,7 +199,9 @@ public class DevolBodTol extends PBase {
                     peso =  dt.getDouble(9);
 
                     valt += val + valm;
+                    val_tot_prod += val + valm;
                     pesot += peso ;
+                    peso_tot_prod += peso ;
 
                     ump = gl.umpeso;
                     sp = mu.frmdecimal(peso, gl.peDecImp) + " " + rep.ltrim(ump, 3);
@@ -202,11 +209,13 @@ public class DevolBodTol extends PBase {
                     spm = mu.frmdecimal(peso, gl.peDecImp) + " " + rep.ltrim(ump, 3);
                     if (!gl.usarpeso) spm = "";
                     spt = mu.frmdecimal(pesot, gl.peDecImp) + " " + rep.ltrim(ump, 3);
-                    if (!gl.usarpeso) spt = "";
+                    spt_por_prod = mu.frmdecimal(peso_tot_prod, gl.peDecImp) + " " + rep.ltrim(ump, 3);
+                    if (!gl.usarpeso) {spt = ""; spt_por_prod = "";}
 
                     sc = mu.frmdecimal(val, gl.peDecImp) + " " + rep.ltrim(um, 2);
                     scm = mu.frmdecimal(valm, gl.peDecImp) + " " + rep.ltrim(um, 2);
                     sct = mu.frmdecimal(valt, gl.peDecImp) + " " + rep.ltrim(um, 2);
+                    sct_por_prod = mu.frmdecimal(val_tot_prod, gl.peDecImp) + " " + rep.ltrim(um, 2);
 
                     item = clsCls.new clsExist();
                     itemm = clsCls.new clsExist();
@@ -246,8 +255,8 @@ public class DevolBodTol extends PBase {
 
                 if (icnt>1) {
                     itemt = clsCls.new clsExist();
-                    itemt.ValorT = sct;
-                    itemt.PesoT = spt;
+                    itemt.ValorT = sct_por_prod;
+                    itemt.PesoT = spt_por_prod;
                     itemt.flag = 3;
                     items.add(itemt);
                 }

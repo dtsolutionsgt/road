@@ -217,6 +217,10 @@ public class ComWS extends PBase {
 			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}
 
+        //txtRuta.setText("8001-1");
+        //txtEmp.setText("03");
+        //txtWS.setText("http://192.168.1.10/wsAndr/wsandr.asmx");
+
 		mac = getMac();
 		fsql = du.univfechasql(du.getActDate());
 		fsqli = du.univfechasql(du.ffecha00(du.getActDate())) + " 00:00:00";
@@ -340,7 +344,7 @@ public class ComWS extends PBase {
 			if (gl.banderafindia) {
 				if (!puedeComunicar()) {
 					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
-					return;
+					//return;
 				}
 			}
 
@@ -786,7 +790,7 @@ public class ComWS extends PBase {
 
 		try {
 
-			esEnvioManual = true;
+			//esEnvioManual = true;
 
 			envioFacturas();
 
@@ -822,7 +826,8 @@ public class ComWS extends PBase {
 
 			dbld.saveArchivo_bck(du.getActDateStr());
 
-			errflag = true;
+			//errflag = true;
+
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -1422,6 +1427,7 @@ public class ComWS extends PBase {
 			ss = dbld.items.get(i);
 			s = s + ss + "\n";
 		}
+
 		if (showprogress) {
 			fprog = "Enviando ...";
 			wsStask.onProgressUpdate();

@@ -344,7 +344,7 @@ public class ComWS extends PBase {
 			if (gl.banderafindia) {
 				if (!puedeComunicar()) {
 					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
-					//return;
+					return;
 				}
 			}
 

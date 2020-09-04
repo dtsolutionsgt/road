@@ -792,7 +792,7 @@ public class ComWS extends PBase {
 
 			//esEnvioManual = true;
 
-			envioFacturas();
+			envioFacturas(); 
 
 			envioPedidos();
 

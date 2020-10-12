@@ -19,6 +19,7 @@ public class WebService {
 
     public String  error="";
     public Boolean status;
+    public clsDataBuilder sqls;
 
     // private
 
@@ -189,6 +190,9 @@ public class WebService {
             parent.wsCallBack(errflag,error);
         } catch (Exception e) {
         }
+    }
+
+    public void commit() {
     }
 
     private class AsyncCallWS extends AsyncTask<String, Void, Void> {

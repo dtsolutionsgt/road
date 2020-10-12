@@ -27,7 +27,7 @@ public class appGlobals extends Application {
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
 	public int mpago;
-	public boolean fotos;
+	public boolean fotos, pedsend;
 	public int cols;
 
 	//#CKFK 20190619 Agregué estas dos variables para los valores de clientes nuevos

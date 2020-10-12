@@ -82,6 +82,7 @@ public class PedidoRes extends PBase {
 		spinList = (Spinner) findViewById(R.id.spinner1);
 		
 		cliid=gl.cliente;
+		gl.pedsend = false;
 		
 		setActDate();
 		fechae=fecha;
@@ -324,6 +325,7 @@ public class PedidoRes extends PBase {
 			gl.closeVenta=true;
 
 			if (!gl.impresora.equalsIgnoreCase("S")) {
+				gl.pedsend = true;
 				super.finish();
 			}
 		}catch (Exception e){
@@ -717,6 +719,8 @@ public class PedidoRes extends PBase {
 						}
 
 						gl.brw=0;
+						gl.pedsend=true;
+						finish();
 
 					} else {
 						String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");

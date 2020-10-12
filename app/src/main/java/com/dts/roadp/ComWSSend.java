@@ -159,15 +159,14 @@ public class ComWSSend extends PBase {
     //endregion
 
     //region Web Service
-/*
 
     @Override
     public void wsCallBack(int callmode,Boolean throwing,String errmsg) {
         String ss;
 
         try {
-            //Buscar solución
-           // super.wsCallBack(callmode,throwing, errmsg);
+
+            super.wsCallBack(callmode,throwing, errmsg);
 
             sql = "UPDATE D_PEDIDO SET STATCOM='S' WHERE STATCOM='N'";
             db.execSQL(sql);
@@ -189,7 +188,6 @@ public class ComWSSend extends PBase {
             }
         }
     }
-*/
 
     //endregion
 

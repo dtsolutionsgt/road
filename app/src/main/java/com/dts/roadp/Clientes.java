@@ -920,11 +920,24 @@ public class Clientes extends PBase {
 
 
 	// Activity Events
-	
+
+	private void enviaPedido() {
+		/*if (gl.tolsuper && gl.tolpedsend) {
+			gl.tolpedsend=false;
+*/
+			//if (getWSURL())
+			Intent intent=new Intent(this,ComWSSend.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+			startActivity(intent);
+			//msgAskSend("Enviar pedido");
+		//}
+	}
+
 	protected void onResume() {
 		try{
 			super.onResume();
 			listItems();
+			enviaPedido();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

@@ -72,88 +72,94 @@ public class CliDet extends PBase {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_cli_det);
-		
-		super.InitBase();
-		addlog("CliDet",""+du.getActDateTime(),gl.vend);
-		
-		lblNom= (TextView) findViewById(R.id.lblNom);
-		lblNit = (TextView) findViewById(R.id.lblPres);
-		lblDir= (TextView) findViewById(R.id.lblDir);
-		lblAten= (TextView) findViewById(R.id.lblCant);
-		lblTel= (TextView) findViewById(R.id.lblTel);
-		lblGPS= (TextView) findViewById(R.id.textView2);
-		lblCobro= (TextView) findViewById(R.id.textView6);
-		lblDevol= (TextView) findViewById(R.id.textView3);		 
-		lblCLim= (TextView) findViewById(R.id.lblCLim);
-		lblCUsed= (TextView) findViewById(R.id.lblCUsed);
-		lblCDisp= (TextView) findViewById(R.id.lblCDisp);
-		lblCantDias = (TextView) findViewById(R.id.lblCantDias);
-		lblClientePago = (TextView) findViewById(R.id.lblClientePago);
 
-		chknc = new RadioButton(this,null);
-		chkncv = new RadioButton(this,null);
+		try{
+			super.onCreate(savedInstanceState);
+			setContentView(R.layout.activity_cli_det);
 
-	//	relMain=(RelativeLayout) findViewById(R.id.relclimain);
-		relV=(RelativeLayout) findViewById(R.id.relVenta);
-		relP=(RelativeLayout) findViewById(R.id.relPreventa);
-		relD=(RelativeLayout) findViewById(R.id.relDespacho);
-		relCamara=(RelativeLayout) findViewById(R.id.relCamara);
-		rlContentVenta=(RelativeLayout) findViewById(R.id.rlContentVenta);
-		
-		imgCobro= (ImageView) findViewById(R.id.imgCobro);
-		imgDevol= (ImageView) findViewById(R.id.imgDevol);
-		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
-		imgTel= (ImageView) findViewById(R.id.imgTel);
-		imgWhatsApp= (ImageView) findViewById(R.id.imgWhatsApp);
-		imgWaze= (ImageView) findViewById(R.id.imgWaze);
-		imgVenta = (ImageView) findViewById(R.id.imgVenta);
-		imgPreventa= (ImageView) findViewById(R.id.imgPreventa);
-		imgDespacho= (ImageView) findViewById(R.id.imgDespacho);
-		imgCamara= (ImageView) findViewById(R.id.imgCamara);
-		imgMap= (ImageView) findViewById(R.id.imgMap);
+			super.InitBase();
+			addlog("CliDet",""+du.getActDateTime(),gl.vend);
 
-		app = new AppMethods(this, gl, Con, db);
+			lblNom= (TextView) findViewById(R.id.lblNom);
+			lblNit = (TextView) findViewById(R.id.lblPres);
+			lblDir= (TextView) findViewById(R.id.lblDir);
+			lblAten= (TextView) findViewById(R.id.lblCant);
+			lblTel= (TextView) findViewById(R.id.lblTel);
+			lblGPS= (TextView) findViewById(R.id.textView2);
+			lblCobro= (TextView) findViewById(R.id.textView6);
+			lblDevol= (TextView) findViewById(R.id.textView3);
+			lblCLim= (TextView) findViewById(R.id.lblCLim);
+			lblCUsed= (TextView) findViewById(R.id.lblCUsed);
+			lblCDisp= (TextView) findViewById(R.id.lblCDisp);
+			lblCantDias = (TextView) findViewById(R.id.lblCantDias);
+			lblClientePago = (TextView) findViewById(R.id.lblClientePago);
 
-		cod=gl.cliente;
+			chknc = new RadioButton(this,null);
+			chkncv = new RadioButton(this,null);
 
-		ventaGPS=gl.peVentaGps!=0;
-		rangoGPS=gl.peLimiteGPS+gl.peMargenGPS;
-		flagGPS=ventaGPS;
-		if (rangoGPS<=1) flagGPS=false;
-		if (gl.gpsdist<1) flagGPS=false;
+			//	relMain=(RelativeLayout) findViewById(R.id.relclimain);
+			relV=(RelativeLayout) findViewById(R.id.relVenta);
+			relP=(RelativeLayout) findViewById(R.id.relPreventa);
+			relD=(RelativeLayout) findViewById(R.id.relDespacho);
+			relCamara=(RelativeLayout) findViewById(R.id.relCamara);
+			rlContentVenta=(RelativeLayout) findViewById(R.id.rlContentVenta);
 
-		if (flagGPS) {
-			permiteVenta=gl.gpsdist<=rangoGPS;
-		} else {
-			permiteVenta=true;
-		}
+			imgCobro= (ImageView) findViewById(R.id.imgCobro);
+			imgDevol= (ImageView) findViewById(R.id.imgDevol);
+			imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
+			imgTel= (ImageView) findViewById(R.id.imgTel);
+			imgWhatsApp= (ImageView) findViewById(R.id.imgWhatsApp);
+			imgWaze= (ImageView) findViewById(R.id.imgWaze);
+			imgVenta = (ImageView) findViewById(R.id.imgVenta);
+			imgPreventa= (ImageView) findViewById(R.id.imgPreventa);
+			imgDespacho= (ImageView) findViewById(R.id.imgDespacho);
+			imgCamara= (ImageView) findViewById(R.id.imgCamara);
+			imgMap= (ImageView) findViewById(R.id.imgMap);
 
-		gl.gpspass=false;
+			app = new AppMethods(this, gl, Con, db);
 
-		sgp2 =" ( "+mu.frmint(rangoGPS)+"m ) ";
-		sgp1 =" ( "+mu.frmint(gl.gpsdist)+"m ) ";
+			cod=gl.cliente;
+
+			ventaGPS=gl.peVentaGps!=0;
+			rangoGPS=gl.peLimiteGPS+gl.peMargenGPS;
+			flagGPS=ventaGPS;
+			if (rangoGPS<=1) flagGPS=false;
+			if (gl.gpsdist<1) flagGPS=false;
+
+			if (flagGPS) {
+				permiteVenta=gl.gpsdist<=rangoGPS;
+			} else {
+				permiteVenta=true;
+			}
+
+			gl.gpspass=false;
+
+			sgp2 =" ( "+mu.frmint(rangoGPS)+"m ) ";
+			sgp1 =" ( "+mu.frmint(gl.gpsdist)+"m ) ";
 
 		/*if (!gl.devol) {
 			lblDevol.setVisibility(View.INVISIBLE);
 			imgDevol.setVisibility(View.INVISIBLE);
 		}*/
 
-		resizeButtons();
+			resizeButtons();
 
-		showData();
-		calcCredit();
-		credito=gl.credito;
+			showData();
+			calcCredit();
+			credito=gl.credito;
 
-		browse=0;
-		merc=1;
+			browse=0;
+			merc=1;
 
-		habilitaOpciones();
+			habilitaOpciones();
 
-		miniFachada();
+			miniFachada();
 
-		setHandlers();
+			setHandlers();
+		}catch (Exception ex){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
+			msgbox("Error en el OnCreate " + ex.getMessage());
+		}
 
 	}
 
@@ -435,11 +441,10 @@ public class CliDet extends PBase {
 			lblGPS.setText(sgps);
 
 			try{
-				showStaticMap();
+				//showStaticMap();
 			}catch (Exception ex){
 				//Error mostrando el mapa
 			}
-
 
 			gl.media=DT.getInt(11);
 
@@ -1375,8 +1380,6 @@ public class CliDet extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
 
 	}
 

@@ -147,9 +147,9 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:ems="10"
-            android:hint="http://192.168.0.15/wsAndr/wsandr.asmx"
+            android:hint="http://52.41.114.122/wsAndr/wsandr.asmx"
             android:nextFocusForward="@id/txtEmp"
-            android:text="http://192.168.0.15/wsAndr/wsandr.asmx" />
+            android:text="http://52.41.114.122/wsAndr/wsandr.asmx" />
 
         <TextView
             android:id="@+id/textView3"

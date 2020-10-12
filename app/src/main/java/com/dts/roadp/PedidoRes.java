@@ -84,7 +84,8 @@ public class PedidoRes extends PBase {
 		cliid=gl.cliente;
 		
 		setActDate();
-		fechae=fecha;lblFecha.setText(du.sfecha(fechae));
+		fechae=fecha;
+		lblFecha.setText(du.sfecha_yyyy(fechae));
 		dweek=mu.dayofweek();
 		
 		clsDesc=new clsDescGlob(this);

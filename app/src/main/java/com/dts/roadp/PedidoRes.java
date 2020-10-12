@@ -47,7 +47,7 @@ public class PedidoRes extends PBase {
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
 	private ListAdaptTotals adapter;
 	
-	private Runnable printcallback,printclose;
+	private Runnable printcallback,printclose,printexit;
 	
 	private clsDescGlob clsDesc;
 	private printer prn;
@@ -108,14 +108,21 @@ public class PedidoRes extends PBase {
 		    	askPrint();
 		    }
 		};
-		
+
 		printclose= new Runnable() {
-		    public void run() {
-		    	PedidoRes.super.finish();
-		    }
+			public void run() {
+
+			}
 		};
-		
-		prn=new printer(this,printclose,gl.validimp);
+
+		printexit= new Runnable() {
+			public void run() {
+				gl.pedsend=true;
+				PedidoRes.super.finish();
+			}
+		};
+
+		prn=new printer(this,printexit,gl.validimp);
 		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp, "");
 		pdoc.deviceid =gl.numSerie;
 	}

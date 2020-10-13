@@ -193,6 +193,8 @@ public class WebService {
     }
 
     public void commit() {
+        mode=2;
+        execute();
     }
 
     private class AsyncCallWS extends AsyncTask<String, Void, Void> {

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class WebService {
 
     public Cursor openDTCursor;
-    public String openDTResult;
+    //public String openDTResult;
 
     public String  error="";
     public Boolean status;
@@ -95,7 +95,7 @@ public class WebService {
 
                     if (i==1) odt_rows = Integer.parseInt(str);
                     if (i==2) odt_cols=Integer.parseInt(str);
-                 }
+                }
             }
 
             createCursor();

@@ -136,6 +136,8 @@ public class Cobro extends PBase {
 
 		try{
 
+			docs.clear();
+
 			calcSelected();
 
 			if (tsel==0) {
@@ -156,7 +158,7 @@ public class Cobro extends PBase {
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			msgbox("Error al seleccionar metodo de pago: "+e.getMessage());
+ 			msgbox("Error al seleccionar método de pago: "+e.getMessage());
 		}
 
 	}
@@ -166,6 +168,8 @@ public class Cobro extends PBase {
 		try{
 
 			if(gl.validarCred!=2) gl.validarCred = 1;
+
+			docs.clear();
 
 			calcSelected();
 
@@ -219,6 +223,8 @@ public class Cobro extends PBase {
 
 				adapter.refreshItems();
 
+				docs.clear();
+
 				calcSelected();
 				showTotals();
 			}else{
@@ -227,6 +233,8 @@ public class Cobro extends PBase {
 				}
 
 				adapter.refreshItems();
+
+				docs.clear();
 
 				calcSelected();
 				showTotals();
@@ -306,6 +314,8 @@ public class Cobro extends PBase {
 
 					adapter.refreshItems();
 
+					docs.clear();
+
 					calcSelected();
 					showTotals();
 
@@ -374,6 +384,8 @@ public class Cobro extends PBase {
 
 			adapter=new ListAdaptCobro(this,items);adapter.cursym=gl.peMon;
 			listView.setAdapter(adapter);
+
+			docs.clear();
 
 			calcSelected();
 			showTotals();
@@ -587,9 +599,6 @@ public class Cobro extends PBase {
 				if (!applyPay()) return;
 			}
 
-			//Aplica descuento por pronto pago
-			AplicaDescuentoPP();
-
 			if (saveCobro()) {
 
 				if (!msgDesc.isEmpty()){
@@ -647,7 +656,7 @@ public class Cobro extends PBase {
 
 	}
 
-	public void AplicaDescuentoPP(){
+	public double MontoDescuentoPP(String documento){
 
 		Cursor DT;
 		double cantDias=0;
@@ -662,14 +671,17 @@ public class Cobro extends PBase {
 		long diasMilli = horasMilli * 24;
 		long diferencia;
 
+		double result = 0;
+
 		try{
 
-			docs.clear();
 			msgDesc="";
 
-			sql="SELECT P.FECHAEMIT, d.DOCUMENTO, p.VALORORIG " +
-				"FROM T_PAGOD d INNER JOIN P_COBRO p ON d.DOCUMENTO = p.DOCUMENTO " +
-				"WHERE (d.PAGO = p.VALORORIG) ";
+			sql=" SELECT P.FECHAV, P.DOCUMENTO, P.VALORORIG " +
+				" FROM P_COBRO P" +
+				" WHERE (P.DOCUMENTO = '" + documento + "')" +
+				"  AND  (P.SALDO = P.VALORORIG)" +
+				"  AND  (P.CANCELADO = 0)";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 
@@ -682,25 +694,31 @@ public class Cobro extends PBase {
 
 				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 				Date strDate = sdf.parse(sfechaE);
-				diferencia=System.currentTimeMillis() - strDate.getTime();
+				diferencia=strDate.getTime() - System.currentTimeMillis() ;
 
 				cantDias = diferencia / diasMilli;
 
-				clsDesc=new clsDescuento(this,"",0,cantDias);
-				double desc=clsDesc.getDescPP();
+				if (cantDias>0){
 
-				if (desc>0){
+					clsDesc=new clsDescuento(this,"",0,cantDias);
+					double desc=clsDesc.getDescPP();
 
-					vItem = clsCls.new clsNCPP();
-					vItem.Factura = DT.getString(1);
-					vItem.MontoFact =  DT.getLong(2);
-					vItem.MontoDesc = vItem.MontoFact-(vItem.MontoFact*(desc*100));
-					vItem.PorcDesc =  desc;
-					vItem.MontoFactPago = DT.getLong(2);
-					vItem.Total=vItem.MontoFactPago-vItem.MontoDesc;
-					docs.add(vItem);
+					if (desc>0){
 
-					msgDesc += vItem.Factura + ", ";
+						vItem = clsCls.new clsNCPP();
+						vItem.Factura = DT.getString(1);
+						vItem.MontoFact =  DT.getLong(2);
+						vItem.MontoDesc = vItem.MontoFact*(desc/100);
+						vItem.PorcDesc =  desc;
+						vItem.MontoFactPago = DT.getLong(2);
+						vItem.Total=vItem.MontoFactPago-vItem.MontoDesc;
+						docs.add(vItem);
+
+						msgDesc += vItem.Factura + ", ";
+
+						result = vItem.MontoDesc;
+					}
+
 				}
 
 				DT.moveToNext();
@@ -710,13 +728,16 @@ public class Cobro extends PBase {
 				DT.close();
 			}
 
-			if (docs.size()>0){
-				msgDesc = "Se le aplicó nota de crédito a los siguientes documentos " + msgDesc.substring(0,msgDesc.length()-2);
+			if (result>0){
+				msgDesc = "Documento aplica para descuento  por pronto pago por un descuento de  " + result;
+				toast(msgDesc);
 			}
 
 		}catch (Exception ex) {
-         	msgbox("Ocurrió un error obteniendo los descuentos por pronto pago " + ex.getMessage());
+         	msgbox("Ocurrió un error obteniendo el descuentos por pronto pago " + ex.getMessage());
 		}
+
+		return result;
 	}
 
 	public String sfecha(long f) {
@@ -1234,6 +1255,7 @@ public class Cobro extends PBase {
 			Object lvObj;
 			int flag,dc;
 			double val;
+            double montoDescuento = 0;
 
 			tsel=0;
 			tpagos=0;
@@ -1262,8 +1284,13 @@ public class Cobro extends PBase {
 
 							} else{
 
+								//Aplica descuento por pronto pago
+								montoDescuento = MontoDescuentoPP(vItem.Factura);
+
 								val=vItem.Saldo;
-								tsel+=val;
+								vItem.DescuentoPP = montoDescuento;
+
+								tsel+=val-montoDescuento;
 
 							}
 						}

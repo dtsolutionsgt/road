@@ -46,7 +46,8 @@ public class PBase extends Activity {
 		Con = new BaseDatos(this);
 
 	    opendb();
-	    ins=Con.Ins;upd=Con.Upd;
+	    ins=Con.Ins;
+	    upd=Con.Upd;
 		
 		vApp=this.getApplication();
 		gl=((appGlobals) this.getApplication());

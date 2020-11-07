@@ -2068,6 +2068,71 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+			//#CKFK 20201106 Agregué la tabla P_PEDIDO_RECHAZADO para poder configurar la lectura de las barras
+			vSQL = "CREATE TABLE [P_PEDIDO_RECHAZADO](" +
+					"[COREL] TEXT NOT NULL," +
+					"[FECHA] INT ," +
+					"[EMPRESA] TEXT," +
+					"[SUCURSAL] TEXT ," +
+					"[RUTA] TEXT ," +
+					"[VENDEDOR] TEXT ," +
+					"[CLIENTE] TEXT ," +
+					"[TOTAL] REAL," +
+					"[PESO] REAL," +
+					"[RAZON_RECHAZADO] TEXT,"+
+					"PRIMARY KEY ([COREL])"+
+					");";
+			database.execSQL(vSQL);
+
+			//#CKFK 20201106 Agregué la tabla DS_PEDIDO para el encabezado de los pedidos para despachar
+			vSQL = "CREATE TABLE [DS_PEDIDO](" +
+			        "[COREL] TEXT NOT NULL," +
+					"[ANULADO] TEXT ," +
+					"[FECHA] INT," +
+					"[EMPRESA] TEXT," +
+					"[RUTA] TEXT," +
+					"[VENDEDOR] TEXT," +
+					"[CLIENTE] TEXT," +
+					"[KILOMETRAJE] TEXT," +
+					"[FECHAENTR] INT," +
+					"[DIRENTREGA] TEXT," +
+					"[TOTAL] REAL," +
+					"[DESMONTO] REAL," +
+					"[IMPMONTO] REAL," +
+					"[PESO] REAL," +
+					"[BANDERA] TEXT," +
+					"[STATCOM] TEXT," +
+					"[CALCOBJ] TEXT," +
+					"[IMPRES] INT," +
+					"[ADD1] TEXT," +
+					"[ADD2] TEXT," +
+					"[ADD3] TEXT,"+
+					"PRIMARY KEY ([COREL])"+
+					");";
+			database.execSQL(vSQL);
+
+			//#CKFK 20201106 Agregué la tabla DS_PEDIDOD para el detalle de los pedidos a despachar
+			vSQL = "CREATE TABLE [DS_PEDIDOD](" +
+			        "[COREL] TEXT NOT NULL," +
+					"[PRODUCTO] TEXT NOT NULL," +
+					"[EMPRESA] TEXT," +
+					"[ANULADO] TEXT," +
+					"[CANT] REAL," +
+					"[PRECIO] REAL," +
+					"[IMP] REAL," +
+					"[DES] REAL," +
+					"[DESMON] REAL," +
+					"[TOTAL] REAL," +
+					"[PRECIODOC] REAL," +
+					"[PESO] REAL," +
+					"[VAL1] REAL," +
+					"[VAL2] TEXT," +
+					"[ruta] TEXT,"+
+					"PRIMARY KEY ([COREL]," +
+					"[PRODUCTO])"+
+					");";
+			database.execSQL(vSQL);
+
 			return 1;
 			 
 		} catch (SQLiteException e) {

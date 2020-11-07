@@ -1708,6 +1708,10 @@ public class ComWS extends PBase {
 			if (!AddTable("P_PEDSUG")) return false;
 			if (!AddTable("P_ULTIMOPRECIO")) return false;
 
+			if (!AddTable("P_PEDIDO_RECHAZADO")) return false;
+			if (!AddTable("DS_PEDIDO")) return false;
+			if (!AddTable("DS_PEDIDOD")) return false;
+
 		} catch (Exception e) {
 			addlog(new Object() {}.getClass().getEnclosingMethod().getName(),idbg, fstr);
 			return false;
@@ -2643,6 +2647,29 @@ public class ComWS extends PBase {
 			SQL = " SELECT IDULTIMOPRECIO, RUTA, CLIENTE, PRODUCTO, PRECIO, FECHAGENERACION "+
 					" FROM P_ULTIMOPRECIO " +
 					" WHERE RUTA='" + ActRuta + "' AND (FECHAGENERACION>='" + fsqli + "') AND (FECHAGENERACION<='" + fsqlf + "')";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_PEDIDO_RECHAZADO")) {
+			SQL = " SELECT COREL, FECHA, EMPRESA, SUCURSAL, RUTA, VENDEDOR, CLIENTE, TOTAL, PESO, RAZON_RECHAZADO "+
+				  " FROM D_PEDIDO " +
+				  " WHERE RUTA='" + ActRuta + "' AND INFORMADO = 0";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("DS_PEDIDO")) {
+			SQL = " SELECT COREL, ANULADO, FECHA, EMPRESA, RUTA, VENDEDOR, CLIENTE, KILOMETRAJE, FECHAENTR, DIRENTREGA, " +
+				  " TOTAL, DESMONTO, IMPMONTO, PESO, BANDERA, STATCOM, CALCOBJ, IMPRES, ADD1, ADD2, ADD3 "+
+				  " FROM DS_PEDIDO " +
+				  " WHERE RUTA='" + ActRuta + "' ";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("DS_PEDIDOD")) {
+			SQL = " SELECT COREL, PRODUCTO, EMPRESA, ANULADO, CANT, PRECIO, IMP, DES, DESMON, TOTAL, PRECIODOC, " +
+					"PESO, VAL1, VAL2, RUTA "+
+				  " FROM DS_PEDIDOD " +
+				  " WHERE COREL IN (SELECT COREL FROM DS_PEDIDO WHERE RUTA = '" + ActRuta + "' )";
 			return SQL;
 		}
 

@@ -59,7 +59,7 @@ public class clsClasses {
 	
 	public class clsCobro {
 		public String Factura,Tipo,fini,ffin;
-		public double Valor,Saldo,Pago;
+		public double Valor,Saldo,Pago, DescuentoPP;
 		public int id,flag;
 	}
 	

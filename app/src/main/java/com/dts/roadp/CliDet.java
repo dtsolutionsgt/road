@@ -395,7 +395,8 @@ public class CliDet extends PBase {
 	
 	private void showData() {
 		Cursor DT;
-		int uvis,dcred;
+		int dcred;
+		long uvis;
 		String contr,sgps="0.00000000 , 0.00000000";
 		
 		lblNom.setText("");
@@ -418,7 +419,7 @@ public class CliDet extends PBase {
 
 			tel=DT.getString(4);
 			lblTel.setText(DT.getString(4));
-			uvis=DT.getInt(3);
+			uvis=DT.getLong(3);
 			
 			nivel=DT.getInt(6);
 			gl.nivel=nivel;

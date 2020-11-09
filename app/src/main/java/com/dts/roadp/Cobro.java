@@ -163,6 +163,7 @@ public class Cobro extends PBase {
 
 	}
 
+	//Probando
 	public void payCash(View view) {
 
 		try{

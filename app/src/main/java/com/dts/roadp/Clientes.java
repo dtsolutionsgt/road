@@ -151,7 +151,17 @@ public class Clientes extends PBase {
 		msgAskDist("Ordenar los clientes por distancia aérea");
 	}
 
-	private void setHandlers() {
+    public void showDespacho(View view) {
+        try {
+            startActivity(new Intent(this, CliNuevo.class));
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+        }
+    }
+
+
+    private void setHandlers() {
 
 		try {
 
@@ -300,7 +310,6 @@ public class Clientes extends PBase {
 		}
 
 	}
-
 
 	// Main
 

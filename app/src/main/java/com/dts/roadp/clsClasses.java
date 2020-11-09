@@ -124,4 +124,47 @@ public class clsClasses {
 		public String Factura;
 		public double MontoFact, MontoDesc, PorcDesc, MontoFactPago, Total;
 	}
+
+    public class clsDs_pedido {
+        public String corel;
+        public String anulado;
+        public long fecha;
+        public String empresa;
+        public String ruta;
+        public String vendedor;
+        public String cliente;
+        public double kilometraje;
+        public long fechaentr;
+        public String direntrega;
+        public double total;
+        public double desmonto;
+        public double impmonto;
+        public double peso;
+        public String bandera;
+        public String statcom;
+        public String calcobj;
+        public int  impres;
+        public String add1;
+        public String add2;
+        public String add3;
+    }
+
+    public class clsDs_pedidod {
+        public String corel;
+        public String producto;
+        public String empresa;
+        public String anulado;
+        public double cant;
+        public double precio;
+        public double imp;
+        public double des;
+        public double desmon;
+        public double total;
+        public double preciodoc;
+        public double peso;
+        public double val1;
+        public String val2;
+        public String ruta;
+    }
+
 }

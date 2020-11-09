@@ -148,8 +148,8 @@ public class MainActivity extends PBase {
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
             if (gl.debug) {
-                txtUser.setText("1");
-                txtPass.setText("1");
+                txtUser.setText("1");txtPass.setText("1");
+                txtUser.setText("001");txtPass.setText("001");
             }
 
         } catch (Exception e) {

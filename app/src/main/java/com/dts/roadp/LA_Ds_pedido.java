@@ -70,7 +70,7 @@ public class LA_Ds_pedido  extends BaseAdapter {
 
         holder.lbl1.setText(""+items.get(position).corel);
         holder.lbl10.setText(""+items.get(position).direntrega);
-        holder.lbl11.setText(""+items.get(position).total);
+        holder.lbl11.setText(mu.frmcur(items.get(position).total));
         holder.lbl19.setText(""+items.get(position).add1);
         holder.lbl20.setText(""+items.get(position).add2);
 

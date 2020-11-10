@@ -21,7 +21,7 @@ public class appGlobals extends Application {
 	public boolean CellCom,closeDevBod;
 
 	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra,
-           parNumVer, parFechaVer, parTipoVer, iddespacho;
+           parNumVer, parFechaVer, parTipoVer, iddespacho,coddespacho;
 
 	public int tiponcredito,validarCred,gpsdist;
     public boolean vcredito,vcheque,vchequepost,validimp;

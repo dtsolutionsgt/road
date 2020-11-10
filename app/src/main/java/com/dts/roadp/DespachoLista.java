@@ -62,7 +62,7 @@ public class DespachoLista extends PBase {
         gl.iddespacho="";
 
         try {
-            Ds_pedidoObj.fill();
+            Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
 
             for (int i = 0; i <Ds_pedidoObj.count; i++) {
                 nombreCliente(Ds_pedidoObj.items.get(i).cliente);
@@ -83,7 +83,7 @@ public class DespachoLista extends PBase {
         gl.closeVenta = false;
         gl.credito=0;
         gl.banderaCobro = false;
-        gl.rutatipo="P";
+        gl.rutatipo="V";
 
         try {
 

@@ -159,9 +159,8 @@ public class Venta extends PBase {
 			}
 		};
 
-        if (!gl.iddespacho.isEmpty()) {
-            procesaDespacho();
-        }
+        if (!gl.iddespacho.isEmpty()) procesaDespacho();
+
 	}
 
 	//region Events
@@ -1924,10 +1923,13 @@ public class Venta extends PBase {
 	    String umv,ums;
 
         try {
+            lblTit.setText("Despacho");
+            gl.coddespacho=gl.iddespacho;gl.iddespacho="";
+
             clsClasses.clsDs_pedidod item;
 
             clsDs_pedidodObj Ds_pedidodObj=new clsDs_pedidodObj(this,Con,db);
-            Ds_pedidodObj.fill("WHERE COREL='"+gl.iddespacho+"'");
+            Ds_pedidodObj.fill("WHERE COREL='"+gl.coddespacho+"'");
 
             for (int i = 0; i <Ds_pedidodObj.count; i++) {
 
@@ -2282,7 +2284,6 @@ public class Venta extends PBase {
 
 			if(DT.getCount()>0){
 				DT.moveToFirst();
-
 				tiposcan=DT.getString(0);
 			}
 			

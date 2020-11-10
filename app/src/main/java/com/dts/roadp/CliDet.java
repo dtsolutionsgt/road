@@ -51,7 +51,7 @@ import static org.apache.commons.io.FileUtils.copyFile;
 
 public class CliDet extends PBase {
 
-	private TextView lblNom, lblNit,lblDir,lblAten,lblTel,lblGPS;
+	private TextView lblNom, lblNit,lblDir,lblAten,lblTel,lblGPS,lblDespacho;
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago;
 	private RelativeLayout relV,relP,relD,relCamara, rlContentVenta;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol,imgRoadTit, imgTel, imgWhatsApp, imgWaze, imgVenta, imgPreventa, imgDespacho, imgCamara, imgMap;
@@ -93,6 +93,7 @@ public class CliDet extends PBase {
 			lblCDisp= (TextView) findViewById(R.id.lblCDisp);
 			lblCantDias = (TextView) findViewById(R.id.lblCantDias);
 			lblClientePago = (TextView) findViewById(R.id.lblClientePago);
+            lblDespacho = (TextView) findViewById(R.id.lblPend);
 
 			chknc = new RadioButton(this,null);
 			chkncv = new RadioButton(this,null);
@@ -155,6 +156,8 @@ public class CliDet extends PBase {
 
 			miniFachada();
 
+            validaDespacho();
+
 			setHandlers();
 		}catch (Exception ex){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
@@ -215,19 +218,15 @@ public class CliDet extends PBase {
 	}
 
 	public void showDespacho(View view) {
-
 		if (!permiteVenta) {
 			msgbox("¡Distancia del cliente mayor que permitida!\nPara realizar la venta debe acercarse más al cliente.");return;
 		}
 
-		try {
-			mu.msgbox("La funcionalidad no esta implementada.");
-
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-		//gl.rutatipo="D";
-		//runVenta();
+        try {
+            startActivity(new Intent(this, DespachoLista.class));
+        } catch (Exception e) {
+            addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+        }
 	}
 
 	public void showCredit(View viev){
@@ -754,7 +753,7 @@ public class CliDet extends PBase {
 			imgCamara.setLayoutParams(layoutParams8);
 
 			ViewGroup.LayoutParams layoutParams9 = rlContentVenta.getLayoutParams();
-			layoutParams9.width = width;
+			layoutParams9.width = width+8;
 			rlContentVenta.setLayoutParams(layoutParams9);
 
 		} catch (Exception e) {
@@ -832,6 +831,24 @@ public class CliDet extends PBase {
 		}
 
 	}
+
+	private void validaDespacho() {
+
+        lblDespacho.setVisibility(View.INVISIBLE);
+        imgDespacho.setVisibility(View.INVISIBLE);
+        relD.setVisibility(View.GONE);
+        try {
+            clsDs_pedidoObj Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
+            Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
+            if (Ds_pedidoObj.count>0) {
+                lblDespacho.setVisibility(View.VISIBLE);
+                imgDespacho.setVisibility(View.VISIBLE);
+                relD.setVisibility(View.VISIBLE);
+            }
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+    }
 
 	//endregion
 
@@ -1162,7 +1179,7 @@ public class CliDet extends PBase {
 
 			flag=false;
 			//if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
-			if (flag) relD.setVisibility(View.VISIBLE);else relD.setVisibility(View.GONE);
+
 
 			if (esClienteNuevo()){
 				imgDevol.setVisibility(View.INVISIBLE);

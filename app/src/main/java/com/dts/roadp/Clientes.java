@@ -90,6 +90,7 @@ public class Clientes extends PBase {
 		app = new AppMethods(this, gl, Con, db);
 		gl.validimp = app.validaImpresora();
 		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+		gl.iddespacho="";
 
 		setHandlers();
 
@@ -150,16 +151,6 @@ public class Clientes extends PBase {
 	public void orderDist(View view) {
 		msgAskDist("Ordenar los clientes por distancia aérea");
 	}
-
-    public void showDespacho(View view) {
-        try {
-            startActivity(new Intent(this, DespachoLista.class));
-        } catch (Exception e) {
-            addlog(new Object() {
-            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-        }
-    }
-
 
     private void setHandlers() {
 

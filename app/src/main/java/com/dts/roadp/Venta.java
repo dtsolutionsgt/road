@@ -158,6 +158,9 @@ public class Venta extends PBase {
 				}, 1000);
 			}
 		};
+
+        if (!gl.iddespacho.isEmpty()) procesaDespacho();
+
 	}
 
 	//region Events
@@ -1914,7 +1917,66 @@ public class Venta extends PBase {
 
 	//endregion
 
-	//region Location
+    //region Despacho
+
+    private void procesaDespacho() {
+	    String umv,ums;
+
+        try {
+            lblTit.setText("Despacho");
+            gl.coddespacho=gl.iddespacho;gl.iddespacho="";
+
+            clsClasses.clsDs_pedidod item;
+
+            clsDs_pedidodObj Ds_pedidodObj=new clsDs_pedidodObj(this,Con,db);
+            Ds_pedidodObj.fill("WHERE COREL='"+gl.coddespacho+"'");
+
+            for (int i = 0; i <Ds_pedidodObj.count; i++) {
+
+                item=Ds_pedidodObj.items.get(i);
+
+                db.execSQL("DELETE FROM T_VENTA WHERE PRODUCTO='"+item.producto+"'");
+
+                umv=app.umVenta(item.producto);
+                ums=app.umStock(item.producto);if (ums.isEmpty()) ums=umv;
+
+                ins.init("T_VENTA");
+
+                ins.add("PRODUCTO",item.producto);
+                ins.add("EMPRESA",emp);
+                ins.add("UM",umv);
+                ins.add("CANT",item.cant);
+                ins.add("UMSTOCK",ums);
+                ins.add("FACTOR",app.factorPres(item.producto,umv,ums));
+                ins.add("PRECIO",item.precio);
+                ins.add("IMP",item.imp);
+                ins.add("DES",item.des);
+                ins.add("DESMON",item.desmon);
+                ins.add("TOTAL",item.total);
+                ins.add("PRECIODOC",item.precio);
+                ins.add("PESO",item.peso);
+                ins.add("VAL1",i+1);
+                ins.add("VAL2","");
+                ins.add("VAL3",0);
+                ins.add("VAL4","");
+                ins.add("PERCEP",0);
+
+                String ss=ins.sql();
+
+                db.execSQL(ins.sql());
+
+            }
+
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
+        listItems();
+    }
+
+    //endregion
+
+	//region Ubicacion
 
 	private void setGPS() {
 
@@ -2222,7 +2284,6 @@ public class Venta extends PBase {
 
 			if(DT.getCount()>0){
 				DT.moveToFirst();
-
 				tiposcan=DT.getString(0);
 			}
 			

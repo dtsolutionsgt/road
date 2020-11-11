@@ -52,6 +52,8 @@ public class ProdCant extends PBase {
 
 	private String URL;
 
+	private AppMethods app;
+
 	private WebService ws;
 
 	@Override
@@ -63,6 +65,8 @@ public class ProdCant extends PBase {
 		addlog("ProdCant",""+du.getActDateTime(),gl.vend);
 
 		setControls();
+
+        app = new AppMethods(this, gl, Con, db);
 
 		if (gl.mostrarPedidoSugerido==1){
 
@@ -87,7 +91,8 @@ public class ProdCant extends PBase {
 		ws=new WebService(ProdCant.this,URL);
 
 		prodid=gl.prod;lblCodProd.setText(prodid);
-		um=gl.um;
+		//um=gl.um;
+		um=app.umVenta(prodid);
 		nivel=gl.nivel;
 		rutatipo=gl.rutatipo;
 

@@ -579,7 +579,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentRight="true"
                 android:gravity="center"
-                android:text="Despachos"
+                android:text="Rechazados"
                 android:textSize="10sp" />
         </RelativeLayout>
 

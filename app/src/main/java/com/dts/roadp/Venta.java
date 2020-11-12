@@ -2055,7 +2055,7 @@ public class Venta extends PBase {
 		idist=(int) cdist;cdist=idist;
 
 		gl.gpspx=px;
-		gl.gpspy=px;
+		gl.gpspy=py;
 		gl.gpscpx=cpx;
 		gl.gpscpy=cpy;
 		gl.gpscdist=cdist;

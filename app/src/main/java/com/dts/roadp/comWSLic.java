@@ -262,7 +262,7 @@ public class comWSLic extends PBase {
             request.addProperty(param);
             envelope.setOutputSoapObject(request);
 
-            HttpTransportSE transport = new HttpTransportSE(URL);
+            HttpTransportSE transport = new HttpTransportSE(URL,60000);
             transport.call(NAMESPACE + METHOD_NAME, envelope);
 
             SoapObject resSoap = (SoapObject) envelope.getResponse();

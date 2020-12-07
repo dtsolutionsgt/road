@@ -1059,20 +1059,20 @@ public class ComWS extends PBase {
 			envelope.setOutputSoapObject(request);
 
 			//HttpTransportSE transport = new HttpTransportSE(URL, 10000);
-
 			//ArrayList<HeaderProperty> headerPropertyArrayList = new ArrayList<HeaderProperty>();
 			//headerPropertyArrayList.add(new HeaderProperty("Connection", "close"));
-
 			//transport.getServiceConnection().openOutputStream();
 
 			try
 			{
+				transport = new HttpTransportSE(URL, 90000);
 				transport.call(NAMESPACE + METHOD_NAME, envelope);
 			}catch (Exception ex1)
 			{
 				//#EJC20201207: Cerrar conexión y reintentar...
 				transport.getServiceConnection().openOutputStream().close();
 				transport.getServiceConnection().disconnect();
+
 				try
 				{
 					transport.call(NAMESPACE + METHOD_NAME, envelope);
@@ -1080,10 +1080,37 @@ public class ComWS extends PBase {
 				{
 					transport.getServiceConnection().openOutputStream().close();
 					transport.getServiceConnection().disconnect();
-					transport.call(NAMESPACE + METHOD_NAME, envelope);
 
-					sstr = ex2.getMessage();
-					return 0;
+					try
+					{
+						transport = new HttpTransportSE(URL, 90000);
+						transport.getServiceConnection().openOutputStream().close();
+						transport.getServiceConnection().disconnect();
+
+						try
+						{
+							transport.call(NAMESPACE + METHOD_NAME, envelope);
+						}catch (Exception ex3){
+
+							transport.getServiceConnection().openOutputStream().close();
+							transport.getServiceConnection().disconnect();
+
+							try
+							{
+								transport = new HttpTransportSE(URL, 90000);
+								transport.getServiceConnection();
+								transport.call(NAMESPACE + METHOD_NAME, envelope);
+							}
+							catch (Exception ex4){
+								sstr = ex4.getMessage();
+								return 0;
+							}
+						}
+
+					}catch (Exception ex3){
+						sstr = ex2.getMessage();
+						return 0;
+					}
 				}
 
 			}
@@ -1224,18 +1251,30 @@ public class ComWS extends PBase {
 			*/
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 6000);
+			transport = new HttpTransportSE(URL, 12000);
 
-			try{
+			try
+			{
 				transport.call(NAMESPACE + METHOD_NAME, envelope);
-			}catch (Exception ex1){
-				addlog(new Object() {
-				}.getClass().getEnclosingMethod().getName(), ex1.getMessage(), sql);
-				sstr = ex1.getMessage();
-				idbg = idbg + " ERR " + ex1.getMessage();
-				return 0;
-			}
+			}catch (Exception ex1)
+			{
+				//#EJC20201207: Cerrar conexión y reintentar...
+				transport.getServiceConnection().openOutputStream().close();
+				transport.getServiceConnection().disconnect();
+				try
+				{
+					transport.call(NAMESPACE + METHOD_NAME, envelope);
+				}catch (Exception ex2)
+				{
+					transport.getServiceConnection().openOutputStream().close();
+					transport.getServiceConnection().disconnect();
+					transport.call(NAMESPACE + METHOD_NAME, envelope);
 
+					sstr = ex2.getMessage();
+					return 0;
+				}
+
+			}
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
 			SoapObject result = (SoapObject) envelope.bodyIn;
@@ -1424,9 +1463,36 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 6000);
+			transport = new HttpTransportSE(URL, 6000);
 
-			transport.call(NAMESPACE + METHOD_NAME, envelope);
+			try
+			{
+				transport.call(NAMESPACE + METHOD_NAME, envelope);
+			}catch (Exception ex1)
+			{
+				//#EJC20201207: Cerrar conexión y reintentar...
+				transport.getServiceConnection().openOutputStream().close();
+				transport.getServiceConnection().disconnect();
+				try
+				{
+					transport.call(NAMESPACE + METHOD_NAME, envelope);
+				}catch (Exception ex2)
+				{
+					transport.getServiceConnection().openOutputStream().close();
+					transport.getServiceConnection().disconnect();
+
+					try
+					{
+						transport.call(NAMESPACE + METHOD_NAME, envelope);
+					}catch (Exception ex3)
+					{
+						sstr = ex3.getMessage();
+						return 0;
+					}
+
+				}
+
+			}
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
 
@@ -1666,6 +1732,7 @@ public class ComWS extends PBase {
 		try {
 
 			if (!AddTable("P_PARAMEXT")) return false;
+			android.os.SystemClock.sleep(1000);
 			procesaParamsExt();
 
 			listItems.clear();
@@ -1674,53 +1741,93 @@ public class ComWS extends PBase {
 
 			listItems.clear();
 			if (!AddTable("P_COREL")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_CLIENTE")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_PRODUCTO")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_PRODPRECIO")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_NIVELPRECIO")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_TIPONEG")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_CLIRUTA")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_CLIDIR")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_FACTORCONV")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_LINEA")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("TMP_PRECESPEC")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_DESCUENTO")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_EMPRESA")) return false;
+			android.os.SystemClock.sleep(2000);
 			if (!AddTable("P_SUCURSAL")) return false;
+			android.os.SystemClock.sleep(2000);
 			if (!AddTable("P_BANCO")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_STOCKINV")) return false;
-
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_CODATEN")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_CODDEV")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_CODNOLEC")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_CORELNC")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_CORRELREC")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_CORREL_OTROS")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_STOCK_APR")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_STOCK")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_STOCKB")) return false;
-			if (!AddTable("P_STOCK_PALLET"))
-				return false;//#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
+			android.os.SystemClock.sleep(1000);
+			if (!AddTable("P_STOCK_PALLET")) return false;//#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_COBRO")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_CLIGRUPO")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_MEDIAPAGO")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_BONIF")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_BONLIST")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_PRODGRUP")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_IMPUESTO")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_VENDEDOR")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_MUNI")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_VEHICULO")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_HANDHELD")) return false;
+			android.os.SystemClock.sleep(1000);
             if (!AddTable("P_TRANSERROR")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_CATALOGO_PRODUCTO")) return false;
+			android.os.SystemClock.sleep(1000);
 			if (!AddTable("P_GLOBPARAM")) return false;
-			//if (!AddTable("P_CONFIGBARRA")) return false;
+			android.os.SystemClock.sleep(1000);
+			if (!AddTable("P_CONFIGBARRA")) return false;
+			android.os.SystemClock.sleep(1000);
 
 			licResult=checkLicence(licSerial);
 			licResultRuta=checkLicenceRuta(licRuta);
 
 			fillTableImpresora();
+			android.os.SystemClock.sleep(1000);
 
 			if (!AddTable("P_REF1")) return false;
 			if (!AddTable("P_REF2")) return false;
@@ -2669,17 +2776,19 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_CATALOGO_PRODUCTO")) {
-			SQL = " SELECT CODIGO_PRODUCTO, ORDEN FROM P_CATALOGO_PRODUCTO " +
-				  "	WHERE CODIGO_PRODUCTO IN (SELECT CODIGO ";
-			SQL += "FROM P_PRODUCTO WHERE ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
-					" OR CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "'))" +
-					" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) OR UNIDMED='CAN' )" +
-					" AND CODIGO IN ( " +
-					" SELECT CODIGO FROM P_PRODPRECIO WHERE (NIVEL IN ( SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE " +
-					" WHERE (CODIGO IN ( SELECT DISTINCT CLIENTE FROM DS_PEDIDO WHERE (RUTA ='" + ActRuta + "') AND (BANDERA='D')))))OR " +
-					" NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE  " +
-					" WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "')))" +
-					" OR TIENE_VINETA_O_TUBO = 1 )";
+			SQL = " SELECT CODIGO_PRODUCTO, ORDEN FROM P_CATALOGO_PRODUCTO; ";
+
+//					+
+//				  "	WHERE CODIGO_PRODUCTO IN (SELECT CODIGO ";
+//			SQL += "FROM P_PRODUCTO WHERE ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
+//					" OR CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "'))" +
+//					" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) OR UNIDMED='CAN' )" +
+//					" AND CODIGO IN ( " +
+//					" SELECT CODIGO FROM P_PRODPRECIO WHERE (NIVEL IN ( SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE " +
+//					" WHERE (CODIGO IN ( SELECT DISTINCT CLIENTE FROM DS_PEDIDO WHERE (RUTA ='" + ActRuta + "') AND (BANDERA='D')))))OR " +
+//					" NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE  " +
+//					" WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "')))" +
+//					" OR TIENE_VINETA_O_TUBO = 1 )";
 			return SQL;
 		}
 

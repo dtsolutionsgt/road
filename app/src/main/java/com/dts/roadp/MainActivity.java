@@ -789,6 +789,7 @@ public class MainActivity extends PBase {
     }
 
     private boolean validaLicencia() {
+
         CryptUtil cu = new CryptUtil();
         Cursor dt;
         String lic, lickey, licruta, rutaencrypt;

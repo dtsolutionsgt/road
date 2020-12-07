@@ -128,6 +128,7 @@ public class comWSLic extends PBase {
     public void askSend(View view) {
 
         try {
+
             if (isbusy == 1) {
                 toastcent("Por favor, espere que se termine la tarea actual.");
                 return;
@@ -155,11 +156,13 @@ public class comWSLic extends PBase {
     }
 
     private void validaLicencia() {
+
         CryptUtil cu = new CryptUtil();
         Cursor dt;
         String lic, lickey, licruta, rutaencrypt;
 
         try {
+
             lickey = cu.encrypt(gl.deviceId);
             rutaencrypt = cu.encrypt(gl.ruta);
 

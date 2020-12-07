@@ -67,7 +67,11 @@ public class clsClasses {
 		public String Tipo,Num,Valor;
 		public int id;
 	}
-	
+
+	public class clsPedRec {
+		public String Factura,Razon,Fecha, Valor, Cliente;
+	}
+
 	public class clsEnvio {
 		public String Nombre;
 		public int id,env,pend;

@@ -976,7 +976,9 @@ public class BaseDatosScript {
 					"[MONTOPAGADOFACT] REAL NOT NULL," +
 					"[STATCOM] TEXT NOT NULL," +
 					"[CODIGOLIQUIDACION] INTEGER NOT NULL," +
-					"[IMPRES] INTEGER NOT NULL"+
+					"[IMPRES] INTEGER NOT NULL," +
+					"[EMPRESA] TEXT NOT NULL," +
+					"[COREL_COBRO] TEXT"+
 					");";
 			database.execSQL(vSQL);
 
@@ -1085,7 +1087,6 @@ public class BaseDatosScript {
 			database.execSQL(vSQL);
 			vSQL="CREATE INDEX O_PROD_idx2 ON O_PROD(CODIGO)";
 			database.execSQL(vSQL);
-
 
 			vSQL="CREATE TABLE [O_LINEA] ("+
 					"[RUTA] TEXT NOT NULL,"+
@@ -2080,6 +2081,7 @@ public class BaseDatosScript {
 					"[TOTAL] REAL," +
 					"[PESO] REAL," +
 					"[RAZON_RECHAZADO] TEXT,"+
+					"[COREL_COBRO] TEXT,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);

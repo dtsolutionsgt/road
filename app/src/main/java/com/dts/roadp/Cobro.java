@@ -27,7 +27,7 @@ import java.util.Date;
 public class Cobro extends PBase {
 
 	private ListView listView;
-	private TextView lblSel,lblPag,lblPend;
+	private TextView lblSel,lblPag,lblPend, txtMontoDescPP;
 
 	private ArrayList<clsClasses.clsCobro> items= new ArrayList<clsClasses.clsCobro>();
 	ArrayList<clsClasses.clsNCPP> docs= new ArrayList<clsClasses.clsNCPP>();
@@ -40,8 +40,8 @@ public class Cobro extends PBase {
 	private clsDocFactura fdocf;
 	private AppMethods app;
 
-	private String cliid,cod,itemid,prodid,sefect,corel,fserie,dtipo="",fechav,msgDesc="";
-	private double ttot,tsel,tpag,tpagos,tpend,vefect,plim,cred,pg,sal,ssal,total,monto,pago;
+	private String cliid,cod,itemid,prodid,sefect,corel,fserie,dtipo="",fechav,msgDesc="", cor_nc="";
+	private double ttot,tsel, tdescpp,tpag,tpagos,tpend,vefect,plim,cred,pg,sal,ssal,total,monto,pago, descpp;
 	private boolean peexit;
 	private boolean porcentaje = false, validarCred = false;
 	private int fflag=1,fcorel,medPago,checkCheck=0, impres=0;
@@ -60,6 +60,7 @@ public class Cobro extends PBase {
 
 		listView = (ListView) findViewById(R.id.listView1);
 		lblSel = (TextView) findViewById(R.id.lblSel);
+		txtMontoDescPP= (TextView) findViewById(R.id.txtMontoDescPP);
 		lblPag = (TextView) findViewById(R.id.lblPag);
 		lblPend = (TextView) findViewById(R.id.lblPend);
 		cbCheckAll= (CheckBox) findViewById(R.id.cbCheckAll);
@@ -140,7 +141,7 @@ public class Cobro extends PBase {
 
 			calcSelected();
 
-			if (tsel==0) {
+			if (Math.round(tsel)==0) {
 				mu.msgbox("Total a pagar = 0, debe seleccionar un documento");return;
 			}
 
@@ -152,6 +153,8 @@ public class Cobro extends PBase {
 
 			browse=1;
 			if(gl.validarCred!=2) gl.validarCred = 1;
+
+			gl.tieneDescPP = docs.size()>0;
 
 			Intent intent = new Intent(this,Pago.class);
 			startActivity(intent);
@@ -347,8 +350,15 @@ public class Cobro extends PBase {
 		items.clear();ttot=0;tpag=0;
 
 		try {
-			sql="SELECT DOCUMENTO,TIPODOC,VALORORIG,SALDO,FECHAEMIT,FECHAV " +
+
+			if (!gl.pFiltroCobros.toString().isEmpty()){
+				sql="SELECT DOCUMENTO,TIPODOC,VALORORIG,SALDO,FECHAEMIT,FECHAV " +
+						"FROM P_COBRO WHERE CLIENTE='"+cliid+"' AND (TIPODOC = '" + gl.pFiltroCobros + "')" +
+						"ORDER BY FECHAV";
+			}else{
+				sql="SELECT DOCUMENTO,TIPODOC,VALORORIG,SALDO,FECHAEMIT,FECHAV " +
 					"FROM P_COBRO WHERE CLIENTE='"+cliid+"' ORDER BY FECHAV";
+			}
 
 			DT=Con.OpenDT(sql);
 			if (DT.getCount()==0) return;
@@ -361,10 +371,12 @@ public class Cobro extends PBase {
 				vItem.Factura=DT.getString(0);
 				vItem.Tipo=DT.getString(1);
 				vItem.Valor=DT.getDouble(2);
+				vItem.DescuentoPP=getDescPP(vItem.Factura);
 
 				sal=DT.getDouble(3);
 				pg=getDocPago(DT.getString(0),DT.getString(1));
-				ssal=sal-pg;if (ssal<0) ssal=0;
+				descpp=vItem.DescuentoPP;
+				ssal=sal-pg-descpp;if (ssal<0) ssal=0;
 				if (ssal>0) fflag=1; else fflag=0;
 
 				vItem.Saldo=ssal;
@@ -658,83 +670,86 @@ public class Cobro extends PBase {
 
 	public double MontoDescuentoPP(String documento){
 
-		Cursor DT;
-		double cantDias=0;
-		clsDescuento clsDesc;
-		clsClasses.clsNCPP vItem;
-		long lfechaE;
-		String sfechaE;
-
-		long segsMilli = 1000;
-		long minsMilli = segsMilli * 60;
-		long horasMilli = minsMilli * 60;
-		long diasMilli = horasMilli * 24;
-		long diferencia;
-
 		double result = 0;
 
-		try{
+		if (getDescPP(documento)==0){
+			Cursor DT;
+			double cantDias=0;
+			clsDescuento clsDesc;
+			clsClasses.clsNCPP vItem;
+			long lfechaE;
+			String sfechaE;
 
-			msgDesc="";
+			long segsMilli = 1000;
+			long minsMilli = segsMilli * 60;
+			long horasMilli = minsMilli * 60;
+			long diasMilli = horasMilli * 24;
+			long diferencia;
 
-			sql=" SELECT P.FECHAV, P.DOCUMENTO, P.VALORORIG " +
-				" FROM P_COBRO P" +
-				" WHERE (P.DOCUMENTO = '" + documento + "')" +
-				"  AND  (P.SALDO = P.VALORORIG)" +
-				"  AND  (P.CANCELADO = 0)";
-			DT=Con.OpenDT(sql);
-			DT.moveToFirst();
+			try{
 
-			for (int i = 0; i < DT.getCount(); i++ ) {
+				msgDesc="";
 
-				cantDias=0;
+				sql=" SELECT P.FECHAV, P.DOCUMENTO, P.VALORORIG " +
+						" FROM P_COBRO P" +
+						" WHERE (P.DOCUMENTO = '" + documento + "')" +
+						"  AND  (P.SALDO = P.VALORORIG)" +
+						"  AND  (P.CANCELADO = 0)";
+				DT=Con.OpenDT(sql);
+				DT.moveToFirst();
 
-				lfechaE=DT.getLong(0);
-				sfechaE = du.sfecha(lfechaE);
+				for (int i = 0; i < DT.getCount(); i++ ) {
 
-				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-				Date strDate = sdf.parse(sfechaE);
-				diferencia=strDate.getTime() - System.currentTimeMillis() ;
+					cantDias=0;
 
-				cantDias = diferencia / diasMilli;
+					lfechaE=DT.getLong(0);
+					sfechaE = du.sfecha(lfechaE);
 
-				if (cantDias>0){
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+					Date strDate = sdf.parse(sfechaE);
+					diferencia=strDate.getTime() - System.currentTimeMillis() ;
 
-					clsDesc=new clsDescuento(this,"",0,cantDias);
-					double desc=clsDesc.getDescPP();
+					cantDias = diferencia / diasMilli;
 
-					if (desc>0){
+					if (cantDias>0){
 
-						vItem = clsCls.new clsNCPP();
-						vItem.Factura = DT.getString(1);
-						vItem.MontoFact =  DT.getLong(2);
-						vItem.MontoDesc = vItem.MontoFact*(desc/100);
-						vItem.PorcDesc =  desc;
-						vItem.MontoFactPago = DT.getLong(2);
-						vItem.Total=vItem.MontoFactPago-vItem.MontoDesc;
-						docs.add(vItem);
+						clsDesc=new clsDescuento(this,"",0,cantDias);
+						double desc=clsDesc.getDescPP();
 
-						msgDesc += vItem.Factura + ", ";
+						if (desc>0){
 
-						result = vItem.MontoDesc;
+							vItem = clsCls.new clsNCPP();
+							vItem.Factura = DT.getString(1);
+							vItem.MontoFact =  DT.getLong(2);
+							vItem.MontoDesc = vItem.MontoFact*(desc/100);
+							vItem.PorcDesc =  desc;
+							vItem.MontoFactPago = vItem.MontoFact-vItem.MontoDesc;
+							vItem.Total=vItem.MontoFactPago;
+							docs.add(vItem);
+
+							msgDesc += vItem.Factura + ", ";
+
+							result = vItem.MontoDesc;
+						}
+
 					}
 
+					DT.moveToNext();
 				}
 
-				DT.moveToNext();
+				if(DT!=null){
+					DT.close();
+				}
+
+				if (result>0){
+					msgDesc = "Documento aplica para descuento  por pronto pago por un descuento de  " + result;
+					toast(msgDesc);
+				}
+
+			}catch (Exception ex) {
+				msgbox("Ocurrió un error obteniendo el descuentos por pronto pago " + ex.getMessage());
 			}
 
-			if(DT!=null){
-				DT.close();
-			}
-
-			if (result>0){
-				msgDesc = "Documento aplica para descuento  por pronto pago por un descuento de  " + result;
-				toast(msgDesc);
-			}
-
-		}catch (Exception ex) {
-         	msgbox("Ocurrió un error obteniendo el descuentos por pronto pago " + ex.getMessage());
 		}
 
 		return result;
@@ -762,7 +777,10 @@ public class Cobro extends PBase {
 		double tpago;
 		String doc="";
 
-		if (!assignCorel()) return false;
+		if (!assignCorel()) {
+			msgbox("No tiene correlativos definidos para recibos");
+			return false;
+		}
 
 		corel= correlativo_recibo();
 
@@ -893,16 +911,17 @@ public class Cobro extends PBase {
 					for (int i = 0; i < docs.size(); i++ ) {
 
 						vItem=docs.get(i);
+						cor_nc = gl.ruta+"_"+mu.getCorelBase();
 
 						ins.init("D_NOTACRED_PP");
 
-						ins.add("COREL",corel);
+						ins.add("COREL",cor_nc);
 						ins.add("ANULADO","N");
 						ins.add("FECHA", fecha);
 						ins.add("RUTA",gl.ruta);
 						ins.add("VENDEDOR",gl.vend);
 						ins.add("CLIENTE",gl.cliente);
-						ins.add("TOTAL",vItem.toString());
+						ins.add("TOTAL",vItem.Total);
 						ins.add("FACTURA",vItem.Factura);
 						ins.add("MONTOFACTURA",vItem.MontoFact);
 						ins.add("MONTODESCUENTO",vItem.MontoDesc);
@@ -911,6 +930,8 @@ public class Cobro extends PBase {
 						ins.add("STATCOM","N");
 						ins.add("CODIGOLIQUIDACION",0);
 						ins.add("IMPRES",0);
+						ins.add("COREL_COBRO", corel);
+						ins.add("EMPRESA", gl.emp);
 
 						db.execSQL(ins.sql());
 
@@ -1225,10 +1246,11 @@ public class Cobro extends PBase {
 	private void showTotals(){
 
 		try{
-			total = tsel + tpagos;
+			total = tsel + tpagos + tdescpp;
 
 			lblSel.setText(mu.frmcur(total));
 			lblPag.setText(mu.frmcur(tpagos));
+			txtMontoDescPP.setText(mu.frmcur(tdescpp));
 
 			/*tpend=total-tpagos;
 			plim=total-tpagos;*/
@@ -1259,6 +1281,7 @@ public class Cobro extends PBase {
 
 			tsel=0;
 			tpagos=0;
+			tdescpp=0;
 
 			if (adapter!=null){
 
@@ -1276,7 +1299,8 @@ public class Cobro extends PBase {
 							if(vItem.Pago > 0){
 
 								val=vItem.Pago;
-								tpagos+=val;
+								tdescpp+=vItem.DescuentoPP;
+								tpagos+=val-tdescpp;
 
 								//#CKFK 20190412 Agregué esto para que se sumara el dato de lo  para que llegue
 								val=vItem.Saldo;
@@ -1291,7 +1315,7 @@ public class Cobro extends PBase {
 								vItem.DescuentoPP = montoDescuento;
 
 								tsel+=val-montoDescuento;
-
+                                tdescpp+=montoDescuento;
 							}
 						}
 					}
@@ -1326,6 +1350,35 @@ public class Cobro extends PBase {
 
 			sql="SELECT SUM(PAGO) FROM D_COBROD "+
 					"WHERE (ANULADO='N') AND (DOCUMENTO='"+doc+"') AND (TIPODOC='"+ptipo+"') ";
+			DT=Con.OpenDT(sql);
+
+			if(DT.getCount()>0){
+
+				DT.moveToFirst();
+
+				tp=DT.getDouble(0);
+
+			}else{
+				tp=0;
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			tp=0;
+		}
+
+		return tp;
+
+	}
+
+	private double getDescPP(String doc){
+		Cursor DT;
+		double tp;
+
+		try {
+
+			sql="SELECT IFNULL(SUM(MONTODESCUENTO),0) AS MONTODESCUENTO FROM D_NOTACRED_PP "+
+					"WHERE (ANULADO='N') AND (FACTURA='"+doc+"') ";
 			DT=Con.OpenDT(sql);
 
 			if(DT.getCount()>0){
@@ -1489,7 +1542,8 @@ public class Cobro extends PBase {
 		try{
 
 			showTotals();
-			if(tsel>0) {
+			//if(tsel>0) {
+			if(total>0) {
 				msgAskExit("Tiene documentos pendientes de pago. Salir");
 			} else {
 				super.finish();

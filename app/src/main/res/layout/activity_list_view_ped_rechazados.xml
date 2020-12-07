@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:context=".list_view_ped_rechazados">
+
+    <LinearLayout
+        android:id="@+id/llEnc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#2196F3"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/lblEFactura"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="5dp"
+            android:text="FACTURA" />
+
+        <TextView
+            android:id="@+id/lblEFechaPR"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="FECHA" />
+
+        <TextView
+            android:id="@+id/lblEMontoPR"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:gravity="right|end"
+            android:paddingEnd="5dp"
+            android:text="MONTO" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llDet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/llEnc"
+        android:orientation="horizontal"
+        android:paddingTop="2dp">
+
+        <TextView
+            android:id="@+id/lblDFactura"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="5dp"
+            android:text="AS000001" />
+
+        <TextView
+            android:id="@+id/lblDFechaPR"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="14/11/2020" />
+
+        <TextView
+            android:id="@+id/lblDMontoPR"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:paddingEnd="5dp"
+            android:text="1000.00" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llRazon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/llDet"
+        android:orientation="horizontal"
+        android:paddingTop="2dp">
+
+        <TextView
+            android:id="@+id/lblRazonRechazado"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Razón" />
+    </LinearLayout>
+</RelativeLayout>

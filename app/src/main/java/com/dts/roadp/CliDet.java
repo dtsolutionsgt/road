@@ -52,9 +52,9 @@ import static org.apache.commons.io.FileUtils.copyFile;
 public class CliDet extends PBase {
 
 	private TextView lblNom, lblNit,lblDir,lblAten,lblTel,lblGPS;
-	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago;
-	private RelativeLayout relV,relP,relD,relCamara, rlContentVenta;//#HS_20181213 relCamara
-	private ImageView imgCobro,imgDevol,imgRoadTit, imgTel, imgWhatsApp, imgWaze, imgVenta, imgPreventa, imgDespacho, imgCamara, imgMap;
+	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago, lblRechazados;
+	private RelativeLayout relV,relP,relD,relCamara, rlContentVenta,relPedRechazados;//#HS_20181213 relCamara
+	private ImageView imgCobro,imgDevol,imgRoadTit, imgTel, imgWhatsApp, imgWaze, imgVenta, imgPreventa, imgDespacho, imgCamara, imgMap, imgRechazados;
 	private RadioButton chknc,chkncv;
 
 	private PhotoViewAttacher zoomFoto;
@@ -93,6 +93,7 @@ public class CliDet extends PBase {
 			lblCDisp= (TextView) findViewById(R.id.lblCDisp);
 			lblCantDias = (TextView) findViewById(R.id.lblCantDias);
 			lblClientePago = (TextView) findViewById(R.id.lblClientePago);
+            lblRechazados=(TextView)findViewById(R.id.lblRechazados);
 
 			chknc = new RadioButton(this,null);
 			chkncv = new RadioButton(this,null);
@@ -103,6 +104,7 @@ public class CliDet extends PBase {
 			relD=(RelativeLayout) findViewById(R.id.relDespacho);
 			relCamara=(RelativeLayout) findViewById(R.id.relCamara);
 			rlContentVenta=(RelativeLayout) findViewById(R.id.rlContentVenta);
+			relPedRechazados =(RelativeLayout) findViewById(R.id.relPedRechazados);
 
 			imgCobro= (ImageView) findViewById(R.id.imgCobro);
 			imgDevol= (ImageView) findViewById(R.id.imgDevol);
@@ -115,6 +117,7 @@ public class CliDet extends PBase {
 			imgDespacho= (ImageView) findViewById(R.id.imgDespacho);
 			imgCamara= (ImageView) findViewById(R.id.imgCamara);
 			imgMap= (ImageView) findViewById(R.id.imgMap);
+			imgRechazados= (ImageView) findViewById(R.id.imgRechazados);
 
 			app = new AppMethods(this, gl, Con, db);
 
@@ -156,6 +159,7 @@ public class CliDet extends PBase {
 			miniFachada();
 
 			setHandlers();
+
 		}catch (Exception ex){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
 			msgbox("Error en el OnCreate " + ex.getMessage());
@@ -198,6 +202,11 @@ public class CliDet extends PBase {
 		} else {
 			doVenta();
 		}
+	}
+
+	public void showRechazados(View view){
+		Intent intent = new Intent(this,ped_rechazados.class);
+		startActivity(intent);
 	}
 
 	public void showPreventa(View view) {
@@ -519,13 +528,19 @@ public class CliDet extends PBase {
 		double tpg,tsal,cu=0;
 	
 		try {
-			sql="SELECT SUM(SALDO) FROM P_COBRO WHERE (CLIENTE='"+cod+"')";
+
+			if (!gl.pFiltroCobros.toString().isEmpty()){
+				sql="SELECT SUM(SALDO) FROM P_COBRO WHERE (CLIENTE='"+cod+"') AND (TIPODOC = '" + gl.pFiltroCobros + "')";
+			}else{
+				sql="SELECT SUM(SALDO) FROM P_COBRO WHERE (CLIENTE='"+cod+"')";
+			}
+
            	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			tsal=DT.getDouble(0);
-	
-			
+
 			sql="SELECT SUM(TOTAL) FROM D_COBRO WHERE (ANULADO='N') AND (CLIENTE='"+cod+"')";
+
            	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			tpg=DT.getDouble(0);
@@ -754,8 +769,16 @@ public class CliDet extends PBase {
 			imgCamara.setLayoutParams(layoutParams8);
 
 			ViewGroup.LayoutParams layoutParams9 = rlContentVenta.getLayoutParams();
-			layoutParams9.width = width;
+			layoutParams9.width = width+30;
 			rlContentVenta.setLayoutParams(layoutParams9);
+
+			ViewGroup.LayoutParams layoutParams10 = relPedRechazados.getLayoutParams();
+			layoutParams10.width = width+30;
+			relPedRechazados.setLayoutParams(layoutParams10);
+
+			ViewGroup.LayoutParams layoutParams11 = imgRechazados.getLayoutParams();
+			layoutParams8.height = width+30;
+			imgRechazados.setLayoutParams(layoutParams11);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1010,6 +1033,65 @@ public class CliDet extends PBase {
 
 	}
 
+	private void msgAskIngreseFactura() {
+
+		try{
+			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Ingrese No. factura");
+
+			final LinearLayout layout = new LinearLayout(this);
+			layout.setOrientation(LinearLayout.VERTICAL);
+
+			final TextView lblNoFactura = new TextView(this);
+			lblNoFactura.setTextSize(10);
+			lblNoFactura.setText("Factura:");
+
+			final EditText editFactura = new EditText(this);
+			editFactura.setInputType(InputType.TYPE_CLASS_TEXT);
+			editFactura.setText("");
+
+			layout.addView(lblNoFactura);
+			layout.addView(editFactura);
+
+			alert.setView(layout);
+
+			alert.setPositiveButton("Ingresar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+
+					if(!editFactura.getText().toString().isEmpty()){
+
+						gl.fNoFactura = editFactura.getText().toString();
+
+						layout.removeAllViews();
+
+						Intent intent = new Intent(CliDet.this,DevolCli.class);
+						startActivity(intent);
+
+					}else{
+						//toast("Ingreso el número de factura");
+						closekeyb();
+						layout.removeAllViews();
+
+						msgAskIngreseFactura();
+					}
+
+				}
+			});
+
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+
+				}
+			});
+
+			alert.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
 	private void ActualizarCliente(String corel, String NombreEdit, String NitEdit){
 		Cursor DT;
 		String updatecli = "";
@@ -1077,9 +1159,6 @@ public class CliDet extends PBase {
 	public void callPhone(View view){
 		String to=tel;
 
-
-		//to="42161467";
-
 		try {
 
 			if (to.length()==0) {
@@ -1117,7 +1196,7 @@ public class CliDet extends PBase {
 				String url = "waze://?ll="+sgps;
 				//"waze://?ll=14.6017278,-90.5236343";
 				//"waze://?ll=14.586997,-90.513685";
-						Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( url ) );
+				Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( url ) );
 				startActivity( intent );
 			}else{
 				msgbox("El cliente no tiene definidas las coordenadas GPS");
@@ -1136,8 +1215,16 @@ public class CliDet extends PBase {
 		try{
 			gl.dvbrowse=0;
 			gl.devtipo=tdev;
-			Intent intent = new Intent(this,DevolCli.class);
-			startActivity(intent);
+
+			if (gl.pSolicitarFactura){
+				gl.fNoFactura="";
+				msgAskIngreseFactura();
+			}else{
+
+				Intent intent = new Intent(this,DevolCli.class);
+				startActivity(intent);
+			}
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -1164,16 +1251,23 @@ public class CliDet extends PBase {
 			//if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
 			if (flag) relD.setVisibility(View.VISIBLE);else relD.setVisibility(View.GONE);
 
+			flag=tienePedidosRechazados();
+			if (flag) relPedRechazados.setVisibility(View.VISIBLE);else relPedRechazados.setVisibility(View.GONE);
+
 			if (esClienteNuevo()){
 				imgDevol.setVisibility(View.INVISIBLE);
 				lblDevol.setVisibility(View.INVISIBLE);
 				imgCobro.setVisibility(View.INVISIBLE);
 				lblCobro.setVisibility(View.INVISIBLE);
+				lblRechazados.setVisibility(View.INVISIBLE);
+				imgRechazados.setVisibility(View.INVISIBLE);
 			}else{
 				imgDevol.setVisibility(View.VISIBLE);
 				lblDevol.setVisibility(View.VISIBLE);
 				imgCobro.setVisibility(View.VISIBLE);
 				lblCobro.setVisibility(View.VISIBLE);
+				lblRechazados.setVisibility(View.VISIBLE);
+				imgRechazados.setVisibility(View.VISIBLE);
 			}
 
 		}catch (Exception ex)
@@ -1217,6 +1311,25 @@ public class CliDet extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return true;
+	}
+
+	private boolean tienePedidosRechazados(){
+
+		Cursor dt;
+		String sql = "";
+
+		try{
+
+			sql="SELECT * FROM P_PEDIDO_RECHAZADO WHERE CLIENTE='"+cod+"'";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return false;
+
+		}catch (Exception ex) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
+			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+ex.getMessage());
 		}
 
 		return true;
@@ -1346,8 +1459,8 @@ public class CliDet extends PBase {
             chknc.setChecked(false);
             chkncv.setChecked(false);
 
-			if (clicred || gl.rutatipo.equals("P"))layout.addView(chknc);
-			if (!clicred & !gl.rutatipo.equals("P")) layout.addView(chkncv);
+			if (clicred || gl.rutatipog.equals("P"))layout.addView(chknc);
+			if (!clicred & !gl.rutatipog.equals("P")) layout.addView(chkncv);
 
 			alert.setView(layout);
 

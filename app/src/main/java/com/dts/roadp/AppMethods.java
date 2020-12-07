@@ -99,13 +99,25 @@ public class AppMethods {
 
 				case "Cobros":
 
-					sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_COBRO";
-					sql += (sinEnviar?" WHERE STATCOM = 'N'":"");
+					if(gl.pCobrosDepositados){
+						sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_COBRO";
+						sql += (sinEnviar?" WHERE STATCOM = 'N' AND DEPOS = 'S'":"");
+					}else{
+						sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_COBRO";
+						sql += (sinEnviar?" WHERE STATCOM = 'N'":"");
+					}
+
 					break;
 
 				case "Devolucion":
 
 					sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_NOTACRED";
+					sql += (sinEnviar?" WHERE STATCOM = 'N'":"");
+					break;
+
+				case "NotaCredPP":
+
+					sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_NOTACRED_PP";
 					sql += (sinEnviar?" WHERE STATCOM = 'N'":"");
 					break;
 
@@ -442,7 +454,6 @@ public class AppMethods {
 			gl.pMostrarCodigoCliente =true;
 		}
 
-
 		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=23";
 			dt=Con.OpenDT(sql);
@@ -453,6 +464,54 @@ public class AppMethods {
 				gl.pMostrarRazonNoAten =false;
 			}else{
 				gl.pMostrarRazonNoAten =val.equalsIgnoreCase("S");
+			}
+
+		} catch (Exception e) {
+			gl.pMostrarRazonNoAten =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=24";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) {
+				gl.pFiltroCobros ="";
+			}else{
+				gl.pFiltroCobros =val;
+			}
+
+		} catch (Exception e) {
+			gl.pMostrarRazonNoAten =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=25";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) {
+				gl.pCobrosDepositados =false;
+			}else{
+				gl.pCobrosDepositados =val.equalsIgnoreCase("S");
+			}
+
+		} catch (Exception e) {
+			gl.pMostrarRazonNoAten =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=26";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) {
+				gl.pSolicitarFactura =false;
+			}else{
+				gl.pSolicitarFactura =val.equalsIgnoreCase("S");
 			}
 
 		} catch (Exception e) {

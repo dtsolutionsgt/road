@@ -884,6 +884,8 @@ public class Anulacion extends PBase {
 			db.execSQL(sql);
 			sql="UPDATE D_COBROP SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
+			sql="UPDATE D_NOTACRED_PP SET Anulado='S' WHERE COREL_COBRO='"+itemid+"'";
+			db.execSQL(sql);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}

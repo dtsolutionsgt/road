@@ -693,6 +693,8 @@ public class ComWS extends PBase {
 
 			envioNotasCredito();
 
+			envioNotasCreditoPP();
+
 			envioNotasDevolucion();
 
 			envioCobros();
@@ -1012,6 +1014,8 @@ public class ComWS extends PBase {
 			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_COBRO WHERE STATCOM<>'S'", "Rec: ");
 			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_DEPOS WHERE STATCOM<>'S'", "Dep: ");
 			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_MOV WHERE STATCOM<>'S'", "Inv : ");
+			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_NOTACRED WHERE STATCOM<>'S'", "Dev : ");
+			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_NOTACRED_PP WHERE STATCOM<>'S'", "PP : ");
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -1136,6 +1140,9 @@ public class ComWS extends PBase {
 				} else {
 					try {
 						sql = str;
+						if (str.contains("D_PEDIDO")){
+							sql = sql.replace("D_PEDIDO", "P_PEDIDO_RECHAZADO");
+						}
 						listItems.add(sql);
 						sstr = str;
 					} catch (Exception e) {
@@ -2400,7 +2407,6 @@ public class ComWS extends PBase {
 		if (TN.equalsIgnoreCase("P_COBRO")) {
 			SQL = "SELECT  DOCUMENTO, EMPRESA, RUTA, CLIENTE, TIPODOC, VALORORIG, SALDO, CANCELADO, dbo.AndrDate(FECHAEMIT),dbo.AndrDate(FECHAV),'' AS CONTRASENA, ID_TRANSACCION, REFERENCIA, ASIGNACION ";
 			SQL += "FROM P_COBRO WHERE (RUTA='" + ActRuta + "') AND CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "')) ";
-			//idbg=SQL;
 			return SQL;
 		}
 
@@ -2652,8 +2658,8 @@ public class ComWS extends PBase {
 
 		if (TN.equalsIgnoreCase("P_PEDIDO_RECHAZADO")) {
 			SQL = " SELECT COREL, FECHA, EMPRESA, SUCURSAL, RUTA, VENDEDOR, CLIENTE, TOTAL, PESO, RAZON_RECHAZADO "+
-				  " FROM D_PEDIDO " +
-				  " WHERE RUTA='" + ActRuta + "' AND INFORMADO = 0";
+				  " FROM D_PEDIDO  " +
+				  " WHERE RUTA='" + ActRuta + "' AND INFORMADO = 0 AND RECHAZADO = 1";
 			return SQL;
 		}
 
@@ -2804,6 +2810,7 @@ public class ComWS extends PBase {
 				db.execSQL("UPDATE D_FACTURA SET STATCOM='S'");
 				db.execSQL("UPDATE D_PEDIDO SET STATCOM='S'");
 				db.execSQL("UPDATE D_NOTACRED SET STATCOM='S'");
+				db.execSQL("UPDATE D_NOTACRED_PP SET STATCOM='S'");
 				db.execSQL("UPDATE D_CXC SET STATCOM='S'");
 				db.execSQL("UPDATE D_COBRO SET STATCOM='S'");
 				db.execSQL("UPDATE D_DEPOS SET STATCOM='S'");
@@ -2837,6 +2844,7 @@ public class ComWS extends PBase {
 			db.execSQL("UPDATE D_FACTURA SET STATCOM='S'");
 			db.execSQL("UPDATE D_PEDIDO SET STATCOM='S'");
 			db.execSQL("UPDATE D_NOTACRED SET STATCOM='S'");
+			db.execSQL("UPDATE D_NOTACRED_PP SET STATCOM='S'");
 			db.execSQL("UPDATE D_CXC SET STATCOM='S'");
 			db.execSQL("UPDATE D_COBRO SET STATCOM='S'");
 			db.execSQL("UPDATE D_DEPOS SET STATCOM='S'");
@@ -3165,6 +3173,12 @@ public class ComWS extends PBase {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
 				return false;
 			}
+			envioNotasCreditoPP();
+			if (!fstr.equals("Sync OK")){
+				dbld.savelog();
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),fstr,"");
+				return false;
+			}
 			envioNotasDevolucion();
 			if (!fstr.equals("Sync OK")){
 				dbld.savelog();
@@ -3320,6 +3334,8 @@ public class ComWS extends PBase {
 			envioPedidos();
 
 			envioNotasCredito();
+
+			envioNotasCreditoPP();
 
 			envioNotasDevolucion();
 
@@ -3603,7 +3619,12 @@ public class ComWS extends PBase {
 		int i, pc = 0, pcc = 0, corult;
 
 		try {
-			sql = "SELECT COREL,CORELATIVO,RUTA FROM D_COBRO WHERE STATCOM='N' ORDER BY COREL";
+            if(gl.pCobrosDepositados){
+				sql = "SELECT COREL,CORELATIVO,RUTA FROM D_COBRO WHERE STATCOM='N' AND DEPOS = 'S' ORDER BY COREL";
+			}else{
+				sql = "SELECT COREL,CORELATIVO,RUTA FROM D_COBRO WHERE STATCOM='N' ORDER BY COREL";
+			}
+
 			DT = Con.OpenDT(sql);
 			if (DT.getCount() == 0) {
 				senv += "Cobros : " + pc + "\n";
@@ -3756,6 +3777,81 @@ public class ComWS extends PBase {
 			} else {
 				senv += "Notas crédito : " + pc + "\n";
 			}
+		//}
+	}
+
+	public void envioNotasCreditoPP() {
+		Cursor DT;
+		String cor, fruta="";
+		int i, pc = 0, pcc = 0, ccorel;
+
+		try {
+
+			sql = "SELECT COREL,RUTA FROM D_NOTACRED_PP WHERE STATCOM='N' ORDER BY COREL";
+			DT = Con.OpenDT(sql);
+			if (DT.getCount() == 0) {
+				senv += "Notas crédito pronto pago : " + pc + "\n";
+				return;
+			}
+
+			pcc = DT.getCount();
+			pc = 0;
+			i = 0;
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				cor = DT.getString(0);
+				fruta = DT.getString(1);
+
+				try {
+
+					i += 1;
+					fprog = "Nota crédito pronto pago" + i;
+					if (!esEnvioManual){
+						wsStask.onProgressUpdate();
+					}
+
+					if (envioparcial && !esEnvioManual) dbld.clear();
+
+					dbld.insert("D_NOTACRED_PP", "WHERE COREL='" + cor + "'");
+
+					if (envioparcial && !esEnvioManual) {
+						if (commitSQL() == 1) {
+							sql = "UPDATE D_NOTACRED_PP SET STATCOM='S' WHERE COREL='" + cor + "'";
+							db.execSQL(sql);
+							pc += 1;
+						} else {
+							errflag=true;
+							fterr += "\n" + sstr;
+						}
+					}else pc += 1;
+
+				} catch (Exception e) {
+					errflag = true;
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					fterr += "\n" + e.getMessage();
+				}
+
+				DT.moveToNext();
+			}
+
+		} catch (Exception e) {
+			errflag = true;
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+		}
+
+		//#CKFK 20190325 Sea el envío parcial o no se deben mostrar las facturas comunicadas
+		//if (envioparcial) {
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Notas crédito : " + pc + " , NO ENVIADO : " + pf + "\n";
+		} else {
+			senv += "Notas crédito : " + pc + "\n";
+		}
 		//}
 	}
 
@@ -5313,7 +5409,7 @@ public class ComWS extends PBase {
 				imgRec.setVisibility(View.INVISIBLE);
 
 				//Tiene documentos
-				boolean TieneFact,TienePedidos,TieneCobros,TieneDevol,YaComunico, TieneInventario, TieneOtros;
+				boolean TieneFact,TienePedidos,TieneCobros,TieneDevol,YaComunico, TieneInventario, TieneOtros, TieneNCPP;
 
                 if (!envioparcial){
                     TieneFact = (clsAppM.getDocCountTipo("Facturas",false)>0?true:false);
@@ -5321,13 +5417,15 @@ public class ComWS extends PBase {
                     TieneCobros = (clsAppM.getDocCountTipo("Cobros",false)>0?true:false);
                     TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",false)>0?true:false);
                     YaComunico=(claseFindia.getComunicacion() == 2?true:false);
-                    TieneInventario=(clsAppM.getDocCountTipo("Inventario",false)>0?true:false);
+					TieneNCPP=(clsAppM.getDocCountTipo("NotaCredPP",false)>0?true:false);
+					TieneInventario=(clsAppM.getDocCountTipo("Inventario",false)>0?true:false);
                 }else{
                     TieneFact = (clsAppM.getDocCountTipo("Facturas",true)>0?true:false);
                     TienePedidos = (clsAppM.getDocCountTipo("Pedidos",true)>0?true:false);
                     TieneCobros = (clsAppM.getDocCountTipo("Cobros",true)>0?true:false);
                     TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",true)>0?true:false);
                     YaComunico=(claseFindia.getComunicacion() == 2?true:false);
+					TieneNCPP=(clsAppM.getDocCountTipo("NotaCredPP",false)>0?true:false);
                     TieneInventario=(clsAppM.getDocCountTipo("Inventario",true)>0?true:false);
                 }
 
@@ -5356,7 +5454,7 @@ public class ComWS extends PBase {
 												}
                                         }
                                     else if ((rutatipo.equalsIgnoreCase("V") && TieneInventario &&
-                                            (TieneFact || TieneCobros || TieneDevol || TienePedidos)) ||
+                                            (TieneFact || TieneCobros || TieneDevol || TienePedidos || TieneNCPP)) ||
                                             (!rutatipo.equalsIgnoreCase("V")))
                                         {
                                             lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);
@@ -5370,7 +5468,7 @@ public class ComWS extends PBase {
                             }
                         else
                             {
-                                if ((!YaComunico) &&  !(TieneFact || TienePedidos) && !TieneCobros && !TieneDevol)
+                                if ((!YaComunico) &&  !(TieneFact || TienePedidos) && !TieneCobros && !TieneDevol && !TieneNCPP)
                                     {
                                         lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);
                                         lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
@@ -5390,7 +5488,7 @@ public class ComWS extends PBase {
                                     }
                                 else
                                     {
-                                        if (YaComunico &&  !(TieneFact || TienePedidos) && !TieneCobros && !TieneDevol)
+                                        if (YaComunico &&  !(TieneFact || TienePedidos) && !TieneCobros && !TieneDevol && !TieneNCPP)
                                             {
                                                 lblRec.setVisibility(View.VISIBLE);	imgRec.setVisibility(View.VISIBLE);
                                                 lblEnv.setVisibility(View.INVISIBLE);imgEnv.setVisibility(View.INVISIBLE);
@@ -5448,7 +5546,7 @@ public class ComWS extends PBase {
                         else
                             {
                                 if (((((rutatipo.equalsIgnoreCase("V")) || (rutatipo.equalsIgnoreCase("D")))&& TieneInventario
-                                && (TieneFact || TieneCobros || TienePedidos) || TieneDevol)) ||((!rutatipo.equalsIgnoreCase("V"))
+                                && (TieneFact || TieneCobros || TienePedidos) || TieneDevol || TieneNCPP)) ||((!rutatipo.equalsIgnoreCase("V"))
                                         && (!rutatipo.equalsIgnoreCase("D"))))
                                     {
                                         lblRec.setVisibility(View.INVISIBLE);imgRec.setVisibility(View.INVISIBLE);

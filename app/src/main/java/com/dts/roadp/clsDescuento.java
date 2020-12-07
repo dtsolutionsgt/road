@@ -235,7 +235,7 @@ public class clsDescuento {
 			val=0;
 
 			vSQL="SELECT RANGOINI,RANGOFIN,VALOR "+
-				 "FROM T_DESC WHERE ("+cantDias+"<=RANGOINI) "+
+				 "FROM T_DESC WHERE ("+cantDias+">=RANGOINI) "+
 				 "AND (PTIPO=5) AND (DESCTIPO='P') AND (GLOBDESC='S') AND (PORCANT='A')";
 
 			DT=Con.OpenDT(vSQL);

@@ -443,7 +443,13 @@ public class DevolCli extends PBase {
                 ins.add("STATCOM","N");
                 ins.add("CODIGOLIQUIDACION",0);
                 ins.add("RESOLNC","N");
-                ins.add("SERIEFACT",0);
+
+                if (gl.pSolicitarFactura){
+					ins.add("SERIEFACT",gl.fNoFactura);
+				}else{
+					ins.add("SERIEFACT",0);
+				}
+
                 ins.add("CORELFACT",0);
                 ins.add("IMPRES",0);
 

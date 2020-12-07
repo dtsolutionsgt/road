@@ -20,10 +20,10 @@ public class appGlobals extends Application {
 	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor,prectemp, nuevoprecio;
 	public boolean CellCom,closeDevBod;
 
-	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra, parNumVer, parFechaVer, parTipoVer;
+	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra, parNumVer, parFechaVer, parTipoVer, fNoFactura;
 
 	public int tiponcredito,validarCred,gpsdist;
-    public boolean vcredito,vcheque,vchequepost,validimp;
+    public boolean vcredito,vcheque,vchequepost,validimp, tieneDescPP;
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
 	public int mpago;
@@ -45,10 +45,10 @@ public class appGlobals extends Application {
     public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc;
 
 	// Parametros Extra
-	public String peModal,peMon,peFormatoFactura,CodDev;
+	public String peModal,peMon,peFormatoFactura,CodDev, pFiltroCobros;
 	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec,endPrint;
 	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre;
-	public boolean peImprFactCorrecta, pTransBarra, pMostrarCodigoCliente, pMostrarRazonNoAten;
+	public boolean peImprFactCorrecta, pTransBarra, pMostrarCodigoCliente, pMostrarRazonNoAten, pCobrosDepositados, pSolicitarFactura;
 	public int peDec,peDecCant,peDecImp,peLimiteGPS,peMargenGPS,peVentaGps;
 	
 	// Descuentos

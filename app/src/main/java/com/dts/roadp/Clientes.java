@@ -320,7 +320,12 @@ public class Clientes extends PBase {
 		try {
 
 			cobros.clear();
-			sql = "SELECT DISTINCT CLIENTE FROM P_COBRO ";
+			if (!gl.pFiltroCobros.toString().isEmpty()){
+				sql="SELECT DISTINCT CLIENTE FROM P_COBRO WHERE (TIPODOC = '" + gl.pFiltroCobros + "')";
+			}else{
+				sql = "SELECT DISTINCT CLIENTE FROM P_COBRO ";
+			}
+
 			DT = Con.OpenDT(sql);
 
 			if (DT.getCount() > 0) {
@@ -695,7 +700,6 @@ public class Clientes extends PBase {
 
 			spinList.setAdapter(dataAdapter);
 			spinList.setSelection(dweek);
-
 
 			List<String> flist = new ArrayList<String>();
 			flist.add("Todos");

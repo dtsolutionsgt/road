@@ -301,12 +301,17 @@ public class Pago extends PBase {
 	private void finalCheck(boolean vPagoCobro) {
 		try{
 
-			if (!vPagoCobro){
+			if (!vPagoCobro ){
 				if (totalPago()<saldo) {
 					msgAskSaveEmpty("Pago no está completo. Salir");
 					return;
 				}
-			}else if (vPagoCobro){
+			} else if (gl.tieneDescPP) {
+				if (totalPago()<saldo) {
+					msgAskSaveEmpty("Tiene descuentos por pronto pago, no puede hacer pagos parciales. Salir");
+					return;
+				}
+			} else if (vPagoCobro) {
 				if (saldo < totalPago()) {
 					msgAskSaveEmpty("Total a pagar mayor que saldo. Salir");
 					return;

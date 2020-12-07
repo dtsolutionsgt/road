@@ -39,6 +39,7 @@ import android.widget.Toast;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
@@ -106,6 +107,8 @@ public class ComWS extends PBase {
 	private String METHOD_NAME, URL, URL_Remota;
 
 	protected PowerManager.WakeLock wakelock;
+
+	private HttpTransportSE transport;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -258,6 +261,9 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"wakeLock");
 		}
+
+		transport = new HttpTransportSE(URL, 0);
+
 	}
 
 	//region Events
@@ -1052,11 +1058,41 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
-			transport.call(NAMESPACE + METHOD_NAME, envelope);
+			//HttpTransportSE transport = new HttpTransportSE(URL, 10000);
+
+			//ArrayList<HeaderProperty> headerPropertyArrayList = new ArrayList<HeaderProperty>();
+			//headerPropertyArrayList.add(new HeaderProperty("Connection", "close"));
+
+			//transport.getServiceConnection().openOutputStream();
+
+			try
+			{
+				transport.call(NAMESPACE + METHOD_NAME, envelope);
+			}catch (Exception ex1)
+			{
+				//#EJC20201207: Cerrar conexión y reintentar...
+				transport.getServiceConnection().openOutputStream().close();
+				transport.getServiceConnection().disconnect();
+				try
+				{
+					transport.call(NAMESPACE + METHOD_NAME, envelope);
+				}catch (Exception ex2)
+				{
+					transport.getServiceConnection().openOutputStream().close();
+					transport.getServiceConnection().disconnect();
+					transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+					sstr = ex2.getMessage();
+					return 0;
+				}
+
+			}
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
 			SoapObject result = (SoapObject) envelope.bodyIn;
+
+			//transport.getServiceConnection().openOutputStream().close();
+			//transport.getServiceConnection().disconnect();
 
 			rc = resSoap.getPropertyCount() - 1;
 			idbg = idbg + " rec " + rc + "  ";
@@ -1188,8 +1224,18 @@ public class ComWS extends PBase {
 			*/
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
-			transport.call(NAMESPACE + METHOD_NAME, envelope);
+			HttpTransportSE transport = new HttpTransportSE(URL, 6000);
+
+			try{
+				transport.call(NAMESPACE + METHOD_NAME, envelope);
+			}catch (Exception ex1){
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), ex1.getMessage(), sql);
+				sstr = ex1.getMessage();
+				idbg = idbg + " ERR " + ex1.getMessage();
+				return 0;
+			}
+
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
 			SoapObject result = (SoapObject) envelope.bodyIn;
@@ -1198,6 +1244,8 @@ public class ComWS extends PBase {
 			idbg = idbg + " rec " + rc + "  ";
 
 			s = "";
+
+			transport.getServiceConnection().disconnect();
 
 			for (int i = 0; i < rc; i++) {
 				String str = "";
@@ -1280,7 +1328,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
+			HttpTransportSE transport = new HttpTransportSE(URL, 6000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1325,7 +1373,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
+			HttpTransportSE transport = new HttpTransportSE(URL, 6000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
@@ -1376,7 +1424,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
+			HttpTransportSE transport = new HttpTransportSE(URL, 6000);
 
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
@@ -1414,7 +1462,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
+			HttpTransportSE transport = new HttpTransportSE(URL, 6000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
 
@@ -1516,7 +1564,7 @@ public class ComWS extends PBase {
 
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
+			HttpTransportSE transport = new HttpTransportSE(URL, 6000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1554,7 +1602,7 @@ public class ComWS extends PBase {
 
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
+			HttpTransportSE transport = new HttpTransportSE(URL, 6000);
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
@@ -1667,7 +1715,7 @@ public class ComWS extends PBase {
             if (!AddTable("P_TRANSERROR")) return false;
 			if (!AddTable("P_CATALOGO_PRODUCTO")) return false;
 			if (!AddTable("P_GLOBPARAM")) return false;
-			if (!AddTable("P_CONFIGBARRA")) return false;
+			//if (!AddTable("P_CONFIGBARRA")) return false;
 
 			licResult=checkLicence(licSerial);
 			licResultRuta=checkLicenceRuta(licRuta);

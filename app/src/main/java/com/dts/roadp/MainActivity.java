@@ -43,7 +43,7 @@ public class MainActivity extends PBase {
 
     private String parNumVer = "9.5.24 / ";
     private String parFechaVer = "13-10-2020";
-    private String parTipoVer = "ROAD PRD DIVENSA";
+    private String parTipoVer = "ROAD PRD";
 
 
     @Override
@@ -789,7 +789,7 @@ public class MainActivity extends PBase {
     }
 
     private boolean validaLicencia() {
-        CryptUtil cu = new CryptUtil();
+        /*CryptUtil cu = new CryptUtil();
         Cursor dt;
         String lic, lickey, licruta, rutaencrypt;
         Integer msgLic = 0;
@@ -845,8 +845,8 @@ public class MainActivity extends PBase {
             mu.msgbox(new Object() {
             }.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
         }
-
-        return false;
+*/
+        return true;
 
     }
 

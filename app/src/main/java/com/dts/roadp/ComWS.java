@@ -183,7 +183,7 @@ public class ComWS extends PBase {
 
         txtRuta.setText("003000");
         txtEmp.setText("03");
-        txtWS.setText("http://192.168.1.10/wsAndr/wsAndr.asmx");
+        txtWS.setText("http://192.168.0.11/wsAndr/wsAndr.asmx");
 
 		if(gl.ruta.isEmpty()){
 			ruta = txtRuta.getText().toString();
@@ -240,7 +240,7 @@ public class ComWS extends PBase {
 
         txtRuta.setText("003000");
         txtEmp.setText("03");
-        txtWS.setText("http://192.168.1.10/wsAndr/wsAndr.asmx");
+        txtWS.setText("http://192.168.0.11/wsAndr/wsAndr.asmx");
 
 
 		mac = getMac();
@@ -1979,8 +1979,7 @@ public class ComWS extends PBase {
 
             listItems.clear();
 
-            nombretabla="P_COREL";
-            indicetabla=1;
+            indicetabla=-5;
 
             executaTabla();
 
@@ -2116,6 +2115,19 @@ public class ComWS extends PBase {
             } catch (Exception e) {
                 //addlog(new Object() {	}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
             }
+
+			lblInfo.setText(" ");
+			s = "Recepción completa.";
+			if (stockflag == 1) s = s + "\nSe actualizó inventario.";
+
+			clsAppM.estandartInventario();
+			validaDatos(true);
+
+			if (stockflag == 1) sendConfirm();
+
+			isbusy = 0;
+
+			msgAskExit(s);
 
             return true;
 
@@ -2418,6 +2430,11 @@ public class ComWS extends PBase {
 			fprog = TN;idbg = TN;
 			wsRtask.onProgressUpdate();
 			SQL = getTableSQL(TN);
+
+			if (TN.equalsIgnoreCase("P_IMPRESORA")){
+				int result =  fillTableImpresora();
+				return (result==1?true:false);
+			}
 
 			if (fillTable(SQL, "DELETE FROM " + TN) == 1) {
 				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " ok ";
@@ -3205,7 +3222,7 @@ public class ComWS extends PBase {
 	}
 
 	private boolean validaLicencia() {
-		CryptUtil cu=new CryptUtil();
+		/*CryptUtil cu=new CryptUtil();
 		Cursor dt;
 		String lic,lickey,licruta,rutaencrypt;
 		Integer msgLic=0;
@@ -3233,8 +3250,8 @@ public class ComWS extends PBase {
 		if(msgLic==1)toastlong("El dispositivo no tiene licencia válida de handheld, ni de ruta");
 		else if(msgLic==2){toastlong("El dispositivo no tiene licencia valida de handheld");}
 		else if(msgLic==3){toastlong("El dispositivo no tiene licencia valida de ruta");}
-
-		return false;
+*/
+		return true;
 	}
 
 	private void fechaCarga() {
@@ -3440,109 +3457,193 @@ public class ComWS extends PBase {
     }
 
     public void wsCallback() {
+       boolean ejecutar=true;
 
         try {
             indicetabla++;
 
             switch (indicetabla) {
+				case -4:
+					nombretabla="P_PARAMEXT";break;
+				case -3:
+                     procesaParamsExt();
+                     nombretabla ="";
+					 break;
+				case -2:
+					nombretabla="P_RUTA";break;
+				case -1:
+					procesaRuta();
+					nombretabla ="";
+					break;
+				case 0:
+					nombretabla="PARAMS";break;
+				case 1:
+					nombretabla="P_EMPRESA";break;
                 case 2:
-                    nombretabla="P_CLIENTE";break;
+                    nombretabla="P_COREL";break;
                 case 3:
-                    nombretabla="P_PRODUCTO";;break;
+                    nombretabla="P_PRODUCTO";break;
+				case 4:
+					nombretabla="P_CLIENTE";break;
+				case 5:
+					nombretabla="P_PRODUCTO";break;
+				case 6:
+                    nombretabla="P_PRODPRECIO";break;
+				case 7:
+                    nombretabla="P_NIVELPRECIO";break;
+				case 8:
+                    nombretabla="P_TIPONEG";break;
+				case 9:
+                    nombretabla="P_CLIRUTA";break;
+				case 10:
+                    nombretabla="P_CLIDIR";break;
+				case 11:
+                    nombretabla="P_FACTORCONV";break;
+				case 12:
+                    nombretabla="P_LINEA";break;
+				case 13:
+                    nombretabla="TMP_PRECESPEC";break;
+				case 14:
+                    nombretabla="P_DESCUENTO";break;
+				case 15:
+                    nombretabla="P_EMPRESA";break;
+				case 16:
+                    nombretabla="P_SUCURSAL";break;
+				case 17:
+                    nombretabla="P_BANCO";break;
+				case 18:
+                    nombretabla="P_STOCKINV";break;
+				case 19:
+                    nombretabla="P_CODATEN";break;
+				case 20:
+                    nombretabla="P_CODDEV";break;
+				case 21:
+                    nombretabla="P_CODNOLEC";break;
+				case 22:
+                    nombretabla="P_CORELNC";break;
+				case 23:
+                    nombretabla="P_CORRELREC";break;
+				case 24:
+                    nombretabla="P_CORREL_OTROS";break;
+				case 25:
+                    nombretabla="P_STOCK_APR";break;
+				case 26:
+                    nombretabla="P_STOCK";break;
+				case 27:
+                    nombretabla="P_STOCKB";break;
+				case 28:
+                    nombretabla="P_STOCK_PALLET";break;//#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
+				case 29:
+                    nombretabla="P_COBRO";break;
+				case 30:
+                    nombretabla="P_CLIGRUPO";break;
+				case 31:
+                    nombretabla="P_MEDIAPAGO";break;
+				case 32:
+                    nombretabla="P_BONIF";break;
+				case 33:
+                    nombretabla="P_BONLIST";break;
+				case 34:
+                    nombretabla="P_PRODGRUP";break;
+				case 35:
+                    nombretabla="P_IMPUESTO";break;
+				case 36:
+                    nombretabla="P_VENDEDOR";break;
+				case 37:
+                    nombretabla="P_MUNI";break;
+				case 38:
+                    nombretabla="P_VEHICULO";break;
+				case 39:
+                    nombretabla="P_HANDHELD";break;
+				case 40:
+                    nombretabla="P_TRANSERROR";break;
+				case 41:
+                    nombretabla="P_CATALOGO_PRODUCTO";break;
+				case 42:
+                    nombretabla="P_GLOBPARAM";break;
+				case 43:
+                    nombretabla="P_CONFIGBARRA";break;
+				case 44:
+                    nombretabla="P_REF1";break;
+				case 45:
+                    nombretabla="P_REF2";break;
+				case 46:
+                    nombretabla="P_REF3";break;
+				case 47:
+                    nombretabla="P_ARCHIVOCONF";break;
+				case 48:
+                    nombretabla="P_ENCABEZADO_REPORTESHH";break;
+				case 49:
+                    nombretabla="P_PORCMERMA";break;
 
-                case 99:
-                    //procesaData();
-                    break;
+				// Objetivos
+
+				case 50:
+                    nombretabla="O_RUTA";break;
+				case 51:
+                    nombretabla="O_COBRO";break;
+				case 52:
+                    nombretabla="O_PROD";break;
+				case 53:
+                    nombretabla="O_LINEA";break;
+
+				// Mercadeo
+
+				case 54:
+                    nombretabla="P_MEREQTIPO";break;
+				case 55:
+                    nombretabla="P_MEREQUIPO";break;
+				case 56:
+                    nombretabla="P_MERESTADO";break;
+				case 57:
+                    nombretabla="P_MERPREGUNTA";break;
+				case 58:
+                    nombretabla="P_MERRESP";break;
+				case 59:
+                    nombretabla="P_MERMARCACOMP";break;
+				case 60:
+                    nombretabla="P_MERPRODCOMP";break;
+
+				case 61:
+                    nombretabla="P_PEDIDO_RECHAZADO";break;
+				case 62:
+                    nombretabla="DS_PEDIDO";break;
+				case 63:
+                    nombretabla="DS_PEDIDOD";break;
+				case 64:
+					dbld.clear();
+					dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");
+					dbld.add("EXEC SP_ULTIMOSPRECIOS '" + ruta + "'");
+					commitSQL();
+					nombretabla = "";
+					break;
+				case 65:
+					nombretabla="P_PEDSUG";break;
+				case 66:
+					nombretabla="P_ULTIMOPRECIO";break;
+				case 67:
+					//nombretabla="P_IMPRESORA";break;
+					fillTableImpresora();
+					nombretabla = "";
+					break;
+				/*case 68:
+					//licResult=checkLicence(licSerial);
+					//nombretabla = "";
+					break;
+				case 69:
+					//licResultRuta=checkLicenceRuta(licRuta);
+					//nombretabla = "";
+					break;*/
+				case 68:
+                    procesaData();
+					ejecutar = false;
+					break;
             }
 
-            executaTabla();
-/*
-            if (!AddTable("P_CLIENTE")) return false;
-            if (!AddTable("P_PRODUCTO")) return false;
-            if (!AddTable("P_PRODPRECIO")) return false;
-            if (!AddTable("P_NIVELPRECIO")) return false;
-            if (!AddTable("P_TIPONEG")) return false;
-            if (!AddTable("P_CLIRUTA")) return false;
-            if (!AddTable("P_CLIDIR")) return false;
-            if (!AddTable("P_FACTORCONV")) return false;
-            if (!AddTable("P_LINEA")) return false;
-            if (!AddTable("TMP_PRECESPEC")) return false;
-            if (!AddTable("P_DESCUENTO")) return false;
-            if (!AddTable("P_EMPRESA")) return false;
-            if (!AddTable("P_SUCURSAL")) return false;
-            if (!AddTable("P_BANCO")) return false;
-            if (!AddTable("P_STOCKINV")) return false;
+            if(ejecutar) {
+				executaTabla();
+			}
 
-            if (!AddTable("P_CODATEN")) return false;
-            if (!AddTable("P_CODDEV")) return false;
-            if (!AddTable("P_CODNOLEC")) return false;
-            if (!AddTable("P_CORELNC")) return false;
-            if (!AddTable("P_CORRELREC")) return false;
-            if (!AddTable("P_CORREL_OTROS")) return false;
-            if (!AddTable("P_STOCK_APR")) return false;
-            if (!AddTable("P_STOCK")) return false;
-            if (!AddTable("P_STOCKB")) return false;
-            if (!AddTable("P_STOCK_PALLET"))
-                return false;//#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
-            if (!AddTable("P_COBRO")) return false;
-            if (!AddTable("P_CLIGRUPO")) return false;
-            if (!AddTable("P_MEDIAPAGO")) return false;
-            if (!AddTable("P_BONIF")) return false;
-            if (!AddTable("P_BONLIST")) return false;
-            if (!AddTable("P_PRODGRUP")) return false;
-            if (!AddTable("P_IMPUESTO")) return false;
-            if (!AddTable("P_VENDEDOR")) return false;
-            if (!AddTable("P_MUNI")) return false;
-            if (!AddTable("P_VEHICULO")) return false;
-            if (!AddTable("P_HANDHELD")) return false;
-            if (!AddTable("P_TRANSERROR")) return false;
-            if (!AddTable("P_CATALOGO_PRODUCTO")) return false;
-            if (!AddTable("P_GLOBPARAM")) return false;
-            //if (!AddTable("P_CONFIGBARRA")) return false;
-
-            licResult=checkLicence(licSerial);
-            licResultRuta=checkLicenceRuta(licRuta);
-
-            fillTableImpresora();
-
-            if (!AddTable("P_REF1")) return false;
-            if (!AddTable("P_REF2")) return false;
-            if (!AddTable("P_REF3")) return false;
-
-            if (!AddTable("P_ARCHIVOCONF")) return false;
-            if (!AddTable("P_ENCABEZADO_REPORTESHH")) return false;
-            if (!AddTable("P_PORCMERMA")) return false;
-
-            // Objetivos
-
-            if (!AddTable("O_RUTA")) return false;
-            if (!AddTable("O_COBRO")) return false;
-            if (!AddTable("O_PROD")) return false;
-            if (!AddTable("O_LINEA")) return false;
-
-            // Mercadeo
-
-            if (!AddTable("P_MEREQTIPO")) return false;
-            if (!AddTable("P_MEREQUIPO")) return false;
-            if (!AddTable("P_MERESTADO")) return false;
-            if (!AddTable("P_MERPREGUNTA")) return false;
-            if (!AddTable("P_MERRESP")) return false;
-            if (!AddTable("P_MERMARCACOMP")) return false;
-            if (!AddTable("P_MERPRODCOMP")) return false;
-
-            //Pedido Sugerido
-            dbld.clear();
-            dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");
-            dbld.add("EXEC SP_ULTIMOSPRECIOS '" + ruta + "'");
-            commitSQL();
-
-            if (!AddTable("P_PEDSUG")) return false;
-            if (!AddTable("P_ULTIMOPRECIO")) return false;
-
-            if (!AddTable("P_PEDIDO_RECHAZADO")) return false;
-            if (!AddTable("DS_PEDIDO")) return false;
-            if (!AddTable("DS_PEDIDOD")) return false;
-     */
         } catch (Exception e) {
             e.printStackTrace();
         }

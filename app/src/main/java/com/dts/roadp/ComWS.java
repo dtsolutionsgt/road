@@ -3444,7 +3444,11 @@ public class ComWS extends PBase {
     public void wsCargaTabla() {
 
         try {
-            AddTable(nombretabla);
+        	if (nombretabla.contains("P_IMPRESORA")){
+				fillTableImpresora();
+			}else{
+				AddTable(nombretabla);
+			}
         } catch (Exception e) {
             String ee=e.getMessage();
         }

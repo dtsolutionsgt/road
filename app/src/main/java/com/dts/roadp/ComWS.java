@@ -1860,7 +1860,7 @@ public class ComWS extends PBase {
             wsRtask.onProgressUpdate();
 
             Actualiza_FinDia();
-            encodePrinters();
+            //encodePrinters();
             encodeLicence();
             encodeLicenceRuta();
 
@@ -2430,11 +2430,6 @@ public class ComWS extends PBase {
 			fprog = TN;idbg = TN;
 			wsRtask.onProgressUpdate();
 			SQL = getTableSQL(TN);
-
-			if (TN.equalsIgnoreCase("P_IMPRESORA")){
-				int result =  fillTableImpresora();
-				return (result==1?true:false);
-			}
 
 			if (fillTable(SQL, "DELETE FROM " + TN) == 1) {
 				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " ok ";
@@ -3622,10 +3617,10 @@ public class ComWS extends PBase {
 				case 66:
 					nombretabla="P_ULTIMOPRECIO";break;
 				case 67:
-					//nombretabla="P_IMPRESORA";break;
-					fillTableImpresora();
+					nombretabla="P_IMPRESORA";break;
+					/*fillTableImpresora();
 					nombretabla = "";
-					break;
+					break;*/
 				/*case 68:
 					//licResult=checkLicence(licSerial);
 					//nombretabla = "";

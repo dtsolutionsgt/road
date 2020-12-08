@@ -891,7 +891,7 @@ public class AppMethods {
 	}
 
 	public boolean validaImpresora() {
-		CryptUtil cu=new CryptUtil();
+		/*CryptUtil cu=new CryptUtil();
 		Cursor dt;
 		String se,sd,prid;
 
@@ -926,7 +926,9 @@ public class AppMethods {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
 
-		return false;
+		return false;*/
+
+		return  true;
 
 	}
 

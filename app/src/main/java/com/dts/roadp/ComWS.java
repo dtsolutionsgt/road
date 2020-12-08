@@ -46,6 +46,7 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -53,6 +54,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class ComWS extends PBase {
@@ -1072,14 +1074,15 @@ public class ComWS extends PBase {
 
 			//HttpTransportSE transport = new HttpTransportSE(URL, 10000);
 
-			//ArrayList<HeaderProperty> headerPropertyArrayList = new ArrayList<HeaderProperty>();
-			//headerPropertyArrayList.add(new HeaderProperty("Connection", "close"));
+			transport = new HttpTransportSE(URL, 10000);
+			ArrayList<HeaderProperty> headerPropertyArrayList = new ArrayList<HeaderProperty>();
+			headerPropertyArrayList.add(new HeaderProperty("Accept-Encoding", "identity"));
 
 			//transport.getServiceConnection().openOutputStream();
 
 			try
 			{
-				transport.call(NAMESPACE + METHOD_NAME, envelope);
+				transport.call(NAMESPACE + METHOD_NAME, envelope,headerPropertyArrayList);
 			}catch (Exception ex1)
 			{
 				//#EJC20201207: Cerrar conexión y reintentar...
@@ -1087,17 +1090,22 @@ public class ComWS extends PBase {
 				transport.getServiceConnection().disconnect();
 				try
 				{
-					transport.call(NAMESPACE + METHOD_NAME, envelope);
+					transport.call(NAMESPACE + METHOD_NAME, envelope,headerPropertyArrayList);
 				}catch (Exception ex2)
 				{
 					transport.getServiceConnection().openOutputStream().close();
 					transport.getServiceConnection().disconnect();
-					transport.call(NAMESPACE + METHOD_NAME, envelope);
 
-					sstr = ex2.getMessage();
-					return 0;
+					try
+					{
+						transport = new HttpTransportSE(URL, 10000);
+						transport.call(NAMESPACE + METHOD_NAME, envelope,headerPropertyArrayList);
+					}catch (Exception ex3)
+					{
+						sstr = ex3.getMessage();
+						return 0;
+					}
 				}
-
 			}
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
@@ -1435,9 +1443,19 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 6000);
+			transport = new HttpTransportSE(URL, 6000);
 
-			transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+			try {
+				transport.call(NAMESPACE + METHOD_NAME, envelope);
+			} catch (IOException e) {
+				transport.getServiceConnection().disconnect();
+				transport.getServiceConnection().openOutputStream().close();
+				transport.call(NAMESPACE + METHOD_NAME, envelope);
+				e.printStackTrace();
+			} catch (XmlPullParserException e) {
+				e.printStackTrace();
+			}
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
 

@@ -205,10 +205,10 @@ public class ComWS extends PBase {
 			}
 		}
 
-        txtRuta.setText("003000");
+        /*txtRuta.setText("003000");
         txtEmp.setText("03");
         txtWS.setText("http://192.168.1.10/wsAndr/wsAndr.asmx");
-
+*/
 		if(gl.ruta.isEmpty()){
 			ruta = txtRuta.getText().toString();
 			gl.ruta=ruta;
@@ -264,10 +264,9 @@ public class ComWS extends PBase {
 			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}
 
-        txtRuta.setText("003000");
+       /* txtRuta.setText("003000");
         txtEmp.setText("03");
-        txtWS.setText("http://192.168.1.10/wsAndr/wsAndr.asmx");
-
+        txtWS.setText("http://192.168.1.10/wsAndr/wsAndr.asmx");*/
 
 		mac = getMac();
 		fsql = du.univfechasql(du.getActDate());
@@ -1672,7 +1671,7 @@ public class ComWS extends PBase {
 
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 		}
-
+		vCommit =1;
 		return vCommit;
 	}
 

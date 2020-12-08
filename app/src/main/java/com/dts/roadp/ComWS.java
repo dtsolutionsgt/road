@@ -110,6 +110,11 @@ public class ComWS extends PBase {
 
 	private HttpTransportSE transport;
 
+	//Web service adicional
+
+    private String nombretabla;
+    private int indicetabla;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -176,6 +181,10 @@ public class ComWS extends PBase {
 			}
 		}
 
+        txtRuta.setText("003000");
+        txtEmp.setText("03");
+        txtWS.setText("http://192.168.0.11/wsAndr/wsAndr.asmx");
+
 		if(gl.ruta.isEmpty()){
 			ruta = txtRuta.getText().toString();
 			gl.ruta=ruta;
@@ -229,6 +238,9 @@ public class ComWS extends PBase {
 			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}
 
+        txtRuta.setText("003000");
+        txtEmp.setText("03");
+        txtWS.setText("http://192.168.0.11/wsAndr/wsAndr.asmx");
 
 
 		mac = getMac();
@@ -1059,20 +1071,20 @@ public class ComWS extends PBase {
 			envelope.setOutputSoapObject(request);
 
 			//HttpTransportSE transport = new HttpTransportSE(URL, 10000);
+
 			//ArrayList<HeaderProperty> headerPropertyArrayList = new ArrayList<HeaderProperty>();
 			//headerPropertyArrayList.add(new HeaderProperty("Connection", "close"));
+
 			//transport.getServiceConnection().openOutputStream();
 
 			try
 			{
-				transport = new HttpTransportSE(URL, 90000);
 				transport.call(NAMESPACE + METHOD_NAME, envelope);
 			}catch (Exception ex1)
 			{
 				//#EJC20201207: Cerrar conexión y reintentar...
 				transport.getServiceConnection().openOutputStream().close();
 				transport.getServiceConnection().disconnect();
-
 				try
 				{
 					transport.call(NAMESPACE + METHOD_NAME, envelope);
@@ -1080,37 +1092,10 @@ public class ComWS extends PBase {
 				{
 					transport.getServiceConnection().openOutputStream().close();
 					transport.getServiceConnection().disconnect();
+					transport.call(NAMESPACE + METHOD_NAME, envelope);
 
-					try
-					{
-						transport = new HttpTransportSE(URL, 90000);
-						transport.getServiceConnection().openOutputStream().close();
-						transport.getServiceConnection().disconnect();
-
-						try
-						{
-							transport.call(NAMESPACE + METHOD_NAME, envelope);
-						}catch (Exception ex3){
-
-							transport.getServiceConnection().openOutputStream().close();
-							transport.getServiceConnection().disconnect();
-
-							try
-							{
-								transport = new HttpTransportSE(URL, 90000);
-								transport.getServiceConnection();
-								transport.call(NAMESPACE + METHOD_NAME, envelope);
-							}
-							catch (Exception ex4){
-								sstr = ex4.getMessage();
-								return 0;
-							}
-						}
-
-					}catch (Exception ex3){
-						sstr = ex2.getMessage();
-						return 0;
-					}
+					sstr = ex2.getMessage();
+					return 0;
 				}
 
 			}
@@ -1251,30 +1236,18 @@ public class ComWS extends PBase {
 			*/
 			envelope.setOutputSoapObject(request);
 
-			transport = new HttpTransportSE(URL, 12000);
+			HttpTransportSE transport = new HttpTransportSE(URL, 6000);
 
-			try
-			{
+			try{
 				transport.call(NAMESPACE + METHOD_NAME, envelope);
-			}catch (Exception ex1)
-			{
-				//#EJC20201207: Cerrar conexión y reintentar...
-				transport.getServiceConnection().openOutputStream().close();
-				transport.getServiceConnection().disconnect();
-				try
-				{
-					transport.call(NAMESPACE + METHOD_NAME, envelope);
-				}catch (Exception ex2)
-				{
-					transport.getServiceConnection().openOutputStream().close();
-					transport.getServiceConnection().disconnect();
-					transport.call(NAMESPACE + METHOD_NAME, envelope);
-
-					sstr = ex2.getMessage();
-					return 0;
-				}
-
+			}catch (Exception ex1){
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), ex1.getMessage(), sql);
+				sstr = ex1.getMessage();
+				idbg = idbg + " ERR " + ex1.getMessage();
+				return 0;
 			}
+
 
 			SoapObject resSoap = (SoapObject) envelope.getResponse();
 			SoapObject result = (SoapObject) envelope.bodyIn;
@@ -1384,8 +1357,7 @@ public class ComWS extends PBase {
             vCommit=0;
             sstr = e.getMessage();
 
-            addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 		}
 
 		return vCommit;
@@ -1463,36 +1435,9 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			transport = new HttpTransportSE(URL, 6000);
+			HttpTransportSE transport = new HttpTransportSE(URL, 6000);
 
-			try
-			{
-				transport.call(NAMESPACE + METHOD_NAME, envelope);
-			}catch (Exception ex1)
-			{
-				//#EJC20201207: Cerrar conexión y reintentar...
-				transport.getServiceConnection().openOutputStream().close();
-				transport.getServiceConnection().disconnect();
-				try
-				{
-					transport.call(NAMESPACE + METHOD_NAME, envelope);
-				}catch (Exception ex2)
-				{
-					transport.getServiceConnection().openOutputStream().close();
-					transport.getServiceConnection().disconnect();
-
-					try
-					{
-						transport.call(NAMESPACE + METHOD_NAME, envelope);
-					}catch (Exception ex3)
-					{
-						sstr = ex3.getMessage();
-						return 0;
-					}
-
-				}
-
-			}
+			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
 
@@ -1689,7 +1634,286 @@ public class ComWS extends PBase {
 
 	//region WS Recepcion Methods
 
-	private boolean getData() {
+    private boolean getDataOriginal() {
+        Cursor DT;
+        BufferedWriter writer = null;
+        FileWriter wfile;
+        int rc, scomp, prn, jj;
+        int ejecutarhh = 0;
+        String s, val = "";
+
+        try {
+
+            String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
+            wfile = new FileWriter(fname, false);
+            writer = new BufferedWriter(wfile);
+
+            db.execSQL("DELETE FROM P_LIQUIDACION");
+
+            sql = "SELECT VALOR FROM P_PARAMEXT WHERE ID=2";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                val = DT.getString(0);
+            } else {
+                val = "N";
+            }
+
+            DT.close();
+
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            val = "N";
+        }
+
+        if (val.equalsIgnoreCase("S")) gl.peStockItf = true;
+        else gl.peStockItf = false;
+
+        listItems.clear();
+        scomp = 0;idbg = "";stockflag = 0;ftmsg = "";ftflag = false;rrs="...";
+
+        try {
+
+            if (!AddTable("P_PARAMEXT")) return false;
+            procesaParamsExt();
+
+            listItems.clear();
+            if (!AddTable("P_RUTA")) return false;
+            procesaRuta();
+
+            listItems.clear();
+            if (!AddTable("P_COREL")) return false;
+            if (!AddTable("P_CLIENTE")) return false;
+            if (!AddTable("P_PRODUCTO")) return false;
+            if (!AddTable("P_PRODPRECIO")) return false;
+            if (!AddTable("P_NIVELPRECIO")) return false;
+            if (!AddTable("P_TIPONEG")) return false;
+            if (!AddTable("P_CLIRUTA")) return false;
+            if (!AddTable("P_CLIDIR")) return false;
+            if (!AddTable("P_FACTORCONV")) return false;
+            if (!AddTable("P_LINEA")) return false;
+            if (!AddTable("TMP_PRECESPEC")) return false;
+            if (!AddTable("P_DESCUENTO")) return false;
+            if (!AddTable("P_EMPRESA")) return false;
+            if (!AddTable("P_SUCURSAL")) return false;
+            if (!AddTable("P_BANCO")) return false;
+            if (!AddTable("P_STOCKINV")) return false;
+
+            if (!AddTable("P_CODATEN")) return false;
+            if (!AddTable("P_CODDEV")) return false;
+            if (!AddTable("P_CODNOLEC")) return false;
+            if (!AddTable("P_CORELNC")) return false;
+            if (!AddTable("P_CORRELREC")) return false;
+            if (!AddTable("P_CORREL_OTROS")) return false;
+            if (!AddTable("P_STOCK_APR")) return false;
+            if (!AddTable("P_STOCK")) return false;
+            if (!AddTable("P_STOCKB")) return false;
+            if (!AddTable("P_STOCK_PALLET"))
+                return false;//#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
+            if (!AddTable("P_COBRO")) return false;
+            if (!AddTable("P_CLIGRUPO")) return false;
+            if (!AddTable("P_MEDIAPAGO")) return false;
+            if (!AddTable("P_BONIF")) return false;
+            if (!AddTable("P_BONLIST")) return false;
+            if (!AddTable("P_PRODGRUP")) return false;
+            if (!AddTable("P_IMPUESTO")) return false;
+            if (!AddTable("P_VENDEDOR")) return false;
+            if (!AddTable("P_MUNI")) return false;
+            if (!AddTable("P_VEHICULO")) return false;
+            if (!AddTable("P_HANDHELD")) return false;
+            if (!AddTable("P_TRANSERROR")) return false;
+            if (!AddTable("P_CATALOGO_PRODUCTO")) return false;
+            if (!AddTable("P_GLOBPARAM")) return false;
+            //if (!AddTable("P_CONFIGBARRA")) return false;
+
+            licResult=checkLicence(licSerial);
+            licResultRuta=checkLicenceRuta(licRuta);
+
+            fillTableImpresora();
+
+            if (!AddTable("P_REF1")) return false;
+            if (!AddTable("P_REF2")) return false;
+            if (!AddTable("P_REF3")) return false;
+
+            if (!AddTable("P_ARCHIVOCONF")) return false;
+            if (!AddTable("P_ENCABEZADO_REPORTESHH")) return false;
+            if (!AddTable("P_PORCMERMA")) return false;
+
+            // Objetivos
+
+            if (!AddTable("O_RUTA")) return false;
+            if (!AddTable("O_COBRO")) return false;
+            if (!AddTable("O_PROD")) return false;
+            if (!AddTable("O_LINEA")) return false;
+
+            // Mercadeo
+
+            if (!AddTable("P_MEREQTIPO")) return false;
+            if (!AddTable("P_MEREQUIPO")) return false;
+            if (!AddTable("P_MERESTADO")) return false;
+            if (!AddTable("P_MERPREGUNTA")) return false;
+            if (!AddTable("P_MERRESP")) return false;
+            if (!AddTable("P_MERMARCACOMP")) return false;
+            if (!AddTable("P_MERPRODCOMP")) return false;
+
+            //Pedido Sugerido
+            dbld.clear();
+            dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");
+            dbld.add("EXEC SP_ULTIMOSPRECIOS '" + ruta + "'");
+            commitSQL();
+
+            if (!AddTable("P_PEDSUG")) return false;
+            if (!AddTable("P_ULTIMOPRECIO")) return false;
+
+            if (!AddTable("P_PEDIDO_RECHAZADO")) return false;
+            if (!AddTable("DS_PEDIDO")) return false;
+            if (!AddTable("DS_PEDIDOD")) return false;
+
+        } catch (Exception e) {
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(),idbg, fstr);
+            return false;
+        }
+
+        ferr = "";
+
+        try {
+
+            rc = listItems.size();
+            reccnt = rc;
+            if (rc == 0) return true;
+
+            fprog = "Procesando ...";
+            wsRtask.onProgressUpdate();
+
+            ConT=new BaseDatos(this);
+            dbT=ConT.getWritableDatabase();
+            ConT.vDatabase = dbT;
+            insT = ConT.Ins;
+
+            prn = 0;jj = 0;
+
+            try{
+                for (int i = 0; i < rc; i++) {
+
+                    sql = listItems.get(i);
+                    esql = sql;
+                    sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
+                    sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
+                    sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
+
+                    try {
+                        writer.write(sql);
+                        writer.write("\r\n");
+                    } catch (Exception e) {
+                        Log.d("M", "Write Something happend there " + e.getMessage());
+                    }
+                }
+
+                writer.close();
+
+            }catch (Exception ex){
+                Log.d("M", "Write Something happend there " + ex.getMessage());
+            }
+
+            dbT.beginTransaction();
+
+            for (int i = 0; i < rc; i++) {
+
+                sql = listItems.get(i);esql = sql;
+                sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
+                sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
+                sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
+
+				/*try {
+					writer.write(sql);writer.write("\r\n");
+				} catch (Exception e) {
+					Log.d("M", "Write Something happend there " + e.getMessage());
+				}*/
+
+                try {
+                    dbT = ConT.getWritableDatabase();
+                    dbT.execSQL(sql);
+                } catch (Exception e) {
+                    ferr += " " +e.getMessage();
+                    Log.d("M", "Something happend there " + e.getMessage() + "EJC" + " Yo fui " + sql);
+                    Log.e("z", e.getMessage());
+                }
+
+                try {
+
+                    if (i % 10 == 0) {
+                        fprog = "Procesando: " + i + " de: " + (rc - 1);
+                        wsRtask.onProgressUpdate();
+                        SystemClock.sleep(20);
+                    }
+                } catch (Exception e) {
+                    Log.e("z", e.getMessage());
+                    ferr += " " +e.getMessage();
+                    addlog(new Object() {
+                    }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+                }
+            }
+
+            fprog = "Procesando: " + (rc - 1) + " de: " + (rc - 1);
+            wsRtask.onProgressUpdate();
+
+            Actualiza_FinDia();
+            //encodePrinters();
+            encodeLicence();
+            encodeLicenceRuta();
+
+            SetStatusRecToTrans("1");
+
+            dbT.setTransactionSuccessful();
+            dbT.endTransaction();
+
+            fprog = "Documento de inventario recibido en BOF...";
+            wsRtask.onProgressUpdate();
+
+            fechaCarga();
+            Actualiza_Documentos();
+
+            fprog = "Fin de actualización";
+            wsRtask.onProgressUpdate();
+
+            scomp = 1;
+
+            try {
+                ConT.close();
+            } catch (Exception e) {
+                //addlog(new Object() {	}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            }
+
+            return true;
+
+        } catch (Exception e) {
+            fprog = "Actualización incompleta";
+            wsRtask.onProgressUpdate();
+
+            Log.e("Error", e.getMessage());
+            try {
+                ConT.close();
+            } catch (Exception ee) {
+                sstr = e.getMessage();
+                ferr += " " + sstr;
+            }
+
+            sstr = e.getMessage();
+            ferr += " " + sstr + "\n" + sql;
+            esql = sql;
+
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), ferr, esql);
+
+            return false;
+
+        }
+
+    }
+
+    private boolean getData() {
 		Cursor DT;
 		BufferedWriter writer = null;
 		FileWriter wfile;
@@ -1731,167 +1955,76 @@ public class ComWS extends PBase {
 
 		try {
 
+		    /* temporalmente deshabilitado, cuando va a funcionar carga de todas las tablas, habilitar otra vez
 			if (!AddTable("P_PARAMEXT")) return false;
-			android.os.SystemClock.sleep(1000);
 			procesaParamsExt();
 
 			listItems.clear();
 			if (!AddTable("P_RUTA")) return false;
 			procesaRuta();
+            */
 
-			listItems.clear();
-			if (!AddTable("P_COREL")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_CLIENTE")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_PRODUCTO")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_PRODPRECIO")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_NIVELPRECIO")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_TIPONEG")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_CLIRUTA")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_CLIDIR")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_FACTORCONV")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_LINEA")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("TMP_PRECESPEC")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_DESCUENTO")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_EMPRESA")) return false;
-			android.os.SystemClock.sleep(2000);
-			if (!AddTable("P_SUCURSAL")) return false;
-			android.os.SystemClock.sleep(2000);
-			if (!AddTable("P_BANCO")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_STOCKINV")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_CODATEN")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_CODDEV")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_CODNOLEC")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_CORELNC")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_CORRELREC")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_CORREL_OTROS")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_STOCK_APR")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_STOCK")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_STOCKB")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_STOCK_PALLET")) return false;//#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_COBRO")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_CLIGRUPO")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_MEDIAPAGO")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_BONIF")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_BONLIST")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_PRODGRUP")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_IMPUESTO")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_VENDEDOR")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_MUNI")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_VEHICULO")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_HANDHELD")) return false;
-			android.os.SystemClock.sleep(1000);
-            if (!AddTable("P_TRANSERROR")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_CATALOGO_PRODUCTO")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_GLOBPARAM")) return false;
-			android.os.SystemClock.sleep(1000);
-			if (!AddTable("P_CONFIGBARRA")) return false;
-			android.os.SystemClock.sleep(1000);
 
-			licResult=checkLicence(licSerial);
-			licResultRuta=checkLicenceRuta(licRuta);
-
-			fillTableImpresora();
-			android.os.SystemClock.sleep(1000);
-
-			if (!AddTable("P_REF1")) return false;
-			if (!AddTable("P_REF2")) return false;
-			if (!AddTable("P_REF3")) return false;
-
-			if (!AddTable("P_ARCHIVOCONF")) return false;
-			if (!AddTable("P_ENCABEZADO_REPORTESHH")) return false;
-			if (!AddTable("P_PORCMERMA")) return false;
-
-			// Objetivos
-
-			if (!AddTable("O_RUTA")) return false;
-			if (!AddTable("O_COBRO")) return false;
-			if (!AddTable("O_PROD")) return false;
-			if (!AddTable("O_LINEA")) return false;
-
-			// Mercadeo
-
-			if (!AddTable("P_MEREQTIPO")) return false;
-			if (!AddTable("P_MEREQUIPO")) return false;
-			if (!AddTable("P_MERESTADO")) return false;
-			if (!AddTable("P_MERPREGUNTA")) return false;
-			if (!AddTable("P_MERRESP")) return false;
-			if (!AddTable("P_MERMARCACOMP")) return false;
-			if (!AddTable("P_MERPRODCOMP")) return false;
-
-			//Pedido Sugerido
-			dbld.clear();
-			dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");
-			dbld.add("EXEC SP_ULTIMOSPRECIOS '" + ruta + "'");
-			commitSQL();
-
-			if (!AddTable("P_PEDSUG")) return false;
-			if (!AddTable("P_ULTIMOPRECIO")) return false;
-
-			if (!AddTable("P_PEDIDO_RECHAZADO")) return false;
-			if (!AddTable("DS_PEDIDO")) return false;
-			if (!AddTable("DS_PEDIDOD")) return false;
-
+            ferr = "";
+            return true;
 		} catch (Exception e) {
 			addlog(new Object() {}.getClass().getEnclosingMethod().getName(),idbg, fstr);
 			return false;
 		}
 
-		ferr = "";
+	}
 
-		try {
+	private void cargaTablas() {
+        try {
 
-			rc = listItems.size();
-			reccnt = rc;
-			if (rc == 0) return true;
+            listItems.clear();
 
-			fprog = "Procesando ...";
-			wsRtask.onProgressUpdate();
+            indicetabla=-5;
 
-			ConT = new BaseDatos(this);
-			dbT = ConT.getWritableDatabase();
-			ConT.vDatabase = dbT;
-			insT = ConT.Ins;
+            executaTabla();
 
-			prn = 0;jj = 0;
-			Log.d("M", "So far so good");
+        } catch (Exception e) {
+            String ss=e.getMessage();
+        }
+    }
 
-			try{
+    private void executaTabla() {
+        try {
+            WSRec wsrec = new WSRec();
+            wsrec.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean procesaData() {
+        Cursor DT;
+        BufferedWriter writer = null;
+        FileWriter wfile;
+        int rc, scomp, prn, jj;
+        int ejecutarhh = 0;
+        String s, val = "";
+
+
+        ferr = "";
+
+        try {
+
+            rc = listItems.size();
+            reccnt = rc;
+            if (rc == 0) return true;
+
+            fprog = "Procesando ...";
+            wsRtask.onProgressUpdate();
+
+            ConT=new BaseDatos(this);
+            dbT=ConT.getWritableDatabase();
+            ConT.vDatabase = dbT;
+            insT = ConT.Ins;
+
+            prn = 0;jj = 0;
+
+            try{
                 for (int i = 0; i < rc; i++) {
 
                     sql = listItems.get(i);
@@ -1918,9 +2051,9 @@ public class ComWS extends PBase {
 
             for (int i = 0; i < rc; i++) {
 
-				sql = listItems.get(i);esql = sql;
-				sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
-				sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
+                sql = listItems.get(i);esql = sql;
+                sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
+                sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
                 sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
 
 				/*try {
@@ -1929,88 +2062,101 @@ public class ComWS extends PBase {
 					Log.d("M", "Write Something happend there " + e.getMessage());
 				}*/
 
-				try {
-					dbT = ConT.getWritableDatabase();
-					dbT.execSQL(sql);
-				} catch (Exception e) {
-					ferr += " " +e.getMessage();
-					Log.d("M", "Something happend there " + e.getMessage() + "EJC" + " Yo fui " + sql);
-					Log.e("z", e.getMessage());
-				}
+                try {
+                    dbT = ConT.getWritableDatabase();
+                    dbT.execSQL(sql);
+                } catch (Exception e) {
+                    ferr += " " +e.getMessage();
+                    Log.d("M", "Something happend there " + e.getMessage() + "EJC" + " Yo fui " + sql);
+                    Log.e("z", e.getMessage());
+                }
 
-				try {
+                try {
 
-					if (i % 10 == 0) {
-						fprog = "Procesando: " + i + " de: " + (rc - 1);
-						wsRtask.onProgressUpdate();
-						SystemClock.sleep(20);
-					}
-				} catch (Exception e) {
-					Log.e("z", e.getMessage());
-					ferr += " " +e.getMessage();
-					addlog(new Object() {
-					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-				}
-			}
+                    if (i % 10 == 0) {
+                        fprog = "Procesando: " + i + " de: " + (rc - 1);
+                        wsRtask.onProgressUpdate();
+                        SystemClock.sleep(20);
+                    }
+                } catch (Exception e) {
+                    Log.e("z", e.getMessage());
+                    ferr += " " +e.getMessage();
+                    addlog(new Object() {
+                    }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+                }
+            }
 
-			fprog = "Procesando: " + (rc - 1) + " de: " + (rc - 1);
-			wsRtask.onProgressUpdate();
+            fprog = "Procesando: " + (rc - 1) + " de: " + (rc - 1);
+            wsRtask.onProgressUpdate();
 
-			Actualiza_FinDia();
-			encodePrinters();
-			encodeLicence();
-			encodeLicenceRuta();
+            Actualiza_FinDia();
+            encodePrinters();
+            encodeLicence();
+            encodeLicenceRuta();
 
             SetStatusRecToTrans("1");
 
-			dbT.setTransactionSuccessful();
-			dbT.endTransaction();
+            dbT.setTransactionSuccessful();
+            dbT.endTransaction();
 
-			fprog = "Documento de inventario recibido en BOF...";
-			wsRtask.onProgressUpdate();
+            fprog = "Documento de inventario recibido en BOF...";
+            wsRtask.onProgressUpdate();
 
-			fechaCarga();
-			Actualiza_Documentos();
+            fechaCarga();
+            Actualiza_Documentos();
 
-			fprog = "Fin de actualización";
-			wsRtask.onProgressUpdate();
+            fprog = "Fin de actualización";
+            wsRtask.onProgressUpdate();
 
-			scomp = 1;
+            scomp = 1;
 
-			try {
-				ConT.close();
-			} catch (Exception e) {
-				//addlog(new Object() {	}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-			}
+            try {
+                ConT.close();
+            } catch (Exception e) {
+                //addlog(new Object() {	}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            }
 
-			return true;
+			lblInfo.setText(" ");
+			s = "Recepción completa.";
+			if (stockflag == 1) s = s + "\nSe actualizó inventario.";
 
-		} catch (Exception e) {
-			fprog = "Actualización incompleta";
-			wsRtask.onProgressUpdate();
+			clsAppM.estandartInventario();
+			validaDatos(true);
 
-			Log.e("Error", e.getMessage());
-			try {
-				ConT.close();
-			} catch (Exception ee) {
-				sstr = e.getMessage();
-				ferr += " " + sstr;
-			}
+			if (stockflag == 1) sendConfirm();
 
-			sstr = e.getMessage();
-			ferr += " " + sstr + "\n" + sql;
-			esql = sql;
+			isbusy = 0;
 
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), ferr, esql);
+			msgAskExit(s);
 
-			return false;
+            return true;
 
-		}
+        } catch (Exception e) {
+            fprog = "Actualización incompleta";
+            wsRtask.onProgressUpdate();
 
-	}
+            Log.e("Error", e.getMessage());
+            try {
+                ConT.close();
+            } catch (Exception ee) {
+                sstr = e.getMessage();
+                ferr += " " + sstr;
+            }
 
-	private void procesaParamsExt() {
+            sstr = e.getMessage();
+            ferr += " " + sstr + "\n" + sql;
+            esql = sql;
+
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), ferr, esql);
+
+            return false;
+
+        }
+
+    }
+
+    private void procesaParamsExt() {
 		Cursor dt;
 		String sql, val = "";
 		int ival, rc;
@@ -2776,19 +2922,17 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_CATALOGO_PRODUCTO")) {
-			SQL = " SELECT CODIGO_PRODUCTO, ORDEN FROM P_CATALOGO_PRODUCTO; ";
-
-//					+
-//				  "	WHERE CODIGO_PRODUCTO IN (SELECT CODIGO ";
-//			SQL += "FROM P_PRODUCTO WHERE ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
-//					" OR CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "'))" +
-//					" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) OR UNIDMED='CAN' )" +
-//					" AND CODIGO IN ( " +
-//					" SELECT CODIGO FROM P_PRODPRECIO WHERE (NIVEL IN ( SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE " +
-//					" WHERE (CODIGO IN ( SELECT DISTINCT CLIENTE FROM DS_PEDIDO WHERE (RUTA ='" + ActRuta + "') AND (BANDERA='D')))))OR " +
-//					" NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE  " +
-//					" WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "')))" +
-//					" OR TIENE_VINETA_O_TUBO = 1 )";
+			SQL = " SELECT CODIGO_PRODUCTO, ORDEN FROM P_CATALOGO_PRODUCTO " +
+				  "	WHERE CODIGO_PRODUCTO IN (SELECT CODIGO ";
+			SQL += "FROM P_PRODUCTO WHERE ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
+					" OR CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "'))" +
+					" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) OR UNIDMED='CAN' )" +
+					" AND CODIGO IN ( " +
+					" SELECT CODIGO FROM P_PRODPRECIO WHERE (NIVEL IN ( SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE " +
+					" WHERE (CODIGO IN ( SELECT DISTINCT CLIENTE FROM DS_PEDIDO WHERE (RUTA ='" + ActRuta + "') AND (BANDERA='D')))))OR " +
+					" NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE  " +
+					" WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "')))" +
+					" OR TIENE_VINETA_O_TUBO = 1 )";
 			return SQL;
 		}
 
@@ -3073,7 +3217,7 @@ public class ComWS extends PBase {
 	}
 
 	private boolean validaLicencia() {
-		CryptUtil cu=new CryptUtil();
+		/*CryptUtil cu=new CryptUtil();
 		Cursor dt;
 		String lic,lickey,licruta,rutaencrypt;
 		Integer msgLic=0;
@@ -3101,8 +3245,8 @@ public class ComWS extends PBase {
 		if(msgLic==1)toastlong("El dispositivo no tiene licencia válida de handheld, ni de ruta");
 		else if(msgLic==2){toastlong("El dispositivo no tiene licencia valida de handheld");}
 		else if(msgLic==3){toastlong("El dispositivo no tiene licencia valida de ruta");}
-
-		return false;
+*/
+		return true;
 	}
 
 	private void fechaCarga() {
@@ -3128,20 +3272,16 @@ public class ComWS extends PBase {
 	//region WS Recepcion Handling Methods
 
 	public void wsExecute() {
-
 		running = 1;
 		fstr = "No connect";
 		scon = 0;
 
 		try {
-
 			if (getTest() == 1) {
 				scon = 1;
 			} else {
 				URL = URL_Remota;
-				if (getTest() == 1) {
-					scon = 1;
-				}
+				if (getTest() == 1) scon = 1;
 			}
 
 			idbg = idbg + sstr;
@@ -3152,7 +3292,6 @@ public class ComWS extends PBase {
 			} else {
 				fstr = "No se puede conectar al web service : " + sstr;
 			}
-
 		} catch (Exception e) {
 			scon = 0;
 			fstr = "Error importando los datos: " + fstr;
@@ -3170,6 +3309,9 @@ public class ComWS extends PBase {
 		try {
 			if (fstr.equalsIgnoreCase("Sync OK")) {
 
+                cargaTablas();
+
+			    /*
 				lblInfo.setText(" ");
 				s = "Recepción completa.";
 				if (stockflag == 1) s = s + "\nSe actualizó inventario.";
@@ -3181,6 +3323,8 @@ public class ComWS extends PBase {
 
 				msgAskExit(s);
 
+			    */
+
 			} else {
 				lblInfo.setText(fstr);
 				mu.msgbox("Ocurrió error : \n" + fstr + " " + idbg + " (Registro: " + reccnt + ") ");
@@ -3190,7 +3334,7 @@ public class ComWS extends PBase {
 				addlog("Recepcion", fstr, idbg);
 				return;
 			}
-
+/*
 			pendientes = validaPendientes();
 			visibilidadBotones();
 
@@ -3200,11 +3344,13 @@ public class ComWS extends PBase {
 			otrosParametros();
 
 			if (ftflag) msgbox(ftmsg);
+
+ */
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
-		if (!validaLicencia()) restartApp();
+		//if (!validaLicencia()) restartApp();
 
 	}
 
@@ -3214,6 +3360,7 @@ public class ComWS extends PBase {
 		protected Void doInBackground(String... params) {
 
 			try {
+
 				wsExecute();
 			} catch (Exception e) {
 				if (scon == 0) {
@@ -3259,6 +3406,250 @@ public class ComWS extends PBase {
 	}
 
 	//endregion
+
+    //region WS Recepcion por tabla
+
+    private class WSRec extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+
+            try {
+                wsCargaTabla();
+            } catch (Exception e) {
+                if (scon == 0) fstr = "No se puede conectar al web service : " + sstr;
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            try {
+                wsCallback();
+            } catch (Exception e) {
+                Log.d("onPostExecute", e.getMessage());
+            }
+
+        }
+
+        @Override
+        protected void onPreExecute() {  }
+
+        @Override
+        protected void onProgressUpdate(Void... values) { }
+
+    }
+
+    public void wsCargaTabla() {
+
+        try {
+        	if (nombretabla.contains("P_IMPRESORA")){
+				fillTableImpresora();
+			}else{
+				AddTable(nombretabla);
+			}
+        } catch (Exception e) {
+            String ee=e.getMessage();
+        }
+
+    }
+
+    public void wsCallback() {
+       boolean ejecutar=true;
+
+        try {
+            indicetabla++;
+
+            switch (indicetabla) {
+				case -4:
+					nombretabla="P_PARAMEXT";break;
+				case -3:
+                     procesaParamsExt();
+                     nombretabla ="";
+					 break;
+				case -2:
+					nombretabla="P_RUTA";break;
+				case -1:
+					procesaRuta();
+					nombretabla ="";
+					break;
+				case 0:
+					nombretabla="PARAMS";break;
+				case 1:
+					nombretabla="P_EMPRESA";break;
+                case 2:
+                    nombretabla="P_COREL";break;
+                case 3:
+                    nombretabla="P_PRODUCTO";break;
+				case 4:
+					nombretabla="P_CLIENTE";break;
+				case 5:
+					nombretabla="P_PRODUCTO";break;
+				case 6:
+                    nombretabla="P_PRODPRECIO";break;
+				case 7:
+                    nombretabla="P_NIVELPRECIO";break;
+				case 8:
+                    nombretabla="P_TIPONEG";break;
+				case 9:
+                    nombretabla="P_CLIRUTA";break;
+				case 10:
+                    nombretabla="P_CLIDIR";break;
+				case 11:
+                    nombretabla="P_FACTORCONV";break;
+				case 12:
+                    nombretabla="P_LINEA";break;
+				case 13:
+                    nombretabla="TMP_PRECESPEC";break;
+				case 14:
+                    nombretabla="P_DESCUENTO";break;
+				case 15:
+                    nombretabla="P_EMPRESA";break;
+				case 16:
+                    nombretabla="P_SUCURSAL";break;
+				case 17:
+                    nombretabla="P_BANCO";break;
+				case 18:
+                    nombretabla="P_STOCKINV";break;
+				case 19:
+                    nombretabla="P_CODATEN";break;
+				case 20:
+                    nombretabla="P_CODDEV";break;
+				case 21:
+                    nombretabla="P_CODNOLEC";break;
+				case 22:
+                    nombretabla="P_CORELNC";break;
+				case 23:
+                    nombretabla="P_CORRELREC";break;
+				case 24:
+                    nombretabla="P_CORREL_OTROS";break;
+				case 25:
+                    nombretabla="P_STOCK_APR";break;
+				case 26:
+                    nombretabla="P_STOCK";break;
+				case 27:
+                    nombretabla="P_STOCKB";break;
+				case 28:
+                    nombretabla="P_STOCK_PALLET";break;//#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
+				case 29:
+                    nombretabla="P_COBRO";break;
+				case 30:
+                    nombretabla="P_CLIGRUPO";break;
+				case 31:
+                    nombretabla="P_MEDIAPAGO";break;
+				case 32:
+                    nombretabla="P_BONIF";break;
+				case 33:
+                    nombretabla="P_BONLIST";break;
+				case 34:
+                    nombretabla="P_PRODGRUP";break;
+				case 35:
+                    nombretabla="P_IMPUESTO";break;
+				case 36:
+                    nombretabla="P_VENDEDOR";break;
+				case 37:
+                    nombretabla="P_MUNI";break;
+				case 38:
+                    nombretabla="P_VEHICULO";break;
+				case 39:
+                    nombretabla="P_HANDHELD";break;
+				case 40:
+                    nombretabla="P_TRANSERROR";break;
+				case 41:
+                    nombretabla="P_CATALOGO_PRODUCTO";break;
+				case 42:
+                    nombretabla="P_GLOBPARAM";break;
+				case 43:
+                    nombretabla="P_CONFIGBARRA";break;
+				case 44:
+                    nombretabla="P_REF1";break;
+				case 45:
+                    nombretabla="P_REF2";break;
+				case 46:
+                    nombretabla="P_REF3";break;
+				case 47:
+                    nombretabla="P_ARCHIVOCONF";break;
+				case 48:
+                    nombretabla="P_ENCABEZADO_REPORTESHH";break;
+				case 49:
+                    nombretabla="P_PORCMERMA";break;
+
+				// Objetivos
+
+				case 50:
+                    nombretabla="O_RUTA";break;
+				case 51:
+                    nombretabla="O_COBRO";break;
+				case 52:
+                    nombretabla="O_PROD";break;
+				case 53:
+                    nombretabla="O_LINEA";break;
+
+				// Mercadeo
+
+				case 54:
+                    nombretabla="P_MEREQTIPO";break;
+				case 55:
+                    nombretabla="P_MEREQUIPO";break;
+				case 56:
+                    nombretabla="P_MERESTADO";break;
+				case 57:
+                    nombretabla="P_MERPREGUNTA";break;
+				case 58:
+                    nombretabla="P_MERRESP";break;
+				case 59:
+                    nombretabla="P_MERMARCACOMP";break;
+				case 60:
+                    nombretabla="P_MERPRODCOMP";break;
+
+				case 61:
+                    nombretabla="P_PEDIDO_RECHAZADO";break;
+				case 62:
+                    nombretabla="DS_PEDIDO";break;
+				case 63:
+                    nombretabla="DS_PEDIDOD";break;
+				case 64:
+					dbld.clear();
+					dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");
+					dbld.add("EXEC SP_ULTIMOSPRECIOS '" + ruta + "'");
+					commitSQL();
+					nombretabla = "";
+					break;
+				case 65:
+					nombretabla="P_PEDSUG";break;
+				case 66:
+					nombretabla="P_ULTIMOPRECIO";break;
+				case 67:
+					nombretabla="P_IMPRESORA";break;
+					/*fillTableImpresora();
+					nombretabla = "";
+					break;*/
+				/*case 68:
+					//licResult=checkLicence(licSerial);
+					//nombretabla = "";
+					break;
+				case 69:
+					//licResultRuta=checkLicenceRuta(licRuta);
+					//nombretabla = "";
+					break;*/
+				case 68:
+                    procesaData();
+					ejecutar = false;
+					break;
+            }
+
+            if(ejecutar) {
+				executaTabla();
+			}
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    //endregion
 
 	//region WS Envio Methods
 

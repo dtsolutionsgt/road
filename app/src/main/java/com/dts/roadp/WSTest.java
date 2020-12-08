@@ -79,7 +79,6 @@ public class WSTest extends PBase {
 
         try {
             super.wsCallBack(throwing, errmsg);
-
             toast("Rows : " + ws.openDTCursor.getCount());
         } catch (Exception e) {
             msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());

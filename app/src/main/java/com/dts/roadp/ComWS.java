@@ -181,9 +181,9 @@ public class ComWS extends PBase {
 			}
 		}
 
-        txtRuta.setText("003000");
+       /* txtRuta.setText("003000");
         txtEmp.setText("03");
-        txtWS.setText("http://192.168.0.11/wsAndr/wsAndr.asmx");
+        txtWS.setText("http://192.168.0.11/wsAndr/wsAndr.asmx");*/
 
 		if(gl.ruta.isEmpty()){
 			ruta = txtRuta.getText().toString();
@@ -238,9 +238,9 @@ public class ComWS extends PBase {
 			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}
 
-        txtRuta.setText("003000");
+        /*txtRuta.setText("003000");
         txtEmp.setText("03");
-        txtWS.setText("http://192.168.0.11/wsAndr/wsAndr.asmx");
+        txtWS.setText("http://192.168.0.11/wsAndr/wsAndr.asmx");*/
 
 
 		mac = getMac();
@@ -274,7 +274,7 @@ public class ComWS extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"wakeLock");
 		}
 
-		transport = new HttpTransportSE(URL, 0);
+		transport = new HttpTransportSE(URL, 6000);
 
 	}
 
@@ -1070,7 +1070,7 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			//HttpTransportSE transport = new HttpTransportSE(URL, 10000);
+			HttpTransportSE transport = new HttpTransportSE(URL, 10000);
 
 			//ArrayList<HeaderProperty> headerPropertyArrayList = new ArrayList<HeaderProperty>();
 			//headerPropertyArrayList.add(new HeaderProperty("Connection", "close"));
@@ -1979,7 +1979,7 @@ public class ComWS extends PBase {
 
             listItems.clear();
 
-            indicetabla=-5;
+            indicetabla=-4;
 
             executaTabla();
 
@@ -3462,20 +3462,18 @@ public class ComWS extends PBase {
             indicetabla++;
 
             switch (indicetabla) {
-				case -4:
-					nombretabla="P_PARAMEXT";break;
 				case -3:
+					nombretabla="P_PARAMEXT";break;
+				case -2:
                      procesaParamsExt();
                      nombretabla ="";
 					 break;
-				case -2:
-					nombretabla="P_RUTA";break;
 				case -1:
+					nombretabla="P_RUTA";break;
+				case 0:
 					procesaRuta();
 					nombretabla ="";
 					break;
-				case 0:
-					nombretabla="PARAMS";break;
 				case 1:
 					nombretabla="P_EMPRESA";break;
                 case 2:

@@ -1248,6 +1248,9 @@ public class ComWS extends PBase {
 			if (nombretabla.contains("P_IMPRESORA")){
 				callMethod("getInsImpresora");
 				xr=getXMLRegionSingle("getInsImpresoraResult");
+			}else if (nombretabla.contains("commitSQL")){
+				callMethod("Commit", "SQL", value);
+				xr=getXMLRegionSingle("CommitResponse");
 			}else{
 				callMethod("getIns", "SQL", value);
 				xr=getXMLRegionSingle("getInsResult");
@@ -1261,78 +1264,80 @@ public class ComWS extends PBase {
                 if (rc == 1) stockflag = 0; else stockflag = 1;
             }
 
-            tabla=delcmd.substring(12);
-            switch (tabla){
+            if (!delcmd.contains("commitSQL")){
+				tabla=delcmd.substring(12);
+				switch (tabla){
 
-                case "P_RUTA":
-                    if (rc==1){
-                        borraDatos();
-                        throw new Exception("La ruta ingresada no es válida, ruta: " + ruta + ", no se puede continuar la carga de datos");
-                    }
-                    break;
+					case "P_RUTA":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("La ruta ingresada no es válida, ruta: " + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
 
-                case "P_CLIENTE":
-                    if (rc==1){
-                        borraDatos();
-                        throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
-                    }
-                    break;
+					case "P_CLIENTE":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
 
-                case "P_PRODUCTO":
-                    if (rc==1){
-                        borraDatos();
-                        throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
-                    }
-                    break;
-                case "P_PRODPRECIO":
-                    if (rc==1){
-                        borraDatos();
-                        throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
-                    }
-                    break;
-                case "P_COREL":
-                    if (rc==1 && gl.rutatipo.equals("V")){
-                        borraDatos();
-                        throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
-                    }
-                    break;
-            }
+					case "P_PRODUCTO":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+					case "P_PRODPRECIO":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+					case "P_COREL":
+						if (rc==1 && gl.rutatipo.equals("V")){
+							borraDatos();
+							throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+				}
 
-            for (int i=1; i < rc-2; i++) {
+				for (int i=1; i < rc-2; i++) {
 
-                try {
-                    ss=sitems[i];
-                    ss=ss.replace("<string>","");
-                    str=ss.replace("</string>","");
-                } catch (Exception e) {
-                    str="";
-                }
+					try {
+						ss=sitems[i];
+						ss=ss.replace("<string>","");
+						str=ss.replace("</string>","");
+					} catch (Exception e) {
+						str="";
+					}
 
-                if (i == 1) {
+					if (i == 1) {
 
-                    idbg = idbg + " ret " + str + "  ";
+						idbg = idbg + " ret " + str + "  ";
 
-                    if (str.equalsIgnoreCase("#")) {
-                        listItems.add(delcmd);
-                    } else {
-                        idbg = idbg + str;
-                        ftmsg = ftmsg + "\n" + str;
-                        ftflag = true;
-                        sstr = str;
-                        return 0;
-                    }
-                } else {
-                    try {
-                        sql = str;
-                        listItems.add(sql);
-                        sstr = str;
-                    } catch (Exception e) {
-                        addlog(new Object() {
-                        }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-                        sstr = e.getMessage();
-                    }
-                }
-            }
+						if (str.equalsIgnoreCase("#")) {
+							listItems.add(delcmd);
+						} else {
+							idbg = idbg + str;
+							ftmsg = ftmsg + "\n" + str;
+							ftflag = true;
+							sstr = str;
+							return 0;
+						}
+					} else {
+						try {
+							sql = str;
+							listItems.add(sql);
+							sstr = str;
+						} catch (Exception e) {
+							addlog(new Object() {
+							}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+							sstr = e.getMessage();
+						}
+					}
+				}
+			}
 
             retFillTable= 1;
 
@@ -1625,7 +1630,7 @@ public class ComWS extends PBase {
 
 	public int commitSQL() {
 		int rc;
-		String s, ss;
+		String s, ss="";
 		//#CKFK 20190429 Creé esta variable para retornar si la comunicación fue correcta o no
 		//e hice modificaciones en la función para garantizar esta funcionalidad
 		int vCommit=0;
@@ -1645,7 +1650,9 @@ public class ComWS extends PBase {
 			wsStask.onProgressUpdate();
 		}
 
-		try {
+		nombretabla = "commitSQL";
+		vCommit=fillTable2(s,"commitSQL");
+		/*try {
 
 			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
 			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
@@ -1677,8 +1684,8 @@ public class ComWS extends PBase {
             sstr = e.getMessage();
 
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-		}
-		vCommit =1;
+		}*/
+
 		return vCommit;
 	}
 

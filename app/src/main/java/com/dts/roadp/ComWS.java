@@ -1240,12 +1240,19 @@ public class ComWS extends PBase {
         String str, ss, tabla;
         String[] sitems;
 
+		String xr;
+
         try {
             sstr = "OK";
 
-            callMethod("getIns", "SQL", value);
+			if (nombretabla.contains("P_IMPRESORA")){
+				callMethod("getInsImpresora");
+				xr=getXMLRegionSingle("getInsImpresoraResult");
+			}else{
+				callMethod("getIns", "SQL", value);
+				xr=getXMLRegionSingle("getInsResult");
+			}
 
-            String xr=getXMLRegionSingle("getInsResult");
             sitems=xr.split("\n");
             rc=sitems.length;
 
@@ -2811,8 +2818,11 @@ public class ComWS extends PBase {
 		if (TN.equalsIgnoreCase("P_STOCK")) {
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+				/*SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
 						"FROM P_STOCK WHERE RUTA='" + ActRuta + "'  AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";*/
+				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' " +
 						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";
 			} else if (gl.peModal.equalsIgnoreCase("APR")) {
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
@@ -3762,11 +3772,11 @@ public class ComWS extends PBase {
     public void wsCargaTabla() {
 
         try {
-        	if (nombretabla.contains("P_IMPRESORA")){
-				fillTableImpresora();
-			}else{
+//        	if (nombretabla.contains("P_IMPRESORA")){
+//				fillTableImpresora();
+//			}else{
 				AddTable(nombretabla);
-			}
+//			}
         } catch (Exception e) {
             String ee=e.getMessage();
         }
@@ -3937,6 +3947,8 @@ public class ComWS extends PBase {
 				case 66:
 					nombretabla="P_ULTIMOPRECIO";break;
 				case 67:
+					nombretabla="P_IMPRESORA";break;
+				case 68:
 					nombretabla="Procesando tablas ...";break;
 					/*fillTableImpresora();
 					nombretabla = "";
@@ -3949,7 +3961,7 @@ public class ComWS extends PBase {
 					//licResultRuta=checkLicenceRuta(licRuta);
 					//nombretabla = "";
 					break;*/
-				case 68:
+				case 69:
                     procesaDatos();
 					ejecutar = false;
 					break;

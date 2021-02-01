@@ -375,7 +375,7 @@ public class PedidoRes extends PBase {
 			ins.add("CLIENTE",gl.cliente);
 			ins.add("KILOMETRAJE",0);
 			ins.add("FECHAENTR",fechae);
-			ins.add("DIRENTREGA",txtDir.getText().toString());
+			ins.add("DIRENTREGA",getCodigoSAP(txtDir.getText().toString()));
 			ins.add("TOTAL",tot);
 			ins.add("DESMONTO",descmon);
 			ins.add("IMPMONTO",imp);
@@ -522,8 +522,30 @@ public class PedidoRes extends PBase {
 		}	
 		
 	}
-	
-	
+
+	private String getCodigoSAP(String vDireccion){
+        String vSQL = "", vCodigoSAP = vDireccion;
+		Cursor DT;
+
+		try {
+
+				vSQL = "SELECT COD_SAP FROM P_CLIDIR WHERE DIRECCION_ENTREGA = '" + vDireccion + "'";
+				DT=Con.OpenDT(vSQL);
+				DT.moveToFirst();
+
+				if (DT.getCount()>0){
+					vCodigoSAP = DT.getString(0);
+				}
+
+				DT.close();
+
+		}catch (Exception ex){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
+			mu.msgbox( ex.getMessage());
+		}
+
+		return vCodigoSAP;
+	}
 	// Date
 
 	public void showDateDialog(View view) {

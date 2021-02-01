@@ -109,7 +109,7 @@ public class AppMethods {
 
 					break;
 
-				case "Devolucion":
+				case "Devoluciones":
 
 					sql="SELECT IFNULL(COUNT(COREL),0) AS CANT FROM D_NOTACRED";
 					sql += (sinEnviar?" WHERE STATCOM = 'N'":"");

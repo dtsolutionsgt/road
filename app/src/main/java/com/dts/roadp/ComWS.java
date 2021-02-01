@@ -497,7 +497,7 @@ public class ComWS extends PBase {
 			final TextView input = new TextView(this);
 			alert.setView(input);
 
-			input.setText("Archivo de datos creado conecte el dispotivo al ordenador");
+			input.setText("Archivo de datos creado conecte el dispositivo al ordenador");
 			input.requestFocus();
 
 			alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -2266,7 +2266,7 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_CLIDIR")) {
-			SQL = " SELECT * FROM P_CLIDIR ";
+			SQL = " SELECT CODIGO_CLIENTE,DIRECCION_ENTREGA,COD_SAP FROM P_CLIDIR ";
 			SQL += " WHERE (P_CLIDIR.CODIGO_CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') ))";
 			return SQL;
 		}
@@ -3920,15 +3920,8 @@ public class ComWS extends PBase {
 				ccorel = DT.getInt(0);
 				serie = DT.getString(1);
 
-				//dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND SERIE = '"+serie +"' AND TIPO = 'D' " +
-				//		" AND ACTUAL =< "+ccorel+1);
-
 				dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'D' " +
 						" AND ACTUAL < "+ccorel);
-				//updCxC="UPDATE P_CORREL_OTROS SET ACTUAL="+ccorel+ "  WHERE RUTA='"+fruta+"' AND TIPO='D' " ;
-
-				//ss = "exec actualizaCorelDev '" + gl.ruta + "'," + ccorel;
-				//dbld.add(ss);
 
 			}
 

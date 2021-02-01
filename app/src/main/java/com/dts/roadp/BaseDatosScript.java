@@ -1192,7 +1192,8 @@ public class BaseDatosScript {
 
 			vSQL="CREATE TABLE [P_CLIDIR] ("+
 					"[CODIGO_CLIENTE] TEXT NOT NULL,"+
-					"[DIRECCION_ENTREGA] TEXT NOT NULL"+
+					"[DIRECCION_ENTREGA] TEXT NOT NULL,"+
+					"[COD_SAP] TEXT NOT NULL"+
 					");";
 			database.execSQL(vSQL);
 

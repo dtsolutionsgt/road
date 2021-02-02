@@ -400,7 +400,9 @@ public class Cobro extends PBase {
 
 	public void doExit(View view){
 		try{
-			validaCredito();
+			if (validaCredito()){
+				finish();
+			};
 		}catch (Exception e){
 			mu.msgbox("doExit: "+e.getMessage());
 		}

@@ -471,6 +471,8 @@ public class ProdCant extends PBase {
 
 	private double DameInventario() {
 
+		Cursor DT;
+
 		try {
 
 			sql=" SELECT SUM(CANTIDAD) AS CANTIDAD " +
@@ -495,18 +497,34 @@ public class ProdCant extends PBase {
 	}
 
 	@Override
-	protected void wsCallBack(Boolean throwing,String errmsg) {
+	public void wsCallBack(int callmode,Boolean throwing,String errmsg) {
+
+		double vValor=0;
 
 		try {
-			super.wsCallBack(throwing, errmsg);
 
-			ws.openDTCursor.moveToFirst();
+			super.wsCallBack(callmode,throwing, errmsg);
 
-			double vValor= ws.openDTCursor.getDouble(0);
+			if (ws.openDTCursor != null){
 
-			toast("Existencia " + vValor);
+				if (ws.openDTCursor.getCount()>0){
 
-			lblDisp.setText("Disponible: " + vValor);
+					ws.openDTCursor.moveToFirst();
+
+					vValor= ws.openDTCursor.getDouble(0);
+
+					toast("Existencia " + vValor);
+
+					lblDisp.setVisibility(View.VISIBLE);
+
+					lblDisp.setText("Disponible: " + vValor);
+				}
+
+			}else{
+				toast("Existencia " + vValor);
+
+				lblDisp.setText("Disponible: " + vValor);
+			}
 
 		} catch (Exception e) {
 			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());

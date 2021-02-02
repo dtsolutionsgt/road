@@ -1652,6 +1652,7 @@ public class ComWS extends PBase {
 
 		nombretabla = "commitSQL";
 		vCommit=fillTable2(s,"commitSQL");
+
 		/*try {
 
 			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
@@ -2825,12 +2826,12 @@ public class ComWS extends PBase {
 		if (TN.equalsIgnoreCase("P_STOCK")) {
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				/*SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-						"FROM P_STOCK WHERE RUTA='" + ActRuta + "'  AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
-						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";*/
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' " +
+						"FROM P_STOCK WHERE RUTA='" + ActRuta + "'  AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";
+				/*SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' " +
+						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";*/
 			} else if (gl.peModal.equalsIgnoreCase("APR")) {
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
 						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') ";
@@ -4519,8 +4520,9 @@ public class ComWS extends PBase {
 					dbld.insert("D_COBROD_SR", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_COBROP", "WHERE COREL='" + cor + "'");
 
-					dbld.add("UPDATE P_CORRELREC SET Actual=" + corult + "  WHERE RUTA='" + fruta + "' " +
-							"AND Actual<"+corult);
+					dbld.add("UPDATE P_CORRELREC SET Actual=" + corult + "  WHERE RUTA='" + fruta + "' ");
+							/*+
+							"AND Actual<"+corult);*/
 
 					if (envioparcial && !esEnvioManual){
 						if (commitSQL() == 1) {

@@ -147,6 +147,7 @@ public class WebService {
             int rc=cursor.getCount();
 
             openDTCursor=cursor;
+
         } catch (Exception e) {
             errflag=true;
             error=e.getMessage();

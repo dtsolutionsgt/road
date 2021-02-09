@@ -95,8 +95,9 @@
             android:layout_width="670dp"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="5dp"
             android:layout_toLeftOf="@+id/imageView"
+            android:layout_toRightOf="@id/textView14"
             android:ems="10"
             android:inputType="textPersonName"
             android:paddingBottom="5dp" />

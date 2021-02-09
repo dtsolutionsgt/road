@@ -147,6 +147,8 @@ public class CliDet extends PBase {
 
 			resizeButtons();
 
+			clsDescFiltro clsDFilt=new clsDescFiltro(this,gl.ruta,gl.cliente);
+
 			showData();
 			calcCredit();
 			credito=gl.credito;
@@ -240,8 +242,6 @@ public class CliDet extends PBase {
 	}
 
 	public void showCredit(View viev){
-
-		clsDescFiltro clsDFilt=new clsDescFiltro(this,gl.ruta,gl.cliente);
 
 		if (!permiteVenta) {
 			if (gl.peVentaGps == 1) {

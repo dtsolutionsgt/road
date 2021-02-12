@@ -1646,6 +1646,7 @@ public class ComWS extends PBase {
 		return vCommit;
 	}
 */
+
 	public int commitSQL() {
 	int rc;
 	String s, ss="";
@@ -1708,59 +1709,59 @@ public class ComWS extends PBase {
 	return vCommit;
 }
 
-public int OpenDTt(String sql) {
-		int rc;
+	public int OpenDTt(String sql) {
+			int rc;
 
-		METHOD_NAME = "OpenDT";
+			METHOD_NAME = "OpenDT";
 
-		results.clear();
+			results.clear();
 
-		try {
+			try {
 
-			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
-			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-			envelope.dotNet = true;
+				SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+				SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+				envelope.dotNet = true;
 
-			PropertyInfo param = new PropertyInfo();
-			param.setType(String.class);
-			param.setName("SQL");
-			param.setValue(sql);
+				PropertyInfo param = new PropertyInfo();
+				param.setType(String.class);
+				param.setName("SQL");
+				param.setValue(sql);
 
-			request.addProperty(param);
-			envelope.setOutputSoapObject(request);
+				request.addProperty(param);
+				envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
-			transport.call(NAMESPACE + METHOD_NAME, envelope);
+				HttpTransportSE transport = new HttpTransportSE(URL, 60000);
+				transport.call(NAMESPACE + METHOD_NAME, envelope);
 
-			SoapObject resSoap = (SoapObject) envelope.getResponse();
-			SoapObject result = (SoapObject) envelope.bodyIn;
+				SoapObject resSoap = (SoapObject) envelope.getResponse();
+				SoapObject result = (SoapObject) envelope.bodyIn;
 
-			rc = resSoap.getPropertyCount() - 1;
+				rc = resSoap.getPropertyCount() - 1;
 
-			for (int i = 0; i < rc + 1; i++) {
-				String str = ((SoapObject) result.getProperty(0)).getPropertyAsString(i);
+				for (int i = 0; i < rc + 1; i++) {
+					String str = ((SoapObject) result.getProperty(0)).getPropertyAsString(i);
 
-				if (i == 0) {
-					sstr = str;
-					if (!str.equalsIgnoreCase("#")) {
+					if (i == 0) {
 						sstr = str;
-						return 0;
+						if (!str.equalsIgnoreCase("#")) {
+							sstr = str;
+							return 0;
+						}
+					} else {
+						results.add(str);
 					}
-				} else {
-					results.add(str);
 				}
+
+				return 1;
+			} catch (Exception e) {
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+				sstr = e.getMessage();
 			}
 
-			return 1;
-		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-			sstr = e.getMessage();
+			return 0;
+
 		}
-
-		return 0;
-
-	}
 
 	public int getTest() {
 

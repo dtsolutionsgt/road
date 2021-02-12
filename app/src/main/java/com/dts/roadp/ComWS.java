@@ -3684,6 +3684,41 @@ public int OpenDTt(String sql) {
 		}
 
 	}
+
+	//region WS Recepcion por tabla
+
+	private class WSRec extends AsyncTask<String, Void, Void> {
+
+		@Override
+		protected Void doInBackground(String... params) {
+
+			try {
+				wsCargaTabla();
+			} catch (Exception e) {
+				if (scon == 0) fstr = "No se puede conectar al web service : " + sstr;
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			try {
+				wsCallback();
+			} catch (Exception e) {
+				Log.d("onPostExecute", e.getMessage());
+			}
+
+		}
+
+		@Override
+		protected void onPreExecute() {  }
+
+		@Override
+		protected void onProgressUpdate(Void... values) { }
+
+	}
+
 	public void wsCargaTabla() {
 
 		try {

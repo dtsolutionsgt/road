@@ -4,8 +4,8 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.util.Log;
 
-//import org.simpleframework.xml.Serializer;
-//import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

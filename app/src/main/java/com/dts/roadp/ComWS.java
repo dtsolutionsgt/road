@@ -123,7 +123,7 @@ public class ComWS extends PBase {
 	private static String sstr, fstr, fprog, finf, ferr, fterr, idbg, dbg, ftmsg, esql, ffpos;
 	private int scon, running, pflag, stockflag, conflag;
 	private String ftext, slsync, senv, gEmpresa, ActRuta, mac,rootdir;
-	private String fsql, fsqli, fsqlf, strliqid,xmlresult;
+	private String fsql, fsqli, fsqlf, strliqid,argstr,xmlresult;
 	private boolean rutapos, ftflag, esvacio, liqid;
 
 	private final String NAMESPACE = "http://tempuri.org/";

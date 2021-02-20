@@ -1251,7 +1251,7 @@ public class Menu extends PBase {
 	public void showInvMenuUtils() {
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ","Soporte","Serial del dipositivo","Impresión de barras", "Rating ROAD"};
+			final String[] selitems = {"Configuracion de impresora","Tablas","Actualización versión ROAD","Correlativo CierreZ","Soporte","Serial del dispositivo","Impresión de barras", "Rating ROAD"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.utils48);
@@ -1266,14 +1266,16 @@ public class Menu extends PBase {
 						case 1:
 							startActivity(new Intent(Menu.this,Tablas.class));break;
 						case 2:
-							menuCorelZ();break;
+							msgAskActualizarVersion();break;
 						case 3:
-							startActivity(new Intent(Menu.this,Soporte.class));break;
+							menuCorelZ();break;
 						case 4:
-							msgbox("Serial# : "+gl.deviceId);break;
+							startActivity(new Intent(Menu.this,Soporte.class));break;
 						case 5:
-							startActivity(new Intent(Menu.this,imprime_barras.class));break;
+							msgbox("Serial# : "+gl.deviceId);break;
 						case 6:
+							startActivity(new Intent(Menu.this,imprime_barras.class));break;
+						case 7:
 							startActivity(new Intent(Menu.this,rating.class));break;
 
 					}
@@ -1297,6 +1299,17 @@ public class Menu extends PBase {
 			nbutton.setTextColor(Color.WHITE);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	private void actualizaVersion() {
+		try {
+			Intent intent = this.getPackageManager().getLaunchIntentForPackage("com.dts.mposupd");
+			intent.putExtra("filename","road.apk");
+			this.startActivity(intent);
+		} catch (Exception e) {
+			msgbox("No está instalada la aplicación para actualización de versiones, por favor informe a Soporte.");
 		}
 
 	}
@@ -1504,6 +1517,33 @@ public class Menu extends PBase {
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					startActivity(new Intent(Menu.this, Clientes.class));
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
+	}
+
+	private void msgAskActualizarVersion() {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage("¿Está seguro de actualizar la versión de la aplicación?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					actualizaVersion();
 				}
 			});
 

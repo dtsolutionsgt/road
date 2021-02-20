@@ -75,7 +75,10 @@ public class ComWSSend extends PBase {
     private void initSession() {
         Cursor dt;
 
-        if (!getWSURL()) return;
+        if (!getWSURL()) {
+            finish();
+            return;
+        }
 
         try {
             pcount=0;

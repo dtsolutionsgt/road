@@ -524,7 +524,10 @@ public class PedidoRes extends PBase {
 	}
 
 	private String getCodigoSAP(String vDireccion){
-        String vSQL = "", vCodigoSAP = vDireccion;
+
+        String vSQL = "";
+        String vCodigoSAP = cliid;
+
 		Cursor DT;
 
 		try {

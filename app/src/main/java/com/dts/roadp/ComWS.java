@@ -932,8 +932,8 @@ public class ComWS extends PBase {
 			try{
 				//#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
 				View view = this.getCurrentFocus();
-				view.clearFocus();
 				if (view != null) {
+					view.clearFocus();
 					keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
 				}
 			}catch (Exception e){
@@ -1298,6 +1298,14 @@ public class ComWS extends PBase {
 			if (nombretabla.contains("P_IMPRESORA")){
 				callMethod("getInsImpresora");
 				xr=getXMLRegionSingle("getInsImpresoraResult");
+			}else if (nombretabla.contains("checkLicenceRuta")){
+				callMethod("checkLicenceRuta", "Ruta",ruta);
+				xr=getXMLRegionSingle("checkLicenceRutaResult");
+				licResultRuta=(Integer) getSingle(xr,"checkLicenceRutaResult",Integer.class);
+			}else if (nombretabla.contains("checkLicence")){
+				callMethod("checkLicence","Serial",licSerial);
+				xr=getXMLRegionSingle("checkLicenceResult");
+				licResult=(Integer) getSingle(xr,"checkLicenceResult",Integer.class);
 			}else if (nombretabla.contains("commitSQL")){
 				callMethod("Commit", "SQL", value);
 				xr=getXMLRegionSingle("CommitResponse");
@@ -1446,6 +1454,34 @@ public class ComWS extends PBase {
 			throw new Exception("XMLObject nodeToString : "+te.getMessage());
 		}
 		return sw.toString();
+	}
+
+	public Object getSingle( String body, String name, Class<?> cl)  throws Exception {
+
+		int start = body.indexOf("<" + name + ">");
+		if (start>-1)  start += name.length() + 2;else start=0;//with <and > char
+		int end = body.indexOf("</" + name + ">");
+		if (end == -1) body = "";else body = body.substring(start, end);
+
+		String gname = cl.getName();
+
+		if (cl.getName().toLowerCase().contains("string")) {
+			return body;
+		}
+		if (cl.getName().toLowerCase().contains("double")) {
+			if (body.isEmpty()) return 0; else return
+					Double.parseDouble(body);
+		}
+		if (cl.getName().toLowerCase().contains("int")) {
+			if (body.isEmpty()) return 0; else return
+					Integer.parseInt(body);
+		}
+
+		if (cl.getName().toLowerCase().contains("boolean")) {
+			return Boolean.parseBoolean(body);
+		}
+
+		return null;
 	}
 
 	public void callMethod(String methodName, Object... args) throws Exception {
@@ -1980,7 +2016,7 @@ public class ComWS extends PBase {
 
 	//region WS Recepcion Methods
 
-	private boolean getData() {
+	private boolean getDataOriginal() {
 		Cursor DT;
 		BufferedWriter writer = null;
 		FileWriter wfile;
@@ -2256,6 +2292,67 @@ public class ComWS extends PBase {
 
 			return false;
 
+		}
+
+	}
+
+	private boolean getData() {
+		Cursor DT;
+		BufferedWriter writer = null;
+		FileWriter wfile;
+		int rc, scomp, prn, jj;
+		int ejecutarhh = 0;
+		String s, val = "";
+
+		try {
+
+			String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
+			wfile = new FileWriter(fname, false);
+			writer = new BufferedWriter(wfile);
+
+			db.execSQL("DELETE FROM P_LIQUIDACION");
+
+			sql = "SELECT VALOR FROM P_PARAMEXT WHERE ID=2";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
+				val = DT.getString(0);
+			} else {
+				val = "N";
+			}
+
+			DT.close();
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			val = "N";
+		}
+
+		if (val.equalsIgnoreCase("S")) gl.peStockItf = true;
+		else gl.peStockItf = false;
+
+		listItems.clear();
+		scomp = 0;idbg = "";stockflag = 0;ftmsg = "";ftflag = false;rrs="...";
+
+		try {
+
+		    /* temporalmente deshabilitado, cuando va a funcionar carga de todas las tablas, habilitar otra vez
+			if (!AddTable("P_PARAMEXT")) return false;
+			procesaParamsExt();
+
+			listItems.clear();
+			if (!AddTable("P_RUTA")) return false;
+			procesaRuta();
+            */
+
+
+			ferr = "";
+			return true;
+		} catch (Exception e) {
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(),idbg, fstr);
+			return false;
 		}
 
 	}
@@ -2714,7 +2811,8 @@ public class ComWS extends PBase {
 			wsRtask.onProgressUpdate();
 			SQL = getTableSQL(TN);
 
-			if (fillTable(SQL, "DELETE FROM " + TN) == 1) {
+			//if (fillTable(SQL, "DELETE FROM " + TN) == 1) {
+			if (fillTable2(SQL, "DELETE FROM " + TN) == 1) {
 				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " ok ";
 				idbg = idbg + SQL + "#" + "PASS OK";
 				return true;
@@ -3554,7 +3652,7 @@ public class ComWS extends PBase {
 	//endregion
 
 	//region WS Recepcion Handling Methods
-
+/*
 	public void wsExecute() {
 
 		running = 1;
@@ -3633,6 +3731,90 @@ public class ComWS extends PBase {
 		}
 
 		if (!validaLicencia()) restartApp();
+
+	}
+*/
+
+	public void wsExecute() {
+		running = 1;
+		fstr = "No connect";
+		scon = 0;
+
+		try {
+			if (getTest() == 1) {
+				scon = 1;
+			} else {
+				URL = URL_Remota;
+				if (getTest() == 1) scon = 1;
+			}
+
+			idbg = idbg + sstr;
+
+			if (scon == 1) {
+				fstr = "Sync OK";
+				if (!getData()) fstr = "Recepcion incompleta : " + fstr;
+			} else {
+				fstr = "No se puede conectar al web service : " + sstr;
+			}
+		} catch (Exception e) {
+			scon = 0;
+			fstr = "Error importando los datos: " + fstr;
+			Log.d("E", fstr + " " + sstr);
+		}
+
+	}
+
+	public void wsFinished() {
+
+		barInfo.setVisibility(View.INVISIBLE);
+		lblParam.setVisibility(View.INVISIBLE);
+		running = 0;
+
+		try {
+			if (fstr.equalsIgnoreCase("Sync OK")) {
+
+				cargaTablas();
+
+			    /*
+				lblInfo.setText(" ");
+				s = "Recepción completa.";
+				if (stockflag == 1) s = s + "\nSe actualizó inventario.";
+
+				clsAppM.estandartInventario();
+				validaDatos(true);
+
+				if (stockflag == 1) sendConfirm();
+
+				msgAskExit(s);
+
+			    */
+
+			} else {
+				lblInfo.setText(fstr);
+				mu.msgbox("Ocurrió error : \n" + fstr + " " + idbg + " (Registro: " + reccnt + ") ");
+				//mu.msgbox("::" + esql);
+				isbusy = 0;
+				barInfo.setVisibility(View.INVISIBLE);
+				addlog("Recepcion", fstr, idbg);
+				return;
+			}
+/*
+			pendientes = validaPendientes();
+			visibilidadBotones();
+
+			isbusy = 0;
+			comparaCorrel();
+
+			otrosParametros();
+
+			if (ftflag) msgbox(ftmsg);
+
+ */
+		} catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
+		//if (!validaLicencia()) restartApp();
 
 	}
 
@@ -3904,15 +4086,15 @@ public class ComWS extends PBase {
 					/*fillTableImpresora();
 					nombretabla = "";
 					break;*/
-				/*case 68:
+				case 69:
 					//licResult=checkLicence(licSerial);
-					//nombretabla = "";
+					nombretabla = "checkLicence";
 					break;
-				case 69:
+				case 70:
 					//licResultRuta=checkLicenceRuta(licRuta);
-					//nombretabla = "";
-					break;*/
-				case 69:
+					nombretabla = "checkLicenceRuta";
+					break;
+				case 71:
 					procesaDatos();
 					ejecutar = false;
 					break;

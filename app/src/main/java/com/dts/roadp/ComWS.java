@@ -88,6 +88,8 @@ public class ComWS extends PBase {
     private TextView lblUser,lblPassword,txtVersion;
     private EditText txtUser, txtPassword;
 
+	private static final String signomenorque = "<";
+
 	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
 	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs;
 	private String licSerial,licRuta,licSerialEnc,licRutaEnc,parImprID;
@@ -1620,9 +1622,7 @@ public class ComWS extends PBase {
 		return result;
 	}
 
-	/*
-
-	public int commitSQL() {
+	public int commitSQL_Sin_XML() {
 		int rc;
 		String s, ss;
 		//#CKFK 20190429 Creé esta variable para retornar si la comunicación fue correcta o no
@@ -1681,7 +1681,6 @@ public class ComWS extends PBase {
 
 		return vCommit;
 	}
-*/
 
 	public int commitSQL() {
 	int rc;
@@ -4294,7 +4293,7 @@ public class ComWS extends PBase {
 				}
 
 				if (scon==1) {
-					if (commitSQL() == 1) {
+					if (commitSQL_Sin_XML() == 1) {
 						errflag=false;
 						return true;
 					} else {
@@ -4478,7 +4477,7 @@ public class ComWS extends PBase {
 							"AND CORELULT<" + ccorel);
 
 					if (envioparcial && !esEnvioManual) {
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 							sql = "UPDATE D_FACTURA SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
 							pc += 1;
@@ -4576,7 +4575,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_BONIFFALT", "WHERE COREL='" + cor + "'");
 
 					if (envioparcial && !esEnvioManual) {
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 							sql = "UPDATE D_PEDIDO SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
 							Toast.makeText(this, "Envio correcto", Toast.LENGTH_SHORT).show();
@@ -4658,11 +4657,11 @@ public class ComWS extends PBase {
 					dbld.insert("D_COBROD_SR", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_COBROP", "WHERE COREL='" + cor + "'");
 
-					dbld.add("UPDATE P_CORRELREC SET Actual=" + corult + "  WHERE RUTA='" + fruta + "' " +
-							"AND Actual<"+corult);
+					dbld.add(" UPDATE P_CORRELREC SET Actual=" + corult +
+							 " WHERE RUTA='" + fruta + "' AND Actual<"+corult);
 
 					if (envioparcial && !esEnvioManual){
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 							sql = "UPDATE D_COBRO SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
 							pc += 1;
@@ -4743,7 +4742,7 @@ public class ComWS extends PBase {
 							"AND ACTUAL<" + ccorel);
 
 					if (envioparcial && !esEnvioManual) {
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 							sql = "UPDATE D_NOTACRED SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
 							pc += 1;
@@ -4818,7 +4817,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_NOTACRED_PP", "WHERE COREL='" + cor + "'");
 
 					if (envioparcial && !esEnvioManual) {
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 							sql = "UPDATE D_NOTACRED_PP SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
 							pc += 1;
@@ -4893,7 +4892,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_CXCD", "WHERE COREL='" + cor + "'");
 
 					if (envioparcial && !esEnvioManual) {
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 							sql = "UPDATE D_CXC SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
 							pc += 1;
@@ -4981,7 +4980,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_DEPOSD", "WHERE COREL='" + cor + "'");
 
 					if (envioparcial && !esEnvioManual) {
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 							sql = "UPDATE D_DEPOS SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
 							pc += 1;
@@ -5095,7 +5094,7 @@ public class ComWS extends PBase {
 					pc += 1;
 
 					if (envioparcial && !esEnvioManual) {
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 							sql = "UPDATE D_MOV SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
 
@@ -5177,7 +5176,7 @@ public class ComWS extends PBase {
 					}
 
 					if (envioparcial && !esEnvioManual) {
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 
 							sql = "UPDATE D_CLINUEVO SET STATCOM='S' WHERE CODIGO='" + cor + "'";
 							db.execSQL(sql);
@@ -5247,7 +5246,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_ATENCION", "WHERE (RUTA='" + cor + "') AND (FECHA=" + fecha + ") AND (HORALLEG='" + hora + "') ");
 
 					if (envioparcial && !esEnvioManual) {
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 							sql = "UPDATE D_ATENCION SET STATCOM='S' WHERE (RUTA='" + cor + "') AND (FECHA=" + fecha + ") AND (HORALLEG='" + hora + "') ";
 							db.execSQL(sql);
 						} else {
@@ -5306,7 +5305,7 @@ public class ComWS extends PBase {
 					dbld.add(ss);
 
 					if (envioparcial && !esEnvioManual) {
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 							sql = "UPDATE D_CLICOORD SET STATCOM='S' WHERE (CODIGO='" + cod + "') AND (STAMP=" + stp + ") ";
 							db.execSQL(sql);
 						} else {
@@ -5368,7 +5367,7 @@ public class ComWS extends PBase {
 					dbld.add(ss);
 
 					if (envioparcial && !esEnvioManual) {
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 							sql = "UPDATE D_MODIFICACIONES SET STATCOM='S' WHERE (ruta='" + ruta + "') AND (fecha='" + fechaM + "') ";
 							db.execSQL(sql);
 						} else {
@@ -5434,7 +5433,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_SOLICINVD", "WHERE COREL='" + cor + "'");
 
 					if (envioparcial && !esEnvioManual) {
-						if (commitSQL() == 1) {
+						if (commitSQL_Sin_XML() == 1) {
 							sql = "UPDATE D_SOLICINV SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
 							pc += 1;
@@ -5493,7 +5492,7 @@ public class ComWS extends PBase {
 			dbld.insert("D_REPFINDIA", "WHERE (LINEA>=0)");
 
 			if (envioparcial && !esEnvioManual) {
-				if (commitSQL() == 1) {
+				if (commitSQL_Sin_XML() == 1) {
 					pc = 1;
 				} else {
 					errflag = true;
@@ -5555,7 +5554,7 @@ public class ComWS extends PBase {
                     dbld.add(ss);
 
                     if (envioparcial && !esEnvioManual) {
-                        if (commitSQL() == 1) {
+                        if (commitSQL_Sin_XML() == 1) {
                             sql = "UPDATE D_RATING SET STATCOM='S' WHERE IDRATING='" + id + "'";
                             db.execSQL(sql);
                         }else{
@@ -5610,7 +5609,7 @@ public class ComWS extends PBase {
 			dbld.add(ss);
 
 			if (envioparcial && !esEnvioManual) {
-				if (commitSQL() == 0) {
+				if (commitSQL_Sin_XML() == 0) {
 					fterr += "\n" + sstr;
 					errflag = true;
 				}
@@ -5642,7 +5641,7 @@ public class ComWS extends PBase {
 			dbld.add(ss);
 
 			if (envioparcial && !esEnvioManual) {
-				if (commitSQL() == 0) {
+				if (commitSQL_Sin_XML() == 0) {
 					fterr += "\n" + sstr;
 					errflag = true;
 				}
@@ -6419,7 +6418,7 @@ public class ComWS extends PBase {
                     TieneCobros = (clsAppM.getDocCountTipo("Cobros",true)>0?true:false);
                     TieneDevol = (clsAppM.getDocCountTipo("Devoluciones",true)>0?true:false);
                     YaComunico=(claseFindia.getComunicacion() == 2?true:false);
-					TieneNCPP=(clsAppM.getDocCountTipo("NotaCredPP",false)>0?true:false);
+					TieneNCPP=(clsAppM.getDocCountTipo("NotaCredPP",true)>0?true:false);
                     TieneInventario=(clsAppM.getDocCountTipo("Inventario",true)>0?true:false);
                 }
 

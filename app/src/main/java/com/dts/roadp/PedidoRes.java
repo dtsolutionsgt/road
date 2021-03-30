@@ -639,7 +639,7 @@ public class PedidoRes extends PBase {
 		Cursor DT;
 		
 		spname.clear();
-			
+		/*
 		try {
 			sql="SELECT DIRECCION FROM P_CLIENTE WHERE CODIGO='"+cliid+"'";
            	DT=Con.OpenDT(sql);
@@ -650,7 +650,7 @@ public class PedidoRes extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			spname.add("");txtDir.setText("");
 			mu.msgbox( e.getMessage());
-	    }		
+	    }		*/
 		
 		
 		try {

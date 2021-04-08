@@ -358,12 +358,12 @@ public class ComWS extends PBase {
 				return;
 			}
 
-			/*
-			if (!validaLicencia()) {
-				mu.msgbox("Licencia inválida!");
-				return;
+			if (!gl.debug) {
+				if (!validaLicencia()) {
+					mu.msgbox("Licencia inválida!");
+					return;
+				}
 			}
-			 */
 
 			if (gl.banderafindia) {
 					if (!puedeComunicar()) {
@@ -402,12 +402,14 @@ public class ComWS extends PBase {
                 return;
             }
 
-            if (!validaLicencia()) {
-                mu.msgbox("Licencia inválida!");
-                return;
-            }
+			if (!gl.debug) {
+				if (!validaLicencia()) {
+					mu.msgbox("Licencia inválida!");
+					return;
+				}
+			}
 
-            if (gl.banderafindia) {
+			if (gl.banderafindia) {
                 if (!puedeComunicar()) {
                     mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
                     return;

@@ -1370,6 +1370,7 @@ public class ComWS extends PBase {
 						ss=sitems[i];
 						ss=ss.replace("<string>","");
 						str=ss.replace("</string>","");
+						str=str.replace("&amp;", "&");
 					} catch (Exception e) {
 						str="";
 					}
@@ -1564,6 +1565,7 @@ public class ComWS extends PBase {
 	private String buildArgs(Object... args) throws IllegalArgumentException, IllegalAccessException    {
 		String result = "";
 		String argName = "";
+		String valor = "";
 
 		for (int i = 0; i < args.length; i++)   {
 			if (i % 2 == 0) {
@@ -1571,6 +1573,7 @@ public class ComWS extends PBase {
 			} else {
 				result += "<" + argName + ">";
 				argstr = result;
+
 				result += buildArgValue(args[i]);
 				argstr = result;
 				result += "</" + argName + ">";

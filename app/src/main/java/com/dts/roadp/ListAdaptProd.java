@@ -16,7 +16,8 @@ import android.widget.TextView;
 public class ListAdaptProd extends BaseAdapter {
 	
 	private static ArrayList<clsCD> items;
-		
+
+
 	private int selectedIndex;
 	
 	private LayoutInflater l_Inflater;

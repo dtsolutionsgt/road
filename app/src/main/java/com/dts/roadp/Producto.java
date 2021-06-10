@@ -40,7 +40,7 @@ public class Producto extends PBase {
 	private int act,prodtipo;
 	private double disp_und;
 	private double disp_peso;
-	boolean ordPorNombre;
+	boolean ordPorNombre,modotol;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +59,8 @@ public class Producto extends PBase {
 		gl.prodtipo=0;
 		this.setTitle("Producto");
 		if (prodtipo==1) this.setTitle("Producto con existencia");
+
+        modotol=gl.peModal.equalsIgnoreCase("TOL");
 
         app = new AppMethods(this, gl, Con, db);
 
@@ -229,7 +231,6 @@ public class Producto extends PBase {
 
     }
 
-
     // Main
 	
 	private void listItems() {
@@ -252,11 +253,28 @@ public class Producto extends PBase {
 			switch (prodtipo) {
 
 				case 0: // Preventa
-					sql="SELECT CODIGO,DESCCORTA,UNIDBAS FROM P_PRODUCTO WHERE 1=1 ";
-					if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
-					if (vF.length()>0) {sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
 
-					if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
+                    if (modotol) { // La empresa es Toledano
+
+                        sql="SELECT DISTINCT P_PRODUCTO.CODIGO, P_PRODUCTO.DESCCORTA, P_PRODPRECIO.UNIDADMEDIDA " +
+                                "FROM P_PRODUCTO INNER JOIN	P_STOCK_PV ON P_STOCK_PV.CODIGO=P_PRODUCTO.CODIGO INNER JOIN " +
+                                "P_PRODPRECIO ON (P_STOCK_PV.CODIGO=P_PRODPRECIO.CODIGO)  " +
+                                "WHERE (P_STOCK_PV.CANT > 0) AND (P_PRODPRECIO.NIVEL = " + gl.nivel +") AND (P_PRODUCTO.ES_VENDIBLE=1) ";
+                        if (!mu.emptystr(famid)){
+                            if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
+                        }
+                        if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO='" + vF + "')) ";
+                        if (ordPorNombre) sql += "ORDER BY P_PRODUCTO.DESCCORTA"; else sql += "ORDER BY P_PRODUCTO.CODIGO";
+
+                    } else {
+
+                        sql="SELECT CODIGO,DESCCORTA,UNIDBAS FROM P_PRODUCTO WHERE 1=1 ";
+                        if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
+                        if (vF.length()>0) sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";
+                        if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
+
+                    }
+
 					break;
 					
 				case 1:  // Venta

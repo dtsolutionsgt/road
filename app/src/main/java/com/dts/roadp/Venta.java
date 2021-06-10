@@ -59,7 +59,7 @@ public class Venta extends PBase {
 
 	private String emp,cliid,rutatipo,prodid,um,tiposcan;
 	private int nivel,dweek,clidia,scanc=0;
-	private boolean sinimp,rutapos,softscanexist,porpeso,usarscan,contrans;
+	private boolean sinimp,rutapos,softscanexist,porpeso,usarscan,contrans,pedido;
 
 	private AppMethods app;
 
@@ -111,6 +111,8 @@ public class Venta extends PBase {
 			imgroad.setImageResource(R.drawable.pedidos_3_gray);
 		}
 		if (rutapos) imgroad.setImageResource(R.drawable.pedidos_3_gray);
+
+        pedido=rutatipo.equalsIgnoreCase("P");
 
 		contrans=gl.pTransBarra;
 
@@ -581,11 +583,15 @@ public class Venta extends PBase {
 	private void setCant(){
 		try{
 			browse=2;
-
 			gl.prod=prodid;
 			gl.precprev=0;
-			Intent intent = new Intent(this,ProdCant.class);
-			startActivity(intent);
+
+            if (pedido) {
+                startActivity(new Intent(this,ProdCantPrev.class));
+            } else {
+                startActivity(new Intent(this,ProdCant.class));
+            }
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

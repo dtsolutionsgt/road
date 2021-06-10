@@ -53,7 +53,7 @@ public class ListAdaptProd extends BaseAdapter {
 	
 		if (convertView == null) {
 			
-			convertView = l_Inflater.inflate(R.layout.activity_list_view_cd, null);
+			convertView = l_Inflater.inflate(R.layout.activity_list_view_cd2, null);
 			holder = new ViewHolder();
 			
 			holder.lblCod  = (TextView) convertView.findViewById(R.id.lblETipo);

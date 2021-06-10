@@ -2200,6 +2200,30 @@ public class BaseDatosScript {
                     ");";
             database.execSQL(vSQL);
 
+
+            vSQL="CREATE TABLE [P_STOCK_PV] ("+
+                    "RUTA TEXT NOT NULL,"+
+                    "CODIGO TEXT NOT NULL,"+
+                    "CANT REAL NOT NULL,"+
+                    "PESO REAL NOT NULL,"+
+                    "CANT_SOL REAL NOT NULL,"+
+                    "PESO_SOL REAL NOT NULL,"+
+                    "UNIDADMEDIDA TEXT NOT NULL,"+
+                    "DOCUMENTO TEXT NOT NULL,"+
+                    "FECHA INTEGER NOT NULL,"+
+                    "ANULADO INTEGER NOT NULL,"+
+                    "CENTRO TEXT NOT NULL,"+
+                    "ESTADO TEXT NOT NULL,"+
+                    "ENVIADO INTEGER NOT NULL,"+
+                    "PRIMARY KEY ([RUTA],[CODIGO],[UNIDADMEDIDA],[DOCUMENTO])"+
+                    ");";
+            database.execSQL(vSQL);
+
+            vSQL="CREATE INDEX P_stock_pv_idx1 ON P_stock_pv(FECHA)";database.execSQL(vSQL);
+            vSQL="CREATE INDEX P_stock_pv_idx2 ON P_stock_pv(ANULADO)";database.execSQL(vSQL);
+            vSQL="CREATE INDEX P_stock_pv_idx3 ON P_stock_pv(ESTADO)";database.execSQL(vSQL);
+            vSQL="CREATE INDEX P_stock_pv_idx4 ON P_stock_pv(ENVIADO)";database.execSQL(vSQL);
+
             return 1;
 
 		} catch (SQLiteException e) {

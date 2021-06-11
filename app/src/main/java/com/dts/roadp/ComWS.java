@@ -1410,6 +1410,132 @@ public class ComWS extends PBase {
 			return 0;
 		}
 	}
+/*
+
+	public int fillTable2(String value, String delcmd) {
+		int rc,retFillTable = 0;
+		String str, ss, tabla;
+		String[] sitems;
+
+		String xr;
+
+		try {
+			sstr = "OK";
+
+			if (nombretabla.contains("P_IMPRESORA")){
+				callMethod("getInsImpresora");
+				xr=getXMLRegionSingle("getInsImpresoraResult");
+			}else if (nombretabla.contains("checkLicenceRuta")){
+				callMethod("checkLicenceRuta", "Ruta",ruta);
+				xr=getXMLRegionSingle("checkLicenceRutaResult");
+				licResultRuta=(Integer) getSingle(xr,"checkLicenceRutaResult",Integer.class);
+			}else if (nombretabla.contains("checkLicence")){
+				callMethod("checkLicence","Serial",licSerial);
+				xr=getXMLRegionSingle("checkLicenceResult");
+				licResult=(Integer) getSingle(xr,"checkLicenceResult",Integer.class);
+			}else if (nombretabla.contains("commitSQL")){
+				callMethod("Commit", "SQL", value);
+				xr=getXMLRegionSingle("CommitResponse");
+			}else{
+				callMethod("getIns", "SQL", value);
+				xr=getXMLRegionSingle("getInsResult");
+			}
+
+			sitems=xr.split("\n");
+			rc=sitems.length;
+
+			s = "";
+			if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK")) {
+				if (rc == 1) stockflag = 0; else stockflag = 1;
+			}
+
+			if (!delcmd.contains("commitSQL")){
+				tabla=delcmd.substring(12);
+				switch (tabla){
+
+					case "P_RUTA":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("La ruta ingresada no es válida, ruta: " + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+
+					case "P_CLIENTE":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+
+					case "P_PRODUCTO":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+					case "P_PRODPRECIO":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+					case "P_COREL":
+						if (rc==1 && gl.rutatipo.equals("V")){
+							borraDatos();
+							throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+				}
+
+				for (int i=1; i < rc-2; i++) {
+
+					try {
+						ss=sitems[i];
+						ss=ss.replace("<string>","");
+						str=ss.replace("</string>","");
+						str=str.replace("&amp;", "&");
+					} catch (Exception e) {
+						str="";
+					}
+
+					if (i == 1) {
+
+						idbg = idbg + " ret " + str + "  ";
+
+						if (str.equalsIgnoreCase("#")) {
+							listItems.add(delcmd);
+						} else {
+							idbg = idbg + str;
+							ftmsg = ftmsg + "\n" + str;
+							ftflag = true;
+							sstr = str;
+							return 0;
+						}
+					} else {
+						try {
+							sql = str;
+							listItems.add(sql);
+							sstr = str;
+						} catch (Exception e) {
+							addlog(new Object() {
+							}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+							sstr = e.getMessage();
+						}
+					}
+				}
+			}
+
+			retFillTable= 1;
+
+		} catch (Exception e) {
+			sstr = e.getMessage();
+			idbg = idbg + " ERR " + e.getMessage();
+			retFillTable= 0;
+		}
+
+		return  retFillTable;
+	}
+*/
 
 	public int commitSQL() {
 		int rc;

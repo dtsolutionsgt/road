@@ -109,6 +109,14 @@ public class ComWS extends PBase {
 
 	protected PowerManager.WakeLock wakelock;
 
+	private HttpTransportSE transport;
+	private XMLObject xobj;
+
+	//Web service adicional
+
+	private String nombretabla;
+	private int indicetabla;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -1410,7 +1418,221 @@ public class ComWS extends PBase {
 			return 0;
 		}
 	}
-/*
+
+	public String getXMLRegionSingle(String nodename) throws Exception {
+		String st,ss,sv,en,sxml;
+		Node xmlnode;
+
+		try {
+
+			InputStream istream = new ByteArrayInputStream( xmlresult.getBytes() );
+			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(istream);
+
+			Element root=doc.getDocumentElement();
+
+			NodeList children=root.getChildNodes();
+			Node bodyroot=children.item(0);
+			NodeList body=bodyroot.getChildNodes();
+			Node responseroot=body.item(0);
+			NodeList response=responseroot.getChildNodes();
+
+			ss="";
+			for(int i =0;i<response.getLength();i++) {
+				ss+=response.item(i).getNodeName()+",\n";
+
+				if (response.item(i).getNodeName().equalsIgnoreCase(nodename)) {
+					xmlnode=response.item(i);
+					sxml=nodeToString(xmlnode);
+					return sxml;
+				}
+			}
+		} catch (Exception e) {
+			throw new Exception(" XMLObject getXMLRegion : "+ e.getMessage());
+		}
+		return "";
+	}
+
+	private String nodeToString(Node node)  throws Exception {
+		StringWriter sw = new StringWriter();
+		try {
+			Transformer t = TransformerFactory.newInstance().newTransformer();
+			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			t.setOutputProperty(OutputKeys.INDENT, "yes");
+			t.transform(new DOMSource(node), new StreamResult(sw));
+		} catch (Exception te) {
+			throw new Exception("XMLObject nodeToString : "+te.getMessage());
+		}
+		return sw.toString();
+	}
+
+	public Object getSingle( String body, String name, Class<?> cl)  throws Exception {
+
+		int start = body.indexOf("<" + name + ">");
+		if (start>-1)  start += name.length() + 2;else start=0;//with <and > char
+		int end = body.indexOf("</" + name + ">");
+		if (end == -1) body = "";else body = body.substring(start, end);
+
+		String gname = cl.getName();
+
+		if (cl.getName().toLowerCase().contains("string")) {
+			return body;
+		}
+		if (cl.getName().toLowerCase().contains("double")) {
+			if (body.isEmpty()) return 0; else return
+					Double.parseDouble(body);
+		}
+		if (cl.getName().toLowerCase().contains("int")) {
+			if (body.isEmpty()) return 0; else return
+					Integer.parseInt(body);
+		}
+
+		if (cl.getName().toLowerCase().contains("boolean")) {
+			return Boolean.parseBoolean(body);
+		}
+
+		return null;
+	}
+
+
+	public void callMethod(String methodName, Object... args) throws Exception {
+		int mTimeOut=5000;
+		String mResult,line="";
+		URL mUrl = new URL(URL);
+
+		try{
+			mResult = "";xmlresult="";
+
+			URLConnection conn = mUrl.openConnection();
+			conn.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
+			conn.addRequestProperty("SOAPAction", "http://tempuri.org/" + methodName);
+
+			//#EJC 20200601: Set Timeout
+			conn.setConnectTimeout(mTimeOut);
+			conn.setReadTimeout(mTimeOut);
+
+			conn.setDoOutput(true);
+
+			OutputStream ostream = conn.getOutputStream();
+
+			OutputStreamWriter wr = new OutputStreamWriter(ostream);
+
+			String body = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+					"<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:" +
+					"xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:" +
+					"soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+					"<soap:Body>" +
+					"<" + methodName + " xmlns=\"http://tempuri.org/\">";
+
+			body += buildArgs(args);
+			body += "</" + methodName + ">" +
+					"</soap:Body>" +
+					"</soap:Envelope>";
+			wr.write(body);
+			wr.flush();
+
+			int responsecode = ((HttpURLConnection) conn).getResponseCode();
+
+			//#EJC20200702:Capturar excepcion de SQL (No se sabe el error pero sabemos que no se proceso)
+			if (responsecode==500) {
+				throw new Exception("Error 500: Esto es poco usual pero algún problema ocurrió del lado del motor de BD al ejecutar sentencia SQL: \n" +
+						"\n" + args[1].toString());
+			}else if (responsecode!=299 && responsecode!=404) {
+
+				BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				while ((line = rd.readLine()) != null) mResult += line;
+				rd.close();rd.close();
+
+				mResult=mResult.replace("ñ","n");
+				xmlresult=mResult;
+
+			} if (responsecode==299) {
+
+				BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				while ((line = rd.readLine()) != null) mResult += line;
+				rd.close();rd.close();
+
+				mResult=mResult.replace("ñ","n");
+				xmlresult=mResult;
+
+				throw new Exception("Error al procesar la solicitud :\n " );
+
+			} if (responsecode==404) {
+				throw new Exception("Error 404: No se obtuvo acceso a: \n" + mUrl.toURI() +
+						"\n" + "Verifique que el WS Existe y es accesible desde el explorador.");
+			}
+
+		} catch (Exception e) {
+			sstr=e.getMessage();
+			throw new Exception(sstr);
+		}
+	}
+
+	private String buildArgs(Object... args) throws IllegalArgumentException, IllegalAccessException    {
+		String result = "";
+		String argName = "";
+		String valor = "";
+
+		for (int i = 0; i < args.length; i++)   {
+			if (i % 2 == 0) {
+				argName = args[i].toString();
+			} else {
+				result += "<" + argName + ">";
+				argstr = result;
+
+				result += buildArgValue(args[i]);
+				argstr = result;
+				result += "</" + argName + ">";
+				argstr = result;
+			}
+		}
+		return result;
+	}
+
+	private String buildArgValue(Object obj) throws IllegalArgumentException, IllegalAccessException   {
+
+		Class<?> cl = null;
+
+		try  {
+			cl = obj.getClass();
+		} catch (Exception e) {
+			return "";
+		}
+
+		String result = "";
+
+		if (cl.isPrimitive()) return obj.toString();
+		if (cl.getName().contains("java.lang.")) return obj.toString();
+		if (cl.getName().equals("java.util.Date"))  {
+			DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+			return dfm.format((Date) obj);
+		}
+
+		if (cl.isArray())  {
+			String xmlName = cl.getName().substring(cl.getName().lastIndexOf(".") + 1);
+			xmlName = xmlName.replace(";", "");
+			Object[] arr = (Object[]) obj;
+
+			for (int i = 0; i < arr.length; i++) {
+				result += "<" + xmlName + ">";
+				result += buildArgValue(arr[i]);
+				result += "</" + xmlName + ">";
+			}
+
+			return result;
+		}
+
+		Field[] fields = cl.getDeclaredFields();
+
+		for (int i = 0; i < fields.length - 1; i++) {
+			result += "<" + fields[i].getName() + ">";
+			result += buildArgValue(fields[i].get(obj));
+			result += "</" + fields[i].getName() + ">";
+		}
+
+		return result;
+	}
 
 	public int fillTable2(String value, String delcmd) {
 		int rc,retFillTable = 0;
@@ -1535,7 +1757,6 @@ public class ComWS extends PBase {
 
 		return  retFillTable;
 	}
-*/
 
 	public int commitSQL() {
 		int rc;

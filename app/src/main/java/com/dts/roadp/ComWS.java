@@ -1289,6 +1289,7 @@ public class ComWS extends PBase {
 		}
 	}
 
+
 	public int fillTable2(String value, String delcmd) {
 		int rc,retFillTable = 0;
 		String str, ss, tabla;

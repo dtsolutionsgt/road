@@ -44,27 +44,36 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -73,10 +82,10 @@ import javax.xml.transform.stream.StreamResult;
 
 public class ComWS extends PBase {
 
-	private TextView lblInfo, lblParam, lblRec, lblEnv, lblExis, lblEnvM;
+	private TextView lblInfo, lblParam, lblRec, lblEnv, lblEnvM;
 	private ProgressBar barInfo;
 	private EditText txtRuta, txtWS, txtEmp;
-	private ImageView imgRec, imgEnv, imgExis, imgEnvM;
+	private ImageView imgRec, imgEnv, imgEnvM;
 	private RelativeLayout ralBack, relExist, relPrecio, relStock, relPedidos;
 	private TextView lblUser, lblPassword, txtVersion;
 	private EditText txtUser, txtPassword;
@@ -84,7 +93,7 @@ public class ComWS extends PBase {
 
 	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
 	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant, rrs;
-	private String licSerial, licRuta, licSerialEnc, licRutaEnc, parImprID;
+	private String licSerial, licRuta, licSerialEnc, licRutaEnc, parImprID,xmlresult;
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag, esEnvioManual = false;
 
 	private SQLiteDatabase dbT;

@@ -1784,60 +1784,28 @@ public class ComWS extends PBase {
 
 	public int commitSQL() {
 		int rc;
-		String s, ss;
+		String s, ss="";
 		//#CKFK 20190429 Creé esta variable para retornar si la comunicación fue correcta o no
 		//e hice modificaciones en la función para garantizar esta funcionalidad
-		int vCommit = 0;
+		int vCommit=0;
 
 		METHOD_NAME = "Commit";
 		sstr = "OK";
 
-		if (dbld.size() == 0) vCommit = 1;//return 1
+		if (dbld.size() == 0) vCommit =1;//return 1
 
 		s = "";
 		for (int i = 0; i < dbld.size(); i++) {
 			ss = dbld.items.get(i);
 			s = s + ss + "\n";
 		}
-
 		if (showprogress) {
 			fprog = "Enviando ...";
 			wsStask.onProgressUpdate();
 		}
 
-		try {
-
-			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
-			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-			envelope.dotNet = true;
-
-			PropertyInfo param = new PropertyInfo();
-			param.setType(String.class);
-			param.setName("SQL");
-			param.setValue(s);
-
-			request.addProperty(param);
-			envelope.setOutputSoapObject(request);
-
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
-			transport.call(NAMESPACE + METHOD_NAME, envelope);
-
-			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
-
-			s = response.toString();
-
-			sstr = "#";
-			if (s.equalsIgnoreCase("#")) vCommit = 1;// return 1;
-
-			sstr = s;
-			//return 0;
-
-		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-			sstr = e.getMessage();
-			vCommit = 0;
-		}
+		nombretabla = "commitSQL";
+		vCommit=fillTable2(s,"commitSQL");
 
 		return vCommit;
 	}

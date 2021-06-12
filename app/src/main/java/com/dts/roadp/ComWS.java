@@ -93,7 +93,7 @@ public class ComWS extends PBase {
 
 	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
 	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant, rrs;
-	private String licSerial, licRuta, licSerialEnc, licRutaEnc, parImprID,xmlresult;
+	private String licSerial, licRuta, licSerialEnc, licRutaEnc, parImprID;
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag, esEnvioManual = false;
 
 	private SQLiteDatabase dbT;
@@ -125,7 +125,7 @@ public class ComWS extends PBase {
 	private static String sstr, fstr, fprog, finf, ferr, fterr, idbg, dbg, ftmsg, esql, ffpos;
 	private int scon, running, pflag, stockflag, conflag;
 	private String ftext, slsync, senv, gEmpresa, ActRuta, mac, rootdir;
-	private String fsql, fsqli, fsqlf, strliqid;
+	private String fsql, fsqli, fsqlf, strliqid,argstr,xmlresult;
 	private boolean rutapos, ftflag, esvacio, liqid, cargasuper;
 
 	private final String NAMESPACE = "http://tempuri.org/";
@@ -2707,7 +2707,7 @@ public class ComWS extends PBase {
 			wsRtask.onProgressUpdate();
 			SQL = getTableSQL(TN);
 
-			if (fillTable(SQL, "DELETE FROM " + TN) == 1) {
+			if (fillTable2(SQL, "DELETE FROM " + TN) == 1) {
 				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " ok ";
 				idbg = idbg + SQL + "#" + "PASS OK";
 				return true;

@@ -1,3 +1,4 @@
+/*
 package com.dts.roadp;
 
 import android.app.AlertDialog;
@@ -7,6 +8,1242 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.DatabaseErrorHandler;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.PowerManager;
+import android.os.SystemClock;
+import android.text.InputType;
+import android.util.Log;
+import android.view.Display;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.zebra.sdk.util.internal.Base64;
+
+import org.apache.commons.lang.StringUtils;
+import org.ksoap2.HeaderProperty;
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+public class ComWS extends PBase {
+
+	private TextView lblInfo, lblParam, lblRec, lblEnv, lblExis,lblEnvM;
+	private ProgressBar barInfo;
+	private EditText txtRuta, txtWS, txtEmp;
+	private ImageView imgRec, imgEnv, imgExis,imgEnvM;
+	private RelativeLayout ralBack, relExist, relPrecio, relStock;
+	private TextView lblUser,lblPassword,txtVersion;
+	private EditText txtUser, txtPassword;
+
+	private static final String signomenorque = "<";
+
+	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
+	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs;
+	private String licSerial,licRuta,licSerialEnc,licRutaEnc,parImprID;
+	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag,esEnvioManual=false;
+
+	private SQLiteDatabase dbT;
+	private DatabaseErrorHandler er;
+	private BaseDatos ConT;
+	private BaseDatos.Insert insT;
+	private AppMethods clsAppM;
+
+	private ArrayList<String> listItems = new ArrayList<String>();
+	private ArrayList<String> results = new ArrayList<String>();
+
+	private ArrayList<clsClasses.clsEnvio> items = new ArrayList<clsClasses.clsEnvio>();
+	private ListAdaptEnvio adapter;
+
+	private clsDataBuilder dbld;
+	private clsLicence lic;
+	private clsFinDia claseFindia;
+	private DateUtils DU;
+	private String jsonWS,updCxC;
+	private CryptUtil cu=new CryptUtil();
+
+	protected PowerManager.WakeLock wakeLock;
+
+	// Web Service -
+
+	public AsyncCallRec wsRtask;
+	public AsyncCallSend wsStask;
+	public AsyncCallConfirm wsCtask;
+
+	private static String sstr, fstr, fprog, finf, ferr, fterr, idbg, dbg, ftmsg, esql, ffpos;
+	private int scon, running, pflag, stockflag, conflag;
+	private String ftext, slsync, senv, gEmpresa, ActRuta, mac,rootdir;
+	private String fsql, fsqli, fsqlf, strliqid,argstr,xmlresult;
+	private boolean rutapos, ftflag, esvacio, liqid;
+
+	private final String NAMESPACE = "http://tempuri.org/";
+	private String METHOD_NAME, URL, URL_Remota;
+
+	protected PowerManager.WakeLock wakelock;
+
+	private HttpTransportSE transport;
+	private XMLObject xobj;
+
+	//Web service adicional
+
+	private String nombretabla;
+	private int indicetabla;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_com_ws);
+
+		super.InitBase();
+		addlog("ComWS", "" + du.getActDateTime(), gl.vend);
+
+		System.setProperty("line.separator", "\r\n");
+		rootdir=Environment.getExternalStorageDirectory()+"/RoadFotos/";
+
+		dbld = new clsDataBuilder(this);
+		claseFindia = new clsFinDia(this);
+		clsAppM = new AppMethods(this, gl, Con, db);
+
+		lblInfo = (TextView) findViewById(R.id.lblETipo);
+		lblParam = (TextView) findViewById(R.id.lblProd);
+		txtVersion = (TextView) findViewById(R.id.txtVersion);
+		barInfo = (ProgressBar) findViewById(R.id.progressBar2);
+		txtRuta = (EditText) findViewById(R.id.txtRuta);
+		txtRuta.setEnabled(false);
+		txtWS = (EditText) findViewById(R.id.txtWS);
+		txtWS.setEnabled(false);
+		txtEmp = (EditText) findViewById(R.id.txtEmp);
+		txtEmp.setEnabled(false);
+
+		lblRec = (TextView) findViewById(R.id.btnRec);
+		lblEnv = (TextView) findViewById(R.id.btnSend);
+		lblEnvM = (TextView) findViewById(R.id.btnSenHand);
+
+		imgEnv = (ImageView) findViewById(R.id.imageView6);
+		imgEnvM = (ImageView) findViewById(R.id.imageView23);
+		imgRec = (ImageView) findViewById(R.id.imageView5);
+
+		ralBack = (RelativeLayout) findViewById(R.id.relwsmail);
+		relExist = (RelativeLayout) findViewById(R.id.relExist);
+		relPrecio = (RelativeLayout) findViewById(R.id.relPrecio);
+		relStock = (RelativeLayout) findViewById(R.id.relStock);
+
+		resizeButtons();
+
+		isbusy = 0;
+
+		lblInfo.setText("");
+		lblParam.setText("");
+		barInfo.setVisibility(View.INVISIBLE);
+
+		lblUser = new TextView(this,null);
+		lblPassword = new TextView(this,null);
+		//txtVersion=new TextView(this, null);
+
+		txtUser = new EditText(this,null);
+		txtPassword = new EditText(this,null);
+
+		txtVersion.setText(gl.parFechaVer);
+
+		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
+		if (gl.debug) {
+			if (mu.emptystr(txtRuta.getText().toString())) {
+				txtRuta.setText("1");
+				txtEmp.setText("009");
+				txtWS.setText("http://190.34.215.189/wsandr/wsandr.asmx");
+			}
+		}
+
+		if(gl.ruta.isEmpty()){
+			ruta = txtRuta.getText().toString();
+			gl.ruta=ruta;
+		}else {
+			ruta = gl.ruta;
+		}
+
+		if(gl.emp.isEmpty()){
+			gEmpresa = txtEmp.getText().toString();
+			gl.emp= gEmpresa;
+		}else {
+			gEmpresa = gl.emp;
+		}
+
+		ActRuta = ruta;
+		rutatipo = gl.rutatipog;
+		rutapos = gl.rutapos;
+
+		if (gl.tipo == 0) {
+			this.setTitle("Comunicación");
+		} else {
+			this.setTitle("Comunicación Local");
+		}
+
+		licSerial=gl.deviceId;
+		licRuta=ruta;
+
+		try {
+			licSerialEnc=cu.encrypt(licSerial);
+			licRutaEnc=cu.encrypt(licRuta);
+		} catch (Exception e) {
+			licSerialEnc="";
+			licRutaEnc="";
+		}
+
+		gl.isOnWifi = clsAppM.isOnWifi();
+
+		getWSURL();
+
+		xobj = new XMLObject();
+
+		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
+		if (gl.debug) {
+			if (mu.emptystr(txtRuta.getText().toString())) {
+				txtRuta.setText("1");
+				txtEmp.setText("009");
+			}
+
+			txtWS.setText("http://190.34.215.189/wsandr/wsandr.asmx");
+
+			//txtRuta.setText("8001-1");
+			//txtEmp.setText("03");
+			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
+		}
+
+
+
+		mac = getMac();
+		fsql = du.univfechasql(du.getActDate());
+		fsqli = du.univfechasql(du.ffecha00(du.getActDate())) + " 00:00:00";
+		fsqlf = du.univfechasql(du.ffecha24(du.getActDate())) + " 23:59:59";
+
+		parImprID="0";
+
+		lic = new clsLicence(this);
+
+		pendientes = validaPendientes();
+
+		envioparcial = gl.peEnvioParcial;
+
+		visibilidadBotones();
+
+		//if (gl.autocom==1) runSend();
+
+		//relExist.setVisibility(View.VISIBLE);
+
+		if (esvacio) txtWS.setEnabled(true);
+
+		setHandlers();
+
+		try {
+			final PowerManager pm = (PowerManager) getSystemService(this.POWER_SERVICE);
+			this.wakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "myapp:mywakelocktag");
+			this.wakeLock.acquire();
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"wakeLock");
+		}
+	}
+
+	//region Events
+
+	public void askRec(View view) {
+
+		if (isbusy == 1) {
+			toastcent("Por favor, espere que se termine la tarea actual.");
+			return;
+		}
+
+		if(gl.ruta.isEmpty()){
+			ruta = txtRuta.getText().toString();
+			gl.ruta=ruta;
+		}else {
+			ruta = gl.ruta;
+		}
+
+		licSerial=gl.deviceId;
+		licRuta=ruta;
+
+		try {
+			licSerialEnc=cu.encrypt(licSerial);
+			licRutaEnc=cu.encrypt(licRuta);
+		} catch (Exception e) {
+			licSerialEnc="";
+			licRutaEnc="";
+		}
+
+		//CKFK 20190222 Se agregó esta validación para no sobreescribir los datos si ya se importaron
+		if (!gl.modoadmin) {
+
+			if (gl.banderafindia) {
+
+				int fechaUltimoCierre;
+
+				fechaUltimoCierre = claseFindia.ultimoCierreFecha();
+
+				if ((du.getActDate() == fechaUltimoCierre) && ExistenDatos()) {
+					//claseFindia.
+					claseFindia.eliminarTablasD();
+				}
+
+			}
+
+			if (ExistenDatosSinEnviar()) {
+				BorraDatosAnteriores("¿Tiene facturas, pedidos, cobros, devoluciones o inventario, está seguro de borrar los datos?");
+			} else {
+				msgAskConfirmaRecibido();
+			}
+		} else {
+			msgAskConfirmaRecibido();
+		}
+
+	}
+
+	public void askSend(View view) {
+
+		try {
+			if (isbusy == 1) {
+				toastcent("Por favor, espere que se termine la tarea actual.");
+				return;
+			}
+
+			if (!gl.debug) {
+				if (!validaLicencia()) {
+					mu.msgbox("Licencia inválida!");
+					return;
+				}
+			}
+
+			if (gl.banderafindia) {
+				if (!puedeComunicar()) {
+					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+					return;
+				}
+			}
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Envio");
+			dialog.setMessage("¿Enviar datos?");
+
+			dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					runSend();
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", null);
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+
+	}
+
+	public void askSendManual(View view) {
+
+		try {
+			if (isbusy == 1) {
+				toastcent("Por favor, espere que se termine la tarea actual.");
+				return;
+			}
+
+			if (!gl.debug) {
+				if (!validaLicencia()) {
+					mu.msgbox("Licencia inválida!");
+					return;
+				}
+			}
+
+			if (gl.banderafindia) {
+				if (!puedeComunicar()) {
+					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+					return;
+				}
+			}
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Envio");
+			dialog.setMessage("¿Va a realizar la COMUNICACIÓN MANUAL, está seguro?");
+
+			dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					DatosSupervisor();
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", null);
+
+			dialog.show();
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+
+	}
+
+	public void askSendContinue() {
+
+		try {
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Envio");
+			dialog.setMessage("La COMUNICACIÓN MANUAL no envía los datos directamente a liquidación,¿está seguro?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if (sendDataManual()){
+						askOk();
+					}
+				}
+			});
+
+			dialog.setNegativeButton("No", null);
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+
+	}
+
+	public void askSendCorrect() {
+
+		try {
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Envio");
+			dialog.setMessage("¿Comunicación correcta?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					askOkCom();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					askIncorrect();
+				}
+			});
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+	}
+
+	public void askIncorrect() {
+
+		try {
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Envio");
+			dialog.setMessage("¿Está seguro de que la comunicacion NO fue correcta?");
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					return;
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					Eliminatablas();
+				}
+			});
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+	}
+
+	private void askOk() {
+
+		try {
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Envio");//	alert.setMessage("Serial");
+
+			final TextView input = new TextView(this);
+			alert.setView(input);
+
+			input.setText("Archivo de datos creado conecte el dispositivo al ordenador");
+			input.requestFocus();
+
+			alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					askSendCorrect();
+				}
+			});
+
+			alert.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+
+	}
+
+	private void askOkCom() {
+
+		try {
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Envio");//	alert.setMessage("Serial");
+
+			final TextView input = new TextView(this);
+			alert.setView(input);
+
+			input.setText("Está seguro de que la comunicación fue correcta");
+			input.requestFocus();
+
+			alert.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					Eliminatablas();
+				}
+			});
+
+			alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					return;
+				}
+			});
+
+			alert.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+
+	}
+
+	private void DatosSupervisor() {
+
+		try{
+
+			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Envío");
+
+			final LinearLayout layout   = new LinearLayout(this);
+			layout.setOrientation(LinearLayout.VERTICAL);
+
+			if(lblUser.getParent()!= null){
+				((ViewGroup) lblUser.getParent()).removeView(lblUser);
+			}
+
+			if(lblPassword.getParent()!= null){
+				((ViewGroup) lblPassword.getParent()).removeView(lblPassword);
+			}
+
+			if(txtUser.getParent()!= null){
+				((ViewGroup) txtUser.getParent()).removeView(txtUser);
+			}
+
+			if(txtPassword.getParent()!= null){
+				((ViewGroup) txtPassword.getParent()).removeView(txtPassword);
+			}
+
+			lblUser.setText("Usuario: ");
+			lblPassword.setText("Contraseña: ");
+			txtPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+			txtUser.setText("");
+			txtPassword.setText("");
+
+			layout.addView(lblUser);
+			layout.addView(txtUser);
+			layout.addView(lblPassword);
+			layout.addView(txtPassword);
+
+			alert.setView(layout);
+
+			alert.setCancelable(false);
+			alert.create();
+
+			alert.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+
+					String usr, pwd;
+					boolean dtCorrectos;
+
+					usr = txtUser.getText().toString().trim();
+					pwd = txtPassword.getText().toString().trim();
+
+					if (mu.emptystr(usr)) {
+						toast("Usuario incorrecto.");
+						return;
+					}
+
+					if (mu.emptystr(pwd)) {
+						toast("Contraseña incorrecta.");
+						return;
+					}
+
+					dtCorrectos = validaDatos(usr,pwd);
+
+					if (dtCorrectos){
+						askSendContinue();
+					}else{
+						layout.removeAllViews();
+						return;
+					}
+
+				}
+			});
+
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					layout.removeAllViews();
+				}
+			});
+
+			alert.show();
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	private boolean validaDatos(String user,String psw){
+
+		Cursor DT;
+		boolean correctos=false;
+		String dpsw;
+		try{
+
+
+			sql = "SELECT NOMBRE,CLAVE,NIVEL,NIVELPRECIO FROM P_VENDEDOR WHERE CODIGO='" + user + "' AND NIVEL=1";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() == 0) {
+				mu.msgbox("Usuario incorrecto !");
+				return false;
+			}
+
+			DT.moveToFirst();
+			dpsw = DT.getString(1);
+			if (!psw.equalsIgnoreCase(dpsw)) {
+				mu.msgbox("Contraseña incorrecta !");
+				return false;
+			}
+
+
+			correctos = true;
+
+		}catch (Exception e){
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			return false;
+		}
+
+		return  correctos;
+
+	}
+
+	private boolean sendDataManual() {
+
+		errflag = false;
+
+		senv = "Envío terminado \n \n";
+
+		items.clear();
+		dbld.clearlog();
+
+		try {
+
+			esEnvioManual = true;
+
+			envioFacturas();
+
+			envioPedidos();
+
+			envioNotasCredito();
+
+			envioNotasCreditoPP();
+
+			envioNotasDevolucion();
+
+			envioCobros();
+
+			envioDepositos();
+
+			envio_D_MOV();
+
+			envioCli();
+
+			envioAtten();
+
+			envioCoord();
+
+			envioSolicitud();
+
+			envioRating();
+
+			envioModifCliente();
+
+			updateAcumulados();
+
+			updateInventario();
+
+			update_Corel_GrandTotal();
+
+			envioFinDia();
+
+			dbld.saveArchivo(du.getActDateStr());
+
+			esEnvioManual = false;
+
+			errflag = true;
+
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			esEnvioManual = false;
+		}
+
+		return errflag;
+	}
+
+	private void Eliminatablas(){
+		boolean Eliminadas = false;
+		try{
+
+			claseFindia.updateFinDia(du.getActDate());
+			claseFindia.updateComunicacion(2);
+
+			ActualizaStatcom();
+			Eliminadas = claseFindia.eliminarTablasD();
+
+			if (Eliminadas){
+				mu.msgbox("Envío de datos correcto");
+			}
+
+			visibilidadBotones();
+
+		}catch (Exception e){
+
+		}
+	}
+
+	private boolean puedeComunicar() {
+
+		boolean vPuedeCom = false;
+
+		try {
+
+			//#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
+			if (gl.banderafindia) {
+
+				return ((claseFindia.getImprimioCierreZ() == 7));
+
+			} else {
+				return true;
+			}
+
+		} catch (Exception ex) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), ex.getMessage(), "");
+		}
+
+		return vPuedeCom;
+	}
+
+	public void askExist(View view) {
+
+		try {
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Existencias bodega");
+			dialog.setMessage("¿Actualizar existencias?");
+
+			dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					runExist();
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", null);
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+		if (isbusy == 1) {
+			toastcent("Por favor, espere que se termine la tarea actual.");
+			return;
+		}
+
+	}
+
+	public void askPrecios(View view) {
+
+		try {
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Precios");
+			dialog.setMessage("¿Actualizar precios?");
+
+			dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					runPrecios();
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", null);
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+		if (isbusy == 1) {
+			toastcent("Por favor, espere que se termine la tarea actual.");
+			return;
+		}
+
+	}
+
+	public void askRecarga(View view) {
+
+		try {
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Recarga de inventario");
+			dialog.setMessage("¿Recargar inventario?");
+
+			dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					runRecarga();
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", null);
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+		if (isbusy == 1) {
+			toastcent("Por favor, espere hasta que se termine la tarea actual.");
+			return;
+		}
+
+	}
+
+	public void doFotos(View view) {
+		startActivity(new Intent(this,ComWSFotos.class));
+	}
+
+	public void doFotosCli(View view) {
+		//startActivity(new Intent(this,comWSFotosCli.class));
+	}
+
+	private void setHandlers() {
+		ralBack.setOnTouchListener(new SwipeListener(this) {
+			public void onSwipeRight() {
+				onBackPressed();
+			}
+
+			public void onSwipeLeft() {
+			}
+		});
+	}
+
+	//endregion
+
+	//region Main
+
+	private void runRecep() {
+
+		try {
+			if (isbusy == 1) return;
+
+			if (!setComParams()) return;
+
+			try{
+				//#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
+				View view = this.getCurrentFocus();
+				if (view != null) {
+					view.clearFocus();
+					keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
+				}
+			}catch (Exception e){
+			}
+
+			isbusy = 1;
+
+			if (!esvacio) {
+				ultcor_ant = ultCorel();
+				ultSerie_ant = ultSerie();
+			}
+
+			barInfo.setVisibility(View.VISIBLE);
+			barInfo.invalidate();
+			lblInfo.setText("Iniciando proceso de carga..");
+
+			lblInfo.setText("Conectando ...");
+
+			wsRtask = new AsyncCallRec();
+			wsRtask.execute();
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+	}
+
+	private void runSend() {
+
+		try {
+			if (isbusy == 1) return;
+
+			if (!setComParams()) return;
+
+			isbusy = 1;
+
+			barInfo.setVisibility(View.VISIBLE);
+			barInfo.invalidate();
+			lblInfo.setText("Conectando ...");
+
+			showprogress = true;
+			wsStask = new AsyncCallSend();
+			wsStask.execute();
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+
+	}
+
+	private void runExist() {
+		try {
+			super.finish();
+			startActivity(new Intent(this, ComWSExist.class));
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+	}
+
+	private void runPrecios() {
+		try {
+			super.finish();
+			startActivity(new Intent(this, ComWSPrec.class));
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+	}
+
+	private void runRecarga() {
+		try {
+			super.finish();
+			startActivity(new Intent(this, ComWSRec.class));
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+	}
+
+	public void writeData(View view) {
+
+		try {
+			dbld.clear();
+			dbld.insert("D_PEDIDO", "WHERE 1=1");
+			dbld.insert("D_PEDIDOD", "WHERE 1=1");
+			dbld.save();
+			dbld.saveArchivo(du.getActDateStr());
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+		}
+
+
+	}
+
+	private boolean validaPendientes() {
+		int pend = 0;
+
+		sp = "";
+
+		try {
+
+			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_FACTURA WHERE STATCOM<>'S'", "Fact: ");
+			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_PEDIDO WHERE STATCOM<>'S'", "Ped: ");
+			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_COBRO WHERE STATCOM<>'S'", "Rec: ");
+			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_DEPOS WHERE STATCOM<>'S'", "Dep: ");
+			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_MOV WHERE STATCOM<>'S'", "Inv : ");
+			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_NOTACRED WHERE STATCOM<>'S'", "Dev : ");
+			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_NOTACRED_PP WHERE STATCOM<>'S'", "PP : ");
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+		}
+
+		return pend > 0;
+	}
+
+	//endregion
+
+	//region Common Web Service Methods
+
+	public int fillTable(String value, String delcmd) {
+
+		int rc;
+		String s, ss, tabla;
+
+		int retFillTable = 0;
+
+		METHOD_NAME = "getIns";
+
+		sstr = "OK";
+
+		try {
+
+			idbg = idbg + " filltable ";
+
+			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+			envelope.dotNet = true;
+
+			PropertyInfo param = new PropertyInfo();
+			param.setType(String.class);
+			param.setName("SQL");
+			param.setValue(value);
+
+			request.addProperty(param);
+			envelope.setOutputSoapObject(request);
+
+			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
+			transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+			SoapObject resSoap = (SoapObject) envelope.getResponse();
+			SoapObject result = (SoapObject) envelope.bodyIn;
+
+			rc = resSoap.getPropertyCount() - 1;
+			idbg = idbg + " rec " + rc + "  ";
+
+			s = "";
+			if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK")) {
+				if (rc == 1) {
+					stockflag = 0;//return 1;
+				} else {
+					stockflag = 1;
+				}
+			}
+
+			// if (delcmd.equalsIgnoreCase("DELETE FROM P_COBRO")) {
+			// 	idbg=idbg+" RC ="+rc+"---";
+			//}
+
+			tabla=delcmd.substring(12);
+			switch (tabla){
+
+				case "P_RUTA":
+					if (rc==1){
+						borraDatos();
+						throw new Exception("La ruta ingresada no es válida, ruta: " + ruta + ", no se puede continuar la carga de datos");
+					}
+					break;
+
+				case "P_CLIENTE":
+					if (rc==1){
+						borraDatos();
+						throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+					}
+					break;
+
+				case "P_PRODUCTO":
+					if (rc==1){
+						borraDatos();
+						throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+					}
+					break;
+				case "P_PRODPRECIO":
+					if (rc==1){
+						borraDatos();
+						throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+					}
+					break;
+				case "P_COREL":
+					if (rc==1 && gl.rutatipo.equals("V")){
+						borraDatos();
+						throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+					}
+					break;
+			}
+
+			for (int i = 0; i < rc; i++) {
+				String str = "";
+				try {
+					str = ((SoapObject) result.getProperty(0)).getPropertyAsString(i);
+					//s=s+str+"\n";
+				} catch (Exception e) {
+					mu.msgbox("error: " + e.getMessage());
+				}
+
+				if (i == 0) {
+
+					idbg = idbg + " ret " + str + "  ";
+
+					if (str.equalsIgnoreCase("#")) {
+						listItems.add(delcmd);
+					} else {
+						idbg = idbg + str;
+						ftmsg = ftmsg + "\n" + str;
+						ftflag = true;
+						sstr = str;
+						return 0;
+					}
+				} else {
+					try {
+						sql = str;
+						if (str.contains("D_PEDIDO")){
+							sql = sql.replace("D_PEDIDO", "P_PEDIDO_RECHAZADO");
+						}
+						listItems.add(sql);
+						sstr = str;
+					} catch (Exception e) {
+						addlog(new Object() {
+						}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+						sstr = e.getMessage();
+					}
+				}
+			}
+
+			retFillTable= 1;
+
+		} catch (Exception e) {
+
+			//#EJC20190226: Evitar que se muestre OK después del nombre de la tabla cuando da error de timeOut.
+			sstr = e.getMessage();
+			idbg = idbg + " ERR " + e.getMessage();
+			retFillTable= 0;
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), idbg, value);
+
+		}
+
+		return  retFillTable;
+	}
+
+	public int fillTableImpresora() {
+
+		int rc;
+		String s, ss, delcmd="DELETE FROM P_IMPRESORA";
+
+		METHOD_NAME = "getInsImpresora";
+
+		sstr = "OK";
+
+		try {
+
+			idbg = idbg + " filltableImpresora ";
+
+			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+			envelope.dotNet = true;
+
+			/*
+			PropertyInfo param = new PropertyInfo();
+			param.setType(String.class);
+			param.setName("SQL");
+			param.setValue(value);
+			request.addProperty(param);
+			*/
+package com.dts.roadp;
+
+import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.DatabaseErrorHandler;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -36,8 +1273,6 @@ import android.widget.Toast;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
@@ -48,6 +1283,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -55,8 +1291,8 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -67,7 +1303,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -79,6 +1314,12 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.FileOutputStream;
+import java.text.ParseException;
 
 public class ComWS extends PBase {
 
@@ -97,6 +1338,7 @@ public class ComWS extends PBase {
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag, esEnvioManual = false;
 
 	private SQLiteDatabase dbT;
+	private DatabaseErrorHandler er;
 	private BaseDatos ConT;
 	private BaseDatos.Insert insT;
 	private AppMethods clsAppM;
@@ -234,6 +1476,8 @@ public class ComWS extends PBase {
 
 		getWSURL();
 
+		xobj = new XMLObject();
+
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
 			if (mu.emptystr(txtRuta.getText().toString())) {
@@ -249,9 +1493,9 @@ public class ComWS extends PBase {
 			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}
 
-        //txtRuta.setText("8001-1");
-        //txtEmp.setText("03");
-        //txtWS.setText("http://192.168.1.10/wsAndr/wsandr.asmx");
+		//txtRuta.setText("8001-1");
+		//txtEmp.setText("03");
+		//txtWS.setText("http://192.168.1.10/wsAndr/wsandr.asmx");
 
 		mac = getMac();
 		fsql = du.univfechasql(du.getActDate());
@@ -824,7 +2068,7 @@ public class ComWS extends PBase {
 
 			//esEnvioManual = true;
 
-			envioFacturas(); 
+			envioFacturas();
 
 			envioPedidos();
 
@@ -999,7 +2243,7 @@ public class ComWS extends PBase {
 					long vfecha = clsAppM.fechaFactTol(du.getActDate());
 					long aFecha = du.getActDate();
 					String fechav = du.sfecha(vfecha);
-                    String fechaa = du.sfecha(aFecha);
+					String fechaa = du.sfecha(aFecha);
 
 					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -1442,6 +2686,129 @@ public class ComWS extends PBase {
 			return 0;
 		}
 	}
+	public int fillTable2(String value, String delcmd) {
+		int rc,retFillTable = 0;
+		String str, ss, tabla;
+		String[] sitems;
+
+		String xr;
+
+		try {
+			sstr = "OK";
+
+			if (nombretabla.contains("P_IMPRESORA")){
+				callMethod("getInsImpresora");
+				xr=getXMLRegionSingle("getInsImpresoraResult");
+			}else if (nombretabla.contains("checkLicenceRuta")){
+				callMethod("checkLicenceRuta", "Ruta",ruta);
+				xr=getXMLRegionSingle("checkLicenceRutaResult");
+				licResultRuta=(Integer) getSingle(xr,"checkLicenceRutaResult",Integer.class);
+			}else if (nombretabla.contains("checkLicence")){
+				callMethod("checkLicence","Serial",licSerial);
+				xr=getXMLRegionSingle("checkLicenceResult");
+				licResult=(Integer) getSingle(xr,"checkLicenceResult",Integer.class);
+			}else if (nombretabla.contains("commitSQL")){
+				callMethod("Commit", "SQL", value);
+				xr=getXMLRegionSingle("CommitResponse");
+			}else{
+				callMethod("getIns", "SQL", value);
+				xr=getXMLRegionSingle("getInsResult");
+			}
+
+			sitems=xr.split("\n");
+			rc=sitems.length;
+
+			s = "";
+			if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK")) {
+				if (rc == 1) stockflag = 0; else stockflag = 1;
+			}
+
+			if (!delcmd.contains("commitSQL")){
+				tabla=delcmd.substring(12);
+				switch (tabla){
+
+					case "P_RUTA":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("La ruta ingresada no es válida, ruta: " + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+
+					case "P_CLIENTE":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+
+					case "P_PRODUCTO":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+					case "P_PRODPRECIO":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+					case "P_COREL":
+						if (rc==1 && gl.rutatipo.equals("V")){
+							borraDatos();
+							throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+				}
+
+				for (int i=1; i < rc-2; i++) {
+
+					try {
+						ss=sitems[i];
+						ss=ss.replace("<string>","");
+						str=ss.replace("</string>","");
+						str=str.replace("&amp;", "&");
+					} catch (Exception e) {
+						str="";
+					}
+
+					if (i == 1) {
+
+						idbg = idbg + " ret " + str + "  ";
+
+						if (str.equalsIgnoreCase("#")) {
+							listItems.add(delcmd);
+						} else {
+							idbg = idbg + str;
+							ftmsg = ftmsg + "\n" + str;
+							ftflag = true;
+							sstr = str;
+							return 0;
+						}
+					} else {
+						try {
+							sql = str;
+							listItems.add(sql);
+							sstr = str;
+						} catch (Exception e) {
+							addlog(new Object() {
+							}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+							sstr = e.getMessage();
+						}
+					}
+				}
+			}
+
+			retFillTable= 1;
+
+		} catch (Exception e) {
+			sstr = e.getMessage();
+			idbg = idbg + " ERR " + e.getMessage();
+			retFillTable= 0;
+		}
+
+		return  retFillTable;
+	}
 
 	public String getXMLRegionSingle(String nodename) throws Exception {
 		String st,ss,sv,en,sxml;
@@ -1658,129 +3025,6 @@ public class ComWS extends PBase {
 		return result;
 	}
 
-	public int fillTable2(String value, String delcmd) {
-		int rc,retFillTable = 0;
-		String str, ss, tabla;
-		String[] sitems;
-
-		String xr;
-
-		try {
-			sstr = "OK";
-
-			if (nombretabla.contains("P_IMPRESORA")){
-				callMethod("getInsImpresora");
-				xr=getXMLRegionSingle("getInsImpresoraResult");
-			}else if (nombretabla.contains("checkLicenceRuta")){
-				callMethod("checkLicenceRuta", "Ruta",ruta);
-				xr=getXMLRegionSingle("checkLicenceRutaResult");
-				licResultRuta=(Integer) getSingle(xr,"checkLicenceRutaResult",Integer.class);
-			}else if (nombretabla.contains("checkLicence")){
-				callMethod("checkLicence","Serial",licSerial);
-				xr=getXMLRegionSingle("checkLicenceResult");
-				licResult=(Integer) getSingle(xr,"checkLicenceResult",Integer.class);
-			}else if (nombretabla.contains("commitSQL")){
-				callMethod("Commit", "SQL", value);
-				xr=getXMLRegionSingle("CommitResponse");
-			}else{
-				callMethod("getIns", "SQL", value);
-				xr=getXMLRegionSingle("getInsResult");
-			}
-
-			sitems=xr.split("\n");
-			rc=sitems.length;
-
-			s = "";
-			if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK")) {
-				if (rc == 1) stockflag = 0; else stockflag = 1;
-			}
-
-			if (!delcmd.contains("commitSQL")){
-				tabla=delcmd.substring(12);
-				switch (tabla){
-
-					case "P_RUTA":
-						if (rc==1){
-							borraDatos();
-							throw new Exception("La ruta ingresada no es válida, ruta: " + ruta + ", no se puede continuar la carga de datos");
-						}
-						break;
-
-					case "P_CLIENTE":
-						if (rc==1){
-							borraDatos();
-							throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
-						}
-						break;
-
-					case "P_PRODUCTO":
-						if (rc==1){
-							borraDatos();
-							throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
-						}
-						break;
-					case "P_PRODPRECIO":
-						if (rc==1){
-							borraDatos();
-							throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
-						}
-						break;
-					case "P_COREL":
-						if (rc==1 && gl.rutatipo.equals("V")){
-							borraDatos();
-							throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
-						}
-						break;
-				}
-
-				for (int i=1; i < rc-2; i++) {
-
-					try {
-						ss=sitems[i];
-						ss=ss.replace("<string>","");
-						str=ss.replace("</string>","");
-						str=str.replace("&amp;", "&");
-					} catch (Exception e) {
-						str="";
-					}
-
-					if (i == 1) {
-
-						idbg = idbg + " ret " + str + "  ";
-
-						if (str.equalsIgnoreCase("#")) {
-							listItems.add(delcmd);
-						} else {
-							idbg = idbg + str;
-							ftmsg = ftmsg + "\n" + str;
-							ftflag = true;
-							sstr = str;
-							return 0;
-						}
-					} else {
-						try {
-							sql = str;
-							listItems.add(sql);
-							sstr = str;
-						} catch (Exception e) {
-							addlog(new Object() {
-							}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-							sstr = e.getMessage();
-						}
-					}
-				}
-			}
-
-			retFillTable= 1;
-
-		} catch (Exception e) {
-			sstr = e.getMessage();
-			idbg = idbg + " ERR " + e.getMessage();
-			retFillTable= 0;
-		}
-
-		return  retFillTable;
-	}
 
 	public int commitSQL() {
 		int rc;

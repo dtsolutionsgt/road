@@ -3948,7 +3948,7 @@ public class ComWS extends PBase {
 				wsCargaTabla();
 			} catch (Exception e) {
 				if (scon == 0) fstr = "No se puede conectar al web service : " + sstr;
-				else fstr = e.getMessage();
+				Log.d("onPostExecute", e.getMessage());
 			}
 
 			return null;

@@ -60,17 +60,25 @@ public class ListAdaptProd extends BaseAdapter {
 			holder.lblCod  = (TextView) convertView.findViewById(R.id.lblETipo);
 			holder.lblDesc = (TextView) convertView.findViewById(R.id.lblPNum);
 			holder.lblExtra = (TextView) convertView.findViewById(R.id.textView1);
+			holder.img1 = convertView.findViewById(R.id.imageView17);
 			
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-					
+
+        //JP20210614
 		holder.lblCod.setText(items.get(position).Cod);
 		//holder.lblCod.setText(items.get(position).Cod+"  "+items.get(position).um);
 		holder.lblDesc.setText(items.get(position).Desc);
 		holder.lblExtra.setText(items.get(position).Text);
-		
+
+		if (items.get(position).bandera) {
+            holder.img1.setVisibility(View.VISIBLE);
+        } else {
+            holder.img1.setVisibility(View.INVISIBLE);
+        }
+
 		if(selectedIndex!= -1 && position == selectedIndex) {
 			convertView.setBackgroundColor(Color.rgb(26,138,198));
         } else {
@@ -83,6 +91,7 @@ public class ListAdaptProd extends BaseAdapter {
 	
 	static class ViewHolder {
 		TextView  lblCod,lblDesc,lblExtra;
+		ImageView img1;
 	}
 	
 }

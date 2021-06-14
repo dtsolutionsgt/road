@@ -16,6 +16,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -27,15 +28,18 @@ public class ProdCantPrev extends PBase {
     private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot,lblCodProd;
     private TextView lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso,lblPesoUni;
     private ImageView imgProd,imgDel;
+    private RelativeLayout relcrit;
 
     private Precio prc;
 
     private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact,umini;
     private int nivel,browse=0,deccant,prevfact=1;
     private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
-    private boolean pexist,esdecimal,porpeso,esbarra,idle=true;
+    private boolean pexist,esdecimal,porpeso,esbarra,idle=true,critico;
     private AppMethods app;
 
+
+    //JP20210614  - activy creada nueva
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +69,7 @@ public class ProdCantPrev extends PBase {
             txtCant.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         }
 
-        gl.dval=-1;
-        gl.gstr="";
+        gl.dval=-1;gl.gstr="";
 
         paramProd();
 
@@ -74,7 +77,6 @@ public class ProdCantPrev extends PBase {
 
         showData();
     }
-
 
     //region Events
 
@@ -339,10 +341,7 @@ public class ProdCantPrev extends PBase {
             imgDel.setVisibility(View.INVISIBLE);
         }
 
-        if (rutatipo.equalsIgnoreCase("V")) {
-            idisp=getDisp();
-        } else {
-        }
+        idisp=getDisp();
 
 		/*
 		prec=prc.precio(prodid,1,nivel,um,gl.umpeso,0,um);
@@ -367,9 +366,9 @@ public class ProdCantPrev extends PBase {
         lblFactor.setText("x "+mu.frmdecimal(umfactor, gl.peDecImp));
         lblPesoUni.setText(gl.umpeso);
 
-        if (rutatipo.equalsIgnoreCase("P") && (idisp==0)) {
-            lblDisp.setText("");lblDispLbl.setText("");
-        }
+        //if (rutatipo.equalsIgnoreCase("P") && (idisp==0)) {
+        //    lblDisp.setText("");lblDispLbl.setText("");
+        //}
 
         try {
             txtCant.setSelection(txtCant.getText().length());
@@ -392,7 +391,7 @@ public class ProdCantPrev extends PBase {
             pesostock=0;
 
             sql=" SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO " +
-                    " FROM P_STOCK WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
+                    " FROM P_STOCK_PV WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
             dt=Con.OpenDT(sql);
 
             if (dt.getCount()>0) {
@@ -416,7 +415,7 @@ public class ProdCantPrev extends PBase {
 
             //#CKFK 20190517 Agregué para que el umfactor sea igual al peso promedio en el pedido y se calcule correctamente
             if(gl.rutatipo.equalsIgnoreCase("P")){
-                umfactor = pesoprom;
+                umfactor = pesoprom;if (umfactor==0) umfactor=1;
             }
 
             if (disp>0) return disp;
@@ -544,6 +543,14 @@ public class ProdCantPrev extends PBase {
                     txtCant.requestFocus();
                     return;
                 }
+            } else if (rutatipo.equalsIgnoreCase("P") && gl.peModal.equalsIgnoreCase("TOL"))  {
+                if (critico) {
+                    if (cant > idisp) {
+                        mu.msgbox("Cantidad mayor que disponible.");
+                        txtCant.requestFocus();
+                        return;
+                    }
+                }
             }
 
             if (porpeso) {
@@ -638,10 +645,10 @@ public class ProdCantPrev extends PBase {
             lblCodProd=(TextView) findViewById(R.id.txtRoadTit);
             imgProd=(ImageView) findViewById(R.id.imgPFoto);
             imgDel=(ImageView) findViewById(R.id.imageView2);
-        }catch (Exception e){
+            relcrit=findViewById(R.id.relativeLayout1);
+        } catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
 
     }
 
@@ -931,9 +938,20 @@ public class ProdCantPrev extends PBase {
     }
 
     private void paramProd() {
+        Cursor dt;
+
         try {
             porpeso=app.ventaPeso(prodid);
             esbarra=app.prodBarra(prodid);
+
+            sql="SELECT ESTADO FROM P_STOCK_PV  WHERE CODIGO='" + prodid + "' ";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+            critico=dt.getString(0).equalsIgnoreCase("C");
+
+            if (critico) relcrit.setVisibility(View.VISIBLE); else relcrit.setVisibility(View.INVISIBLE);
+
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             porpeso=false;esbarra=false;
@@ -941,11 +959,12 @@ public class ProdCantPrev extends PBase {
         }
 
         if (porpeso) {
-            txtPeso.setVisibility(View.VISIBLE);
-            lblPesoLbl.setVisibility(View.VISIBLE);
+            //txtPeso.setVisibility(View.VISIBLE);
+            //lblPesoLbl.setVisibility(View.VISIBLE);
             lblFactor.setVisibility(View.VISIBLE);
             lblCantPeso.setVisibility(View.VISIBLE);
         }
+
     }
 
     private void forceClose() {

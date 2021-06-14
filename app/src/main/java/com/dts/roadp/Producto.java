@@ -256,7 +256,7 @@ public class Producto extends PBase {
 
                     if (modotol) { // La empresa es Toledano
 
-                        sql="SELECT DISTINCT P_PRODUCTO.CODIGO, P_PRODUCTO.DESCCORTA, P_PRODPRECIO.UNIDADMEDIDA " +
+                        sql="SELECT DISTINCT P_PRODUCTO.CODIGO, P_PRODUCTO.DESCCORTA, P_PRODPRECIO.UNIDADMEDIDA, P_STOCK_PV.ESTADO , P_STOCK_PV.CANT, P_STOCK_PV.PESO  " +
                                 "FROM P_PRODUCTO INNER JOIN	P_STOCK_PV ON P_STOCK_PV.CODIGO=P_PRODUCTO.CODIGO INNER JOIN " +
                                 "P_PRODPRECIO ON (P_STOCK_PV.CODIGO=P_PRODPRECIO.CODIGO)  " +
                                 "WHERE (P_STOCK_PV.CANT > 0) AND (P_PRODPRECIO.NIVEL = " + gl.nivel +") AND (P_PRODUCTO.ES_VENDIBLE=1) ";
@@ -357,6 +357,11 @@ public class Producto extends PBase {
 
 			  vItem.um=um;
 			  vItem.Text="";
+              vItem.bandera=false;
+
+              if (prodtipo==0 && modotol) {
+                  if (DT.getString(3).equalsIgnoreCase("C")) vItem.bandera=true;
+              }
 
 			  items.add(vItem);
 			  vitems.add(vItem);

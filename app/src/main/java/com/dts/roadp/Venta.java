@@ -813,6 +813,7 @@ public class Venta extends PBase {
 			ins.init("T_VENTA");
 
 			ins.add("PRODUCTO",prodid);
+            ins.add("SIN_EXISTENCIA",0);
 			ins.add("EMPRESA",emp);
 			if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
 			ins.add("CANT",cant);

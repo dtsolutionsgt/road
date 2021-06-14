@@ -78,7 +78,7 @@
         android:layout_alignParentTop="false"
         android:layout_below="@+id/relRoad"
         android:clickable="true"
-        android:onClick="anulDoc"
+        android:onClick="nuevoPedido"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"

@@ -4,6 +4,7 @@ public class clsClasses {
 	
 	public class clsCD {
 		public String Cod,Desc,Text,um;
+		public boolean bandera,disp;
 	}
 	
 	public class clsCDB {
@@ -11,7 +12,8 @@ public class clsClasses {
 		public int Bandera,Cobro,ppend;
 		public double valor,coorx,coory;
 	}
-	
+
+    //JP20210614
 	public class clsCFDV {
 		public int id,flag;
 		public String Cod,Desc,Fecha,Valor,Sid;

@@ -145,8 +145,9 @@ public class BaseDatosScript {
 					"[UMVENTA] TEXT NOT NULL,"+
 					"[FACTOR] REAL NOT NULL,"+
 					"[UMSTOCK] TEXT NOT NULL,"+
-					"[UMPESO] TEXT NOT NULL,"+										
-					"PRIMARY KEY ([COREL],[PRODUCTO])"+
+					"[UMPESO] TEXT NOT NULL,"+
+                    "[SIN_EXISTENCIA] INTEGER NOT NULL,"+  //JP20210614
+					"PRIMARY KEY ([COREL],[PRODUCTO],[SIN_EXISTENCIA])"+
 					");";
 			database.execSQL(vSQL);
 			
@@ -2004,6 +2005,7 @@ public class BaseDatosScript {
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[EMPRESA] TEXT NOT NULL,"+
 					"[UM] TEXT NOT NULL,"+
+                    "[SIN_EXISTENCIA] INTEGER NOT NULL,"+ //JP20210614
 					"[CANT] REAL NOT NULL,"+
 					"[UMSTOCK] TEXT NOT NULL,"+
 					"[FACTOR] REAL NOT NULL,"+
@@ -2019,7 +2021,7 @@ public class BaseDatosScript {
 					"[VAL3] REAL NOT NULL,"+
 					"[VAL4] TEXT NOT NULL,"+					
 					"[PERCEP] REAL NOT NULL,"+
-					"PRIMARY KEY ([PRODUCTO],[UM])"+
+					"PRIMARY KEY ([PRODUCTO],[UM],[SIN_EXISTENCIA])"+
 					");";
 			database.execSQL(vSQL);
 
@@ -2199,6 +2201,30 @@ public class BaseDatosScript {
                     "PRIMARY KEY ([PRODID],[PRODUCTO])"+
                     ");";
             database.execSQL(vSQL);
+
+
+            vSQL="CREATE TABLE [P_STOCK_PV] ("+
+                    "RUTA TEXT NOT NULL,"+
+                    "CODIGO TEXT NOT NULL,"+
+                    "CANT REAL NOT NULL,"+
+                    "PESO REAL NOT NULL,"+
+                    "CANT_SOL REAL NOT NULL,"+
+                    "PESO_SOL REAL NOT NULL,"+
+                    "UNIDADMEDIDA TEXT NOT NULL,"+
+                    "DOCUMENTO TEXT NOT NULL,"+
+                    "FECHA INTEGER NOT NULL,"+
+                    "ANULADO INTEGER NOT NULL,"+
+                    "CENTRO TEXT NOT NULL,"+
+                    "ESTADO TEXT NOT NULL,"+
+                    "ENVIADO INTEGER NOT NULL,"+
+                    "PRIMARY KEY ([RUTA],[CODIGO],[UNIDADMEDIDA],[DOCUMENTO])"+
+                    ");";
+            database.execSQL(vSQL);
+
+            vSQL="CREATE INDEX P_stock_pv_idx1 ON P_stock_pv(FECHA)";database.execSQL(vSQL);
+            vSQL="CREATE INDEX P_stock_pv_idx2 ON P_stock_pv(ANULADO)";database.execSQL(vSQL);
+            vSQL="CREATE INDEX P_stock_pv_idx3 ON P_stock_pv(ESTADO)";database.execSQL(vSQL);
+            vSQL="CREATE INDEX P_stock_pv_idx4 ON P_stock_pv(ENVIADO)";database.execSQL(vSQL);
 
             return 1;
 

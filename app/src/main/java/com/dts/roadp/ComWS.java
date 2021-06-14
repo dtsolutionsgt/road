@@ -1120,8 +1120,7 @@ public class ComWS extends PBase {
 			wsRtask.execute();
 
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
 	}
@@ -2272,6 +2271,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_TRANSERROR")) return false;
 			if (!AddTable("P_GLOBPARAM")) return false;
 			if (!AddTable("P_CONFIGBARRA")) return false;
+            if (!AddTable("P_STOCK_PV")) return false;
 
 			licResult = checkLicence(licSerial);
 			licResultRuta = checkLicenceRuta(licRuta);
@@ -3514,6 +3514,16 @@ public class ComWS extends PBase {
 					" FROM P_SUCURSAL WHERE CODIGO IN (SELECT SUCURSAL FROM P_RUTA WHERE CODIGO = '" + ActRuta + "')";
 			return SQL;
 		}
+
+        if (TN.equalsIgnoreCase("P_STOCK_PV")) {
+            //"FROM P_STOCK WHERE RUTA='" + ActRuta + "'  AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+            //        "AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";
+
+            SQL = "SELECT  RUTA, CODIGO, CANT, PESO, CANT_SOL, PESO_SOL, UNIDADMEDIDA, DOCUMENTO, " +
+                    "0 , ANULADO, CENTRO, ESTADO, ENVIADO " +
+                    "FROM P_STOCK_PV WHERE (RUTA ='"+ActRuta+"') AND (ANULADO=0) ";
+            return SQL;
+        }
 
 		return SQL;
 	}

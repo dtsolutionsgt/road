@@ -420,6 +420,7 @@ public class PedidoRes extends PBase {
 				ins.add("FACTOR",DT.getDouble(12));
 				ins.add("UMSTOCK",DT.getString(13));
 				ins.add("UMPESO",gl.umpeso);
+                ins.add("SIN_EXISTENCIA",0); //JP20210614
 			
 			    db.execSQL(ins.sql());
 				

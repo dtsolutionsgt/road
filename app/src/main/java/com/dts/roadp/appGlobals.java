@@ -19,7 +19,8 @@ public class appGlobals extends Application {
 	public long nuevaFecha,atentini;
 	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor,prectemp,precprev;
 	public boolean CellCom,closeDevBod;
-	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra, parNumVer, parFechaVer, parTipoVer,umprev;
+	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra, parNumVer, parFechaVer;
+	public String parTipoVer,umprev,modpedid;
 	public int tiponcredito,validarCred,gpsdist;
     public boolean vcredito,vcheque,vchequepost,validimp,tolsuper=false,tolpedsend;
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,devol,modoadmin;

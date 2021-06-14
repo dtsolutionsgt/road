@@ -1252,6 +1252,13 @@ public class ComWS extends PBase {
 				callMethod("Commit", "SQL", value);
 				xr=getXMLRegionSingle("CommitResponse");
 			}else{
+
+				value=value.replace("&", "&amp;");
+				value=value.replace("\"", "&quot;");
+				value=value.replace("'", "&apos;");
+				value=value.replace("<", "&lt;");
+				value=value.replace(">", "&gt;");
+
 				callMethod("getIns", "SQL", value);
 				xr=getXMLRegionSingle("getInsResult");
 			}
@@ -1308,6 +1315,11 @@ public class ComWS extends PBase {
 						ss=sitems[i];
 						ss=ss.replace("<string>","");
 						str=ss.replace("</string>","");
+						str=str.replace("&amp;", "&");
+						str=str.replace("&quot;", "\"");
+						str=str.replace("&apos;", "'");
+						str=str.replace("&lt;", "<");
+						str=str.replace("&gt;", ">");
 					} catch (Exception e) {
 						str="";
 					}
@@ -1649,6 +1661,12 @@ public class ComWS extends PBase {
 			fprog = "Enviando ...";
 			wsStask.onProgressUpdate();
 		}
+
+		s=s.replace("&","&amp;");
+		s=s.replace("\"", "&quot;");
+		s=s.replace("'","&apos;");
+		s=s.replace("<", "&lt;");
+		s=s.replace(">", "&gt;");
 
 		nombretabla = "commitSQL";
 		vCommit=fillTable2(s,"commitSQL");
@@ -2826,12 +2844,12 @@ public class ComWS extends PBase {
 		if (TN.equalsIgnoreCase("P_STOCK")) {
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				/*SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-						"FROM P_STOCK WHERE RUTA='" + ActRuta + "'  AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
-						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";*/
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' " +
+						"FROM P_STOCK WHERE RUTA='" + ActRuta + "'  AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";
+				/*SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' " +
+						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";*/
 			} else if (gl.peModal.equalsIgnoreCase("APR")) {
 				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
 						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') ";

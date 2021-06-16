@@ -677,6 +677,24 @@ public class CliDet extends PBase {
 
 	}
 
+	/*private void validaDespacho() {
+
+		lblDespacho.setVisibility(View.INVISIBLE);
+		imgDespacho.setVisibility(View.INVISIBLE);
+		relD.setVisibility(View.GONE);
+		try {
+			clsDs_pedidoObj Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
+			Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
+			if (Ds_pedidoObj.count>0) {
+				lblDespacho.setVisibility(View.VISIBLE);
+				imgDespacho.setVisibility(View.VISIBLE);
+				relD.setVisibility(View.VISIBLE);
+			}
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+	}*/
+
 	//endregion
 
 	//region  Aux

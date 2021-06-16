@@ -119,7 +119,7 @@ public class FinDia extends PBase {
 
 		boolean rslt;
 
-		File fd=new File(Environment.getExternalStorageDirectory()+"/SyncFold/findia.txt");
+		File fd=new File(Environment.getExternalStorageDirectory()+"/findia.txt");//"/SyncFold/findia.txt");
 		FileUtils.deleteQuietly(fd);
 
         idle = false;
@@ -2314,7 +2314,9 @@ public class FinDia extends PBase {
 
                       if(imprimeCierreZ()){
                            corelz+=1;
+                           claseFinDia.updateImprimioCierreZ(7);
                            claseFinDia.updateGrandTotalCorelZ(gSumados,corelz);
+                          startFDD();
                        }
                    }else{
                        msgAskCierreIncompleto("No se pudo generar el reporte Z");

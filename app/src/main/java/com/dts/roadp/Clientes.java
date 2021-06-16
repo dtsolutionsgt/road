@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -483,6 +484,9 @@ public class Clientes extends PBase {
 		}
 
 		try {
+
+			inicializa_desc_Bon();
+
 			gl.cliente = selid;
 
 			gl.closeCliDet = false;
@@ -496,6 +500,26 @@ public class Clientes extends PBase {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
+	}
+
+	private void inicializa_desc_Bon(){
+		Cursor DT;
+		int id;
+		String vSQL="";
+
+		try {
+			vSQL="DELETE FROM T_DESC";
+			db.execSQL(vSQL);
+		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
+		try {
+			sql="DELETE FROM T_BONIF";
+			db.execSQL(sql);
+		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
 	}
 
 	private void editCliente() {

@@ -247,8 +247,8 @@ public class Venta extends PBase {
 			clsBonG=new clsBonifGlob(this,tot);
 			if (clsBonG.tieneBonif()) {
 				for (int i = 0; i <clsBonG.items.size(); i++) {
-					//s=clsBonG.items.get(i).valor+"   "+clsBonG.items.get(i).tipolista+"  "+clsBonG.items.get(i).lista;
-					//Toast.makeText(this,s, Toast.LENGTH_SHORT).show();
+					s=clsBonG.items.get(i).valor+"   "+clsBonG.items.get(i).tipolista+"  "+clsBonG.items.get(i).lista;
+					Toast.makeText(this,s, Toast.LENGTH_SHORT).show();
 					gl.bonus.add(clsBonG.items.get(i));
 				}
 			} else {
@@ -269,11 +269,11 @@ public class Venta extends PBase {
 				startActivity(intent);
 			}
 
-			//Toast.makeText(this,"Bon global "+clsBonG.items.size(), Toast.LENGTH_SHORT).show();
+			Toast.makeText(this,"Bon global "+clsBonG.items.size(), Toast.LENGTH_SHORT).show();
 
 			if (gl.bonus.size()>0) {
-				//Intent intent = new Intent(this,BonList.class);
-				//startActivity(intent);
+				Intent intent = new Intent(this,BonList.class);
+				startActivity(intent);
 			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

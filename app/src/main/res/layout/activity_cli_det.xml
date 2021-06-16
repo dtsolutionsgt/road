@@ -512,6 +512,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="10sp"
                 android:textStyle="bold" />
+
         </RelativeLayout>
 
         <RelativeLayout

@@ -3270,7 +3270,12 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_CODDEV")) {
-			SQL = "SELECT * FROM P_CODDEV";
+			SQL = "SELECT CODIGO, DESCRIPCION, ESTADO, PORCENTAJE FROM P_CODDEV";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_RAZON_DESP_INCOMP")) {
+			SQL = "SELECT IDRAZON, DESCRIPCION FROM P_RAZON_DESP_INCOMP";
 			return SQL;
 		}
 
@@ -4225,9 +4230,6 @@ public class ComWS extends PBase {
 					nombretabla="P_IMPRESORA";break;
 				case 68:
 					nombretabla="Procesando tablas ...";break;
-					/*fillTableImpresora();
-					nombretabla = "";
-					break;*/
 				case 69:
 					//licResult=checkLicence(licSerial);
 					nombretabla = "checkLicence";
@@ -4237,6 +4239,8 @@ public class ComWS extends PBase {
 					nombretabla = "checkLicenceRuta";
 					break;
 				case 71:
+					nombretabla="P_RAZON_DESP_INCOMP";break;
+				case 72:
 					procesaDatos();
 					ejecutar = false;
 					break;
@@ -4575,6 +4579,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_FACTURAP", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_FACTURAD_LOTES", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_FACTURAF", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_FACTURA_MODIF", "WHERE COREL='" + cor + "'");
 
 					dbld.insert("D_STOCKB_DEV", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIF", "WHERE COREL='" + cor + "'");

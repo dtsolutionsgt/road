@@ -84,7 +84,7 @@ import java.io.FileOutputStream;
 import java.text.ParseException;
 
 public class ComWS extends PBase {
-
+//Esto es de Kelvyn
 	private TextView lblInfo, lblParam, lblRec, lblEnv, lblEnvM;
 	private ProgressBar barInfo;
 	private EditText txtRuta, txtWS, txtEmp;

@@ -517,11 +517,15 @@ public class CliDet extends PBase {
             sql="SELECT COREL FROM D_PEDIDO WHERE (CLIENTE='"+gl.cliente+"') AND (ANULADO='N') AND (STATCOM='N')";
             dt=Con.OpenDT(sql);
 
+            /*
             if (dt.getCount()>0) {
                 startActivity(new Intent(this,ListaPedidos.class));
             } else {
                 startActivity(new Intent(this,Venta.class));
             }
+            */
+
+            startActivity(new Intent(this,Venta.class));
         } catch (Exception e) {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }

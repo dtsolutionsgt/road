@@ -39,7 +39,7 @@ public class Anulacion extends PBase {
 	
 	private int tipo,depparc,fcorel;	
 	private String selid,itemid,fserie,fres,scor;
-	private boolean modoapr=false;
+	private boolean modoapr=false,toledano;
 
 	// impresion nota credito
 	
@@ -63,6 +63,7 @@ public class Anulacion extends PBase {
 		app = new AppMethods(this, gl, Con, db);
 		gl.validimp=app.validaImpresora();
 		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+        toledano=gl.peModal.equalsIgnoreCase("TOL");
 
 		tipo=gl.tipo;
 		if (gl.peModal.equalsIgnoreCase("APR")) modoapr=true;
@@ -379,22 +380,46 @@ public class Anulacion extends PBase {
 	//endregion
 
 	//region Documents
-	
-	private void anulPedido(String itemid) {
 
-		try{
-			sql="UPDATE D_PEDIDO SET Anulado='S' WHERE COREL='"+itemid+"'";
-			db.execSQL(sql);
+    private void anulPedido(String itemid) {
+        Cursor dt;
+        double dcant,dpeso;
+        String prid;
 
-			sql="UPDATE D_PEDIDOD SET Anulado='S' WHERE COREL='"+itemid+"'";
-			db.execSQL(sql);
+        try {
+            db.beginTransaction();
 
-			//anulBonif(itemid);
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-		}
+            sql="UPDATE D_PEDIDO SET Anulado='S' WHERE COREL='"+itemid+"'";
+            db.execSQL(sql);
 
-	}	
+            sql="UPDATE D_PEDIDOD SET Anulado='S' WHERE COREL='"+itemid+"'";
+            db.execSQL(sql);
+
+            if (toledano) {
+
+                sql="SELECT PRODUCTO,CANT,PESO FROM D_PEDIDOD WHERE COREL='"+itemid+"'";
+                dt=Con.OpenDT(sql);
+
+                dt.moveToFirst();
+                while (!dt.isAfterLast()) {
+                    prid=dt.getString(0);
+                    dcant=dt.getDouble(1);
+                    dpeso=dt.getDouble(2);
+
+                    sql="UPDATE P_STOCK_PV SET CANT=CANT+"+dcant+",PESO=PESO+"+dpeso+" WHERE (CODIGO='"+prid+"') ";
+                    db.execSQL(sql);
+
+                    dt.moveToNext();
+                }
+            }
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        } catch (Exception e) {
+            db.endTransaction();
+            msgbox(e.getMessage());
+        }
+    }
 	
 	private boolean anulFactura(String itemid) {
 		Cursor dt;
@@ -1627,7 +1652,6 @@ public class Anulacion extends PBase {
 	    }
 	}
 
-
 	private void inputValor() {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		int cor;
@@ -1671,7 +1695,6 @@ public class Anulacion extends PBase {
 
 		alert.show();
 	}
-
 
 	//endregion
 

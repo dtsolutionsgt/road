@@ -323,14 +323,11 @@ public class ComWS extends PBase {
 	}
 
 	public void askSend(View view) {
-
 		try {
 
 			if (isbusy == 1) {
-				toastcent("Por favor, espere que se termine la tarea actual.");
-				return;
+				toastcent("Por favor, espere que se termine la tarea actual.");return;
 			}
-
 
 			if (!gl.debug) {
 				if (!validaLicencia()) {
@@ -344,7 +341,7 @@ public class ComWS extends PBase {
 			if (gl.banderafindia) {
 				if (!puedeComunicar()) {
 					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
-					return;
+					//return;
 				}
 			}
 
@@ -3266,6 +3263,9 @@ public class ComWS extends PBase {
 				if (stockflag == 1) s = s + "\nSe actualizó inventario.";
 
 				clsAppM.estandartInventario();
+
+                clsAppM.estandartInventarioPedido();
+
 				validaDatos(true);
 
 				if (stockflag == 1) sendConfirm();
@@ -3797,7 +3797,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_REL_PROD_BON", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIFFALT", "WHERE COREL='" + cor + "'");
 
-					if (envioparcial && !esEnvioManual) {
+					//if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_PEDIDO SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -3807,7 +3807,7 @@ public class ComWS extends PBase {
 							errflag = true;
 							fterr += "\n" + sstr;
 						}
-					} else pc += 1;
+					//} else pc += 1;
 
 				} catch (Exception e) {
 					errflag = true;

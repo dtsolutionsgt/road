@@ -34,7 +34,7 @@ public class ProdCantPrev extends PBase {
 
     private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact,umini;
     private int nivel,browse=0,deccant,prevfact=1;
-    private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
+    private double cant,cexist,cstand,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
     private boolean pexist,esdecimal,porpeso,esbarra,idle=true,critico;
     private AppMethods app;
 
@@ -55,6 +55,7 @@ public class ProdCantPrev extends PBase {
         um=gl.um;
         nivel=gl.nivel;
         rutatipo=gl.rutatipo;
+        gl.cexist=0;gl.cstand=0;
 
         prc=new Precio(this,mu,gl.peDec);
         getDisp();
@@ -319,7 +320,8 @@ public class ProdCantPrev extends PBase {
         if (gl.sinimp) prec=prc.precsin;
 
         try {
-            sql="SELECT CANT,PESO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
+            //sql="SELECT CANT,PESO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
+            sql="SELECT SUM(CANT),SUM(PESO) FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
             dt=Con.OpenDT(sql);
 
             if(dt.getCount()>0){
@@ -380,7 +382,6 @@ public class ProdCantPrev extends PBase {
     }
 
     private double getDisp() {
-
         Cursor dt;
         double disp = 0;
         double umf1 =1;
@@ -537,20 +538,24 @@ public class ProdCantPrev extends PBase {
                 return;
             }
 
-            if (rutatipo.equalsIgnoreCase("V")) {
-                if (cant > idisp) {
-                    mu.msgbox("Cantidad mayor que disponible.");
-                    txtCant.requestFocus();
-                    return;
-                }
-            } else if (rutatipo.equalsIgnoreCase("P") && gl.peModal.equalsIgnoreCase("TOL"))  {
+            if (gl.peModal.equalsIgnoreCase("TOL"))  {
                 if (critico) {
                     if (cant > idisp) {
+                        cexist=0;cstand=0;
                         mu.msgbox("Cantidad mayor que disponible.");
                         txtCant.requestFocus();
                         return;
+                    } else {
+                        cexist=cant;cstand=0;
+                    }
+                } else {
+                    if (cant > idisp) {
+                        cexist=idisp;cstand=cant-idisp;
+                    } else {
+                        cexist=cant;cstand=0;
                     }
                 }
+                cant=cexist;
             }
 
             if (porpeso) {
@@ -588,6 +593,13 @@ public class ProdCantPrev extends PBase {
             gl.umstock = umstock;
             gl.umfactor = umfactor;
             gl.prectemp = prec;
+
+
+            if (gl.peModal.equalsIgnoreCase("TOL")) {
+                gl.cexist=cexist;gl.cstand=cstand;
+            } else {
+                gl.cexist=0;gl.cstand=0;
+            }
 
             if (rutatipo.equalsIgnoreCase("P")) {
                 gl.um=um;

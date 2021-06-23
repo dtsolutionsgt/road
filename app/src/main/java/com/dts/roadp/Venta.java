@@ -470,6 +470,16 @@ public class Venta extends PBase {
 				" FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO "+
 				" ORDER BY P_PRODUCTO.DESCCORTA ";
 
+            if (gl.rutatipo.equalsIgnoreCase("P") && gl.peModal.equalsIgnoreCase("TOL")) {
+                sql=" SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, SUM(T_VENTA.TOTAL), SUM(T_VENTA.CANT), "+
+                        " T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, " +
+                        " SUM(T_VENTA.PESO), T_VENTA.UMSTOCK, T_VENTA.PRECIO, T_VENTA.FACTOR  " +
+                        " FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO " +
+                        " GROUP BY T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA,T_VENTA.PRECIODOC, T_VENTA.DES, " +
+                        " T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, T_VENTA.UMSTOCK, T_VENTA.PRECIO, T_VENTA.FACTOR "+
+                        " ORDER BY P_PRODUCTO.DESCCORTA ";
+            }
+
 			DT=Con.OpenDT(sql);
 
 			if (DT.getCount()>0) {
@@ -595,7 +605,6 @@ public class Venta extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 
 	private void processCant(){
@@ -847,7 +856,54 @@ public class Venta extends PBase {
 
 			db.execSQL(ins.sql());
 
-		} catch (SQLException e) {
+            if ((gl.cstand>0) && rutatipo.equalsIgnoreCase("P") && gl.peModal.equalsIgnoreCase("TOL")) {
+
+                if (porpeso) {
+                    prodtot=gl.cstand*gl.prectemp;
+                } else {
+                    prodtot=gl.cstand*prec;
+                }
+
+                ins.init("T_VENTA");
+
+                ins.add("PRODUCTO",prodid);
+                ins.add("SIN_EXISTENCIA",1);
+                ins.add("EMPRESA",emp);
+                if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
+                ins.add("CANT",gl.cstand);
+                if (rutatipo.equalsIgnoreCase("V")) {
+                    ins.add("UMSTOCK",gl.umstock);
+                }else {
+                    ins.add("UMSTOCK",gl.um);
+                }
+                if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
+                ins.add("FACTOR",factorconv);
+                if (porpeso) {
+                    ins.add("PRECIO",gl.prectemp);
+                } else {
+                    ins.add("PRECIO",prec);
+                }
+                ins.add("IMP",impval);
+                ins.add("DES",desc);
+                ins.add("DESMON",descmon);
+                ins.add("TOTAL",prodtot);
+                if (porpeso) {
+                    ins.add("PRECIODOC",gl.prectemp);
+                } else {
+                    ins.add("PRECIODOC",precdoc);
+                }
+                ins.add("PESO",peso);
+                ins.add("VAL1",0);
+                ins.add("VAL2","");
+                ins.add("VAL3",0);
+                ins.add("VAL4","");
+                ins.add("PERCEP",percep);
+
+                db.execSQL(ins.sql());
+            }
+
+
+        } catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}

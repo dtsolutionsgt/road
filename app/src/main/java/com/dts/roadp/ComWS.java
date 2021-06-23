@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.DatabaseErrorHandler;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -36,43 +37,70 @@ import android.widget.Toast;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.text.ParseException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.FileOutputStream;
+import java.text.ParseException;
+
 public class ComWS extends PBase {
 
-	private TextView lblInfo, lblParam, lblRec, lblEnv, lblExis, lblEnvM;
+	private TextView lblInfo, lblParam, lblRec, lblEnv, lblEnvM;
 	private ProgressBar barInfo;
 	private EditText txtRuta, txtWS, txtEmp;
-	private ImageView imgRec, imgEnv, imgExis, imgEnvM;
+	private ImageView imgRec, imgEnv, imgEnvM;
 	private RelativeLayout ralBack, relExist, relPrecio, relStock, relPedidos;
 	private TextView lblUser, lblPassword, txtVersion;
 	private EditText txtUser, txtPassword;
 	private CheckBox cbSuper;
 
-	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
-	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant, rrs;
+	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta, iRutaSupervisor;
+	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant, rrs,sRutaSupervisor;
 	private String licSerial, licRuta, licSerialEnc, licRutaEnc, parImprID;
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag, esEnvioManual = false;
 
 	private SQLiteDatabase dbT;
+	private DatabaseErrorHandler er;
 	private BaseDatos ConT;
 	private BaseDatos.Insert insT;
 	private AppMethods clsAppM;
@@ -101,13 +129,23 @@ public class ComWS extends PBase {
 	private static String sstr, fstr, fprog, finf, ferr, fterr, idbg, dbg, ftmsg, esql, ffpos;
 	private int scon, running, pflag, stockflag, conflag;
 	private String ftext, slsync, senv, gEmpresa, ActRuta, mac, rootdir;
-	private String fsql, fsqli, fsqlf, strliqid;
+	private String fsql, fsqli, fsqlf, strliqid,argstr,xmlresult;
 	private boolean rutapos, ftflag, esvacio, liqid, cargasuper;
 
 	private final String NAMESPACE = "http://tempuri.org/";
 	private String METHOD_NAME, URL, URL_Remota;
 
 	protected PowerManager.WakeLock wakelock;
+
+	private HttpTransportSE transport;
+	private XMLObject xobj;
+
+	private boolean vDBVacia= false;
+
+	//Web service adicional
+
+	private String nombretabla;
+	private int indicetabla;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -168,7 +206,6 @@ public class ComWS extends PBase {
 
 		txtVersion.setText(gl.parFechaVer);
 
-
 		if (gl.ruta.isEmpty()) {
 			ruta = txtRuta.getText().toString();
 			gl.ruta = ruta;
@@ -180,6 +217,7 @@ public class ComWS extends PBase {
 		gEmpresa = gl.emp;
 		rutatipo = gl.rutatipog;
 		rutapos = gl.rutapos;
+		vDBVacia = dbVacia();
 
 		if (gl.tipo == 0) {
 			this.setTitle("Comunicación");
@@ -202,6 +240,8 @@ public class ComWS extends PBase {
 
 		getWSURL();
 
+		xobj = new XMLObject();
+
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
 			if (mu.emptystr(txtRuta.getText().toString())) {
@@ -217,9 +257,9 @@ public class ComWS extends PBase {
 			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}
 
-        //txtRuta.setText("8001-1");
-        //txtEmp.setText("03");
-        //txtWS.setText("http://192.168.1.10/wsAndr/wsandr.asmx");
+		//txtRuta.setText("8001-1");
+		//txtEmp.setText("03");
+		//txtWS.setText("http://192.168.1.10/wsAndr/wsandr.asmx");
 
 		mac = getMac();
 		fsql = du.univfechasql(du.getActDate());
@@ -262,6 +302,21 @@ public class ComWS extends PBase {
 		}
 
 
+	}
+
+	private boolean dbVacia() {
+		Cursor dt;
+
+		try {
+			sql = "SELECT CODIGO FROM P_RUTA";
+			dt = Con.OpenDT(sql);
+
+			return dt.getCount() == 0;
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			return true;
+		}
 	}
 
 	//region Events
@@ -789,7 +844,7 @@ public class ComWS extends PBase {
 
 			//esEnvioManual = true;
 
-			envioFacturas(); 
+			envioFacturas();
 
 			envioPedidos();
 
@@ -964,7 +1019,7 @@ public class ComWS extends PBase {
 					long vfecha = clsAppM.fechaFactTol(du.getActDate());
 					long aFecha = du.getActDate();
 					String fechav = du.sfecha(vfecha);
-                    String fechaa = du.sfecha(aFecha);
+					String fechaa = du.sfecha(aFecha);
 
 					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -1035,14 +1090,14 @@ public class ComWS extends PBase {
 
 			if (!setComParams()) return;
 
-			try {
+			try{
 				//#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
 				View view = this.getCurrentFocus();
-				view.clearFocus();
 				if (view != null) {
+					view.clearFocus();
 					keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
 				}
-			} catch (Exception e) {
+			}catch (Exception e){
 			}
 
 			isbusy = 1;
@@ -1190,6 +1245,7 @@ public class ComWS extends PBase {
 		sstr = "OK";
 
 		try {
+
 
 			idbg = idbg + " filltable ";
 
@@ -1405,63 +1461,400 @@ public class ComWS extends PBase {
 			return 0;
 		}
 	}
+	public int fillTable2(String value, String delcmd) {
+		int rc,retFillTable = 0;
+		String str, ss, tabla;
+		String[] sitems;
+
+		String xr;
+
+		try {
+			sstr = "OK";
+
+			if (nombretabla.contains("P_IMPRESORA")) {
+				callMethod("getInsImpresora");
+				xr = getXMLRegionSingle("getInsImpresoraResult");
+			}else if (nombretabla.contains("CARGA_SUPERVISOR")){
+				callMethod("RutaSupervisor");
+				xr = getXMLRegionSingle("RutaSupervisorResult");
+				sRutaSupervisor = (String) getSingle(xr,"checkLicenceResult",String.class);
+				iRutaSupervisor =  0;
+				if (sRutaSupervisor.equalsIgnoreCase("S")) {
+					iRutaSupervisor = 1;
+				} else if (sRutaSupervisor.equalsIgnoreCase("N")) {
+					iRutaSupervisor= 0;
+				}
+				cargasuper = iRutaSupervisor == 1;
+			}else if (nombretabla.contains("checkLicenceRuta")){
+				callMethod("checkLicenceRuta", "Ruta",ruta);
+				xr=getXMLRegionSingle("checkLicenceRutaResult");
+				licResultRuta=(Integer) getSingle(xr,"checkLicenceRutaResult",Integer.class);
+			}else if (nombretabla.contains("checkLicence")){
+				callMethod("checkLicence","Serial",licSerial);
+				xr=getXMLRegionSingle("checkLicenceResult");
+				licResult=(Integer) getSingle(xr,"checkLicenceResult",Integer.class);
+			}else if (nombretabla.contains("commitSQL")){
+				callMethod("Commit", "SQL", value);
+				xr=getXMLRegionSingle("CommitResponse");
+			}else{
+
+				value=value.replace("&", "&amp;");
+				value=value.replace("\"", "&quot;");
+				value=value.replace("'", "&apos;");
+				value=value.replace("<", "&lt;");
+				value=value.replace(">", "&gt;");
+
+				callMethod("getIns", "SQL", value);
+				xr=getXMLRegionSingle("getInsResult");
+			}
+
+			sitems=xr.split("\n");
+			rc=sitems.length;
+
+			s = "";
+			if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK")) {
+				if (rc == 1) stockflag = 0; else stockflag = 1;
+			}
+
+			if (!delcmd.contains("commitSQL")){
+				tabla=delcmd.substring(12);
+				switch (tabla){
+
+					case "P_RUTA":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("La ruta ingresada no es válida, ruta: " + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+
+					case "P_CLIENTE":
+						if (!cargasuper) {
+							if (rc == 1) {
+								borraDatos();
+								throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+							}
+						}
+						break;
+
+					case "P_PRODUCTO":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+					case "P_PRODPRECIO":
+						if (rc==1){
+							borraDatos();
+							throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+					case "P_COREL":
+						if (rc==1 && gl.rutatipo.equals("V")){
+							borraDatos();
+							throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+						}
+						break;
+				}
+
+				for (int i=1; i < rc-2; i++) {
+
+					try {
+						ss=sitems[i];
+						ss=ss.replace("<string>","");
+						str=ss.replace("</string>","");
+						str=str.replace("&amp;", "&");
+						str=str.replace("&quot;", "\"");
+						str=str.replace("&apos;", "'");
+						str=str.replace("&lt;", "<");
+						str=str.replace("&gt;", ">");
+					} catch (Exception e) {
+						str="";
+					}
+
+					if (i == 1) {
+
+						idbg = idbg + " ret " + str + "  ";
+
+						if (str.equalsIgnoreCase("#")) {
+							listItems.add(delcmd);
+						} else {
+							idbg = idbg + str;
+							ftmsg = ftmsg + "\n" + str;
+							ftflag = true;
+							sstr = str;
+							return 0;
+						}
+					} else {
+						try {
+							sql = str;
+							listItems.add(sql);
+							sstr = str;
+						} catch (Exception e) {
+							addlog(new Object() {
+							}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+							sstr = e.getMessage();
+						}
+					}
+				}
+			}
+
+			retFillTable= 1;
+
+		} catch (Exception e) {
+			sstr = e.getMessage();
+			idbg = idbg + " ERR " + e.getMessage();
+			retFillTable= 0;
+		}
+
+		return  retFillTable;
+	}
+
+	public String getXMLRegionSingle(String nodename) throws Exception {
+		String st,ss,sv,en,sxml;
+		Node xmlnode;
+
+		try {
+
+			InputStream istream = new ByteArrayInputStream( xmlresult.getBytes() );
+			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(istream);
+
+			Element root=doc.getDocumentElement();
+
+			NodeList children=root.getChildNodes();
+			Node bodyroot=children.item(0);
+			NodeList body=bodyroot.getChildNodes();
+			Node responseroot=body.item(0);
+			NodeList response=responseroot.getChildNodes();
+
+			ss="";
+			for(int i =0;i<response.getLength();i++) {
+				ss+=response.item(i).getNodeName()+",\n";
+
+				if (response.item(i).getNodeName().equalsIgnoreCase(nodename)) {
+					xmlnode=response.item(i);
+					sxml=nodeToString(xmlnode);
+					return sxml;
+				}
+			}
+		} catch (Exception e) {
+			throw new Exception(" XMLObject getXMLRegion : "+ e.getMessage());
+		}
+		return "";
+	}
+
+	private String nodeToString(Node node)  throws Exception {
+		StringWriter sw = new StringWriter();
+		try {
+			Transformer t = TransformerFactory.newInstance().newTransformer();
+			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			t.setOutputProperty(OutputKeys.INDENT, "yes");
+			t.transform(new DOMSource(node), new StreamResult(sw));
+		} catch (Exception te) {
+			throw new Exception("XMLObject nodeToString : "+te.getMessage());
+		}
+		return sw.toString();
+	}
+
+	public Object getSingle( String body, String name, Class<?> cl)  throws Exception {
+
+		int start = body.indexOf("<" + name + ">");
+		if (start>-1)  start += name.length() + 2;else start=0;//with <and > char
+		int end = body.indexOf("</" + name + ">");
+		if (end == -1) body = "";else body = body.substring(start, end);
+
+		String gname = cl.getName();
+
+		if (cl.getName().toLowerCase().contains("string")) {
+			return body;
+		}
+		if (cl.getName().toLowerCase().contains("double")) {
+			if (body.isEmpty()) return 0; else return
+					Double.parseDouble(body);
+		}
+		if (cl.getName().toLowerCase().contains("int")) {
+			if (body.isEmpty()) return 0; else return
+					Integer.parseInt(body);
+		}
+
+		if (cl.getName().toLowerCase().contains("boolean")) {
+			return Boolean.parseBoolean(body);
+		}
+
+		return null;
+	}
+
+
+	public void callMethod(String methodName, Object... args) throws Exception {
+		int mTimeOut=5000;
+		String mResult,line="";
+		URL mUrl = new URL(URL);
+
+		try{
+			mResult = "";xmlresult="";
+
+			URLConnection conn = mUrl.openConnection();
+			conn.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
+			conn.addRequestProperty("SOAPAction", "http://tempuri.org/" + methodName);
+
+			//#EJC 20200601: Set Timeout
+			conn.setConnectTimeout(mTimeOut);
+			conn.setReadTimeout(mTimeOut);
+
+			conn.setDoOutput(true);
+
+			OutputStream ostream = conn.getOutputStream();
+
+			OutputStreamWriter wr = new OutputStreamWriter(ostream);
+
+			String body = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+					"<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:" +
+					"xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:" +
+					"soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+					"<soap:Body>" +
+					"<" + methodName + " xmlns=\"http://tempuri.org/\">";
+
+			body += buildArgs(args);
+			body += "</" + methodName + ">" +
+					"</soap:Body>" +
+					"</soap:Envelope>";
+			wr.write(body);
+			wr.flush();
+
+			int responsecode = ((HttpURLConnection) conn).getResponseCode();
+
+			//#EJC20200702:Capturar excepcion de SQL (No se sabe el error pero sabemos que no se proceso)
+			if (responsecode==500) {
+				throw new Exception("Error 500: Esto es poco usual pero algún problema ocurrió del lado del motor de BD al ejecutar sentencia SQL: \n" +
+						"\n" + args[1].toString());
+			}else if (responsecode!=299 && responsecode!=404) {
+
+				BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				while ((line = rd.readLine()) != null) mResult += line;
+				rd.close();rd.close();
+
+				mResult=mResult.replace("ñ","n");
+				xmlresult=mResult;
+
+			} if (responsecode==299) {
+
+				BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				while ((line = rd.readLine()) != null) mResult += line;
+				rd.close();rd.close();
+
+				mResult=mResult.replace("ñ","n");
+				xmlresult=mResult;
+
+				throw new Exception("Error al procesar la solicitud :\n " );
+
+			} if (responsecode==404) {
+				throw new Exception("Error 404: No se obtuvo acceso a: \n" + mUrl.toURI() +
+						"\n" + "Verifique que el WS Existe y es accesible desde el explorador.");
+			}
+
+		} catch (Exception e) {
+			sstr=e.getMessage();
+			throw new Exception(sstr);
+		}
+	}
+
+	private String buildArgs(Object... args) throws IllegalArgumentException, IllegalAccessException    {
+		String result = "";
+		String argName = "";
+		String valor = "";
+
+		for (int i = 0; i < args.length; i++)   {
+			if (i % 2 == 0) {
+				argName = args[i].toString();
+			} else {
+				result += "<" + argName + ">";
+				argstr = result;
+
+				result += buildArgValue(args[i]);
+				argstr = result;
+				result += "</" + argName + ">";
+				argstr = result;
+			}
+		}
+		return result;
+	}
+
+	private String buildArgValue(Object obj) throws IllegalArgumentException, IllegalAccessException   {
+
+		Class<?> cl = null;
+
+		try  {
+			cl = obj.getClass();
+		} catch (Exception e) {
+			return "";
+		}
+
+		String result = "";
+
+		if (cl.isPrimitive()) return obj.toString();
+		if (cl.getName().contains("java.lang.")) return obj.toString();
+		if (cl.getName().equals("java.util.Date"))  {
+			DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+			return dfm.format((Date) obj);
+		}
+
+		if (cl.isArray())  {
+			String xmlName = cl.getName().substring(cl.getName().lastIndexOf(".") + 1);
+			xmlName = xmlName.replace(";", "");
+			Object[] arr = (Object[]) obj;
+
+			for (int i = 0; i < arr.length; i++) {
+				result += "<" + xmlName + ">";
+				result += buildArgValue(arr[i]);
+				result += "</" + xmlName + ">";
+			}
+
+			return result;
+		}
+
+		Field[] fields = cl.getDeclaredFields();
+
+		for (int i = 0; i < fields.length - 1; i++) {
+			result += "<" + fields[i].getName() + ">";
+			result += buildArgValue(fields[i].get(obj));
+			result += "</" + fields[i].getName() + ">";
+		}
+
+		return result;
+	}
+
 
 	public int commitSQL() {
 		int rc;
-		String s, ss;
+		String s, ss="";
 		//#CKFK 20190429 Creé esta variable para retornar si la comunicación fue correcta o no
 		//e hice modificaciones en la función para garantizar esta funcionalidad
-		int vCommit = 0;
+		int vCommit=0;
 
 		METHOD_NAME = "Commit";
 		sstr = "OK";
 
-		if (dbld.size() == 0) vCommit = 1;//return 1
+		if (dbld.size() == 0) vCommit =1;//return 1
 
 		s = "";
 		for (int i = 0; i < dbld.size(); i++) {
 			ss = dbld.items.get(i);
 			s = s + ss + "\n";
 		}
-
 		if (showprogress) {
 			fprog = "Enviando ...";
 			wsStask.onProgressUpdate();
 		}
 
-		try {
+		s=s.replace("&","&amp;");
+		s=s.replace("\"", "&quot;");
+		s=s.replace("'","&apos;");
+		s=s.replace("<", "&lt;");
+		s=s.replace(">", "&gt;");
 
-			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
-			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-			envelope.dotNet = true;
-
-			PropertyInfo param = new PropertyInfo();
-			param.setType(String.class);
-			param.setName("SQL");
-			param.setValue(s);
-
-			request.addProperty(param);
-			envelope.setOutputSoapObject(request);
-
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
-			transport.call(NAMESPACE + METHOD_NAME, envelope);
-
-			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
-
-			s = response.toString();
-
-			sstr = "#";
-			if (s.equalsIgnoreCase("#")) vCommit = 1;// return 1;
-
-			sstr = s;
-			//return 0;
-
-		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-			sstr = e.getMessage();
-			vCommit = 0;
-		}
+		nombretabla = "commitSQL";
+		vCommit=fillTable2(s,"commitSQL");
 
 		return vCommit;
 	}
@@ -1772,7 +2165,7 @@ public class ComWS extends PBase {
 
 	//region WS Recepcion Methods
 
-	private boolean getData() {
+	private boolean getDataOriginal() {
 		Cursor DT;
 		BufferedWriter writer = null;
 		FileWriter wfile;
@@ -2012,6 +2405,250 @@ public class ComWS extends PBase {
 				//msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
 				Log.e("Error", e.getMessage());
 			}
+
+			return true;
+
+		} catch (Exception e) {
+			fprog = "Actualización incompleta";
+			wsRtask.onProgressUpdate();
+
+			Log.e("Error", e.getMessage());
+			try {
+				ConT.close();
+			} catch (Exception ee) {
+				sstr = e.getMessage();
+				ferr += " " + sstr;
+			}
+
+			sstr = e.getMessage();
+			ferr += " " + sstr + "\n" + sql;
+			esql = sql;
+
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), ferr, esql);
+
+			return false;
+
+		}
+
+	}
+
+	private boolean getData() {
+		Cursor DT;
+		BufferedWriter writer = null;
+		FileWriter wfile;
+		int rc, scomp, prn, jj;
+		int ejecutarhh = 0;
+		String s, val = "";
+
+		try {
+
+			if (TieneInventarioSinVentas()) {
+				return false;
+			}
+
+			String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
+			wfile = new FileWriter(fname, false);
+			writer = new BufferedWriter(wfile);
+
+			db.execSQL("DELETE FROM P_LIQUIDACION");
+
+			sql = "SELECT VALOR FROM P_PARAMEXT WHERE ID=2";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
+				val = DT.getString(0);
+			} else {
+				val = "N";
+			}
+
+			DT.close();
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			val = "N";
+		}
+
+		if (val.equalsIgnoreCase("S")) gl.peStockItf = true;
+		else gl.peStockItf = false;
+
+		listItems.clear();
+		scomp = 0;idbg = "";stockflag = 0;ftmsg = "";ftflag = false;rrs="...";
+
+		try {
+
+		    /* temporalmente deshabilitado, cuando va a funcionar carga de todas las tablas, habilitar otra vez
+			if (!AddTable("P_PARAMEXT")) return false;
+			procesaParamsExt();
+
+			listItems.clear();
+			if (!AddTable("P_RUTA")) return false;
+			procesaRuta();
+            */
+
+
+			ferr = "";
+			return true;
+		} catch (Exception e) {
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(),idbg, fstr);
+			return false;
+		}
+
+	}
+
+	private void cargaTablas() {
+		try {
+			listItems.clear();
+			indicetabla=-5;nombretabla="P_PARAMEXT";
+			executaTabla();
+		} catch (Exception e) {
+			String ss=e.getMessage();
+		}
+	}
+
+	private void executaTabla() {
+		try {
+			lblInfo.setText(nombretabla);
+			WSRec wsrec = new WSRec();
+			wsrec.execute();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean procesaDatos() {
+		Cursor DT;
+		BufferedWriter writer = null;
+		FileWriter wfile;
+		int rc, scomp, prn, jj;
+		int ejecutarhh = 0;
+		String s, val = "";
+
+
+		ferr = "";
+		lblInfo.setText("Procesando tablas . . .");
+		try {
+
+			rc = listItems.size();
+			reccnt = rc;
+			if (rc == 0) return true;
+
+			fprog = "Procesando ...";
+			wsRtask.onProgressUpdate();
+
+			ConT=new BaseDatos(this);
+			dbT=ConT.getWritableDatabase();
+			ConT.vDatabase = dbT;
+			insT = ConT.Ins;
+
+			prn = 0;jj = 0;
+
+			try{
+				for (int i = 0; i < rc; i++) {
+
+					sql = listItems.get(i);
+					esql = sql;
+					sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
+					sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
+					sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
+
+					try {
+						writer.write(sql);
+						writer.write("\r\n");
+					} catch (Exception e) {
+						Log.d("M", "Write Something happend there " + e.getMessage());
+					}
+				}
+
+				writer.close();
+
+			}catch (Exception ex){
+				Log.d("M", "Write Something happend there " + ex.getMessage());
+			}
+
+			dbT.beginTransaction();
+
+			for (int i = 0; i < rc; i++) {
+
+				sql = listItems.get(i);esql = sql;
+				sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
+				sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
+				sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
+
+				/*try {
+					writer.write(sql);writer.write("\r\n");
+				} catch (Exception e) {
+					Log.d("M", "Write Something happend there " + e.getMessage());
+				}*/
+
+				try {
+					dbT = ConT.getWritableDatabase();
+					dbT.execSQL(sql);
+				} catch (Exception e) {
+					ferr += " " +e.getMessage();
+					Log.d("M", "Something happend there " + e.getMessage() + "EJC" + " Yo fui " + sql);
+					Log.e("z", e.getMessage());
+				}
+
+				try {
+
+					if (i % 10 == 0) {
+						fprog = "Procesando: " + i + " de: " + (rc - 1);
+						wsRtask.onProgressUpdate();
+						SystemClock.sleep(20);
+					}
+				} catch (Exception e) {
+					Log.e("z", e.getMessage());
+					ferr += " " +e.getMessage();
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+				}
+			}
+
+			fprog = "Procesando: " + (rc - 1) + " de: " + (rc - 1);
+			wsRtask.onProgressUpdate();
+
+			Actualiza_FinDia();
+			encodePrinters();
+			encodeLicence();
+			encodeLicenceRuta();
+
+			SetStatusRecToTrans("1");
+
+			dbT.setTransactionSuccessful();
+			dbT.endTransaction();
+
+			fprog = "Documento de inventario recibido en BOF...";
+			wsRtask.onProgressUpdate();
+
+			fechaCarga();
+			Actualiza_Documentos();
+
+			fprog = "Fin de actualización";
+			wsRtask.onProgressUpdate();
+
+			scomp = 1;
+
+			try {
+				ConT.close();
+			} catch (Exception e) {
+				//addlog(new Object() {	}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			}
+
+			lblInfo.setText(" ");
+			s = "Recepción completa.";
+			if (stockflag == 1) s = s + "\nSe actualizó inventario.";
+
+			clsAppM.estandartInventario();
+			validaDatos(true);
+
+			if (stockflag == 1) sendConfirm();
+
+			isbusy = 0;
+
+			msgAskExit(s);
 
 			return true;
 
@@ -2332,7 +2969,7 @@ public class ComWS extends PBase {
 			wsRtask.onProgressUpdate();
 			SQL = getTableSQL(TN);
 
-			if (fillTable(SQL, "DELETE FROM " + TN) == 1) {
+			if (fillTable2(SQL, "DELETE FROM " + TN) == 1) {
 				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " ok ";
 				idbg = idbg + SQL + "#" + "PASS OK";
 				return true;
@@ -2897,7 +3534,7 @@ public class ComWS extends PBase {
 				DT = Con.OpenDT(sql);
 
 				if (DT.getCount() == 0) {
-					msgbox("La ruta no existe. Por favor informe su supervisor !");
+					msgbox("La ruta no existe, por favor informe a su supervisor!");
 				}
 
 				DT.moveToFirst();
@@ -3211,6 +3848,20 @@ public class ComWS extends PBase {
 
 	//region WS Recepcion Handling Methods
 
+	private void confImpresora() {
+		try {
+
+			sql = "UPDATE Params SET prn='" + clsAppM.getPrintId_Ruta() + "',prnserie='" + clsAppM.impresTipo_Ruta() + "' ";
+			db.execSQL(sql);
+
+		} catch (Exception e) {
+			msgbox(new Object() {
+			}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+		}
+	}
+
+	//endregion
+
 	public void wsExecute() {
 
 		running = 1;
@@ -3258,7 +3909,8 @@ public class ComWS extends PBase {
 		try {
 			if (fstr.equalsIgnoreCase("Sync OK")) {
 
-				lblInfo.setText(" ");
+				cargaTablas();
+				/*lblInfo.setText(" ");
 				s = "Recepción completa.";
 				if (stockflag == 1) s = s + "\nSe actualizó inventario.";
 
@@ -3270,7 +3922,7 @@ public class ComWS extends PBase {
 
 				if (stockflag == 1) sendConfirm();
 
-				msgAskExit(s);
+				msgAskExit(s);*/
 
 			} else {
 				lblInfo.setText(fstr);
@@ -3282,15 +3934,18 @@ public class ComWS extends PBase {
 				return;
 			}
 
-			pendientes = validaPendientes();
+			if (!vDBVacia){
+				pendientes = validaPendientes();
+
+				isbusy = 0;
+				comparaCorrel();
+
+				otrosParametros();
+
+				confImpresora();
+			}
+
 			visibilidadBotones();
-
-			isbusy = 0;
-			comparaCorrel();
-
-			otrosParametros();
-
-			confImpresora();
 
 			if (ftflag) msgbox(ftmsg);
 		} catch (Exception e) {
@@ -3298,20 +3953,8 @@ public class ComWS extends PBase {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 		}
 
-		if (!validaLicencia()) restartApp();
+		//if (!validaLicencia()) restartApp();
 
-	}
-
-	private void confImpresora() {
-		try {
-
-			sql = "UPDATE Params SET prn='" + clsAppM.getPrintId_Ruta() + "',prnserie='" + clsAppM.impresTipo_Ruta() + "' ";
-			db.execSQL(sql);
-
-		} catch (Exception e) {
-			msgbox(new Object() {
-			}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
-		}
 	}
 
 	private class AsyncCallRec extends AsyncTask<String, Void, Void> {
@@ -3360,6 +4003,251 @@ public class ComWS extends PBase {
 			} catch (Exception e) {
 				Log.d("onProgressUpdate", e.getMessage());
 			}
+		}
+
+	}
+
+	//region WS Recepcion por tabla
+
+	private class WSRec extends AsyncTask<String, Void, Void> {
+
+		@Override
+		protected Void doInBackground(String... params) {
+
+			try {
+				wsCargaTabla();
+			} catch (Exception e) {
+				if (scon == 0) fstr = "No se puede conectar al web service : " + sstr;
+				Log.d("onPostExecute", e.getMessage());
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			try {
+				wsCallback();
+			} catch (Exception e) {
+				Log.d("onPostExecute", e.getMessage());
+			}
+
+		}
+
+		@Override
+		protected void onPreExecute() {  }
+
+		@Override
+		protected void onProgressUpdate(Void... values) { }
+
+	}
+
+	public void wsCargaTabla() {
+
+		try {
+//        	if (nombretabla.contains("P_IMPRESORA")){
+//				fillTableImpresora();
+//			}else{
+			AddTable(nombretabla);
+//			}
+		} catch (Exception e) {
+			String ee=e.getMessage();
+		}
+
+	}
+
+	public void wsCallback() {
+		boolean ejecutar=true;
+
+		try {
+			indicetabla++;
+
+			switch (indicetabla) {
+				case -4:
+					nombretabla = "CARGA_SUPERVISOR";break;
+				case -3:
+					nombretabla="P_PARAMEXT";break;
+				case -2:
+					procesaParamsExt();
+					nombretabla ="";
+					break;
+				case -1:
+					nombretabla="P_RUTA";break;
+				case 0:
+					procesaRuta();
+					nombretabla ="";
+					break;
+				case 1:
+					nombretabla="P_EMPRESA";break;
+				case 2:
+					nombretabla="P_COREL";break;
+				case 3:
+					nombretabla="P_PRODUCTO";break;
+				case 4:
+					nombretabla="P_CLIENTE";break;
+				case 5:
+					nombretabla="P_PRODUCTO";break;
+				case 6:
+					nombretabla="P_PRODPRECIO";break;
+				case 7:
+					nombretabla="P_NIVELPRECIO";break;
+				case 8:
+					nombretabla="P_TIPONEG";break;
+				case 9:
+					nombretabla="P_CLIRUTA";break;
+				case 10:
+					nombretabla="P_CLIDIR";break;
+				case 11:
+					nombretabla="P_FACTORCONV";break;
+				case 12:
+					nombretabla="P_LINEA";break;
+				case 13:
+					nombretabla="TMP_PRECESPEC";break;
+				case 14:
+					nombretabla="P_DESCUENTO";break;
+				case 15:
+					nombretabla="P_EMPRESA";break;
+				case 16:
+					nombretabla="P_SUCURSAL";break;
+				case 17:
+					nombretabla="P_BANCO";break;
+				case 18:
+					nombretabla="P_STOCKINV";break;
+				case 19:
+					nombretabla="P_CODATEN";break;
+				case 20:
+					nombretabla="P_CODDEV";break;
+				case 21:
+					nombretabla="P_CODNOLEC";break;
+				case 22:
+					nombretabla="P_CORELNC";break;
+				case 23:
+					nombretabla="P_CORRELREC";break;
+				case 24:
+					nombretabla="P_CORREL_OTROS";break;
+				case 25:
+					nombretabla="P_STOCK_APR";break;
+				case 26:
+					nombretabla="P_STOCK";break;
+				case 27:
+					nombretabla="P_STOCKB";break;
+				case 28:
+					nombretabla="P_STOCK_PALLET";break;//#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
+				case 29:
+					nombretabla="P_COBRO";break;
+				case 30:
+					nombretabla="P_CLIGRUPO";break;
+				case 31:
+					nombretabla="P_MEDIAPAGO";break;
+				case 32:
+					nombretabla="P_BONIF";break;
+				case 33:
+					nombretabla="P_BONLIST";break;
+				case 34:
+					nombretabla="P_PRODGRUP";break;
+				case 35:
+					nombretabla="P_IMPUESTO";break;
+				case 36:
+					nombretabla="P_VENDEDOR";break;
+				case 37:
+					nombretabla="P_MUNI";break;
+				case 38:
+					nombretabla="P_VEHICULO";break;
+				case 39:
+					nombretabla="P_HANDHELD";break;
+				case 40:
+					nombretabla="P_TRANSERROR";break;
+				case 41:
+					nombretabla="P_CATALOGO_PRODUCTO";break;
+				case 42:
+					nombretabla="P_GLOBPARAM";break;
+				case 43:
+					nombretabla="P_CONFIGBARRA";break;
+				case 44:
+					nombretabla="P_REF1";break;
+				case 45:
+					nombretabla="P_REF2";break;
+				case 46:
+					nombretabla="P_REF3";break;
+				case 47:
+					nombretabla="P_ARCHIVOCONF";break;
+				case 48:
+					nombretabla="P_ENCABEZADO_REPORTESHH";break;
+				case 49:
+					nombretabla="P_PORCMERMA";break;
+
+				// Objetivos
+
+				case 50:
+					nombretabla="O_RUTA";break;
+				case 51:
+					nombretabla="O_COBRO";break;
+				case 52:
+					nombretabla="O_PROD";break;
+				case 53:
+					nombretabla="O_LINEA";break;
+
+				// Mercadeo
+
+				case 54:
+					nombretabla="P_MEREQTIPO";break;
+				case 55:
+					nombretabla="P_MEREQUIPO";break;
+				case 56:
+					nombretabla="P_MERESTADO";break;
+				case 57:
+					nombretabla="P_MERPREGUNTA";break;
+				case 58:
+					nombretabla="P_MERRESP";break;
+				case 59:
+					nombretabla="P_MERMARCACOMP";break;
+				case 60:
+					nombretabla="P_MERPRODCOMP";break;
+
+				case 61:
+					nombretabla="P_PEDIDO_RECHAZADO";break;
+				case 62:
+					nombretabla="DS_PEDIDO";break;
+				case 63:
+					nombretabla="DS_PEDIDOD";break;
+				case 64:
+					dbld.clear();
+					dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");
+					dbld.add("EXEC SP_ULTIMOSPRECIOS '" + ruta + "'");
+					commitSQL();
+					nombretabla = "";
+					break;
+				case 65:
+					nombretabla="P_PEDSUG";break;
+				case 66:
+					nombretabla="P_ULTIMOPRECIO";break;
+				case 67:
+					nombretabla="P_IMPRESORA";break;
+				case 68:
+					nombretabla="Procesando tablas ...";break;
+					/*fillTableImpresora();
+					nombretabla = "";
+					break;*/
+				case 69:
+					//licResult=checkLicence(licSerial);
+					nombretabla = "checkLicence";
+					break;
+				case 70:
+					//licResultRuta=checkLicenceRuta(licRuta);
+					nombretabla = "checkLicenceRuta";
+					break;
+				case 71:
+					procesaDatos();
+					ejecutar = false;
+					break;
+			}
+
+			if(ejecutar) {
+				executaTabla();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}

@@ -348,7 +348,8 @@ public class clsDataBuilder {
 	private int getCType(String cn,String ct) {
 		int c=0;
 		
-		if (cn.equalsIgnoreCase("FECHA") || cn.equalsIgnoreCase("FECHAENTR") || cn.equalsIgnoreCase("FECHANAC")) {
+		if (cn.equalsIgnoreCase("FECHA") || cn.equalsIgnoreCase("FECHAENTR")
+            || cn.equalsIgnoreCase("FECHANAC") || cn.equalsIgnoreCase("FECHA_SISTEMA") ) {
 			c=2;
 			if (cn.equalsIgnoreCase("FECHANAC")) c=3;
 		} else {	

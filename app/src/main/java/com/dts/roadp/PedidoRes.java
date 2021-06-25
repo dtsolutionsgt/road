@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -48,6 +47,7 @@ public class PedidoRes extends PBase {
 	private Runnable printcallback,printclose,printexit;
 	
 	private clsDescGlob clsDesc;
+    private clsDataBuilder dbld;
 	private printer prn;
 	private clsDocPedido pdoc;
     private AppMethods app;
@@ -303,9 +303,7 @@ public class PedidoRes extends PBase {
 				return;
 			}
 
-			if (!saveOrder()) {
-				return;
-			}
+			if (!saveOrder()) return;
 
 			clsBonifSave bonsave=new clsBonifSave(this,corel,"P");
 
@@ -324,6 +322,8 @@ public class PedidoRes extends PBase {
 				prn.printask(printcallback);
 			}
 
+            if (toledano) enviaPedido();
+
 			gl.closeCliDet=true;
 			gl.closeVenta=true;
 
@@ -331,13 +331,45 @@ public class PedidoRes extends PBase {
 				gl.tolpedsend=true;
 				super.finish();
 			}
-		}catch (Exception e){
+		} catch (Exception e){
 			mu.msgbox("Error " + e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		
 	}
+
+	private void enviaPedido() {
+        Cursor dt;
+        String wsurl,psql="";
+
+        try {
+            sql="SELECT FTPFOLD FROM P_RUTA";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+            wsurl=dt.getString(0);
+            if (wsurl.isEmpty()) {
+                toastlong("No se puede enviar pedido, no está definida la URL de web service");return;
+            }
+
+            dbld = new clsDataBuilder(this);
+            dbld.insert("D_PEDIDO", "WHERE COREL='" + corel + "'");
+            dbld.insert("D_PEDIDOD", "WHERE COREL='" + corel + "'");
+
+            for (int i = 0; i < dbld.size(); i++) {
+                psql=psql+dbld.items.get(i)+"\n";
+            }
+
+            Intent intent = new Intent(PedidoRes.this, srvEnvPedido.class);
+            intent.putExtra("URL",wsurl);
+            intent.putExtra("command",psql);
+            intent.putExtra("correlativo",corel);
+            startService(intent);
+
+        } catch (Exception e) {
+            toastlong(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
+    }
  	
 	private void singlePrint() {
  		prn.printask(printcallback);

@@ -301,7 +301,7 @@ public class ComWS extends PBase {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "wakeLock");
 		}
 
-
+        actualizaEstadoPedidos();
 	}
 
 	private boolean dbVacia() {
@@ -396,7 +396,7 @@ public class ComWS extends PBase {
 			if (gl.banderafindia) {
 				if (!puedeComunicar()) {
 					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
-					//return;
+					return;
 				}
 			}
 
@@ -1461,6 +1461,7 @@ public class ComWS extends PBase {
 			return 0;
 		}
 	}
+
 	public int fillTable2(String value, String delcmd) {
 		int rc,retFillTable = 0;
 		String str, ss, tabla;
@@ -1685,7 +1686,6 @@ public class ComWS extends PBase {
 		return null;
 	}
 
-
 	public void callMethod(String methodName, Object... args) throws Exception {
 		int mTimeOut=5000;
 		String mResult,line="";
@@ -1824,7 +1824,6 @@ public class ComWS extends PBase {
 		return result;
 	}
 
-
 	public int commitSQL() {
 		int rc;
 		String s, ss="";
@@ -1859,7 +1858,65 @@ public class ComWS extends PBase {
 		return vCommit;
 	}
 
-	public int OpenDTt(String sql) {
+    public int commitSQLs() {
+        int rc;
+        String s, ss;
+        int vCommit = 0;
+
+        METHOD_NAME = "Commit";
+        sstr = "OK";
+
+        if (dbld.size() == 0) vCommit = 1;//return 1
+
+        s = "";
+        for (int i = 0; i < dbld.size(); i++) {
+            ss = dbld.items.get(i);
+            s = s + ss + "\n";
+        }
+
+        if (showprogress) {
+            fprog = "Enviando ...";
+            wsStask.onProgressUpdate();
+        }
+
+        try {
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            PropertyInfo param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("SQL");
+            param.setValue(s);
+
+            request.addProperty(param);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL, 60000);
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+            s = response.toString();
+
+            sstr = "#";
+            if (s.equalsIgnoreCase("#")) vCommit = 1;// return 1;
+
+            sstr = s;
+            //return 0;
+
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            sstr = e.getMessage();
+            vCommit = 0;
+        }
+
+        return vCommit;
+    }
+
+    public int OpenDTt(String sql) {
 		int rc;
 
 		METHOD_NAME = "OpenDT";
@@ -2466,8 +2523,7 @@ public class ComWS extends PBase {
 			DT.close();
 
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			val = "N";
 		}
 
@@ -3518,7 +3574,8 @@ public class ComWS extends PBase {
 
             SQL = "SELECT  RUTA, CODIGO, CANT, PESO, CANT_SOL, PESO_SOL, UNIDADMEDIDA, DOCUMENTO, " +
                     "0 , ANULADO, CENTRO, ESTADO, ENVIADO " +
-                    "FROM P_STOCK_PV WHERE (RUTA ='"+ActRuta+"') AND (ANULADO=0) ";
+                    "FROM P_STOCK_PV WHERE (RUTA ='"+ActRuta+"') AND (ANULADO=0) " +
+                    "AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') ";
             return SQL;
         }
 
@@ -3848,20 +3905,6 @@ public class ComWS extends PBase {
 
 	//region WS Recepcion Handling Methods
 
-	private void confImpresora() {
-		try {
-
-			sql = "UPDATE Params SET prn='" + clsAppM.getPrintId_Ruta() + "',prnserie='" + clsAppM.impresTipo_Ruta() + "' ";
-			db.execSQL(sql);
-
-		} catch (Exception e) {
-			msgbox(new Object() {
-			}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
-		}
-	}
-
-	//endregion
-
 	public void wsExecute() {
 
 		running = 1;
@@ -3957,7 +4000,19 @@ public class ComWS extends PBase {
 
 	}
 
-	private class AsyncCallRec extends AsyncTask<String, Void, Void> {
+    private void confImpresora() {
+        try {
+
+            sql = "UPDATE Params SET prn='" + clsAppM.getPrintId_Ruta() + "',prnserie='" + clsAppM.impresTipo_Ruta() + "' ";
+            db.execSQL(sql);
+
+        } catch (Exception e) {
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+        }
+    }
+
+    private class AsyncCallRec extends AsyncTask<String, Void, Void> {
 
 		@Override
 		protected Void doInBackground(String... params) {
@@ -4006,6 +4061,8 @@ public class ComWS extends PBase {
 		}
 
 	}
+
+    //endregion
 
 	//region WS Recepcion por tabla
 
@@ -4236,7 +4293,12 @@ public class ComWS extends PBase {
 					//licResultRuta=checkLicenceRuta(licRuta);
 					nombretabla = "checkLicenceRuta";
 					break;
-				case 71:
+
+                case 71:
+                    nombretabla = "P_STOCK_PV";
+                    break;
+
+				case 72:
 					procesaDatos();
 					ejecutar = false;
 					break;
@@ -4685,7 +4747,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_REL_PROD_BON", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIFFALT", "WHERE COREL='" + cor + "'");
 
-					//if (envioparcial && !esEnvioManual) {
+					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_PEDIDO SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
@@ -4695,7 +4757,7 @@ public class ComWS extends PBase {
 							errflag = true;
 							fterr += "\n" + sstr;
 						}
-					//} else pc += 1;
+					} else pc += 1;
 
 				} catch (Exception e) {
 					errflag = true;
@@ -6634,8 +6696,6 @@ public class ComWS extends PBase {
 
 	}
 
-	;
-
 	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
 	public boolean ExisteInventario() {
 
@@ -6657,8 +6717,6 @@ public class ComWS extends PBase {
 		}
 
 	}
-
-	;
 
 	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
 	public boolean ExistenDatos() {
@@ -6685,8 +6743,6 @@ public class ComWS extends PBase {
 		}
 
 	}
-
-	;
 
 	private void msgResultEnvio(String msg) {
 		try {
@@ -6768,8 +6824,6 @@ public class ComWS extends PBase {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
-
-
 	}
 
 	private void msgAskExitComplete() {
@@ -6944,6 +6998,36 @@ public class ComWS extends PBase {
 
 		return  vTieneInventarioSinVentas;
 	}
+
+    private void actualizaEstadoPedidos() {
+        int pp;
+        String fname,cor;
+
+        try {
+            String path = Environment.getExternalStorageDirectory().getPath() + "/RoadPedidos";
+            File directory = new File(path);
+            File[] files = directory.listFiles();
+
+            for (int i = 0; i < files.length; i++) {
+                try {
+                    fname = files[i].getName();
+                    pp = fname.indexOf(".txt");
+                    if (pp > 0) {
+                        cor=fname.substring(0,pp);
+
+                        db.execSQL("UPDATE D_PEDIDO SET STATCOM='S' WHERE COREL='"+cor+"'");
+
+                        new File(path+"/"+cor+".txt").delete();
+                    }
+                } catch (Exception e) {
+                    msgbox("actualizaEstadoPedidos1 : "+e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            msgbox("actualizaEstadoPedidos2 : "+e.getMessage());
+        }
+    }
+
 	//endregion
 
 	//region Activity Events

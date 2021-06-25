@@ -38,8 +38,7 @@ public class ProdCantPrev extends PBase {
     private boolean pexist,esdecimal,porpeso,esbarra,idle=true,critico;
     private AppMethods app;
 
-
-    //JP20210614  - activy creada nueva
+    //JP20210614  - activity creada nueva
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -539,6 +538,7 @@ public class ProdCantPrev extends PBase {
             }
 
             if (gl.peModal.equalsIgnoreCase("TOL"))  {
+                /*
                 if (critico) {
                     if (cant > idisp) {
                         cexist=0;cstand=0;
@@ -549,12 +549,13 @@ public class ProdCantPrev extends PBase {
                         cexist=cant;cstand=0;
                     }
                 } else {
+                 */
                     if (cant > idisp) {
                         cexist=idisp;cstand=cant-idisp;
                     } else {
                         cexist=cant;cstand=0;
                     }
-                }
+                //}
                 cant=cexist;
             }
 
@@ -593,7 +594,6 @@ public class ProdCantPrev extends PBase {
             gl.umstock = umstock;
             gl.umfactor = umfactor;
             gl.prectemp = prec;
-
 
             if (gl.peModal.equalsIgnoreCase("TOL")) {
                 gl.cexist=cexist;gl.cstand=cstand;
@@ -961,8 +961,15 @@ public class ProdCantPrev extends PBase {
             dt.moveToFirst();
             critico=dt.getString(0).equalsIgnoreCase("C");
 
-            if (critico) relcrit.setVisibility(View.VISIBLE); else relcrit.setVisibility(View.INVISIBLE);
-
+            if (critico) {
+                relcrit.setVisibility(View.VISIBLE);
+                lblDisp.setVisibility(View.VISIBLE);
+                lblDispLbl.setVisibility(View.VISIBLE);
+            } else {
+                relcrit.setVisibility(View.INVISIBLE);
+                lblDisp.setVisibility(View.INVISIBLE);
+                lblDispLbl.setVisibility(View.INVISIBLE);
+            }
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

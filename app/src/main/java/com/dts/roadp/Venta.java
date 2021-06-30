@@ -854,7 +854,7 @@ public class Venta extends PBase {
 			ins.add("VAL4","");
 			ins.add("PERCEP",percep);
 
-			db.execSQL(ins.sql());
+			if (cant>0) db.execSQL(ins.sql());
 
             if ((gl.cstand>0) && rutatipo.equalsIgnoreCase("P") && gl.peModal.equalsIgnoreCase("TOL")) {
 
@@ -867,7 +867,13 @@ public class Venta extends PBase {
                 ins.init("T_VENTA");
 
                 ins.add("PRODUCTO",prodid);
-                ins.add("SIN_EXISTENCIA",1);
+
+                if (gl.tolprodcrit) {
+                    ins.add("SIN_EXISTENCIA",1);
+                } else {
+                    ins.add("SIN_EXISTENCIA",0);
+                }
+
                 ins.add("EMPRESA",emp);
                 if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
                 ins.add("CANT",gl.cstand);
@@ -899,7 +905,7 @@ public class Venta extends PBase {
                 ins.add("VAL4","");
                 ins.add("PERCEP",percep);
 
-                db.execSQL(ins.sql());
+                if (gl.cstand>0) db.execSQL(ins.sql());
             }
 
 

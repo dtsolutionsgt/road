@@ -1698,6 +1698,8 @@ public class BaseDatosScript {
 					"[NUMVERSION] TEXT NOT NULL,"+
 					"[FECHAVERSION] INTEGER NOT NULL,"+
 					"[ARQUITECTURA] TEXT NOT NULL,"+
+                    "[ENVIO_AUTO_PEDIDOS] INTEGER NOT NULL,"+
+                    "[PEDIDOS_CLINUEVO] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

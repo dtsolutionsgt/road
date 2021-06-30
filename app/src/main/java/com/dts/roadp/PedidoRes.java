@@ -291,8 +291,21 @@ public class PedidoRes extends PBase {
 	}
 	
  	private void finishOrder(){
+	    boolean autoenvio=false;
 
-		try{
+        try {
+            sql = "SELECT ENVIO_AUTO_PEDIDOS FROM P_RUTA";
+            Cursor DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                autoenvio = DT.getInt(0)==1;
+            }
+        } catch (Exception e) {
+            autoenvio=false;
+        }
+
+		try {
 
 			fecha=du.cfechaSinHora(Integer.parseInt(lblFecha.getText().toString().substring(8,10)),
 					Integer.parseInt(lblFecha.getText().toString().substring(3,5)),
@@ -322,7 +335,9 @@ public class PedidoRes extends PBase {
 				prn.printask(printcallback);
 			}
 
-            if (toledano) enviaPedido();
+            if (toledano && autoenvio) {
+                enviaPedido();
+            }
 
 			gl.closeCliDet=true;
 			gl.closeVenta=true;

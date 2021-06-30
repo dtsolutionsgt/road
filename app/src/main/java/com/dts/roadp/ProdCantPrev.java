@@ -961,6 +961,8 @@ public class ProdCantPrev extends PBase {
             dt.moveToFirst();
             critico=dt.getString(0).equalsIgnoreCase("C");
 
+            gl.tolprodcrit=critico;
+
             if (critico) {
                 relcrit.setVisibility(View.VISIBLE);
                 lblDisp.setVisibility(View.VISIBLE);

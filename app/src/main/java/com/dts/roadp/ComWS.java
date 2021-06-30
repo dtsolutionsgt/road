@@ -3297,7 +3297,7 @@ public class ComWS extends PBase {
 					"FTPFOLD, EMAIL, LASTIMP, LASTCOM, LASTEXP, IMPSTAT, EXPSTAT, COMSTAT, PARAM1, " +
 					"PARAM2, PESOLIM, INTERVALO_MAX, LECTURAS_VALID, INTENTOS_LECT, HORA_INI, HORA_FIN, " +
 					"APLICACION_USA, PUERTO_GPS, ES_RUTA_OFICINA, DILUIR_BON, PREIMPRESION_FACTURA, MODIFICAR_MEDIA_PAGO, " +
-					"IDIMPRESORA, NUMVERSION,0 AS FECHAVERSION, ARQUITECTURA " +
+					"IDIMPRESORA, NUMVERSION,0 AS FECHAVERSION, ARQUITECTURA,ENVIO_AUTO_PEDIDOS,PEDIDOS_CLINUEVO " +
 					"FROM P_RUTA WHERE CODIGO = '" + ActRuta + "'";
 			return SQL;
 		}
@@ -4736,12 +4736,19 @@ public class ComWS extends PBase {
 						wsStask.onProgressUpdate();
 					}
 
-
 					if (envioparcial) dbld.clear();
+
+					/*
+                    dbld.add("DELETE FROM D_PEDIDO WHERE COREL='" + cor + "'");
+                    dbld.add("DELETE FROM D_PEDIDOD WHERE COREL='" + cor + "'");
+                    dbld.add("DELETE FROM D_BONIF WHERE COREL='" + cor + "'");
+                    dbld.add("DELETE FROM D_BONIF_LOTES WHERE COREL='" + cor + "'");
+                    dbld.add("DELETE FROM D_REL_PROD_BON WHERE COREL='" + cor + "'");
+                    dbld.add("DELETE FROM D_BONIFFALT WHERE COREL='" + cor + "'");
+                    */
 
 					dbld.insert("D_PEDIDO", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_PEDIDOD", "WHERE COREL='" + cor + "'");
-
 					dbld.insert("D_BONIF", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIF_LOTES", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_REL_PROD_BON", "WHERE COREL='" + cor + "'");

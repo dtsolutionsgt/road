@@ -16,6 +16,8 @@ import java.io.IOException;
 
 public class wsEnvPedido extends wsBase {
 
+    public boolean correcto;
+
     private String command,corel;
 
     private String pdir= Environment.getExternalStorageDirectory().getPath() + "/RoadPedidos";
@@ -25,10 +27,11 @@ public class wsEnvPedido extends wsBase {
         super(Url);
     }
 
-    public void execute(String commandlist,String correlativo) {
+    public void execute(String commandlist,String correlativo,Runnable afterfinish) {
         command=commandlist;
         corel=correlativo;
-        super.execute(null);
+        callBack=afterfinish;
+        super.execute(callBack);
     }
 
     @Override
@@ -44,6 +47,8 @@ public class wsEnvPedido extends wsBase {
 
     public boolean commit() {
         String sstr,mNAME = "Commit";
+
+        correcto=false;
 
         try {
 
@@ -67,6 +72,7 @@ public class wsEnvPedido extends wsBase {
             sstr = response.toString();
 
             if (sstr.equalsIgnoreCase("#")) {
+                correcto=true;
                 return true;
             } else {
                 error=sstr;return false;

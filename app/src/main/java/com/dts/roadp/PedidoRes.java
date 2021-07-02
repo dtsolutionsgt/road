@@ -335,9 +335,7 @@ public class PedidoRes extends PBase {
 				prn.printask(printcallback);
 			}
 
-            if (toledano && autoenvio) {
-                enviaPedido();
-            }
+            if (toledano && autoenvio) enviaPedido();
 
 			gl.closeCliDet=true;
 			gl.closeVenta=true;
@@ -410,6 +408,12 @@ public class PedidoRes extends PBase {
 			peso=DT.getDouble(3);
 			
 			db.beginTransaction();
+
+			if (!gl.modpedid.isEmpty()) {
+                corel=gl.modpedid;
+                db.execSQL("DELETE FROM D_PEDIDO WHERE COREL='"+corel+"'");
+                db.execSQL("DELETE FROM D_PEDIDOD WHERE COREL='"+corel+"'");
+           }
 			
 			ins.init("D_PEDIDO");
 			ins.add("COREL",corel);

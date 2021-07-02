@@ -136,6 +136,8 @@ public class Venta extends PBase {
 		cliPorDia();
 		validaNivelPrecio();
 
+		if (!gl.modpedid.isEmpty()) cargaPedido();
+
 		txtBarra.requestFocus();txtBarra.setText("");
 
 		dialogBarra= new AlertDialog.Builder(this);
@@ -961,6 +963,61 @@ public class Venta extends PBase {
 			mu.msgbox("Error : " + e.getMessage());
 		}
 	}
+
+	private void cargaPedido() {
+        Cursor dt;
+
+        try {
+            db.beginTransaction();
+
+            sql="SELECT PRODUCTO,SIN_EXISTENCIA,UMVENTA,CANT,FACTOR,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2 " +
+                "FROM D_PEDIDOD WHERE COREL='"+gl.modpedid+"'";
+            dt=Con.OpenDT(sql);
+
+            if (dt.getCount()>0) {
+                dt.moveToFirst();
+                while (!dt.isAfterLast()) {
+
+                    ins.init("T_VENTA");
+
+                    ins.add("PRODUCTO",dt.getString(0));
+                    ins.add("SIN_EXISTENCIA",dt.getInt(1));
+                    ins.add("EMPRESA",emp);
+                    ins.add("UM",dt.getString(2));
+                    ins.add("CANT",dt.getDouble(3));
+                    ins.add("UMSTOCK",dt.getString(2));
+                    ins.add("FACTOR",dt.getDouble(4));
+                    ins.add("PRECIO",dt.getDouble(5));
+                    ins.add("IMP",dt.getDouble(6));
+                    ins.add("DES",dt.getDouble(7));
+                    ins.add("DESMON",dt.getDouble(8));
+                    ins.add("TOTAL",dt.getDouble(9));
+                    ins.add("PRECIODOC",dt.getDouble(10));
+                    ins.add("PESO",dt.getDouble(11));
+                    ins.add("VAL1",dt.getDouble(12));
+                    ins.add("VAL2",dt.getString(13));
+
+                    ins.add("VAL3",0);
+                    ins.add("VAL4","");
+                    ins.add("PERCEP",0);
+
+                    db.execSQL(ins.sql());
+
+                    dt.moveToNext();
+                }
+            }
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
+            listItems();
+
+        } catch (Exception e) {
+            db.endTransaction();
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
+    }
 
 	//endregion
 

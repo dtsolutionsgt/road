@@ -4738,15 +4738,6 @@ public class ComWS extends PBase {
 
 					if (envioparcial) dbld.clear();
 
-					/*
-                    dbld.add("DELETE FROM D_PEDIDO WHERE COREL='" + cor + "'");
-                    dbld.add("DELETE FROM D_PEDIDOD WHERE COREL='" + cor + "'");
-                    dbld.add("DELETE FROM D_BONIF WHERE COREL='" + cor + "'");
-                    dbld.add("DELETE FROM D_BONIF_LOTES WHERE COREL='" + cor + "'");
-                    dbld.add("DELETE FROM D_REL_PROD_BON WHERE COREL='" + cor + "'");
-                    dbld.add("DELETE FROM D_BONIFFALT WHERE COREL='" + cor + "'");
-                    */
-
 					dbld.insert("D_PEDIDO", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_PEDIDOD", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIF", "WHERE COREL='" + cor + "'");

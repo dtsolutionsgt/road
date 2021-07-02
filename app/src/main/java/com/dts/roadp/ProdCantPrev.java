@@ -57,9 +57,9 @@ public class ProdCantPrev extends PBase {
         gl.cexist=0;gl.cstand=0;
 
         prc=new Precio(this,mu,gl.peDec);
-        getDisp();
-
         app = new AppMethods(this, gl, Con, db);
+
+        getDisp();
 
         setHandlers();
 
@@ -222,7 +222,9 @@ public class ProdCantPrev extends PBase {
             dt.moveToFirst();
             um=dt.getString(0);umini=um;
             if (rutatipo.equalsIgnoreCase("P")) {
-                if (app.prodBarra(prodid)) um=DameUnidadMinimaVenta(prodid);
+                if (app.prodBarra(prodid)) {
+                    um=DameUnidadMinimaVenta(prodid);
+                }
             }
             ubas=um;umfact=um;
             lblBU.setText(ubas);gl.ubas=ubas;upres=ubas;
@@ -387,6 +389,17 @@ public class ProdCantPrev extends PBase {
         double umf2 =1;
 
         try {
+
+            sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+            um=dt.getString(0);umini=um;
+            if (rutatipo.equalsIgnoreCase("P")) {
+                if (app.prodBarra(prodid)) {
+                    um=DameUnidadMinimaVenta(prodid);
+                }
+            }
+            ubas=um;umfact=um;
 
             pesostock=0;
 
@@ -1026,7 +1039,6 @@ public class ProdCantPrev extends PBase {
 
     private double precioPreventaPres() {
         double pp=0;
-
 
         pp=prc.precio(prodid,1,nivel,umini,gl.umpeso,0,umini);
         if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {

@@ -2532,6 +2532,7 @@ public class ComWS extends PBase {
 
 		ferr = "";
 		lblInfo.setText("Procesando tablas . . .");
+
 		try {
 
 			rc = listItems.size();

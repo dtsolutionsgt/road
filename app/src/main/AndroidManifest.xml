@@ -43,6 +43,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name="com.dts.roadp.srvBase"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name="com.dts.roadp.srvEnvPedido"
+            android:enabled="true"
+            android:exported="true" />
+
         <activity
             android:name=".Menu"
             android:label="@string/title_activity_menu"

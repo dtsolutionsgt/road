@@ -111,6 +111,7 @@ public class BaseDatosScript {
 					"[ID_DESPACHO] INTEGER NOT NULL,"+
 					"[ID_FACTURACION] INTEGER NOT NULL,"+
 					"[RUTASUPER] TEXT NOT NULL,"+
+                    "[FECHA_SISTEMA] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);
@@ -1725,6 +1726,8 @@ public class BaseDatosScript {
 					"[ARQUITECTURA] TEXT NOT NULL,"+
 					"[PERMITIR_PRODUCTO_NUEVO] INTEGER NOT NULL,"+
 					"[PERMITIR_CANTIDAD_MAYOR] INTEGER NOT NULL,"+
+                    "[ENVIO_AUTO_PEDIDOS] INTEGER NOT NULL,"+
+                    "[PEDIDOS_CLINUEVO] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

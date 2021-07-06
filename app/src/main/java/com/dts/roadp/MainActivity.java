@@ -413,14 +413,17 @@ public class MainActivity extends PBase {
         try {
             File directory = new File(Environment.getExternalStorageDirectory() + "/SyncFold");
             directory.mkdirs();
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos");
             directory.mkdirs();
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
+
+        try {
+            File directory = new File(Environment.getExternalStorageDirectory() + "/RoadPedidos");
+            directory.mkdirs();
+        } catch (Exception e) {}
 
         //Id de Dispositivo
         gl.deviceId = androidid();

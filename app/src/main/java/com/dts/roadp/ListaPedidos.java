@@ -36,12 +36,14 @@ public class ListaPedidos extends PBase {
 
         setHandlers();
         listItems();
+
+        gl.modpedid="";
     }
 
     //region Events
 
     public void nuevoPedido(View view){
-        gl.modpedid="*";
+        gl.modpedid="";
         iniciaPedido();
     }
 

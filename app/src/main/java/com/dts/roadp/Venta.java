@@ -136,6 +136,8 @@ public class Venta extends PBase {
 		cliPorDia();
 		validaNivelPrecio();
 
+		if (!gl.modpedid.isEmpty()) cargaPedido();
+
 		txtBarra.requestFocus();txtBarra.setText("");
 
 		dialogBarra= new AlertDialog.Builder(this);
@@ -472,6 +474,16 @@ public class Venta extends PBase {
 				" FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO "+
 				" ORDER BY P_PRODUCTO.DESCCORTA ";
 
+            if (gl.rutatipo.equalsIgnoreCase("P") && gl.peModal.equalsIgnoreCase("TOL")) {
+                sql=" SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, SUM(T_VENTA.TOTAL), SUM(T_VENTA.CANT), "+
+                        " T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, " +
+                        " SUM(T_VENTA.PESO), T_VENTA.UMSTOCK, T_VENTA.PRECIO, T_VENTA.FACTOR  " +
+                        " FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO " +
+                        " GROUP BY T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA,T_VENTA.PRECIODOC, T_VENTA.DES, " +
+                        " T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, T_VENTA.UMSTOCK, T_VENTA.PRECIO, T_VENTA.FACTOR "+
+                        " ORDER BY P_PRODUCTO.DESCCORTA ";
+            }
+
 			DT=Con.OpenDT(sql);
 
 			if (DT.getCount()>0) {
@@ -597,7 +609,6 @@ public class Venta extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 
 	private void processCant(){
@@ -847,9 +858,62 @@ public class Venta extends PBase {
 			ins.add("VAL4","");
 			ins.add("PERCEP",percep);
 
-			db.execSQL(ins.sql());
+			if (cant>0) db.execSQL(ins.sql());
 
-		} catch (SQLException e) {
+            if ((gl.cstand>0) && rutatipo.equalsIgnoreCase("P") && gl.peModal.equalsIgnoreCase("TOL")) {
+
+                if (porpeso) {
+                    prodtot=gl.cstand*gl.prectemp;
+                } else {
+                    prodtot=gl.cstand*prec;
+                }
+
+                ins.init("T_VENTA");
+
+                ins.add("PRODUCTO",prodid);
+
+                if (gl.tolprodcrit) {
+                    ins.add("SIN_EXISTENCIA",1);
+                } else {
+                    ins.add("SIN_EXISTENCIA",0);
+                }
+
+                ins.add("EMPRESA",emp);
+                if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
+                ins.add("CANT",gl.cstand);
+                if (rutatipo.equalsIgnoreCase("V")) {
+                    ins.add("UMSTOCK",gl.umstock);
+                }else {
+                    ins.add("UMSTOCK",gl.um);
+                }
+                if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
+                ins.add("FACTOR",factorconv);
+                if (porpeso) {
+                    ins.add("PRECIO",gl.prectemp);
+                } else {
+                    ins.add("PRECIO",prec);
+                }
+                ins.add("IMP",impval);
+                ins.add("DES",desc);
+                ins.add("DESMON",descmon);
+                ins.add("TOTAL",prodtot);
+                if (porpeso) {
+                    ins.add("PRECIODOC",gl.prectemp);
+                } else {
+                    ins.add("PRECIODOC",precdoc);
+                }
+                ins.add("PESO",peso);
+                ins.add("VAL1",0);
+                ins.add("VAL2","");
+                ins.add("VAL3",0);
+                ins.add("VAL4","");
+                ins.add("PERCEP",percep);
+
+                if (gl.cstand>0) db.execSQL(ins.sql());
+            }
+
+
+        } catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
@@ -901,6 +965,61 @@ public class Venta extends PBase {
 			mu.msgbox("Error : " + e.getMessage());
 		}
 	}
+
+	private void cargaPedido() {
+        Cursor dt;
+
+        try {
+            db.beginTransaction();
+
+            sql="SELECT PRODUCTO,SIN_EXISTENCIA,UMVENTA,CANT,FACTOR,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2 " +
+                "FROM D_PEDIDOD WHERE COREL='"+gl.modpedid+"'";
+            dt=Con.OpenDT(sql);
+
+            if (dt.getCount()>0) {
+                dt.moveToFirst();
+                while (!dt.isAfterLast()) {
+
+                    ins.init("T_VENTA");
+
+                    ins.add("PRODUCTO",dt.getString(0));
+                    ins.add("SIN_EXISTENCIA",dt.getInt(1));
+                    ins.add("EMPRESA",emp);
+                    ins.add("UM",dt.getString(2));
+                    ins.add("CANT",dt.getDouble(3));
+                    ins.add("UMSTOCK",dt.getString(2));
+                    ins.add("FACTOR",dt.getDouble(4));
+                    ins.add("PRECIO",dt.getDouble(5));
+                    ins.add("IMP",dt.getDouble(6));
+                    ins.add("DES",dt.getDouble(7));
+                    ins.add("DESMON",dt.getDouble(8));
+                    ins.add("TOTAL",dt.getDouble(9));
+                    ins.add("PRECIODOC",dt.getDouble(10));
+                    ins.add("PESO",dt.getDouble(11));
+                    ins.add("VAL1",dt.getDouble(12));
+                    ins.add("VAL2",dt.getString(13));
+
+                    ins.add("VAL3",0);
+                    ins.add("VAL4","");
+                    ins.add("PERCEP",0);
+
+                    db.execSQL(ins.sql());
+
+                    dt.moveToNext();
+                }
+            }
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
+            listItems();
+
+        } catch (Exception e) {
+            db.endTransaction();
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
+    }
 
 	//endregion
 

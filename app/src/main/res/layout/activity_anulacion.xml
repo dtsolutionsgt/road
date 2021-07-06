@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@layout/back"
-    tools:context=".Reimpresion" >
+    tools:context=".Anulacion" >
 
     <RelativeLayout
         android:id="@+id/relRoad"
@@ -74,15 +74,15 @@
         android:id="@+id/imgImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="false"
         android:layout_below="@+id/relRoad"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentRight="true"
         android:clickable="true"
-        android:onClick="nuevoPedido"
-        android:paddingBottom="10dp"
+        android:onClick="anulDoc"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
         android:paddingTop="5dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
         android:src="@drawable/anulacion48" />
 
     <TextView

@@ -661,22 +661,22 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX D_FACTURA_BARRA_idx1 ON D_FACTURA_BARRA(COREL)";
 			database.execSQL(vSQL);
 
-			vSQL="CREATE TABLE [D_FACTURA_MODIF]("+
-					"[COREL] [nvarchar](20) NOT NULL,"+
-					"[ANULADO] [bit] NOT NULL,"+
-					"[PRODUCTO] [nvarchar](15) NOT NULL,"+
-					"[CANTSOLICITADA] [float],"+
-					"[PESOSOLICITADO] [float],"+
-					"[CANTENTREGADA] [float],"+
-					"[PESOENTREGADO] [float],"+
-					"[IDRAZON] [int],"+
+			vSQL="CREATE TABLE [D_FACTURAD_MODIF]("+
+					"[COREL] TEXT NOT NULL,"+
+					"[ANULADO] INTEGER NOT NULL,"+
+					"[PRODUCTO] TEXT (15) NOT NULL,"+
+					"[CANTSOLICITADA] REAL,"+
+					"[PESOSOLICITADO] REAL,"+
+					"[CANTENTREGADA] REAL,"+
+					"[PESOENTREGADO] REAL,"+
+					"[IDRAZON] TEXT,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);
 
-			vSQL="CREATE INDEX D_FACTURA_MODIF_IDX1 ON D_FACTURA_MODIF(PRODUCTO)";
+			vSQL="CREATE INDEX D_FACTURAD_MODIF_IDX1 ON D_FACTURAD_MODIF(PRODUCTO)";
 			database.execSQL(vSQL);
-			vSQL="CREATE INDEX D_FACTURA_MODIF_IDX2 ON D_FACTURA_MODIF(ANULADO)";
+			vSQL="CREATE INDEX D_FACTURAD_MODIF_IDX2 ON D_FACTURAD_MODIF(ANULADO)";
 			database.execSQL(vSQL);
 
 			vSQL="CREATE TABLE [D_MOV] ("+
@@ -1540,7 +1540,6 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-
 			vSQL="CREATE TABLE [P_CODDEV] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[DESCRIPCION] TEXT NOT NULL,"+
@@ -1554,7 +1553,7 @@ public class BaseDatosScript {
 			database.execSQL(vSQL);
 
 			vSQL="CREATE TABLE [P_RAZON_DESP_INCOMP]("+
-					"[IDRAZON] INTEGER NOT NULL,"+
+					"[IDRAZON] TEXT NOT NULL,"+
 					"[DESCRIPCION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([IDRAZON])"+
 					");";

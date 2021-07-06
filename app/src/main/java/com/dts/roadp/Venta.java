@@ -163,7 +163,10 @@ public class Venta extends PBase {
 			}
 		};
 
-		if (!gl.iddespacho.isEmpty()) procesaDespacho();
+		if (gl.iddespacho !=null ){
+			if (!gl.iddespacho.isEmpty()) procesaDespacho();
+		}
+
 	}
 
 	//region Events

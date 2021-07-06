@@ -87,7 +87,7 @@ public class CliDet extends PBase {
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
 
-		lblDespacho = (TextView) findViewById(R.id.lblPend);
+		lblDespacho = (TextView) findViewById(R.id.lblDespacho);
 
 		//	relMain=(RelativeLayout) findViewById(R.id.relclimain);
 		relV=(RelativeLayout) findViewById(R.id.relVenta);
@@ -98,6 +98,7 @@ public class CliDet extends PBase {
 		imgCobro= (ImageView) findViewById(R.id.imageView2);
 		imgDevol= (ImageView) findViewById(R.id.imageView1);
 		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
+		imgDespacho = (ImageView) findViewById(R.id.imgDespacho);
 
 		app = new AppMethods(this, gl, Con, db);
 
@@ -683,17 +684,25 @@ public class CliDet extends PBase {
 
 	private void validaDespacho() {
 
-		lblDespacho.setVisibility(View.INVISIBLE);
-		imgDespacho.setVisibility(View.INVISIBLE);
-		relD.setVisibility(View.GONE);
 		try {
-			/*clsDs_pedidoObj Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
-			Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
-			if (Ds_pedidoObj.count>0) {
-				lblDespacho.setVisibility(View.VISIBLE);
-				imgDespacho.setVisibility(View.VISIBLE);
-				relD.setVisibility(View.VISIBLE);
-			}*/
+
+			lblDespacho.setVisibility(View.INVISIBLE);
+			imgDespacho.setVisibility(View.INVISIBLE);
+			relD.setVisibility(View.GONE);
+
+			clsDs_pedidoObj Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
+
+			if (Ds_pedidoObj.items != null){
+
+				if (Ds_pedidoObj.count>0) {
+
+					Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
+
+					lblDespacho.setVisibility(View.VISIBLE);
+					imgDespacho.setVisibility(View.VISIBLE);
+					relD.setVisibility(View.VISIBLE);
+				}
+			}
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}

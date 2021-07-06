@@ -192,22 +192,6 @@ public class CliDet extends PBase {
 			doPreventa();
 		}
 	}
-/*
-	public void showDespacho(View view) {
-
-		if (!permiteVenta) {
-			msgbox("¡Distancia del cliente mayor que permitida!\nPara realizar la venta debe asercarse más al cliente.");return;
-		}
-
-		try {
-			mu.msgbox("La funcionalidad no esta implementada.");
-
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-		//gl.rutatipo="D";
-		//runVenta();
-	}*/
 
 	public void showDespacho(View view) {
 		if (!permiteVenta) {
@@ -215,7 +199,7 @@ public class CliDet extends PBase {
 		}
 
 		try {
-		//	startActivity(new Intent(this, DespachoLista.class));
+			startActivity(new Intent(this, DespachoLista.class));
 		} catch (Exception e) {
 			addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}

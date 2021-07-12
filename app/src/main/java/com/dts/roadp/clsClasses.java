@@ -116,4 +116,15 @@ public class clsClasses {
 	public class clsBarras{
 		public String barra,peso;
 	}
+
+	public class clsTipoCanastas {
+		public String codigo, desccorta, desclarga;
+		public int tenregado, trecibido;
+	}
+
+	public class clsCanasta {
+		public String ruta, cliente, producto;
+		public int fecha, cantrec, cantentr;
+		public String codigo, desccorta, desclarga, fechaFormato;
+	}
 }

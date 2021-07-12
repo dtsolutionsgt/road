@@ -5,7 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-		
+import android.os.Environment;
+import android.os.Handler;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 public class BaseDatosScript {
 	
 	private Context vcontext;
@@ -987,9 +992,24 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+			vSQL="CREATE TABLE [D_CANASTA] ("+
+					"RUTA TEXT NOT NULL,"+
+					"FECHA INTEGER NOT NULL,"+
+					"CLIENTE TEXT NOT NULL,"+
+					"PRODUCTO TEXT NOT NULL,"+
+					"CANTREC INTEGER,"+
+					"CANTENTR INTEGER,"+
+					"STATCOM TEXT,"+
+					"CORELTRANS TEXT,"+
+					"PESOREC REAL,"+
+					"PESOENTR INTEGER,"+
+					"PRIMARY KEY ([RUTA], [FECHA], [CLIENTE], [PRODUCTO])"+
+					");";
+			database.execSQL(vSQL);
+
 			return 1;
 		} catch (SQLiteException e) {
-		   	msgbox(e.getMessage());
+			msgbox(e.getMessage());
 		   	return 0;
 		} 
 	}
@@ -1326,7 +1346,8 @@ public class BaseDatosScript {
                     "[PRECIO_VINETA_O_TUBO] REAL NOT NULL,"+
                     "[ES_VENDIBLE] INTEGER NOT NULL,"+
                     "[UNIGRASAP] REAL NOT NULL,"+
-                    "[UM_SALIDA] TEXT NOT NULL,"+
+                    "[UM_SALIDA] TEXT NOT NULL," +
+					"[ES_CANASTA] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

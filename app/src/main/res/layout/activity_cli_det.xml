@@ -475,6 +475,46 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/relCanastas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_below="@+id/relDespacho"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="false"
+            android:clickable="true"
+            android:onClick="showCanastas">
+
+            <ImageView
+                android:id="@+id/ImageCanastas"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="false"
+                android:clickable="false"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:src="@drawable/canastas" />
+
+            <TextView
+                android:id="@+id/lblCanastas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ImageCanastas"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="0dp"
+                android:gravity="center_horizontal"
+                android:paddingBottom="5dp"
+                android:text="CANASTAS"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/relDespacho"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

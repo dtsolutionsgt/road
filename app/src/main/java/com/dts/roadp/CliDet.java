@@ -3,6 +3,7 @@ package com.dts.roadp;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,10 +16,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.service.autofill.Dataset;
 import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -300,6 +303,15 @@ public class CliDet extends PBase {
 
 	public void rutaHelp(View view) {
 		mostraRutaSupervisor();
+	}
+
+	public void showCanastas(View view) {
+		try {
+			Intent i = new Intent(this, Canastas.class);
+			startActivity(i);
+		} catch (Exception e) {
+
+		}
 	}
 
 	@Override

@@ -691,18 +691,18 @@ public class CliDet extends PBase {
 			relD.setVisibility(View.GONE);
 
 			clsDs_pedidoObj Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
+			Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
 
-			if (Ds_pedidoObj.items != null){
+			if (Ds_pedidoObj!= null){
 
 				if (Ds_pedidoObj.count>0) {
-
-					Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
 
 					lblDespacho.setVisibility(View.VISIBLE);
 					imgDespacho.setVisibility(View.VISIBLE);
 					relD.setVisibility(View.VISIBLE);
 				}
 			}
+
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 		}
@@ -989,7 +989,9 @@ public class CliDet extends PBase {
 			if (flag) relP.setVisibility(View.VISIBLE);else relP.setVisibility(View.GONE);
 
 			flag=false;
-			//if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
+
+			if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
+
 			if (flag) relD.setVisibility(View.VISIBLE);else relD.setVisibility(View.GONE);
 
 			if (esClienteNuevo()){

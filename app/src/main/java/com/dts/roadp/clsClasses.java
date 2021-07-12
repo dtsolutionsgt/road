@@ -157,6 +157,9 @@ public class clsClasses {
 		public double val1;
 		public String val2;
 		public String ruta;
+		public String umventa;
+		public String umstock;
+		public String umpeso;
 	}
 
 }

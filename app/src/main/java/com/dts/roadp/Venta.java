@@ -2179,8 +2179,8 @@ public class Venta extends PBase {
 
 				db.execSQL("DELETE FROM T_VENTA WHERE PRODUCTO='"+item.producto+"'");
 
-				umv=app.umVenta(item.producto);
-				ums=app.umStock(item.producto);if (ums.isEmpty()) ums=umv;
+				umv=item.umventa;//app.umVenta(item.producto);
+				ums=item.umstock;//app.umStock(item.producto);if (ums.isEmpty()) ums=umv;
 
 				ins.init("T_VENTA");
 
@@ -2202,6 +2202,7 @@ public class Venta extends PBase {
 				ins.add("VAL3",0);
 				ins.add("VAL4","");
 				ins.add("PERCEP",0);
+				ins.add("SIN_EXISTENCIA",0);
 
 				String ss=ins.sql();
 

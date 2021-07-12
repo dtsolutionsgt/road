@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 public class DespachoLista extends PBase {
@@ -30,13 +29,16 @@ public class DespachoLista extends PBase {
         setHandlers();
 
         listItems();
+
+        gl.modpedid="";
+
     }
 
-    //region Events
+//region Events
 
     private void setHandlers() {
 
-        listView.setOnItemClickListener(new OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
                 Object lvObj = listView.getItemAtPosition(position);
@@ -53,9 +55,9 @@ public class DespachoLista extends PBase {
         });
     }
 
-    //endregion
+//endregion
 
-    //region Main
+//region Main
 
     private void listItems() {
 
@@ -113,9 +115,9 @@ public class DespachoLista extends PBase {
 
     }
 
-    //endregion
+//endregion
 
-    //region Aux
+//region Aux
 
     private void nombreCliente(String cliid) {
         Cursor dt;
@@ -136,26 +138,25 @@ public class DespachoLista extends PBase {
 
     }
 
-    //endregion
+//endregion
 
-    //region Dialogs
+//region Dialogs
 
 
-    //endregion
+//endregion
 
-    //region Activity Events
+//region Activity Events
 
     @Override
     protected void onResume() {
         super.onResume();
         try {
-            Ds_pedidoObj.reconnect(Con,db);
+           Ds_pedidoObj.reconnect(Con,db);
         } catch (Exception e) {
             msgbox(e.getMessage());
         }
     }
 
-    //endregion
-
+//endregion
 
 }

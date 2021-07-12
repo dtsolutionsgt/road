@@ -2710,6 +2710,12 @@ public class ComWS extends PBase {
 
 			msgAskExit(s);
 
+			barInfo.setVisibility(View.INVISIBLE);
+			lblParam.setVisibility(View.INVISIBLE);
+
+			lblRec.setVisibility(View.VISIBLE);
+			imgRec.setVisibility(View.VISIBLE);
+
 			return true;
 
 		} catch (Exception e) {
@@ -2833,6 +2839,10 @@ public class ComWS extends PBase {
 
 				sql = listItems.get(i);
 				esql = sql;
+
+				if (sql.contains("ds_pedido")){
+					msgbox("Si");
+				}
 				dbT.execSQL(sql);
 
 				try {
@@ -3589,6 +3599,24 @@ public class ComWS extends PBase {
             return SQL;
         }
 
+		if (TN.equalsIgnoreCase("DS_PEDIDO")) {
+			SQL = " SELECT COREL, ANULADO, dbo.AndrDate(FECHA), EMPRESA, RUTA, VENDEDOR, CLIENTE, KILOMETRAJE, dbo.AndrDate(FECHAENTR), DIRENTREGA, " +
+					" TOTAL, DESMONTO, IMPMONTO, PESO, BANDERA, STATCOM, CALCOBJ, IMPRES, ADD1, ADD2, ADD3 "+
+					" FROM DS_PEDIDO " +
+					" WHERE RUTA='" + ActRuta + "' AND (ANULADO='N') " +
+					"AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') ";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("DS_PEDIDOD")) {
+			SQL = " SELECT COREL, PRODUCTO, EMPRESA, ANULADO, CANT, PRECIO, IMP, DES, DESMON, TOTAL, PRECIODOC, " +
+					"PESO, VAL1, VAL2, RUTA, UMVENTA, UMSTOCK, UMPESO "+
+					" FROM DS_PEDIDOD " +
+					" WHERE COREL IN (SELECT COREL FROM DS_PEDIDO WHERE RUTA = '" + ActRuta + "'  AND (ANULADO='N') " +
+					"AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') )";
+			return SQL;
+		}
+
 		return SQL;
 	}
 
@@ -3951,12 +3979,6 @@ public class ComWS extends PBase {
 
 	public void wsFinished() {
 
-		barInfo.setVisibility(View.INVISIBLE);
-		lblParam.setVisibility(View.INVISIBLE);
-
-		lblRec.setVisibility(View.VISIBLE);
-		imgRec.setVisibility(View.VISIBLE);
-
 		running = 0;
 
 		try {
@@ -4274,9 +4296,11 @@ public class ComWS extends PBase {
 				case 61:
 					nombretabla="P_PEDIDO_RECHAZADO";break;
 				case 62:
-					nombretabla="DS_PEDIDO";break;
+					nombretabla="DS_PEDIDO";
+					break;
 				case 63:
-					nombretabla="DS_PEDIDOD";break;
+					nombretabla="DS_PEDIDOD";
+					break;
 				case 64:
 					dbld.clear();
 					dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");

@@ -90,6 +90,9 @@ public class clsDs_pedidodObj {
         ins.add("VAL1",item.val1);
         ins.add("VAL2",item.val2);
         ins.add("Ruta",item.ruta);
+        ins.add("UMVENTA",item.umventa);
+        ins.add("UMSTOCK",item.umstock);
+        ins.add("UMPESO",item.umpeso);
 
         db.execSQL(ins.sql());
 
@@ -112,6 +115,9 @@ public class clsDs_pedidodObj {
         upd.add("VAL1",item.val1);
         upd.add("VAL2",item.val2);
         upd.add("Ruta",item.ruta);
+        upd.add("UMVENTA",item.umventa);
+        upd.add("UMSTOCK",item.umstock);
+        upd.add("UMPESO",item.umpeso);
 
         upd.Where("(COREL='"+item.corel+"') AND (PRODUCTO='"+item.producto+"')");
 
@@ -160,6 +166,9 @@ public class clsDs_pedidodObj {
             item.val1=dt.getDouble(12);
             item.val2=dt.getString(13);
             item.ruta=dt.getString(14);
+            item.umventa=dt.getString(15);
+            item.umstock=dt.getString(16);
+            item.umpeso=dt.getString(17);
 
             items.add(item);
 
@@ -206,6 +215,9 @@ public class clsDs_pedidodObj {
         ins.add("VAL1",item.val1);
         ins.add("VAL2",item.val2);
         ins.add("Ruta",item.ruta);
+        ins.add("UMVENTA",item.umventa);
+        ins.add("UMSTOCK",item.umstock);
+        ins.add("UMPESO",item.umpeso);
 
         return ins.sql();
 
@@ -228,7 +240,9 @@ public class clsDs_pedidodObj {
         upd.add("VAL1",item.val1);
         upd.add("VAL2",item.val2);
         upd.add("Ruta",item.ruta);
-
+        upd.add("UMVENTA",item.umventa);
+        upd.add("UMSTOCK",item.umstock);
+        upd.add("UMPESO",item.umpeso);
         upd.Where("(COREL='"+item.corel+"') AND (PRODUCTO='"+item.producto+"')");
 
         return upd.SQL();

@@ -51,6 +51,7 @@ public class Venta extends PBase {
 	private ArrayList<String> lcode = new ArrayList<String>();
 	private ArrayList<String> lname = new ArrayList<String>();
 
+
 	private int browse;
 
 	private double cant,desc,mdesc,prec,precsin,imp,impval;
@@ -852,7 +853,7 @@ public class Venta extends PBase {
 			ins.add("PESO",peso);
 			ins.add("VAL1",0);
 			ins.add("VAL2","");
-			ins.add("VAL3",0);
+            if (gl.tolprodcrit) ins.add("VAL3",1);else ins.add("VAL3",0);
 			ins.add("VAL4","");
 			ins.add("PERCEP",percep);
 
@@ -903,7 +904,7 @@ public class Venta extends PBase {
                 ins.add("PESO",peso);
                 ins.add("VAL1",0);
                 ins.add("VAL2","");
-                ins.add("VAL3",0);
+                if (gl.tolprodcrit) ins.add("VAL3",1);else ins.add("VAL3",0);
                 ins.add("VAL4","");
                 ins.add("PERCEP",percep);
 

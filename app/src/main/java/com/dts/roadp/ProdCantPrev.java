@@ -38,8 +38,6 @@ public class ProdCantPrev extends PBase {
     private boolean pexist,esdecimal,porpeso,esbarra,idle=true,critico;
     private AppMethods app;
 
-    //JP20210614  - activity creada nueva
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

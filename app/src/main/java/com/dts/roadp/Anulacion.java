@@ -24,7 +24,7 @@ public class Anulacion extends PBase {
 	private TextView lblTipo;
 	
 	private ArrayList<clsClasses.clsCFDV> items= new ArrayList<clsClasses.clsCFDV>();
-	private ListAdaptCFDV adapter;
+	private ListAdaptCFDVB adapter;
 	private clsClasses.clsCFDV selitem;
 	
 	private Runnable printotrodoc,printclose;
@@ -193,7 +193,7 @@ public class Anulacion extends PBase {
 		try {
 			
 			if (tipo==0) {
-				sql="SELECT D_PEDIDO.COREL,P_CLIENTE.NOMBRE,D_PEDIDO.FECHA,D_PEDIDO.TOTAL "+
+				sql="SELECT D_PEDIDO.COREL,P_CLIENTE.NOMBRE,D_PEDIDO.FECHA,D_PEDIDO.TOTAL,D_PEDIDO.BANDERA "+
 					 "FROM D_PEDIDO INNER JOIN P_CLIENTE ON D_PEDIDO.CLIENTE=P_CLIENTE.CODIGO "+
 					 "WHERE (D_PEDIDO.ANULADO='N') AND (D_PEDIDO.STATCOM='N') ORDER BY D_PEDIDO.COREL DESC ";	
 			}
@@ -265,8 +265,12 @@ public class Anulacion extends PBase {
 						sval=""+val;
 					}					
 					
-					vItem.Valor=sval;	  
-					
+					vItem.Valor=sval;
+					vItem.bandera=0;
+                    if (tipo==0) {
+                        if (DT.getString(4).equalsIgnoreCase("S")) vItem.bandera=1;
+                    }
+
 					if (tipo==4 || tipo==5) vItem.Valor="";
 					
 					items.add(vItem);	
@@ -286,7 +290,7 @@ public class Anulacion extends PBase {
 		   	mu.msgbox(e.getMessage());
 	    }
 			 
-		adapter=new ListAdaptCFDV(this, items);
+		adapter=new ListAdaptCFDVB(this, items);
 		listView.setAdapter(adapter);
 		
 		if (selidx>-1) {

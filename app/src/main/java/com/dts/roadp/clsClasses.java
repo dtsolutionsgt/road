@@ -15,7 +15,7 @@ public class clsClasses {
 
     //JP20210614
 	public class clsCFDV {
-		public int id,flag;
+		public int id,flag,bandera;
 		public String Cod,Desc,Fecha,Valor,Sid;
 		public double val;
 	}

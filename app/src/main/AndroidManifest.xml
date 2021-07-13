@@ -44,11 +44,11 @@
         </activity>
 
         <service
-            android:name="com.dts.roadp.srvBase"
+            android:name=".srvBase"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name="com.dts.roadp.srvEnvPedido"
+            android:name=".srvEnvPedido"
             android:enabled="true"
             android:exported="true" />
 
@@ -359,6 +359,11 @@
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
+            android:name=".ExistPed"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
             android:name=".Tablas"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="Tablas"
@@ -471,7 +476,6 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
-
     </application>
 
 </manifest>

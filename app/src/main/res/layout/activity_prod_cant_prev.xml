@@ -35,7 +35,7 @@
             android:layout_toEndOf="@+id/imageView26"
             android:paddingLeft="1dp"
             android:paddingRight="1dp"
-            android:text="Producto critico"
+            android:text="Producto cerrado"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView

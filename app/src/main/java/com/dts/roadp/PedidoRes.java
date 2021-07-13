@@ -57,7 +57,7 @@ public class PedidoRes extends PBase {
 	private int cyear, cmonth, cday,dweek,impres;
 	
 	private double dmax,dfinmon,descpmon,descg,descgmon,tot,stot0,stot,descmon,totimp,totperc;
-	private boolean acum,cleandprod,toledano,porpeso;
+	private boolean acum,cleandprod,toledano,porpeso,prodstandby;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -337,6 +337,8 @@ public class PedidoRes extends PBase {
 
             if (toledano && autoenvio) enviaPedido();
 
+            if (prodstandby) toastcent("EL PEDIDO CONTIENE PRODUCTO CERRADO");
+
 			gl.closeCliDet=true;
 			gl.closeVenta=true;
 
@@ -344,6 +346,7 @@ public class PedidoRes extends PBase {
 				gl.tolpedsend=true;
 				super.finish();
 			}
+
 		} catch (Exception e){
 			mu.msgbox("Error " + e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -395,6 +398,7 @@ public class PedidoRes extends PBase {
 
 		corel=gl.ruta+"_"+mu.getCorelBase();
 		fechae=du.ffecha00(fechae);
+        prodstandby=false;
 
 		try {
 			
@@ -413,7 +417,7 @@ public class PedidoRes extends PBase {
                 corel=gl.modpedid;
                 db.execSQL("DELETE FROM D_PEDIDO WHERE COREL='"+corel+"'");
                 db.execSQL("DELETE FROM D_PEDIDOD WHERE COREL='"+corel+"'");
-           }
+            }
 			
 			ins.init("D_PEDIDO");
 			ins.add("COREL",corel);
@@ -453,7 +457,7 @@ public class PedidoRes extends PBase {
 
 			db.execSQL(ins.sql());
           		
-			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK,SIN_EXISTENCIA FROM T_VENTA";
+			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK,SIN_EXISTENCIA,VAL3 FROM T_VENTA";
 			DT=Con.OpenDT(sql);
 	
 			DT.moveToFirst();
@@ -483,6 +487,9 @@ public class PedidoRes extends PBase {
 
                 db.execSQL(ins.sql());
 
+                if (DT.getInt(15)==1) prodstandby=true;
+
+
                 if (toledano) {
 
                     vprod = DT.getString(0);
@@ -501,6 +508,8 @@ public class PedidoRes extends PBase {
 			}
 
 			if(DT!=null) DT.close();
+
+         	if (prodstandby)  db.execSQL("UPDATE D_PEDIDO SET BANDERA='S' WHERE (COREL='"+corel+"')");
 
 			db.setTransactionSuccessful();
 			db.endTransaction();

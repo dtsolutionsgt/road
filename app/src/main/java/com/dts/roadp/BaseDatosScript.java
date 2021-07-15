@@ -2110,6 +2110,33 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX T_VENTA_idx1 ON T_VENTA(PRODUCTO)";
 			database.execSQL(vSQL);
 
+			vSQL="CREATE TABLE [T_VENTA_DESPACHO] ("+
+					"[PRODUCTO] TEXT NOT NULL,"+
+					"[EMPRESA] TEXT NOT NULL,"+
+					"[UM] TEXT NOT NULL,"+
+					"[CANTSOL] REAL NOT NULL,"+
+					"[CANTREC] REAL NOT NULL,"+
+					"[CANTDIF] REAL NOT NULL,"+
+					"[UMSTOCK] TEXT NOT NULL,"+
+					"[FACTOR] REAL NOT NULL,"+
+					"[PRECIO] REAL NOT NULL,"+
+					"[IMP] REAL NOT NULL,"+
+					"[DES] REAL NOT NULL,"+
+					"[DESMON] REAL NOT NULL,"+
+					"[TOTAL] REAL NOT NULL,"+
+					"[PRECIODOC] REAL NOT NULL,"+
+					"[PESO] REAL NOT NULL,"+
+					"[VAL1] REAL NOT NULL,"+
+					"[VAL2] TEXT NOT NULL,"+
+					"[VAL3] REAL NOT NULL,"+
+					"[VAL4] TEXT NOT NULL,"+
+					"PRIMARY KEY ([PRODUCTO])"+
+					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE INDEX T_VENTA_DESPACHO_idx1 ON T_VENTA_DESPACHO(PRODUCTO)";
+			database.execSQL(vSQL);
+
 
 			vSQL="CREATE TABLE [T_DESC] ("+
 					"[ID] INTEGER NOT NULL,"+

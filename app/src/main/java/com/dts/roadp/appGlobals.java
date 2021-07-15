@@ -26,6 +26,7 @@ public class appGlobals extends Application {
     public boolean vcredito,vcheque,vchequepost,validimp,tolsuper=false,tolpedsend,tolprodcrit;
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
+	public boolean permitir_cantidad_mayor, permitir_producto_nuevo;
 	public int mpago;
 
 	//#CKFK 20190619 Agregué estas dos variables para los valores de clientes nuevo

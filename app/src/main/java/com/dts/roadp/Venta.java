@@ -1054,8 +1054,9 @@ public class Venta extends PBase {
 					txtBarra.setText("");return;
 				}
 
-
-                if (rutatipo.equalsIgnoreCase("V")) {
+                if (rutatipo.equalsIgnoreCase("V") ||
+					rutatipo.equalsIgnoreCase("T") ||
+					rutatipo.equalsIgnoreCase("D") ) {
                     bbolsa=barraBolsa();
                     if (bbolsa==1) {
                         txtBarra.setText("");
@@ -1372,6 +1373,10 @@ public class Venta extends PBase {
 
 			actualizaTotalesBarra();
 
+			if (gl.iddespacho !=null ){
+				if (!gl.iddespacho.isEmpty()) actualizaTotalesBarraDespacho();
+			}
+
 			if (isnew) validaBarraBon();
 
 			//db.setTransactionSuccessful();
@@ -1387,6 +1392,34 @@ public class Venta extends PBase {
 			return 0;
 		}
 
+	}
+
+	private boolean despachoTieneBarras(){
+
+		boolean resultado=false;
+		try{
+
+			Cursor DT;
+
+			String vSQL="SELECT COUNT(*) FROM T_VENTA_DESPACHO";
+			sql="SELECT * FROM T_DEPOSB";
+
+			DT=Con.OpenDT(sql);
+
+			if (DT!=null){
+				if (DT.getCount()>0) {
+					DT.moveToFirst();
+					resultado=DT.getInt(0)>0;
+				}
+			}
+
+			if(DT!=null) DT.close();
+
+		}catch (Exception e){
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return resultado;
 	}
 
     //region ProporcionVenta
@@ -1703,6 +1736,10 @@ public class Venta extends PBase {
 
 			actualizaTotalesBarra();
 
+			if (gl.iddespacho !=null ){
+				if (!gl.iddespacho.isEmpty()) actualizaTotalesBarraDespacho();
+			}
+
 			if (isnew) validaBarraBon();
 
 			db.setTransactionSuccessful();
@@ -1768,6 +1805,45 @@ public class Venta extends PBase {
 		}
 	}
 
+	private void actualizaTotalesBarraDespacho() {
+		Cursor dt;
+		int ccant;
+		double ppeso,pprecio,unfactor,stfact;
+
+		try {
+
+			sql="SELECT Factor FROM T_VENTA_DESPACHO WHERE PRODUCTO='"+prodid+"'";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			unfactor=dt.getDouble(0);
+
+			sql="SELECT SUM(CANTIDAD),SUM(PESO),SUM(PRECIO) FROM T_BARRA WHERE CODIGO='"+prodid+"'";
+			dt=Con.OpenDT(sql);
+
+			ccant=0;ppeso=0;pprecio=0;
+
+			if (dt.getCount()>0) {
+				dt.moveToFirst();
+
+				ccant=dt.getInt(0);
+				ppeso=dt.getDouble(1);
+				pprecio=dt.getDouble(2);
+			}
+
+			if(dt!=null) dt.close();
+
+			sql="UPDATE T_VENTA_DESPACHO SET CANTREC="+ccant+",CANTDIF=CANSOL -"+ccant+"," +
+					                       " PESO="+ppeso+",   TOTAL="+pprecio+" WHERE PRODUCTO='"+prodid+"'";
+			db.execSQL(sql);
+
+			sql="DELETE FROM T_VENTA_DESPACHO WHERE CANTDIF=0";
+			db.execSQL(sql);
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+	}
+
 	private boolean barraProducto() {
 		Cursor dt;
 
@@ -1806,6 +1882,10 @@ public class Venta extends PBase {
 			db.execSQL("DELETE FROM T_BARRA WHERE BARRA='"+gl.barra+"' AND CODIGO='"+prodid+"'");
 			Log.d("BARRA","Borrar barra");
 			actualizaTotalesBarra();
+
+			if (gl.iddespacho !=null ){
+				if (!gl.iddespacho.isEmpty()) actualizaTotalesBarraDespacho();
+			}
 
 			gl.bonbarprod=prodid;
 
@@ -2165,7 +2245,7 @@ public class Venta extends PBase {
 		String umv,ums;
 
 		try {
-			lblTit.setText("Despacho");
+			lblTit.setText("Pre Factura");
 			gl.coddespacho=gl.iddespacho;gl.iddespacho="";
 
 			clsClasses.clsDs_pedidod item;

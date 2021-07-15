@@ -1302,6 +1302,14 @@ public class FacturaRes extends PBase {
 
 			//endregion
 
+			//region Despacho
+
+			if (!gl.coddespacho.isEmpty()) {
+				db.execSQL("UPDATE DS_PEDIDO SET BANDERA='S' WHERE COREL='"+gl.coddespacho+"'");
+			}
+
+			//endregion
+
 			//region Actualización del último correlativo
 
 			sql="UPDATE P_COREL SET CORELULT="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";

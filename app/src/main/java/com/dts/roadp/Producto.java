@@ -524,11 +524,11 @@ public class Producto extends PBase {
                     break;
 
                 case 3:  // Mercadeo comp
-                    sql="SELECT CODIGO,NOMBRE,'' FROM P_MERPRODCOMP WHERE 1=1 ";
-                    if (!mu.emptystr(famid)) {sql=sql+"AND (MARCA='"+famid+"') ";}
-                    if (vF.length()>0) {sql=sql+"AND ((NOMBRE LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
+                    sql=" SELECT P.CODIGO,TRIM(P.NOMBRE) AS DESCCORTA,'UN' AS UNIDBAS,TRIM(P.NOMBRE) AS DESCLARGA "+
+                            " FROM P_MERPRODCOMP P ";
+                    //if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P.LINEA='"+famid+"') ";
+                    if (vF.length()>0) {sql=sql+"AND ((P.NOMBRE LIKE '%" + vF + "%') OR (P.CODIGO LIKE '%" + vF + "%')) ";}
 
-                    if (ordPorNombre) sql+="ORDER BY NOMBRE"; else sql+="ORDER BY CODIGO";
                     break;
             }
 

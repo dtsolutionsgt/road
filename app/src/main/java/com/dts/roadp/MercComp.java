@@ -283,9 +283,18 @@ private ListView listView;
 			ins.add("CODDEV",raz);
 			ins.add("TOTAL",0);
 			ins.add("PRECIO",0);
+			ins.add("PESO",0);
 			ins.add("PRECLISTA",0);
+			ins.add("FECHA_CAD",0);
 			ins.add("REF","");
-			
+			ins.add("LOTE","");
+			ins.add("UMVENTA","UN");
+			ins.add("UMSTOCK","UN");
+			ins.add("UMPESO","KG");
+			ins.add("FACTOR",0);
+			ins.add("POR_PESO","N");
+			ins.add("TIENE_LOTE",0);
+
 	    	db.execSQL(ins.sql());
 	    	
 		} catch (SQLException e) {

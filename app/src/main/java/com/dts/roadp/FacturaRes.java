@@ -1299,9 +1299,11 @@ public class FacturaRes extends PBase {
 
             //region Despacho
 
-            if (!gl.coddespacho.isEmpty()) {
-                db.execSQL("UPDATE DS_PEDIDO SET BANDERA='S' WHERE COREL='"+gl.coddespacho+"'");
-            }
+			if (gl.coddespacho!=null) {
+				if (!gl.coddespacho.isEmpty()) {
+					db.execSQL("UPDATE DS_PEDIDO SET BANDERA='S' WHERE COREL='"+gl.coddespacho+"'");
+				}
+			}
 
             //endregion
 

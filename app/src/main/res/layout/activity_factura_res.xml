@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rl_facturares"
     android:layout_width="match_parent"
@@ -283,4 +284,13 @@
 
     </ListView>
 
+    <ImageView
+        android:id="@+id/imageView29"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="150dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="1dp"
+        android:src="@drawable/canastas"
+        android:onClick="showCanastas"/>
 </RelativeLayout>

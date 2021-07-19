@@ -494,6 +494,17 @@ public class FacturaRes extends PBase {
 
 	}
 
+	public void showCanastas(View view) {
+		try {
+			Intent iCanasta = new Intent(this, Canastas.class);
+			startActivity(iCanasta);
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox( e.getMessage());
+		}
+	}
+
 	private void updDesc(){
 
 		try{

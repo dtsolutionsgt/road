@@ -70,6 +70,7 @@ public class Canastas extends PBase {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 clearCanastas();
+                setTitulo();
             }
         });
         ad = dialog.create();
@@ -88,7 +89,7 @@ public class Canastas extends PBase {
                         clsClasses.clsCanasta item = (clsClasses.clsCanasta) lvObj;
                         adapter.setSelectedIndex(position);
 
-                        editReg(item);
+                        editarRegistro(item);
 
                     } catch (Exception e) {
                         addlog(new Object() {
@@ -176,7 +177,7 @@ public class Canastas extends PBase {
         lblEntr.setText(String.valueOf(tEntr));
     }
 
-    public void editReg(clsClasses.clsCanasta reg) {
+    public void editarRegistro(clsClasses.clsCanasta reg) {
         try {
             gl.prodCanasta = reg.producto;
             regFecha = reg.fecha;
@@ -184,6 +185,7 @@ public class Canastas extends PBase {
             txtCanastasEnt.setText(reg.cantentr+"");
             txtCanastasRec.setText(reg.cantrec+"");
             editando = true;
+            setTitulo();
             ad.show();
         } catch (Exception e){
             mu.msgbox(e.getMessage());
@@ -196,6 +198,8 @@ public class Canastas extends PBase {
             editando = false;
             gl.prodCanasta = "";
             regFecha = 0;
+            clearCanastas();
+            setTitulo();
 
             Intent i = new Intent(this, TipoCanasta.class);
             startActivity(i);
@@ -221,6 +225,7 @@ public class Canastas extends PBase {
                 ins.add("PRODUCTO", gl.prodCanasta);
                 ins.add("CANTREC", cantRec);
                 ins.add("CANTENTR", cantEntr);
+                ins.add("STATCOM", "N");
 
                 db.execSQL(ins.sql());
             }else {
@@ -238,6 +243,7 @@ public class Canastas extends PBase {
                 upd.add("PRODUCTO", producto);
                 upd.add("CANTREC", cantRec);
                 upd.add("CANTENTR", cantEntr);
+                upd.add("STATCOM", "N");
                 db.execSQL(upd.SQL());
             }
             clearCanastas();
@@ -261,11 +267,30 @@ public class Canastas extends PBase {
         txtCanastasEnt.setText("");
     }
 
+    public void setTitulo() {
+        ad.setTitle("Canastas");
+        if (gl.prodCanasta != "") {
+            opendb();
+            String sql = "SELECT desccorta, desclarga from p_producto WHERE codigo = '" + gl.prodCanasta + "'";
+            Cursor DT = Con.OpenDT(sql);
+
+            if (DT != null && DT.getCount() >= 1) {
+                DT.moveToFirst();
+                String nom = DT.getString(0);
+
+                ad.setTitle(nom);
+            }
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         if (mu.emptystr(gl.prodCanasta)){
+            ad.setTitle("Canastas");
             ad.dismiss();
+        }else {
+            setTitulo();
         }
     }
 }

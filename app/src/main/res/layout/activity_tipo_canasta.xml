@@ -125,20 +125,22 @@
 
             <TextView
                 android:id="@+id/textView91"
-                android:layout_width="150dp"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/frame_rect_gray"
+                android:gravity="right"
                 android:text="Rec"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textView94"
-                android:layout_width="150dp"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/frame_rect_gray"
+                android:gravity="right"
                 android:text="Entr"
                 android:textSize="18sp"
                 android:textStyle="bold" />

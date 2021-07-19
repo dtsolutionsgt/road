@@ -22,11 +22,12 @@
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="217dp"
         android:layout_above="@+id/lblFact"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
+        android:layout_marginLeft="0dp"
         android:paddingBottom="5dp">
 
         <ImageView
@@ -177,6 +178,18 @@
             android:onClick="checkedBox"
             android:text="Pagar Al Contado" />
 
+        <ImageView
+            android:id="@+id/imageView29"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_below="@+id/imageView6"
+            android:layout_alignEnd="@+id/imageView6"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="18dp"
+            android:onClick="showCanastas"
+            android:src="@drawable/canastas" />
+
     </RelativeLayout>
 
     <TextView
@@ -284,13 +297,4 @@
 
     </ListView>
 
-    <ImageView
-        android:id="@+id/imageView29"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginTop="150dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="1dp"
-        android:src="@drawable/canastas"
-        android:onClick="showCanastas"/>
 </RelativeLayout>

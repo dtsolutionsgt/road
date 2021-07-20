@@ -145,7 +145,7 @@
             android:clickable="true"
             android:maxWidth="610dp"
             android:onClick="showMenu"
-            android:src="@drawable/logo" />
+            android:src="@drawable/logo_nuevo" />
 
         <TextView
             android:id="@+id/textView81"

@@ -217,6 +217,8 @@ public class Canastas extends PBase {
             int cantRec = Integer.parseInt(txtCanastasRec.getText().toString());
             int cantEntr = Integer.parseInt(txtCanastasEnt.getText().toString());
 
+
+
             if (!editando) {
                 ins.init("D_CANASTA");
                 ins.add("RUTA", gl.ruta);

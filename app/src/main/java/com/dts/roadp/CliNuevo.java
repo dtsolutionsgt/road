@@ -209,6 +209,8 @@ public class CliNuevo extends PBase {
 			ins.add("BAND1", "");
 			ins.add("BAND2", "");
 			ins.add("STATCOM", "N");
+            ins.add("IMAGEN", "");
+            ins.add("CODIGO_ERP", "");
 
 			db.execSQL(ins.sql());
 

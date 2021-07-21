@@ -31,26 +31,52 @@ public class clsDocPedido extends clsDocument {
 		String cu,cp;
 
 		rep.line();
-		rep.add("CODIGO   DESCRIPCION                ");
-		rep.add("CANT  UM   KGS   PRECIO        VALOR");
+		rep.add("CODIGO   DESCRIPCION       T. PEDIDO");
+		rep.add("CANT  U-VENTA   KGS");
 		rep.line();
 		//rep.empty();
 		
 		for (int i = 0; i <items.size(); i++) {
 			item=items.get(i);
-			rep.add(item.cod + " " + item.nombre);
+			rep.add2ss1(item.cod + " " + item.nombre,"F");
 			//rep.add3lrr(rep.rtrim(""+item.cant,5),item.prec,item.tot);
 
 			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um,6);
 			cp=frmdecimal(0,decimp)+" "+rep.ltrim(item.ump,3);
 			
-			rep.add3fact(cu+" "+cp,item.prec,item.tot);
+			rep.addg(cu+" "+cp,"0.00","");
 		}
 		
 		rep.line();
 		
 		return true;
 	}
+
+    protected boolean buildDetailOrig() {
+        itemData item;
+        String cu,cp;
+
+        rep.line();
+        rep.add("CODIGO   DESCRIPCION                ");
+        rep.add("CANT  UM   KGS   PRECIO        VALOR");
+        rep.line();
+        //rep.empty();
+
+        for (int i = 0; i <items.size(); i++) {
+            item=items.get(i);
+            rep.add(item.cod + " " + item.nombre);
+            //rep.add3lrr(rep.rtrim(""+item.cant,5),item.prec,item.tot);
+
+            cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um,6);
+            cp=frmdecimal(0,decimp)+" "+rep.ltrim(item.ump,3);
+
+            rep.add3fact(cu+" "+cp,item.prec,item.tot);
+        }
+
+        rep.line();
+
+        return true;
+    }
 	
 	protected boolean buildFooter() {
 		double totimp,totperc;
@@ -70,12 +96,18 @@ public class clsDocPedido extends clsDocument {
 				rep.addtotsp("Subtotal", stot);
 				rep.addtotsp("Descuento", -desc);	
 			}		
-			rep.addtotsp("TOTAL A PAGAR", tot);			
+			//rep.addtotsp("TOTAL A PAGAR", tot);
 		}
 
 		rep.empty();
 		rep.add("No. Serie : "+deviceid);
 		rep.empty();
+        rep.empty();
+        rep.empty();
+        rep.add("Firma Cliente _____________");
+        rep.empty();
+        rep.empty();
+        rep.empty();
 
 		return super.buildFooter();
 	}	
@@ -91,7 +123,7 @@ public class clsDocPedido extends clsDocument {
 		nombre="PEDIDO";
 		
 		try {
-			sql=" SELECT COREL,'' as CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2, IMPRES, ANULADO " +
+			sql=" SELECT COREL,'' as CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2, IMPRES, ANULADO, FECHAENTR " +
 				" FROM D_PEDIDO WHERE COREL='"+corel+"'";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
@@ -128,7 +160,8 @@ public class clsDocPedido extends clsDocument {
 
 			empp=DT.getString(8);
 			ffecha=DT.getInt(9);fsfecha=sfecha(ffecha);
-			
+            int fefecha=DT.getInt(14);fsfechaent=sfecha(fefecha);
+
 			add1=DT.getString(10);
 			add2=DT.getString(11);
 			

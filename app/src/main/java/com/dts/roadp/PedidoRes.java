@@ -819,13 +819,17 @@ public class PedidoRes extends PBase {
 	}
 	
 	public void askSave(View view) {
+        String ss;
 
-		try{
+		try {
+
+            prodstandby=validaStandby();
+            if (prodstandby) ss="Guardar pedido con el producto cerrado?";else ss="Guardar pedido ?";
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle("Road");
-			dialog.setMessage("Guardar pedido ?");
+			dialog.setMessage(ss);
 
 			dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -840,9 +844,7 @@ public class PedidoRes extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-			
-	}	
+	}
 
 	public  boolean fechaValida(){
 		boolean vFechaValida = false;
@@ -950,6 +952,30 @@ public class PedidoRes extends PBase {
             return false;
         }
     }
+
+    private boolean validaStandby(){
+        Cursor DT;
+
+        prodstandby=false;
+
+        try {
+            sql="SELECT VAL3 FROM T_VENTA";
+            DT=Con.OpenDT(sql);
+
+            DT.moveToFirst();
+            while (!DT.isAfterLast()) {
+                if (DT.getInt(0)==1) prodstandby=true;
+                DT.moveToNext();
+            }
+
+            if(DT!=null) DT.close();
+        } catch (Exception e) {
+            mu.msgbox( e.getMessage());return false;
+        }
+
+        return prodstandby;
+    }
+
 
     //endregion
 

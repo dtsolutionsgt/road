@@ -22,7 +22,6 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.text.InputType;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,7 +82,10 @@ import org.json.JSONObject;
 import java.io.FileOutputStream;
 import java.text.ParseException;
 
+import com.dts.roadp.Base64;
+
 public class ComWS extends PBase {
+
 
 	private TextView lblInfo, lblParam, lblRec, lblEnv, lblEnvM;
 	private ProgressBar barInfo;
@@ -95,7 +97,7 @@ public class ComWS extends PBase {
 	private CheckBox cbSuper;
 
 	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta, iRutaSupervisor;
-	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant, rrs,sRutaSupervisor;
+	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant, rrs,sRutaSupervisor,rrss;
 	private String licSerial, licRuta, licSerialEnc, licRutaEnc, parImprID;
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag, esEnvioManual = false;
 
@@ -130,7 +132,7 @@ public class ComWS extends PBase {
 	private int scon, running, pflag, stockflag, conflag;
 	private String ftext, slsync, senv, gEmpresa, ActRuta, mac, rootdir;
 	private String fsql, fsqli, fsqlf, strliqid,argstr,xmlresult;
-	private boolean rutapos, ftflag, esvacio, liqid, cargasuper;
+	private boolean rutapos, ftflag, esvacio, liqid, cargasuper, autoenvio;
 
 	private final String NAMESPACE = "http://tempuri.org/";
 	private String METHOD_NAME, URL, URL_Remota;
@@ -289,8 +291,13 @@ public class ComWS extends PBase {
 		} else {
 			if (gl.tolsuper) relPedidos.setVisibility(View.VISIBLE);
 		}
+		if (!autoenvio && rutatipo.equals("P")) {
+            relPedidos.setVisibility(View.VISIBLE);
+        }
 
-		if (gl.ruta.isEmpty()) relPedidos.setVisibility(View.INVISIBLE);
+		if (gl.ruta.isEmpty()) {
+		    relPedidos.setVisibility(View.INVISIBLE);
+        }
 
 		try {
 			final PowerManager pm = (PowerManager) getSystemService(this.POWER_SERVICE);
@@ -308,8 +315,12 @@ public class ComWS extends PBase {
 		Cursor dt;
 
 		try {
-			sql = "SELECT CODIGO FROM P_RUTA";
+			sql = "SELECT CODIGO,ENVIO_AUTO_PEDIDOS FROM P_RUTA";
 			dt = Con.OpenDT(sql);
+
+			if (dt.getCount()==0) {
+                autoenvio = dt.getInt(1)==1;
+            } else autoenvio=false;
 
 			return dt.getCount() == 0;
 		} catch (Exception e) {
@@ -423,8 +434,6 @@ public class ComWS extends PBase {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
-
-
 	}
 
 	public void askSendManual(View view) {
@@ -2123,6 +2132,7 @@ public class ComWS extends PBase {
 		return 0;
 	}
 
+	/*
 	public int guardaImagen(String idprod) {
 		int rc;
 		String s, ss, resstr;
@@ -2176,7 +2186,7 @@ public class ComWS extends PBase {
 
 		return 0;
 	}
-
+    */
 	public int rutaSupervisor(String ruta) {
 		int rc;
 		String s, ss;
@@ -4470,7 +4480,7 @@ public class ComWS extends PBase {
 			if (!fstr.equals("Sync OK")) {
 				dbld.savelog();
 				addlog(new Object() {
-				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
+                }.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
 
@@ -4490,7 +4500,8 @@ public class ComWS extends PBase {
 				return false;
 			}
 
-			listaFachada();
+			//listaFachada();
+            envioFotos();
 
 			dbld.savelog();
 			dbld.saveArchivo(du.getActDateStr());
@@ -5809,7 +5820,147 @@ public class ComWS extends PBase {
 		}
 	}
 
-	//#HS_20181219 funcion para crear JSON de fotos fachada.
+    public boolean envioFotos() {
+        String trid,fname;
+        int pp;
+
+        try {
+            File dir = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue");
+
+            for (File imagen : dir.listFiles()) {
+
+                try {
+                    trid=imagen.getName();pp=trid.indexOf(".");
+                    trid=trid.substring(0,pp);
+                    fname=imagen.getAbsolutePath();
+
+                    if (sendFoto(trid,ruta,fname)==1) imagen.delete();
+                } catch (Exception e) {
+                }
+            }
+
+            return true;
+        } catch (Exception e) {
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+        }
+        return false;
+    }
+
+    public int sendFoto(String codigo,String ruta,String fname) {
+        String resstr="";
+
+        METHOD_NAME = "saveImageCN";
+
+        try {
+
+            Bitmap bmp = BitmapFactory.decodeFile(fname);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG,75, out);
+            byte[] imagebyte = out.toByteArray();
+            String strBase64 = Base64.encodeBytes(imagebyte);
+
+            int iv1=strBase64.length();
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            PropertyInfo param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("codigo");
+            param.setValue(codigo);
+            request.addProperty(param);
+
+            PropertyInfo param2 = new PropertyInfo();
+            param2.setType(String.class);
+            param2.setName("ruta");
+            param2.setValue(ruta);
+            request.addProperty(param2);
+
+            PropertyInfo param3 = new PropertyInfo();
+            param3.setType(String.class);
+            param3.setName("imgdata");
+            param3.setValue(strBase64);
+            request.addProperty(param3);
+
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+            resstr = response.toString();
+
+            if (resstr.equalsIgnoreCase("#")) {
+                return 1;
+            } else {
+                throw new Exception(resstr);
+            }
+        } catch (Exception e) {
+            String ss= e.getMessage();
+            //addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage());
+        }
+
+        return 0;
+    }
+
+    public int sendFotoTest(String transid,String firmaid) {
+        String fname,resstr="";
+
+        fname=firmaid;
+
+        METHOD_NAME = "saveImageFT";
+
+        try {
+
+            Bitmap bmp = BitmapFactory.decodeFile(fname);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG,75, out);
+            byte[] imagebyte = out.toByteArray();
+            String strBase64 = Base64.encodeBytes(imagebyte);
+
+            int iv1=strBase64.length();
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            PropertyInfo param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("transid");
+            param.setValue(transid);
+            request.addProperty(param);
+
+            PropertyInfo param2 = new PropertyInfo();
+            param2.setType(String.class);
+            param2.setName("imgdata");
+            param2.setValue(strBase64);
+            request.addProperty(param2);
+
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+            resstr = response.toString();
+
+            if (resstr.equalsIgnoreCase("#")) {
+                return 1;
+            } else {
+                throw new Exception(resstr);
+            }
+        } catch (Exception e) {
+            //addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage());
+        }
+
+        return 0;
+    }
+
+    /*
+    //#HS_20181219 funcion para crear JSON de fotos fachada.
 	public void listaFachada() {
 
 		Cursor DT;
@@ -5837,7 +5988,7 @@ public class ComWS extends PBase {
 
 					if (archivo.exists()) {
 
-						/*LO CONVIERTE A BASE64*/
+
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						Bitmap bitmap = BitmapFactory.decodeFile(paht);
 						bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -5852,7 +6003,6 @@ public class ComWS extends PBase {
 					}
 
 					DT.moveToNext();
-
 				}
 
 				if (DT != null) DT.close();
@@ -5876,6 +6026,7 @@ public class ComWS extends PBase {
 			mu.msgbox("listaFachada: " + e.getMessage());
 		}
 	}
+    */
 
 	//#HS_20181221 Elimina las fotos de ROADFOTOS
 	public void EliminarArchivos(File ArchivoDirectorio) {

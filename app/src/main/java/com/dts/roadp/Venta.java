@@ -805,7 +805,8 @@ public class Venta extends PBase {
 		if (porpeso) {
 			peso=mu.round(gl.dpeso,gl.peDec);
 		} else {
-			peso=mu.round(gl.dpeso*gl.umfactor,gl.peDec);
+            peso=mu.round(gl.dpeso,gl.peDec);
+			//peso=mu.round(gl.dpeso*gl.umfactor,gl.peDec);
 		}
 
 		if (porpeso) {

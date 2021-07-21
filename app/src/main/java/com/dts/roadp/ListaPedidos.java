@@ -60,7 +60,7 @@ public class ListaPedidos extends PBase {
                         itemid=vItem.Cod;
                         adapter.setSelectedIndex(position);
 
-                        msgAsk("Modificar existente pedido");
+                        msgAsk("Modificar pedido existente");
                     } catch (Exception e) {
                         mu.msgbox( e.getMessage());
                     }

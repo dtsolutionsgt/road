@@ -56,7 +56,7 @@ public class CliDet extends PBase {
 	private Boolean imgPath, imgDB, ventaGPS,flagGPS=true,permiteVenta=true,clicred;
 	private double gpx,gpy,credito,clim,cused,cdisp,cred;
 	private int nivel,browse,merc,rangoGPS,modoGPS;
-	private boolean porcentaje = false;
+	private boolean porcentaje = false,clinue,pedclinue;
 	private byte[] imagenBit;
 
 
@@ -176,6 +176,13 @@ public class CliDet extends PBase {
 	}
 
 	public void showPreventa(View view) {
+
+	    if (clinue) {
+            if (!pedclinue) {
+                msgbox("No se permite crear pedido al cliente nuevo.");return;
+            }
+        }
+
 		if (!permiteVenta) {
 			if (gl.peVentaGps == 1) {
 				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\nPara realizar la venta debe asercarse más al cliente.");
@@ -234,7 +241,9 @@ public class CliDet extends PBase {
 	}
 
 	public void tomarFoto(View view){
+        File URLfoto;
 		int codResult = 1;
+
 		try{
 			if (!this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
 				msgbox("El dispositivo no soporta toma de foto");return;
@@ -246,7 +255,13 @@ public class CliDet extends PBase {
 			//	try {
 
 			Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+
+			if (clinue) {
+                URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + cod + ".jpg");
+            } else {
+                URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+            }
+
 			intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
 			startActivityForResult(intento1,codResult);
 
@@ -266,9 +281,15 @@ public class CliDet extends PBase {
 	public void mostrarFachada(View view){
 		Cursor DT;
 		imgDB = false; imgPath=false;
+
 		try {
 
-			path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+		    if (clinue) {
+                path = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + cod + ".jpg");
+            } else {
+                path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+            }
+
 			File archivo = new File(path);
 
 			sql = "SELECT IMAGEN FROM P_CLIENTE_FACHADA WHERE CODIGO ='"+ cod +"'";
@@ -304,14 +325,20 @@ public class CliDet extends PBase {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 1) {
+        String paht;
 
+		if (requestCode == 1) {
 			try {
 
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-				Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
 
+				if (clinue) {
+                    paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + cod + ".jpg");
+                } else {
+                    paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+                }
+
+				Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
 				bitmap1 = redimensionarImagen(bitmap1, 640, 360);
 
 				FileOutputStream out = new FileOutputStream(paht);
@@ -319,11 +346,11 @@ public class CliDet extends PBase {
 				out.flush();
 				out.close();
 
-				File archivo = new File(path);
-				imgRoadTit.setImageURI(Uri.fromFile(archivo));
+                File iarchivo = new File(paht);
+				imgRoadTit.setImageURI(Uri.fromFile(iarchivo));
 			}catch (Exception e){
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-				//mu.msgbox("onActivityResult: " + e.getMessage());
+				mu.msgbox("onActivityResult: " + e.getMessage());
 			}
 
 		}
@@ -437,6 +464,10 @@ public class CliDet extends PBase {
 			lblRuta.setText("Ruta: ");
 			txtRuta.setText(gl.rutasup);
 
+			sql="SELECT PEDIDOS_CLINUEVO FROM P_RUTA ";
+            DT=Con.OpenDT(sql);
+            DT.moveToFirst();
+            pedclinue=DT.getInt(0)==1;
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -964,7 +995,9 @@ public class CliDet extends PBase {
 			//if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
 			if (flag) relD.setVisibility(View.VISIBLE);else relD.setVisibility(View.GONE);
 
-			if (esClienteNuevo()){
+            clinue=esClienteNuevo();
+
+			if (clinue){
 				imgDevol.setVisibility(View.INVISIBLE);
 				lblDevol.setVisibility(View.INVISIBLE);
 				imgCobro.setVisibility(View.INVISIBLE);
@@ -976,7 +1009,7 @@ public class CliDet extends PBase {
 				lblCobro.setVisibility(View.VISIBLE);
 			}
 
-		}catch (Exception ex) 	{
+		} catch (Exception ex) 	{
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
 			Log.d("habilitaOpciones_err", ex.getMessage());
 		}
@@ -1029,7 +1062,7 @@ public class CliDet extends PBase {
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage()+"\n"+sql);
 		}
 
 		return true;

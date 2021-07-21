@@ -548,8 +548,8 @@ public class ProdCantPrev extends PBase {
                 return;
             }
 
+            /*
             if (gl.peModal.equalsIgnoreCase("TOL"))  {
-                /*
                 if (critico) {
                     if (cant > idisp) {
                         cexist=0;cstand=0;
@@ -560,7 +560,7 @@ public class ProdCantPrev extends PBase {
                         cexist=cant;cstand=0;
                     }
                 } else {
-                 */
+
                     if (cant > idisp) {
                         cexist=idisp;cstand=cant-idisp;
                     } else {
@@ -569,6 +569,7 @@ public class ProdCantPrev extends PBase {
                 //}
                 cant=cexist;
             }
+            */
 
             if (porpeso) {
 

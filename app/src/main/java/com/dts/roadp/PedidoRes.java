@@ -824,7 +824,7 @@ public class PedidoRes extends PBase {
 		try {
 
             prodstandby=validaStandby();
-            if (prodstandby) ss="Guardar pedido con el producto cerrado?";else ss="Guardar pedido ?";
+            if (prodstandby) ss="Guardar pedido con producto cerrado?";else ss="Guardar pedido ?";
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 

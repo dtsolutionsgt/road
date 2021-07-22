@@ -214,7 +214,6 @@ public class CliNuevo extends PBase {
 
 			db.execSQL(ins.sql());
 
-
 			// P_CLIENTE
 
 			ins.init("P_CLIENTE");

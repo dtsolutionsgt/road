@@ -2262,27 +2262,51 @@ public class Venta extends PBase {
 				umv=item.umventa;//app.umVenta(item.producto);
 				ums=item.umstock;//app.umStock(item.producto);if (ums.isEmpty()) ums=umv;
 
-				ins.init("T_VENTA");
-
-				ins.add("PRODUCTO",item.producto);
-				ins.add("EMPRESA",emp);
-				ins.add("UM",umv);
-				ins.add("CANT",item.cant);
-				ins.add("UMSTOCK",ums);
-				ins.add("FACTOR",app.factorPres(item.producto,umv,ums));
-				ins.add("PRECIO",item.precio);
-				ins.add("IMP",item.imp);
-				ins.add("DES",item.des);
-				ins.add("DESMON",item.desmon);
-				ins.add("TOTAL",item.total);
-				ins.add("PRECIODOC",item.precio);
-				ins.add("PESO",item.peso);
-				ins.add("VAL1",i+1);
-				ins.add("VAL2","");
-				ins.add("VAL3",0);
-				ins.add("VAL4","");
-				ins.add("PERCEP",0);
-				ins.add("SIN_EXISTENCIA",0);
+				if (!app.prodBarra(item.producto)){
+					ins.init("T_VENTA_DESPACHO");
+					ins.add("PRODUCTO",item.producto);
+					ins.add("EMPRESA",emp);
+					ins.add("UM",umv);
+					ins.add("CANTSOL",item.cant);
+					ins.add("CANTREC",item.cant);
+					ins.add("CANTREC",item.cant);
+					ins.add("UMSTOCK",ums);
+					ins.add("FACTOR",app.factorPres(item.producto,umv,ums));
+					ins.add("PRECIO",item.precio);
+					ins.add("IMP",item.imp);
+					ins.add("DES",item.des);
+					ins.add("DESMON",item.desmon);
+					ins.add("TOTAL",item.total);
+					ins.add("PRECIODOC",item.precio);
+					ins.add("PESO",item.peso);
+					ins.add("VAL1",i+1);
+					ins.add("VAL2","");
+					ins.add("VAL3",0);
+					ins.add("VAL4","");
+					ins.add("PERCEP",0);
+					ins.add("SIN_EXISTENCIA",0);
+				}else{
+					ins.init("T_VENTA");
+					ins.add("PRODUCTO",item.producto);
+					ins.add("EMPRESA",emp);
+					ins.add("UM",umv);
+					ins.add("CANT",item.cant);
+					ins.add("UMSTOCK",ums);
+					ins.add("FACTOR",app.factorPres(item.producto,umv,ums));
+					ins.add("PRECIO",item.precio);
+					ins.add("IMP",item.imp);
+					ins.add("DES",item.des);
+					ins.add("DESMON",item.desmon);
+					ins.add("TOTAL",item.total);
+					ins.add("PRECIODOC",item.precio);
+					ins.add("PESO",item.peso);
+					ins.add("VAL1",i+1);
+					ins.add("VAL2","");
+					ins.add("VAL3",0);
+					ins.add("VAL4","");
+					ins.add("PERCEP",0);
+					ins.add("SIN_EXISTENCIA",0);
+				}
 
 				String ss=ins.sql();
 

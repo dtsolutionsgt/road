@@ -146,7 +146,7 @@
             android:layout_marginBottom="20dp"
             android:clickable="true"
             android:maxWidth="610dp"
-            android:src="@drawable/logo" />
+            android:src="@drawable/logo_nuevo" />
 
         <TextView
             android:id="@+id/textView81"

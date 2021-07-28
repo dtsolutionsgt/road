@@ -260,9 +260,9 @@ public class ExistPed extends PBase {
                     spt = mu.frmdecimal(pesot, gl.peDecImp) + " " + rep.ltrim(ump, 3);
                     if (!gl.usarpeso) spt = "";
 
-                    sc = mu.frmdecimal(val, gl.peDecImp) + " " + rep.ltrim(um, 2);
-                    scm = mu.frmdecimal(valm, gl.peDecImp) + " " + rep.ltrim(um, 2);
-                    sct = mu.frmdecimal(valt, gl.peDecImp) + " " + rep.ltrim(um, 2);
+                    sc = mu.frmdecimal(val, gl.peDecImp) + " " + rep.ltrim(um, 3);
+                    scm = mu.frmdecimal(valm, gl.peDecImp) + " " + rep.ltrim(um, 3);
+                    sct = mu.frmdecimal(valt, gl.peDecImp) + " " + rep.ltrim(um, 3);
 
                     item = clsCls.new clsExist();
                     itemm = clsCls.new clsExist();

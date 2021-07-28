@@ -394,7 +394,7 @@ public class PedidoRes extends PBase {
 	private boolean saveOrder(){
 		Cursor DT;
 		double tot,desc,imp,peso,vcant,vpeso,vfactor,factpres;
-        String vprod,vumstock,vumventa;
+        String vprod,vumstock,vumventa,bandisp;
 
 		corel=gl.ruta+"_"+mu.getCorelBase();
 		fechae=du.ffecha00(fechae);
@@ -463,7 +463,10 @@ public class PedidoRes extends PBase {
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 
+                if (DT.getInt(14)==1) bandisp="S";else bandisp="F";
+
                 ins.init("D_PEDIDOD");
+
                 ins.add("COREL", corel);
                 ins.add("PRODUCTO", DT.getString(0));
                 ins.add("EMPRESA", gl.emp);
@@ -477,7 +480,7 @@ public class PedidoRes extends PBase {
                 ins.add("PRECIODOC", DT.getDouble(7));
                 ins.add("PESO", DT.getDouble(8));
                 ins.add("VAL1", DT.getDouble(9));
-                ins.add("VAL2", DT.getString(10));
+                ins.add("VAL2", bandisp); //DT.getString(10));
                 ins.add("CANTPROC", 0);
                 ins.add("UMVENTA", DT.getString(11));
                 ins.add("FACTOR", DT.getDouble(12));

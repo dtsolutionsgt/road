@@ -8,6 +8,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.widget.Toast;
 
+import org.apache.commons.lang.StringUtils;
+
 public class clsDocPedido extends clsDocument {
 
 	private ArrayList<itemData> items= new ArrayList<itemData>();
@@ -32,7 +34,7 @@ public class clsDocPedido extends clsDocument {
 
 		rep.line();
 		rep.add("CODIGO   DESCRIPCION       T. PEDIDO");
-		rep.add("CANT  U-VENTA   KGS");
+		rep.add("CANT  U-VENTA    KGS");
 		rep.line();
 		//rep.empty();
 		
@@ -42,9 +44,11 @@ public class clsDocPedido extends clsDocument {
 			//rep.add3lrr(rep.rtrim(""+item.cant,5),item.prec,item.tot);
 
 			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um,6);
-			cp=frmdecimal(0,decimp)+" "+rep.ltrim(item.ump,3);
-			
-			rep.addg(cu+" "+cp,"0.00","");
+			cp=StringUtils.leftPad(frmdecimal(item.peso,decimp),6);
+            rep.add(cu+"  "+cp);
+
+			//cp=frmdecimal(item.peso,decimp)+" "+rep.ltrim(item.ump,3);
+			//rep.addg(cu+" "+cp,"0.00","");
 		}
 		
 		rep.line();
@@ -282,7 +286,8 @@ public class clsDocPedido extends clsDocument {
 		
 		try {
 			sql="SELECT D_PEDIDOD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_PEDIDOD.CANT,D_PEDIDOD.PRECIODOC," +
-				"D_PEDIDOD.IMP, D_PEDIDOD.DES,D_PEDIDOD.DESMON, D_PEDIDOD.TOTAL, D_PEDIDOD.UMVENTA, D_PEDIDOD.UMPESO " +
+				"D_PEDIDOD.IMP, D_PEDIDOD.DES,D_PEDIDOD.DESMON, D_PEDIDOD.TOTAL, D_PEDIDOD.UMVENTA, " +
+                "D_PEDIDOD.UMPESO, D_PEDIDOD.PESO " +
 				"FROM D_PEDIDOD INNER JOIN P_PRODUCTO ON D_PEDIDOD.PRODUCTO = P_PRODUCTO.CODIGO " +
 				"WHERE (D_PEDIDOD.COREL='"+corel+"')";	
 			DT=Con.OpenDT(sql);
@@ -303,6 +308,7 @@ public class clsDocPedido extends clsDocument {
 				item.tot=DT.getDouble(7);				
 				item.um=DT.getString(8);
 				item.ump=DT.getString(9);
+				item.peso=DT.getDouble(10);
 				
 				if (sinimp) item.tot=item.tot-item.imp;
 				
@@ -313,6 +319,7 @@ public class clsDocPedido extends clsDocument {
 			}				
 			
 		} catch (Exception e) {
+		    String ss=e.getMessage();
 	    }		
 		
 		return true;
@@ -336,7 +343,7 @@ public class clsDocPedido extends clsDocument {
 	
 	private class itemData {
 		public String cod,nombre,um,ump;
-		public double cant,prec,imp,descper,desc,tot;
+		public double cant,prec,imp,descper,desc,tot,peso;
 	}
 	
 	

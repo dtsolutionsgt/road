@@ -828,13 +828,16 @@ public class Venta extends PBase {
 			ins.add("PRODUCTO",prodid);
             ins.add("SIN_EXISTENCIA",0);
 			ins.add("EMPRESA",emp);
-			if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
+
 			ins.add("CANT",cant);
 			if (rutatipo.equalsIgnoreCase("V")) {
 				ins.add("UMSTOCK",gl.umstock);
+                if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
 			}else {
 				ins.add("UMSTOCK",gl.um);
+                ins.add("UM",gl.umpres);
 			}
+
 			if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
 			ins.add("FACTOR",factorconv);
 			if (porpeso) {

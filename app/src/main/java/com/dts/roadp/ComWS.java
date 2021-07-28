@@ -108,8 +108,8 @@ public class ComWS extends PBase {
 	private BaseDatos.Insert insT;
 	private AppMethods clsAppM;
 
-	private ArrayList<String> listItems = new ArrayList<String>();
-	private ArrayList<String> results = new ArrayList<String>();
+	private ArrayList<String> listItems = new ArrayList<>();
+	private ArrayList<String> results = new ArrayList<>();
 
 	private ArrayList<clsClasses.clsEnvio> items = new ArrayList<clsClasses.clsEnvio>();
 	private ListAdaptEnvio adapter;
@@ -2708,6 +2708,14 @@ public class ComWS extends PBase {
 
 			isbusy = 0;
 
+			isbusy = 0;
+
+			comparaCorrel();
+
+			otrosParametros();
+
+			visibilidadBotones();
+
 			msgAskExit(s);
 
 			barInfo.setVisibility(View.INVISIBLE);
@@ -2739,6 +2747,8 @@ public class ComWS extends PBase {
 
 			return false;
 
+		}finally {
+			visibilidadBotones();
 		}
 
 	}
@@ -3099,7 +3109,7 @@ public class ComWS extends PBase {
 		if (TN.equalsIgnoreCase("P_STOCK")) {
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, 0 " +
 						"FROM P_STOCK WHERE RUTA='" + ActRuta + "'  AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";
 			} else if (gl.peModal.equalsIgnoreCase("APR")) {
@@ -3117,7 +3127,7 @@ public class ComWS extends PBase {
 		//CKFK 20190222 Agregué a la consulta el AND (ENVIADO = 0)
 		if (TN.equalsIgnoreCase("P_STOCKB")) {
 			SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, " +
-					"STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
+					"STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA, 0 " +
 					"FROM P_STOCKB WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 					"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
 			return SQL;
@@ -3985,6 +3995,7 @@ public class ComWS extends PBase {
 			if (fstr.equalsIgnoreCase("Sync OK")) {
 
 				cargaTablas();
+
 				/*lblInfo.setText(" ");
 				s = "Recepción completa.";
 				if (stockflag == 1) s = s + "\nSe actualizó inventario.";
@@ -4009,18 +4020,17 @@ public class ComWS extends PBase {
 				return;
 			}
 
-			if (!vDBVacia){
+			//#CKFK 20210725 Puse esto en comentario porque no llega a esta opción
+			/*if (!vDBVacia){
 				pendientes = validaPendientes();
 
 				isbusy = 0;
 				comparaCorrel();
 
 				otrosParametros();
+			}*/
 
-				confImpresora();
-			}
-
-			visibilidadBotones();
+			//visibilidadBotones();
 
 			if (ftflag) msgbox(ftmsg);
 		} catch (Exception e) {
@@ -4031,18 +4041,6 @@ public class ComWS extends PBase {
 		//if (!validaLicencia()) restartApp();
 
 	}
-
-    private void confImpresora() {
-        try {
-
-            sql = "UPDATE Params SET prn='" + clsAppM.getPrintId_Ruta() + "',prnserie='" + clsAppM.impresTipo_Ruta() + "' ";
-            db.execSQL(sql);
-
-        } catch (Exception e) {
-            msgbox(new Object() {
-            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
-        }
-    }
 
     private class AsyncCallRec extends AsyncTask<String, Void, Void> {
 
@@ -6656,6 +6654,7 @@ public class ComWS extends PBase {
 			app.parametrosExtra();
 			app.parametrosGlobales();
 			app.parametrosBarras();
+			app.confImpresora();
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");

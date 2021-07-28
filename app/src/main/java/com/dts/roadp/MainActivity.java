@@ -441,6 +441,7 @@ public class MainActivity extends PBase {
             app.parametrosExtra();
             app.parametrosGlobales();
             app.parametrosBarras();
+
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             msgbox(e.getMessage());

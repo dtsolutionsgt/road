@@ -980,7 +980,7 @@ public class AppMethods {
 			dt.moveToFirst();
 			prnid=dt.getString(0);
 
-			sql="SELECT MARCA FROM P_IMPRESORA WHERE IDIMPRESORA='"+prnid+"'";
+			sql="SELECT NUMSERIE FROM P_IMPRESORA WHERE IDIMPRESORA='"+prnid+"'";
 			dt=Con.OpenDT(sql);
 			if (dt.getCount()==0) return "SIN IMPRESORA";
 			dt.moveToFirst();
@@ -1090,6 +1090,18 @@ public class AppMethods {
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			return " #### ";
+		}
+	}
+
+	public void confImpresora() {
+		try {
+
+			sql = "UPDATE Params SET prn='" + getPrintId_Ruta() + "',prnserie='" + impresTipo_Ruta() + "' ";
+			db.execSQL(sql);
+
+		} catch (Exception e) {
+			msgbox(new Object() {
+			}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
 		}
 	}
 

@@ -105,11 +105,15 @@ public class Venta extends PBase {
 
 		if (rutatipo.equalsIgnoreCase("V")) {
 			lblTit.setText("Venta");
-			imgroad.setImageResource(R.drawable.pedidos_1_gray);
+			imgroad.setImageResource(R.drawable.factura);
+		} else if (rutatipo.equalsIgnoreCase("D")) {
+			lblTit.setText("Prefactura");
+			imgroad.setImageResource(R.drawable.despacho1);
 		} else {
 			lblTit.setText("Preventa");
-			imgroad.setImageResource(R.drawable.pedidos_3_gray);
+			imgroad.setImageResource(R.drawable.pedido);
 		}
+
 		if (rutapos) imgroad.setImageResource(R.drawable.pedidos_3_gray);
 
         pedido=rutatipo.equalsIgnoreCase("P");
@@ -1113,7 +1117,7 @@ public class Venta extends PBase {
 				db.beginTransaction();
 
 				if (barraBonif()) {
-					toastlong("¡La barra es parte de bonificacion!");
+					toastlong("¡La barra es parte de una bonificacion!");
 					db.setTransactionSuccessful();
 					db.endTransaction();
 					txtBarra.setText("");return;
@@ -1130,6 +1134,15 @@ public class Venta extends PBase {
 					return;
 				} else if (bbolsa==-1) {
 					toast("Barra vendida");
+					return;
+				}else if (bbolsa==-2) {
+					msgbox("Esa barra está reservada para otros despachos");
+					return;
+				}else if (bbolsa==-3) {
+					msgbox("Al cliente no se le pueden vender productos nuevos");
+					return;
+				}else if (bbolsa==-4) {
+					msgbox("Al cliente no se le pueden vender mas cantidad de la solicitada");
 					return;
 				}
 
@@ -1162,8 +1175,9 @@ public class Venta extends PBase {
 
 	private int barraBolsa() {
 		Cursor dt;
-		double ppeso=0,pprecdoc=0,factbolsa,factorconv;
+		double ppeso=0,pprecdoc=0,factbolsa,factorconv,diferencia=0;
 		String uum,umven,uunistock;
+		boolean reservado = false;
 		boolean isnew=true;
 
 		porpeso=true;
@@ -1198,6 +1212,56 @@ public class Venta extends PBase {
 			uum = dt.getString(3);
 
 			if (dt != null) dt.close();
+
+			if (gl.iddespacho !=null ){
+
+				if (!gl.iddespacho.isEmpty()) {
+
+					sql="SELECT PRODUCTO, CANTDIF " +
+							"FROM T_VENTA_DESPACHO WHERE (PRODUCTO='"+prodid+"') ";
+					dt=Con.OpenDT(sql);
+
+					if (dt.getCount()==0) {
+						//Es un producto nuevo, validaremos si al cliente se le pueden vender productos nuevos
+						//y si hay barras disponibles
+
+						if (gl.permitir_producto_nuevo) {
+
+							if (reservado) {
+								//La barra no está disponible
+								return -2;
+							}
+
+						} else {
+							//No se le pueden vender productos nuevos
+							return -3;
+						}
+
+					}else{
+						//Vamos a validar si está solicitando más producto
+						dt.moveToFirst();
+
+						diferencia = dt.getDouble(1);
+
+						if (diferencia==0){
+
+							if (gl.permitir_cantidad_mayor) {
+
+								if (reservado) {
+									//La barra no está disponible
+									return -2;
+								}
+
+							} else {
+								//No se le pueden vender cantidades mayores
+								return -4;
+							}
+						}
+					}
+				}
+			}
+
+			if(dt!=null) dt.close();
 
 			//#CKFK 20191204 Modifiqué la forma de obtener la unidad de medida (um)
 			//um = uum;
@@ -1524,8 +1588,9 @@ public class Venta extends PBase {
 
 	private int barraBolsaTrans() {
 		Cursor dt;
-		double ppeso=0,pprecdoc=0,factbolsa;
+		double ppeso=0,pprecdoc=0,factbolsa,diferencia=0;
 		String uum,umven,uunistock;
+		boolean reservado = false;
 		boolean isnew=true;
 
 		porpeso=true;
@@ -1534,7 +1599,7 @@ public class Venta extends PBase {
 
 			db.beginTransaction();
 
-			sql="SELECT CODIGO,CANT,PESO,UNIDADMEDIDA " +
+			sql="SELECT CODIGO,CANT,PESO,UNIDADMEDIDA, RESERVADO " +
 					"FROM P_STOCKB WHERE (BARRA='"+barcode+"') ";
 			dt=Con.OpenDT(sql);
 
@@ -1557,6 +1622,57 @@ public class Venta extends PBase {
 			cant = dt.getInt(1);
 			ppeso = dt.getDouble(2);
 			uum = dt.getString(3);
+			reservado = (dt.getInt(4)==0?true:false);
+
+			if(dt!=null) dt.close();
+
+			if (gl.iddespacho !=null ){
+				if (!gl.iddespacho.isEmpty()) {
+
+					sql="SELECT PRODUCTO, CANTDIF " +
+							"FROM T_VENTA_DESPACHO WHERE (PRODUCTO='"+prodid+"') ";
+					dt=Con.OpenDT(sql);
+					db.endTransaction();
+
+					if (dt.getCount()==0) {
+						//Es un producto nuevo, validaremos si al cliente se le pueden vender productos nuevos
+						//y si hay barras disponibles
+
+						if (gl.permitir_producto_nuevo) {
+
+							if (reservado) {
+								//La barra no está disponible
+								return -2;
+							}
+
+						} else {
+							//No se le pueden vender productos nuevos
+							return -3;
+						}
+
+					}else{
+						//Vamos a validar si está solicitando más producto
+						dt.moveToFirst();
+
+						diferencia = dt.getDouble(1);
+
+						if (diferencia==0){
+
+							if (gl.permitir_cantidad_mayor) {
+
+								if (reservado) {
+									//La barra no está disponible
+									return -2;
+								}
+
+							} else {
+								//No se le pueden vender cantidades mayores
+								return -4;
+							}
+						}
+					}
+				}
+			}
 
 			if(dt!=null) dt.close();
 
@@ -1836,8 +1952,10 @@ public class Venta extends PBase {
 					                       " PESO="+ppeso+",   TOTAL="+pprecio+" WHERE PRODUCTO='"+prodid+"'";
 			db.execSQL(sql);
 
-			sql="DELETE FROM T_VENTA_DESPACHO WHERE CANTDIF=0";
-			db.execSQL(sql);
+			//#CKFK 20210725 Puse esto en comentario porque voy a necesitar validar si el producto existía en el pedido
+			// o es un producto nuevo
+			/*sql="DELETE FROM T_VENTA_DESPACHO WHERE CANTDIF=0";
+			db.execSQL(sql);*/
 
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
@@ -1921,6 +2039,26 @@ public class Venta extends PBase {
 		try {
 
 			sql="SELECT PRODUCTO FROM T_BARRA_BONIF WHERE (BARRA='"+barcode+"')";
+			dt=Con.OpenDT(sql);
+
+			boolean rslt=dt.getCount()>0;
+
+			if(dt!=null) dt.close();
+
+			return rslt;
+
+		} catch (Exception e) {
+			return false;
+		}
+		//return true;
+	}
+
+	private boolean barraReservada() {
+		Cursor dt;
+
+		try {
+
+			sql="SELECT barra FROM P_STOCKB WHERE (BARRA='"+barcode+"') AND RESERVADA = 1";
 			dt=Con.OpenDT(sql);
 
 			boolean rslt=dt.getCount()>0;

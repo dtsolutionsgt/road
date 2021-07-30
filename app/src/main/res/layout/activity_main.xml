@@ -139,13 +139,15 @@
             android:id="@+id/imgNext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_margin="20dp"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
             android:clickable="true"
             android:maxWidth="610dp"
             android:onClick="showMenu"
-            android:src="@drawable/logo" />
+            android:src="@drawable/logo_nuevo" />
 
         <TextView
             android:id="@+id/textView81"

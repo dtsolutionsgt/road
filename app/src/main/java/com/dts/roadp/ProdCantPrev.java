@@ -34,8 +34,8 @@ public class ProdCantPrev extends PBase {
 
     private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact,umini;
     private int nivel,browse=0,deccant,prevfact=1;
-    private double cant,cexist,cstand,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
-    private boolean pexist,esdecimal,porpeso,esbarra,idle=true,critico;
+    private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
+    private boolean pexist,esdecimal,porpeso,esbarra,idle=true;
     private AppMethods app;
 
     @Override
@@ -548,26 +548,12 @@ public class ProdCantPrev extends PBase {
                 return;
             }
 
-            /*
-            if (gl.peModal.equalsIgnoreCase("TOL"))  {
-                if (critico) {
-                    if (cant > idisp) {
-                        cexist=0;cstand=0;
-                        mu.msgbox("Cantidad mayor que disponible.");
-                        txtCant.requestFocus();
-                        return;
-                    } else {
-                        cexist=cant;cstand=0;
-                    }
-                } else {
-
-                    if (cant > idisp) {
-                        cexist=idisp;cstand=cant-idisp;
-                    } else {
-                        cexist=cant;cstand=0;
-                    }
-                //}
-                cant=cexist;
+            if (rutatipo.equalsIgnoreCase("V")) {
+                if (cant > idisp) {
+                    mu.msgbox("Cantidad mayor que disponible.");
+                    txtCant.requestFocus();
+                    return;
+                }
             }
             */
 
@@ -968,24 +954,6 @@ public class ProdCantPrev extends PBase {
         try {
             porpeso=app.ventaPeso(prodid);
             esbarra=app.prodBarra(prodid);
-
-            sql="SELECT ESTADO FROM P_STOCK_PV  WHERE CODIGO='" + prodid + "' ";
-            dt=Con.OpenDT(sql);
-            dt.moveToFirst();
-            critico=dt.getString(0).equalsIgnoreCase("C");
-
-            gl.tolprodcrit=critico;
-
-            if (critico) {
-                relcrit.setVisibility(View.VISIBLE);
-                lblDisp.setVisibility(View.VISIBLE);
-                lblDispLbl.setVisibility(View.VISIBLE);
-            } else {
-                relcrit.setVisibility(View.INVISIBLE);
-                lblDisp.setVisibility(View.INVISIBLE);
-                lblDispLbl.setVisibility(View.INVISIBLE);
-            }
-
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             porpeso=false;esbarra=false;

@@ -146,9 +146,8 @@ public class BaseDatosScript {
 					"[UMVENTA] TEXT NOT NULL,"+
 					"[FACTOR] REAL NOT NULL,"+
 					"[UMSTOCK] TEXT NOT NULL,"+
-					"[UMPESO] TEXT NOT NULL,"+
-                    "[SIN_EXISTENCIA] INTEGER NOT NULL,"+  //JP20210614
-					"PRIMARY KEY ([COREL],[PRODUCTO],[SIN_EXISTENCIA])"+
+					"[UMPESO] TEXT NOT NULL,"+										
+					"PRIMARY KEY ([COREL],[PRODUCTO])"+
 					");";
 			database.execSQL(vSQL);
 			
@@ -2010,7 +2009,6 @@ public class BaseDatosScript {
 					"[PRODUCTO] TEXT NOT NULL,"+
 					"[EMPRESA] TEXT NOT NULL,"+
 					"[UM] TEXT NOT NULL,"+
-                    "[SIN_EXISTENCIA] INTEGER NOT NULL,"+ //JP20210614
 					"[CANT] REAL NOT NULL,"+
 					"[UMSTOCK] TEXT NOT NULL,"+
 					"[FACTOR] REAL NOT NULL,"+

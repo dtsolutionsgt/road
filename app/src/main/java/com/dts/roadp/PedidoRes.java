@@ -51,7 +51,7 @@ public class PedidoRes extends PBase {
 	private printer prn;
 	private clsDocPedido pdoc;
     private AppMethods app;
-	
+
 	private long fecha,fechae;
 	private String itemid,cliid,corel;
 	private int cyear, cmonth, cday,dweek,impres;
@@ -78,7 +78,7 @@ public class PedidoRes extends PBase {
 		cliid=gl.cliente;
 		gl.tolpedsend=false;
         toledano=gl.peModal.equalsIgnoreCase("TOL");
-		
+
 		setActDate2();
 		fechae=fecha;
 		lblFecha.setText(du.sfecha(fechae));
@@ -88,7 +88,7 @@ public class PedidoRes extends PBase {
 
 		clsDesc=new clsDescGlob(this);
         app=new AppMethods(this,gl,Con,db);
-		
+
 		adjustSpinner();
 		fillSpinner();
 		
@@ -418,7 +418,7 @@ public class PedidoRes extends PBase {
                 db.execSQL("DELETE FROM D_PEDIDO WHERE COREL='"+corel+"'");
                 db.execSQL("DELETE FROM D_PEDIDOD WHERE COREL='"+corel+"'");
             }
-			
+
 			ins.init("D_PEDIDO");
 			ins.add("COREL",corel);
 			ins.add("ANULADO","N");
@@ -463,10 +463,7 @@ public class PedidoRes extends PBase {
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 
-                if (DT.getInt(14)==1) bandisp="S";else bandisp="F";
-
                 ins.init("D_PEDIDOD");
-
                 ins.add("COREL", corel);
                 ins.add("PRODUCTO", DT.getString(0));
                 ins.add("EMPRESA", gl.emp);
@@ -480,7 +477,7 @@ public class PedidoRes extends PBase {
                 ins.add("PRECIODOC", DT.getDouble(7));
                 ins.add("PESO", DT.getDouble(8));
                 ins.add("VAL1", DT.getDouble(9));
-                ins.add("VAL2", bandisp); //DT.getString(10));
+                ins.add("VAL2", DT.getString(10));
                 ins.add("CANTPROC", 0);
                 ins.add("UMVENTA", DT.getString(11));
                 ins.add("FACTOR", DT.getDouble(12));

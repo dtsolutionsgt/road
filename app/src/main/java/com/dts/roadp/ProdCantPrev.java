@@ -34,7 +34,7 @@ public class ProdCantPrev extends PBase {
 
     private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact,umini;
     private int nivel,browse=0,deccant,prevfact=1;
-    private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
+    private double cant,cexist,cstand,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
     private boolean pexist,esdecimal,porpeso,esbarra,idle=true;
     private AppMethods app;
 
@@ -555,7 +555,6 @@ public class ProdCantPrev extends PBase {
                     return;
                 }
             }
-            */
 
             if (porpeso) {
 

@@ -198,14 +198,15 @@ public class DevolBodCan extends PBase {
 
         try {
 
-            sql =  " SELECT D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA " +
+            sql =  " SELECT D_CXCD.CODIGO AS CODIGO, P_PRODUCTO.DESCLARGA AS DESCLARGA " +
                     " FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO " +
                     " INNER JOIN D_CXC ON D_CXC.COREL = D_CXCD.COREL WHERE D_CxC.STATCOM='N' AND D_CXC.ANULADO = 'N' " +
                     " GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA ";
+            sql += "UNION SELECT DISTINCT(PRODUCTO) AS CODIGO, '' as DESCLARGA FROM D_CANASTA WHERE CANTREC > 0";
 
             dp = Con.OpenDT(sql);
 
-            if (dp.getCount() == 0) {
+            if (dp == null || dp.getCount() == 0) {
                 adapter = new list_view_dev_bod_can(this, items);
                 listView.setAdapter(adapter);
                 return;
@@ -218,12 +219,20 @@ public class DevolBodCan extends PBase {
 
                 pcod=dp.getString(0);
 
-                sql =  "SELECT D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA,SUM(D_CXCD.CANT) AS TOTAL,D_CXCD.UMVENTA, " +
-                        "D_CXCD.LOTE,D_CXCD.COREL,D_CXCD.ESTADO,SUM(D_CXCD.PESO)  " +
+                sql =  "SELECT D_CXCD.CODIGO AS CODIGO, P_PRODUCTO.DESCLARGA AS DESCLARGA, SUM(D_CXCD.CANT) AS TOTAL,D_CXCD.UMVENTA AS UMVENTA, " +
+                        "D_CXCD.LOTE AS LOTE, D_CXCD.COREL AS COREL, D_CXCD.ESTADO AS ESTADO ,SUM(D_CXCD.PESO) AS PESO " +
                         "FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO INNER JOIN " +
                         "D_CxC ON D_CxC.COREL = D_CxCD.COREL  " +
                         "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') AND D_CxC.STATCOM='N' AND D_CxC.ANULADO='N' " +
                         "GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA,D_CXCD.UMVENTA,D_CXCD.LOTE,D_CXCD.COREL,D_CXCD.ESTADO ";
+
+                sql += "UNION SELECT b.CODIGO AS CODIGO, b.DESCLARGA AS DESCLARGA, SUM(a.CANTREC) AS TOTAL, " +
+                        "a.UNIDBAS AS UMVENTA, NULL AS LOTE, NULL as COREL, NULL AS ESTADO, 0 AS PESO " +
+                        "FROM D_CANASTA a " +
+                        "INNER JOIN P_PRODUCTO b ON b.CODIGO = a.PRODUCTO " +
+                        "WHERE a.PRODUCTO = '" + pcod + "' " +
+                        "AND a.CANTREC > 0 " +
+                        "GROUP BY b.CODIGO, b.DESCLARGA, b.UM_SALIDA;";
 
                 dt = Con.OpenDT(sql);
                 icnt=dt.getCount();
@@ -234,12 +243,14 @@ public class DevolBodCan extends PBase {
 
                 item = clsCls.new clsDevCan();
                 item.Cod = pcod;
-                item.Desc = dp.getString(1);
+                item.Desc = dt.getString(1);
                 item.flag = 0;
                 item.items=icnt;
                 items.add(item);
 
                 if (dt.getCount() > 0) dt.moveToFirst();
+                else continue;
+
                 while (!dt.isAfterLast()) {
 
                     cod = dt.getString(0);

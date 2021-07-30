@@ -25,9 +25,11 @@ public class Canastas extends PBase {
     private TextView lblEntr;
     private EditText txtCanastasEnt, txtCanastasRec;
     private AlertDialog ad;
-    private int regFecha;
+    private long regFecha;
     private boolean editando;
     private String producto = "";
+    private AppMethods app;
+    private long fecha;
 
     ListAdaptCanasta adapter;
 
@@ -38,10 +40,11 @@ public class Canastas extends PBase {
 
         super.InitBase();
         addlog("Canastas",""+du.getActDateTime(),gl.vend);
-
+        app= new AppMethods(this, gl, Con, db);
         listView = findViewById(R.id.listaCanastas);
         lblRec = findViewById(R.id.lblTotRec);
         lblEntr = findViewById(R.id.lblTotEntr);
+        fecha = app.fechaFactTol(du.getActDateTime());
         createDialog();
         setHandlers();
         listItems();
@@ -62,7 +65,7 @@ public class Canastas extends PBase {
         dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                saveCanastas();
+                guardarCanastas();
             }
         });
 
@@ -89,7 +92,11 @@ public class Canastas extends PBase {
                         clsClasses.clsCanasta item = (clsClasses.clsCanasta) lvObj;
                         adapter.setSelectedIndex(position);
 
-                        editarRegistro(item);
+                        if (item.editar) {
+                            editarRegistro(item);
+                        } else {
+                            toastcent("No puede modificar este registro");
+                        }
 
                     } catch (Exception e) {
                         addlog(new Object() {
@@ -103,7 +110,7 @@ public class Canastas extends PBase {
                 @Override
                 public boolean onKey(View v, int keyCode, KeyEvent event) {
                     if ((event.getAction() == KeyEvent.ACTION_DOWN) && keyCode == KeyEvent.KEYCODE_ENTER) {
-                        saveCanastas();
+                        guardarCanastas();
                         return true;
                     }
                     return false;
@@ -123,18 +130,20 @@ public class Canastas extends PBase {
             Cursor DT;
 
             sql = "SELECT " +
-                "a.RUTA, " +
-                "a.FECHA, " +
-                "a.CLIENTE, " +
-                "a.PRODUCTO, " +
-                "a.CANTREC, " +
-                "a.CANTENTR," +
-                "b.CODIGO, " +
-                "b.DESCCORTA, " +
-                "b.DESCLARGA " +
+                    "a.RUTA, " +
+                    "a.FECHA, " +
+                    "a.CLIENTE, " +
+                    "a.PRODUCTO, " +
+                    "a.CANTREC, " +
+                    "a.CANTENTR," +
+                    "b.CODIGO, " +
+                    "b.DESCCORTA, " +
+                    "b.DESCLARGA, " +
+                    "a.STATCOM " +
                 "FROM D_CANASTA a " +
                 "INNER JOIN P_PRODUCTO b ON b.CODIGO = a.PRODUCTO " +
                 "WHERE a.CLIENTE = '" + gl.cliente +"' " +
+                "AND a.ANULADO = 0 " +
                 "ORDER BY a.FECHA DESC;";
 
             DT = Con.OpenDT(sql);
@@ -147,7 +156,7 @@ public class Canastas extends PBase {
 
 
                 item.fecha = DT.getInt(1);
-                item.fechaFormato = du.sfecha(item.fecha) + " "+ du.shora(item.fecha);
+                item.fechaFormato = du.sfecha(item.fecha);
                 item.cliente = DT.getString(2);
                 item.producto = DT.getString(3);
                 item.cantrec = DT.getInt(4);
@@ -155,6 +164,7 @@ public class Canastas extends PBase {
                 item.codigo = DT.getString(6);
                 item.desccorta = DT.getString(7);
                 item.desclarga = DT.getString(8);
+                item.editar = DT.getString(9).equalsIgnoreCase("N");
 
                 items.add(item);
                 tEntr += item.cantentr;
@@ -211,23 +221,41 @@ public class Canastas extends PBase {
         }
     }
 
-    public void saveCanastas() {
+    public void guardarCanastas() {
         try {
             opendb();
-            int cantRec = Integer.parseInt(txtCanastasRec.getText().toString());
-            int cantEntr = Integer.parseInt(txtCanastasEnt.getText().toString());
+            String txtCanRec = txtCanastasRec.getText().toString();
+            String txtCanEntr = txtCanastasEnt.getText().toString();
+            if (mu.emptystr(txtCanRec) || mu.emptystr(txtCanEntr)) {
+                toast("Los campos recibido y entregado son obligatorios.");
+                return;
+            }
+            int cantRec = Integer.parseInt(txtCanRec);
+            int cantEntr = Integer.parseInt(txtCanEntr);
+
+            if (cantRec == 0 && cantEntr == 0) {
+                toast("El campo recibido o entregado debe ser mayor a cero.");
+                return;
+            }
 
 
 
             if (!editando) {
+
+                if (!registroValido()) {
+                    toastcent("El cliente ya tiene un registro con el tipo de canasta seleccionado.");
+                    return;
+                }
+
                 ins.init("D_CANASTA");
                 ins.add("RUTA", gl.ruta);
-                ins.add("FECHA", du.getActDateTime());
+                ins.add("FECHA", fecha);
                 ins.add("CLIENTE", gl.cliente);
                 ins.add("PRODUCTO", gl.prodCanasta);
                 ins.add("CANTREC", cantRec);
                 ins.add("CANTENTR", cantEntr);
                 ins.add("STATCOM", "N");
+                ins.add("CORELTRANS", (gl.corelFac == null || gl.corelFac.isEmpty()) ? "": gl.corelFac);
 
                 db.execSQL(ins.sql());
             }else {
@@ -267,6 +295,7 @@ public class Canastas extends PBase {
     public void clearCanastas() {
         txtCanastasRec.setText("");
         txtCanastasEnt.setText("");
+        txtCanastasEnt.requestFocus();
     }
 
     public void setTitulo() {
@@ -285,6 +314,20 @@ public class Canastas extends PBase {
         }
     }
 
+    private boolean registroValido() {
+        String sql = "SELECT * FROM D_CANASTA " +
+                "WHERE RUTA = '"+ gl.ruta +"' " +
+                "AND CLIENTE = '"+gl.cliente+"' " +
+                "AND FECHA="+ fecha +" " +
+                "AND PRODUCTO= '"+gl.prodCanasta+"';";
+
+        Cursor total = Con.OpenDT(sql);
+
+        if (total != null && total.getCount() >= 1) return false;
+
+        return true;
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -293,6 +336,7 @@ public class Canastas extends PBase {
             ad.dismiss();
         }else {
             setTitulo();
+            txtCanastasEnt.requestFocus();
         }
     }
 }

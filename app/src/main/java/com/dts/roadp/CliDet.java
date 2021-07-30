@@ -386,7 +386,7 @@ public class CliDet extends PBase {
 		try {
 
 			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
-					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO "+
+					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO,INGRESA_CANASTAS "+
 					"FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
@@ -438,6 +438,7 @@ public class CliDet extends PBase {
 			gl.vcheque = DT.getString(14).equalsIgnoreCase("S");
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
 			gl.clitipo = DT.getString(16);
+			gl.ingresaCanastas = DT.getInt(18) == 1;
 
 			if(DT!=null) DT.close();
 

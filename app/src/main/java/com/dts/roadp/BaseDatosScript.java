@@ -999,10 +999,13 @@ public class BaseDatosScript {
 					"PRODUCTO TEXT NOT NULL,"+
 					"CANTREC INTEGER,"+
 					"CANTENTR INTEGER,"+
-					"STATCOM TEXT,"+
+					"STATCOM TEXT DEFAULT 'N',"+
 					"CORELTRANS TEXT,"+
-					"PESOREC REAL,"+
-					"PESOENTR INTEGER,"+
+					"PESOREC REAL DEFAULT 0,"+
+					"PESOENTR INTEGER DEFAULT 0,"+
+					"ANULADO INTEGER DEFAULT 0,"+
+					"UNIDBAS TEXT DEFAULT 'UN'," +
+					"CODIGOLIQUIDACION INTEGER DEFAULT 0,"+
 					"PRIMARY KEY ([RUTA], [FECHA], [CLIENTE], [PRODUCTO])"+
 					");";
 			database.execSQL(vSQL);
@@ -1165,6 +1168,7 @@ public class BaseDatosScript {
 					"[ID_DESPACHO] INTEGER NOT NULL,"+
 					"[ID_FACTURACION] INTEGER NOT NULL,"+
 					"[MODIF_PRECIO] INTEGER NOT NULL,"+
+					"[INGRESA_CANASTAS] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

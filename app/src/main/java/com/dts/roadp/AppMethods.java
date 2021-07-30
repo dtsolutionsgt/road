@@ -116,6 +116,10 @@ public class AppMethods {
 						" UNION SELECT IFNULL(COUNT(DOCUMENTO),0) AS CANT FROM P_STOCKB " +
 						" UNION SELECT IFNULL(COUNT(DOCUMENTO),0) AS CAN FROM P_STOCK_PALLET) A";
 					break;
+
+				case "Canastas":
+					sql="SELECT COUNT(*) AS CANT FROM D_CANASTA WHERE STATCOM = 'N'";
+					break;
 			}
 
 			DT=Con.OpenDT(sql);

@@ -32,7 +32,7 @@ public class ProdCantPrev extends PBase {
 
     private Precio prc;
 
-    private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact,umini;
+    private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact,umini,strdisp;
     private int nivel,browse=0,deccant,prevfact=1;
     private double cant,cexist,cstand,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
     private boolean pexist,esdecimal,porpeso,esbarra,idle=true,critico;
@@ -117,6 +117,11 @@ public class ProdCantPrev extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
+    }
+
+    public void doHint(View view) {
+        String ss="LA CANTIDAD EXEDENTE A "+strdisp+" PODRIA NO ENTREGAR SE";
+        toastlong(ss);
     }
 
     public void askExist(View view) {
@@ -351,7 +356,7 @@ public class ProdCantPrev extends PBase {
 		}
 		*/
 
-        idisp=mu.trunc(idisp);
+        idisp=mu.trunc(idisp);strdisp=""+idisp;
 
         if (porpeso) {
             lblBU.setText(umstock);

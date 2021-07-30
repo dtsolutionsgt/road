@@ -607,6 +607,7 @@ public class ProdCantPrev extends PBase {
             gl.umfactor = umfactor;
             gl.prectemp = prec;
 
+            //No da error
             if (gl.peModal.equalsIgnoreCase("TOL")) {
                 gl.cexist=cexist;gl.cstand=cstand;
             } else {

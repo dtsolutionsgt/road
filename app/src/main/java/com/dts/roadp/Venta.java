@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.dts.roadp.clsClasses.clsVenta;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class Venta extends PBase {
@@ -735,7 +736,6 @@ public class Venta extends PBase {
 			totsin = prc.totsin;
 			percep = 0;
 
-
 			//Toast.makeText(this,"Impval : "+impval+" , prec sin : "+precsin+" tot sin  "+totsin, Toast.LENGTH_LONG).show();
 
 			if (sinimp) lblPrec.setText(mu.frmcur(precsin));
@@ -772,6 +772,42 @@ public class Venta extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
 
+	}
+
+	private void getPrecio(){
+		try{
+			//prodPrecio();
+
+			if (prodPorPeso(prodid)) {
+				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, gl.dpeso,um);
+				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
+					if (prc.precioespecial>0) prec=prc.precioespecial;
+				}
+			} else {
+				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0,um);
+				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
+					if (prc.precioespecial>0) prec=prc.precioespecial;
+				}
+			}
+
+			precsin = prc.precsin;
+			imp = prc.imp;
+			impval = prc.impval;
+			descmon = prc.descmon;
+
+			tot = prc.tot;
+			prodtot = tot;
+			totsin = prc.totsin;
+			percep = 0;
+
+			//Toast.makeText(this,"Impval : "+impval+" , prec sin : "+precsin+" tot sin  "+totsin, Toast.LENGTH_LONG).show();
+
+			if (sinimp) lblPrec.setText(mu.frmcur(precsin));
+			else lblPrec.setText(mu.frmcur(prec));
+
+		}catch (Exception ex){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
+		}
 	}
 
 	private void addItem(){
@@ -2400,30 +2436,23 @@ public class Venta extends PBase {
 				umv=item.umventa;//app.umVenta(item.producto);
 				ums=item.umstock;//app.umStock(item.producto);if (ums.isEmpty()) ums=umv;
 
+				//#CKFK 20210729 Obtener el precio del produdcto
+				getPrecio();
+
+				prodid =item.producto;
+                cant =item.cant;
+				//nivel =item.producto;
+				um =item.umventa;
+				gl.umpeso =item.umpeso;
+				gl.dpeso =item.peso;
+
+				item.precio = prec;
+				item.imp= prc.imp;
+				item.des = desc;
+				item.desmon = prc.descmon;
+				item.total = prodtot;
+
 				if (!app.prodBarra(item.producto)){
-					ins.init("T_VENTA_DESPACHO");
-					ins.add("PRODUCTO",item.producto);
-					ins.add("EMPRESA",emp);
-					ins.add("UM",umv);
-					ins.add("CANTSOL",item.cant);
-					ins.add("CANTREC",item.cant);
-					ins.add("CANTREC",item.cant);
-					ins.add("UMSTOCK",ums);
-					ins.add("FACTOR",app.factorPres(item.producto,umv,ums));
-					ins.add("PRECIO",item.precio);
-					ins.add("IMP",item.imp);
-					ins.add("DES",item.des);
-					ins.add("DESMON",item.desmon);
-					ins.add("TOTAL",item.total);
-					ins.add("PRECIODOC",item.precio);
-					ins.add("PESO",item.peso);
-					ins.add("VAL1",i+1);
-					ins.add("VAL2","");
-					ins.add("VAL3",0);
-					ins.add("VAL4","");
-					ins.add("PERCEP",0);
-					ins.add("SIN_EXISTENCIA",0);
-				}else{
 					ins.init("T_VENTA");
 					ins.add("PRODUCTO",item.producto);
 					ins.add("EMPRESA",emp);
@@ -2442,8 +2471,29 @@ public class Venta extends PBase {
 					ins.add("VAL2","");
 					ins.add("VAL3",0);
 					ins.add("VAL4","");
-					ins.add("PERCEP",0);
+					ins.add("PERCEP",percep);
 					ins.add("SIN_EXISTENCIA",0);
+				}else{
+					ins.init("T_VENTA_DESPACHO");
+					ins.add("PRODUCTO",item.producto);
+					ins.add("EMPRESA",emp);
+					ins.add("UM",umv);
+					ins.add("CANTSOL",item.cant);
+					ins.add("CANTREC",0);
+					ins.add("CANTDIF", item.cant);
+					ins.add("UMSTOCK",ums);
+					ins.add("FACTOR",app.factorPres(item.producto,umv,ums));
+					ins.add("PRECIO",item.precio);
+					ins.add("IMP",item.imp);
+					ins.add("DES",item.des);
+					ins.add("DESMON",item.desmon);
+					ins.add("TOTAL",item.total);
+					ins.add("PRECIODOC",item.precio);
+					ins.add("PESO",item.peso);
+					ins.add("VAL1",i+1);
+					ins.add("VAL2","");
+					ins.add("VAL3",0);
+					ins.add("VAL4","");
 				}
 
 				String ss=ins.sql();

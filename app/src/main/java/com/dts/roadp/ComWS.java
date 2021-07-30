@@ -54,6 +54,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -99,7 +100,8 @@ public class ComWS extends PBase {
 	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta, iRutaSupervisor;
 	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant, rrs,sRutaSupervisor,rrss;
 	private String licSerial, licRuta, licSerialEnc, licRutaEnc, parImprID;
-	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag, esEnvioManual = false;
+	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag,
+            esEnvioManual = false,pedidos, cargastockpv;
 
 	private SQLiteDatabase dbT;
 	private DatabaseErrorHandler er;
@@ -298,6 +300,8 @@ public class ComWS extends PBase {
 		if (gl.ruta.isEmpty()) {
 		    relPedidos.setVisibility(View.INVISIBLE);
         }
+
+        pedidos=rutatipo.equals("P");
 
 		try {
 			final PowerManager pm = (PowerManager) getSystemService(this.POWER_SERVICE);
@@ -1243,19 +1247,14 @@ public class ComWS extends PBase {
 	//region Web Service Methods
 
 	public int fillTable(String value, String delcmd) {
-
 		int rc;
 		String s, ss, tabla;
-
 		int retFillTable = 0;
 
 		METHOD_NAME = "getIns";
-
 		sstr = "OK";
 
 		try {
-
-
 			idbg = idbg + " filltable ";
 
 			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
@@ -1281,16 +1280,16 @@ public class ComWS extends PBase {
 
 			s = "";
 			if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK")) {
-				if (rc == 1) {
-					stockflag = 0;//return 1;
-				} else {
-					stockflag = 1;
-				}
+				if (rc == 1) stockflag=0; else stockflag=1;
 			}
 
-			// if (delcmd.equalsIgnoreCase("DELETE FROM P_COBRO")) {
-			// 	idbg=idbg+" RC ="+rc+"---";
-			//}
+            if (cargastockpv) {
+                if (rc == 1) {
+                    stockflag=0;
+                } else {
+                    stockflag=1;
+                }
+            }
 
 			tabla = delcmd.substring(12);
 			switch (tabla) {
@@ -1522,9 +1521,24 @@ public class ComWS extends PBase {
 			rc=sitems.length;
 
 			s = "";
-			if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK")) {
-				if (rc == 1) stockflag = 0; else stockflag = 1;
-			}
+
+			if (pedidos) {
+                if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK_PV")) {
+                    if (rc == 1) {
+                        stockflag = 0;
+                    } else {
+                        stockflag = 1;
+                    }
+                }
+            } else {
+                if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK")) {
+                    if (rc == 1) {
+                        stockflag = 0;
+                    } else {
+                        stockflag = 1;
+                    }
+                }
+            }
 
 			if (!delcmd.contains("commitSQL")){
 				tabla=delcmd.substring(12);
@@ -2241,6 +2255,8 @@ public class ComWS extends PBase {
 
 		try {
 
+
+
 			if (TieneInventarioSinVentas()) {
 				return false;
 			}
@@ -2510,9 +2526,9 @@ public class ComWS extends PBase {
 
 		try {
 
-			if (TieneInventarioSinVentas()) {
-				return false;
-			}
+		    if (!pedidos) {
+                if (TieneInventarioSinVentas()) return false;
+            }
 
 			String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
 			wfile = new FileWriter(fname, false);
@@ -2592,8 +2608,7 @@ public class ComWS extends PBase {
 		int ejecutarhh = 0;
 		String s, val = "";
 
-
-		ferr = "";
+    	ferr = "";
 		lblInfo.setText("Procesando tablas . . .");
 		try {
 
@@ -2601,7 +2616,14 @@ public class ComWS extends PBase {
 			reccnt = rc;
 			if (rc == 0) return true;
 
-			fprog = "Procesando ...";
+            try {
+                String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
+                wfile = new FileWriter(fname, false);
+                writer = new BufferedWriter(wfile);
+            } catch (IOException e) {}
+
+
+            fprog = "Procesando ...";
 			wsRtask.onProgressUpdate();
 
 			ConT=new BaseDatos(this);
@@ -2612,6 +2634,7 @@ public class ComWS extends PBase {
 			prn = 0;jj = 0;
 
 			try{
+
 				for (int i = 0; i < rc; i++) {
 
 					sql = listItems.get(i);
@@ -2621,18 +2644,15 @@ public class ComWS extends PBase {
 					sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
 
 					try {
-						writer.write(sql);
-						writer.write("\r\n");
+						writer.write(sql);writer.write("\r\n");
 					} catch (Exception e) {
-						Log.d("M", "Write Something happend there " + e.getMessage());
 					}
 				}
 
 				writer.close();
 
-			}catch (Exception ex){
-				Log.d("M", "Write Something happend there " + ex.getMessage());
-			}
+			} catch (Exception ex){}
+
 
 			dbT.beginTransaction();
 
@@ -2643,35 +2663,29 @@ public class ComWS extends PBase {
 				sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
 				sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
 
-				/*try {
-					writer.write(sql);writer.write("\r\n");
-				} catch (Exception e) {
-					Log.d("M", "Write Something happend there " + e.getMessage());
-				}*/
-
 				try {
 					dbT = ConT.getWritableDatabase();
 					dbT.execSQL(sql);
 				} catch (Exception e) {
 					ferr += " " +e.getMessage();
-					Log.d("M", "Something happend there " + e.getMessage() + "EJC" + " Yo fui " + sql);
-					Log.e("z", e.getMessage());
 				}
 
 				try {
-
 					if (i % 10 == 0) {
 						fprog = "Procesando: " + i + " de: " + (rc - 1);
-						wsRtask.onProgressUpdate();
-						SystemClock.sleep(20);
+						wsRtask.onProgressUpdate();SystemClock.sleep(20);
 					}
 				} catch (Exception e) {
-					Log.e("z", e.getMessage());
 					ferr += " " +e.getMessage();
-					addlog(new Object() {
-					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 				}
 			}
+
+            try {
+                writer.close();
+            } catch (Exception e) {
+                String ss=e.getMessage();
+            }
 
 			fprog = "Procesando: " + (rc - 1) + " de: " + (rc - 1);
 			wsRtask.onProgressUpdate();
@@ -2692,8 +2706,7 @@ public class ComWS extends PBase {
 			fechaCarga();
 			Actualiza_Documentos();
 
-			fprog = "Fin de actualización";
-			wsRtask.onProgressUpdate();
+			fprog = "Fin de actualización";wsRtask.onProgressUpdate();
 
 			scomp = 1;
 
@@ -2705,13 +2718,24 @@ public class ComWS extends PBase {
 
 			lblInfo.setText(" ");
 			s = "Recepción completa.";
-			if (stockflag == 1) s = s + "\nSe actualizó inventario.";
+
+
+			// if (stockflag == 1) s = s + "\nSe actualizó inventario.";
+
+            if (pedidos) {
+                sql = "SELECT Codigo FROM P_STOCK_PV ";
+            } else {
+                sql = "SELECT Codigo FROM P_STOCK ";
+            }
+            Cursor dt = Con.OpenDT(sql);
+            if (dt.getCount() > 0) s = s + "\nSe actualizó inventario.";
+
 
 			clsAppM.estandartInventario();
+            clsAppM.estandartInventarioPedido();
 			validaDatos(true);
 
 			if (stockflag == 1) sendConfirm();
-
 			isbusy = 0;
 
 			msgAskExit(s);
@@ -2722,23 +2746,16 @@ public class ComWS extends PBase {
 			fprog = "Actualización incompleta";
 			wsRtask.onProgressUpdate();
 
-			Log.e("Error", e.getMessage());
 			try {
 				ConT.close();
 			} catch (Exception ee) {
-				sstr = e.getMessage();
-				ferr += " " + sstr;
+				sstr = e.getMessage();ferr += " " + sstr;
 			}
 
-			sstr = e.getMessage();
-			ferr += " " + sstr + "\n" + sql;
-			esql = sql;
-
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), ferr, esql);
+			sstr = e.getMessage();ferr += " " + sstr + "\n" + sql;esql = sql;
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), ferr, esql);
 
 			return false;
-
 		}
 
 	}
@@ -2842,13 +2859,8 @@ public class ComWS extends PBase {
 				dbT.execSQL(sql);
 
 				try {
-					if (i % 10 == 0) {
-
-						SystemClock.sleep(20);
-					}
-				} catch (Exception e) {
-					Log.e("z", e.getMessage());
-				}
+					if (i % 10 == 0) SystemClock.sleep(20);
+				} catch (Exception e) {}
 			}
 
 			dbT.setTransactionSuccessful();
@@ -3030,8 +3042,8 @@ public class ComWS extends PBase {
 
 		try {
 
-			fprog = TN;
-			idbg = TN;
+			fprog = TN;	if (cargastockpv) fprog="Procesando datos . . .";
+         	idbg = TN;
 			wsRtask.onProgressUpdate();
 			SQL = getTableSQL(TN);
 
@@ -3641,7 +3653,6 @@ public class ComWS extends PBase {
 	}
 
 	private boolean validaDatos(boolean completo) {
-
 		Cursor dt;
 
 		try {
@@ -3650,7 +3661,7 @@ public class ComWS extends PBase {
 				sql = "SELECT RESOL FROM P_COREL";
 				dt = Con.OpenDT(sql);
 				if (dt.getCount() == 0) {
-					msgbox("No está definido correlativo de facturas");
+					toastlong("No está definido correlativo de facturas");
 					return false;
 				}
 			}
@@ -3658,21 +3669,21 @@ public class ComWS extends PBase {
 			sql = "SELECT Codigo FROM P_CLIENTE";
 			dt = Con.OpenDT(sql);
 			if (dt.getCount() == 0) {
-				msgbox("Lista de clientes está vacia");
+                toastlong("Lista de clientes está vacia");
 				return false;
 			}
 
 			sql = "SELECT Ruta FROM P_CLIRUTA";
 			dt = Con.OpenDT(sql);
 			if (dt.getCount() == 0) {
-				msgbox("Lista de clientes por ruta está vacia");
+                toastlong("Lista de clientes por ruta está vacia");
 				return false;
 			}
 
 			sql = "SELECT Codigo FROM P_PRODUCTO";
 			dt = Con.OpenDT(sql);
 			if (dt.getCount() == 0) {
-				msgbox("Lista de productos está vacia");
+                toastlong("Lista de productos está vacia");
 				return false;
 			}
 
@@ -3688,18 +3699,21 @@ public class ComWS extends PBase {
 				sql = "SELECT Producto FROM P_FACTORCONV ";
 				dt = Con.OpenDT(sql);
 				if (dt.getCount() == 0) {
-					msgbox("Lista de conversiones está vacia");
+                    toastlong("Lista de conversiones está vacia");
 					return false;
 				}
 
-				if (gl.peStockItf) {
-					sql = "SELECT Codigo FROM P_STOCK ";
-					dt = Con.OpenDT(sql);
-					if (dt.getCount() == 0) {
-						msgbox("La carga de productos está vacia");
-						return false;
-					}
-				}
+                if (pedidos) {
+                    sql = "SELECT Codigo FROM P_STOCK_PV ";
+                } else {
+                    sql = "SELECT Codigo FROM P_STOCK ";
+                }
+
+                dt = Con.OpenDT(sql);
+                if (dt.getCount() == 0) {
+                    toastlong("La carga de productos está vacia");
+                    return false;
+                }
 
 			}
 
@@ -3963,20 +3977,19 @@ public class ComWS extends PBase {
 			if (fstr.equalsIgnoreCase("Sync OK")) {
 
 				cargaTablas();
-				/*lblInfo.setText(" ");
+
+				/*
+				lblInfo.setText(" ");
 				s = "Recepción completa.";
 				if (stockflag == 1) s = s + "\nSe actualizó inventario.";
 
 				clsAppM.estandartInventario();
-
                 clsAppM.estandartInventarioPedido();
-
 				validaDatos(true);
-
 				if (stockflag == 1) sendConfirm();
 
-				msgAskExit(s);*/
-
+				msgAskExit(s);
+*/
 			} else {
 				lblInfo.setText(fstr);
 				mu.msgbox("Ocurrió error : \n" + fstr + " " + idbg + " (Registro: " + reccnt + ") ");
@@ -4013,8 +4026,8 @@ public class ComWS extends PBase {
     private void confImpresora() {
         try {
 
-            sql = "UPDATE Params SET prn='" + clsAppM.getPrintId_Ruta() + "',prnserie='" + clsAppM.impresTipo_Ruta() + "' ";
-            db.execSQL(sql);
+            //sql = "UPDATE Params SET prn='" + clsAppM.getPrintId_Ruta() + "',prnserie='" + clsAppM.impresTipo_Ruta() + "' ";
+            //db.execSQL(sql);
 
         } catch (Exception e) {
             msgbox(new Object() {
@@ -4110,7 +4123,6 @@ public class ComWS extends PBase {
 	}
 
 	public void wsCargaTabla() {
-
 		try {
 //        	if (nombretabla.contains("P_IMPRESORA")){
 //				fillTableImpresora();
@@ -4120,11 +4132,12 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			String ee=e.getMessage();
 		}
-
 	}
 
 	public void wsCallback() {
 		boolean ejecutar=true;
+
+        cargastockpv=false;
 
 		try {
 			indicetabla++;
@@ -4270,7 +4283,6 @@ public class ComWS extends PBase {
 					nombretabla="P_MERMARCACOMP";break;
 				case 60:
 					nombretabla="P_MERPRODCOMP";break;
-
 				case 61:
 					nombretabla="P_PEDIDO_RECHAZADO";break;
 				case 62:
@@ -4297,26 +4309,19 @@ public class ComWS extends PBase {
 					break;*/
 				case 69:
 					//licResult=checkLicence(licSerial);
-					nombretabla = "checkLicence";
-					break;
+					nombretabla = "checkLicence";break;
 				case 70:
 					//licResultRuta=checkLicenceRuta(licRuta);
-					nombretabla = "checkLicenceRuta";
-					break;
-
+					nombretabla = "checkLicenceRuta";break;
                 case 71:
-                    nombretabla = "P_STOCK_PV";
-                    break;
-
+                    nombretabla = "P_STOCK_PV";cargastockpv=true;break;
 				case 72:
 					procesaDatos();
 					ejecutar = false;
 					break;
 			}
 
-			if(ejecutar) {
-				executaTabla();
-			}
+			if (ejecutar) executaTabla();
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -5899,60 +5904,6 @@ public class ComWS extends PBase {
             }
         } catch (Exception e) {
             String ss= e.getMessage();
-            //addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage());
-        }
-
-        return 0;
-    }
-
-    public int sendFotoTest(String transid,String firmaid) {
-        String fname,resstr="";
-
-        fname=firmaid;
-
-        METHOD_NAME = "saveImageFT";
-
-        try {
-
-            Bitmap bmp = BitmapFactory.decodeFile(fname);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            bmp.compress(Bitmap.CompressFormat.JPEG,75, out);
-            byte[] imagebyte = out.toByteArray();
-            String strBase64 = Base64.encodeBytes(imagebyte);
-
-            int iv1=strBase64.length();
-
-            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
-            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-            envelope.dotNet = true;
-
-            PropertyInfo param = new PropertyInfo();
-            param.setType(String.class);
-            param.setName("transid");
-            param.setValue(transid);
-            request.addProperty(param);
-
-            PropertyInfo param2 = new PropertyInfo();
-            param2.setType(String.class);
-            param2.setName("imgdata");
-            param2.setValue(strBase64);
-            request.addProperty(param2);
-
-            envelope.setOutputSoapObject(request);
-
-            HttpTransportSE transport = new HttpTransportSE(URL);
-            transport.call(NAMESPACE + METHOD_NAME, envelope);
-
-            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
-
-            resstr = response.toString();
-
-            if (resstr.equalsIgnoreCase("#")) {
-                return 1;
-            } else {
-                throw new Exception(resstr);
-            }
-        } catch (Exception e) {
             //addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage());
         }
 

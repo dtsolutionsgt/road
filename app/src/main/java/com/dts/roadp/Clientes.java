@@ -372,7 +372,6 @@ public class Clientes extends PBase {
 
 			lblCant.setText("" + DT.getCount() + "");
 
-
 			if (DT.getCount() > 0) {
 
 				DT.moveToFirst();
@@ -681,7 +680,6 @@ public class Clientes extends PBase {
 
 			spinList.setAdapter(dataAdapter);
 			spinList.setSelection(dweek);
-
 
 			List<String> flist = new ArrayList<String>();
 			flist.add("Todos");

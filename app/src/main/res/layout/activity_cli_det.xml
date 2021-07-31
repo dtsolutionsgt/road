@@ -419,7 +419,7 @@
                 android:onClick="showVenta"
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
-                android:src="@drawable/next48" />
+                android:src="@drawable/factura_redonda" />
 
             <TextView
                 android:id="@+id/textView1"
@@ -458,7 +458,7 @@
                 android:onClick="showPreventa"
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
-                android:src="@drawable/next48" />
+                android:src="@drawable/pedido_redondo" />
 
             <TextView
                 android:id="@+id/TextView01"
@@ -496,7 +496,7 @@
                 android:clickable="false"
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
-                android:src="@drawable/next48" />
+                android:src="@drawable/despacho_redondo" />
 
             <TextView
                 android:id="@+id/lblPend"

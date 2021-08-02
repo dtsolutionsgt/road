@@ -496,7 +496,7 @@
                 android:clickable="false"
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
-                android:src="@drawable/canastas" />
+                android:src="@drawable/canasta_redonda" />
 
             <TextView
                 android:id="@+id/lblCanastas"

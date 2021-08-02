@@ -6,6 +6,26 @@
     tools:context=".DespachoLista" >
 
     <RelativeLayout
+        android:id="@+id/relCliente"
+        android:layout_width="match_parent"
+        android:layout_height="37dp"
+        android:layout_below="@id/relRoad">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/txtClienteDespacho"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:text="Cliente"
+                android:textSize="20sp" />
+        </TableRow>
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/relRoad"
         android:layout_width="match_parent"
         android:layout_height="48dp" >
@@ -54,16 +74,17 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_margin="1dp"
-        android:background="@layout/blue_strip" />
+        android:background="@layout/blue_strip" >
+
+    </RelativeLayout>
 
     <ListView
-        android:id="@+id/listView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/rellaydn"
-        android:layout_below="@+id/relRoad"
+        android:id="@+id/lvDespacho"
+        android:layout_width="406dp"
+        android:layout_height="528dp"
+        android:layout_above="@id/rellaydn"
+        android:layout_below="@+id/relCliente"
         android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
         android:layout_marginRight="5dp">
 
     </ListView>

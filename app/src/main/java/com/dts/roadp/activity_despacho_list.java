@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-public class DespachoLista extends PBase {
+public class activity_despacho_list extends PBase {
 
     private ListView listView;
     private LA_Ds_pedido adapter;
@@ -107,7 +107,7 @@ public class DespachoLista extends PBase {
             gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
             gl.clitipo = DT.getString(16);
 
-            startActivity(new Intent(DespachoLista.this,Venta.class));
+            startActivity(new Intent(activity_despacho_list.this,Venta.class));
             finish();
         } catch (Exception e) {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());

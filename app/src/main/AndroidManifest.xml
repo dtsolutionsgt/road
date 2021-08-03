@@ -31,7 +31,6 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activity_despacho_list"></activity>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -478,7 +477,7 @@
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".DespachoLista"
+            android:name=".activity_despacho_list"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateHidden" />

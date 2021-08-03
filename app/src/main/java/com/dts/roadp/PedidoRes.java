@@ -57,7 +57,7 @@ public class PedidoRes extends PBase {
 	private int cyear, cmonth, cday,dweek,impres;
 	
 	private double dmax,dfinmon,descpmon,descg,descgmon,tot,stot0,stot,descmon,totimp,totperc;
-	private boolean acum,cleandprod,toledano,porpeso;
+	private boolean acum,cleandprod,toledano,porpeso,prodstandby,impprecio;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +109,6 @@ public class PedidoRes extends PBase {
 		
 		printclose= new Runnable() {
 		    public void run() {
-
 		    }
 		};
 
@@ -337,6 +336,8 @@ public class PedidoRes extends PBase {
 
             if (toledano && autoenvio) enviaPedido();
 
+            if (prodstandby) toastcent("EL PEDIDO CONTIENE PRODUCTO CERRADO");
+
 			gl.closeCliDet=true;
 			gl.closeVenta=true;
 
@@ -344,6 +345,7 @@ public class PedidoRes extends PBase {
 				gl.tolpedsend=true;
 				super.finish();
 			}
+
 		} catch (Exception e){
 			mu.msgbox("Error " + e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -391,10 +393,11 @@ public class PedidoRes extends PBase {
 	private boolean saveOrder(){
 		Cursor DT;
 		double tot,desc,imp,peso,vcant,vpeso,vfactor,factpres;
-        String vprod,vumstock,vumventa;
+        String vprod,vumstock,vumventa,bandisp;
 
 		corel=gl.ruta+"_"+mu.getCorelBase();
 		fechae=du.ffecha00(fechae);
+        prodstandby=false;
 
 		try {
 			
@@ -413,7 +416,7 @@ public class PedidoRes extends PBase {
                 corel=gl.modpedid;
                 db.execSQL("DELETE FROM D_PEDIDO WHERE COREL='"+corel+"'");
                 db.execSQL("DELETE FROM D_PEDIDOD WHERE COREL='"+corel+"'");
-           }
+            }
 			
 			ins.init("D_PEDIDO");
 			ins.add("COREL",corel);
@@ -453,13 +456,16 @@ public class PedidoRes extends PBase {
 
 			db.execSQL(ins.sql());
           		
-			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK,SIN_EXISTENCIA FROM T_VENTA";
+			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK,SIN_EXISTENCIA,VAL3 FROM T_VENTA";
 			DT=Con.OpenDT(sql);
 	
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 
+                if (DT.getInt(14)==1) bandisp="S";else bandisp="F";
+
                 ins.init("D_PEDIDOD");
+
                 ins.add("COREL", corel);
                 ins.add("PRODUCTO", DT.getString(0));
                 ins.add("EMPRESA", gl.emp);
@@ -473,7 +479,7 @@ public class PedidoRes extends PBase {
                 ins.add("PRECIODOC", DT.getDouble(7));
                 ins.add("PESO", DT.getDouble(8));
                 ins.add("VAL1", DT.getDouble(9));
-                ins.add("VAL2", DT.getString(10));
+                ins.add("VAL2", bandisp); //DT.getString(10));
                 ins.add("CANTPROC", 0);
                 ins.add("UMVENTA", DT.getString(11));
                 ins.add("FACTOR", DT.getDouble(12));
@@ -482,6 +488,9 @@ public class PedidoRes extends PBase {
                 ins.add("SIN_EXISTENCIA", DT.getInt(14)); //JP20210614
 
                 db.execSQL(ins.sql());
+
+                if (DT.getInt(15)==1) prodstandby=true;
+
 
                 if (toledano) {
 
@@ -501,6 +510,8 @@ public class PedidoRes extends PBase {
 			}
 
 			if(DT!=null) DT.close();
+
+         	if (prodstandby)  db.execSQL("UPDATE D_PEDIDO SET BANDERA='S' WHERE (COREL='"+corel+"')");
 
 			db.setTransactionSuccessful();
 			db.endTransaction();
@@ -656,6 +667,7 @@ public class PedidoRes extends PBase {
 		
 	}
 
+
     //endregion
 
 	//region Date
@@ -810,13 +822,17 @@ public class PedidoRes extends PBase {
 	}
 	
 	public void askSave(View view) {
+        String ss;
 
-		try{
+		try {
+
+            prodstandby=validaStandby();
+            if (prodstandby) ss="Guardar pedido con producto cerrado?";else ss="Guardar pedido ?";
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle("Road");
-			dialog.setMessage("Guardar pedido ?");
+			dialog.setMessage(ss);
 
 			dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -831,9 +847,7 @@ public class PedidoRes extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-			
-	}	
+	}
 
 	public  boolean fechaValida(){
 		boolean vFechaValida = false;
@@ -940,6 +954,29 @@ public class PedidoRes extends PBase {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private boolean validaStandby(){
+        Cursor DT;
+
+        prodstandby=false;
+
+        try {
+            sql="SELECT VAL3 FROM T_VENTA";
+            DT=Con.OpenDT(sql);
+
+            DT.moveToFirst();
+            while (!DT.isAfterLast()) {
+                if (DT.getInt(0)==1) prodstandby=true;
+                DT.moveToNext();
+            }
+
+            if(DT!=null) DT.close();
+        } catch (Exception e) {
+            mu.msgbox( e.getMessage());return false;
+        }
+
+        return prodstandby;
     }
 
     //endregion

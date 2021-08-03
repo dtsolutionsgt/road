@@ -52,6 +52,7 @@ public class Venta extends PBase {
 	private ArrayList<String> lcode = new ArrayList<String>();
 	private ArrayList<String> lname = new ArrayList<String>();
 
+
 	private int browse;
 
 	private double cant,desc,mdesc,prec,precsin,imp,impval;
@@ -111,8 +112,10 @@ public class Venta extends PBase {
 			lblTit.setText("Prefactura");
 			imgroad.setImageResource(R.drawable.despacho1);
 		} else {
-			lblTit.setText("Preventa");
-			imgroad.setImageResource(R.drawable.pedido);
+		    String tstr="Preventa";
+            if (!gl.modpedid.isEmpty()) tstr+="\n# "+gl.modpedid; else tstr+="\nNUEVO ";
+			lblTit.setText(tstr);
+			imgroad.setImageResource(R.drawable.pedidos_3_gray);
 		}
 
 		if (rutapos) imgroad.setImageResource(R.drawable.pedidos_3_gray);
@@ -849,7 +852,8 @@ public class Venta extends PBase {
 		if (porpeso) {
 			peso=mu.round(gl.dpeso,gl.peDec);
 		} else {
-			peso=mu.round(gl.dpeso*gl.umfactor,gl.peDec);
+            peso=mu.round(gl.dpeso,gl.peDec);
+			//peso=mu.round(gl.dpeso*gl.umfactor,gl.peDec);
 		}
 
 		if (porpeso) {
@@ -871,13 +875,16 @@ public class Venta extends PBase {
 			ins.add("PRODUCTO",prodid);
             ins.add("SIN_EXISTENCIA",0);
 			ins.add("EMPRESA",emp);
-			if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
+
 			ins.add("CANT",cant);
 			if (rutatipo.equalsIgnoreCase("V")) {
 				ins.add("UMSTOCK",gl.umstock);
+                if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
 			}else {
 				ins.add("UMSTOCK",gl.um);
+                ins.add("UM",gl.umpres);
 			}
+
 			if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
 			ins.add("FACTOR",factorconv);
 			if (porpeso) {
@@ -897,7 +904,7 @@ public class Venta extends PBase {
 			ins.add("PESO",peso);
 			ins.add("VAL1",0);
 			ins.add("VAL2","");
-			ins.add("VAL3",0);
+            if (gl.tolprodcrit) ins.add("VAL3",1);else ins.add("VAL3",0);
 			ins.add("VAL4","");
 			ins.add("PERCEP",percep);
 
@@ -948,7 +955,7 @@ public class Venta extends PBase {
                 ins.add("PESO",peso);
                 ins.add("VAL1",0);
                 ins.add("VAL2","");
-                ins.add("VAL3",0);
+                if (gl.tolprodcrit) ins.add("VAL3",1);else ins.add("VAL3",0);
                 ins.add("VAL4","");
                 ins.add("PERCEP",percep);
 

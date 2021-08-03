@@ -45,11 +45,11 @@
         </activity>
 
         <service
-            android:name="com.dts.roadp.srvBase"
+            android:name=".srvBase"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name="com.dts.roadp.srvEnvPedido"
+            android:name=".srvEnvPedido"
             android:enabled="true"
             android:exported="true" />
 
@@ -356,6 +356,11 @@
             android:name=".ComWSExist"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_com_wsexist"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".ExistPed"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateHidden" />

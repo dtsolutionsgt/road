@@ -659,7 +659,6 @@ public class Menu extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 
 	//endregion
@@ -980,6 +979,8 @@ public class Menu extends PBase {
 			final String[] selitems = new String[itemcnt];
 
 			selitems[itempos]="Existencias";itempos++;
+            selitems[itempos]="Existencias pedidos";itempos++;
+
 			if (gl.peAceptarCarga) {
 				selitems[itempos]="Aceptar Inventario";itempos++;
 			} else {
@@ -1011,7 +1012,8 @@ public class Menu extends PBase {
 					String mt=selitems[item];
 
 					if (mt.equalsIgnoreCase("Existencias")) menuExist();
-					if (mt.equalsIgnoreCase("Devolucion a bodega")) menuDevBod();
+                    if (mt.equalsIgnoreCase("Existencias pedidos")) menuExist();
+            		if (mt.equalsIgnoreCase("Devolucion a bodega")) menuDevBod();
 					if (mt.equalsIgnoreCase("Recarga manual")) menuRecarga();
 					if (mt.equalsIgnoreCase("Aceptar Inventario")) menuRecargaAuto();
 					if (mt.equalsIgnoreCase("Solicitud de inventario")) menuSolicInv();
@@ -1042,7 +1044,7 @@ public class Menu extends PBase {
 	public void showInvMenuPreventa() {
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Existencias","Devolucion a bodega"};
+			final String[] selitems = {"Existencias","Existencias pedidos","Devolucion a bodega"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.inventario48);
@@ -1054,7 +1056,9 @@ public class Menu extends PBase {
 					switch (item) {
 						case 0:
 							menuExist();break;
-						case 1:
+                        case 1:
+                            menuExistPed();break;
+						case 2:
 							menuDevBod();break;
 					}
 
@@ -1136,8 +1140,17 @@ public class Menu extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
+
+    private void menuExistPed() {
+        try{
+            gl.tipo=0;
+            Intent intent = new Intent(this, ExistPed.class);
+            startActivity(intent);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+    }
 	
 	private void menuRecarga() {
 

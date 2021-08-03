@@ -415,6 +415,8 @@ public class BaseDatosScript {
 					"[BAND1] TEXT NOT NULL,"+
 					"[BAND2] TEXT NOT NULL,"+
 					"[STATCOM] TEXT NOT NULL,"+
+                    "[IMAGEN] TEXT NOT NULL,"+
+                    "[CODIGO_ERP] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO],[RUTA])"+
 					");";
 			database.execSQL(vSQL);

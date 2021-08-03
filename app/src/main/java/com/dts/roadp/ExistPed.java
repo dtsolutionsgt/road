@@ -10,26 +10,23 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dts.roadp.clsClasses.clsExist;
-
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 
-public class Exist extends PBase {
+public class ExistPed extends PBase {
 
     private ListView listView;
     private EditText txtFilter;
     private TextView lblReg;
 
     private ArrayList<clsClasses.clsExist> items= new ArrayList<clsClasses.clsExist>();
-    private ListAdaptExist adapter;
+    private ListAdaptExistPed adapter;
     private clsClasses.clsExist selitem;
 
     private clsRepBuilder rep;
@@ -46,10 +43,9 @@ public class Exist extends PBase {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_exist);
+        setContentView(R.layout.activity_exist_ped);
 
         super.InitBase();
-        addlog("exist",""+du.getActDateTime(),gl.vend);
 
         tipo=((appGlobals) vApp).tipo;
 
@@ -63,20 +59,13 @@ public class Exist extends PBase {
 
         setHandlers();
 
-        try {
-            sql="DELETE FROM P_STOCK WHERE CANT+CANTM=0";
-            db.execSQL(sql);
-        } catch (SQLException e) {
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-        }
-
         rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "");
 
         listItems();
 
         printclose= new Runnable() {
             public void run() {
-                Exist.super.finish();
+                finish();
             }
         };
 
@@ -85,7 +74,6 @@ public class Exist extends PBase {
 
         float cant = CantExistencias();
         Toast.makeText(this, "Cantidad : " + (int)cant, Toast.LENGTH_SHORT).show();
-
     }
 
 
@@ -119,7 +107,8 @@ public class Exist extends PBase {
     private void setHandlers(){
 
         try{
-            listView.setOnItemClickListener(new OnItemClickListener() {
+
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
                     try {
@@ -127,17 +116,12 @@ public class Exist extends PBase {
                         clsClasses.clsExist item = (clsClasses.clsExist)lvObj;
 
                         itemid=item.Cod;
-
                         adapter.setSelectedIndex(position);
-
-                        //appProd();
                     } catch (Exception e) {
-                        addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
                         mu.msgbox( e.getMessage());
                     }
                 };
             });
-
 
             listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
@@ -148,7 +132,6 @@ public class Exist extends PBase {
                         clsClasses.clsExist item = (clsClasses.clsExist) lvObj;
 
                         adapter.setSelectedIndex(position);
-                        if (item.flag==1 | item.flag==2) itemDetail(item);
                     } catch (Exception e) {
                         addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
                     }
@@ -174,17 +157,16 @@ public class Exist extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
-
     }
 
     public float CantExistencias() {
         Cursor DT;
-        float cantidad=0,cantb=0;
+        float cantidad=0;
 
         try {
 
-            sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.CANT,P_STOCK.CANTM,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
-                    "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
+            sql = "SELECT P_STOCK_PV.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK_PV.CANT,0,P_STOCK_PV.UNIDADMEDIDA " +
+                    "FROM P_STOCK_PV INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK_PV.CODIGO  WHERE 1=1 ";
             if (Con != null){
                 DT = Con.OpenDT(sql);
                 cantidad = DT.getCount();
@@ -192,17 +174,6 @@ public class Exist extends PBase {
                 cantidad = 0;
             }
 
-            sql = "SELECT BARRA FROM P_STOCKB";
-            if (Con != null){
-                DT = Con.OpenDT(sql);
-                cantb = DT.getCount();
-
-                if(DT!=null) DT.close();
-            }else {
-                cantb = 0;
-            }
-
-            cantidad=cantidad+cantb;
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             return 0;
@@ -224,21 +195,16 @@ public class Exist extends PBase {
 
         try {
 
-            sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA " +
-                    "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
+            sql ="SELECT P_STOCK_PV.CODIGO,P_PRODUCTO.DESCLARGA " +
+                 "FROM P_STOCK_PV INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK_PV.CODIGO  WHERE 1=1 ";
             if (vF.length() > 0) sql = sql + "AND ((P_PRODUCTO.DESCLARGA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
-            sql += "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA ";
-            sql += "UNION ";
-            sql += "SELECT P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA " +
-                    "FROM P_STOCKB INNER JOIN P_PRODUCTO ON P_STOCKB.CODIGO=P_PRODUCTO.CODIGO ";
-            if (vF.length() > 0) sql = sql + "AND ((P_PRODUCTO.DESCLARGA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO LIKE '%" + vF + "%')) ";
-            sql += "GROUP BY P_STOCKB.CODIGO, P_PRODUCTO.DESCLARGA ";
-            sql += "ORDER BY P_STOCK.CODIGO";
+            sql+="GROUP BY P_STOCK_PV.CODIGO,P_PRODUCTO.DESCLARGA ";
+            sql+="ORDER BY P_STOCK_PV.CODIGO";
 
             dp = Con.OpenDT(sql);
 
             if (dp.getCount() == 0) {
-                adapter = new ListAdaptExist(this, items);
+                adapter = new ListAdaptExistPed(this, items);
                 listView.setAdapter(adapter);
                 return;
             }
@@ -252,16 +218,10 @@ public class Exist extends PBase {
                 pcod=dp.getString(0);
                 valt=0;pesot=0;
 
-                sql =  "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK.CANT) AS TOTAL,SUM(P_STOCK.CANTM),P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS,SUM(P_STOCK.PESO)  " +
-                        "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  " +
+                sql =  "SELECT P_STOCK_PV.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK_PV.CANT) AS TOTAL,0,P_STOCK_PV.UNIDADMEDIDA,'' AS GLOTE,'' AS GDOCUMENTO,'' AS GCENTRO,0 AS GSTATUS, SUM(P_STOCK_PV.PESO)  " +
+                        "FROM P_STOCK_PV INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK_PV.CODIGO  " +
                         "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
-                        "GROUP BY P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS ";
-                sql+=  "UNION ";
-                sql+=  "SELECT P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCKB.CANT) AS TOTAL, 0 AS Expr2,P_STOCKB.UNIDADMEDIDA, '' AS Expr4, P_STOCKB.DOCUMENTO,P_STOCKB.CENTRO,P_STOCKB.STATUS, SUM(P_STOCKB.PESO) AS Expr3 "+
-                        "FROM  P_STOCKB INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCKB.CODIGO "+
-                        "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
-                        "GROUP BY P_STOCKB.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCKB.UNIDADMEDIDA,P_STOCKB.DOCUMENTO,P_STOCKB.CENTRO,P_STOCKB.STATUS "+
-                        "ORDER BY TOTAL ";
+                        "GROUP BY P_STOCK_PV.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK_PV.UNIDADMEDIDA,GLOTE,GDOCUMENTO,GCENTRO,GSTATUS ";
 
                 dt = Con.OpenDT(sql);
                 icnt=dt.getCount();
@@ -285,7 +245,7 @@ public class Exist extends PBase {
                     cod = dt.getString(0);
                     name = dt.getString(1);
                     val = dt.getDouble(2);
-                    valm = dt.getDouble(3);
+                    valm = 0;
                     um = dt.getString(4);
                     peso =  dt.getDouble(9);
 
@@ -300,9 +260,9 @@ public class Exist extends PBase {
                     spt = mu.frmdecimal(pesot, gl.peDecImp) + " " + rep.ltrim(ump, 3);
                     if (!gl.usarpeso) spt = "";
 
-                    sc = mu.frmdecimal(val, gl.peDecImp) + " " + rep.ltrim(um, 2);
-                    scm = mu.frmdecimal(valm, gl.peDecImp) + " " + rep.ltrim(um, 2);
-                    sct = mu.frmdecimal(valt, gl.peDecImp) + " " + rep.ltrim(um, 2);
+                    sc = mu.frmdecimal(val, gl.peDecImp) + " " + rep.ltrim(um, 3);
+                    scm = mu.frmdecimal(valm, gl.peDecImp) + " " + rep.ltrim(um, 3);
+                    sct = mu.frmdecimal(valt, gl.peDecImp) + " " + rep.ltrim(um, 3);
 
                     item = clsCls.new clsExist();
                     itemm = clsCls.new clsExist();
@@ -327,7 +287,7 @@ public class Exist extends PBase {
                     item.Centro = dt.getString(7);itemm.Centro = dt.getString(7);
                     item.Stat = dt.getString(8);itemm.Stat = dt.getString(8);
 
-                    if (val>0) {
+                    if (val>=0) {
                         item.flag = 1;
                         items.add(item);
 
@@ -361,7 +321,7 @@ public class Exist extends PBase {
             mu.msgbox(e.getMessage());
         }
 
-        adapter = new ListAdaptExist(this, items);
+        adapter = new ListAdaptExistPed(this, items);
         listView.setAdapter(adapter);
 
     }
@@ -457,44 +417,8 @@ public class Exist extends PBase {
             mu.msgbox(e.getMessage());
         }
 
-        adapter = new ListAdaptExist(this, items);
+        adapter = new ListAdaptExistPed(this, items);
         listView.setAdapter(adapter);
-    }
-
-    private void appProd(){
-        try{
-            if (tipo==0) return;
-
-            ((appGlobals) vApp).gstr=itemid;
-            super.finish();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
-    }
-
-    private void itemDetail(clsClasses.clsExist item) {
-        String ss;
-
-        try{
-            ss="Lote : "+item.Lote+"\n";
-            ss+="Documento : "+item.Doc+"\n";
-            ss+="Centro : "+item.Centro+"\n";
-            ss+="Estado : "+item.Stat+"\n";
-
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-            dialog.setTitle(item.Desc);
-            dialog.setMessage(ss);
-
-            dialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {}
-            });
-            dialog.show();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
-
     }
 
     //endregion
@@ -516,7 +440,7 @@ public class Exist extends PBase {
         }
 
         protected boolean buildDetail() {
-            clsExist item;
+            clsClasses.clsExist item;
             String s1,s2,lote;
             int ic;
 
@@ -528,7 +452,7 @@ public class Exist extends PBase {
                 rep.line();lns=items.size();
 
                 rep.add("Cod  Descripcion");
-                rep.add("Lote         Cantidad UM     Peso UM");
+                rep.add("             Cantidad UM     Peso UM");
                 rep.line();
 
                 for (int i = 0; i <items.size(); i++) {
@@ -603,7 +527,6 @@ public class Exist extends PBase {
 
     }
 
-
     //region Activity Events
 
     @Override
@@ -613,8 +536,6 @@ public class Exist extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
-
     }
 
     @Override
@@ -624,7 +545,6 @@ public class Exist extends PBase {
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
     }
 
     //endregion

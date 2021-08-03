@@ -27,7 +27,7 @@ public class Reimpresion extends PBase {
 	private ImageView imgPrint;
 
 	private ArrayList<clsClasses.clsCFDV> items= new ArrayList<clsClasses.clsCFDV>();
-	private ListAdaptCFDV adapter;
+	private ListAdaptCFDVB adapter;
 	private clsClasses.clsCFDV selitem;
 
 	private AppMethods app;
@@ -281,7 +281,7 @@ public class Reimpresion extends PBase {
 		try {
 				
 			if (tipo==0) {
-				sql= " SELECT D_PEDIDO.COREL,P_CLIENTE.NOMBRE,D_PEDIDO.FECHA,D_PEDIDO.TOTAL "+
+				sql= " SELECT D_PEDIDO.COREL,P_CLIENTE.NOMBRE,D_PEDIDO.FECHA,D_PEDIDO.TOTAL,D_PEDIDO.BANDERA "+
 					 " FROM D_PEDIDO INNER JOIN P_CLIENTE ON D_PEDIDO.CLIENTE=P_CLIENTE.CODIGO "+
 					 " ORDER BY D_PEDIDO.COREL DESC ";
 			}
@@ -358,6 +358,11 @@ public class Reimpresion extends PBase {
 							vItem.Valor=mu.frmcur(val);
 						}
 
+						vItem.bandera=0;
+						if (tipo==0) {
+						    if (DT.getString(4).equalsIgnoreCase("S")) vItem.bandera=1;
+                        }
+
 						if (tipo==3 || tipo==6) {
 							if (gl.peModal.equalsIgnoreCase("TOL")) {
 								items.add(vItem);
@@ -396,7 +401,7 @@ public class Reimpresion extends PBase {
 		   	mu.msgbox("listItems: "+ e.getMessage());
 	    }
 			 
-		adapter=new ListAdaptCFDV(this, items);
+		adapter=new ListAdaptCFDVB(this, items);
 		listView.setAdapter(adapter);
 		
 		if (selidx>-1) {

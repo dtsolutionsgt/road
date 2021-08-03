@@ -141,15 +141,17 @@ public class ComWSFotos extends PBase {
                 sql = "SELECT DISTINCT CODIGO FROM P_STOCK";
             }
             dt = Con.OpenDT(sql);
-            reccnt=dt.getCount();
-            if (reccnt>0) dt.moveToFirst();else return;
-
-            while (!dt.isAfterLast()) {
-                listItems.add(dt.getString(0));
-                dt.moveToNext();
+            if (dt.getCount()>0) {
+                dt.moveToFirst();
+                while (!dt.isAfterLast()) {
+                    listItems.add(dt.getString(0));
+                    dt.moveToNext();
+                }
             }
-
             if(dt!=null) dt.close();
+
+            reccnt=listItems.size();
+            if (reccnt==0) return;
 
             isbusy=1;
 
@@ -455,6 +457,13 @@ public class ComWSFotos extends PBase {
     private boolean setComParams() {
         String ss;
 
+        /*JP 20210714
+        ruta="0001-1";
+        URL="http://200.46.46.104:8001/RDC7_SAP_DEV_ANDR/wsAndr.asmx";
+        txtRuta.setText(ruta);txtEmp.setText("03");
+        txtWS.setText(URL);
+        */
+
         ss=txtRuta.getText().toString().trim();
 
         try{
@@ -474,6 +483,7 @@ public class ComWSFotos extends PBase {
             }
             URL=ss;
         }catch (Exception e){
+            String sse=e.getMessage();
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
         }
 

@@ -15,11 +15,11 @@ import java.util.ArrayList;
 public class clsDocument {
 
 	public String nombre,numero,serie,ruta,vendedor,cliente,nit,tipo,ref,medidapeso;
-	public String resol,resfecha,resvence,resrango,fsfecha,modofact;
+	public String resol,resfecha,resvence,resrango,fsfecha,fsfechaent,modofact;
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;
 	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod,docdesglose;
-	public int ffecha,pendiente,diacred,condicionPago;
+	public int ffecha,pendiente,diacred,condicionPago,impprecio;
 	
 	protected android.database.sqlite.SQLiteDatabase db;
 	protected BaseDatos Con;
@@ -289,7 +289,14 @@ public class clsDocument {
 			}
 		}
 		rep.add("");
-		rep.add("Fecha : "+fsfecha);
+
+        if (docpedido) {
+            rep.add("Fecha Pedido  : "+fsfecha);
+            rep.add("Fecha Entrega : "+fsfechaent);
+        } else {
+            rep.add("Fecha : "+fsfecha);
+        }
+
 		rep.add("");
 
         //if (!emptystr(clicod)) rep.add("Codigo: "+clicod);

@@ -1180,10 +1180,11 @@ public class FacturaRes extends PBase {
 
 			//#CKFK 20190720 Modifiqué la información que se guarda en D_FACTURA_BARRA y en D_STOCKB_DEV porque se estaban
 			//guardando las barras sin repesaje.
+			//#CKFK 20210803 Agregué el campo Reservado
 			sql=" INSERT INTO D_FACTURA_BARRA "+
 				" SELECT  S.RUTA, B.BARRA, S.CODIGO, S.CANT, S.COREL, S.PRECIO, B.PESO, S.DOCUMENTO, " +
 				" S.FECHA, S.ANULADO, S.CENTRO, S.STATUS, S.ENVIADO, S.CODIGOLIQUIDACION, " +
-				" S.COREL_D_MOV, S.UNIDADMEDIDA, S.DOC_ENTREGA " +
+				" S.COREL_D_MOV, S.UNIDADMEDIDA, S.DOC_ENTREGA, S.RESERVADO " +
 				" FROM P_STOCKB S INNER JOIN T_BARRA B ON S.BARRA = B.BARRA ";
 			db.execSQL(sql);
 
@@ -1352,8 +1353,10 @@ public class FacturaRes extends PBase {
 
 			//region Despacho
 
-			if (!gl.coddespacho.isEmpty()) {
-				db.execSQL("UPDATE DS_PEDIDO SET BANDERA='S' WHERE COREL='"+gl.coddespacho+"'");
+			if (gl.coddespacho !=null){
+				if (!gl.coddespacho.isEmpty()) {
+					db.execSQL("UPDATE DS_PEDIDO SET BANDERA='S' WHERE COREL='"+gl.coddespacho+"'");
+				}
 			}
 
 			//endregion

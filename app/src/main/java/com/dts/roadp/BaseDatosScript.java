@@ -1184,7 +1184,7 @@ public class BaseDatosScript {
 					"[ID_DESPACHO] INTEGER NOT NULL,"+
 					"[ID_FACTURACION] INTEGER NOT NULL,"+
 					"[MODIF_PRECIO] INTEGER NOT NULL,"+
-					"[INGRESA_CANASTAS] INTEGER NOT NULL,"+
+					"[INGRESA_CANASTAS] INTEGER DEFAULT 0 NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

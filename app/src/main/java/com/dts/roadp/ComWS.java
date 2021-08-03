@@ -1325,7 +1325,7 @@ public class ComWS extends PBase {
 				case "P_COREL":
 					if (rc == 1 && gl.rutatipo.equals("V")) {
 						borraDatos();
-						throw new Exception("No hay correlativos definidos para esta ruta:" + ActRuta + ", no se puede continuar la carga de datos");
+                        if (!pedidos)  throw new Exception("No hay correlativos definidos para esta ruta:" + ActRuta + ", no se puede continuar la carga de datos");
 					}
 					break;
 				case "CANTDOCPEND":
@@ -1575,7 +1575,7 @@ public class ComWS extends PBase {
 					case "P_COREL":
 						if (rc==1 && gl.rutatipo.equals("V")){
 							borraDatos();
-							throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+							if (!pedidos) throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
 						}
 						break;
 				}
@@ -3661,8 +3661,9 @@ public class ComWS extends PBase {
 				sql = "SELECT RESOL FROM P_COREL";
 				dt = Con.OpenDT(sql);
 				if (dt.getCount() == 0) {
-					toastlong("No está definido correlativo de facturas");
-					return false;
+				    if (!pedidos) {
+                        toastlong("No está definido correlativo de facturas");return false;
+                    }
 				}
 			}
 

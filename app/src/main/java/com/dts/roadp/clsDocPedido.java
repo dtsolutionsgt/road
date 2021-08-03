@@ -2,8 +2,6 @@ package com.dts.roadp;
 
 import java.util.ArrayList;
 
-import com.dts.roadp.clsClasses.clsCFDV;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.widget.Toast;
@@ -32,6 +30,8 @@ public class clsDocPedido extends clsDocument {
 		itemData item;
 		String cu,cp;
 
+		if (impprecio==1) return buildDetailPrecio();
+
 		rep.line();
 		rep.add("CODIGO   DESCRIPCION       T. PEDIDO");
 		rep.add("CANT  U-VENTA    KGS");
@@ -56,7 +56,7 @@ public class clsDocPedido extends clsDocument {
 		return true;
 	}
 
-    protected boolean buildDetailOrig() {
+    protected boolean buildDetailPrecio() {
         itemData item;
         String cu,cp;
 
@@ -96,11 +96,14 @@ public class clsDocPedido extends clsDocument {
 			rep.addtotsp("Descuento", -desc);
 			rep.addtotsp("TOTAL", tot);			
 		} else {
-			if (desc!=0) {
-				rep.addtotsp("Subtotal", stot);
-				rep.addtotsp("Descuento", -desc);	
-			}		
-			//rep.addtotsp("TOTAL A PAGAR", tot);
+
+            if (impprecio==1) {
+                if (desc!=0) {
+                    rep.addtotsp("Subtotal", stot);
+                    rep.addtotsp("Descuento", -desc);
+                }
+                rep.addtotsp("TOTAL A PAGAR", tot);
+            }
 		}
 
 		rep.empty();
@@ -192,13 +195,14 @@ public class clsDocPedido extends clsDocument {
 	    }	
 		
 		try {
-			sql="SELECT INITPATH FROM P_EMPRESA WHERE EMPRESA='"+empp+"'";
+			sql="SELECT INITPATH,IMPRIMIR_TOTALES_PEDIDO FROM P_EMPRESA WHERE EMPRESA='"+empp+"'";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 		
 			String sim=DT.getString(0);
 			sinimp=sim.equalsIgnoreCase("S");
-			
+            impprecio=DT.getInt(1);
+
 		} catch (Exception e) {
 			sinimp=false;
 	    }	

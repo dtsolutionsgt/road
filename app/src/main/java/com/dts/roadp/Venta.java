@@ -108,7 +108,9 @@ public class Venta extends PBase {
 			lblTit.setText("Venta");
 			imgroad.setImageResource(R.drawable.pedidos_1_gray);
 		} else {
-			lblTit.setText("Preventa");
+		    String tstr="Preventa";
+            if (!gl.modpedid.isEmpty()) tstr+="\n# "+gl.modpedid; else tstr+="\nNUEVO ";
+			lblTit.setText(tstr);
 			imgroad.setImageResource(R.drawable.pedidos_3_gray);
 		}
 		if (rutapos) imgroad.setImageResource(R.drawable.pedidos_3_gray);

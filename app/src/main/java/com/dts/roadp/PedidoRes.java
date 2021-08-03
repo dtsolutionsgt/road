@@ -57,7 +57,7 @@ public class PedidoRes extends PBase {
 	private int cyear, cmonth, cday,dweek,impres;
 	
 	private double dmax,dfinmon,descpmon,descg,descgmon,tot,stot0,stot,descmon,totimp,totperc;
-	private boolean acum,cleandprod,toledano,porpeso,prodstandby;
+	private boolean acum,cleandprod,toledano,porpeso,prodstandby,impprecio;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +109,6 @@ public class PedidoRes extends PBase {
 		
 		printclose= new Runnable() {
 		    public void run() {
-
 		    }
 		};
 
@@ -668,6 +667,7 @@ public class PedidoRes extends PBase {
 		
 	}
 
+
     //endregion
 
 	//region Date
@@ -978,7 +978,6 @@ public class PedidoRes extends PBase {
 
         return prodstandby;
     }
-
 
     //endregion
 

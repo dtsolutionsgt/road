@@ -26,7 +26,7 @@ public class ExistPed extends PBase {
     private TextView lblReg;
 
     private ArrayList<clsClasses.clsExist> items= new ArrayList<clsClasses.clsExist>();
-    private ListAdaptExist adapter;
+    private ListAdaptExistPed adapter;
     private clsClasses.clsExist selitem;
 
     private clsRepBuilder rep;
@@ -204,7 +204,7 @@ public class ExistPed extends PBase {
             dp = Con.OpenDT(sql);
 
             if (dp.getCount() == 0) {
-                adapter = new ListAdaptExist(this, items);
+                adapter = new ListAdaptExistPed(this, items);
                 listView.setAdapter(adapter);
                 return;
             }
@@ -321,7 +321,7 @@ public class ExistPed extends PBase {
             mu.msgbox(e.getMessage());
         }
 
-        adapter = new ListAdaptExist(this, items);
+        adapter = new ListAdaptExistPed(this, items);
         listView.setAdapter(adapter);
 
     }
@@ -417,7 +417,7 @@ public class ExistPed extends PBase {
             mu.msgbox(e.getMessage());
         }
 
-        adapter = new ListAdaptExist(this, items);
+        adapter = new ListAdaptExistPed(this, items);
         listView.setAdapter(adapter);
     }
 

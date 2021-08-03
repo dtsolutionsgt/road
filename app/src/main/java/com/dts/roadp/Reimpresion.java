@@ -77,7 +77,7 @@ public class Reimpresion extends PBase {
 
 		app = new AppMethods(this, gl, Con, db);
 		gl.validimp=app.validaImpresora();
-		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+		//if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
 		if (!gl.debug)imgPrint.setVisibility(View.INVISIBLE);
 		else imgPrint.setVisibility(View.VISIBLE);

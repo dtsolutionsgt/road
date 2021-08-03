@@ -61,7 +61,7 @@ public class FinDia extends PBase {
         app = new AppMethods(this, gl, Con, db);
 
         gl.validimp=app.validaImpresora();
-        if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+        //if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
         gl.devfindia=app.getDevolBod();
 
@@ -403,6 +403,9 @@ public class FinDia extends PBase {
 			/*sql="UPDATE P_RUTA SET Email='0'";
 			db.execSQL(sql);*/
 
+            sql = "DELETE FROM D_CANASTA WHERE STATCOM= 'S'";
+            db.execSQL(sql);
+
             db.setTransactionSuccessful();
             db.endTransaction();
 
@@ -526,8 +529,8 @@ public class FinDia extends PBase {
 
             if (fullfd) {
 
-                if (claseFinDia.getCantFactura() == 0) {
-                    msgExit("No hay facturas, no se puede realizar el Fin de Día");
+                if (claseFinDia.getCantFactura() == 0 && claseFinDia.getCantCanasta() == 0) {
+                    msgExit("No hay facturas ni canastas, no se puede realizar el Fin de Día");
                     return false;
                 }
 

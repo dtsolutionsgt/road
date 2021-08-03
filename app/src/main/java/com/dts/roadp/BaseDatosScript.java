@@ -1008,6 +1008,24 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+			vSQL="CREATE TABLE [D_CANASTA] ("+
+					"RUTA TEXT NOT NULL,"+
+					"FECHA INTEGER NOT NULL,"+
+					"CLIENTE TEXT NOT NULL,"+
+					"PRODUCTO TEXT NOT NULL,"+
+					"CANTREC INTEGER,"+
+					"CANTENTR INTEGER,"+
+					"STATCOM TEXT DEFAULT 'N',"+
+					"CORELTRANS TEXT,"+
+					"PESOREC REAL DEFAULT 0,"+
+					"PESOENTR INTEGER DEFAULT 0,"+
+					"ANULADO INTEGER DEFAULT 0,"+
+					"UNIDBAS TEXT DEFAULT 'UN'," +
+					"CODIGOLIQUIDACION INTEGER DEFAULT 0,"+
+					"PRIMARY KEY ([RUTA], [FECHA], [CLIENTE], [PRODUCTO])"+
+					");";
+			database.execSQL(vSQL);
+
 			return 1;
 		} catch (SQLiteException e) {
 			msgbox(e.getMessage());
@@ -1166,6 +1184,7 @@ public class BaseDatosScript {
 					"[ID_DESPACHO] INTEGER NOT NULL,"+
 					"[ID_FACTURACION] INTEGER NOT NULL,"+
 					"[MODIF_PRECIO] INTEGER NOT NULL,"+
+					"[INGRESA_CANASTAS] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);
@@ -1332,22 +1351,23 @@ public class BaseDatosScript {
 					"[PESO_PROMEDIO] REAL NOT NULL,"+
 					"[MODIF_PRECIO] INTEGER NOT NULL,"+
 					"[IMAGEN] TEXT NOT NULL,"+
-					"[VIDEO] TEXT NOT NULL,"+
-					"[VENTA_POR_PESO] INTEGER NOT NULL,"+
-					"[ES_PROD_BARRA] INTEGER NOT NULL,"+
-					"[UNID_INV] TEXT NOT NULL,"+
-					"[VENTA_POR_PAQUETE] INTEGER NOT NULL,"+
-					"[VENTA_POR_FACTOR_CONV] INTEGER NOT NULL,"+
-					"[ES_SERIALIZADO] INTEGER NOT NULL,"+
-					"[PARAM_CADUCIDAD] INTEGER NOT NULL,"+
-					"[PRODUCTO_PADRE] TEXT NOT NULL,"+
-					"[FACTOR_PADRE] REAL NOT NULL,"+
-					"[TIENE_INV] INTEGER NOT NULL,"+
-					"[TIENE_VINETA_O_TUBO] INTEGER NOT NULL,"+
-					"[PRECIO_VINETA_O_TUBO] REAL NOT NULL,"+
-					"[ES_VENDIBLE] INTEGER NOT NULL,"+
-					"[UNIGRASAP] REAL NOT NULL,"+
-					"[UM_SALIDA] TEXT NOT NULL,"+
+                    "[VIDEO] TEXT NOT NULL,"+
+                    "[VENTA_POR_PESO] INTEGER NOT NULL,"+
+                    "[ES_PROD_BARRA] INTEGER NOT NULL,"+
+                    "[UNID_INV] TEXT NOT NULL,"+
+                    "[VENTA_POR_PAQUETE] INTEGER NOT NULL,"+
+                    "[VENTA_POR_FACTOR_CONV] INTEGER NOT NULL,"+
+                    "[ES_SERIALIZADO] INTEGER NOT NULL,"+
+                    "[PARAM_CADUCIDAD] INTEGER NOT NULL,"+
+                    "[PRODUCTO_PADRE] TEXT NOT NULL,"+
+                    "[FACTOR_PADRE] REAL NOT NULL,"+
+                    "[TIENE_INV] INTEGER NOT NULL,"+
+                    "[TIENE_VINETA_O_TUBO] INTEGER NOT NULL,"+
+                    "[PRECIO_VINETA_O_TUBO] REAL NOT NULL,"+
+                    "[ES_VENDIBLE] INTEGER NOT NULL,"+
+                    "[UNIGRASAP] REAL NOT NULL,"+
+                    "[UM_SALIDA] TEXT NOT NULL," +
+					"[ES_CANASTA] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);
@@ -1419,8 +1439,8 @@ public class BaseDatosScript {
 					"[PRODUCTO_ERROR_SUMA] TEXT NOT NULL,"+
 					"[UNIDAD_MEDIDA_PESO] TEXT NOT NULL,"+
 					"[LOTE_POR_DEFECTO] TEXT NOT NULL,"+
-					"[INCIDENCIA_NO_LECTURA] INTEGER NOT NULL,"+
-					"[IMPRIMIR_TOTALES_PEDIDO] INTEGER NOT NULL,"+
+					"[INCIDENCIA_NO_LECTURA] INTEGER NOT NULL," +
+					"[IMPRIMIR_TOTALES_PEDIDO] INTEGER,"+
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
 			database.execSQL(vSQL);

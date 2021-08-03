@@ -162,4 +162,16 @@ public class clsClasses {
 		public String umpeso;
 	}
 
+
+	public class clsTipoCanastas {
+		public String codigo, desccorta, desclarga;
+		public int tenregado, trecibido;
+	}
+
+	public class clsCanasta {
+		public String ruta, cliente, producto;
+		public int fecha, cantrec, cantentr;
+		public String codigo, desccorta, desclarga, fechaFormato;
+		public boolean editar;
+	}
 }

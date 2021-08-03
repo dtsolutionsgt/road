@@ -28,6 +28,8 @@ public class appGlobals extends Application {
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
 	public boolean permitir_cantidad_mayor, permitir_producto_nuevo;
 	public int mpago;
+	public String prodCanasta, corelFac;
+	public boolean ingresaCanastas;
 
 	//#CKFK 20190619 Agregué estas dos variables para los valores de clientes nuevo
 	public String cuentaCliNuevo, codCliNuevo;

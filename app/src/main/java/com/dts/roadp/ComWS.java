@@ -86,8 +86,7 @@ import java.text.ParseException;
 import com.dts.roadp.Base64;
 
 public class ComWS extends PBase {
-
-
+//Esto es de Kelvyn
 	private TextView lblInfo, lblParam, lblRec, lblEnv, lblEnvM;
 	private ProgressBar barInfo;
 	private EditText txtRuta, txtWS, txtEmp;
@@ -411,12 +410,12 @@ public class ComWS extends PBase {
 				}
 			}
 
-			if (gl.banderafindia) {
+			/*if (gl.banderafindia) {
 				if (!puedeComunicar()) {
 					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
 					return;
 				}
-			}
+			}*/
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -2384,6 +2383,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MERRESP")) return false;
 			if (!AddTable("P_MERMARCACOMP")) return false;
 			if (!AddTable("P_MERPRODCOMP")) return false;
+			if (!AddTable("D_CANASTA")) return false;
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -3198,7 +3198,7 @@ public class ComWS extends PBase {
 				SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
 				SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
 				SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
-				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
+				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO, INGRESA_CANASTAS ";
 				SQL += "FROM P_CLIENTE ";
 				SQL += "WHERE (CODIGO IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') )) ";
 
@@ -3209,7 +3209,7 @@ public class ComWS extends PBase {
 				SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
 				SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
 				SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
-				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
+				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO, INGRESA_CANASTAS ";
 				SQL += "FROM P_CLIENTE WHERE CODIGO IN ( ";
 				SQL += "SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA IN ( ";
 				SQL += "SELECT DISTINCT RUTA FROM VENDEDORES WHERE Codigo IN ( ";
@@ -3243,13 +3243,13 @@ public class ComWS extends PBase {
 		if (TN.equalsIgnoreCase("P_PRODUCTO")) {
 
 			if (!cargasuper) {
-
+				//#KM20210802 Agregué OR ES_CANASTA = 1
 				SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
 				SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, ISNULL(DESCUENTO,'N') AS DESCUENTO, ISNULL(BONIFICACION,'N') AS BONIFICACION, ";
 				SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN, ";
 				SQL += "VIDEO,VENTA_POR_PESO,ES_PROD_BARRA,UNID_INV,VENTA_POR_PAQUETE,VENTA_POR_FACTOR_CONV,ES_SERIALIZADO,PARAM_CADUCIDAD, ";
-				SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
-				SQL += "FROM P_PRODUCTO WHERE (ES_VENDIBLE=1) AND ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
+				SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA,ES_CANASTA ";
+				SQL += "FROM P_PRODUCTO WHERE (ES_VENDIBLE=1 OR ES_CANASTA = 1) AND ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
 						" OR CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "'))" +
 						" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "') AND EMPRESA = '" + gEmpresa + "') OR UNIDMED='CAN' )" +
 						" AND CODIGO IN ( " +
@@ -3258,14 +3258,13 @@ public class ComWS extends PBase {
 						" NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE  " +
 						" WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "')))" +
 						" OR TIENE_VINETA_O_TUBO = 1 ";
-
 			} else {
 
 				SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
 				SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, ISNULL(DESCUENTO,'N') AS DESCUENTO, ISNULL(BONIFICACION,'N') AS BONIFICACION, ";
 				SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN, ";
 				SQL += "VIDEO,VENTA_POR_PESO,ES_PROD_BARRA,UNID_INV,VENTA_POR_PAQUETE,VENTA_POR_FACTOR_CONV,ES_SERIALIZADO,PARAM_CADUCIDAD, ";
-				SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
+				SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA, ES_CANASTA ";
 				SQL += "FROM P_PRODUCTO WHERE (ES_VENDIBLE=1) ";
 
 			}
@@ -3654,6 +3653,13 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
+        if (TN.equalsIgnoreCase("D_CANASTA")) {
+        	SQL = "SELECT RUTA, FECHA, CLIENTE, PRODUCTO, CANTREC, CANTENTR, STATCOM, CORELTRANS, PESOREC, PESOENTR, ANULADO, UNIDBAS, CODIGOLIQUIDACION " +
+					"FROM D_CANASTA " +
+					"WHERE RUTA = '" + ActRuta + "' " +
+					"AND FECHA >= '"+fsqli+"'  " +
+					"AND ANULADO = 0;";
+		}
 		return SQL;
 	}
 
@@ -4356,22 +4362,25 @@ public class ComWS extends PBase {
 				case 68:
 					nombretabla="Procesando tablas ...";break;
 				case 69:
+					nombretabla = "D_CANASTA";
+					break;
+				case 70:
 					//licResult=checkLicence(licSerial);
 					nombretabla = "checkLicence";break;
-				case 70:
+					case 71:
 					//licResultRuta=checkLicenceRuta(licRuta);
 					nombretabla = "checkLicenceRuta";
 					break;
-				case 71:
+				case 72:
 					nombretabla="P_RAZON_DESP_INCOMP";
 					break;
-                case 72:
+                case 73:
                     nombretabla = "P_STOCK_PV";
                     break;
-				case 73:
+				case 74:
 					procesaDatos();
 					ejecutar = false;
-					break;
+                    break;
 			}
 
 			if (ejecutar) executaTabla();
@@ -4431,6 +4440,14 @@ public class ComWS extends PBase {
 		try {
 
 			envioFacturas();
+			if (!fstr.equals("Sync OK")) {
+				dbld.savelog();
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
+				return false;
+			}
+
+			envioCanastas();
 			if (!fstr.equals("Sync OK")) {
 				dbld.savelog();
 				addlog(new Object() {
@@ -4774,6 +4791,89 @@ public class ComWS extends PBase {
 		}
 		//}
 
+	}
+
+	public void envioCanastas() {
+		Cursor DT;
+		String rut, cli, pro;
+		int i, pc = 0, pcc = 0;
+		long fecha;
+
+		try {
+			sql = "SELECT RUTA, FECHA, CLIENTE, PRODUCTO FROM D_CANASTA WHERE STATCOM='N'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() == 0) {
+				senv += "Canastas : " + pc + "\n";
+				return;
+			}
+
+			pcc = DT.getCount();
+			pc = 0;
+			i = 0;
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				rut = DT.getString(0);
+				fecha = DT.getLong(1);
+				cli = DT.getString(2);
+				pro = DT.getString(3);
+
+				try {
+
+					i += 1;
+					fprog = "Depósito " + i;
+					if (!esEnvioManual) {
+						wsStask.onProgressUpdate();
+					}
+
+					if (envioparcial) dbld.clear();
+
+					dbld.insert("D_CANASTA", "WHERE RUTA='" + rut + "' AND FECHA=" + fecha + " AND CLIENTE='" + cli + "' AND PRODUCTO='" + pro + "'");
+
+					if (envioparcial && !esEnvioManual) {
+						if (commitSQL() == 1) {
+							sql = "UPDATE D_CANASTA SET STATCOM='S' WHERE RUTA='" + rut + "' AND FECHA=" + fecha + " AND CLIENTE='" + cli + "' AND PRODUCTO='" + pro + "'";
+							db.execSQL(sql);
+							pc += 1;
+						} else {
+							errflag = true;
+							fterr += "\n" + sstr;
+						}
+					} else pc += 1;
+
+				} catch (Exception e) {
+					errflag = true;
+
+					dbld.savelog("canastas.txt");
+
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					fterr += "\n" + e.getMessage();
+				}
+
+				DT.moveToNext();
+			}
+
+			if (DT != null) DT.close();
+
+		} catch (Exception e) {
+			errflag = true;
+
+			dbld.savelog("canastas.txt");
+
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+		}
+
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Canastas : " + pc + " , NO ENVIADO : " + pf + " \n";
+		} else {
+			senv += "Canastas : " + pc + "\n";
+		}
 	}
 
 	public void envioPedidos() {
@@ -6629,7 +6729,7 @@ public class ComWS extends PBase {
 			imgRec.setVisibility(View.INVISIBLE);
 
 			//Tiene documentos
-			boolean TieneFact, TienePedidos, TieneCobros, TieneDevol, YaComunico, TieneInventario, TieneOtros;
+			boolean TieneFact, TienePedidos, TieneCobros, TieneDevol, YaComunico, TieneInventario, TieneCanastas, TieneOtros;
 
 			if (!envioparcial) {
 				TieneFact = (clsAppM.getDocCountTipo("Facturas", false) > 0 ? true : false);
@@ -6638,6 +6738,7 @@ public class ComWS extends PBase {
 				TieneDevol = (clsAppM.getDocCountTipo("Devoluciones", false) > 0 ? true : false);
 				YaComunico = (claseFindia.getComunicacion() == 2 ? true : false);
 				TieneInventario = (clsAppM.getDocCountTipo("Inventario", false) > 0 ? true : false);
+				TieneCanastas = (clsAppM.getDocCountTipo("Canastas", false) > 0 ? true : false);
 			} else {
 				TieneFact = (clsAppM.getDocCountTipo("Facturas", true) > 0 ? true : false);
 				TienePedidos = (clsAppM.getDocCountTipo("Pedidos", true) > 0 ? true : false);
@@ -6645,12 +6746,13 @@ public class ComWS extends PBase {
 				TieneDevol = (clsAppM.getDocCountTipo("Devoluciones", true) > 0 ? true : false);
 				YaComunico = (claseFindia.getComunicacion() == 2 ? true : false);
 				TieneInventario = (clsAppM.getDocCountTipo("Inventario", true) > 0 ? true : false);
+				TieneCanastas = (clsAppM.getDocCountTipo("Canastas", true) > 0 ? true : false);
 			}
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
 				if (claseFindia.yaHizoFindeDia()) {
 					if (YaComunico) {
-						if ((rutatipo.equalsIgnoreCase("V") && !TieneInventario) || (!rutatipo.equalsIgnoreCase("V"))) {
+						if ((rutatipo.equalsIgnoreCase("V") && !TieneInventario && !TieneCanastas) || (!rutatipo.equalsIgnoreCase("V"))) {
 							lblRec.setVisibility(View.VISIBLE);
 							imgRec.setVisibility(View.VISIBLE);
 							lblEnv.setVisibility(View.INVISIBLE);
@@ -6666,7 +6768,7 @@ public class ComWS extends PBase {
 								relStock.setVisibility(View.INVISIBLE);
 								relPrecio.setVisibility(View.INVISIBLE);
 							}
-						} else if ((rutatipo.equalsIgnoreCase("V") && TieneInventario &&
+						} else if ((rutatipo.equalsIgnoreCase("V") && TieneInventario && TieneCanastas &&
 								(TieneFact || TieneCobros || TieneDevol || TienePedidos)) ||
 								(!rutatipo.equalsIgnoreCase("V"))) {
 							lblRec.setVisibility(View.INVISIBLE);
@@ -6681,7 +6783,7 @@ public class ComWS extends PBase {
 						}
 					}
 				} else {
-					if ((!YaComunico) && !(TieneFact || TienePedidos) && !TieneCobros && !TieneDevol) {
+					if ((!YaComunico) && !(TieneFact || TienePedidos || TieneCanastas) && !TieneCobros && !TieneDevol) {
 						lblRec.setVisibility(View.VISIBLE);
 						imgRec.setVisibility(View.VISIBLE);
 						lblEnv.setVisibility(View.INVISIBLE);

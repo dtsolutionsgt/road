@@ -654,6 +654,7 @@ public class BaseDatosScript {
 					"[COREL_D_MOV] TEXT NOT NULL,"+
 					"[UNIDADMEDIDA] TEXT NOT NULL,"+
 					"[DOC_ENTREGA] TEXT NOT NULL,"+
+					"[RESERVADO] INTEGER DEFAULT 0 NOT NULL,"+
 					"PRIMARY KEY ([RUTA],[BARRA],[DOCUMENTO],[STATUS])"+
 					");";
 			database.execSQL(vSQL);
@@ -1417,6 +1418,7 @@ public class BaseDatosScript {
 					"[UNIDAD_MEDIDA_PESO] TEXT NOT NULL,"+
 					"[LOTE_POR_DEFECTO] TEXT NOT NULL,"+
 					"[INCIDENCIA_NO_LECTURA] INTEGER NOT NULL,"+
+					"[IMPRIMIR_TOTALES_PEDIDO] INTEGER NOT NULL,"+
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
 			database.execSQL(vSQL);

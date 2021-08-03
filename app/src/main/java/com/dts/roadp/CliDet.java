@@ -200,7 +200,7 @@ public class CliDet extends PBase {
 		}
 
 		try {
-			startActivity(new Intent(this, DespachoLista.class));
+			startActivity(new Intent(this, activity_despacho_list.class));
 		} catch (Exception e) {
 			addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@layout/back"
-    tools:context=".DespachoLista" >
+    tools:context=".activity_despacho_list" >
 
     <RelativeLayout
         android:id="@+id/relCliente"

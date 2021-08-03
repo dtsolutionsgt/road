@@ -44,8 +44,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.4.69 / ";
-    private String parFechaVer = "22-04-2020";
+    private String parNumVer = "9.5.0 / ";
+    private String parFechaVer = "22-07-2021";
     private String parTipoVer = "ROAD PRD";
 
     @Override
@@ -330,7 +330,8 @@ public class MainActivity extends PBase {
 
         try {
             //#HS_20181122_1505 Se agrego el campo Impresion.
-            sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR FROM P_RUTA";
+            sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR," +
+                  "PERMITIR_PRODUCTO_NUEVO, PERMITIR_CANTIDAD_MAYOR FROM P_RUTA";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -353,6 +354,9 @@ public class MainActivity extends PBase {
 
                 rutapos = s.equalsIgnoreCase("R");
 
+                gl.permitir_cantidad_mayor=(DT.getInt(8)==0?true:false);
+                gl.permitir_producto_nuevo=(DT.getInt(9)==0?true:false);
+
             } else {
 
                 gl.ruta = "";
@@ -360,6 +364,8 @@ public class MainActivity extends PBase {
                 gl.vend = "0";
                 gl.rutatipog = "V";
                 gl.wsURL = "http://192.168.1.1/wsAndr/wsAndr.asmx";
+                gl.permitir_cantidad_mayor=false;
+                gl.permitir_producto_nuevo=false;
 
             }
 
@@ -413,14 +419,22 @@ public class MainActivity extends PBase {
         try {
             File directory = new File(Environment.getExternalStorageDirectory() + "/SyncFold");
             directory.mkdirs();
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos");
             directory.mkdirs();
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
+
+        try {
+            File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue");
+            directory.mkdirs();
+        } catch (Exception e) {}
+
+        try {
+            File directory = new File(Environment.getExternalStorageDirectory() + "/RoadPedidos");
+            directory.mkdirs();
+        } catch (Exception e) {}
 
         //Id de Dispositivo
         gl.deviceId = androidid();
@@ -432,6 +446,7 @@ public class MainActivity extends PBase {
             app.parametrosExtra();
             app.parametrosGlobales();
             app.parametrosBarras();
+
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             msgbox(e.getMessage());

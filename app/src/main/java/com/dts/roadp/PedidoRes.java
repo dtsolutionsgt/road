@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -48,15 +47,17 @@ public class PedidoRes extends PBase {
 	private Runnable printcallback,printclose,printexit;
 	
 	private clsDescGlob clsDesc;
+    private clsDataBuilder dbld;
 	private printer prn;
 	private clsDocPedido pdoc;
+    private AppMethods app;
 	
 	private long fecha,fechae;
 	private String itemid,cliid,corel;
 	private int cyear, cmonth, cday,dweek,impres;
 	
 	private double dmax,dfinmon,descpmon,descg,descgmon,tot,stot0,stot,descmon,totimp,totperc;
-	private boolean acum,cleandprod;
+	private boolean acum,cleandprod,toledano,porpeso,prodstandby,impprecio;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +77,7 @@ public class PedidoRes extends PBase {
 		
 		cliid=gl.cliente;
 		gl.tolpedsend=false;
+        toledano=gl.peModal.equalsIgnoreCase("TOL");
 		
 		setActDate2();
 		fechae=fecha;
@@ -85,6 +87,7 @@ public class PedidoRes extends PBase {
 		dweek=mu.dayofweek();
 
 		clsDesc=new clsDescGlob(this);
+        app=new AppMethods(this,gl,Con,db);
 		
 		adjustSpinner();
 		fillSpinner();
@@ -106,7 +109,6 @@ public class PedidoRes extends PBase {
 		
 		printclose= new Runnable() {
 		    public void run() {
-
 		    }
 		};
 
@@ -123,15 +125,16 @@ public class PedidoRes extends PBase {
 	}
 		
 	
-	// Events
+	//region Events
 	
 	public void showBon(View view) {
 		Intent intent = new Intent(this,BonVenta.class);
 		startActivity(intent);	
 	}
+
+	//endregion
 	
-	
-	// Main
+	//region Main
 	
 	private void processFinalPromo(){
 		
@@ -287,8 +290,21 @@ public class PedidoRes extends PBase {
 	}
 	
  	private void finishOrder(){
+	    boolean autoenvio=false;
 
-		try{
+        try {
+            sql = "SELECT ENVIO_AUTO_PEDIDOS FROM P_RUTA";
+            Cursor DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                autoenvio = DT.getInt(0)==1;
+            }
+        } catch (Exception e) {
+            autoenvio=false;
+        }
+
+		try {
 
 			fecha=du.cfechaSinHora(Integer.parseInt(lblFecha.getText().toString().substring(8,10)),
 					Integer.parseInt(lblFecha.getText().toString().substring(3,5)),
@@ -299,9 +315,7 @@ public class PedidoRes extends PBase {
 				return;
 			}
 
-			if (!saveOrder()) {
-				return;
-			}
+			if (!saveOrder()) return;
 
 			clsBonifSave bonsave=new clsBonifSave(this,corel,"P");
 
@@ -320,6 +334,10 @@ public class PedidoRes extends PBase {
 				prn.printask(printcallback);
 			}
 
+            if (toledano && autoenvio) enviaPedido();
+
+            if (prodstandby) toastcent("EL PEDIDO CONTIENE PRODUCTO CERRADO");
+
 			gl.closeCliDet=true;
 			gl.closeVenta=true;
 
@@ -327,13 +345,46 @@ public class PedidoRes extends PBase {
 				gl.tolpedsend=true;
 				super.finish();
 			}
-		}catch (Exception e){
+
+		} catch (Exception e){
 			mu.msgbox("Error " + e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		
 	}
+
+	private void enviaPedido() {
+        Cursor dt;
+        String wsurl,psql="";
+
+        try {
+            sql="SELECT FTPFOLD FROM P_RUTA";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+            wsurl=dt.getString(0);
+            if (wsurl.isEmpty()) {
+                toastlong("No se puede enviar pedido, no está definida la URL de web service");return;
+            }
+
+            dbld = new clsDataBuilder(this);
+            dbld.insert("D_PEDIDO", "WHERE COREL='" + corel + "'");
+            dbld.insert("D_PEDIDOD", "WHERE COREL='" + corel + "'");
+
+            for (int i = 0; i < dbld.size(); i++) {
+                psql=psql+dbld.items.get(i)+"\n";
+            }
+
+            Intent intent = new Intent(PedidoRes.this, srvEnvPedido.class);
+            intent.putExtra("URL",wsurl);
+            intent.putExtra("command",psql);
+            intent.putExtra("correlativo",corel);
+            startService(intent);
+
+        } catch (Exception e) {
+            toastlong(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
+    }
  	
 	private void singlePrint() {
  		prn.printask(printcallback);
@@ -341,10 +392,13 @@ public class PedidoRes extends PBase {
 	
 	private boolean saveOrder(){
 		Cursor DT;
-		double tot,desc,imp,peso;
-		
+		double tot,desc,imp,peso,vcant,vpeso,vfactor,factpres;
+        String vprod,vumstock,vumventa,bandisp;
+
 		corel=gl.ruta+"_"+mu.getCorelBase();
-		
+		fechae=du.ffecha00(fechae);
+        prodstandby=false;
+
 		try {
 			
 			sql="SELECT SUM(TOTAL),SUM(DESMON),SUM(IMP),SUM(PESO) FROM T_VENTA";
@@ -357,11 +411,17 @@ public class PedidoRes extends PBase {
 			peso=DT.getDouble(3);
 			
 			db.beginTransaction();
+
+			if (!gl.modpedid.isEmpty()) {
+                corel=gl.modpedid;
+                db.execSQL("DELETE FROM D_PEDIDO WHERE COREL='"+corel+"'");
+                db.execSQL("DELETE FROM D_PEDIDOD WHERE COREL='"+corel+"'");
+            }
 			
 			ins.init("D_PEDIDO");
 			ins.add("COREL",corel);
 			ins.add("ANULADO","N");
-			ins.add("FECHA",du.getActDateTime());
+			ins.add("FECHA",du.getActDate());
 			ins.add("EMPRESA",gl.emp);
 			if (gl.tolsuper) {
 				ins.add("RUTA",gl.rutasup);ins.add("RUTASUPER",gl.ruta);
@@ -391,43 +451,67 @@ public class PedidoRes extends PBase {
 			ins.add("SUCURSAL",gl.sucur);
 			ins.add("ID_DESPACHO",0);
 			ins.add("ID_FACTURACION",0);
-		
+            ins.add("RUTASUPER","");
+            ins.add("FECHA_SISTEMA",du.getActDateTime());
+
 			db.execSQL(ins.sql());
           		
-			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK FROM T_VENTA";
+			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK,SIN_EXISTENCIA,VAL3 FROM T_VENTA";
 			DT=Con.OpenDT(sql);
 	
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
-			
-			  	ins.init("D_PEDIDOD");
-				ins.add("COREL",corel);
-				ins.add("PRODUCTO",DT.getString(0));
-				ins.add("EMPRESA",gl.emp);
-				ins.add("ANULADO","N");
-				ins.add("CANT",DT.getDouble(1));
-				ins.add("PRECIO",DT.getDouble(2));
-				ins.add("IMP",DT.getDouble(3));
-				ins.add("DES",DT.getDouble(4));
-				ins.add("DESMON",DT.getDouble(5));
-				ins.add("TOTAL",DT.getDouble(6));
-				ins.add("PRECIODOC",DT.getDouble(7));
-				ins.add("PESO",DT.getDouble(8));
-				ins.add("VAL1",DT.getDouble(9));
-				ins.add("VAL2",DT.getString(10));
-				ins.add("CANTPROC",0);
-				ins.add("UMVENTA",DT.getString(11));
-				ins.add("FACTOR",DT.getDouble(12));
-				ins.add("UMSTOCK",DT.getString(13));
-				ins.add("UMPESO",gl.umpeso);
-                ins.add("SIN_EXISTENCIA",0); //JP20210614
-			
-			    db.execSQL(ins.sql());
+
+                if (DT.getInt(14)==1) bandisp="S";else bandisp="F";
+
+                ins.init("D_PEDIDOD");
+
+                ins.add("COREL", corel);
+                ins.add("PRODUCTO", DT.getString(0));
+                ins.add("EMPRESA", gl.emp);
+                ins.add("ANULADO", "N");
+                ins.add("CANT", DT.getDouble(1));
+                ins.add("PRECIO", DT.getDouble(2));
+                ins.add("IMP", DT.getDouble(3));
+                ins.add("DES", DT.getDouble(4));
+                ins.add("DESMON", DT.getDouble(5));
+                ins.add("TOTAL", DT.getDouble(6));
+                ins.add("PRECIODOC", DT.getDouble(7));
+                ins.add("PESO", DT.getDouble(8));
+                ins.add("VAL1", DT.getDouble(9));
+                ins.add("VAL2", bandisp); //DT.getString(10));
+                ins.add("CANTPROC", 0);
+                ins.add("UMVENTA", DT.getString(11));
+                ins.add("FACTOR", DT.getDouble(12));
+                ins.add("UMSTOCK", DT.getString(13));
+                ins.add("UMPESO", gl.umpeso);
+                ins.add("SIN_EXISTENCIA", DT.getInt(14)); //JP20210614
+
+                db.execSQL(ins.sql());
+
+                if (DT.getInt(15)==1) prodstandby=true;
+
+
+                if (toledano) {
+
+                    vprod = DT.getString(0);
+                    vumstock = DT.getString(13);
+                    vcant = DT.getDouble(1);
+                    vpeso = DT.getDouble(8);
+                    factpres = DT.getDouble(12);
+                    vfactor = vpeso / (vcant * factpres);
+                    vumventa = DT.getString(11);
+                    porpeso = prodPorPeso(DT.getString(0));
+
+                    rebajaStockUM(vprod, vumstock, vcant, vfactor, vumventa, factpres, peso);
+                }
 				
 			    DT.moveToNext();
 			}
 
 			if(DT!=null) DT.close();
+
+         	if (prodstandby)  db.execSQL("UPDATE D_PEDIDO SET BANDERA='S' WHERE (COREL='"+corel+"')");
 
 			db.setTransactionSuccessful();
 			db.endTransaction();
@@ -460,8 +544,56 @@ public class PedidoRes extends PBase {
 		
 		return true;
 	}
-	
-	private double totalDescProd(){
+
+    private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {
+        Cursor dt;
+        double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso;
+
+        if (porpeso) {
+            actcant=cant;actpeso=ppeso;
+        } else {
+            actcant=cant*factpres;actpeso=cant*factor;
+        }
+
+        try {
+            sql="SELECT CANT,PESO FROM P_STOCK_PV WHERE (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umstock+"')";
+            dt=Con.OpenDT(sql);
+            if (dt.getCount()==0) return;
+
+            dt.moveToFirst();
+            while (!dt.isAfterLast()) {
+
+                cant=dt.getDouble(0);
+                speso=dt.getDouble(1);
+
+                if (actcant>cant) cantapl=cant;else cantapl=actcant;
+                dispcant=cant-cantapl;if (dispcant<0) dispcant=0;
+                actcant=actcant-cantapl;
+
+                if (porpeso) {
+                    if (actpeso>speso) pesoapl=speso;else pesoapl=actpeso;
+                    actpeso=actpeso-pesoapl;
+                } else {
+                    pesoapl=cantapl*factor;
+                }
+                disppeso=speso-pesoapl;if (disppeso<0) disppeso=0;
+
+                sql="UPDATE P_STOCK_PV SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') ";
+                db.execSQL(sql);
+
+                dt.moveToNext();
+            }
+
+            return;
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox("rebajaStockUM: "+e.getMessage());
+            return;
+        }
+    }
+
+    private double totalDescProd(){
 		Cursor DT;
 		
 		try {
@@ -534,9 +666,11 @@ public class PedidoRes extends PBase {
 		}	
 		
 	}
-	
-	
-	// Date
+
+
+    //endregion
+
+	//region Date
 
 	public void showDateDialog(View view) {
 		try{
@@ -594,7 +728,10 @@ public class PedidoRes extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	}
-	// Aux
+
+    //endregion
+
+	//region Aux
 	
 	private void adjustSpinner(){
 
@@ -685,13 +822,17 @@ public class PedidoRes extends PBase {
 	}
 	
 	public void askSave(View view) {
+        String ss;
 
-		try{
+		try {
+
+            prodstandby=validaStandby();
+            if (prodstandby) ss="Guardar pedido con producto cerrado?";else ss="Guardar pedido ?";
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle("Road");
-			dialog.setMessage("Guardar pedido ?");
+			dialog.setMessage(ss);
 
 			dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -706,9 +847,7 @@ public class PedidoRes extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-			
-	}	
+	}
 
 	public  boolean fechaValida(){
 		boolean vFechaValida = false;
@@ -807,10 +946,42 @@ public class PedidoRes extends PBase {
 		}
 
 			
-	}	
+	}
 
+    private boolean prodPorPeso(String prodid) {
+        try {
+            return app.ventaPeso(prodid);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-	// Activity Events
+    private boolean validaStandby(){
+        Cursor DT;
+
+        prodstandby=false;
+
+        try {
+            sql="SELECT VAL3 FROM T_VENTA";
+            DT=Con.OpenDT(sql);
+
+            DT.moveToFirst();
+            while (!DT.isAfterLast()) {
+                if (DT.getInt(0)==1) prodstandby=true;
+                DT.moveToNext();
+            }
+
+            if(DT!=null) DT.close();
+        } catch (Exception e) {
+            mu.msgbox( e.getMessage());return false;
+        }
+
+        return prodstandby;
+    }
+
+    //endregion
+
+	//region Activity Events
 	
 	@Override
 	protected void onResume() {
@@ -829,7 +1000,8 @@ public class PedidoRes extends PBase {
 		}
 
 	
-	}	
-	
-	
+	}
+
+    //endregion
+
 }

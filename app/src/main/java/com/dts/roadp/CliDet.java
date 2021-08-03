@@ -3,6 +3,7 @@ package com.dts.roadp;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,10 +16,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.service.autofill.Dataset;
 import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -42,9 +45,9 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 public class CliDet extends PBase {
 
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
-	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago,lblRuta,lblRuta2;
+	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago,lblRuta,lblRuta2, lblDespacho;
 	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
-	private ImageView imgCobro,imgDevol,imgRoadTit;
+	private ImageView imgCobro,imgDevol,imgRoadTit, imgTel, imgWhatsApp, imgWaze, imgVenta, imgPreventa, imgDespacho, imgCamara, imgMap;
 	private EditText txtRuta;
 	private RadioButton chknc,chkncv;
 
@@ -56,7 +59,7 @@ public class CliDet extends PBase {
 	private Boolean imgPath, imgDB, ventaGPS,flagGPS=true,permiteVenta=true,clicred;
 	private double gpx,gpy,credito,clim,cused,cdisp,cred;
 	private int nivel,browse,merc,rangoGPS,modoGPS;
-	private boolean porcentaje = false;
+	private boolean porcentaje = false,clinue,pedclinue;
 	private byte[] imagenBit;
 
 
@@ -87,6 +90,8 @@ public class CliDet extends PBase {
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
 
+		lblDespacho = (TextView) findViewById(R.id.lblDespacho);
+
 		//	relMain=(RelativeLayout) findViewById(R.id.relclimain);
 		relV=(RelativeLayout) findViewById(R.id.relVenta);
 		relP=(RelativeLayout) findViewById(R.id.relPreventa);
@@ -96,6 +101,7 @@ public class CliDet extends PBase {
 		imgCobro= (ImageView) findViewById(R.id.imageView2);
 		imgDevol= (ImageView) findViewById(R.id.imageView1);
 		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
+		imgDespacho = (ImageView) findViewById(R.id.imgDespacho);
 
 		app = new AppMethods(this, gl, Con, db);
 
@@ -133,6 +139,8 @@ public class CliDet extends PBase {
 		habilitaOpciones();
 
 		miniFachada();
+
+		validaDespacho();
 
 		setHandlers();
 
@@ -176,6 +184,13 @@ public class CliDet extends PBase {
 	}
 
 	public void showPreventa(View view) {
+
+	    if (clinue) {
+            if (!pedclinue) {
+                msgbox("No se permite crear pedido al cliente nuevo.");return;
+            }
+        }
+
 		if (!permiteVenta) {
 			if (gl.peVentaGps == 1) {
 				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\nPara realizar la venta debe asercarse más al cliente.");
@@ -190,20 +205,17 @@ public class CliDet extends PBase {
 	}
 
 	public void showDespacho(View view) {
-
 		if (!permiteVenta) {
-			msgbox("¡Distancia del cliente mayor que permitida!\nPara realizar la venta debe asercarse más al cliente.");return;
+			msgbox("¡Distancia del cliente mayor que permitida!\nPara realizar la venta debe acercarse más al cliente.");return;
 		}
 
 		try {
-			mu.msgbox("La funcionalidad no esta implementada.");
-
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			startActivity(new Intent(this, activity_despacho_list.class));
+		} catch (Exception e) {
+			addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
-		//gl.rutatipo="D";
-		//runVenta();
 	}
+
 
 	public void showCredit(View viev){
 		if (!permiteVenta) {
@@ -234,7 +246,9 @@ public class CliDet extends PBase {
 	}
 
 	public void tomarFoto(View view){
+        File URLfoto;
 		int codResult = 1;
+
 		try{
 			if (!this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
 				msgbox("El dispositivo no soporta toma de foto");return;
@@ -246,7 +260,13 @@ public class CliDet extends PBase {
 			//	try {
 
 			Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			File URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+
+			if (clinue) {
+                URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + cod + ".jpg");
+            } else {
+                URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+            }
+
 			intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
 			startActivityForResult(intento1,codResult);
 
@@ -266,9 +286,15 @@ public class CliDet extends PBase {
 	public void mostrarFachada(View view){
 		Cursor DT;
 		imgDB = false; imgPath=false;
+
 		try {
 
-			path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+		    if (clinue) {
+                path = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + cod + ".jpg");
+            } else {
+                path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+            }
+
 			File archivo = new File(path);
 
 			sql = "SELECT IMAGEN FROM P_CLIENTE_FACHADA WHERE CODIGO ='"+ cod +"'";
@@ -302,16 +328,31 @@ public class CliDet extends PBase {
 		mostraRutaSupervisor();
 	}
 
+	public void showCanastas(View view) {
+		try {
+			Intent i = new Intent(this, Canastas.class);
+			startActivity(i);
+		} catch (Exception e) {
+
+		}
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 1) {
+        String paht;
 
+		if (requestCode == 1) {
 			try {
 
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				String paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-				Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
 
+				if (clinue) {
+                    paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + cod + ".jpg");
+                } else {
+                    paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+                }
+
+				Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
 				bitmap1 = redimensionarImagen(bitmap1, 640, 360);
 
 				FileOutputStream out = new FileOutputStream(paht);
@@ -319,11 +360,11 @@ public class CliDet extends PBase {
 				out.flush();
 				out.close();
 
-				File archivo = new File(path);
-				imgRoadTit.setImageURI(Uri.fromFile(archivo));
+                File iarchivo = new File(paht);
+				imgRoadTit.setImageURI(Uri.fromFile(iarchivo));
 			}catch (Exception e){
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-				//mu.msgbox("onActivityResult: " + e.getMessage());
+				mu.msgbox("onActivityResult: " + e.getMessage());
 			}
 
 		}
@@ -374,7 +415,7 @@ public class CliDet extends PBase {
 		try {
 
 			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
-					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO "+
+					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO,INGRESA_CANASTAS "+
 					"FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
@@ -426,6 +467,7 @@ public class CliDet extends PBase {
 			gl.vcheque = DT.getString(14).equalsIgnoreCase("S");
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
 			gl.clitipo = DT.getString(16);
+			gl.ingresaCanastas = DT.getInt(18) == 1;
 
 			if(DT!=null) DT.close();
 
@@ -437,6 +479,10 @@ public class CliDet extends PBase {
 			lblRuta.setText("Ruta: ");
 			txtRuta.setText(gl.rutasup);
 
+			sql="SELECT PEDIDOS_CLINUEVO FROM P_RUTA ";
+            DT=Con.OpenDT(sql);
+            DT.moveToFirst();
+            pedclinue=DT.getInt(0)==1;
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -516,12 +562,15 @@ public class CliDet extends PBase {
         try {
             sql="SELECT COREL FROM D_PEDIDO WHERE (CLIENTE='"+gl.cliente+"') AND (ANULADO='N') AND (STATCOM='N')";
             dt=Con.OpenDT(sql);
+            gl.modpedid="";
 
             if (dt.getCount()>0) {
                 startActivity(new Intent(this,ListaPedidos.class));
             } else {
                 startActivity(new Intent(this,Venta.class));
             }
+
+            //startActivity(new Intent(this,Venta.class));
         } catch (Exception e) {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
@@ -675,6 +724,32 @@ public class CliDet extends PBase {
 		}
 
 
+	}
+
+	private void validaDespacho() {
+
+		try {
+
+			lblDespacho.setVisibility(View.INVISIBLE);
+			imgDespacho.setVisibility(View.INVISIBLE);
+			relD.setVisibility(View.GONE);
+
+			clsDs_pedidoObj Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
+			Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
+
+			if (Ds_pedidoObj!= null){
+
+				if (Ds_pedidoObj.count>0) {
+
+					lblDespacho.setVisibility(View.VISIBLE);
+					imgDespacho.setVisibility(View.VISIBLE);
+					relD.setVisibility(View.VISIBLE);
+				}
+			}
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
 	}
 
 	//endregion
@@ -958,10 +1033,14 @@ public class CliDet extends PBase {
 			if (flag) relP.setVisibility(View.VISIBLE);else relP.setVisibility(View.GONE);
 
 			flag=false;
-			//if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
+
+			if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
+
 			if (flag) relD.setVisibility(View.VISIBLE);else relD.setVisibility(View.GONE);
 
-			if (esClienteNuevo()){
+            clinue=esClienteNuevo();
+
+			if (clinue){
 				imgDevol.setVisibility(View.INVISIBLE);
 				lblDevol.setVisibility(View.INVISIBLE);
 				imgCobro.setVisibility(View.INVISIBLE);
@@ -973,7 +1052,7 @@ public class CliDet extends PBase {
 				lblCobro.setVisibility(View.VISIBLE);
 			}
 
-		}catch (Exception ex) 	{
+		} catch (Exception ex) 	{
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
 			Log.d("habilitaOpciones_err", ex.getMessage());
 		}
@@ -1026,7 +1105,7 @@ public class CliDet extends PBase {
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+			mu.msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage()+"\n"+sql);
 		}
 
 		return true;

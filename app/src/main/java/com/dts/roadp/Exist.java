@@ -84,7 +84,7 @@ public class Exist extends PBase {
         doc=new clsDocExist(this,prn.prw,"");
 
         float cant = CantExistencias();
-        Toast.makeText(this, "Cantidad." + cant, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Cantidad : " + (int)cant, Toast.LENGTH_SHORT).show();
 
     }
 

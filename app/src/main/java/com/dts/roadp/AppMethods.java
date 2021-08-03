@@ -116,6 +116,10 @@ public class AppMethods {
 						" UNION SELECT IFNULL(COUNT(DOCUMENTO),0) AS CANT FROM P_STOCKB " +
 						" UNION SELECT IFNULL(COUNT(DOCUMENTO),0) AS CAN FROM P_STOCK_PALLET) A";
 					break;
+
+				case "Canastas":
+					sql="SELECT COUNT(*) AS CANT FROM D_CANASTA WHERE STATCOM = 'N'";
+					break;
 			}
 
 			DT=Con.OpenDT(sql);
@@ -615,7 +619,81 @@ public class AppMethods {
 
 	}
 
-	public double getPeso() {
+    public void estandartInventarioPedido()  {
+        Cursor dt,df;
+        String cod,ub,us;
+        double cant,fact,fact1,fact2;
+
+        try {
+            sql="SELECT P_STOCK_PV.CODIGO,P_STOCK_PV.UNIDADMEDIDA, P_PRODUCTO.UNIDBAS, P_STOCK_PV.CANT " +
+                "FROM  P_STOCK_PV INNER JOIN P_PRODUCTO ON P_STOCK_PV.CODIGO=P_PRODUCTO.CODIGO";
+            dt=Con.OpenDT(sql);
+
+            if (dt.getCount()==0) return;
+
+            dt.moveToFirst();
+            while (!dt.isAfterLast()) {
+
+                cod=dt.getString(0);
+                us=dt.getString(1);
+                ub=dt.getString(2);
+                cant=dt.getDouble(3);
+
+                if (!ub.equalsIgnoreCase(us)) {
+
+                    sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+us+"') ";
+                    df=Con.OpenDT(sql);
+                    if (df.getCount()==0) {
+                        msgbox("No existe factor conversion para el producto : " + cod);
+                        sql = "DELETE FROM P_STOCK WHERE CODIGO='" + cod + "'";
+                        db.execSQL(sql);
+                        fact1=1;
+                    } else {
+                        df.moveToFirst();
+                        fact1=df.getDouble(0);
+                    }
+
+                    sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+ub+"') ";
+                    df=Con.OpenDT(sql);
+                    if (df.getCount()==0) {
+                        msgbox("No existe factor conversion para el producto : "+cod);
+                        sql="DELETE FROM P_STOCK WHERE CODIGO='"+cod+"'";
+                        db.execSQL(sql);
+                        fact2=1;
+                    } else {
+                        df.moveToFirst();
+                        fact2=df.getDouble(0);
+                    }
+
+                    if (fact1>=fact2) {
+                        fact=fact1/fact2;
+                        cant = cant * fact;
+
+                        sql="UPDATE P_STOCK_PV SET CANT=" + cant + ",UNIDADMEDIDA='" + ub + "'  " +
+                            "WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + us + "') ";
+                        db.execSQL(sql);
+                    } else {
+                        fact=fact2/fact1;
+                        cant = cant * fact;
+
+                        sql="UPDATE P_STOCK_PV SET CANT=" + cant + ",UNIDADMEDIDA='" + ub + "'  " +
+                            "WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + ub + "') ";
+                        db.execSQL(sql);
+                    }
+                }
+
+                dt.moveToNext();
+            }
+
+            if(dt!=null) dt.close();
+
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
+    }
+
+    public double getPeso() {
 		Cursor DT;
 		double sumaPesoB=0,sumaPeso=0;
 
@@ -906,7 +984,7 @@ public class AppMethods {
 			dt.moveToFirst();
 			prnid=dt.getString(0);
 
-			sql="SELECT MARCA FROM P_IMPRESORA WHERE IDIMPRESORA='"+prnid+"'";
+			sql="SELECT NUMSERIE FROM P_IMPRESORA WHERE IDIMPRESORA='"+prnid+"'";
 			dt=Con.OpenDT(sql);
 			if (dt.getCount()==0) return "SIN IMPRESORA";
 			dt.moveToFirst();
@@ -1016,6 +1094,18 @@ public class AppMethods {
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
 			return " #### ";
+		}
+	}
+
+	public void confImpresora() {
+		try {
+
+			sql = "UPDATE Params SET prn='" + getPrintId_Ruta() + "',prnserie='" + impresTipo_Ruta() + "' ";
+			db.execSQL(sql);
+
+		} catch (Exception e) {
+			msgbox(new Object() {
+			}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
 		}
 	}
 

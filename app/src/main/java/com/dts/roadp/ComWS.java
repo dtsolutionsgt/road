@@ -22,7 +22,6 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.text.InputType;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +54,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -83,21 +83,27 @@ import org.json.JSONObject;
 import java.io.FileOutputStream;
 import java.text.ParseException;
 
-public class ComWS extends PBase {
+import com.dts.roadp.Base64;
 
+public class ComWS extends PBase {
+//Esto es de Kelvyn
 	private TextView lblInfo, lblParam, lblRec, lblEnv, lblEnvM;
 	private ProgressBar barInfo;
 	private EditText txtRuta, txtWS, txtEmp;
 	private ImageView imgRec, imgEnv, imgEnvM;
-	private RelativeLayout ralBack, relExist, relPrecio, relStock, relPedidos;
+	private RelativeLayout ralBack;
+	private RelativeLayout relExist;
+	private RelativeLayout relPrecio;
+	private RelativeLayout relStock;
 	private TextView lblUser, lblPassword, txtVersion;
 	private EditText txtUser, txtPassword;
 	private CheckBox cbSuper;
 
 	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta, iRutaSupervisor;
-	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant, rrs,sRutaSupervisor;
+	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant, rrs,sRutaSupervisor,rrss;
 	private String licSerial, licRuta, licSerialEnc, licRutaEnc, parImprID;
-	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag, esEnvioManual = false;
+	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag,
+            esEnvioManual = false,pedidos, cargastockpv;
 
 	private SQLiteDatabase dbT;
 	private DatabaseErrorHandler er;
@@ -105,8 +111,8 @@ public class ComWS extends PBase {
 	private BaseDatos.Insert insT;
 	private AppMethods clsAppM;
 
-	private ArrayList<String> listItems = new ArrayList<String>();
-	private ArrayList<String> results = new ArrayList<String>();
+	private ArrayList<String> listItems = new ArrayList<>();
+	private ArrayList<String> results = new ArrayList<>();
 
 	private ArrayList<clsClasses.clsEnvio> items = new ArrayList<clsClasses.clsEnvio>();
 	private ListAdaptEnvio adapter;
@@ -130,7 +136,7 @@ public class ComWS extends PBase {
 	private int scon, running, pflag, stockflag, conflag;
 	private String ftext, slsync, senv, gEmpresa, ActRuta, mac, rootdir;
 	private String fsql, fsqli, fsqlf, strliqid,argstr,xmlresult;
-	private boolean rutapos, ftflag, esvacio, liqid, cargasuper;
+	private boolean rutapos, ftflag, esvacio, liqid, cargasuper, autoenvio;
 
 	private final String NAMESPACE = "http://tempuri.org/";
 	private String METHOD_NAME, URL, URL_Remota;
@@ -186,7 +192,7 @@ public class ComWS extends PBase {
 		relExist = (RelativeLayout) findViewById(R.id.relExist);
 		relPrecio = (RelativeLayout) findViewById(R.id.relPrecio);
 		relStock = (RelativeLayout) findViewById(R.id.relStock);
-		relPedidos = (RelativeLayout) findViewById(R.id.relPedidos);
+		RelativeLayout relPedidos = (RelativeLayout) findViewById(R.id.relPedidos);
 		relPedidos.setVisibility(View.INVISIBLE);
 
 		cbSuper = (CheckBox) findViewById(R.id.checkBox8);
@@ -289,8 +295,15 @@ public class ComWS extends PBase {
 		} else {
 			if (gl.tolsuper) relPedidos.setVisibility(View.VISIBLE);
 		}
+		if (!autoenvio && rutatipo.equals("P")) {
+            relPedidos.setVisibility(View.VISIBLE);
+        }
 
-		if (gl.ruta.isEmpty()) relPedidos.setVisibility(View.INVISIBLE);
+		if (gl.ruta.isEmpty()) {
+		    relPedidos.setVisibility(View.INVISIBLE);
+        }
+
+        pedidos=rutatipo.equals("P");
 
 		try {
 			final PowerManager pm = (PowerManager) getSystemService(this.POWER_SERVICE);
@@ -301,15 +314,19 @@ public class ComWS extends PBase {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "wakeLock");
 		}
 
-
+        actualizaEstadoPedidos();
 	}
 
 	private boolean dbVacia() {
 		Cursor dt;
 
 		try {
-			sql = "SELECT CODIGO FROM P_RUTA";
+			sql = "SELECT CODIGO,ENVIO_AUTO_PEDIDOS FROM P_RUTA";
 			dt = Con.OpenDT(sql);
+
+			if (dt.getCount()==0) {
+                autoenvio = dt.getInt(1)==1;
+            } else autoenvio=false;
 
 			return dt.getCount() == 0;
 		} catch (Exception e) {
@@ -378,14 +395,11 @@ public class ComWS extends PBase {
 	}
 
 	public void askSend(View view) {
-
 		try {
 
 			if (isbusy == 1) {
-				toastcent("Por favor, espere que se termine la tarea actual.");
-				return;
+				toastcent("Por favor, espere que se termine la tarea actual.");return;
 			}
-
 
 			if (!gl.debug) {
 				if (!validaLicencia()) {
@@ -396,12 +410,12 @@ public class ComWS extends PBase {
 				}
 			}
 
-			if (gl.banderafindia) {
+			/*if (gl.banderafindia) {
 				if (!puedeComunicar()) {
 					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
 					return;
 				}
-			}
+			}*/
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -426,8 +440,6 @@ public class ComWS extends PBase {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
-
-
 	}
 
 	public void askSendManual(View view) {
@@ -1237,19 +1249,14 @@ public class ComWS extends PBase {
 	//region Web Service Methods
 
 	public int fillTable(String value, String delcmd) {
-
 		int rc;
 		String s, ss, tabla;
-
 		int retFillTable = 0;
 
 		METHOD_NAME = "getIns";
-
 		sstr = "OK";
 
 		try {
-
-
 			idbg = idbg + " filltable ";
 
 			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
@@ -1275,16 +1282,16 @@ public class ComWS extends PBase {
 
 			s = "";
 			if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK")) {
-				if (rc == 1) {
-					stockflag = 0;//return 1;
-				} else {
-					stockflag = 1;
-				}
+				if (rc == 1) stockflag=0; else stockflag=1;
 			}
 
-			// if (delcmd.equalsIgnoreCase("DELETE FROM P_COBRO")) {
-			// 	idbg=idbg+" RC ="+rc+"---";
-			//}
+            if (cargastockpv) {
+                if (rc == 1) {
+                    stockflag=0;
+                } else {
+                    stockflag=1;
+                }
+            }
 
 			tabla = delcmd.substring(12);
 			switch (tabla) {
@@ -1320,7 +1327,7 @@ public class ComWS extends PBase {
 				case "P_COREL":
 					if (rc == 1 && gl.rutatipo.equals("V")) {
 						borraDatos();
-						throw new Exception("No hay correlativos definidos para esta ruta:" + ActRuta + ", no se puede continuar la carga de datos");
+                        if (!pedidos)  throw new Exception("No hay correlativos definidos para esta ruta:" + ActRuta + ", no se puede continuar la carga de datos");
 					}
 					break;
 				case "CANTDOCPEND":
@@ -1464,6 +1471,7 @@ public class ComWS extends PBase {
 			return 0;
 		}
 	}
+
 	public int fillTable2(String value, String delcmd) {
 		int rc,retFillTable = 0;
 		String str, ss, tabla;
@@ -1515,9 +1523,24 @@ public class ComWS extends PBase {
 			rc=sitems.length;
 
 			s = "";
-			if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK")) {
-				if (rc == 1) stockflag = 0; else stockflag = 1;
-			}
+
+			if (pedidos) {
+                if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK_PV")) {
+                    if (rc == 1) {
+                        stockflag = 0;
+                    } else {
+                        stockflag = 1;
+                    }
+                }
+            } else {
+                if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK")) {
+                    if (rc == 1) {
+                        stockflag = 0;
+                    } else {
+                        stockflag = 1;
+                    }
+                }
+            }
 
 			if (!delcmd.contains("commitSQL")){
 				tabla=delcmd.substring(12);
@@ -1554,7 +1577,7 @@ public class ComWS extends PBase {
 					case "P_COREL":
 						if (rc==1 && gl.rutatipo.equals("V")){
 							borraDatos();
-							throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+							if (!pedidos) throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
 						}
 						break;
 				}
@@ -1687,7 +1710,6 @@ public class ComWS extends PBase {
 
 		return null;
 	}
-
 
 	public void callMethod(String methodName, Object... args) throws Exception {
 		int mTimeOut=5000;
@@ -1827,7 +1849,6 @@ public class ComWS extends PBase {
 		return result;
 	}
 
-
 	public int commitSQL() {
 		int rc;
 		String s, ss="";
@@ -1862,7 +1883,65 @@ public class ComWS extends PBase {
 		return vCommit;
 	}
 
-	public int OpenDTt(String sql) {
+    public int commitSQLs() {
+        int rc;
+        String s, ss;
+        int vCommit = 0;
+
+        METHOD_NAME = "Commit";
+        sstr = "OK";
+
+        if (dbld.size() == 0) vCommit = 1;//return 1
+
+        s = "";
+        for (int i = 0; i < dbld.size(); i++) {
+            ss = dbld.items.get(i);
+            s = s + ss + "\n";
+        }
+
+        if (showprogress) {
+            fprog = "Enviando ...";
+            wsStask.onProgressUpdate();
+        }
+
+        try {
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            PropertyInfo param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("SQL");
+            param.setValue(s);
+
+            request.addProperty(param);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL, 60000);
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+            s = response.toString();
+
+            sstr = "#";
+            if (s.equalsIgnoreCase("#")) vCommit = 1;// return 1;
+
+            sstr = s;
+            //return 0;
+
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+            sstr = e.getMessage();
+            vCommit = 0;
+        }
+
+        return vCommit;
+    }
+
+    public int OpenDTt(String sql) {
 		int rc;
 
 		METHOD_NAME = "OpenDT";
@@ -2069,6 +2148,7 @@ public class ComWS extends PBase {
 		return 0;
 	}
 
+	/*
 	public int guardaImagen(String idprod) {
 		int rc;
 		String s, ss, resstr;
@@ -2122,7 +2202,7 @@ public class ComWS extends PBase {
 
 		return 0;
 	}
-
+    */
 	public int rutaSupervisor(String ruta) {
 		int rc;
 		String s, ss;
@@ -2176,6 +2256,8 @@ public class ComWS extends PBase {
 		String s, val = "";
 
 		try {
+
+
 
 			if (TieneInventarioSinVentas()) {
 				return false;
@@ -2301,6 +2383,7 @@ public class ComWS extends PBase {
 			if (!AddTable("P_MERRESP")) return false;
 			if (!AddTable("P_MERMARCACOMP")) return false;
 			if (!AddTable("P_MERPRODCOMP")) return false;
+			if (!AddTable("D_CANASTA")) return false;
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -2446,9 +2529,9 @@ public class ComWS extends PBase {
 
 		try {
 
-			if (TieneInventarioSinVentas()) {
-				return false;
-			}
+		    if (!pedidos) {
+                if (TieneInventarioSinVentas()) return false;
+            }
 
 			String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
 			wfile = new FileWriter(fname, false);
@@ -2469,8 +2552,7 @@ public class ComWS extends PBase {
 			DT.close();
 
 		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			val = "N";
 		}
 
@@ -2529,16 +2611,23 @@ public class ComWS extends PBase {
 		int ejecutarhh = 0;
 		String s, val = "";
 
-
-		ferr = "";
+    	ferr = "";
 		lblInfo.setText("Procesando tablas . . .");
+
 		try {
 
 			rc = listItems.size();
 			reccnt = rc;
 			if (rc == 0) return true;
 
-			fprog = "Procesando ...";
+            try {
+                String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
+                wfile = new FileWriter(fname, false);
+                writer = new BufferedWriter(wfile);
+            } catch (IOException e) {}
+
+
+            fprog = "Procesando ...";
 			wsRtask.onProgressUpdate();
 
 			ConT=new BaseDatos(this);
@@ -2549,6 +2638,7 @@ public class ComWS extends PBase {
 			prn = 0;jj = 0;
 
 			try{
+
 				for (int i = 0; i < rc; i++) {
 
 					sql = listItems.get(i);
@@ -2558,18 +2648,15 @@ public class ComWS extends PBase {
 					sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
 
 					try {
-						writer.write(sql);
-						writer.write("\r\n");
+						writer.write(sql);writer.write("\r\n");
 					} catch (Exception e) {
-						Log.d("M", "Write Something happend there " + e.getMessage());
 					}
 				}
 
 				writer.close();
 
-			}catch (Exception ex){
-				Log.d("M", "Write Something happend there " + ex.getMessage());
-			}
+			} catch (Exception ex){}
+
 
 			dbT.beginTransaction();
 
@@ -2580,35 +2667,29 @@ public class ComWS extends PBase {
 				sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
 				sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
 
-				/*try {
-					writer.write(sql);writer.write("\r\n");
-				} catch (Exception e) {
-					Log.d("M", "Write Something happend there " + e.getMessage());
-				}*/
-
 				try {
 					dbT = ConT.getWritableDatabase();
 					dbT.execSQL(sql);
 				} catch (Exception e) {
 					ferr += " " +e.getMessage();
-					Log.d("M", "Something happend there " + e.getMessage() + "EJC" + " Yo fui " + sql);
-					Log.e("z", e.getMessage());
 				}
 
 				try {
-
 					if (i % 10 == 0) {
 						fprog = "Procesando: " + i + " de: " + (rc - 1);
-						wsRtask.onProgressUpdate();
-						SystemClock.sleep(20);
+						wsRtask.onProgressUpdate();SystemClock.sleep(20);
 					}
 				} catch (Exception e) {
-					Log.e("z", e.getMessage());
 					ferr += " " +e.getMessage();
-					addlog(new Object() {
-					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 				}
 			}
+
+            try {
+                writer.close();
+            } catch (Exception e) {
+                String ss=e.getMessage();
+            }
 
 			fprog = "Procesando: " + (rc - 1) + " de: " + (rc - 1);
 			wsRtask.onProgressUpdate();
@@ -2629,8 +2710,7 @@ public class ComWS extends PBase {
 			fechaCarga();
 			Actualiza_Documentos();
 
-			fprog = "Fin de actualización";
-			wsRtask.onProgressUpdate();
+			fprog = "Fin de actualización";wsRtask.onProgressUpdate();
 
 			scomp = 1;
 
@@ -2642,16 +2722,41 @@ public class ComWS extends PBase {
 
 			lblInfo.setText(" ");
 			s = "Recepción completa.";
-			if (stockflag == 1) s = s + "\nSe actualizó inventario.";
+
+
+			// if (stockflag == 1) s = s + "\nSe actualizó inventario.";
+
+            if (pedidos) {
+                sql = "SELECT Codigo FROM P_STOCK_PV ";
+            } else {
+                sql = "SELECT Codigo FROM P_STOCK ";
+            }
+            Cursor dt = Con.OpenDT(sql);
+            if (dt.getCount() > 0) s = s + "\nSe actualizó inventario.";
+
 
 			clsAppM.estandartInventario();
+            clsAppM.estandartInventarioPedido();
 			validaDatos(true);
 
 			if (stockflag == 1) sendConfirm();
+			isbusy = 0;
 
 			isbusy = 0;
 
+			comparaCorrel();
+
+			otrosParametros();
+
+			visibilidadBotones();
+
 			msgAskExit(s);
+
+			barInfo.setVisibility(View.INVISIBLE);
+			lblParam.setVisibility(View.INVISIBLE);
+
+			lblRec.setVisibility(View.VISIBLE);
+			imgRec.setVisibility(View.VISIBLE);
 
 			return true;
 
@@ -2659,23 +2764,19 @@ public class ComWS extends PBase {
 			fprog = "Actualización incompleta";
 			wsRtask.onProgressUpdate();
 
-			Log.e("Error", e.getMessage());
 			try {
 				ConT.close();
 			} catch (Exception ee) {
-				sstr = e.getMessage();
-				ferr += " " + sstr;
+				sstr = e.getMessage();ferr += " " + sstr;
 			}
 
-			sstr = e.getMessage();
-			ferr += " " + sstr + "\n" + sql;
-			esql = sql;
-
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), ferr, esql);
+			sstr = e.getMessage();ferr += " " + sstr + "\n" + sql;esql = sql;
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), ferr, esql);
 
 			return false;
 
+		}finally {
+			visibilidadBotones();
 		}
 
 	}
@@ -2776,16 +2877,15 @@ public class ComWS extends PBase {
 
 				sql = listItems.get(i);
 				esql = sql;
+
+				if (sql.contains("ds_pedido")){
+					msgbox("Si");
+				}
 				dbT.execSQL(sql);
 
 				try {
-					if (i % 10 == 0) {
-
-						SystemClock.sleep(20);
-					}
-				} catch (Exception e) {
-					Log.e("z", e.getMessage());
-				}
+					if (i % 10 == 0) SystemClock.sleep(20);
+				} catch (Exception e) {}
 			}
 
 			dbT.setTransactionSuccessful();
@@ -2967,8 +3067,8 @@ public class ComWS extends PBase {
 
 		try {
 
-			fprog = TN;
-			idbg = TN;
+			fprog = TN;	if (cargastockpv) fprog="Procesando datos . . .";
+         	idbg = TN;
 			wsRtask.onProgressUpdate();
 			SQL = getTableSQL(TN);
 
@@ -3032,7 +3132,7 @@ public class ComWS extends PBase {
 		if (TN.equalsIgnoreCase("P_STOCK")) {
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
+				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, 0 " +
 						"FROM P_STOCK WHERE RUTA='" + ActRuta + "'  AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";
 			} else if (gl.peModal.equalsIgnoreCase("APR")) {
@@ -3050,7 +3150,7 @@ public class ComWS extends PBase {
 		//CKFK 20190222 Agregué a la consulta el AND (ENVIADO = 0)
 		if (TN.equalsIgnoreCase("P_STOCKB")) {
 			SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, " +
-					"STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA " +
+					"STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA, 0 " +
 					"FROM P_STOCKB WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
 					"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
 			return SQL;
@@ -3098,7 +3198,7 @@ public class ComWS extends PBase {
 				SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
 				SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
 				SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
-				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
+				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO, INGRESA_CANASTAS ";
 				SQL += "FROM P_CLIENTE ";
 				SQL += "WHERE (CODIGO IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') )) ";
 
@@ -3109,7 +3209,7 @@ public class ComWS extends PBase {
 				SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
 				SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
 				SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
-				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO ";
+				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO, INGRESA_CANASTAS ";
 				SQL += "FROM P_CLIENTE WHERE CODIGO IN ( ";
 				SQL += "SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA IN ( ";
 				SQL += "SELECT DISTINCT RUTA FROM VENDEDORES WHERE Codigo IN ( ";
@@ -3143,13 +3243,13 @@ public class ComWS extends PBase {
 		if (TN.equalsIgnoreCase("P_PRODUCTO")) {
 
 			if (!cargasuper) {
-
+				//#KM20210802 Agregué OR ES_CANASTA = 1
 				SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
 				SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, ISNULL(DESCUENTO,'N') AS DESCUENTO, ISNULL(BONIFICACION,'N') AS BONIFICACION, ";
 				SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN, ";
 				SQL += "VIDEO,VENTA_POR_PESO,ES_PROD_BARRA,UNID_INV,VENTA_POR_PAQUETE,VENTA_POR_FACTOR_CONV,ES_SERIALIZADO,PARAM_CADUCIDAD, ";
-				SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
-				SQL += "FROM P_PRODUCTO WHERE (ES_VENDIBLE=1) AND ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
+				SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA,ES_CANASTA ";
+				SQL += "FROM P_PRODUCTO WHERE (ES_VENDIBLE=1 OR ES_CANASTA = 1) AND ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
 						" OR CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "'))" +
 						" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "') AND EMPRESA = '" + gEmpresa + "') OR UNIDMED='CAN' )" +
 						" AND CODIGO IN ( " +
@@ -3158,14 +3258,13 @@ public class ComWS extends PBase {
 						" NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE  " +
 						" WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "')))" +
 						" OR TIENE_VINETA_O_TUBO = 1 ";
-
 			} else {
 
 				SQL = "SELECT CODIGO, TIPO, LINEA, SUBLINEA, EMPRESA, MARCA, CODBARRA, DESCCORTA, DESCLARGA, COSTO, ";
 				SQL += "FACTORCONV, UNIDBAS, UNIDMED, UNIMEDFACT, UNIGRA, UNIGRAFACT, ISNULL(DESCUENTO,'N') AS DESCUENTO, ISNULL(BONIFICACION,'N') AS BONIFICACION, ";
 				SQL += "IMP1, IMP2, IMP3, VENCOMP, ISNULL(DEVOL,'S') AS DEVOL, OFRECER, RENTAB, DESCMAX, PESO_PROMEDIO,MODIF_PRECIO,IMAGEN, ";
 				SQL += "VIDEO,VENTA_POR_PESO,ES_PROD_BARRA,UNID_INV,VENTA_POR_PAQUETE,VENTA_POR_FACTOR_CONV,ES_SERIALIZADO,PARAM_CADUCIDAD, ";
-				SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA ";
+				SQL += "PRODUCTO_PADRE,FACTOR_PADRE,TIENE_INV,TIENE_VINETA_O_TUBO,PRECIO_VINETA_O_TUBO,ES_VENDIBLE,UNIGRASAP,UM_SALIDA, ES_CANASTA ";
 				SQL += "FROM P_PRODUCTO WHERE (ES_VENDIBLE=1) ";
 
 			}
@@ -3233,7 +3332,11 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_EMPRESA")) {
-			SQL = "SELECT * FROM P_EMPRESA WHERE EMPRESA = '" + gEmpresa + "'";
+			SQL = "SELECT EMPRESA, NOMBRE, INITPATH, FTPPATH, NUMREIMPRES, MODDESC, USARPESO, DEVCONPREC, ACUMDESC, DESCMAX, " +
+				  " BONVOLTOL, COD_PAIS, BOLETA_DEPOSITO, EDITAR_DIRECCION, DEPOSITO_PARCIAL, COL_IMP, INV_ENLINEA, FIN_DIA," +
+				  " PRESENTACION_MULTIPLE, PRECIOS_ESPECIALES, AUTORIZ_MODIF_DESCBON, CAMBIO_POR_CAMBIO, DEVOLUCION_MERCANCIA," +
+				  " COBROS_SIN_REFERENCIA, PORCENTAJE_NC, PORC_MERMA, PRODUCTO_ERROR_SUMA, UNIDAD_MEDIDA_PESO, LOTE_POR_DEFECTO," +
+				  " INCIDENCIA_NO_LECTURA, IMPRIMIR_TOTALES_PEDIDO FROM P_EMPRESA WHERE EMPRESA = '" + gEmpresa + "'";
 			return SQL;
 		}
 
@@ -3244,7 +3347,8 @@ public class ComWS extends PBase {
 					"FTPFOLD, EMAIL, LASTIMP, LASTCOM, LASTEXP, IMPSTAT, EXPSTAT, COMSTAT, PARAM1, " +
 					"PARAM2, PESOLIM, INTERVALO_MAX, LECTURAS_VALID, INTENTOS_LECT, HORA_INI, HORA_FIN, " +
 					"APLICACION_USA, PUERTO_GPS, ES_RUTA_OFICINA, DILUIR_BON, PREIMPRESION_FACTURA, MODIFICAR_MEDIA_PAGO, " +
-					"IDIMPRESORA, NUMVERSION,0 AS FECHAVERSION, ARQUITECTURA " +
+					"IDIMPRESORA, NUMVERSION,0 AS FECHAVERSION, ARQUITECTURA, PERMITIR_PRODUCTO_NUEVO, " +
+					"PERMITIR_CANTIDAD_MAYOR, ENVIO_AUTO_PEDIDOS, PEDIDOS_CLINUEVO " +
 					"FROM P_RUTA WHERE CODIGO = '" + ActRuta + "'";
 			return SQL;
 		}
@@ -3270,7 +3374,12 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_CODDEV")) {
-			SQL = "SELECT * FROM P_CODDEV";
+			SQL = "SELECT CODIGO, DESCRIPCION, ESTADO, PORCENTAJE FROM P_CODDEV";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_RAZON_DESP_INCOMP")) {
+			SQL = "SELECT IDRAZON, DESCRIPCION FROM P_RAZON_DESP_INCOMP";
 			return SQL;
 		}
 
@@ -3521,10 +3630,36 @@ public class ComWS extends PBase {
 
             SQL = "SELECT  RUTA, CODIGO, CANT, PESO, CANT_SOL, PESO_SOL, UNIDADMEDIDA, DOCUMENTO, " +
                     "0 , ANULADO, CENTRO, ESTADO, ENVIADO " +
-                    "FROM P_STOCK_PV WHERE (RUTA ='"+ActRuta+"') AND (ANULADO=0) ";
+                    "FROM P_STOCK_PV WHERE (RUTA ='"+ActRuta+"') AND (ANULADO=0) " +
+                    "AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') ";
             return SQL;
         }
 
+		if (TN.equalsIgnoreCase("DS_PEDIDO")) {
+			SQL = " SELECT COREL, ANULADO, dbo.AndrDate(FECHA), EMPRESA, RUTA, VENDEDOR, CLIENTE, KILOMETRAJE, dbo.AndrDate(FECHAENTR), DIRENTREGA, " +
+					" TOTAL, DESMONTO, IMPMONTO, PESO, BANDERA, STATCOM, CALCOBJ, IMPRES, ADD1, ADD2, ADD3 "+
+					" FROM DS_PEDIDO " +
+					" WHERE RUTA='" + ActRuta + "' AND (ANULADO='N') " +
+					"AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') ";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("DS_PEDIDOD")) {
+			SQL = " SELECT COREL, PRODUCTO, EMPRESA, ANULADO, CANT, PRECIO, IMP, DES, DESMON, TOTAL, PRECIODOC, " +
+					"PESO, VAL1, VAL2, RUTA, UMVENTA, UMSTOCK, UMPESO "+
+					" FROM DS_PEDIDOD " +
+					" WHERE COREL IN (SELECT COREL FROM DS_PEDIDO WHERE RUTA = '" + ActRuta + "'  AND (ANULADO='N') " +
+					"AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') )";
+			return SQL;
+		}
+
+        if (TN.equalsIgnoreCase("D_CANASTA")) {
+        	SQL = "SELECT RUTA, FECHA, CLIENTE, PRODUCTO, CANTREC, CANTENTR, STATCOM, CORELTRANS, PESOREC, PESOENTR, ANULADO, UNIDBAS, CODIGOLIQUIDACION " +
+					"FROM D_CANASTA " +
+					"WHERE RUTA = '" + ActRuta + "' " +
+					"AND FECHA >= '"+fsqli+"'  " +
+					"AND ANULADO = 0;";
+		}
 		return SQL;
 	}
 
@@ -3577,7 +3712,6 @@ public class ComWS extends PBase {
 	}
 
 	private boolean validaDatos(boolean completo) {
-
 		Cursor dt;
 
 		try {
@@ -3586,29 +3720,30 @@ public class ComWS extends PBase {
 				sql = "SELECT RESOL FROM P_COREL";
 				dt = Con.OpenDT(sql);
 				if (dt.getCount() == 0) {
-					msgbox("No está definido correlativo de facturas");
-					return false;
+				    if (!pedidos) {
+                        toastlong("No está definido correlativo de facturas");return false;
+                    }
 				}
 			}
 
 			sql = "SELECT Codigo FROM P_CLIENTE";
 			dt = Con.OpenDT(sql);
 			if (dt.getCount() == 0) {
-				msgbox("Lista de clientes está vacia");
+                toastlong("Lista de clientes está vacia");
 				return false;
 			}
 
 			sql = "SELECT Ruta FROM P_CLIRUTA";
 			dt = Con.OpenDT(sql);
 			if (dt.getCount() == 0) {
-				msgbox("Lista de clientes por ruta está vacia");
+                toastlong("Lista de clientes por ruta está vacia");
 				return false;
 			}
 
 			sql = "SELECT Codigo FROM P_PRODUCTO";
 			dt = Con.OpenDT(sql);
 			if (dt.getCount() == 0) {
-				msgbox("Lista de productos está vacia");
+                toastlong("Lista de productos está vacia");
 				return false;
 			}
 
@@ -3624,18 +3759,21 @@ public class ComWS extends PBase {
 				sql = "SELECT Producto FROM P_FACTORCONV ";
 				dt = Con.OpenDT(sql);
 				if (dt.getCount() == 0) {
-					msgbox("Lista de conversiones está vacia");
+                    toastlong("Lista de conversiones está vacia");
 					return false;
 				}
 
-				if (gl.peStockItf) {
-					sql = "SELECT Codigo FROM P_STOCK ";
-					dt = Con.OpenDT(sql);
-					if (dt.getCount() == 0) {
-						msgbox("La carga de productos está vacia");
-						return false;
-					}
-				}
+                if (pedidos) {
+                    sql = "SELECT Codigo FROM P_STOCK_PV ";
+                } else {
+                    sql = "SELECT Codigo FROM P_STOCK ";
+                }
+
+                dt = Con.OpenDT(sql);
+                if (dt.getCount() == 0) {
+                    toastlong("La carga de productos está vacia");
+                    return false;
+                }
 
 			}
 
@@ -3851,20 +3989,6 @@ public class ComWS extends PBase {
 
 	//region WS Recepcion Handling Methods
 
-	private void confImpresora() {
-		try {
-
-			sql = "UPDATE Params SET prn='" + clsAppM.getPrintId_Ruta() + "',prnserie='" + clsAppM.impresTipo_Ruta() + "' ";
-			db.execSQL(sql);
-
-		} catch (Exception e) {
-			msgbox(new Object() {
-			}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
-		}
-	}
-
-	//endregion
-
 	public void wsExecute() {
 
 		running = 1;
@@ -3901,29 +4025,27 @@ public class ComWS extends PBase {
 
 	public void wsFinished() {
 
-		barInfo.setVisibility(View.INVISIBLE);
-		lblParam.setVisibility(View.INVISIBLE);
-
-		lblRec.setVisibility(View.VISIBLE);
-		imgRec.setVisibility(View.VISIBLE);
-
 		running = 0;
 
 		try {
 			if (fstr.equalsIgnoreCase("Sync OK")) {
 
 				cargaTablas();
+
 				/*lblInfo.setText(" ");
+
+				/*
+				lblInfo.setText(" ");
 				s = "Recepción completa.";
 				if (stockflag == 1) s = s + "\nSe actualizó inventario.";
 
 				clsAppM.estandartInventario();
+                clsAppM.estandartInventarioPedido();
 				validaDatos(true);
-
 				if (stockflag == 1) sendConfirm();
 
-				msgAskExit(s);*/
-
+				msgAskExit(s);
+*/
 			} else {
 				lblInfo.setText(fstr);
 				mu.msgbox("Ocurrió error : \n" + fstr + " " + idbg + " (Registro: " + reccnt + ") ");
@@ -3934,18 +4056,17 @@ public class ComWS extends PBase {
 				return;
 			}
 
-			if (!vDBVacia){
+			//#CKFK 20210725 Puse esto en comentario porque no llega a esta opción
+			/*if (!vDBVacia){
 				pendientes = validaPendientes();
 
 				isbusy = 0;
 				comparaCorrel();
 
 				otrosParametros();
+			}*/
 
-				confImpresora();
-			}
-
-			visibilidadBotones();
+			//visibilidadBotones();
 
 			if (ftflag) msgbox(ftmsg);
 		} catch (Exception e) {
@@ -3957,7 +4078,19 @@ public class ComWS extends PBase {
 
 	}
 
-	private class AsyncCallRec extends AsyncTask<String, Void, Void> {
+    private void confImpresora() {
+        try {
+
+            //sql = "UPDATE Params SET prn='" + clsAppM.getPrintId_Ruta() + "',prnserie='" + clsAppM.impresTipo_Ruta() + "' ";
+            //db.execSQL(sql);
+
+        } catch (Exception e) {
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+        }
+    }
+
+    private class AsyncCallRec extends AsyncTask<String, Void, Void> {
 
 		@Override
 		protected Void doInBackground(String... params) {
@@ -4007,6 +4140,8 @@ public class ComWS extends PBase {
 
 	}
 
+    //endregion
+
 	//region WS Recepcion por tabla
 
 	private class WSRec extends AsyncTask<String, Void, Void> {
@@ -4043,7 +4178,6 @@ public class ComWS extends PBase {
 	}
 
 	public void wsCargaTabla() {
-
 		try {
 //        	if (nombretabla.contains("P_IMPRESORA")){
 //				fillTableImpresora();
@@ -4053,11 +4187,12 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			String ee=e.getMessage();
 		}
-
 	}
 
 	public void wsCallback() {
 		boolean ejecutar=true;
+
+        cargastockpv=false;
 
 		try {
 			indicetabla++;
@@ -4203,13 +4338,14 @@ public class ComWS extends PBase {
 					nombretabla="P_MERMARCACOMP";break;
 				case 60:
 					nombretabla="P_MERPRODCOMP";break;
-
 				case 61:
 					nombretabla="P_PEDIDO_RECHAZADO";break;
 				case 62:
-					nombretabla="DS_PEDIDO";break;
+					nombretabla="DS_PEDIDO";
+					break;
 				case 63:
-					nombretabla="DS_PEDIDOD";break;
+					nombretabla="DS_PEDIDOD";
+					break;
 				case 64:
 					dbld.clear();
 					dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");
@@ -4225,26 +4361,29 @@ public class ComWS extends PBase {
 					nombretabla="P_IMPRESORA";break;
 				case 68:
 					nombretabla="Procesando tablas ...";break;
-					/*fillTableImpresora();
-					nombretabla = "";
-					break;*/
 				case 69:
-					//licResult=checkLicence(licSerial);
-					nombretabla = "checkLicence";
+					nombretabla = "D_CANASTA";
 					break;
 				case 70:
+					//licResult=checkLicence(licSerial);
+					nombretabla = "checkLicence";break;
+					case 71:
 					//licResultRuta=checkLicenceRuta(licRuta);
 					nombretabla = "checkLicenceRuta";
 					break;
-				case 71:
+				case 72:
+					nombretabla="P_RAZON_DESP_INCOMP";
+					break;
+                case 73:
+                    nombretabla = "P_STOCK_PV";
+                    break;
+				case 74:
 					procesaDatos();
 					ejecutar = false;
-					break;
+                    break;
 			}
 
-			if(ejecutar) {
-				executaTabla();
-			}
+			if (ejecutar) executaTabla();
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -4301,6 +4440,14 @@ public class ComWS extends PBase {
 		try {
 
 			envioFacturas();
+			if (!fstr.equals("Sync OK")) {
+				dbld.savelog();
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
+				return false;
+			}
+
+			envioCanastas();
 			if (!fstr.equals("Sync OK")) {
 				dbld.savelog();
 				addlog(new Object() {
@@ -4408,7 +4555,7 @@ public class ComWS extends PBase {
 			if (!fstr.equals("Sync OK")) {
 				dbld.savelog();
 				addlog(new Object() {
-				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
+                }.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
 
@@ -4428,7 +4575,8 @@ public class ComWS extends PBase {
 				return false;
 			}
 
-			listaFachada();
+			//listaFachada();
+            envioFotos();
 
 			dbld.savelog();
 			dbld.saveArchivo(du.getActDateStr());
@@ -4575,6 +4723,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_FACTURAP", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_FACTURAD_LOTES", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_FACTURAF", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_FACTURA_MODIF", "WHERE COREL='" + cor + "'");
 
 					dbld.insert("D_STOCKB_DEV", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIF", "WHERE COREL='" + cor + "'");
@@ -4644,6 +4793,89 @@ public class ComWS extends PBase {
 
 	}
 
+	public void envioCanastas() {
+		Cursor DT;
+		String rut, cli, pro;
+		int i, pc = 0, pcc = 0;
+		long fecha;
+
+		try {
+			sql = "SELECT RUTA, FECHA, CLIENTE, PRODUCTO FROM D_CANASTA WHERE STATCOM='N'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() == 0) {
+				senv += "Canastas : " + pc + "\n";
+				return;
+			}
+
+			pcc = DT.getCount();
+			pc = 0;
+			i = 0;
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				rut = DT.getString(0);
+				fecha = DT.getLong(1);
+				cli = DT.getString(2);
+				pro = DT.getString(3);
+
+				try {
+
+					i += 1;
+					fprog = "Depósito " + i;
+					if (!esEnvioManual) {
+						wsStask.onProgressUpdate();
+					}
+
+					if (envioparcial) dbld.clear();
+
+					dbld.insert("D_CANASTA", "WHERE RUTA='" + rut + "' AND FECHA=" + fecha + " AND CLIENTE='" + cli + "' AND PRODUCTO='" + pro + "'");
+
+					if (envioparcial && !esEnvioManual) {
+						if (commitSQL() == 1) {
+							sql = "UPDATE D_CANASTA SET STATCOM='S' WHERE RUTA='" + rut + "' AND FECHA=" + fecha + " AND CLIENTE='" + cli + "' AND PRODUCTO='" + pro + "'";
+							db.execSQL(sql);
+							pc += 1;
+						} else {
+							errflag = true;
+							fterr += "\n" + sstr;
+						}
+					} else pc += 1;
+
+				} catch (Exception e) {
+					errflag = true;
+
+					dbld.savelog("canastas.txt");
+
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					fterr += "\n" + e.getMessage();
+				}
+
+				DT.moveToNext();
+			}
+
+			if (DT != null) DT.close();
+
+		} catch (Exception e) {
+			errflag = true;
+
+			dbld.savelog("canastas.txt");
+
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+		}
+
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Canastas : " + pc + " , NO ENVIADO : " + pf + " \n";
+		} else {
+			senv += "Canastas : " + pc + "\n";
+		}
+	}
+
 	public void envioPedidos() {
 		Cursor DT;
 		String cor;
@@ -4674,12 +4906,10 @@ public class ComWS extends PBase {
 						wsStask.onProgressUpdate();
 					}
 
-
 					if (envioparcial) dbld.clear();
 
 					dbld.insert("D_PEDIDO", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_PEDIDOD", "WHERE COREL='" + cor + "'");
-
 					dbld.insert("D_BONIF", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIF_LOTES", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_REL_PROD_BON", "WHERE COREL='" + cor + "'");
@@ -5749,7 +5979,93 @@ public class ComWS extends PBase {
 		}
 	}
 
-	//#HS_20181219 funcion para crear JSON de fotos fachada.
+    public boolean envioFotos() {
+        String trid,fname;
+        int pp;
+
+        try {
+            File dir = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue");
+
+            for (File imagen : dir.listFiles()) {
+
+                try {
+                    trid=imagen.getName();pp=trid.indexOf(".");
+                    trid=trid.substring(0,pp);
+                    fname=imagen.getAbsolutePath();
+
+                    if (sendFoto(trid,ruta,fname)==1) imagen.delete();
+                } catch (Exception e) {
+                }
+            }
+
+            return true;
+        } catch (Exception e) {
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+        }
+        return false;
+    }
+
+    public int sendFoto(String codigo,String ruta,String fname) {
+        String resstr="";
+
+        METHOD_NAME = "saveImageCN";
+
+        try {
+
+            Bitmap bmp = BitmapFactory.decodeFile(fname);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG,75, out);
+            byte[] imagebyte = out.toByteArray();
+            String strBase64 = Base64.encodeBytes(imagebyte);
+
+            int iv1=strBase64.length();
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.dotNet = true;
+
+            PropertyInfo param = new PropertyInfo();
+            param.setType(String.class);
+            param.setName("codigo");
+            param.setValue(codigo);
+            request.addProperty(param);
+
+            PropertyInfo param2 = new PropertyInfo();
+            param2.setType(String.class);
+            param2.setName("ruta");
+            param2.setValue(ruta);
+            request.addProperty(param2);
+
+            PropertyInfo param3 = new PropertyInfo();
+            param3.setType(String.class);
+            param3.setName("imgdata");
+            param3.setValue(strBase64);
+            request.addProperty(param3);
+
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+            transport.call(NAMESPACE + METHOD_NAME, envelope);
+
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+
+            resstr = response.toString();
+
+            if (resstr.equalsIgnoreCase("#")) {
+                return 1;
+            } else {
+                throw new Exception(resstr);
+            }
+        } catch (Exception e) {
+            String ss= e.getMessage();
+            //addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage());
+        }
+
+        return 0;
+    }
+
+    /*
+    //#HS_20181219 funcion para crear JSON de fotos fachada.
 	public void listaFachada() {
 
 		Cursor DT;
@@ -5777,7 +6093,7 @@ public class ComWS extends PBase {
 
 					if (archivo.exists()) {
 
-						/*LO CONVIERTE A BASE64*/
+
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						Bitmap bitmap = BitmapFactory.decodeFile(paht);
 						bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -5792,7 +6108,6 @@ public class ComWS extends PBase {
 					}
 
 					DT.moveToNext();
-
 				}
 
 				if (DT != null) DT.close();
@@ -5816,6 +6131,7 @@ public class ComWS extends PBase {
 			mu.msgbox("listaFachada: " + e.getMessage());
 		}
 	}
+    */
 
 	//#HS_20181221 Elimina las fotos de ROADFOTOS
 	public void EliminarArchivos(File ArchivoDirectorio) {
@@ -6413,7 +6729,7 @@ public class ComWS extends PBase {
 			imgRec.setVisibility(View.INVISIBLE);
 
 			//Tiene documentos
-			boolean TieneFact, TienePedidos, TieneCobros, TieneDevol, YaComunico, TieneInventario, TieneOtros;
+			boolean TieneFact, TienePedidos, TieneCobros, TieneDevol, YaComunico, TieneInventario, TieneCanastas, TieneOtros;
 
 			if (!envioparcial) {
 				TieneFact = (clsAppM.getDocCountTipo("Facturas", false) > 0 ? true : false);
@@ -6422,6 +6738,7 @@ public class ComWS extends PBase {
 				TieneDevol = (clsAppM.getDocCountTipo("Devoluciones", false) > 0 ? true : false);
 				YaComunico = (claseFindia.getComunicacion() == 2 ? true : false);
 				TieneInventario = (clsAppM.getDocCountTipo("Inventario", false) > 0 ? true : false);
+				TieneCanastas = (clsAppM.getDocCountTipo("Canastas", false) > 0 ? true : false);
 			} else {
 				TieneFact = (clsAppM.getDocCountTipo("Facturas", true) > 0 ? true : false);
 				TienePedidos = (clsAppM.getDocCountTipo("Pedidos", true) > 0 ? true : false);
@@ -6429,12 +6746,13 @@ public class ComWS extends PBase {
 				TieneDevol = (clsAppM.getDocCountTipo("Devoluciones", true) > 0 ? true : false);
 				YaComunico = (claseFindia.getComunicacion() == 2 ? true : false);
 				TieneInventario = (clsAppM.getDocCountTipo("Inventario", true) > 0 ? true : false);
+				TieneCanastas = (clsAppM.getDocCountTipo("Canastas", true) > 0 ? true : false);
 			}
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
 				if (claseFindia.yaHizoFindeDia()) {
 					if (YaComunico) {
-						if ((rutatipo.equalsIgnoreCase("V") && !TieneInventario) || (!rutatipo.equalsIgnoreCase("V"))) {
+						if ((rutatipo.equalsIgnoreCase("V") && !TieneInventario && !TieneCanastas) || (!rutatipo.equalsIgnoreCase("V"))) {
 							lblRec.setVisibility(View.VISIBLE);
 							imgRec.setVisibility(View.VISIBLE);
 							lblEnv.setVisibility(View.INVISIBLE);
@@ -6450,7 +6768,7 @@ public class ComWS extends PBase {
 								relStock.setVisibility(View.INVISIBLE);
 								relPrecio.setVisibility(View.INVISIBLE);
 							}
-						} else if ((rutatipo.equalsIgnoreCase("V") && TieneInventario &&
+						} else if ((rutatipo.equalsIgnoreCase("V") && TieneInventario && TieneCanastas &&
 								(TieneFact || TieneCobros || TieneDevol || TienePedidos)) ||
 								(!rutatipo.equalsIgnoreCase("V"))) {
 							lblRec.setVisibility(View.INVISIBLE);
@@ -6465,7 +6783,7 @@ public class ComWS extends PBase {
 						}
 					}
 				} else {
-					if ((!YaComunico) && !(TieneFact || TienePedidos) && !TieneCobros && !TieneDevol) {
+					if ((!YaComunico) && !(TieneFact || TienePedidos || TieneCanastas) && !TieneCobros && !TieneDevol) {
 						lblRec.setVisibility(View.VISIBLE);
 						imgRec.setVisibility(View.VISIBLE);
 						lblEnv.setVisibility(View.INVISIBLE);
@@ -6563,6 +6881,7 @@ public class ComWS extends PBase {
 			app.parametrosExtra();
 			app.parametrosGlobales();
 			app.parametrosBarras();
+			app.confImpresora();
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -6634,8 +6953,6 @@ public class ComWS extends PBase {
 
 	}
 
-	;
-
 	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
 	public boolean ExisteInventario() {
 
@@ -6657,8 +6974,6 @@ public class ComWS extends PBase {
 		}
 
 	}
-
-	;
 
 	//CKFK 20190222 Se creó esta función para saber si existen datos en la base de datos
 	public boolean ExistenDatos() {
@@ -6685,8 +7000,6 @@ public class ComWS extends PBase {
 		}
 
 	}
-
-	;
 
 	private void msgResultEnvio(String msg) {
 		try {
@@ -6768,8 +7081,6 @@ public class ComWS extends PBase {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
-
-
 	}
 
 	private void msgAskExitComplete() {
@@ -6944,6 +7255,36 @@ public class ComWS extends PBase {
 
 		return  vTieneInventarioSinVentas;
 	}
+
+    private void actualizaEstadoPedidos() {
+        int pp;
+        String fname,cor;
+
+        try {
+            String path = Environment.getExternalStorageDirectory().getPath() + "/RoadPedidos";
+            File directory = new File(path);
+            File[] files = directory.listFiles();
+
+            for (int i = 0; i < files.length; i++) {
+                try {
+                    fname = files[i].getName();
+                    pp = fname.indexOf(".txt");
+                    if (pp > 0) {
+                        cor=fname.substring(0,pp);
+
+                        db.execSQL("UPDATE D_PEDIDO SET STATCOM='S' WHERE COREL='"+cor+"'");
+
+                        new File(path+"/"+cor+".txt").delete();
+                    }
+                } catch (Exception e) {
+                    msgbox("actualizaEstadoPedidos1 : "+e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            msgbox("actualizaEstadoPedidos2 : "+e.getMessage());
+        }
+    }
+
 	//endregion
 
 	//region Activity Events

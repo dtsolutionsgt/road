@@ -32,14 +32,11 @@ public class ProdCantPrev extends PBase {
 
     private Precio prc;
 
-    private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact,umini;
+    private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact,umini,strdisp;
     private int nivel,browse=0,deccant,prevfact=1;
-    private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
+    private double cant,cexist,cstand,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
     private boolean pexist,esdecimal,porpeso,esbarra,idle=true,critico;
     private AppMethods app;
-
-
-    //JP20210614  - activy creada nueva
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +52,12 @@ public class ProdCantPrev extends PBase {
         um=gl.um;
         nivel=gl.nivel;
         rutatipo=gl.rutatipo;
+        gl.cexist=0;gl.cstand=0;
 
         prc=new Precio(this,mu,gl.peDec);
-        getDisp();
-
         app = new AppMethods(this, gl, Con, db);
+
+        getDisp();
 
         setHandlers();
 
@@ -119,6 +117,11 @@ public class ProdCantPrev extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
 
+    }
+
+    public void doHint(View view) {
+        String ss="LA CANTIDAD EXEDENTE A "+strdisp+" PODRIA NO ENTREGAR SE";
+        toastlong(ss);
     }
 
     public void askExist(View view) {
@@ -222,7 +225,9 @@ public class ProdCantPrev extends PBase {
             dt.moveToFirst();
             um=dt.getString(0);umini=um;
             if (rutatipo.equalsIgnoreCase("P")) {
-                if (app.prodBarra(prodid)) um=DameUnidadMinimaVenta(prodid);
+                if (app.prodBarra(prodid)) {
+                    um=DameUnidadMinimaVenta(prodid);
+                }
             }
             ubas=um;umfact=um;
             lblBU.setText(ubas);gl.ubas=ubas;upres=ubas;
@@ -319,7 +324,8 @@ public class ProdCantPrev extends PBase {
         if (gl.sinimp) prec=prc.precsin;
 
         try {
-            sql="SELECT CANT,PESO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
+            //sql="SELECT CANT,PESO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
+            sql="SELECT SUM(CANT),SUM(PESO) FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
             dt=Con.OpenDT(sql);
 
             if(dt.getCount()>0){
@@ -350,7 +356,7 @@ public class ProdCantPrev extends PBase {
 		}
 		*/
 
-        idisp=mu.trunc(idisp);
+        idisp=mu.trunc(idisp);strdisp=""+idisp;
 
         if (porpeso) {
             lblBU.setText(umstock);
@@ -380,13 +386,23 @@ public class ProdCantPrev extends PBase {
     }
 
     private double getDisp() {
-
         Cursor dt;
         double disp = 0;
         double umf1 =1;
         double umf2 =1;
 
         try {
+
+            sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+            um=dt.getString(0);umini=um;
+            if (rutatipo.equalsIgnoreCase("P")) {
+                if (app.prodBarra(prodid)) {
+                    um=DameUnidadMinimaVenta(prodid);
+                }
+            }
+            ubas=um;umfact=um;
 
             pesostock=0;
 
@@ -537,21 +553,28 @@ public class ProdCantPrev extends PBase {
                 return;
             }
 
-            if (rutatipo.equalsIgnoreCase("V")) {
-                if (cant > idisp) {
-                    mu.msgbox("Cantidad mayor que disponible.");
-                    txtCant.requestFocus();
-                    return;
-                }
-            } else if (rutatipo.equalsIgnoreCase("P") && gl.peModal.equalsIgnoreCase("TOL"))  {
+            /*
+            if (gl.peModal.equalsIgnoreCase("TOL"))  {
                 if (critico) {
                     if (cant > idisp) {
+                        cexist=0;cstand=0;
                         mu.msgbox("Cantidad mayor que disponible.");
                         txtCant.requestFocus();
                         return;
+                    } else {
+                        cexist=cant;cstand=0;
                     }
-                }
+                } else {
+
+                    if (cant > idisp) {
+                        cexist=idisp;cstand=cant-idisp;
+                    } else {
+                        cexist=cant;cstand=0;
+                    }
+                //}
+                cant=cexist;
             }
+            */
 
             if (porpeso) {
 
@@ -588,6 +611,12 @@ public class ProdCantPrev extends PBase {
             gl.umstock = umstock;
             gl.umfactor = umfactor;
             gl.prectemp = prec;
+
+            if (gl.peModal.equalsIgnoreCase("TOL")) {
+                gl.cexist=cexist;gl.cstand=cstand;
+            } else {
+                gl.cexist=0;gl.cstand=0;
+            }
 
             if (rutatipo.equalsIgnoreCase("P")) {
                 gl.um=um;
@@ -949,8 +978,17 @@ public class ProdCantPrev extends PBase {
             dt.moveToFirst();
             critico=dt.getString(0).equalsIgnoreCase("C");
 
-            if (critico) relcrit.setVisibility(View.VISIBLE); else relcrit.setVisibility(View.INVISIBLE);
+            gl.tolprodcrit=critico;
 
+            if (critico) {
+                relcrit.setVisibility(View.VISIBLE);
+                lblDisp.setVisibility(View.VISIBLE);
+                lblDispLbl.setVisibility(View.VISIBLE);
+            } else {
+                relcrit.setVisibility(View.INVISIBLE);
+                lblDisp.setVisibility(View.INVISIBLE);
+                lblDispLbl.setVisibility(View.INVISIBLE);
+            }
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1005,7 +1043,6 @@ public class ProdCantPrev extends PBase {
 
     private double precioPreventaPres() {
         double pp=0;
-
 
         pp=prc.precio(prodid,1,nivel,umini,gl.umpeso,0,umini);
         if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {

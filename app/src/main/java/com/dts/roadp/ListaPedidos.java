@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class ListaPedidos extends PBase {
 
     private ListView listView;
-    private TextView lblTipo;
+    private TextView lblTipo,lblCant,lblTotal;
 
     private ArrayList<clsClasses.clsCFDV> items= new ArrayList<clsClasses.clsCFDV>();
     private ListAdaptCFDV adapter;
@@ -32,16 +32,20 @@ public class ListaPedidos extends PBase {
         super.InitBase();
 
         listView = (ListView) findViewById(R.id.listView1);
-        lblTipo= (TextView) findViewById(R.id.lblDescrip);
+        lblTipo= (TextView) findViewById(R.id.lblDescrip);lblTipo.setText(gl.fnombre);
+        lblCant = (TextView) findViewById(R.id.textView88);
+        lblTotal= (TextView) findViewById(R.id.textView9);
 
         setHandlers();
         listItems();
+
+        gl.modpedid="";
     }
 
     //region Events
 
     public void nuevoPedido(View view){
-        gl.modpedid="*";
+        gl.modpedid="";
         iniciaPedido();
     }
 
@@ -58,7 +62,7 @@ public class ListaPedidos extends PBase {
                         itemid=vItem.Cod;
                         adapter.setSelectedIndex(position);
 
-                        msgAsk("Modificar existente pedido");
+                        msgAsk("Modificar pedido existente");
                     } catch (Exception e) {
                         mu.msgbox( e.getMessage());
                     }
@@ -76,19 +80,20 @@ public class ListaPedidos extends PBase {
     public void listItems() {
         Cursor DT;
         clsClasses.clsCFDV vItem;
-        int f;
-        double val;
+        int f,pcant=0;
+        double val,ptot=0;
         String sf,sval;
 
         items.clear();
 
         try {
-            sql="SELECT D_PEDIDO.COREL,P_CLIENTE.NOMBRE,D_PEDIDO.FECHA,D_PEDIDO.TOTAL "+
+            sql="SELECT D_PEDIDO.COREL,P_CLIENTE.NOMBRE,D_PEDIDO.FECHA_SISTEMA,D_PEDIDO.TOTAL "+
                 "FROM D_PEDIDO INNER JOIN P_CLIENTE ON D_PEDIDO.CLIENTE=P_CLIENTE.CODIGO "+
                 "WHERE (CLIENTE='"+gl.cliente+"') AND (D_PEDIDO.ANULADO='N') AND (D_PEDIDO.STATCOM='N') " +
                 "ORDER BY D_PEDIDO.COREL DESC ";
             DT=Con.OpenDT(sql);
 
+            pcant=DT.getCount();
             if (DT.getCount()>0) {
 
                 DT.moveToFirst();
@@ -97,10 +102,10 @@ public class ListaPedidos extends PBase {
                     vItem =clsCls.new clsCFDV();
 
                     vItem.Cod=DT.getString(0);
-                    vItem.Desc=DT.getString(1);
+                    vItem.Desc=DT.getString(0);
                     f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);
                     vItem.Fecha=sf;
-                    val=DT.getDouble(3);
+                    val=DT.getDouble(3);ptot+=val;
                     try {
                         sval=mu.frmcur(val);
                     } catch (Exception e) {
@@ -122,6 +127,9 @@ public class ListaPedidos extends PBase {
 
         adapter=new ListAdaptCFDV(this, items);
         listView.setAdapter(adapter);
+
+        lblCant.setText("Pedidos : "+pcant);
+        lblTotal.setText("Total : "+mu.frmcur(ptot));
     }
 
     private void iniciaPedido() {

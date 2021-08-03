@@ -15,7 +15,7 @@ public class clsClasses {
 
     //JP20210614
 	public class clsCFDV {
-		public int id,flag;
+		public int id,flag,bandera;
 		public String Cod,Desc,Fecha,Valor,Sid;
 		public double val;
 	}
@@ -115,5 +115,63 @@ public class clsClasses {
 
 	public class clsBarras{
 		public String barra,peso;
+	}
+
+	public class clsDs_pedido {
+		public String corel;
+		public String anulado;
+		public long fecha;
+		public String empresa;
+		public String ruta;
+		public String vendedor;
+		public String cliente;
+		public double kilometraje;
+		public long fechaentr;
+		public String direntrega;
+		public double total;
+		public double desmonto;
+		public double impmonto;
+		public double peso;
+		public String bandera;
+		public String statcom;
+		public String calcobj;
+		public int  impres;
+		public String add1;
+		public String add2;
+		public String add3;
+	}
+
+	public class clsDs_pedidod {
+		public String corel;
+		public String producto;
+		public String empresa;
+		public String anulado;
+		public double cant;
+		public double precio;
+		public double imp;
+		public double des;
+		public double desmon;
+		public double total;
+		public double preciodoc;
+		public double peso;
+		public double val1;
+		public String val2;
+		public String ruta;
+		public String umventa;
+		public String umstock;
+		public String umpeso;
+	}
+
+
+	public class clsTipoCanastas {
+		public String codigo, desccorta, desclarga;
+		public int tenregado, trecibido;
+	}
+
+	public class clsCanasta {
+		public String ruta, cliente, producto;
+		public int fecha, cantrec, cantentr;
+		public String codigo, desccorta, desclarga, fechaFormato;
+		public boolean editar;
 	}
 }

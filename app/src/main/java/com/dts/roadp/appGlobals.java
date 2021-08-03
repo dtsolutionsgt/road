@@ -13,19 +13,23 @@ public class appGlobals extends Application {
 
 	public String ruta,rutanom,rutasup,sucur,rutatipo,rutatipog,vend,vendnom,gstr,gstr2,prod,um,umpres,umstock,cliente,clitipo;
 	public String ubas,emp, empnom,imgpath,umpeso,lotedf,impresora, tipoImpresora, codSupervisor, ayudante, ayudanteID, vehiculo, vehiculoID;
-	public String wsURL,bonprodid,bonbarid,bonbarprod,pprodname,contrib,ateninistr,tcorel,URLtemp,URLLocal,URLRemoto;
+	public String wsURL,bonprodid,bonbarid,bonbarprod,pprodname,contrib,ateninistr,tcorel,URLtemp,URLLocal,URLRemoto, iddespacho, coddespacho;
 	public int itemid,gint,tipo,nivel,prodtipo,prw,boldep,vnivel,vnivprec,media;
 	public int autocom,pagomodo,filtrocli,prdlgmode;
 	public long nuevaFecha,atentini;
-	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor,prectemp,precprev;
+	public double dval,dpeso,pagoval,pagolim,bonprodcant,percepcion,costo,credito,umfactor,prectemp;
+	public double precprev,cexist,cstand;
 	public boolean CellCom,closeDevBod;
 	public String ref1,ref2,ref3,fnombre,fnit,fdir,escaneo,corel_d_mov,barra, parNumVer, parFechaVer;
 	public String parTipoVer,umprev,modpedid;
 	public int tiponcredito,validarCred,gpsdist;
-    public boolean vcredito,vcheque,vchequepost,validimp,tolsuper=false,tolpedsend;
+    public boolean vcredito,vcheque,vchequepost,validimp,tolsuper=false,tolpedsend,tolprodcrit;
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
+	public boolean permitir_cantidad_mayor, permitir_producto_nuevo;
 	public int mpago;
+	public String prodCanasta, corelFac;
+	public boolean ingresaCanastas;
 
 	//#CKFK 20190619 Agregué estas dos variables para los valores de clientes nuevo
 	public String cuentaCliNuevo, codCliNuevo;

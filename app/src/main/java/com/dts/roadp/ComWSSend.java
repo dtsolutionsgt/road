@@ -78,18 +78,16 @@ public class ComWSSend extends PBase {
         if (!getWSURL()) return;
 
         try {
-            pcount=0;
-            sql="SELECT COUNT(COREL) FROM D_PEDIDO WHERE STATCOM='N'";
+
+            sql="SELECT COREL FROM D_PEDIDO WHERE STATCOM='N'";
             dt=Con.OpenDT(sql);
+            pcount = dt.getCount();
 
-            if (dt.getCount()>0) {
-                dt.moveToFirst();
-                pcount = dt.getInt(0);
-            } else {
-                pcount=0;
-            }
+            sql = "SELECT CODIGO FROM D_CLINUEVO WHERE STATCOM='N'";
+            dt=Con.OpenDT(sql);
+            pcount+=dt.getCount();
 
-            if (pcount==0) toast("No existen pedidos pendientes de envio.");
+            if (pcount==0) toast("No existen pedidos ni clientes nuevos pendientes de envio.");
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             msgExit(e.getMessage());
@@ -100,11 +98,7 @@ public class ComWSSend extends PBase {
             finish();return;
         }
 
-        if (pcount==1) {
-            lbl1.setText("Enviando 1 pedido . . .");
-        } else {
-            lbl1.setText("Enviando "+pcount+" pedidos . . .");
-        }
+        lbl1.setText("Enviando : "+pcount+" registros . . .");
 
         contador = 0;
 
@@ -129,24 +123,39 @@ public class ComWSSend extends PBase {
             ws = new WebService(ComWSSend.this, URL);
             dbld.clear();
 
-                sql = "SELECT COREL FROM D_PEDIDO WHERE STATCOM='N'";
-                dt = Con.OpenDT(sql);
+            sql = "SELECT COREL FROM D_PEDIDO WHERE STATCOM='N'";
+            dt = Con.OpenDT(sql);
 
+            if (dt.getCount()>0) {
                 dt.moveToFirst();
                 while (!dt.isAfterLast()) {
                     cor = dt.getString(0);
-                    dbld.insert("D_PEDIDO", "WHERE COREL='"+cor+"'");
-                    dbld.insert("D_PEDIDOD","WHERE COREL='"+cor+"'");
+                    dbld.insert("D_PEDIDO", "WHERE COREL='" + cor + "'");
+                    dbld.insert("D_PEDIDOD", "WHERE COREL='" + cor + "'");
 
                     dt.moveToNext();
                 }
+            }
 
-                ws.sqls.clear();
-                for (int i = 0; i <dbld.items.size(); i++) {
-                    ws.sqls.add(dbld.items.get(i));
+            sql = "SELECT CODIGO FROM D_CLINUEVO WHERE STATCOM='N'";
+            dt = Con.OpenDT(sql);
+
+            if (dt.getCount()>0) {
+                dt.moveToFirst();
+                while (!dt.isAfterLast()) {
+                    cor = dt.getString(0);
+                    dbld.insert("D_CLINUEVO", "WHERE CODIGO='" + cor + "'");
+
+                    dt.moveToNext();
                 }
+            }
 
-                ws.commit();
+            ws.sqls.clear();
+            for (int i = 0; i <dbld.items.size(); i++) {
+                ws.sqls.add(dbld.items.get(i));
+            }
+
+            ws.commit();
 
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -167,22 +176,31 @@ public class ComWSSend extends PBase {
         try {
             super.wsCallBack(callmode,throwing, errmsg);
 
-            sql = "UPDATE D_PEDIDO SET STATCOM='S' WHERE STATCOM='N'";
-            db.execSQL(sql);
+            try {
+                db.beginTransaction();
 
-            if (pcount==1) {
-                toast("Enviado 1 pedido.");
-            } else {
-                toast("Enviados "+pcount+" pedidos.");
+                sql = "UPDATE D_PEDIDO SET STATCOM='S' WHERE STATCOM='N'";
+                db.execSQL(sql);
+
+                sql = "UPDATE D_CLINUEVO SET STATCOM='S' WHERE STATCOM='N'";
+                db.execSQL(sql);
+
+                db.setTransactionSuccessful();
+                db.endTransaction();
+                relSend.setVisibility(View.INVISIBLE);
+            } catch (Exception e) {
+                relSend.setVisibility(View.INVISIBLE);
+                db.endTransaction();
+                msgbox(e.getMessage());return;
             }
-            relSend.setVisibility(View.INVISIBLE);
+
+            toast("Registros enviados : "+pcount);
             finish();
         } catch (Exception e) {
             if (contador==0){
-                contador=1;
-                URL=URL_Remota;
+                contador=1;URL=URL_Remota;
                 sendData();
-            }else{
+            } else {
                 msgExit("Error de envio : " + e.getMessage());
             }
         }

@@ -113,7 +113,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:ems="10"
-            android:hint="http://172.16.10.9/rdc7_sap_qas_andr/wsandr.asmx" />
+            android:hint="http://172.16.10.9/RDC7_SAP_DEV_ANDR/wsAndr.asmx" />
 
         <TextView
             android:id="@+id/textView3"

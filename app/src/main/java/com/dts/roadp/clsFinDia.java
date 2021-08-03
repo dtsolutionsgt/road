@@ -66,6 +66,24 @@ public class clsFinDia extends PBase{
         return result;
     }
 
+    public int getCantCanasta(){
+        Cursor DT;
+        int result=0;
+
+        try
+        {
+            sql="SELECT ifnull(COUNT(*), 0) as CANTIDAD FROM D_CANASTA";
+            DT=Con.OpenDT(sql);
+            DT.moveToFirst();
+            result = DT.getInt(0);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            msgbox("getCantCanasta: " + e.getMessage());
+        }
+
+        return result;
+    }
+
     //#HS_20181121_1431 Esta función anteriormente pertenecía a la clase FinDia.
     public int setCorrelZ(){
         Cursor DT;

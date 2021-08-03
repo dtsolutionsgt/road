@@ -297,7 +297,12 @@ public class clsRepBuilder {
 		items.add(ts);
 	}
 
-	public void addtotD(String s1,double val) {
+    public void add2ss1(String s1,String val) {
+        ts=ltrim(s1,prw-3)+" "+rtrim(val,2);
+        items.add(ts);
+    }
+
+    public void addtotD(String s1,double val) {
 		String sval;
 		sval = Double.toString(val);
 		ts=ltrim(s1,prw-13)+" "+rtrim(sval,12);

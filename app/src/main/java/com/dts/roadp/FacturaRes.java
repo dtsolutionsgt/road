@@ -108,6 +108,7 @@ public class FacturaRes extends PBase {
 		gl.cobroPendiente = false;
 		dispventa = gl.dvdispventa;dispventa=mu.round(dispventa,2);
 		notaC = gl.tiponcredito;
+		gl.corelFac=gl.ruta+"_"+mu.getCorelBase();
 
 		app = new AppMethods(this, gl, Con, db);
 
@@ -289,6 +290,8 @@ public class FacturaRes extends PBase {
 	public void paySelect(View view) {
 
 		try{
+			if (!tieneCanastas()) return;
+
 			if (fcorel==0) {
 				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
 			}
@@ -332,9 +335,39 @@ public class FacturaRes extends PBase {
 		}
 	}
 
+	private boolean tieneCanastas() {
+		if (gl.ingresaCanastas) {
+
+			long fecha = app.fechaFactTol(du.getActDateTime());
+
+			String sql = "SELECT ifnull(count(*), 0) as cant FROM d_canasta WHERE ruta='" + gl.ruta + "' AND cliente='" + gl.cliente + "' AND fecha=" + fecha;
+
+			Cursor DT = Con.OpenDT(sql);
+
+			if (DT != null) {
+				if(DT.getCount() >= 1) {
+					DT.moveToFirst();
+					int cant = DT.getInt(0);
+					if (cant >= 1) {
+						return true;
+					}else {
+						toastcent("Debe registrar canastas antes de pagar.");
+						Intent canastas = new Intent(this, Canastas.class);
+						startActivity(canastas);
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
 	public void payCash(View view) {
 
 		try{
+
+			if (!tieneCanastas()) return;
 
 			if (fcorel==0) {
 				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
@@ -353,6 +386,7 @@ public class FacturaRes extends PBase {
 	public void payCred(View view) {
 
 		try{
+			if (!tieneCanastas()) return;
 
 			if (fcorel==0) {
 				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
@@ -435,6 +469,8 @@ public class FacturaRes extends PBase {
 
 	public void pendientePago(View view){
 		try{
+			if (!tieneCanastas()) return;
+
 			askPendientePago();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -492,6 +528,17 @@ public class FacturaRes extends PBase {
 			mu.msgbox( e.getMessage());
 		}
 
+	}
+
+	public void showCanastas(View view) {
+		try {
+			Intent iCanasta = new Intent(this, Canastas.class);
+			startActivity(iCanasta);
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox( e.getMessage());
+		}
 	}
 
 	private void updDesc(){
@@ -742,7 +789,8 @@ public class FacturaRes extends PBase {
 		double vcant,vpeso,vfactor,peso,factpres,vtot,vprec;
 		int mitem,bitem;
 		int dev_ins=1;
-		corel=gl.ruta+"_"+mu.getCorelBase();
+		corel=gl.corelFac;
+
 
         sql="SELECT MAX(ITEM) FROM D_FACT_LOG";
         dt=Con.OpenDT(sql);
@@ -1299,6 +1347,14 @@ public class FacturaRes extends PBase {
             }
 
             //endregion
+
+			//endregion
+
+			//region Despacho
+
+			if (!gl.coddespacho.isEmpty()) {
+				db.execSQL("UPDATE DS_PEDIDO SET BANDERA='S' WHERE COREL='"+gl.coddespacho+"'");
+			}
 
 			//endregion
 

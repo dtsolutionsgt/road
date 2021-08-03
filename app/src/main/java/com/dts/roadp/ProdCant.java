@@ -150,6 +150,7 @@ public class ProdCant extends PBase {
  	private void setHandlers(){
 
 		try{
+
 			txtCant.addTextChangedListener(new TextWatcher() {
 
 				public void afterTextChanged(Editable s) {}
@@ -541,7 +542,7 @@ public class ProdCant extends PBase {
 				return;
 			}
 
-			if (rutatipo.equalsIgnoreCase("V")) {
+			if (rutatipo.equalsIgnoreCase("V") || rutatipo.equalsIgnoreCase("D") ) {
 				if (cant > idisp) {
 					mu.msgbox("Cantidad mayor que disponible.");
 					txtCant.requestFocus();

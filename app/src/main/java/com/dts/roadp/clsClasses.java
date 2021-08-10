@@ -9,7 +9,7 @@ public class clsClasses {
 	
 	public class clsCDB {
 		public String Cod,Desc,Adds;
-		public int Bandera,Cobro,ppend;
+		public int Bandera,Cobro,ppend, prefacturas;
 		public double valor,coorx,coory;
 	}
 

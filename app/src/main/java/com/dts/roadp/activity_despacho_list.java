@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class activity_despacho_list extends PBase {
 
     private ListView listView;
+    private TextView lblCantReg, txtClienteDespacho;
     private LA_Ds_pedido adapter;
     private clsDs_pedidoObj Ds_pedidoObj;
 
@@ -22,7 +24,9 @@ public class activity_despacho_list extends PBase {
 
         super.InitBase();
 
-        listView = (ListView) findViewById(R.id.listView1);
+        listView = (ListView) findViewById(R.id.lvDespacho);
+        lblCantReg = (TextView) findViewById(R.id.lblCant2);
+        txtClienteDespacho = (TextView) findViewById(R.id.txtClienteDespacho);
 
         Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
 
@@ -71,8 +75,10 @@ public class activity_despacho_list extends PBase {
                 Ds_pedidoObj.items.get(i).add1=clinom;
             }
 
-            adapter=new LA_Ds_pedido(this,this,Ds_pedidoObj.items);
+            adapter=new LA_Ds_pedido(this ,this,Ds_pedidoObj.items);
             listView.setAdapter(adapter);
+            lblCantReg.setText("Total: " + Ds_pedidoObj.count);
+            txtClienteDespacho.setText(clinom);
         } catch (Exception e) {
             mu.msgbox(e.getMessage());
         }

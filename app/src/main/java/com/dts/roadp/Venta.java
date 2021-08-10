@@ -45,7 +45,7 @@ public class Venta extends PBase {
 	private ArrayList<clsVenta> items= new ArrayList<clsVenta>();
 	private ListAdaptVenta adapter;
 	private clsVenta selitem;
-	private Precio prc;
+	private Precio prc, prcEsp;
 	private PrecioTran prctr;
 
 	private AlertDialog.Builder mMenuDlg;
@@ -205,7 +205,6 @@ public class Venta extends PBase {
 			browse=1;
 
 			if (rutatipo.equalsIgnoreCase("P")) gl.prodtipo=0;else gl.prodtipo=1;
-
 
 			Intent intent = new Intent(this,Producto.class);
 			startActivity(intent);
@@ -710,7 +709,6 @@ public class Venta extends PBase {
 			}
 
 			//prodPrecio();
-
 			if (prodPorPeso(prodid)) {
 				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, gl.dpeso,um);
 				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
@@ -780,16 +778,17 @@ public class Venta extends PBase {
 	private void getPrecio(){
 		try{
 			//prodPrecio();
-
+			prc=new Precio(this,mu,gl.peDec);
+			prcEsp=new Precio(this,mu,gl.peDec);
 			if (prodPorPeso(prodid)) {
 				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, gl.dpeso,um);
-				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
-					if (prc.precioespecial>0) prec=prc.precioespecial;
+				if (prcEsp.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
+					if (prcEsp.precioespecial>0) prec=prcEsp.precioespecial;
 				}
 			} else {
 				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0,um);
-				if (prc.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
-					if (prc.precioespecial>0) prec=prc.precioespecial;
+				if (prcEsp.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
+					if (prcEsp.precioespecial>0) prec=prcEsp.precioespecial;
 				}
 			}
 
@@ -824,6 +823,9 @@ public class Venta extends PBase {
 			db.execSQL(sql);
 
 			sql="DELETE FROM T_BARRA_BONIF WHERE (PRODUCTO='"+prodid+"')";
+			db.execSQL(sql);
+
+			sql="DELETE FROM T_VENTA_DESPACHO WHERE (PRODUCTO='"+prodid+"')";
 			db.execSQL(sql);
 
 		} catch (SQLException e) {
@@ -2424,9 +2426,10 @@ public class Venta extends PBase {
 
 	private void procesaDespacho() {
 		String umv,ums;
+        int cantProdBarra = 0;
 
 		try {
-			lblTit.setText("Pre Factura");
+			lblTit.setText("Prefactura");
 			gl.coddespacho=gl.iddespacho;gl.iddespacho="";
 
 			clsClasses.clsDs_pedidod item;
@@ -2439,12 +2442,10 @@ public class Venta extends PBase {
 				item=Ds_pedidodObj.items.get(i);
 
 				db.execSQL("DELETE FROM T_VENTA WHERE PRODUCTO='"+item.producto+"'");
+				db.execSQL("DELETE FROM T_VENTA_DESPACHO WHERE PRODUCTO='"+item.producto+"'");
 
 				umv=item.umventa;//app.umVenta(item.producto);
 				ums=item.umstock;//app.umStock(item.producto);if (ums.isEmpty()) ums=umv;
-
-				//#CKFK 20210729 Obtener el precio del produdcto
-				getPrecio();
 
 				prodid =item.producto;
                 cant =item.cant;
@@ -2452,6 +2453,9 @@ public class Venta extends PBase {
 				um =item.umventa;
 				gl.umpeso =item.umpeso;
 				gl.dpeso =item.peso;
+
+				//#CKFK 20210729 Obtener el precio del produdcto
+				getPrecio();
 
 				item.precio = prec;
 				item.imp= prc.imp;
@@ -2480,6 +2484,9 @@ public class Venta extends PBase {
 					ins.add("VAL4","");
 					ins.add("PERCEP",percep);
 					ins.add("SIN_EXISTENCIA",0);
+
+					db.execSQL(ins.sql());
+
 				}else{
 					ins.init("T_VENTA_DESPACHO");
 					ins.add("PRODUCTO",item.producto);
@@ -2501,12 +2508,16 @@ public class Venta extends PBase {
 					ins.add("VAL2","");
 					ins.add("VAL3",0);
 					ins.add("VAL4","");
+
+					db.execSQL(ins.sql());
+
+					cantProdBarra +=1;
 				}
 
-				String ss=ins.sql();
+			}
 
-				db.execSQL(ins.sql());
-
+			if (cantProdBarra>0){
+				startActivity(new Intent(Venta.this,RepesajeLista.class));
 			}
 
 		} catch (Exception e) {
@@ -2875,6 +2886,9 @@ public class Venta extends PBase {
 
 		try {
 			sql="DELETE FROM T_VENTA";
+			db.execSQL(sql);
+
+			sql="DELETE FROM T_VENTA_DESPACHO";
 			db.execSQL(sql);
 
 			sql="DELETE FROM T_BARRA";

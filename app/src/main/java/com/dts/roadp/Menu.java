@@ -395,7 +395,7 @@ public class Menu extends PBase {
 					if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
 						mu.msgbox("No puede realizar esta acción");
 					}else {
-						if (rutatipo.equalsIgnoreCase("P")) {
+						if (rutatipo.equalsIgnoreCase("P") || rutatipo.equalsIgnoreCase("T")) {
 							showInvMenuPreventa();
 						} else {
 							showInvMenuVenta();

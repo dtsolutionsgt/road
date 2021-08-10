@@ -485,6 +485,7 @@ public class Anulacion extends PBase {
             db.execSQL(sql);
 
 			anulBonif(itemid);
+			anularCanastas(itemid);
 
 			// Nota credito
 //
@@ -513,6 +514,48 @@ public class Anulacion extends PBase {
 
 		return vAnulFactura;
 
+	}
+
+	private void anularCanastas(String itemid) {
+		try {
+			String sql;
+			sql = "SELECT PRODUCTO, SUM(CANTENTR) AS CANT " +
+					"FROM D_CANASTA WHERE CORELTRANS='"+itemid+"' " +
+					"AND ANULADO=0 " +
+					"GROUP BY PRODUCTO";
+
+			Cursor can = Con.OpenDT(sql);
+
+			if (can != null || can.getCount() > 0) {
+				can.moveToFirst();
+
+				while (!can.isAfterLast()) {
+					float cant=0;
+					String codigo="";
+					codigo = can.getString(0);
+					cant = can.getFloat(1);
+
+					Cursor stock = Con.OpenDT("SELECT CANT FROM P_STOCK WHERE CODIGO='"+codigo+"'");
+					if (stock != null && stock.getCount() >= 1) {
+						stock.moveToFirst();
+						cant += stock.getFloat(0);
+					}
+
+
+					upd.init("P_STOCK");
+					upd.Where("CODIGO='"+codigo+"'");
+					upd.add("CANT", cant);
+					db.execSQL(upd.SQL());
+					can.moveToNext();
+				}
+
+				sql = "UPDATE D_CANASTA SET ANULADO=1 WHERE CORELTRANS='"+itemid+"'";
+				db.execSQL(sql);
+			}
+
+		}catch (Exception e) {
+			addlog("anularCanastas", e.getMessage(), null);
+		}
 	}
 	
 	private void anulBonif(String itemid) {

@@ -202,7 +202,7 @@ public class DevolBodCan extends PBase {
                     " FROM D_CXCD INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=D_CXCD.CODIGO " +
                     " INNER JOIN D_CXC ON D_CXC.COREL = D_CXCD.COREL WHERE D_CxC.STATCOM='N' AND D_CXC.ANULADO = 'N' " +
                     " GROUP BY D_CXCD.CODIGO,P_PRODUCTO.DESCLARGA ";
-            sql += "UNION SELECT DISTINCT(PRODUCTO) AS CODIGO, '' as DESCLARGA FROM D_CANASTA WHERE CANTREC > 0";
+            sql += "UNION SELECT DISTINCT(PRODUCTO) AS CODIGO, '' as DESCLARGA FROM D_CANASTA WHERE CANTREC > 0 AND ANULADO=0";
 
             dp = Con.OpenDT(sql);
 
@@ -232,6 +232,7 @@ public class DevolBodCan extends PBase {
                         "INNER JOIN P_PRODUCTO b ON b.CODIGO = a.PRODUCTO " +
                         "WHERE a.PRODUCTO = '" + pcod + "' " +
                         "AND a.CANTREC > 0 " +
+                        "AND a.ANULADO=0 " +
                         "GROUP BY b.CODIGO, b.DESCLARGA, b.UM_SALIDA;";
 
                 dt = Con.OpenDT(sql);

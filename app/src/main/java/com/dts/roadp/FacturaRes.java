@@ -340,7 +340,11 @@ public class FacturaRes extends PBase {
 
 			long fecha = app.fechaFactTol(du.getActDateTime());
 
-			String sql = "SELECT ifnull(count(*), 0) as cant FROM d_canasta WHERE ruta='" + gl.ruta + "' AND cliente='" + gl.cliente + "' AND fecha=" + fecha;
+			String sql = "SELECT ifnull(count(*), 0) as cant FROM d_canasta " +
+					"WHERE ruta='" + gl.ruta + "' " +
+					"AND ANULADO=0 " +
+					"AND cliente='" + gl.cliente + "' " +
+					"AND fecha=" + fecha;
 
 			Cursor DT = Con.OpenDT(sql);
 

@@ -130,6 +130,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/frame_rect_gray"
                 android:gravity="right"
+                android:paddingRight="5dp"
                 android:text="Rec"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -141,6 +142,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/frame_rect_gray"
                 android:gravity="right"
+                android:paddingRight="5dp"
                 android:text="Entr"
                 android:textSize="18sp"
                 android:textStyle="bold" />

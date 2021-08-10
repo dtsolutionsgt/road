@@ -21,8 +21,7 @@ import java.util.ArrayList;
 
 public class Canastas extends PBase {
     private ListView listView;
-    private TextView lblRec;
-    private TextView lblEntr;
+    private TextView lblRec, lblEntr, lblCanastaStock;
     private EditText txtCanastasEnt, txtCanastasRec;
     private AlertDialog ad;
     private long regFecha;
@@ -30,6 +29,7 @@ public class Canastas extends PBase {
     private String producto = "";
     private AppMethods app;
     private long fecha;
+    private int entregado, recibido, iEntregado;
 
     ListAdaptCanasta adapter;
 
@@ -45,6 +45,8 @@ public class Canastas extends PBase {
         lblRec = findViewById(R.id.lblTotRec);
         lblEntr = findViewById(R.id.lblTotEntr);
         fecha = app.fechaFactTol(du.getActDateTime());
+        entregado=0;
+        recibido=0;
         createDialog();
         setHandlers();
         listItems();
@@ -56,11 +58,13 @@ public class Canastas extends PBase {
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setIcon(R.drawable.canastas);
+
         dialog.setTitle("Canastas");
         dialog.setView(vistaDialog);
 
         txtCanastasEnt = (EditText) vistaDialog.findViewById(R.id.txtCanastasEnt);
         txtCanastasRec = (EditText) vistaDialog.findViewById(R.id.txtCanastasRec);
+        lblCanastaStock = (TextView) vistaDialog.findViewById(R.id.lblCanastaStock);
 
         dialog.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
             @Override
@@ -192,6 +196,7 @@ public class Canastas extends PBase {
             gl.prodCanasta = reg.producto;
             regFecha = reg.fecha;
             producto = reg.producto;
+            iEntregado = reg.cantentr;
             txtCanastasEnt.setText(reg.cantentr+"");
             txtCanastasRec.setText(reg.cantrec+"");
             editando = true;
@@ -222,28 +227,52 @@ public class Canastas extends PBase {
     }
 
     public void guardarCanastas() {
+        boolean cerrarDialog = true;
         try {
             opendb();
             String txtCanRec = txtCanastasRec.getText().toString();
             String txtCanEntr = txtCanastasEnt.getText().toString();
+
             if (mu.emptystr(txtCanRec) || mu.emptystr(txtCanEntr)) {
                 toast("Los campos recibido y entregado son obligatorios.");
+                cerrarDialog = false;
                 return;
             }
             int cantRec = Integer.parseInt(txtCanRec);
             int cantEntr = Integer.parseInt(txtCanEntr);
 
+            recibido = cantRec;
+            entregado = cantEntr;
+
             if (cantRec == 0 && cantEntr == 0) {
                 toast("El campo recibido o entregado debe ser mayor a cero.");
+                cerrarDialog = false;
                 return;
             }
 
+            if (gl.corelFac != null || !mu.emptystr(gl.corelFac)){
+                if (cantEntr == 0 && gl.ingresaCanastas){
+                    toast("La cantidad de canastas entregadas debe ser mayor que cero.");
+                    cerrarDialog=false;
+                    return;
+                }
+            }
 
+            if (editando) {
+                actualizaStock(iEntregado);
+            }
+
+            if (!hayExistencias()) {
+                toast("No hay suficientes canastas para entregar.");
+                cerrarDialog = false;
+                return;
+            }
 
             if (!editando) {
 
                 if (!registroValido()) {
                     toastcent("El cliente ya tiene un registro con el tipo de canasta seleccionado.");
+                    cerrarDialog = false;
                     return;
                 }
 
@@ -258,7 +287,7 @@ public class Canastas extends PBase {
                 ins.add("CORELTRANS", (gl.corelFac == null || gl.corelFac.isEmpty()) ? "": gl.corelFac);
 
                 db.execSQL(ins.sql());
-            }else {
+            } else {
                 upd.init("D_CANASTA");
                 upd.Where(
                     "RUTA = '" +
@@ -276,6 +305,9 @@ public class Canastas extends PBase {
                 upd.add("STATCOM", "N");
                 db.execSQL(upd.SQL());
             }
+            recibido=0;entregado=0;
+            iEntregado=0;
+            actualizaStock(-cantEntr);
             clearCanastas();
             listItems();
             db.close();
@@ -285,10 +317,12 @@ public class Canastas extends PBase {
             mu.msgbox("Ocurrió un error: "+ e.getMessage());
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         } finally {
-            editando = false;
-            gl.prodCanasta = "";
-            regFecha = 0;
-            ad.dismiss();
+            if (cerrarDialog) {
+                editando = false;
+                gl.prodCanasta = "";
+                regFecha = 0;
+                ad.dismiss();
+            }
         }
     }
 
@@ -302,7 +336,8 @@ public class Canastas extends PBase {
         ad.setTitle("Canastas");
         if (gl.prodCanasta != "") {
             opendb();
-            String sql = "SELECT desccorta, desclarga from p_producto WHERE codigo = '" + gl.prodCanasta + "'";
+            String sql;
+            sql = "SELECT desccorta, desclarga from p_producto WHERE codigo = '" + gl.prodCanasta + "'";
             Cursor DT = Con.OpenDT(sql);
 
             if (DT != null && DT.getCount() >= 1) {
@@ -310,6 +345,18 @@ public class Canastas extends PBase {
                 String nom = DT.getString(0);
 
                 ad.setTitle(nom);
+            }
+
+            //Indica la existencia actual de las canastas
+            sql = "SELECT CANT FROM P_STOCK WHERE CODIGO='"+ gl.prodCanasta +"'";
+            Cursor st = Con.OpenDT(sql);
+
+            if (st != null && st.getCount() >= 1){
+                st.moveToFirst();
+                int cant = st.getInt(0);
+                lblCanastaStock.setText("Existencia: "+cant);
+            }else{
+                lblCanastaStock.setVisibility(View.INVISIBLE);
             }
         }
     }
@@ -326,6 +373,50 @@ public class Canastas extends PBase {
         if (total != null && total.getCount() >= 1) return false;
 
         return true;
+    }
+
+    public void regresar(View view) {
+        finish();
+    }
+
+    public boolean hayExistencias() {
+        String sql = "SELECT CANT FROM P_STOCK WHERE CODIGO='"+gl.prodCanasta+"'";
+        Cursor st = Con.OpenDT(sql);
+
+        if (st != null || st.getCount() >= 1){
+            st.moveToFirst();
+
+            int cant = st.getInt(0);
+            if (editando) {
+                cant += iEntregado;
+            }
+
+            if(cant < entregado) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void actualizaStock(int cantidad) {
+        String sql = "SELECT CANT FROM P_STOCK WHERE CODIGO='"+gl.prodCanasta+"'";
+        Cursor st = Con.OpenDT(sql);
+
+        if (st != null || st.getCount() >= 1){
+            st.moveToFirst();
+
+            int cant = st.getInt(0);
+            cant += cantidad;
+
+            upd.init("P_STOCK");
+            upd.Where("CODIGO = '"+ gl.prodCanasta +"'");
+            upd.add("CANT", cant);
+
+            db.execSQL(upd.SQL());
+        }
     }
 
     @Override

@@ -120,6 +120,7 @@ public class TipoCanasta extends PBase {
                     "FROM P_PRODUCTO a " +
                     "LEFT JOIN D_CANASTA b ON b.PRODUCTO = a.CODIGO " +
                     "AND b.CLIENTE = '" + cliente + "' " +
+                    "AND b.ANULADO = 0 " +
                     "WHERE a.ES_CANASTA=1 ";
 
 

@@ -104,12 +104,15 @@ public class TipoCanasta extends PBase {
         items.clear();
         clsClasses.clsTipoCanastas cItem = null;
         int cantidad = 0;
-        String vF;
+        String vF, tabla="D_CANASTA";
 
         ArrayList<clsClasses.clsTipoCanastas> citems = new ArrayList<clsClasses.clsTipoCanastas>();;
 
         vF=txtFilter.getText().toString().replace("'","");
         vF=vF.replace("\r","");
+
+        if (!mu.emptystr(gl.corelFac)) tabla="T_CANASTA";
+
         try {
             String sql = "SELECT " +
                     "a.CODIGO, " +
@@ -118,7 +121,7 @@ public class TipoCanasta extends PBase {
                     "ifnull(sum(b.CANTENTR),0) as tentregado," +
                     "ifnull(sum(b.CANTREC),0) as trecibido " +
                     "FROM P_PRODUCTO a " +
-                    "LEFT JOIN D_CANASTA b ON b.PRODUCTO = a.CODIGO " +
+                    "LEFT JOIN "+tabla+" b ON b.PRODUCTO = a.CODIGO " +
                     "AND b.CLIENTE = '" + cliente + "' " +
                     "AND b.ANULADO = 0 " +
                     "WHERE a.ES_CANASTA=1 ";

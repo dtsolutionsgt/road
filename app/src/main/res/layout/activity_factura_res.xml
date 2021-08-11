@@ -188,7 +188,7 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="18dp"
             android:onClick="showCanastas"
-            android:src="@drawable/canastas" />
+            android:src="@drawable/canasta_redonda" />
 
     </RelativeLayout>
 

@@ -118,7 +118,7 @@ public class AppMethods {
 					break;
 
 				case "Canastas":
-					sql="SELECT COUNT(*) AS CANT FROM D_CANASTA WHERE STATCOM = 'N'";
+					sql="SELECT COUNT(IDCANASTA) AS CANT FROM D_CANASTA WHERE STATCOM = 'N'";
 					break;
 			}
 

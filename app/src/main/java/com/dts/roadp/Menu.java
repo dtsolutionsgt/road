@@ -140,7 +140,9 @@ public class Menu extends PBase {
 			//#CKFK 20190423 Quité esta validación de configuración de impresora
 			//ConfImpresora();
 
-		}catch (Exception e) 		{
+            validaParametros();
+
+		} catch (Exception e) 		{
 			Log.e("Mnu", e.getMessage());
 		}
 
@@ -1963,8 +1965,6 @@ public class Menu extends PBase {
 		return (cantstock + cantbolsa + cantcan > 0);
 	}
 
-
-
 	public void getWSURLs() {
 		Cursor dt;
 
@@ -1985,6 +1985,28 @@ public class Menu extends PBase {
 		}
 
 	}
+
+    public void validaParametros() {
+        Cursor dt;
+
+        try {
+
+            sql="SELECT IMPRESION,ENVIO_AUTO_PEDIDOS FROM P_RUTA";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+
+            if (dt.getString(0).equalsIgnoreCase("N")) {
+                msgbox("La ruta tiene deshabilitada la impresión");
+            }
+
+            if (dt.getInt(1)==1) {
+                msgbox("Envio de pedidos habilitado");
+            }
+
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+    }
 
 
 	//endregion

@@ -443,7 +443,7 @@ public class ProdCantPrev extends PBase {
         }
 
         try {
-            sql="SELECT UNIDADMEDIDA FROM P_STOCK WHERE (CODIGO='"+prodid+"')";
+            sql="SELECT UNIDADMEDIDA FROM P_STOCK_PV WHERE (CODIGO='"+prodid+"')";
             dt=Con.OpenDT(sql);
 
             if (dt.getCount()>0){
@@ -607,7 +607,7 @@ public class ProdCantPrev extends PBase {
             gl.dval = cant;
             gl.dpeso = ppeso;
             gl.um = upres;
-            gl.umpres = upres;
+            gl.umpres = upres;gl.umpresp=upres;
             gl.umstock = umstock;
             gl.umfactor = umfactor;
             gl.prectemp = prec;
@@ -717,11 +717,19 @@ public class ProdCantPrev extends PBase {
             cant=mu.round(cant,deccant);
 
             if (cant<=0) {
-                mu.msgbox("Cantidad incorrecta");return 2;
+                if (!txtCant.getText().toString().trim().isEmpty()){
+                    mu.msgbox("Cantidad incorrecta");
+                }
+                return 2;
             }
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-            cant=-1;mu.msgbox("Cantidad incorrecta");return 2;
+            //cant=-1;
+            cant=0;
+            if (!txtCant.getText().toString().trim().isEmpty()){
+                mu.msgbox("Cantidad incorrecta");
+            }
+            return 2;
         }
 
         // ajuste a unidades menores

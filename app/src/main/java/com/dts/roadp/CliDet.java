@@ -216,7 +216,6 @@ public class CliDet extends PBase {
 		}
 	}
 
-
 	public void showCredit(View viev){
 		if (!permiteVenta) {
 			if (gl.peVentaGps == 1) {
@@ -352,18 +351,21 @@ public class CliDet extends PBase {
                     paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
                 }
 
-				Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
-				bitmap1 = redimensionarImagen(bitmap1, 640, 360);
+                try {
+                    Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
+                    bitmap1 = redimensionarImagen(bitmap1, 640, 360);
 
-				FileOutputStream out = new FileOutputStream(paht);
-				bitmap1.compress(Bitmap.CompressFormat.JPEG, 50, out);
-				out.flush();
-				out.close();
+                    FileOutputStream out = new FileOutputStream(paht);
+                    bitmap1.compress(Bitmap.CompressFormat.JPEG, 50, out);
+                    out.flush();
+                    out.close();
 
-                File iarchivo = new File(paht);
-				imgRoadTit.setImageURI(Uri.fromFile(iarchivo));
-			}catch (Exception e){
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                    File iarchivo = new File(paht);
+                    imgRoadTit.setImageURI(Uri.fromFile(iarchivo));
+                } catch (Exception e) { }
+
+			} catch (Exception e){
+				//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				mu.msgbox("onActivityResult: " + e.getMessage());
 			}
 

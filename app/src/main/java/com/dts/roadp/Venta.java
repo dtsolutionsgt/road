@@ -884,7 +884,7 @@ public class Venta extends PBase {
                 if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
 			}else {
 				ins.add("UMSTOCK",gl.um);
-                ins.add("UM",gl.umpres);
+                ins.add("UM",gl.umpresp);
 			}
 
 			if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
@@ -931,7 +931,7 @@ public class Venta extends PBase {
                 }
 
                 ins.add("EMPRESA",emp);
-                if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
+                if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpresp);
                 ins.add("CANT",gl.cstand);
                 if (rutatipo.equalsIgnoreCase("V")) {
                     ins.add("UMSTOCK",gl.umstock);
@@ -2422,7 +2422,7 @@ public class Venta extends PBase {
 
 	//endregion
 
-//region Despacho
+    //region Despacho
 
 	private void procesaDespacho() {
 		String umv,ums;

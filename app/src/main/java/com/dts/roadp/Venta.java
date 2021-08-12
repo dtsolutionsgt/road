@@ -903,7 +903,14 @@ public class Venta extends PBase {
 			} else {
 				ins.add("PRECIODOC",precdoc);
 			}
-			ins.add("PESO",peso);
+
+			if (gl.cstand==0) {
+                ins.add("PESO",peso);
+            } else {
+			    double pps=peso*(cant/(cant+gl.cstand));
+                ins.add("PESO",pps);
+            }
+
 			ins.add("VAL1",0);
 			ins.add("VAL2","");
             if (gl.tolprodcrit) ins.add("VAL3",1);else ins.add("VAL3",0);
@@ -954,7 +961,8 @@ public class Venta extends PBase {
                 } else {
                     ins.add("PRECIODOC",precdoc);
                 }
-                ins.add("PESO",peso);
+                double pps=peso*(gl.cstand/(cant+gl.cstand));
+                ins.add("PESO",pps);
                 ins.add("VAL1",0);
                 ins.add("VAL2","");
                 if (gl.tolprodcrit) ins.add("VAL3",1);else ins.add("VAL3",0);

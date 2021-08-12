@@ -40,7 +40,7 @@ public class clsDocPedido extends clsDocument {
 		
 		for (int i = 0; i <items.size(); i++) {
 			item=items.get(i);
-			rep.add2ss1(item.cod + " " + item.nombre,"F");
+			rep.add2ss1(item.cod + " " + item.nombre,item.critico);
 			//rep.add3lrr(rep.rtrim(""+item.cant,5),item.prec,item.tot);
 
 			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um,6);
@@ -291,7 +291,7 @@ public class clsDocPedido extends clsDocument {
 		try {
 			sql="SELECT D_PEDIDOD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_PEDIDOD.CANT,D_PEDIDOD.PRECIODOC," +
 				"D_PEDIDOD.IMP, D_PEDIDOD.DES,D_PEDIDOD.DESMON, D_PEDIDOD.TOTAL, D_PEDIDOD.UMVENTA, " +
-                "D_PEDIDOD.UMPESO, D_PEDIDOD.PESO " +
+                "D_PEDIDOD.UMPESO, D_PEDIDOD.PESO, D_PEDIDOD.SIN_EXISTENCIA " +
 				"FROM D_PEDIDOD INNER JOIN P_PRODUCTO ON D_PEDIDOD.PRODUCTO = P_PRODUCTO.CODIGO " +
 				"WHERE (D_PEDIDOD.COREL='"+corel+"')";	
 			DT=Con.OpenDT(sql);
@@ -313,7 +313,9 @@ public class clsDocPedido extends clsDocument {
 				item.um=DT.getString(8);
 				item.ump=DT.getString(9);
 				item.peso=DT.getDouble(10);
-				
+
+				if (DT.getInt(11)==0) item.critico="F";else item.critico="S";
+
 				if (sinimp) item.tot=item.tot-item.imp;
 				
 				//Toast.makeText(cont,item.cod+" "+item.imp+"   "+item.tot, Toast.LENGTH_SHORT).show();
@@ -346,7 +348,7 @@ public class clsDocPedido extends clsDocument {
 	}
 	
 	private class itemData {
-		public String cod,nombre,um,ump;
+		public String cod,nombre,um,ump,critico;
 		public double cant,prec,imp,descper,desc,tot,peso;
 	}
 	

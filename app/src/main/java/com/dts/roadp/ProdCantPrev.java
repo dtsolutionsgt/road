@@ -393,21 +393,25 @@ public class ProdCantPrev extends PBase {
 
         try {
 
-            sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
-            dt=Con.OpenDT(sql);
+            sql = "SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='" + prodid + "') AND (NIVEL=" + gl.nivel + ")";
+            dt = Con.OpenDT(sql);
             dt.moveToFirst();
-            um=dt.getString(0);umini=um;
+            um = dt.getString(0);
+            umini = um;
             if (rutatipo.equalsIgnoreCase("P")) {
                 if (app.prodBarra(prodid)) {
-                    um=DameUnidadMinimaVenta(prodid);
+                    um = DameUnidadMinimaVenta(prodid);
                 }
             }
-            ubas=um;umfact=um;
+            ubas = um;
+            umfact = um;
 
-            pesostock=0;
+            pesostock = 0;
 
+            //sql = " SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO " +
+            //        " FROM P_STOCK_PV WHERE (CODIGO='" + prodid + "') AND (UNIDADMEDIDA='" + um + "')";
             sql=" SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO " +
-                    " FROM P_STOCK_PV WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+um+"')";
+                " FROM P_STOCK_PV WHERE (CODIGO='"+prodid+"')";
             dt=Con.OpenDT(sql);
 
             if (dt.getCount()>0) {
@@ -575,6 +579,15 @@ public class ProdCantPrev extends PBase {
                 cant=cexist;
             }
             */
+
+
+            if (cant > idisp) {
+                cexist=idisp;cstand=cant-idisp;
+            } else {
+                cexist=cant;cstand=0;
+            }
+
+            cant=cexist;
 
             if (porpeso) {
 

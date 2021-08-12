@@ -144,6 +144,8 @@ public class CliDet extends PBase {
 
 		setHandlers();
 
+		gl.corelFac="";
+
 	}
 
 	@Override

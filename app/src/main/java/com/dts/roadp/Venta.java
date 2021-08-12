@@ -2370,12 +2370,48 @@ public class Venta extends PBase {
 			upd.Where("CLIENTE='"+cliid+"' AND DIA="+dweek);
 
 			db.execSQL(upd.SQL());
+
+			//KM110821 Devulve a inventario las canastas entregadas
+			String csql = "SELECT SUM(CANTENTR), PRODUCTO FROM T_CANASTA WHERE CORELTRANS='"+gl.corelFac+"' GROUP BY PRODUCTO";
+			Cursor can = Con.OpenDT(csql);
+			try	{
+
+				if (can != null && can.getCount()>0) {
+					can.moveToFirst();
+					while (!can.isAfterLast()) {
+						actualizaStockCanasta(can.getString(1), can.getInt(0));
+						can.moveToNext();
+					}
+
+					db.execSQL("DELETE FROM T_CANASTA");
+				}
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),csql);
+			}
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
 
 		saveAtten(""+cna);
+	}
+
+	private void actualizaStockCanasta(String prod, int cantidad) {
+		String sql = "SELECT CANT FROM P_STOCK WHERE CODIGO='"+prod+"'";
+		Cursor st = Con.OpenDT(sql);
+
+		if (st != null || st.getCount() >= 1){
+			st.moveToFirst();
+
+			int cant = st.getInt(0);
+			cant += cantidad;
+
+			upd.init("P_STOCK");
+			upd.Where("CODIGO = '"+ prod +"'");
+			upd.add("CANT", cant);
+
+			db.execSQL(upd.SQL());
+		}
 	}
 
 	private void saveAtten(String codnoate) {
@@ -2906,6 +2942,9 @@ public class Venta extends PBase {
 			db.execSQL(sql);
 
 			sql="DELETE FROM T_BONIFFALT";
+			db.execSQL(sql);
+
+			sql="DELETE FROM T_CANASTA";
 			db.execSQL(sql);
 
 		} catch (SQLException e) {

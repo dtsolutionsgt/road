@@ -340,10 +340,11 @@ public class FacturaRes extends PBase {
 
 			long fecha = app.fechaFactTol(du.getActDateTime());
 
-			String sql = "SELECT ifnull(count(*), 0) as cant FROM d_canasta " +
+			String sql = "SELECT ifnull(count(*), 0) as cant FROM T_CANASTA " +
 					"WHERE ruta='" + gl.ruta + "' " +
 					"AND ANULADO=0 " +
 					"AND cliente='" + gl.cliente + "' " +
+					"AND CORELTRANS='"+gl.corelFac+"' "+
 					"AND fecha=" + fecha;
 
 			Cursor DT = Con.OpenDT(sql);
@@ -884,6 +885,14 @@ public class FacturaRes extends PBase {
 			bonsave.save();
 
 			//endregion
+
+			sql="INSERT INTO D_CANASTA (RUTA, FECHA, CLIENTE, PRODUCTO, CANTREC, CANTENTR, STATCOM, CORELTRANS, ANULADO, UNIDBAS) " +
+					"SELECT RUTA, FECHA, CLIENTE, PRODUCTO, CANTREC, CANTENTR, STATCOM, CORELTRANS, ANULADO, UNIDBAS " +
+					"FROM T_CANASTA WHERE CORELTRANS='"+gl.corelFac+"'";
+			db.execSQL(sql);
+
+			sql="DELETE FROM T_CANASTA";
+			db.execSQL(sql);
 
 			//region Devolución de  producto.
 			if (gl.dvbrowse!=0){

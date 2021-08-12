@@ -4795,12 +4795,10 @@ public class ComWS extends PBase {
 
 	public void envioCanastas() {
 		Cursor DT;
-		String rut, cli, pro;
-		int i, pc = 0, pcc = 0;
-		long fecha;
+		int i, pc = 0, pcc = 0, idCanasta;
 
 		try {
-			sql = "SELECT RUTA, FECHA, CLIENTE, PRODUCTO FROM D_CANASTA WHERE STATCOM='N'";
+			sql = "SELECT IDCANASTA FROM D_CANASTA WHERE STATCOM='N'";
 			DT = Con.OpenDT(sql);
 
 			if (DT.getCount() == 0) {
@@ -4815,26 +4813,23 @@ public class ComWS extends PBase {
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 
-				rut = DT.getString(0);
-				fecha = DT.getLong(1);
-				cli = DT.getString(2);
-				pro = DT.getString(3);
+				idCanasta = DT.getInt(0);
 
 				try {
 
 					i += 1;
-					fprog = "Depósito " + i;
+					fprog = "Canasta " + i;
 					if (!esEnvioManual) {
 						wsStask.onProgressUpdate();
 					}
 
 					if (envioparcial) dbld.clear();
 
-					dbld.insert("D_CANASTA", "WHERE RUTA='" + rut + "' AND FECHA=" + fecha + " AND CLIENTE='" + cli + "' AND PRODUCTO='" + pro + "'");
+					dbld.insert("D_CANASTA", "WHERE IDCANASTA="+idCanasta);
 
 					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
-							sql = "UPDATE D_CANASTA SET STATCOM='S' WHERE RUTA='" + rut + "' AND FECHA=" + fecha + " AND CLIENTE='" + cli + "' AND PRODUCTO='" + pro + "'";
+							sql = "UPDATE D_CANASTA SET STATCOM='S' WHERE IDCANASTA="+idCanasta;
 							db.execSQL(sql);
 							pc += 1;
 						} else {

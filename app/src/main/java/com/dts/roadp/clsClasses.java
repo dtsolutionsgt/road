@@ -170,7 +170,7 @@ public class clsClasses {
 
 	public class clsCanasta {
 		public String ruta, cliente, producto;
-		public int fecha, cantrec, cantentr;
+		public int idCanasta, fecha, cantrec, cantentr;
 		public String codigo, desccorta, desclarga, fechaFormato;
 		public boolean editar;
 	}

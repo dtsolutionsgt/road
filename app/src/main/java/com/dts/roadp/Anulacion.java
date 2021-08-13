@@ -368,7 +368,9 @@ public class Anulacion extends PBase {
 
 			}
 
-			sql="DELETE FROM P_STOCK WHERE CANT=0 AND CANTM=0";
+			//KM120821 Agregué validacion para no eliminar eliminar el stock de las canastas
+			sql="DELETE FROM P_STOCK WHERE CANT=0 AND CANTM=0 " +
+				"AND CODIGO NOT IN(SELECT CODIGO FROM D_PRODUCTO WHERE ES_CANASTA=1)";
 			db.execSQL(sql);
 
 			listItems();

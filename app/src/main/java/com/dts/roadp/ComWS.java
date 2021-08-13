@@ -4360,23 +4360,23 @@ public class ComWS extends PBase {
 				case 67:
 					nombretabla="P_IMPRESORA";break;
 				case 68:
-					nombretabla="Procesando tablas ...";break;
-				case 69:
 					nombretabla = "D_CANASTA";
 					break;
-				case 70:
+				case 69:
 					//licResult=checkLicence(licSerial);
 					nombretabla = "checkLicence";break;
-					case 71:
+				case 70:
 					//licResultRuta=checkLicenceRuta(licRuta);
 					nombretabla = "checkLicenceRuta";
 					break;
-				case 72:
+				case 71:
 					nombretabla="P_RAZON_DESP_INCOMP";
 					break;
-                case 73:
+                case 72:
                     nombretabla = "P_STOCK_PV";
                     break;
+				case 73://#CKFK 20210813 Cambié esto para el final
+					nombretabla="Procesando tablas ...";break;
 				case 74:
 					procesaDatos();
 					ejecutar = false;

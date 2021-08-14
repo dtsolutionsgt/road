@@ -368,9 +368,9 @@ public class Anulacion extends PBase {
 
 			}
 
-			//KM120821 Agregué validacion para no eliminar eliminar el stock de las canastas
+			//KM120821 Agregué validacion para no eliminar el stock de las canastas
 			sql="DELETE FROM P_STOCK WHERE CANT=0 AND CANTM=0 " +
-				"AND CODIGO NOT IN(SELECT CODIGO FROM D_PRODUCTO WHERE ES_CANASTA=1)";
+				"AND CODIGO NOT IN(SELECT CODIGO FROM P_PRODUCTO WHERE ES_CANASTA=1)";
 			db.execSQL(sql);
 
 			listItems();
@@ -524,6 +524,7 @@ public class Anulacion extends PBase {
 			sql = "SELECT PRODUCTO, SUM(CANTENTR) AS CANT " +
 					"FROM D_CANASTA WHERE CORELTRANS='"+itemid+"' " +
 					"AND ANULADO=0 " +
+					"AND CANTENTR > 0 " +
 					"GROUP BY PRODUCTO";
 
 			Cursor can = Con.OpenDT(sql);

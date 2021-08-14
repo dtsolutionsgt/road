@@ -128,9 +128,12 @@ public class Canastas extends PBase {
         int tEntr = 0, tRec = 0;
 
         try {
-            String sql, tabla="D_CANASTA";
+            String sql, tabla="D_CANASTA", where="";
             Cursor DT;
             if (!mu.emptystr(gl.corelFac)) tabla="T_CANASTA";
+            if (mu.emptystr(gl.corelFac)) {
+                where = "AND (a.CORELTRANS = '' OR a.CORELTRANS IS NULL) ";
+            }
 
             sql = "SELECT " +
                     "a.IDCANASTA, " +
@@ -147,6 +150,7 @@ public class Canastas extends PBase {
                 "INNER JOIN P_PRODUCTO b ON b.CODIGO = a.PRODUCTO " +
                 "WHERE a.CLIENTE = '" + gl.cliente +"' " +
                 "AND a.ANULADO = 0 " +
+                    where +
                 "ORDER BY a.FECHA DESC;";
 
             DT = Con.OpenDT(sql);
@@ -260,7 +264,7 @@ public class Canastas extends PBase {
                 actualizaStock(gl.prodCanasta, iEntregado);
             }
 
-            if (!hayExistencias()) {
+            if (entregado > 0 && !hayExistencias()) {
                 toast("No hay suficientes canastas para entregar.");
                 cerrarDialog = false;
                 return;
@@ -348,18 +352,24 @@ public class Canastas extends PBase {
 
     public boolean hayExistencias() {
         opendb();
-        String sql = "SELECT CANT FROM P_STOCK WHERE CODIGO='"+gl.prodCanasta+"'";
+        String sql = "SELECT IFNULL(SUM(CANT), 0) FROM P_STOCK WHERE CODIGO='"+gl.prodCanasta+"'";
         Cursor st = Con.OpenDT(sql);
 
         if (st != null ||  st.getCount() >= 1){
             st.moveToFirst();
 
             int cant = st.getInt(0);
-            if (editando) {
-                cant += iEntregado;
-            }
 
-            if(cant < entregado) {
+            if (cant > 0) {
+
+                if (editando) {
+                    cant += iEntregado;
+                }
+
+                if(cant < entregado) {
+                    return false;
+                }
+            } else {
                 return false;
             }
         } else {

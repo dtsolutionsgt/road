@@ -93,22 +93,26 @@ public class clsDataBuilder {
 			String vSQL = "PRAGMA table_info('"+tn+"')"; 
 			PRG=db.rawQuery(vSQL, null);
 			cc=PRG.getCount();
-			
+			if (tn.equalsIgnoreCase("D_CANASTA")) cc--;
 			PRG.moveToFirst();j=0;
 		
 			while (!PRG.isAfterLast()) {
 				  
 				n=PRG.getString(PRG.getColumnIndex("name"));
 				t=PRG.getString(PRG.getColumnIndex("type"));
+				if (tn.equals("D_CANASTA") && n.equalsIgnoreCase("IDCANASTA")) {
+					PRG.moveToNext();
+					continue;
+				}
 
 				ct=getCType(n,t);
 				tcol.add(ct);
 				s=s+n+"  "+ct+"\n";
-				
+
 				SS=SS+n;
 				if (j<cc-1) SS=SS+",";
-				  
-			    PRG.moveToNext();j+=1;
+
+				PRG.moveToNext();j+=1;
 			}
 
 			if (tn.equals("D_FACTURA")) SS="SELECT COREL, ANULADO, FECHA, EMPRESA, RUTA, VENDEDOR, " +
@@ -116,7 +120,8 @@ public class clsDataBuilder {
 					                       "KILOMETRAJE, FECHAENTR, FACTLINK, TOTAL, DESMONTO, IMPMONTO, PESO, BANDERA, "+
 					                       "STATCOM, CALCOBJ, SERIE, CORELATIVO, IMPRES, ADD1, ADD2, ADD3, DEPOS, PEDCOREL," +
 					                       "REFERENCIA, ASIGNACION, SUPERVISOR, AYUDANTE, VEHICULO, CODIGOLIQUIDACION, RAZON_ANULACION";
-			
+			if (tn.equals("D_CANASTA")) SS="SELECT RUTA,FECHA,CLIENTE,PRODUCTO,CANTREC,CANTENTR,STATCOM,CORELTRANS,PESOREC,PESOENTR," +
+											"ANULADO,UNIDBAS,CODIGOLIQUIDACION";
 		} catch (Exception e) {
 			err=e.getMessage();//return false;
 			throw new RuntimeException(err);

@@ -145,6 +145,7 @@ public class TipoCanasta extends PBase {
                 cItem.desclarga = DT.getString(2);
                 cItem.tenregado = DT.getInt(3);
                 cItem.trecibido = DT.getInt(4);
+                cItem.totales   = false;
 
                 items.add(cItem);
                 citems.add(cItem);

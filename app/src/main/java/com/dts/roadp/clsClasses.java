@@ -166,6 +166,7 @@ public class clsClasses {
 	public class clsTipoCanastas {
 		public String codigo, desccorta, desclarga;
 		public int tenregado, trecibido;
+		public Boolean totales=true;
 	}
 
 	public class clsCanasta {

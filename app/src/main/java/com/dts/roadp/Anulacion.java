@@ -400,17 +400,20 @@ public class Anulacion extends PBase {
 
             if (toledano) {
 
-                sql="SELECT PRODUCTO,CANT,PESO FROM D_PEDIDOD WHERE COREL='"+itemid+"'";
+                sql="SELECT PRODUCTO,CANTPROC,PESO FROM D_PEDIDOD WHERE COREL='"+itemid+"'";
                 dt=Con.OpenDT(sql);
 
                 dt.moveToFirst();
                 while (!dt.isAfterLast()) {
+
                     prid=dt.getString(0);
                     dcant=dt.getDouble(1);
                     dpeso=dt.getDouble(2);
 
-                    sql="UPDATE P_STOCK_PV SET CANT=CANT+"+dcant+",PESO=PESO+"+dpeso+" WHERE (CODIGO='"+prid+"') ";
-                    db.execSQL(sql);
+                    if (dcant>0) {
+                        sql="UPDATE P_STOCK_PV SET CANT=CANT+"+dcant+",PESO=PESO+"+dpeso+" WHERE (CODIGO='"+prid+"') ";
+                        db.execSQL(sql);
+                    }
 
                     dt.moveToNext();
                 }

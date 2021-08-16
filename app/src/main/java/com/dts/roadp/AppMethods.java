@@ -533,7 +533,26 @@ public class AppMethods {
 		}
 	}
 
-	public void estandartInventario()  {
+    public boolean esRosty(String cod) {
+        String umb,ums,ump;
+
+        try {
+            if (!prodBarra(cod)) return false;
+
+            umb=umSalida(cod);
+            ump=umVenta(cod);
+            ums=umStockPV(cod);
+            //if (ump.equalsIgnoreCase(ums))  return false;
+            if (umb.equalsIgnoreCase(ums))  return false;
+            if (ump.equalsIgnoreCase(gl.umpeso))  return false;
+
+            return  true;
+        } catch (Exception e) {
+            toast(e.getMessage());return false;
+        }
+    }
+
+    public void estandartInventario()  {
 		Cursor dt,df;
 		String cod,ub,us,lote,doc,stat;
 		double cant,cantm,fact,fact1,fact2;
@@ -840,7 +859,43 @@ public class AppMethods {
 		}
 	}
 
-	public double pesoProm(String cod) {
+    public String umSalida(String cod) {
+        Cursor DT;
+
+        try {
+            String sql = "SELECT UM_SALIDA FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+            DT = Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            String val=DT.getString(0);
+            if(DT!=null) DT.close();
+
+            return  val;
+        } catch (Exception e) {
+            toast(e.getMessage());
+            return "";
+        }
+    }
+
+    public String umBasica(String cod) {
+        Cursor DT;
+
+        try {
+            String sql = "SELECT UM_SALIDA FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+            DT = Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            String val=DT.getString(0);
+            if(DT!=null) DT.close();
+
+            return  val;
+        } catch (Exception e) {
+            toast(e.getMessage());
+            return "";
+        }
+    }
+
+    public double pesoProm(String cod) {
 		Cursor DT;
 		double pesoprom=0;
 
@@ -887,7 +942,30 @@ public class AppMethods {
 		}
 	}
 
-	public double factorPeso(String cod) {
+    public String umStockPV(String cod) {
+        Cursor DT;
+        String umm,sql;
+
+        try {
+            sql = "SELECT UNIDADMEDIDA FROM P_STOCK_PV WHERE CODIGO='"+cod+ "'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount()==0) {
+                return "";
+            }
+
+            DT.moveToFirst();
+            umm=DT.getString(0);
+
+            if(DT!=null) DT.close();
+
+            return  umm;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public double factorPeso(String cod) {
 		Cursor DT;
 
 		try {

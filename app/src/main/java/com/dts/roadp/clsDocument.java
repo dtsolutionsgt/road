@@ -20,7 +20,9 @@ public class clsDocument {
 	public clsRepBuilder rep;
 	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod,docdesglose;
 	public int ffecha,pendiente,diacred,condicionPago,impprecio;
-	
+
+    protected AppMethods app;
+    protected appGlobals global;
 	protected android.database.sqlite.SQLiteDatabase db;
 	protected BaseDatos Con;
 	protected String sql;

@@ -87,8 +87,7 @@ public class PedidoRes extends PBase {
 		dweek=mu.dayofweek();
 
 		clsDesc=new clsDescGlob(this);
-        app=new AppMethods(this,gl,Con,db);
-		
+
 		adjustSpinner();
 		fillSpinner();
 		
@@ -121,6 +120,7 @@ public class PedidoRes extends PBase {
 		
 		prn=new printer(this,printexit,gl.validimp);
 		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp, "");
+		pdoc.global=gl;
 		pdoc.deviceid =gl.numSerie;
 	}
 		
@@ -392,7 +392,7 @@ public class PedidoRes extends PBase {
 	
 	private boolean saveOrder(){
 		Cursor DT;
-		double tot,desc,imp,peso,vcant,vpeso,vfactor,factpres;
+		double tot,desc,imp,peso,vcant,vpeso,vfactor,factpres,cantinv;
         String vprod,vumstock,vumventa,bandisp;
 
 		corel=gl.ruta+"_"+mu.getCorelBase();
@@ -480,23 +480,32 @@ public class PedidoRes extends PBase {
                 ins.add("PESO", DT.getDouble(8));
                 ins.add("VAL1", DT.getDouble(9));
                 ins.add("VAL2", bandisp); //DT.getString(10));
-                ins.add("CANTPROC", 0);
+
+                if ((DT.getInt(15)==1) && (DT.getInt(14)==0)) {
+                    cantinv=DT.getDouble(1);
+                } else {
+                    cantinv=0;
+                }
+                ins.add("CANTPROC",cantinv);
+
                 ins.add("UMVENTA", DT.getString(11));
                 ins.add("FACTOR", DT.getDouble(12));
                 ins.add("UMSTOCK", DT.getString(13));
                 ins.add("UMPESO", gl.umpeso);
                 ins.add("SIN_EXISTENCIA", DT.getInt(14)); //JP20210614
 
+                String ss=ins.sql();
                 db.execSQL(ins.sql());
 
                 if (DT.getInt(15)==1) prodstandby=true;
 
 
-                if (toledano) {
+                //if (toledano) {
+                if (cantinv>0) {
 
                     vprod = DT.getString(0);
                     vumstock = DT.getString(13);
-                    vcant = DT.getDouble(1);
+                    vcant = cantinv; // DT.getDouble(1);
                     vpeso = DT.getDouble(8);
                     factpres = DT.getDouble(12);
                     vfactor = vpeso / (vcant * factpres);

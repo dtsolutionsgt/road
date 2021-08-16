@@ -484,8 +484,9 @@ public class Venta extends PBase {
 				" FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO "+
 				" ORDER BY P_PRODUCTO.DESCCORTA ";
 
+
             if (gl.rutatipo.equalsIgnoreCase("P") && gl.peModal.equalsIgnoreCase("TOL")) {
-                sql=" SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, SUM(T_VENTA.TOTAL), SUM(T_VENTA.CANT), "+
+                sql=" SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, AVG(T_VENTA.TOTAL), SUM(T_VENTA.CANT), "+
                         " T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, " +
                         " SUM(T_VENTA.PESO), T_VENTA.UMSTOCK, T_VENTA.PRECIO, T_VENTA.FACTOR  " +
                         " FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO " +
@@ -493,6 +494,7 @@ public class Venta extends PBase {
                         " T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, T_VENTA.UMSTOCK, T_VENTA.PRECIO, T_VENTA.FACTOR "+
                         " ORDER BY P_PRODUCTO.DESCCORTA ";
             }
+
 
 			DT=Con.OpenDT(sql);
 
@@ -532,7 +534,13 @@ public class Venta extends PBase {
                     item.Peso=DT.getDouble(9);
 					item.precio=DT.getDouble(11);
 
-					if (app.prodBarra(item.Cod)) item.Cant = item.Cant * item.factor;
+					//if (app.prodBarra(item.Cod)) {
+					    if (app.esRosty(item.Cod)) {
+                            item.Cant = item.Cant * 1;
+                        } else {
+                            item.Cant = item.Cant * item.factor;
+                        }
+                    //}
 
 					item.val=mu.frmdecimal(item.Cant,gl.peDecImp)+" "+ltrim(item.um,6);
 
@@ -630,7 +638,7 @@ public class Venta extends PBase {
 
 		cnt = gl.dval;
 
-		if (cnt < 0) return;
+		if (cnt <= 0) return;
 
 		try {
 			try {
@@ -730,6 +738,10 @@ public class Venta extends PBase {
 				prec=gl.precprev;
 				prc.precdoc=prec;
 				prc.tot=mu.round2(prec*cant);
+				if (prodPorPeso(prodid)) {
+                    double factorconv=app.factorPeso(prodid);
+                    prc.tot=mu.round2(prec*cant*factorconv);
+                }
 			}
 
 			tot = prc.tot;
@@ -834,7 +846,8 @@ public class Venta extends PBase {
 		}
 
 		try {
-			sql="SELECT UNIDADMINIMA,FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+um+"')";
+			sql="SELECT UNIDADMINIMA,FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND " +
+                    "(UNIDADSUPERIOR='"+um+"') ";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 
@@ -846,6 +859,8 @@ public class Venta extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			umb=um;fact=1;
 		}
+
+		if (app.esRosty(prodid)) fact=1;
 
 		cantbas=cant*fact;
 		//peso=mu.round(cant*fact,gl.peDec);
@@ -869,6 +884,7 @@ public class Venta extends PBase {
 		try {
 
             double factorconv=DameProporcionVenta(prodid,gl.cliente,gl.nivel);
+            //if (app.esRosty(prodid)) factorconv=1;
 
             if (sinimp) precdoc=precsin; else precdoc=prec;
 
@@ -878,7 +894,16 @@ public class Venta extends PBase {
             ins.add("SIN_EXISTENCIA",0);
 			ins.add("EMPRESA",emp);
 
-			ins.add("CANT",cant);
+            if (rutatipo.equalsIgnoreCase("V")) {
+                ins.add("CANT",cant);
+            } else {
+                if (gl.tolprodcrit) {
+                    ins.add("CANT",cant-gl.cstand);
+                } else {
+                    ins.add("CANT",cant);
+                }
+            }
+
 			if (rutatipo.equalsIgnoreCase("V")) {
 				ins.add("UMSTOCK",gl.umstock);
                 if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
@@ -904,10 +929,11 @@ public class Venta extends PBase {
 				ins.add("PRECIODOC",precdoc);
 			}
 
-			if (gl.cstand==0) {
+            if (rutatipo.equalsIgnoreCase("V")) {
                 ins.add("PESO",peso);
             } else {
-			    double pps=peso*(cant/(cant+gl.cstand));
+                double pps;
+                pps=peso*((cant-gl.cstand)/cant);if (pps==0) pps=peso;
                 ins.add("PESO",pps);
             }
 
@@ -917,15 +943,20 @@ public class Venta extends PBase {
 			ins.add("VAL4","");
 			ins.add("PERCEP",percep);
 
-			if (cant>0) db.execSQL(ins.sql());
+			if (cant>0) {
+			    String ss=ins.sql();
+			    db.execSQL(ins.sql());
+            }
 
-            if ((gl.cstand>0) && rutatipo.equalsIgnoreCase("P") && gl.peModal.equalsIgnoreCase("TOL")) {
+            if ((gl.cstand>0) && rutatipo.equalsIgnoreCase("P") && gl.tolprodcrit) {
 
+                /*
                 if (porpeso) {
                     prodtot=gl.cstand*gl.prectemp;
                 } else {
                     prodtot=gl.cstand*prec;
                 }
+                */
 
                 ins.init("T_VENTA");
 
@@ -938,13 +969,11 @@ public class Venta extends PBase {
                 }
 
                 ins.add("EMPRESA",emp);
-                if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpresp);
                 ins.add("CANT",gl.cstand);
-                if (rutatipo.equalsIgnoreCase("V")) {
-                    ins.add("UMSTOCK",gl.umstock);
-                }else {
-                    ins.add("UMSTOCK",gl.um);
-                }
+                //if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpresp);
+                ins.add("UMSTOCK",gl.um);
+                ins.add("UM",gl.umpresp);
+
                 if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
                 ins.add("FACTOR",factorconv);
                 if (porpeso) {
@@ -961,8 +990,14 @@ public class Venta extends PBase {
                 } else {
                     ins.add("PRECIODOC",precdoc);
                 }
-                double pps=peso*(gl.cstand/(cant+gl.cstand));
-                ins.add("PESO",pps);
+
+                if (rutatipo.equalsIgnoreCase("V")) {
+                    ins.add("PESO",peso);
+                } else {
+                    double pps=peso*(gl.cstand/(cant));
+                    ins.add("PESO",pps);
+                }
+
                 ins.add("VAL1",0);
                 ins.add("VAL2","");
                 if (gl.tolprodcrit) ins.add("VAL3",1);else ins.add("VAL3",0);

@@ -157,6 +157,7 @@ public class Reimpresion extends PBase {
 		switch (tipo) {
 		case 0:
 			docPed = new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp,"");
+			docPed.global=gl;
 			lblTipo.setText("Pedido");break;
 		case 1:
 			cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.numSerie, "");

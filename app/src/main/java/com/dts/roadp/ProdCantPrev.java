@@ -79,9 +79,9 @@ public class ProdCantPrev extends PBase {
     //region Events
 
     public void sendCant(View view) {
-        try{
+        try {
             if (setCant(false)<1) applyCant();
-        }catch (Exception e){
+        } catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
     }
@@ -580,14 +580,12 @@ public class ProdCantPrev extends PBase {
             }
             */
 
-
             if (cant > idisp) {
                 cexist=idisp;cstand=cant-idisp;
+                //cant=cexist;
             } else {
                 cexist=cant;cstand=0;
             }
-
-            cant=cexist;
 
             if (porpeso) {
 

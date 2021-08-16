@@ -24,6 +24,8 @@ public class clsDocPedido extends clsDocument {
 		docrecibo=false;
 		docdevolucion=false;
 		decimp=decimpres;
+
+
 	}
 	
 	protected boolean buildDetail() {
@@ -39,11 +41,18 @@ public class clsDocPedido extends clsDocument {
 		//rep.empty();
 		
 		for (int i = 0; i <items.size(); i++) {
+
 			item=items.get(i);
+
 			rep.add2ss1(item.cod + " " + item.nombre,item.critico);
 			//rep.add3lrr(rep.rtrim(""+item.cant,5),item.prec,item.tot);
 
-			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um,6);
+            if (!item.rosty) {
+                cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um,6);
+            } else {
+                cu=frmdecimal(item.cantrosty,decimp)+" "+rep.ltrim(item.umrosty,6);
+            }
+
 			cp=StringUtils.leftPad(frmdecimal(item.peso,decimp),6);
             rep.add(cu+"  "+cp);
 
@@ -283,15 +292,19 @@ public class clsDocPedido extends clsDocument {
 	protected boolean loadDocData(String corel) {
 		Cursor DT;
 		itemData item;
+        Boolean rosty;
 		
 		loadHeadData(corel);
 		
 		items.clear();
 		
 		try {
+
+            app = new AppMethods(cont, global, Con, db);
+
 			sql="SELECT D_PEDIDOD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_PEDIDOD.CANT,D_PEDIDOD.PRECIODOC," +
 				"D_PEDIDOD.IMP, D_PEDIDOD.DES,D_PEDIDOD.DESMON, D_PEDIDOD.TOTAL, D_PEDIDOD.UMVENTA, " +
-                "D_PEDIDOD.UMPESO, D_PEDIDOD.PESO, D_PEDIDOD.SIN_EXISTENCIA " +
+                "D_PEDIDOD.UMPESO, D_PEDIDOD.PESO, D_PEDIDOD.SIN_EXISTENCIA, D_PEDIDOD.FACTOR " +
 				"FROM D_PEDIDOD INNER JOIN P_PRODUCTO ON D_PEDIDOD.PRODUCTO = P_PRODUCTO.CODIGO " +
 				"WHERE (D_PEDIDOD.COREL='"+corel+"')";	
 			DT=Con.OpenDT(sql);
@@ -313,14 +326,19 @@ public class clsDocPedido extends clsDocument {
 				item.um=DT.getString(8);
 				item.ump=DT.getString(9);
 				item.peso=DT.getDouble(10);
-
 				if (DT.getInt(11)==0) item.critico="F";else item.critico="S";
+                item.factor=DT.getDouble(12);
 
 				if (sinimp) item.tot=item.tot-item.imp;
-				
-				//Toast.makeText(cont,item.cod+" "+item.imp+"   "+item.tot, Toast.LENGTH_SHORT).show();
-				
-				items.add(item);	
+
+                rosty=app.esRosty(item.cod);
+                if (rosty) {
+                    item.rosty=true;
+                    item.umrosty=app.umStockPV(item.cod);
+                    item.cantrosty=item.cant*item.factor;
+                } else item.rosty=false;
+
+                items.add(item);
 				DT.moveToNext();					
 			}				
 			
@@ -331,8 +349,32 @@ public class clsDocPedido extends clsDocument {
 		return true;
 	}
 
+
+	//region Rosty
+
+
+
+    public boolean prodBarra(String cod) {
+        Cursor DT;
+
+        try {
+            String sql = "SELECT ES_PROD_BARRA FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+            DT = Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            boolean rslt=DT.getInt(0)==1;
+            if(DT!=null) DT.close();
+            return  rslt;
+        } catch (Exception e) {
+            //toast(e.getMessage());
+            return false;
+        }
+    }
+
+
+    //endregion
 	
-	// Aux
+	//region Aux
 	
 	public double round2(double val){
 		int ival;
@@ -348,9 +390,12 @@ public class clsDocPedido extends clsDocument {
 	}
 	
 	private class itemData {
-		public String cod,nombre,um,ump,critico;
-		public double cant,prec,imp,descper,desc,tot,peso;
+		public String cod,nombre,um,ump,critico,umrosty;
+		public double cant,prec,imp,descper,desc,tot,peso,cantrosty,factor;
+		public boolean rosty;
 	}
-	
-	
+
+	//endregion
+
+
 }

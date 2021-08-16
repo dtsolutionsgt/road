@@ -13,12 +13,11 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:layout_centerVertical="true"
-            android:background="#9A999E" >
-        </RelativeLayout>
+            android:background="#9A999E"></RelativeLayout>
 
         <TextView
             android:id="@+id/txtRoadTit"
@@ -35,11 +34,11 @@
             android:id="@+id/ImageView01"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:layout_marginBottom="5dp"
             android:adjustViewBounds="true"
-            android:src="@drawable/logo_panel" />
+            android:src="@drawable/logo_nuevo" />
 
         <ImageView
             android:id="@+id/imageView4"

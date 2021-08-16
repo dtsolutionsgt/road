@@ -50,6 +50,8 @@ public class Venta extends PBase {
 	private ArrayList<String> lcode = new ArrayList<String>();
 	private ArrayList<String> lname = new ArrayList<String>();
 
+	private ArrayList<String> lcodeM = new ArrayList<String>();
+	private ArrayList<String> lnameM = new ArrayList<String>();
 
 	private int browse;
 
@@ -171,6 +173,7 @@ public class Venta extends PBase {
 
 		if (gl.iddespacho !=null ){
 			if (!gl.iddespacho.isEmpty()) {
+				listaModificacion();
 				procesaDespacho();
 			}
 		}else{
@@ -275,6 +278,13 @@ public class Venta extends PBase {
 				}
 			}
 			gl.brw=0;
+
+			if (gl.iddespacho!= null){
+				if(!gl.iddespacho.isEmpty()){
+					tieneProductosNoDespachados();
+				}
+			}
+
 			if (rutatipo.equalsIgnoreCase("V")) {
 				Intent intent = new Intent(this,FacturaRes.class);
 				startActivity(intent);
@@ -3039,22 +3049,26 @@ public class Venta extends PBase {
 			sql="SELECT PRODUCTO FROM T_VENTA";
 			DT=Con.OpenDT(sql);
 
-			boolean rslt=DT.getCount()>0;
+				if (DT.getCount()==0){
+					showNoDespDialog();
+				}
+			}
 
-			if(DT!=null) DT.close();
+			return  true;
 
-			return rslt;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
 		}
 	}
 
-	private boolean hasProductsNoDespachados(){
+	private boolean tieneProductosNoDespachados(){
 		Cursor DT;
+		String producto;
+		double cant;
+		String UM;
 
 		try {
-
 
 			clsClasses.clsDs_pedidod item;
 
@@ -3063,9 +3077,13 @@ public class Venta extends PBase {
 
 			for (int i = 0; i <Ds_pedidodObj.count; i++) {
 
-			}
-			sql="SELECT PRODUCTO FROM T_VENTA";
-			DT=Con.OpenDT(sql);
+				producto = Ds_pedidodObj.items.get(i).producto.toString();
+				um = Ds_pedidodObj.items.get(i).umventa.toString();
+				cant = Ds_pedidodObj.items.get(i).cant;
+
+				sql="SELECT PRODUCTO FROM T_VENTA WHERE PRODUCTO = '" + producto + "' "+
+				    " AND CANT = " + cant + " AND UMVENTA = '" + um + "'";
+				DT=Con.OpenDT(sql);
 
 			boolean rslt=DT.getCount()>0;
 
@@ -3211,6 +3229,130 @@ public class Venta extends PBase {
 			toast("Aplicacion ZXing Barcode Scanner no esta instalada");return false;
 		}
 
+	}
+
+	private void listaModificacion(){
+		Cursor DT;
+		String code,name;
+
+		lcode.clear();lname.clear();
+
+		try {
+
+			sql="SELECT IDRAZON, DESCRIPCION FROM P_RAZON_DESP_INCOMP ORDER BY Nombre";
+
+			DT=Con.OpenDT(sql);
+			if (DT.getCount()==0) {return;}
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				try {
+					code=String.valueOf(DT.getInt(0));
+					name=DT.getString(1);
+
+					lcodeM.add(code);
+					lnameM.add(name);
+				} catch (Exception e) {
+					mu.msgbox(e.getMessage());
+				}
+				DT.moveToNext();
+			}
+
+			if(DT!=null) DT.close();
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox( e.getMessage());return;
+		}
+
+		showAtenDialog();
+
+	}
+
+	public void showNoDespDialog() {
+		try{
+			final AlertDialog Dialog;
+
+			final String[] selitems = new String[lname.size()];
+			for (int i = 0; i < lname.size(); i++) {
+				selitems[i] = lname.get(i);
+			}
+
+			mMenuDlg = new AlertDialog.Builder(this);
+			mMenuDlg.setTitle("Razón de modificación");
+
+			mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+					try {
+						String s=lcodeM.get(item);
+						setModificacion(s);
+					} catch (Exception e) {
+					}
+				}
+			});
+
+			mMenuDlg.setNegativeButton("Regresar", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+
+			Dialog = mMenuDlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	private void setModificacion(String scna){
+		int cna;
+
+		try {
+			cna=Integer.parseInt(scna);
+		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			return;
+		}
+
+		String cliid=gl.cliente;
+
+		try
+		{
+			upd.init("P_CLIRUTA");
+			upd.add("BANDERA",cna);
+			upd.Where("CLIENTE='"+cliid+"' AND DIA="+dweek);
+
+			db.execSQL(upd.SQL());
+
+			//KM110821 Devulve a inventario las canastas entregadas
+			String csql = "SELECT SUM(CANTENTR), PRODUCTO FROM T_CANASTA WHERE CORELTRANS='"+gl.corelFac+"' GROUP BY PRODUCTO";
+			Cursor can = Con.OpenDT(csql);
+			try	{
+
+				if (can != null && can.getCount()>0) {
+					can.moveToFirst();
+					while (!can.isAfterLast()) {
+						actualizaStockCanasta(can.getString(1), can.getInt(0));
+						can.moveToNext();
+					}
+
+					db.execSQL("DELETE FROM T_CANASTA");
+				}
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),csql);
+			}
+		} catch (SQLException e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox("Error : " + e.getMessage());
+		}
+
+		saveAtten(""+cna);
 	}
 
 	//endregion

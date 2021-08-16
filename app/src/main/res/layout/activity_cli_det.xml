@@ -622,7 +622,7 @@
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="5dp"
             android:adjustViewBounds="true"
-            android:src="@drawable/logo_panel" />
+            android:src="@drawable/logo_nuevo" />
 
         <ImageView
             android:id="@+id/imgRoadTit"

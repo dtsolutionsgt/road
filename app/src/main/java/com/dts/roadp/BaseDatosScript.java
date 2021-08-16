@@ -539,6 +539,7 @@ public class BaseDatosScript {
 					"[VEHICULO] TEXT NOT NULL,"+
 					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
 					"[RAZON_ANULACION] TEXT NOT NULL,"+
+					"[CODIGO_RUTA_PEDIDO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);
@@ -2377,6 +2378,24 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX P_stock_pv_idx2 ON P_stock_pv(ANULADO)";database.execSQL(vSQL);
 			vSQL="CREATE INDEX P_stock_pv_idx3 ON P_stock_pv(ESTADO)";database.execSQL(vSQL);
 			vSQL="CREATE INDEX P_stock_pv_idx4 ON P_stock_pv(ENVIADO)";database.execSQL(vSQL);
+
+			vSQL="CREATE TABLE [T_FACTURAD_MODIF]("+
+					"[COREL] TEXT NOT NULL,"+
+					"[ANULADO] INTEGER NOT NULL,"+
+					"[PRODUCTO] TEXT (15) NOT NULL,"+
+					"[CANTSOLICITADA] REAL,"+
+					"[PESOSOLICITADO] REAL,"+
+					"[CANTENTREGADA] REAL,"+
+					"[PESOENTREGADO] REAL,"+
+					"[IDRAZON] TEXT,"+
+					"PRIMARY KEY ([COREL])"+
+					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE INDEX T_FACTURAD_MODIF_IDX1 ON T_FACTURAD_MODIF(PRODUCTO)";
+			database.execSQL(vSQL);
+			vSQL="CREATE INDEX T_FACTURAD_MODIF_IDX2 ON T_FACTURAD_MODIF(ANULADO)";
+			database.execSQL(vSQL);
 
 			return 1;
 

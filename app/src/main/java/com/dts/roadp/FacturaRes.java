@@ -1477,7 +1477,9 @@ public class FacturaRes extends PBase {
 				sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
 				db.execSQL(sql);
 
-				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0)";
+				//KM120821 Agregué validacion para no eliminar eliminar el stock de las canastas
+				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0) " +
+					"AND CODIGO NOT IN(SELECT CODIGO FROM P_PRODUCTO WHERE ES_CANASTA = 1)";
 				db.execSQL(sql);
 
 				// Factura Stock
@@ -1601,7 +1603,9 @@ public class FacturaRes extends PBase {
 				sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
 				db.execSQL(sql);
 
-				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0)";
+				//KM120821 Agregué validacion para no eliminar eliminar el stock de las canastas
+				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0) " +
+					"AND CODIGO NOT IN(SELECT CODIGO FROM P_PRODUCTO WHERE ES_CANASTA = 1)";
 				db.execSQL(sql);
 
 

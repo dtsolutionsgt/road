@@ -4360,24 +4360,21 @@ public class ComWS extends PBase {
 				case 67:
 					nombretabla="P_IMPRESORA";break;
 				case 68:
-					nombretabla="Procesando tablas ...";break;
-				case 69:
-					nombretabla = "D_CANASTA";
-					break;
-				case 70:
 					//licResult=checkLicence(licSerial);
 					nombretabla = "checkLicence";break;
-					case 71:
+				case 69:
 					//licResultRuta=checkLicenceRuta(licRuta);
 					nombretabla = "checkLicenceRuta";
 					break;
-				case 72:
+				case 70:
 					nombretabla="P_RAZON_DESP_INCOMP";
 					break;
-                case 73:
+                case 71:
                     nombretabla = "P_STOCK_PV";
                     break;
-				case 74:
+				case 72://#CKFK 20210813 Cambié esto para el final
+					nombretabla="Procesando tablas ...";break;
+				case 73:
 					procesaDatos();
 					ejecutar = false;
                     break;
@@ -6747,7 +6744,7 @@ public class ComWS extends PBase {
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
 				if (claseFindia.yaHizoFindeDia()) {
 					if (YaComunico) {
-						if ((rutatipo.equalsIgnoreCase("V") && !TieneInventario && !TieneCanastas) || (!rutatipo.equalsIgnoreCase("V"))) {
+						if ((rutatipo.equalsIgnoreCase("V") && !TieneInventario) || (!rutatipo.equalsIgnoreCase("V"))) {
 							lblRec.setVisibility(View.VISIBLE);
 							imgRec.setVisibility(View.VISIBLE);
 							lblEnv.setVisibility(View.INVISIBLE);
@@ -6763,8 +6760,8 @@ public class ComWS extends PBase {
 								relStock.setVisibility(View.INVISIBLE);
 								relPrecio.setVisibility(View.INVISIBLE);
 							}
-						} else if ((rutatipo.equalsIgnoreCase("V") && TieneInventario && TieneCanastas &&
-								(TieneFact || TieneCobros || TieneDevol || TienePedidos)) ||
+						} else if ((rutatipo.equalsIgnoreCase("V") && TieneInventario &&
+								(TieneFact || TieneCobros || TieneDevol || TienePedidos || TieneCanastas)) ||
 								(!rutatipo.equalsIgnoreCase("V"))) {
 							lblRec.setVisibility(View.INVISIBLE);
 							imgRec.setVisibility(View.INVISIBLE);
@@ -6848,7 +6845,7 @@ public class ComWS extends PBase {
 
 				} else {
 					if (((((rutatipo.equalsIgnoreCase("V")) || (rutatipo.equalsIgnoreCase("D"))) && TieneInventario
-							&& (TieneFact || TieneCobros || TienePedidos) || TieneDevol)) || ((!rutatipo.equalsIgnoreCase("V"))
+							&& (TieneFact || TieneCobros || TienePedidos || TieneCanastas) || TieneDevol)) || ((!rutatipo.equalsIgnoreCase("V"))
 							&& (!rutatipo.equalsIgnoreCase("D")))) {
 						lblRec.setVisibility(View.INVISIBLE);
 						imgRec.setVisibility(View.INVISIBLE);

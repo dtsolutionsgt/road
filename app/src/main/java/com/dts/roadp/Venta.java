@@ -28,10 +28,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.dts.roadp.clsClasses.clsVenta;
-
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class Venta extends PBase {
@@ -41,6 +38,7 @@ public class Venta extends PBase {
 	private EditText txtBarra;
 	private ImageView imgroad,imgscan;
 	private CheckBox chkBorrar;
+	private Button cmdBarrasDespacho;
 
 	private ArrayList<clsVenta> items= new ArrayList<clsVenta>();
 	private ListAdaptVenta adapter;
@@ -172,7 +170,11 @@ public class Venta extends PBase {
 		};
 
 		if (gl.iddespacho !=null ){
-			if (!gl.iddespacho.isEmpty()) procesaDespacho();
+			if (!gl.iddespacho.isEmpty()) {
+				procesaDespacho();
+			}
+		}else{
+			cmdBarrasDespacho.setVisibility(View.INVISIBLE);
 		}
 
 	}
@@ -1147,7 +1149,6 @@ public class Venta extends PBase {
 				}
 
                 if (rutatipo.equalsIgnoreCase("V") ||
-					rutatipo.equalsIgnoreCase("T") ||
 					rutatipo.equalsIgnoreCase("D") ) {
                     bbolsa=barraBolsa();
                     if (bbolsa==1) {
@@ -2509,6 +2510,7 @@ public class Venta extends PBase {
 
 		try {
 			lblTit.setText("Prefactura");
+
 			gl.coddespacho=gl.iddespacho;gl.iddespacho="";
 
 			clsClasses.clsDs_pedidod item;
@@ -2596,7 +2598,8 @@ public class Venta extends PBase {
 			}
 
 			if (cantProdBarra>0){
-				startActivity(new Intent(Venta.this,RepesajeLista.class));
+				cmdBarrasDespacho.setVisibility(View.VISIBLE);
+				startActivity(new Intent(Venta.this,despacho_barras.class));
 			}
 
 		} catch (Exception e) {
@@ -2897,6 +2900,8 @@ public class Venta extends PBase {
 
 			txtBarra=(EditText) findViewById(R.id.editText6);
 
+			cmdBarrasDespacho=(Button) findViewById(R.id.cmdBarrasDespacho);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -3031,6 +3036,34 @@ public class Venta extends PBase {
 		Cursor DT;
 
 		try {
+			sql="SELECT PRODUCTO FROM T_VENTA";
+			DT=Con.OpenDT(sql);
+
+			boolean rslt=DT.getCount()>0;
+
+			if(DT!=null) DT.close();
+
+			return rslt;
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			return false;
+		}
+	}
+
+	private boolean hasProductsNoDespachados(){
+		Cursor DT;
+
+		try {
+
+
+			clsClasses.clsDs_pedidod item;
+
+			clsDs_pedidodObj Ds_pedidodObj=new clsDs_pedidodObj(this,Con,db);
+			Ds_pedidodObj.fill("WHERE COREL='"+gl.coddespacho+"'");
+
+			for (int i = 0; i <Ds_pedidodObj.count; i++) {
+
+			}
 			sql="SELECT PRODUCTO FROM T_VENTA";
 			DT=Con.OpenDT(sql);
 

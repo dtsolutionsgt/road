@@ -69,6 +69,14 @@ public class ListAdaptTipoCanasta extends BaseAdapter {
         holder.lblEntr.setText(String.valueOf(items.get(position).tenregado));
         holder.lblRec.setText(String.valueOf(items.get(position).trecibido));
 
+        if (items.get(position).totales){
+            holder.lblEntr.setVisibility(View.VISIBLE);
+            holder.lblRec.setVisibility(View.VISIBLE);
+        } else {
+            holder.lblEntr.setVisibility(View.INVISIBLE);
+            holder.lblRec.setVisibility(View.INVISIBLE);
+        }
+
         convertView.setBackgroundColor(Color.TRANSPARENT);
 
         return convertView;

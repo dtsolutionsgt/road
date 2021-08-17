@@ -4883,6 +4883,7 @@ public class ComWS extends PBase {
 
 				cor = DT.getString(0);
 				fruta = DT.getString(1);
+				ccorel = Integer.valueOf( cor.toString().substring(2,8));
 
 				try {
 					i += 1;
@@ -4895,6 +4896,11 @@ public class ComWS extends PBase {
 
 					dbld.insert("D_CXC", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_CXCD", "WHERE COREL='" + cor + "'");
+
+					dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  " +
+							 "WHERE RUTA='" + fruta + "' " +
+							 "AND TIPO = 'D' " +
+							 "AND ACTUAL<" + ccorel);
 
 					if (envioparcial && !esEnvioManual) {
 						if (commitSQL_Sin_XML() == 1) {

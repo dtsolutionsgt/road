@@ -146,7 +146,7 @@
             android:layout_marginBottom="20dp"
             android:clickable="true"
             android:maxWidth="610dp"
-            android:src="@drawable/logo" />
+            android:src="@drawable/logo_nuevo" />
 
         <TextView
             android:id="@+id/textView81"
@@ -247,7 +247,7 @@
         android:layout_marginRight="0dp"
         android:layout_marginBottom="2dp"
         android:gravity="center_horizontal"
-        android:text="ROAD ver. 9.4  -  26/04/2019"
+        android:text="ROAD ver. 9.5  -  16/08/2021"
         android:textColor="#000000"
         android:textSize="13sp" />
 

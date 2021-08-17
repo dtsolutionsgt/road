@@ -110,8 +110,12 @@ public class DevCliCant extends PBase {
 				mu.msgbox("Cantidad incorrecta");return;
 			}
 
+			if(umcambiar.equals("Seleccione UM....")){
+				mu.msgbox("Debe seleccionar la unidad de medida a cambiar.");return;
+			}
+
 			if (estado.equalsIgnoreCase("M")) {
-				if (razon.equalsIgnoreCase("0")){
+				if (razon.equalsIgnoreCase("0") || razon.equalsIgnoreCase("Seleccione una razón ....") ){
 					mu.msgbox("Debe definir una razón de devolución.");return;
 				}
 			}
@@ -564,7 +568,9 @@ public class DevCliCant extends PBase {
 		getUMCliente();
 
 		try {
-			sql = "SELECT UNIDADSUPERIOR,FACTORCONVERSION FROM P_FACTORCONV WHERE PRODUCTO='" + prodid + "' AND UNIDADSUPERIOR<>'" + gl.umpeso + "'  ORDER BY UNIDADSUPERIOR";
+
+			sql = "SELECT UNIDADSUPERIOR,FACTORCONVERSION FROM P_FACTORCONV WHERE PRODUCTO='" + prodid +
+					"' AND UNIDADSUPERIOR<>'" + gl.umpeso + "'  ORDER BY UNIDADSUPERIOR";
 			DT = Con.OpenDT(sql);
 
 			if (DT.getCount() > 0) {
@@ -585,6 +591,9 @@ public class DevCliCant extends PBase {
 				dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 				cmbum.setAdapter(dataAdapter);
+			}else{
+				msgbox("El producto no tiene precio definido para nivel de precio " + gl.nivel);
+				finish();
 			}
 
 			if (gl.tiponcredito == 1) {

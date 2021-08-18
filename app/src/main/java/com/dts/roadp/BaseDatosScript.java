@@ -978,7 +978,8 @@ public class BaseDatosScript {
 					"[CODIGOLIQUIDACION] INTEGER NOT NULL," +
 					"[IMPRES] INTEGER NOT NULL," +
 					"[EMPRESA] TEXT NOT NULL," +
-					"[COREL_COBRO] TEXT"+
+					"[COREL_COBRO] TEXT,"+
+					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);
 

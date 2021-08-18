@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.InputType;
 import android.view.View;
 import android.view.ViewGroup;
@@ -934,6 +935,9 @@ public class Cobro extends PBase {
 						ins.add("EMPRESA", gl.emp);
 
 						db.execSQL(ins.sql());
+
+						//#CKFK agregué esto porque se estaban guardando mas de dos registros con el mismo correlativo
+						SystemClock.sleep(1000);
 
 					}
 				}

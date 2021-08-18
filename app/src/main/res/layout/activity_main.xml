@@ -247,7 +247,7 @@
         android:layout_marginRight="0dp"
         android:layout_marginBottom="2dp"
         android:gravity="center_horizontal"
-        android:text="ROAD ver. 9.5  -  16/08/2021"
+        android:text="ROAD ver. 9.5.3  -  17/08/2021"
         android:textColor="#000000"
         android:textSize="13sp" />
 

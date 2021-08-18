@@ -251,11 +251,11 @@ public class ComWS extends PBase {
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
 			if (mu.emptystr(txtRuta.getText().toString())) {
-				txtRuta.setText("1");
-				txtEmp.setText("009");
+				txtRuta.setText("202");
+				txtEmp.setText("320");
 			}
 
-			txtWS.setText("http://190.34.215.189/wsandr/wsandr.asmx");
+			txtWS.setText("http://52.41.114.122/wsAndr/wsandr.asmx");
 
 			//txtRuta.setText("8001-1");
 			//txtEmp.setText("03");

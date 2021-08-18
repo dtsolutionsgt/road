@@ -410,6 +410,7 @@ public class ComWS extends PBase {
 				}
 			}
 
+			//#CKFK 20210813 Alquien puso esto en comentario por facilidad para pruebas
 			/*if (gl.banderafindia) {
 				if (!puedeComunicar()) {
 					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");

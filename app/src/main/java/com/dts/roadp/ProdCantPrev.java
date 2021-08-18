@@ -230,7 +230,9 @@ public class ProdCantPrev extends PBase {
                 }
             }
             ubas=um;umfact=um;
-            lblBU.setText(ubas);gl.ubas=ubas;upres=ubas;
+            lblBU.setText(ubas);gl.ubas=ubas;
+            //upres=ubas;
+            upres=app.umStockPV(prodid);
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             mu.msgbox("1-"+ e.getMessage());
@@ -364,7 +366,12 @@ public class ProdCantPrev extends PBase {
 
             lblPrec.setText(mu.frmcur(prec)+" x "+gl.umpeso);
         } else {
-            lblPrec.setText(mu.frmcur(prec)+" x "+upres);
+            if (app.esRosty(prodid)) {
+                prec=prec*umfactor;
+                lblPrec.setText(mu.frmcur(prec)+" x "+lblBU.getText().toString());
+            } else {
+                lblPrec.setText(mu.frmcur(prec)+" x "+upres);
+            }
         }
 
         if (pexist) lblDisp.setText(""+((int) idisp)); else lblDisp.setText("");
@@ -418,7 +425,8 @@ public class ProdCantPrev extends PBase {
 
                 dt.moveToFirst();
 
-                umstock = um;
+                //umstock = um;
+                umstock=app.umStockPV(prodid);
                 umfactor = 1;
 
                 disp = dt.getDouble(0);
@@ -603,8 +611,11 @@ public class ProdCantPrev extends PBase {
                 }
             } else {
                 if(Double.isNaN(pesostock))	pesostock=1;
-                if (pesoprom == 0) ppeso = pesostock * cant;
-                else ppeso = pesoprom * cant;
+                if (pesoprom == 0) {
+                    ppeso = pesostock * cant;
+                } else {
+                    ppeso = pesoprom * cant;
+                }
             }
 
             if (porpeso && gl.rutatipo.equalsIgnoreCase("V")) {

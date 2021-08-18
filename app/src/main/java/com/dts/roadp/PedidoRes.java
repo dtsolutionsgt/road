@@ -499,7 +499,6 @@ public class PedidoRes extends PBase {
 
                 if (DT.getInt(15)==1) prodstandby=true;
 
-
                 //if (toledano) {
                 if (cantinv>0) {
 

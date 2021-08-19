@@ -405,6 +405,7 @@ public class Anulacion extends PBase {
                 sql="SELECT PRODUCTO,CANTPROC,PESO FROM D_PEDIDOD WHERE COREL='"+itemid+"'";
                 dt=Con.OpenDT(sql);
 
+
                 dt.moveToFirst();
                 while (!dt.isAfterLast()) {
 

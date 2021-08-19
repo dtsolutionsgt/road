@@ -57,6 +57,27 @@ public class activity_despacho_list extends PBase {
 
             };
         });
+
+        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+
+            selid = 0;
+
+            if (position>0){
+                Object lvObj = listView.getItemAtPosition(position);
+                clsClasses.clsDs_pedido item = (clsClasses.clsDs_pedido)lvObj;
+
+                adapter.setSelectedIndex(position);
+
+                gl.iddespacho=item.corel;
+                gl.cliente = item.cliente;
+
+                msgbox("Quiere cancelar la entrega de este pedido");
+
+            }
+
+            return true;
+        });
+
     }
 
 //endregion

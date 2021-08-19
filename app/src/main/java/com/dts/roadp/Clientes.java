@@ -958,7 +958,21 @@ public class Clientes extends PBase {
 	}
 
 	private void enviaPedido() {
-		if (gl.tolsuper && gl.tolpedsend) {
+		boolean autoenvio=false;
+
+		try {
+			sql = "SELECT ENVIO_AUTO_PEDIDOS FROM P_RUTA";
+			Cursor DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
+				autoenvio = DT.getInt(0)==1;
+			}
+		} catch (Exception e) {
+			autoenvio=false;
+		}
+
+		if (gl.tolsuper && autoenvio) {
 			gl.tolpedsend=false;
 
 			//if (getWSURL())

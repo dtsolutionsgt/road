@@ -281,7 +281,9 @@ public class Venta extends PBase {
 
 			if (gl.iddespacho!= null){
 				if(!gl.iddespacho.isEmpty()){
-					tieneProductosNoDespachados();
+					if(tieneProductosNoDespachados()){
+						showNoDespDialog();
+					}
 				}
 			}
 
@@ -3061,13 +3063,11 @@ public class Venta extends PBase {
 			sql="SELECT PRODUCTO FROM T_VENTA";
 			DT=Con.OpenDT(sql);
 
-				if (DT.getCount()==0){
-					showNoDespDialog();
-				}
-			}
+			boolean rslt=DT.getCount()>0;
 
-			return  true;
+			if(DT!=null) DT.close();
 
+			return rslt;
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			return false;
@@ -3079,8 +3079,11 @@ public class Venta extends PBase {
 		String producto;
 		double cant;
 		String UM;
+		int cantReg=0;
 
 		try {
+
+			DT = null;
 
 			clsClasses.clsDs_pedidod item;
 
@@ -3093,11 +3096,14 @@ public class Venta extends PBase {
 				um = Ds_pedidodObj.items.get(i).umventa.toString();
 				cant = Ds_pedidodObj.items.get(i).cant;
 
-				sql="SELECT PRODUCTO FROM T_VENTA WHERE PRODUCTO = '" + producto + "' "+
-				    " AND CANT = " + cant + " AND UMVENTA = '" + um + "'";
-				DT=Con.OpenDT(sql);
+				sql = "SELECT PRODUCTO FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
+						" AND CANT = " + cant + " AND UMVENTA = '" + um + "'";
+				DT = Con.OpenDT(sql);
 
-			boolean rslt=DT.getCount()>0;
+				cantReg += DT.getCount();
+			}
+
+			boolean rslt=cantReg>0;
 
 			if(DT!=null) DT.close();
 
@@ -3332,39 +3338,26 @@ public class Venta extends PBase {
 			return;
 		}
 
-		String cliid=gl.cliente;
-
 		try
 		{
-			upd.init("P_CLIRUTA");
-			upd.add("BANDERA",cna);
-			upd.Where("CLIENTE='"+cliid+"' AND DIA="+dweek);
+			/*ins.init("T_FACTURAD_MODIF");
+			ins.add("COREL",gl.corelFac);
+			ins.add("ANULADO",0);
+			ins.add("PRODUCTO",cna);
+			ins.add("CANTSOLICITADA",cna);
+			ins.add("PESOSOLICITADO",cna);
+			ins.add("CANTENTREGADA",cna);
+			ins.add("PESOENTREGADO",cna);
+			ins.add("IDRAZON",cna);
+			ins.add("STATCOM",cna);
+			ins.add("PEDCOREL",cna);
 
-			db.execSQL(upd.SQL());
+			db.execSQL(ins.sql());*/
 
-			//KM110821 Devulve a inventario las canastas entregadas
-			String csql = "SELECT SUM(CANTENTR), PRODUCTO FROM T_CANASTA WHERE CORELTRANS='"+gl.corelFac+"' GROUP BY PRODUCTO";
-			Cursor can = Con.OpenDT(csql);
-			try	{
-
-				if (can != null && can.getCount()>0) {
-					can.moveToFirst();
-					while (!can.isAfterLast()) {
-						actualizaStockCanasta(can.getString(1), can.getInt(0));
-						can.moveToNext();
-					}
-
-					db.execSQL("DELETE FROM T_CANASTA");
-				}
-			} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),csql);
-			}
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
 		}
-
-		saveAtten(""+cna);
 	}
 
 	//endregion

@@ -674,7 +674,7 @@ public class BaseDatosScript {
 					"[CANTENTREGADA] REAL,"+
 					"[PESOENTREGADO] REAL,"+
 					"[IDRAZON] TEXT,"+
-					"PRIMARY KEY ([COREL])"+
+					"PRIMARY KEY ([COREL],[PRODUCTO])"+
 					");";
 			database.execSQL(vSQL);
 
@@ -2388,7 +2388,7 @@ public class BaseDatosScript {
 					"[CANTENTREGADA] REAL,"+
 					"[PESOENTREGADO] REAL,"+
 					"[IDRAZON] TEXT,"+
-					"PRIMARY KEY ([COREL])"+
+					"PRIMARY KEY ([COREL],[PRODUCTO])"+
 					");";
 			database.execSQL(vSQL);
 

@@ -175,4 +175,10 @@ public class clsClasses {
 		public String codigo, desccorta, desclarga, fechaFormato;
 		public boolean editar;
 	}
+
+    public class clsPedItem {
+        public String producto;
+        public double cant;
+	}
+
 }

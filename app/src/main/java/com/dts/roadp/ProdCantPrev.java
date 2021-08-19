@@ -34,7 +34,7 @@ public class ProdCantPrev extends PBase {
 
     private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact,umini,strdisp;
     private int nivel,browse=0,deccant,prevfact=1;
-    private double cant,cexist,cstand,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
+    private double cant,cexist,cstand,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0,cant_venta;
     private boolean pexist,esdecimal,porpeso,esbarra,idle=true,critico;
     private AppMethods app;
 
@@ -111,12 +111,11 @@ public class ProdCantPrev extends PBase {
     }
 
     public void doDelete(View view) {
-        try{
+        try {
             msgAskDel("Borrar producto");
-        }catch (Exception e){
+        } catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
-
     }
 
     public void doHint(View view) {
@@ -441,6 +440,25 @@ public class ProdCantPrev extends PBase {
                 pesostock=0;
             }
 
+
+            // Si se modifica pedido, debe incuir la cant en el pedido existente
+            if (gl.pedidomod) {
+                sql=" SELECT CANT FROM T_VENTA WHERE (PRODUCTO='"+prodid+"')";
+                dt=Con.OpenDT(sql);
+
+                if (dt.getCount()>0) {
+                    dt.moveToFirst();
+                    cant_venta = dt.getDouble(0);
+                    disp+=cant_venta;
+                } else {
+                    for (int i = 0; i <gl.peditems.size(); i++) {
+                        if (gl.peditems.get(i).producto.equalsIgnoreCase(prodid)) {
+                            disp+=gl.peditems.get(i).cant;
+                        };
+                    }
+                }
+            }
+
             //#CKFK 20190517 Agregué para que el umfactor sea igual al peso promedio en el pedido y se calcule correctamente
             if(gl.rutatipo.equalsIgnoreCase("P")){
                 umfactor = pesoprom;if (umfactor==0) umfactor=1;
@@ -536,6 +554,9 @@ public class ProdCantPrev extends PBase {
         try {
             db.execSQL("DELETE FROM T_VENTA WHERE PRODUCTO='"+prodid+"'");
             db.execSQL("DELETE FROM T_BONITEM WHERE Prodid='"+prodid+"'");
+
+            if (gl.pedidomod) registraEliminado();
+
             gl.dval=0;
             super.finish();
         } catch (SQLException e) {
@@ -549,54 +570,19 @@ public class ProdCantPrev extends PBase {
 
         try {
 
-			/*
-			if (rutatipo.equalsIgnoreCase("V")) {
-				if (peso<=0) {
-					mu.msgbox("Peso incorrecto");
-					txtCant.requestFocus();
-					return;
-				}
-			}
-			*/
-
             if (cant < 0) {
                 mu.msgbox("Cantidad incorrecta");
                 txtCant.requestFocus();
                 return;
             }
 
-            /*
-            if (gl.peModal.equalsIgnoreCase("TOL"))  {
-                if (critico) {
-                    if (cant > idisp) {
-                        cexist=0;cstand=0;
-                        mu.msgbox("Cantidad mayor que disponible.");
-                        txtCant.requestFocus();
-                        return;
-                    } else {
-                        cexist=cant;cstand=0;
-                    }
-                } else {
-
-                    if (cant > idisp) {
-                        cexist=idisp;cstand=cant-idisp;
-                    } else {
-                        cexist=cant;cstand=0;
-                    }
-                //}
-                cant=cexist;
-            }
-            */
-
             if (cant > idisp) {
                 cexist=idisp;cstand=cant-idisp;
-                //cant=cexist;
             } else {
                 cexist=cant;cstand=0;
             }
 
             if (porpeso) {
-
                 String spp = txtPeso.getText().toString();
 
                 try {
@@ -676,6 +662,79 @@ public class ProdCantPrev extends PBase {
     //endregion
 
     //region Aux
+
+    private void registraEliminado() {
+        double cant;
+
+        try {
+            for (int i = 0; i <gl.peditems.size(); i++) {
+                if (gl.peditems.get(i).producto.equalsIgnoreCase(prodid)) return;
+            }
+
+            sql="SELECT CANT FROM D_PEDIDOD WHERE (COREL='"+gl.modpedid+"') AND (PRODUCTO='"+prodid+"')";
+            Cursor dt=Con.OpenDT(sql);
+
+            if (dt.getCount()>0) {
+                dt.moveToFirst();
+                cant=dt.getDouble(0);
+            } else cant=0;
+
+            clsClasses.clsPedItem item=clsCls.new clsPedItem();
+
+            item.producto=prodid;
+            item.cant=cant;
+
+            gl.peditems.add(item);
+
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+    }
+
+    private void eliminaProducto() {
+        Cursor dt;
+        boolean flag=false;
+
+        try {
+            sql="SELECT SIN_EXISTENCIA FROM D_PEDIDOD WHERE (COREL='"+gl.modpedid+"') AND (PRODUCTO='"+prodid+"')";
+            dt=Con.OpenDT(sql);
+
+            if (dt.getCount()>0) {
+                dt.moveToFirst();
+
+                if (dt.getInt(0) == 0) {
+                    sql = " SELECT ESTADO FROM P_STOCK_PV WHERE (CODIGO='" + prodid + "')";
+                    dt = Con.OpenDT(sql);
+                    dt.moveToFirst();
+                    if (dt.getString(0).equalsIgnoreCase("C")) flag = true;
+
+                }
+            }
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());return;
+        }
+
+        try {
+            db.beginTransaction();
+
+            sql="DELETE FROM T_VENTA WHERE (PRODUCTO='"+prodid+"')";
+            db.execSQL(sql);
+
+            /*
+            if (flag) {
+                sql="UPDATE P_STOCK_PV SET CANT=CANT"+cant_venta+" WHERE (CODIGO='"+prodid+"')";
+                db.execSQL(sql);
+            }
+
+             */
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        } catch (Exception e) {
+            db.endTransaction();
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+    }
 
     private void setControls() {
 

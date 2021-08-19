@@ -413,9 +413,7 @@ public class PedidoRes extends PBase {
 			db.beginTransaction();
 
 			if (!gl.modpedid.isEmpty()) {
-                corel=gl.modpedid;
-                db.execSQL("DELETE FROM D_PEDIDO WHERE COREL='"+corel+"'");
-                db.execSQL("DELETE FROM D_PEDIDOD WHERE COREL='"+corel+"'");
+                anulaPedidoExistente();
             }
 			
 			ins.init("D_PEDIDO");
@@ -599,6 +597,36 @@ public class PedidoRes extends PBase {
             mu.msgbox("rebajaStockUM: "+e.getMessage());
             return;
         }
+    }
+
+    private void anulaPedidoExistente() {
+        Cursor dt;
+        double dcant,dpeso;
+        String prid;
+
+        corel=gl.modpedid;
+
+        sql="SELECT PRODUCTO,CANTPROC,PESO FROM D_PEDIDOD WHERE COREL='"+corel+"'";
+        dt=Con.OpenDT(sql);
+
+        dt.moveToFirst();
+        while (!dt.isAfterLast()) {
+
+            prid=dt.getString(0);
+            dcant=dt.getDouble(1);
+            dpeso=dt.getDouble(2);
+
+            if (dcant>0) {
+                sql="UPDATE P_STOCK_PV SET CANT=CANT+"+dcant+",PESO=PESO+"+dpeso+" WHERE (CODIGO='"+prid+"') ";
+                db.execSQL(sql);
+            }
+
+            dt.moveToNext();
+        }
+
+        db.execSQL("DELETE FROM D_PEDIDO WHERE COREL='"+corel+"'");
+        db.execSQL("DELETE FROM D_PEDIDOD WHERE COREL='"+corel+"'");
+
     }
 
     private double totalDescProd(){

@@ -144,7 +144,11 @@ public class Venta extends PBase {
 		cliPorDia();
 		validaNivelPrecio();
 
-		if (!gl.modpedid.isEmpty()) cargaPedido();
+        gl.peditems.clear();
+        if (!gl.modpedid.isEmpty()) {
+            gl.pedidomod=true;
+		    cargaPedido();
+        } else gl.pedidomod=false;
 
 		txtBarra.requestFocus();txtBarra.setText("");
 
@@ -176,7 +180,7 @@ public class Venta extends PBase {
 				listaModificacion();
 				procesaDespacho();
 			}
-		}else{
+		} else {
 			cmdBarrasDespacho.setVisibility(View.INVISIBLE);
 		}
 
@@ -654,7 +658,9 @@ public class Venta extends PBase {
 
 		cnt = gl.dval;
 
-		if (cnt <= 0) return;
+		if (cnt <= 0) {
+		    listItems();return;
+        }
 
 		try {
 			try {
@@ -1089,6 +1095,7 @@ public class Venta extends PBase {
         Cursor dt;
 
         try {
+
             db.beginTransaction();
 
             sql="SELECT PRODUCTO,SIN_EXISTENCIA,UMVENTA,CANT,FACTOR,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2 " +
@@ -3064,7 +3071,6 @@ public class Venta extends PBase {
 				if (DT.getCount()==0){
 					showNoDespDialog();
 				}
-			}
 
 			return  true;
 
@@ -3076,8 +3082,8 @@ public class Venta extends PBase {
 
 	private boolean tieneProductosNoDespachados(){
 		Cursor DT;
-		String producto;
-		double cant;
+		String producto="";
+		double cant=0;
 		String UM;
 
 		try {
@@ -3089,9 +3095,10 @@ public class Venta extends PBase {
 
 			for (int i = 0; i <Ds_pedidodObj.count; i++) {
 
-				producto = Ds_pedidodObj.items.get(i).producto.toString();
-				um = Ds_pedidodObj.items.get(i).umventa.toString();
-				cant = Ds_pedidodObj.items.get(i).cant;
+                producto = Ds_pedidodObj.items.get(i).producto.toString();
+                um = Ds_pedidodObj.items.get(i).umventa.toString();
+                cant = Ds_pedidodObj.items.get(i).cant;
+            }
 
 				sql="SELECT PRODUCTO FROM T_VENTA WHERE PRODUCTO = '" + producto + "' "+
 				    " AND CANT = " + cant + " AND UMVENTA = '" + um + "'";
@@ -3100,6 +3107,8 @@ public class Venta extends PBase {
 			boolean rslt=DT.getCount()>0;
 
 			if(DT!=null) DT.close();
+
+
 
 			return rslt;
 		} catch (Exception e) {

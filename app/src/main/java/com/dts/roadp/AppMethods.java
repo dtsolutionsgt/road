@@ -475,6 +475,30 @@ public class AppMethods {
 		return clienteNuevo;
 	}
 
+	public boolean pedModAfectaInv(String corel,String prodid) {
+        Cursor dt;
+
+        try {
+            sql="SELECT SIN_EXISTENCIA FROM D_PEDIDOD WHERE (COREL='"+gl.modpedid+"') AND (PRODUCTO='"+prodid+"')";
+            dt=Con.OpenDT(sql);
+
+            if (dt.getCount()>0) {
+                dt.moveToFirst();
+
+                if (dt.getInt(0) == 0) {
+                    sql = " SELECT ESTADO FROM P_STOCK_PV WHERE (CODIGO='" + prodid + "')";
+                    dt = Con.OpenDT(sql);
+                    dt.moveToFirst();
+                    if (dt.getString(0).equalsIgnoreCase("C")) return true;
+                }
+            }
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+
+        return false;
+    }
+
     // Productos
 
     public boolean ventaPeso(String cod) {

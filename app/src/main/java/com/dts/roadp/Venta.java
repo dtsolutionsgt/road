@@ -528,7 +528,7 @@ public class Venta extends PBase {
 				" T_VENTA.PESO, T_VENTA.UMSTOCK, T_VENTA.PRECIO, T_VENTA.FACTOR  " +
 				" FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO "+
 				" ORDER BY P_PRODUCTO.DESCCORTA ";
-
+            /*
             if (gl.rutatipo.equalsIgnoreCase("P") && gl.peModal.equalsIgnoreCase("TOL")) {
                 sql=" SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, AVG(T_VENTA.TOTAL), SUM(T_VENTA.CANT), "+
                         " T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, " +
@@ -538,6 +538,7 @@ public class Venta extends PBase {
                         " T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, T_VENTA.UMSTOCK, T_VENTA.PRECIO, T_VENTA.FACTOR "+
                         " ORDER BY P_PRODUCTO.DESCCORTA ";
             }
+            */
 
 			DT=Con.OpenDT(sql);
 
@@ -880,7 +881,7 @@ public class Venta extends PBase {
 
 	private void addItem(){
 		Cursor dt;
-		double precdoc,fact,cantbas,peso;
+		double precdoc,fact,cantbas,peso,cantapp,precapp;
 		String umb;
 
 		try {
@@ -972,20 +973,41 @@ public class Venta extends PBase {
 
 			if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
 			ins.add("FACTOR",factorconv);
-			if (porpeso) {
-				ins.add("PRECIO",gl.prectemp);
-			} else {
-				ins.add("PRECIO",prec);
-			}
+
 			ins.add("IMP",impval);
 			ins.add("DES",desc);
 			ins.add("DESMON",descmon);
-			ins.add("TOTAL",prodtot);
-			if (porpeso) {
-				ins.add("PRECIODOC",gl.prectemp);
-			} else {
-				ins.add("PRECIODOC",precdoc);
-			}
+
+
+            if (rutatipo.equalsIgnoreCase("V")) {
+                if (porpeso) {
+                    ins.add("PRECIO",gl.prectemp);
+                    ins.add("PRECIODOC",gl.prectemp);
+                } else {
+                    ins.add("PRECIO",prec);
+                    ins.add("PRECIODOC",precdoc);
+                }
+                ins.add("TOTAL",prodtot);
+            } else {
+
+                if (gl.tolprodcrit) {
+                    cantapp=cant-gl.cstand;
+                } else {
+                    cantapp=cant;
+                }
+
+                if (porpeso) {
+                    precapp=gl.precuni*gl.umfactor*cantapp;
+                } else {
+                    precapp=gl.precuni*cantapp;
+                }
+
+                ins.add("TOTAL",precapp);
+
+                ins.add("PRECIODOC",gl.precuni);
+                ins.add("PRECIO",gl.precuni);
+
+            }
 
             if (rutatipo.equalsIgnoreCase("V")) {
                 ins.add("PESO",peso);
@@ -1035,20 +1057,22 @@ public class Venta extends PBase {
 
                 if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
                 ins.add("FACTOR",factorconv);
-                if (porpeso) {
-                    ins.add("PRECIO",gl.prectemp);
-                } else {
-                    ins.add("PRECIO",prec);
-                }
+
                 ins.add("IMP",impval);
                 ins.add("DES",desc);
                 ins.add("DESMON",descmon);
-                ins.add("TOTAL",prodtot);
+
+
                 if (porpeso) {
-                    ins.add("PRECIODOC",gl.prectemp);
+                    precapp=gl.precuni*gl.umfactor*gl.cstand;
                 } else {
-                    ins.add("PRECIODOC",precdoc);
+                    precapp=gl.precuni*gl.cstand;
                 }
+
+                ins.add("TOTAL",precapp);
+
+                ins.add("PRECIODOC",gl.precuni);
+                ins.add("PRECIO",gl.precuni);
 
                 if (rutatipo.equalsIgnoreCase("V")) {
                     ins.add("PESO",peso);

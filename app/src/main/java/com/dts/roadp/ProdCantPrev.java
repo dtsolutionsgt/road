@@ -358,11 +358,11 @@ public class ProdCantPrev extends PBase {
 		*/
 
         idisp=mu.trunc(idisp);strdisp=""+idisp;
+        gl.precuni=prec;
 
         if (porpeso) {
             lblBU.setText(umstock);
             upres = umstock;
-
             lblPrec.setText(mu.frmcur(prec)+" x "+gl.umpeso);
         } else {
             if (app.esRosty(prodid)) {
@@ -601,8 +601,10 @@ public class ProdCantPrev extends PBase {
                 if(Double.isNaN(pesostock))	pesostock=1;
                 if (pesoprom == 0) {
                     ppeso = pesostock * cant;
+                    gl.pesouni=pesostock;
                 } else {
                     ppeso = pesoprom * cant;
+                    gl.pesouni=pesoprom;
                 }
             }
 

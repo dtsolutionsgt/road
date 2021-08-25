@@ -389,6 +389,8 @@ public class ProdCantPrev extends PBase {
         }
 
         txtPeso.setText(mu.frmdecimal(ippeso, gl.peDecImp));
+
+        setCant(true);
     }
 
     private double getDisp() {

@@ -443,7 +443,7 @@ public class ProdCantPrev extends PBase {
 
             // Si se modifica pedido, debe incuir la cant en el pedido existente
             if (gl.pedidomod) {
-                sql=" SELECT CANT FROM T_VENTA WHERE (PRODUCTO='"+prodid+"')";
+                sql=" SELECT CANT FROM T_VENTA WHERE (PRODUCTO='"+prodid+"') AND (SIN_EXISTENCIA=0)";
                 dt=Con.OpenDT(sql);
 
                 if (dt.getCount()>0) {
@@ -521,7 +521,7 @@ public class ProdCantPrev extends PBase {
 			}
 			*/
 
-            sql="SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO FROM P_STOCK " +
+            sql="SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO FROM P_STOCK_PV " +
                     " WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
             dt=Con.OpenDT(sql);
 

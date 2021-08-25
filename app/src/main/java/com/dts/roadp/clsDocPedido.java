@@ -115,6 +115,8 @@ public class clsDocPedido extends clsDocument {
             }
 		}
 
+		if (deviceid.isEmpty() | deviceid==null ) deviceid="";
+
 		rep.empty();
 		rep.add("No. Serie : "+deviceid);
 		rep.empty();

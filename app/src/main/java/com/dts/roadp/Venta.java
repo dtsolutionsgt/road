@@ -3191,21 +3191,23 @@ public class Venta extends PBase {
 		int cantReg=0, regdif=0;
 		boolean rslt=false;
 
-		try {
+        try {
+            DT = null;
 
-			DT = null;
+            clsClasses.clsDs_pedidod item;
 
-			clsDs_pedidodObj Ds_pedidodObj=new clsDs_pedidodObj(this,Con,db);
-			Ds_pedidodObj.fill("WHERE COREL='"+gl.coddespacho+"'");
+            clsDs_pedidodObj Ds_pedidodObj=new clsDs_pedidodObj(this,Con,db);
+            Ds_pedidodObj.fill("WHERE COREL='"+gl.coddespacho+"'");
 
-			for (int i = 0; i <Ds_pedidodObj.count; i++) {
+            for (int i = 0; i <Ds_pedidodObj.count; i++) {
 
                 producto = Ds_pedidodObj.items.get(i).producto.toString();
                 UM = Ds_pedidodObj.items.get(i).umventa.toString();
                 cant = Ds_pedidodObj.items.get(i).cant;
 
-				sql = "SELECT PRODUCTO, CANT, UM, UMSTOCK FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " ;
-				DT = Con.OpenDT(sql);
+            sql = "SELECT PRODUCTO FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
+                    " AND CANT = " + cant + " AND UMVENTA = '" + um + "'";
+            DT = Con.OpenDT(sql);
 
 				cantReg += DT.getCount();
 
@@ -3244,7 +3246,7 @@ public class Venta extends PBase {
 				}
 			}
 
-			if(DT!=null) DT.close();
+            if(DT!=null) DT.close();
 
 			sql = "SELECT PRODUCTO, CANT, UM FROM T_VENTA WHERE PRODUCTO NOT IN " +
 					"(SELECT PRODUCTO FROM DS_PEDIDOD WHERE COREL ='" + gl.coddespacho + "') " ;
@@ -3329,7 +3331,6 @@ public class Venta extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 	
 	private boolean hasCredits(){

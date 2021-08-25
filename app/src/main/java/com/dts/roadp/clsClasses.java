@@ -5,6 +5,7 @@ public class clsClasses {
 	public class clsCD {
 		public String Cod,Desc,Text,um;
 		public boolean bandera,disp;
+		public double faltante;
 	}
 	
 	public class clsCDB {

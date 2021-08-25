@@ -38,8 +38,8 @@ import java.util.concurrent.ExecutionException;
 public class FacturaRes extends PBase {
 
 	private ListView listView;
-	private TextView lblPago,lblFact,lblTalon,lblMPago,lblCred,lblPend,lblCash;
-	private ImageView imgBon,imgMPago,imgCred,imgPend, imgCash, imgBack;
+	private TextView lblPago,lblFact,lblTalon,lblMPago,lblCred,lblPend,lblCash,lblCanastas;
+	private ImageView imgBon,imgMPago,imgCred,imgPend, imgCash, imgBack, imgCanastas;
 	private CheckBox contadoCheck;
 	private TextView lblVuelto;
 	private EditText txtVuelto;
@@ -86,6 +86,7 @@ public class FacturaRes extends PBase {
 		lblCred = (TextView) findViewById(R.id.lblPend);
 		lblPend = (TextView) findViewById(R.id.lblCVence2);
 		lblCash = (TextView) findViewById(R.id.textView4);
+		lblCanastas = (TextView) findViewById(R.id.lblCanastas);
 
 		imgBon = (ImageView) findViewById(R.id.imageView6);
 		imgMPago = (ImageView) findViewById(R.id.imageView1);
@@ -93,6 +94,7 @@ public class FacturaRes extends PBase {
 		imgPend = (ImageView) findViewById(R.id.imageView12);
 		imgCash = (ImageView) findViewById(R.id.imageView2);
 		imgBack = (ImageView) findViewById(R.id.imageView5);
+		imgCanastas = (ImageView) findViewById(R.id.imgCanastas);
 
 		contadoCheck = (CheckBox) findViewById(R.id.checkContado);
 		rl_facturares=(RelativeLayout)findViewById(R.id.relativeLayout1);rl_facturares.setVisibility(View.VISIBLE);
@@ -854,7 +856,27 @@ public class FacturaRes extends PBase {
 			ins.add("ADD3",gl.ref3);
 
 			ins.add("DEPOS","N");
-			ins.add("PEDCOREL","");
+
+			if (gl.iddespacho !=null ) {
+				if (!gl.iddespacho.isEmpty()) {
+					ins.add("PEDCOREL",gl.pedCorel);
+				}else{
+					ins.add("PEDCOREL","");
+				}
+			}else{
+				ins.add("PEDCOREL","");
+			}
+
+			if (gl.iddespacho !=null ) {
+				if (!gl.iddespacho.isEmpty()) {
+					ins.add("DESPCOREL",gl.iddespacho);
+				}else{
+					ins.add("DESPCOREL","");
+				}
+			}else{
+				ins.add("DESPCOREL","");
+			}
+
 			ins.add("REFERENCIA","");
 
 			if (gl.dvbrowse!=0){
@@ -945,7 +967,6 @@ public class FacturaRes extends PBase {
 				ins.add("IMPRES",0);
 
 				db.execSQL(ins.sql());
-
 
 				sql="SELECT Item,CODIGO,CANT,CODDEV,TOTAL,PRECIO,PRECLISTA,REF,PESO,LOTE,UMVENTA,UMSTOCK,UMPESO,FACTOR,POR_PESO FROM T_CxCD WHERE CANT>0";
 				DT=Con.OpenDT(sql);
@@ -1113,6 +1134,37 @@ public class FacturaRes extends PBase {
 				mu.msgbox("Inconsistencia de lotes , producto : "+consprod+" / "+corel);return false;
 			};
 
+
+			//endregion
+
+			//region D_FACTURAD_MODIF
+
+			sql="SELECT COREL, ANULADO, PRODUCTO, CANTSOLICITADA, UMVENTASOLICITADA, PESOSOLICITADO, CANTENTREGADA, " +
+				"UMVENTAENTREGADA, PESOENTREGADO, IDRAZON, PEDCOREL, STATCOM, DESPCOREL FROM T_FACTURAD_MODIF";
+			dt=Con.OpenDT(sql);
+
+			dt.moveToFirst();
+			while (!dt.isAfterLast()) {
+
+				ins.init("D_FACTURAD_MODIF");
+				ins.add("COREL",corel);
+				ins.add("ANULADO",0);
+				ins.add("PRODUCTO",dt.getString(2));
+				ins.add("CANTSOLICITADA",dt.getDouble(3));
+				ins.add("UMVENTASOLICITADA",dt.getString(4));
+				ins.add("PESOSOLICITADO",dt.getDouble(5));
+				ins.add("CANTENTREGADA",dt.getDouble(6));
+				ins.add("UMVENTAENTREGADA",dt.getString(7));
+				ins.add("PESOENTREGADO",dt.getDouble(8));
+				ins.add("IDRAZON",dt.getString(9));
+				ins.add("PEDCOREL",dt.getString(10));
+				ins.add("STATCOM",dt.getString(11));
+				ins.add("DESPCOREL",dt.getString(12));
+
+				db.execSQL(ins.sql());
+
+				dt.moveToNext();
+			}
 
 			//endregion
 
@@ -2609,6 +2661,9 @@ public class FacturaRes extends PBase {
 			db.execSQL("DELETE FROM T_PAGO");
 
 			db.execSQL("DELETE FROM T_BONITEM WHERE PRODID='*'");
+
+			sql="DELETE FROM T_FACTURAD_MODIF";
+			db.execSQL(sql);
 
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

@@ -315,19 +315,19 @@
             android:src="@drawable/bonus"
             android:visibility="invisible" />
 
-        <ImageView
-            android:id="@+id/imgNext"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_below="@+id/relRoad"
-            android:layout_alignParentRight="true"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
-            android:clickable="true"
-            android:onClick="sendCant"
-            android:src="@drawable/next48" />
+    <ImageView
+        android:id="@+id/imgNext"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_below="@+id/relRoad"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:clickable="true"
+        android:onClick="sendCant"
+        android:src="@drawable/next48" />
 
         <RelativeLayout
             android:id="@+id/relbotpan"

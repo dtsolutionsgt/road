@@ -44,8 +44,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.5.5 / ";
-    private String parFechaVer = "18-08-2021";
+    private String parNumVer = "9.5.8 / ";
+    private String parFechaVer = "23-08-2021";
     private String parTipoVer = "ROAD QAS";
 
     @Override
@@ -351,8 +351,8 @@ public class MainActivity extends PBase {
 
                 rutapos = s.equalsIgnoreCase("R");
 
-                gl.permitir_cantidad_mayor=(DT.getInt(8)==0?true:false);
-                gl.permitir_producto_nuevo=(DT.getInt(9)==0?true:false);
+                gl.permitir_cantidad_mayor=(DT.getInt(8)==1?true:false);
+                gl.permitir_producto_nuevo=(DT.getInt(9)==1?true:false);
 
             } else {
 

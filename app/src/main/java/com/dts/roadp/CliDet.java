@@ -107,6 +107,8 @@ public class CliDet extends PBase {
 
 		cod=gl.cliente;
 
+		gl.iddespacho = null;
+
 		ventaGPS=gl.peVentaGps!=0;
 		rangoGPS=gl.peLimiteGPS+gl.peMargenGPS;
 		flagGPS=ventaGPS;
@@ -564,6 +566,7 @@ public class CliDet extends PBase {
         Cursor dt;
 
         try {
+
             sql="SELECT COREL FROM D_PEDIDO WHERE (CLIENTE='"+gl.cliente+"') AND (ANULADO='N') AND (STATCOM='N')";
             dt=Con.OpenDT(sql);
             gl.modpedid="";

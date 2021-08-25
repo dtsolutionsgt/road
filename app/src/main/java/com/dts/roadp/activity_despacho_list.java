@@ -1,12 +1,19 @@
 package com.dts.roadp;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.SQLException;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class activity_despacho_list extends PBase {
 
@@ -14,6 +21,10 @@ public class activity_despacho_list extends PBase {
     private TextView lblCantReg, txtClienteDespacho;
     private LA_Ds_pedido adapter;
     private clsDs_pedidoObj Ds_pedidoObj;
+
+    private ArrayList<String> lcodeM = new ArrayList<String>();
+    private ArrayList<String> lnameM = new ArrayList<String>();
+    private AlertDialog.Builder mMenuDlg;
 
     private String clinom;
 
@@ -32,6 +43,7 @@ public class activity_despacho_list extends PBase {
 
         setHandlers();
 
+        listaModificacion();
         listItems();
 
         gl.modpedid="";
@@ -52,6 +64,7 @@ public class activity_despacho_list extends PBase {
 
                 gl.iddespacho=item.corel;
                 gl.cliente = item.cliente;
+                gl.pedCorel=item.add1;
 
                 iniciaVenta();
 
@@ -62,16 +75,15 @@ public class activity_despacho_list extends PBase {
 
             selid = 0;
 
-            if (position>0){
+            if (position>=0){
                 Object lvObj = listView.getItemAtPosition(position);
                 clsClasses.clsDs_pedido item = (clsClasses.clsDs_pedido)lvObj;
 
                 adapter.setSelectedIndex(position);
 
                 gl.iddespacho=item.corel;
-                gl.cliente = item.cliente;
-
-                msgbox("Quiere cancelar la entrega de este pedido");
+                gl.pedCorel=item.add1;
+                msgAskNoDespachar("Quiere cancelar la entrega de la prefactura " + gl.iddespacho);
 
             }
 
@@ -87,13 +99,13 @@ public class activity_despacho_list extends PBase {
     private void listItems() {
 
         gl.iddespacho="";
+        gl.pedCorel="";
 
         try {
             Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
 
             for (int i = 0; i <Ds_pedidoObj.count; i++) {
                 nombreCliente(Ds_pedidoObj.items.get(i).cliente);
-                Ds_pedidoObj.items.get(i).add1=clinom;
             }
 
             adapter=new LA_Ds_pedido(this ,this,Ds_pedidoObj.items);
@@ -139,6 +151,149 @@ public class activity_despacho_list extends PBase {
         } catch (Exception e) {
             msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
         }
+
+    }
+
+    private void listaModificacion(){
+        Cursor DT;
+        String code,name;
+
+        lcodeM.clear();lnameM.clear();
+
+        try {
+
+            sql="SELECT IDRAZON, DESCRIPCION FROM P_RAZON_DESP_INCOMP ORDER BY DESCRIPCION";
+
+            DT=Con.OpenDT(sql);
+            if (DT.getCount()==0) {return;}
+
+            DT.moveToFirst();
+            while (!DT.isAfterLast()) {
+
+                try {
+                    code=DT.getString(0);
+                    name=DT.getString(1);
+
+                    lcodeM.add(code);
+                    lnameM.add(name);
+                } catch (Exception e) {
+                    mu.msgbox(e.getMessage());
+                }
+                DT.moveToNext();
+            }
+
+            if(DT!=null) DT.close();
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox( e.getMessage());return;
+        }
+
+    }
+
+    public void showNoDespDialog() {
+        try{
+            final AlertDialog Dialog;
+
+            final String[] selitems = new String[lnameM.size()];
+            for (int i = 0; i < lnameM.size(); i++) {
+                selitems[i] = lnameM.get(i);
+            }
+
+            mMenuDlg = new AlertDialog.Builder(this);
+            mMenuDlg.setTitle("Razón de modificación");
+
+            mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
+                    try {
+                        String s=lcodeM.get(item);
+                        setModificacion(s);
+                    } catch (Exception e) {
+                    }
+                }
+            });
+
+            mMenuDlg.setNegativeButton("Regresar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+            Dialog = mMenuDlg.create();
+            Dialog.show();
+
+            Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+            nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+            nbutton.setTextColor(Color.WHITE);
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+    private void setModificacion(String scna){
+
+        try
+        {
+
+            gl.coddespacho=gl.iddespacho;
+
+            clsClasses.clsDs_pedidod item;
+
+            clsDs_pedidodObj Ds_pedidodObj=new clsDs_pedidodObj(this,Con,db);
+            Ds_pedidodObj.fill("WHERE COREL='"+gl.coddespacho+"'");
+
+            for (int i = 0; i <Ds_pedidodObj.count; i++) {
+
+                item=Ds_pedidodObj.items.get(i);
+
+                ins.init("D_DESPACHADO_NO_ENTREGADO");
+                ins.add("COREL",item.corel);
+                ins.add("ANULADO",item.anulado);
+                ins.add("PRODUCTO",item.producto);
+                ins.add("CANTSOLICITADA",item.cant);
+                ins.add("UMVENTASOLICITADA",item.umventa);
+                ins.add("PESOSOLICITADO",item.peso);
+                ins.add("CANTENTREGADA",0);
+                ins.add("UMVENTAENTREGADA","");
+                ins.add("PESOENTREGADO",0);
+                ins.add("IDRAZON",scna);
+                ins.add("STATCOM","N");
+
+                db.execSQL(ins.sql());
+            }
+
+        } catch (SQLException e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox("Error : " + e.getMessage());
+        }
+    }
+
+    private void msgAskNoDespachar(String msg) {
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle(R.string.app_name);
+            dialog.setMessage(msg  + " ?");
+            dialog.setIcon(R.drawable.ic_quest);
+
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                   showNoDespDialog();
+                }
+            });
+
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    ;
+                }
+            });
+
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
 
     }
 

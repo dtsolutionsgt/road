@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@layout/back"
     android:clickable="true"
-    android:onClick="doFocus"
+    android:onClick="muestraProdBarraDespacho"
     tools:context=".Venta">
 
     <RelativeLayout
@@ -279,7 +279,7 @@
 
         <EditText
             android:id="@+id/editText6"
-            android:layout_width="200dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginStart="13dp"
@@ -294,18 +294,20 @@
 
         <Button
             android:id="@+id/cmdBarrasDespacho"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="45dp"
+            android:layout_width="182dp"
+            android:layout_height="43dp"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="5dp"
-            android:layout_marginEnd="45dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="5dp"
             android:layout_toStartOf="@+id/textView9"
             android:layout_toEndOf="@+id/checkBox1"
             android:background="#CEEBEF"
+            android:onClick="muestraProdBarraDespacho"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
-            android:text="Barras despacho"
+            android:text="Barras pendientes"
+            android:textSize="16sp"
             tools:visibility="visible" />
     </RelativeLayout>
 

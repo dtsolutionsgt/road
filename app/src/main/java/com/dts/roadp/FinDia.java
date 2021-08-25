@@ -539,6 +539,12 @@ public class FinDia extends PBase {
                     return false;
                 }
 
+                //#CKFK 20210824 Valida si existen despachos pendientes de entregar
+                if (!validaDespachosPendientes()) {
+                    msgDespachosPendientesEntrega("Existen prefacturas pendientes de entrega. No se puede realizar fin del día");
+                    return false;
+                }
+
                 if (gl.peModal.equalsIgnoreCase("APR")) {
                     setFactCor();
                     if (fcorel == 0) {
@@ -629,6 +635,23 @@ public class FinDia extends PBase {
                     "(SELECT DISTINCT D_FACTURA_1.COREL " +
                     "FROM D_FACTURA AS D_FACTURA_1 INNER JOIN " +
                     "D_FACTURAP ON D_FACTURA_1.COREL=D_FACTURAP.COREL))";
+            dt = Con.OpenDT(sql);
+
+            return (dt.getCount() == 0);
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+            return false;
+        }
+
+    }
+
+    private boolean validaDespachosPendientes() {
+        Cursor dt;
+
+        try {
+            sql = "SELECT COREL FROM DS_PEDIDO WHERE (ANULADO=0) AND BANDERA = 'N'";
             dt = Con.OpenDT(sql);
 
             return (dt.getCount() == 0);
@@ -2491,6 +2514,27 @@ public class FinDia extends PBase {
     }
 
     private void msgPendPago(String msg) {
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle(R.string.app_name);
+            dialog.setMessage(msg);
+
+            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    gl.filtrocli = 2;
+                    startActivity(new Intent(FinDia.this, Clientes.class));
+                }
+            });
+
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+    private void msgDespachosPendientesEntrega(String msg) {
         try{
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 

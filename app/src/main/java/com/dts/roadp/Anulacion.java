@@ -467,6 +467,9 @@ public class Anulacion extends PBase {
 			sql="UPDATE D_FACTURAD SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
 
+			sql="UPDATE D_FACTURAD_MODIF SET Anulado=1 WHERE COREL='"+itemid+"'";
+			db.execSQL(sql);
+
 			sql="UPDATE D_FACTURAP SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
 
@@ -508,6 +511,11 @@ public class Anulacion extends PBase {
 //			}
 
 			//ImpresionFactura();
+
+			//Despacho
+			sql="UPDATE DS_PEDIDO SET BANDERA='N' WHERE COREL IN (" +
+				"SELECT DESPCOREL FROM D_FACTURA WHERE COREL = '"+itemid+"')";
+			db.execSQL(sql);
 
 			if(dt!=null) dt.close();
 

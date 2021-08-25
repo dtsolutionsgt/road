@@ -2591,6 +2591,8 @@ public class ComWS extends PBase {
 			executaTabla();
 		} catch (Exception e) {
 			String ss=e.getMessage();
+			lblRec.setVisibility(View.VISIBLE);
+			imgRec.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -4053,6 +4055,8 @@ public class ComWS extends PBase {
 				//mu.msgbox("::" + esql);
 				isbusy = 0;
 				barInfo.setVisibility(View.INVISIBLE);
+				lblRec.setVisibility(View.VISIBLE);
+				imgRec.setVisibility(View.VISIBLE);
 				addlog("Recepcion", fstr, idbg);
 				return;
 			}
@@ -4101,7 +4105,8 @@ public class ComWS extends PBase {
 			} catch (Exception e) {
 				if (scon == 0) {
 					fstr = "No se puede conectar al web service : " + sstr;
-					//lblInfo.setText(fstr);
+					lblRec.setVisibility(View.VISIBLE);
+					imgRec.setVisibility(View.VISIBLE);
 				}
 				//msgbox(fstr);
 			}
@@ -4453,6 +4458,14 @@ public class ComWS extends PBase {
 				return false;
 			}
 
+			envioDespachosNoEntregados();
+			if (!fstr.equals("Sync OK")) {
+				dbld.savelog();
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
+				return false;
+			}
+
 			envioPedidos();
 			if (!fstr.equals("Sync OK")) {
 				dbld.savelog();
@@ -4721,7 +4734,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_FACTURAP", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_FACTURAD_LOTES", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_FACTURAF", "WHERE COREL='" + cor + "'");
-					dbld.insert("D_FACTURA_MODIF", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_FACTURAD_MODIF", "WHERE COREL='" + cor + "'");
 
 					dbld.insert("D_STOCKB_DEV", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIF", "WHERE COREL='" + cor + "'");
@@ -4866,6 +4879,88 @@ public class ComWS extends PBase {
 			senv += "Canastas : " + pc + " , NO ENVIADO : " + pf + " \n";
 		} else {
 			senv += "Canastas : " + pc + "\n";
+		}
+	}
+
+	public void envioDespachosNoEntregados() {
+		Cursor DT;
+		int i, pc = 0, pcc = 0;
+		String Corel, Producto;
+
+		try {
+			sql = "SELECT COREL, PRODUCTO FROM D_DESPACHOD_NO_ENTREGADO WHERE STATCOM='N'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() == 0) {
+				senv += "Prefacturas : " + pc + "\n";
+				return;
+			}
+
+			pcc = DT.getCount();
+			pc = 0;
+			i = 0;
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				Corel = DT.getString(0);
+				Producto = DT.getString(1);
+
+				try {
+
+					i += 1;
+					fprog = "Prefactura " + i;
+					if (!esEnvioManual) {
+						wsStask.onProgressUpdate();
+					}
+
+					if (envioparcial) dbld.clear();
+
+					dbld.insert("D_DESPACHOD_NO_ENTREGADO", "WHERE COREL= '" + Corel + "'" +
+							     " AND PRODUCTO = '" + Producto + "'");
+
+					if (envioparcial && !esEnvioManual) {
+						if (commitSQL() == 1) {
+							sql = "UPDATE D_DESPACHOD_NO_ENTREGADO SET STATCOM='S' WHERE COREL= '" + Corel + "'" +
+									" AND PRODUCTO = '" + Producto + "'";
+							db.execSQL(sql);
+							pc += 1;
+						} else {
+							errflag = true;
+							fterr += "\n" + sstr;
+						}
+					} else pc += 1;
+
+				} catch (Exception e) {
+					errflag = true;
+
+					dbld.savelog("despachos.txt");
+
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					fterr += "\n" + e.getMessage();
+				}
+
+				DT.moveToNext();
+			}
+
+			if (DT != null) DT.close();
+
+		} catch (Exception e) {
+			errflag = true;
+
+			dbld.savelog("despachos.txt");
+
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+		}
+
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Prefacturas : " + pc + " , NO ENVIADO : " + pf + " \n";
+		} else {
+			senv += "Prefacturas : " + pc + "\n";
 		}
 	}
 
@@ -6230,6 +6325,8 @@ public class ComWS extends PBase {
 				lblInfo.setText(fterr);
 				isbusy = 0;
 				barInfo.setVisibility(View.INVISIBLE);
+				lblRec.setVisibility(View.VISIBLE);
+				imgRec.setVisibility(View.VISIBLE);
 				mu.msgbox("Ocurrió error : \n" + fterr);
 				addlog("Envío", fterr, esql);
 				return;

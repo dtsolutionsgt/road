@@ -61,6 +61,7 @@ public class ListAdaptProd extends BaseAdapter {
 			holder.lblDesc = (TextView) convertView.findViewById(R.id.lblPNum);
 			holder.lblExtra = (TextView) convertView.findViewById(R.id.textView1);
 			holder.img1 = convertView.findViewById(R.id.imageView17);
+			holder.lblFaltante = (TextView) convertView.findViewById(R.id.lblFaltante);
 			
 			convertView.setTag(holder);
 		} else {
@@ -72,12 +73,19 @@ public class ListAdaptProd extends BaseAdapter {
 		//holder.lblCod.setText(items.get(position).Cod+"  "+items.get(position).um);
 		holder.lblDesc.setText(items.get(position).Desc);
 		holder.lblExtra.setText(items.get(position).Text);
+		holder.lblFaltante.setText("Faltante: " + items.get(position).faltante);
 
 		if (items.get(position).bandera) {
             holder.img1.setVisibility(View.VISIBLE);
         } else {
             holder.img1.setVisibility(View.INVISIBLE);
         }
+
+		if (items.get(position).faltante>0) {
+			holder.lblFaltante.setVisibility(View.VISIBLE);
+		} else {
+			holder.lblFaltante.setVisibility(View.GONE);
+		}
 
 		if(selectedIndex!= -1 && position == selectedIndex) {
 			convertView.setBackgroundColor(Color.rgb(26,138,198));
@@ -90,7 +98,7 @@ public class ListAdaptProd extends BaseAdapter {
 	
 	
 	static class ViewHolder {
-		TextView  lblCod,lblDesc,lblExtra;
+		TextView  lblCod,lblDesc,lblExtra,lblFaltante;
 		ImageView img1;
 	}
 	

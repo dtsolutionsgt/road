@@ -539,7 +539,8 @@ public class BaseDatosScript {
 					"[VEHICULO] TEXT NOT NULL,"+
 					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
 					"[RAZON_ANULACION] TEXT NOT NULL,"+
-					"[CODIGO_RUTA_PEDIDO] TEXT NOT NULL,"+
+					"[CODIGO_RUTA_PEDIDO] TEXT,"+
+					"[DESPCOREL] TEXT,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);
@@ -670,10 +671,15 @@ public class BaseDatosScript {
 					"[ANULADO] INTEGER NOT NULL,"+
 					"[PRODUCTO] TEXT (15) NOT NULL,"+
 					"[CANTSOLICITADA] REAL,"+
+					"[UMVENTASOLICITADA] TEXT,"+
 					"[PESOSOLICITADO] REAL,"+
 					"[CANTENTREGADA] REAL,"+
+					"[UMVENTAENTREGADA] TEXT,"+
 					"[PESOENTREGADO] REAL,"+
 					"[IDRAZON] TEXT,"+
+					"[PEDCOREL] TEXT,"+
+					"[STATCOM] TEXT,"+
+					"[DESPCOREL] TEXT,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO])"+
 					");";
 			database.execSQL(vSQL);
@@ -1024,6 +1030,22 @@ public class BaseDatosScript {
 					"ANULADO INTEGER DEFAULT 0,"+
 					"UNIDBAS TEXT DEFAULT 'UN'," +
 					"CODIGOLIQUIDACION INTEGER DEFAULT 0"+
+					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE TABLE [D_DESPACHADO_NO_ENTREGADO](" +
+					"[COREL] TEXT NOT NULL," +
+					"[ANULADO] INTEGER NOT NULL," +
+					"[PRODUCTO] TEXT NOT NULL," +
+					"[CANTSOLICITADA] REAL," +
+					"[UMVENTASOLICITADA] TEXT," +
+					"[PESOSOLICITADO] REAL," +
+					"[CANTENTREGADA] REAL," +
+					"[UMVENTAENTREGADA] TEXT," +
+					"[PESOENTREGADO] REAL," +
+					"[IDRAZON] TEXT NOT NULL," +
+					"[STATCOM] TEXT NOT NULL,"+
+					"PRIMARY KEY ([COREL],[PRODUCTO])"+
 					");";
 			database.execSQL(vSQL);
 
@@ -2384,10 +2406,15 @@ public class BaseDatosScript {
 					"[ANULADO] INTEGER NOT NULL,"+
 					"[PRODUCTO] TEXT (15) NOT NULL,"+
 					"[CANTSOLICITADA] REAL,"+
+					"[UMVENTASOLICITADA] TEXT,"+
 					"[PESOSOLICITADO] REAL,"+
 					"[CANTENTREGADA] REAL,"+
+					"[UMVENTAENTREGADA] TEXT,"+
 					"[PESOENTREGADO] REAL,"+
 					"[IDRAZON] TEXT,"+
+					"[PEDCOREL] TEXT,"+
+					"[STATCOM] TEXT,"+
+					"[DESPCOREL] TEXT,"+
 					"PRIMARY KEY ([COREL],[PRODUCTO])"+
 					");";
 			database.execSQL(vSQL);

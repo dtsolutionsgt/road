@@ -42,7 +42,9 @@
             android:layout_above="@+id/relRoadbar"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:layout_margin="2dp"
             android:adjustViewBounds="true"
+            android:background="@drawable/frame_btn"
             android:padding="5dp"
             android:src="@drawable/pedidos_1_gray" />
 

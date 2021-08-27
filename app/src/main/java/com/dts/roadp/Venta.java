@@ -184,8 +184,7 @@ public class Venta extends PBase {
 		} else {
 			cmdBarrasDespacho.setVisibility(View.INVISIBLE);
 		}
-
-
+		
 	}
 
 	//region Events

@@ -45,8 +45,9 @@ public class MainActivity extends PBase {
     private String cs1, cs2, cs3, barcode;
 
     private String parNumVer = "9.5.8 / ";
-    private String parFechaVer = "28-08-2021";
+    private String parFechaVer = "27-08-2021";
     private String parTipoVer = "ROAD QAS";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

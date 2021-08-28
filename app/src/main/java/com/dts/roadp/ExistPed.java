@@ -218,7 +218,7 @@ public class ExistPed extends PBase {
                 pcod=dp.getString(0);
                 valt=0;pesot=0;
 
-                sql =  "SELECT P_STOCK_PV.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK_PV.CANT) AS TOTAL,0,P_STOCK_PV.UNIDADMEDIDA,'' AS GLOTE,'' AS GDOCUMENTO,'' AS GCENTRO,0 AS GSTATUS, SUM(P_STOCK_PV.PESO)  " +
+                sql =  "SELECT P_STOCK_PV.CODIGO,P_PRODUCTO.DESCLARGA,SUM(P_STOCK_PV.CANT) AS TOTAL,0,P_STOCK_PV.UNIDADMEDIDA,'' AS GLOTE,'' AS GDOCUMENTO,'' AS GCENTRO,0 AS GSTATUS, SUM(P_STOCK_PV.PESO), P_STOCK_PV.ESTADO   " +
                         "FROM P_STOCK_PV INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK_PV.CODIGO  " +
                         "WHERE (P_PRODUCTO.CODIGO='"+pcod+"') " +
                         "GROUP BY P_STOCK_PV.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK_PV.UNIDADMEDIDA,GLOTE,GDOCUMENTO,GCENTRO,GSTATUS ";
@@ -235,6 +235,7 @@ public class ExistPed extends PBase {
                 item.Desc = dp.getString(1);
                 item.flag = 0;
                 item.items=icnt;
+
                 items.add(item);
 
                 //if (dt.getCount() == 0) return;
@@ -287,6 +288,8 @@ public class ExistPed extends PBase {
                     item.Centro = dt.getString(7);itemm.Centro = dt.getString(7);
                     item.Stat = dt.getString(8);itemm.Stat = dt.getString(8);
 
+                    item.Estado=dt.getString(10);
+
                     if (val>=0) {
                         item.flag = 1;
                         items.add(item);
@@ -300,6 +303,7 @@ public class ExistPed extends PBase {
                         item.flag = 2;
                         items.add(item);
                     }
+
                     dt.moveToNext();
                 }
 

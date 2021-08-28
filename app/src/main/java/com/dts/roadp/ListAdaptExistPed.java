@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -71,6 +72,8 @@ public class ListAdaptExistPed extends BaseAdapter {
 			holder.relbueno= (RelativeLayout) convertView.findViewById(R.id.relexist);
 			holder.relmalo = (RelativeLayout) convertView.findViewById(R.id.relexistm);
 			holder.reltot = (RelativeLayout) convertView.findViewById(R.id.relexistt);
+
+            holder.imgCer = convertView.findViewById(R.id.imageView28);
 			
 			convertView.setTag(holder);
 		} else {
@@ -111,13 +114,21 @@ public class ListAdaptExistPed extends BaseAdapter {
                 holder.reltot.setVisibility(View.VISIBLE);break;
 		}
 
-        if (items.get(position).cant>0) {
-            holder.lblPeso.setBackgroundColor(Color.parseColor("#00F077"));
-        } else {
+        try {
+            if (items.get(position).Estado.equalsIgnoreCase("C")) {
+                holder.lblPeso.setBackgroundColor(Color.parseColor("#00F077"));
+                holder.imgCer.setVisibility(View.VISIBLE);
+            } else {
+                holder.lblPeso.setBackgroundColor(Color.TRANSPARENT);
+                holder.imgCer.setVisibility(View.INVISIBLE);
+            }
+        } catch (Exception e) {
+            String ss=e.getMessage();
             holder.lblPeso.setBackgroundColor(Color.TRANSPARENT);
+            holder.imgCer.setVisibility(View.INVISIBLE);
         }
 
-		if(selectedIndex!= -1 && position == selectedIndex) {
+        if(selectedIndex!= -1 && position == selectedIndex) {
 			convertView.setBackgroundColor(Color.rgb(26,138,198));
         } else {
         	convertView.setBackgroundColor(Color.TRANSPARENT);
@@ -130,6 +141,7 @@ public class ListAdaptExistPed extends BaseAdapter {
 	static class ViewHolder {
 		TextView  lblLote,lblLotem,lblCod,lblDesc,lblValor,lblValorM,lblValorT,lblPeso,lblPesoM,lblPesoT;
 		RelativeLayout reltitle,relbueno,relmalo,reltot;
+		ImageView imgCer;
 	}
 	
 }

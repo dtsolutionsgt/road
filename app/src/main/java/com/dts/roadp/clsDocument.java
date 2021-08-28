@@ -105,6 +105,7 @@ public class clsDocument {
 			}
 
 		}catch (Exception e){
+		    String ss=e.getMessage();
 			setAddlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 

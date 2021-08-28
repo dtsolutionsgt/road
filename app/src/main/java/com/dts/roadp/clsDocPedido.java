@@ -115,9 +115,13 @@ public class clsDocPedido extends clsDocument {
             }
 		}
 
-		if (deviceid.isEmpty() | deviceid==null ) deviceid="";
+        try {
+            if (deviceid.isEmpty() | deviceid==null ) deviceid="";
+        } catch (Exception e) {
+            deviceid="";
+        }
 
-		rep.empty();
+        rep.empty();
 		rep.add("No. Serie : "+deviceid);
 		rep.empty();
         rep.empty();

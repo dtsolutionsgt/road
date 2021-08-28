@@ -31,7 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="5dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="15dp"
             android:adjustViewBounds="true"
             android:src="@drawable/logo_nuevo" />
 
@@ -62,6 +63,18 @@
             android:text="ROAD"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#1A8AC6" />
+
+        <TextView
+            android:id="@+id/textView96"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:text="TextView"
+            android:textColor="#1A8AC6"
+            android:textSize="10sp" />
 
     </RelativeLayout>
 

@@ -69,6 +69,7 @@ public class ListAdaptVenta extends BaseAdapter {
 			holder.lblTot = (TextView) convertView.findViewById(R.id.lblTot);
 			holder.lblPeso = (TextView) convertView.findViewById(R.id.lblPeso);
 			holder.lblPrecio = (TextView) convertView.findViewById(R.id.lblPrecio);
+            holder.lblPE = (TextView) convertView.findViewById(R.id.textView97);
 			
 			convertView.setTag(holder);
 		} else {
@@ -92,7 +93,7 @@ public class ListAdaptVenta extends BaseAdapter {
 		holder.lblPeso.setText(items.get(position).valp);
 		if (items.get(position).valp.equalsIgnoreCase(".")) holder.lblPeso.setVisibility(View.GONE);
 		if (items.get(position).Peso==0) holder.lblPeso.setVisibility(View.GONE);
-
+        holder.lblPE.setText(items.get(position).PE);
 
 		if(selectedIndex!= -1 && position == selectedIndex) {
 			convertView.setBackgroundColor(Color.rgb(26,138,198));
@@ -105,7 +106,7 @@ public class ListAdaptVenta extends BaseAdapter {
 	
 	
 	static class ViewHolder {
-		TextView  lblCod, lblNombre,lblCant,lblPrec,lblDesc,lblTot,lblPeso,lblPrecio;
+		TextView  lblCod, lblNombre,lblCant,lblPrec,lblDesc,lblTot,lblPeso,lblPrecio,lblPE;
 	}
 	
 }

@@ -35,7 +35,7 @@ import java.util.ArrayList;
 public class Venta extends PBase {
 
 	private ListView listView;
-	private TextView lblProd,lblPres,lblCant,lblPrec,lblTot,lblTit;
+	private TextView lblProd,lblPres,lblCant,lblPrec,lblTot,lblTit,lblVer;
 	private EditText txtBarra;
 	private ImageView imgroad,imgscan;
 	private CheckBox chkBorrar;
@@ -184,7 +184,7 @@ public class Venta extends PBase {
 		} else {
 			cmdBarrasDespacho.setVisibility(View.INVISIBLE);
 		}
-		
+
 	}
 
 	//region Events
@@ -525,7 +525,7 @@ public class Venta extends PBase {
 
 			sql=" SELECT T_VENTA.PRODUCTO, P_PRODUCTO.DESCCORTA, T_VENTA.TOTAL, T_VENTA.CANT, "+
 				" T_VENTA.PRECIODOC, T_VENTA.DES, T_VENTA.IMP, T_VENTA.PERCEP, T_VENTA.UM, " +
-				" T_VENTA.PESO, T_VENTA.UMSTOCK, T_VENTA.PRECIO, T_VENTA.FACTOR  " +
+				" T_VENTA.PESO, T_VENTA.UMSTOCK, T_VENTA.PRECIO, T_VENTA.FACTOR, T_VENTA.SIN_EXISTENCIA " +
 				" FROM T_VENTA INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=T_VENTA.PRODUCTO "+
 				" ORDER BY P_PRODUCTO.DESCCORTA ";
             /*
@@ -564,6 +564,9 @@ public class Venta extends PBase {
 					item.ums=DT.getString(10);
 					item.um=DT.getString(8);
 					item.factor=DT.getDouble(12);
+					if (pedido) {
+					    if (DT.getInt(13)==1) item.PE="S";else item.PE="F";
+                    } else item.PE="";
 
 					//if (prodPorPeso(item.Cod)) 	item.um=DT.getString(10); else item.um=app.umVenta(item.Cod);
 
@@ -3035,7 +3038,7 @@ public class Venta extends PBase {
 
 	}
 
-	private void setControls(){
+	private void setControls() {
 
 		try{
 			
@@ -3046,6 +3049,7 @@ public class Venta extends PBase {
 			lblPrec= (TextView) findViewById(R.id.lblPNum);
 			lblTot= (TextView) findViewById(R.id.lblTot);
 			lblTit= (TextView) findViewById(R.id.txtRoadTit);
+            lblVer= (TextView) findViewById(R.id.textView96);lblVer.setText(gl.parNumVer.replace("/",""));
 
 			imgroad= (ImageView) findViewById(R.id.imgRoadTit);
 			imgscan= (ImageView) findViewById(R.id.imageView13);imgscan.setVisibility(View.INVISIBLE);

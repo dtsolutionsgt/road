@@ -22,7 +22,7 @@ public class clsClasses {
 	}
 	
 	public class clsExist {
-		public String Cod,Desc,Fecha,Valor,ValorM,ValorT,Peso,PesoM,PesoT,Lote,Doc,Centro,Stat;
+		public String Cod,Desc,Fecha,Valor,ValorM,ValorT,Peso,PesoM,PesoT,Lote,Doc,Centro,Stat,Estado;
 		public double cant,cantm;
 		public int id,flag,items;
 	}
@@ -39,7 +39,7 @@ public class clsClasses {
 	}	
 	
 	public class clsVenta {
-		public String Cod,Nombre,um,val,valp,sdesc,ums;
+		public String Cod,Nombre,um,val,valp,sdesc,ums,PE;
 		public double Cant,Peso,Prec,Desc,Total,imp,percep, precio,factor;
 
 	}

@@ -447,15 +447,17 @@ public class Reimpresion extends PBase {
 	private void imprPedido() {
 		try{
 
-			if(prn.isEnabled()){
+			//if(prn.isEnabled()){
+                docPed.global=gl;
+                docPed.deviceid =gl.numSerie;
 				docPed.buildPrint(itemid,1,"");
 				prn.printask(printcallback);
-			}else if(!prn.isEnabled()){
-				docPed.buildPrint(itemid,1,"");
-				toast("Reimpresion pedido");
-			}
+			//} else if(!prn.isEnabled()){
+			//	docPed.buildPrint(itemid,1,"");
+			//	toast("Reimpresion pedido");
+			//}
 
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 		

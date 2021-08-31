@@ -211,12 +211,18 @@ public class CliDet extends PBase {
 	public void showDespacho(View view) {
 		if (!permiteVenta) {
 			msgbox("¡Distancia del cliente mayor que permitida!\nPara realizar la venta debe acercarse más al cliente.");return;
-		}
+		}else{
+			try{
+				gl.banderaCobro = false;
 
-		try {
-			startActivity(new Intent(this, activity_despacho_list.class));
-		} catch (Exception e) {
-			addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+				if (!validaVenta()) return;//Se valida si hay correlativos de factura para la venta
+
+				if(porcentaje == false) VerificaCantidadDesp();
+
+			} catch (Exception e){
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				mu.msgbox("doVenta: " + e.getMessage());
+			}
 		}
 	}
 
@@ -826,6 +832,28 @@ public class CliDet extends PBase {
 
 	}
 
+	public void VerificaCantidadDesp(){
+		Float cantidad;
+		gl.rutatipo="V";
+		//Asigna conexión actual a la forma de Existencias.
+		cantidad = Float.valueOf(CantExistencias());
+
+		try{
+			if(cantidad == 0){
+				mu.msgbox("No hay existencias disponibles.");
+			}else{
+				try {
+					startActivity(new Intent(this, activity_despacho_list.class));
+				} catch (Exception e) {
+					addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+				}
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
+	}
+
 	private void runVenta() {
 
 		try{
@@ -1042,12 +1070,11 @@ public class CliDet extends PBase {
 			flag=false;
 
 			if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
-
 			if (flag) relD.setVisibility(View.VISIBLE);else relD.setVisibility(View.GONE);
 
             clinue=esClienteNuevo();
 
-			if (clinue){
+			if (clinue || rt.equalsIgnoreCase("C")){
 				imgDevol.setVisibility(View.INVISIBLE);
 				lblDevol.setVisibility(View.INVISIBLE);
 				imgCobro.setVisibility(View.INVISIBLE);

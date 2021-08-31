@@ -295,7 +295,7 @@ public class despacho_barras extends PBase {
             clsClasses.clsCD vItem = null;
             int cantidad = 0;
             String vF,cod,name,um;
-            double vFaltante = 0;
+            double vFaltante = 0, vCantOriginal = 0, vPesoOriginal = 0;
 
             ArrayList<clsClasses.clsCD> vitems = new ArrayList<clsClasses.clsCD>();;
 
@@ -312,7 +312,7 @@ public class despacho_barras extends PBase {
 
             try {
 
-               sql="SELECT DISTINCT P.CODIGO, P.DESCCORTA, R.UNIDADMEDIDA, D.CANTDIF " +
+               sql="SELECT DISTINCT P.CODIGO, P.DESCCORTA, R.UNIDADMEDIDA, D.CANTDIF, D.CANTORIGINAL, D.PESOORIGINAL " +
                     "FROM T_VENTA_DESPACHO D INNER JOIN P_PRODUCTO P ON D.PRODUCTO=P.CODIGO INNER JOIN " +
                     "P_PRODPRECIO R ON (D.PRODUCTO=R.CODIGO) " +
                     "WHERE (D.CANTDIF > 0)  AND (R.NIVEL = " + gl.nivel + ") AND (P.ES_VENDIBLE=1)";
@@ -342,6 +342,8 @@ public class despacho_barras extends PBase {
                     name=DT.getString(1);
                     um=DT.getString(2);
                     vFaltante = DT.getDouble(3);
+                    vCantOriginal = DT.getDouble(4);
+                    vPesoOriginal = DT.getDouble(5);
 
                     vItem = clsCls.new clsCD();
 
@@ -355,6 +357,9 @@ public class despacho_barras extends PBase {
                     vItem.Text="";
                     vItem.bandera=false;
                     vItem.faltante=vFaltante;
+                    vItem.cantOriginal =vCantOriginal;
+                    vItem.pesoOriginal = vPesoOriginal;
+                    vItem.es_despacho = true;
 
                     if (prodtipo==0 && modotol) {
                         if (DT.getString(3).equalsIgnoreCase("C")) vItem.bandera=true;

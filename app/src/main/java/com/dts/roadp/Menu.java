@@ -85,6 +85,8 @@ public class Menu extends PBase {
 
 			if (rutatipo.equalsIgnoreCase("T")) {
 				sdoc="Factura + Pedido";
+			} if (rutatipo.equalsIgnoreCase("D")) {
+				sdoc="Prefactura";iicon=102;
 			} else {
 				if (rutatipo.equalsIgnoreCase("V")) {
 					sdoc="Venta";iicon=102;
@@ -981,7 +983,10 @@ public class Menu extends PBase {
 			final String[] selitems = new String[itemcnt];
 
 			selitems[itempos]="Existencias";itempos++;
-            selitems[itempos]="Existencias pedidos";itempos++;
+
+		   if (rutatipo.equals("P") || rutatipo.equals("T")){
+				selitems[itempos]="Existencias pedidos";itempos++;
+			}
 
 			if (gl.peAceptarCarga) {
 				selitems[itempos]="Aceptar Inventario";itempos++;

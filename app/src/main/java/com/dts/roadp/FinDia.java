@@ -69,7 +69,8 @@ public class FinDia extends PBase {
         if (rutatipo.equalsIgnoreCase("T")) {
             fullfd = true;
         } else {
-            if (rutatipo.equalsIgnoreCase("V")) fullfd = true;
+            if (rutatipo.equalsIgnoreCase("V") ||
+                rutatipo.equalsIgnoreCase("D") ) fullfd = true;
             else fullfd = false;
         }
 
@@ -267,6 +268,11 @@ public class FinDia extends PBase {
                     sql = "DELETE FROM D_REL_PROD_BON";
                     db.execSQL(sql);
                     sql = "DELETE FROM D_BONIFFALT";
+                    db.execSQL(sql);
+
+                    //CKFK 20210828 Agregué el limpiar la tabla del inventario de Preventa
+                    // cuando se hace el fin de día
+                    sql = "DELETE FROM P_STOCK_PV";
                     db.execSQL(sql);
 
                     DT.moveToNext();
@@ -529,8 +535,13 @@ public class FinDia extends PBase {
 
             if (fullfd) {
 
-                if (claseFinDia.getCantFactura() == 0 && claseFinDia.getCantCanasta() == 0) {
-                    msgExit("No hay facturas ni canastas, no se puede realizar el Fin de Día");
+                if (rutatipo.equals("C") && claseFinDia.getCantCanasta() == 0) {
+                    msgExit("No hay canastas, no se puede realizar el Fin de Día");
+                    return false;
+                }
+
+                if (claseFinDia.getCantFactura() == 0) {
+                    msgExit("No hay facturas, no se puede realizar el Fin de Día");
                     return false;
                 }
 
@@ -540,10 +551,10 @@ public class FinDia extends PBase {
                 }
 
                 //#CKFK 20210824 Valida si existen despachos pendientes de entregar
-                if (!validaDespachosPendientes()) {
+               /* if (!validaDespachosPendientes()) {
                     msgDespachosPendientesEntrega("Existen prefacturas pendientes de entrega. No se puede realizar fin del día");
                     return false;
-                }
+                }*/
 
                 if (gl.peModal.equalsIgnoreCase("APR")) {
                     setFactCor();
@@ -651,7 +662,7 @@ public class FinDia extends PBase {
         Cursor dt;
 
         try {
-            sql = "SELECT COREL FROM DS_PEDIDO WHERE (ANULADO=0) AND BANDERA = 'N'";
+            sql = "SELECT COREL FROM DS_PEDIDO WHERE (ANULADO='N') AND BANDERA = 'N'";
             dt = Con.OpenDT(sql);
 
             return (dt.getCount() == 0);
@@ -2543,7 +2554,7 @@ public class FinDia extends PBase {
 
             dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    gl.filtrocli = 2;
+                    gl.filtrocli = 3;
                     startActivity(new Intent(FinDia.this, Clientes.class));
                 }
             });

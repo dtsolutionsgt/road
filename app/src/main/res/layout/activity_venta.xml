@@ -43,9 +43,11 @@
             android:layout_above="@+id/relRoadbar"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_margin="2dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="2dp"
             android:adjustViewBounds="true"
-            android:background="@drawable/frame_btn"
             android:padding="5dp"
             android:src="@drawable/pedidos_1_gray" />
 
@@ -310,9 +312,9 @@
         <Button
             android:id="@+id/cmdBarrasDespacho"
             android:layout_width="182dp"
-            android:layout_height="43dp"
+            android:layout_height="30dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="5dp"
             android:layout_toStartOf="@+id/textView9"

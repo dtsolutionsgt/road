@@ -411,12 +411,12 @@ public class ComWS extends PBase {
 			}
 
 			//#CKFK 20210813 Alquien puso esto en comentario por facilidad para pruebas
-			/*if (gl.banderafindia) {
+			if (gl.banderafindia) {
 				if (!puedeComunicar()) {
 					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
 					return;
 				}
-			}*/
+			}
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -2591,8 +2591,7 @@ public class ComWS extends PBase {
 			executaTabla();
 		} catch (Exception e) {
 			String ss=e.getMessage();
-			lblRec.setVisibility(View.VISIBLE);
-			imgRec.setVisibility(View.VISIBLE);
+			visibilidadBotones();
 		}
 	}
 
@@ -2726,13 +2725,29 @@ public class ComWS extends PBase {
 			lblInfo.setText(" ");
 			s = "Recepción completa.";
 
+			try {
+				Cursor dt1 = Con.OpenDT(sql);
+				sql = "SELECT VENTA FROM P_RUTA";
+				dt1 = Con.OpenDT(sql);
+				dt1.moveToFirst();
+				val = dt1.getString(0);
+
+				if (dt1 != null) dt1.close();
+
+			} catch (Exception e) {
+				val = "V";
+			}
+
+			gl.rutatipo = val;
+			rutatipo = gl.rutatipo;
+			pedidos=rutatipo.equals("P");
 
 			// if (stockflag == 1) s = s + "\nSe actualizó inventario.";
 
             if (pedidos) {
                 sql = "SELECT Codigo FROM P_STOCK_PV ";
             } else {
-                sql = "SELECT Codigo FROM P_STOCK ";
+                sql = "SELECT Codigo FROM P_STOCK UNION SELECT Codigo FROM P_STOCKB ";
             }
             Cursor dt = Con.OpenDT(sql);
             if (dt.getCount() > 0) s = s + "\nSe actualizó inventario.";
@@ -3649,7 +3664,7 @@ public class ComWS extends PBase {
 
 		if (TN.equalsIgnoreCase("DS_PEDIDOD")) {
 			SQL = " SELECT COREL, PRODUCTO, EMPRESA, ANULADO, CANT, PRECIO, IMP, DES, DESMON, TOTAL, PRECIODOC, " +
-					"PESO, VAL1, VAL2, RUTA, UMVENTA, UMSTOCK, UMPESO "+
+					"PESO, VAL1, VAL2, RUTA, UMVENTA, UMSTOCK, UMPESO, CANT_ORIGINAL, PESO_ORIGINAL "+
 					" FROM DS_PEDIDOD " +
 					" WHERE COREL IN (SELECT COREL FROM DS_PEDIDO WHERE RUTA = '" + ActRuta + "'  AND (ANULADO='N') " +
 					"AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') )";
@@ -3719,7 +3734,7 @@ public class ComWS extends PBase {
 
 		try {
 
-			if (!rutatipo.equalsIgnoreCase("P")) {
+			if (!rutatipo.equalsIgnoreCase("P") && !rutatipo.equalsIgnoreCase("C")) {
 				sql = "SELECT RESOL FROM P_COREL";
 				dt = Con.OpenDT(sql);
 				if (dt.getCount() == 0) {
@@ -3769,7 +3784,7 @@ public class ComWS extends PBase {
                 if (pedidos) {
                     sql = "SELECT Codigo FROM P_STOCK_PV ";
                 } else {
-                    sql = "SELECT Codigo FROM P_STOCK ";
+                    sql = "SELECT Codigo FROM P_STOCK UNION SELECT Codigo FROM P_STOCKB";
                 }
 
                 dt = Con.OpenDT(sql);
@@ -4055,8 +4070,7 @@ public class ComWS extends PBase {
 				//mu.msgbox("::" + esql);
 				isbusy = 0;
 				barInfo.setVisibility(View.INVISIBLE);
-				lblRec.setVisibility(View.VISIBLE);
-				imgRec.setVisibility(View.VISIBLE);
+				visibilidadBotones();
 				addlog("Recepcion", fstr, idbg);
 				return;
 			}
@@ -4105,8 +4119,7 @@ public class ComWS extends PBase {
 			} catch (Exception e) {
 				if (scon == 0) {
 					fstr = "No se puede conectar al web service : " + sstr;
-					lblRec.setVisibility(View.VISIBLE);
-					imgRec.setVisibility(View.VISIBLE);
+					visibilidadBotones();
 				}
 				//msgbox(fstr);
 			}
@@ -5960,6 +5973,11 @@ public class ComWS extends PBase {
 					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "')";
 			dbld.add(ss);
 
+			ss = " UPDATE P_STOCK_PV SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
+				 " WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + sFecha + "' AND ENVIADO = 0 " +
+				 " AND DOCUMENTO IN (SELECT DISTINCT DOCUMENTO FROM P_STOCK_PV WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "')";
+			dbld.add(ss);
+
 			if (envioparcial && !esEnvioManual) {
 				if (commitSQL() == 0) {
 					fterr += "\n" + sstr;
@@ -6325,8 +6343,7 @@ public class ComWS extends PBase {
 				lblInfo.setText(fterr);
 				isbusy = 0;
 				barInfo.setVisibility(View.INVISIBLE);
-				lblRec.setVisibility(View.VISIBLE);
-				imgRec.setVisibility(View.VISIBLE);
+				visibilidadBotones();
 				mu.msgbox("Ocurrió error : \n" + fterr);
 				addlog("Envío", fterr, esql);
 				return;

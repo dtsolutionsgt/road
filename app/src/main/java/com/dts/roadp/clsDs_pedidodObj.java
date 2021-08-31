@@ -93,6 +93,8 @@ public class clsDs_pedidodObj {
         ins.add("UMVENTA",item.umventa);
         ins.add("UMSTOCK",item.umstock);
         ins.add("UMPESO",item.umpeso);
+        ins.add("CANTORIGINAL", item.cantOriginal);
+        ins.add("PESOORIGINAL", item.pesoOriginal);
 
         db.execSQL(ins.sql());
 
@@ -118,6 +120,8 @@ public class clsDs_pedidodObj {
         upd.add("UMVENTA",item.umventa);
         upd.add("UMSTOCK",item.umstock);
         upd.add("UMPESO",item.umpeso);
+        upd.add("CANTORIGINAL", item.cantOriginal);
+        upd.add("PESOORIGINAL", item.pesoOriginal);
 
         upd.Where("(COREL='"+item.corel+"') AND (PRODUCTO='"+item.producto+"')");
 
@@ -169,6 +173,8 @@ public class clsDs_pedidodObj {
             item.umventa=dt.getString(15);
             item.umstock=dt.getString(16);
             item.umpeso=dt.getString(17);
+            item.cantOriginal=dt.getDouble(18);
+            item.pesoOriginal=dt.getDouble(19);;
 
             items.add(item);
 
@@ -218,6 +224,8 @@ public class clsDs_pedidodObj {
         ins.add("UMVENTA",item.umventa);
         ins.add("UMSTOCK",item.umstock);
         ins.add("UMPESO",item.umpeso);
+        ins.add("CANTORIGINAL", item.cantOriginal);
+        ins.add("PESOORIGINAL", item.pesoOriginal);
 
         return ins.sql();
 
@@ -243,6 +251,8 @@ public class clsDs_pedidodObj {
         upd.add("UMVENTA",item.umventa);
         upd.add("UMSTOCK",item.umstock);
         upd.add("UMPESO",item.umpeso);
+        upd.add("CANTORIGINAL", item.cantOriginal);
+        upd.add("PESOORIGINAL", item.pesoOriginal);
         upd.Where("(COREL='"+item.corel+"') AND (PRODUCTO='"+item.producto+"')");
 
         return upd.SQL();

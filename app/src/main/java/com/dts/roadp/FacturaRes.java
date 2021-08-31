@@ -890,7 +890,16 @@ public class FacturaRes extends PBase {
 			ins.add("VEHICULO",gl.vehiculoID);//#HS_20181207 Agregue parametro de vehiculoID
 			ins.add("CODIGOLIQUIDACION",0);
 			ins.add("RAZON_ANULACION","");
-			ins.add("CODIGO_RUTA_PEDIDO","");
+
+			if (gl.iddespacho !=null ) {
+				if (!gl.iddespacho.isEmpty()) {
+					ins.add("CODIGO_RUTA_PEDIDO",gl.rutaPedido);
+				}else{
+					ins.add("CODIGO_RUTA_PEDIDO","");
+				}
+			}else{
+				ins.add("CODIGO_RUTA_PEDIDO","");
+			}
 
 			db.execSQL(ins.sql());
 

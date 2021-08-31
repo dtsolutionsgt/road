@@ -1033,7 +1033,7 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-			vSQL="CREATE TABLE [D_DESPACHADO_NO_ENTREGADO](" +
+			vSQL="CREATE TABLE [D_DESPACHOD_NO_ENTREGADO](" +
 					"[COREL] TEXT NOT NULL," +
 					"[ANULADO] INTEGER NOT NULL," +
 					"[PRODUCTO] TEXT NOT NULL," +
@@ -2114,6 +2114,8 @@ public class BaseDatosScript {
 					"[UMVENTA] TEXT," +
 					"[UMSTOCK] TEXT," +
 					"[UMPESO] TEXT," +
+					"[CANT_ORIGINAL] REAL," +
+					"[PESO_ORIGINAL] REAL," +
 					"PRIMARY KEY ([COREL]," +
 					"[PRODUCTO])"+
 					");";
@@ -2152,6 +2154,8 @@ public class BaseDatosScript {
 					"[VAL3] REAL NOT NULL,"+
 					"[VAL4] TEXT NOT NULL,"+
 					"[PERCEP] REAL NOT NULL,"+
+					"[CANTORIGINAL] REAL,"+
+					"[PESOORIGINAL] REAL,"+
 					"PRIMARY KEY ([PRODUCTO],[UM],[SIN_EXISTENCIA])"+
 					");";
 			database.execSQL(vSQL);
@@ -2179,6 +2183,8 @@ public class BaseDatosScript {
 					"[VAL2] TEXT NOT NULL,"+
 					"[VAL3] REAL NOT NULL,"+
 					"[VAL4] TEXT NOT NULL,"+
+					"[CANTORIGINAL] REAL NOT NULL,"+
+					"[PESOORIGINAL] REAL NOT NULL,"+
 					"PRIMARY KEY ([PRODUCTO])"+
 					");";
 			database.execSQL(vSQL);

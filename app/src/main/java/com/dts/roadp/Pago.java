@@ -141,15 +141,20 @@ public class Pago extends PBase {
 	}
 	
 	public void savePago(View view){
+		double pagado=0;
 		try{
+
 			if ((pagomodo==0) ) {
 				finalCheck(cobro);
 			}else {
-				gl.pagado=totalPago()>0;
-				if (gl.dvbrowse!=0){
-					gl.brw=1;
+				pagado = totalPago();
+				gl.pagado=pagado>0;
+
+				if (pagado==0){
+					msgAskSaveEmpty("No ha realizado ningún pago. Salir");
+				}else{
+					msgAskSaveSR("Aplicar pagos y continuar?");
 				}
-				finish();
 			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -846,8 +851,40 @@ public class Pago extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	}	
-	
+	}
+
+	private void msgAskSaveSR(String msg) {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+
+			dialog.setIcon(R.drawable.ic_quest);
+			dialog.setCancelable(false);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if (gl.dvbrowse!=0){
+						gl.brw=1;
+					}
+					finish();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
 	private void msgAskSaveEmpty(String msg) {
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);

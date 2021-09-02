@@ -72,23 +72,26 @@ public class activity_despacho_list extends PBase {
             };
         });
 
-        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-            selid = 0;
+                selid = 0;
 
-            if (position>=0){
-                Object lvObj = listView.getItemAtPosition(position);
-                clsClasses.clsDs_pedido item = (clsClasses.clsDs_pedido)lvObj;
+                if (position >= 0) {
+                    Object lvObj = listView.getItemAtPosition(position);
+                    clsClasses.clsDs_pedido item = (clsClasses.clsDs_pedido) lvObj;
 
-                adapter.setSelectedIndex(position);
+                    adapter.setSelectedIndex(position);
 
-                gl.iddespacho=item.corel;
-                gl.pedCorel=item.add1;
-                msgAskNoDespachar("Quiere cancelar la entrega de la prefactura " + gl.iddespacho);
+                    gl.iddespacho = item.corel;
+                    gl.pedCorel = item.add1;
+                    activity_despacho_list.this.msgAskNoDespachar("Quiere cancelar la entrega de la prefactura " + gl.iddespacho);
 
+                }
+
+                return true;
             }
-
-            return true;
         });
 
     }

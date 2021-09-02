@@ -3560,7 +3560,7 @@ public class Venta extends PBase {
 		}
 	}
 
-	public void showNoDespDialog(String prod) {
+	public void showNoDespDialog(final String prod) {
 		try{
 			final AlertDialog Dialog;
 

@@ -44,9 +44,10 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.5.0 / ";
-    private String parFechaVer = "05-09-2021";
+    private String parNumVer = "9.5.9 / ";
+    private String parFechaVer = "27-08-2021";
     private String parTipoVer = "ROAD QAS";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,11 +155,9 @@ public class MainActivity extends PBase {
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
             if (gl.debug) {
-                //txtUser.setText("00103790");
-                //txtPass.setText("04");
-
-                txtUser.setText("1");
-                txtPass.setText("1");
+                txtUser.setText("00108457");txtPass.setText("108457");
+                //txtUser.setText("00109776");txtPass.setText("109776");
+                //txtUser.setText("1");txtPass.setText("1");
             }
 
         } catch (Exception e) {
@@ -330,7 +329,8 @@ public class MainActivity extends PBase {
 
         try {
             //#HS_20181122_1505 Se agrego el campo Impresion.
-            sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR FROM P_RUTA";
+            sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR," +
+                    "PERMITIR_PRODUCTO_NUEVO, PERMITIR_CANTIDAD_MAYOR FROM P_RUTA";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -353,6 +353,9 @@ public class MainActivity extends PBase {
 
                 rutapos = s.equalsIgnoreCase("R");
 
+                gl.permitir_cantidad_mayor=(DT.getInt(8)==1?true:false);
+                gl.permitir_producto_nuevo=(DT.getInt(9)==1?true:false);
+
             } else {
 
                 gl.ruta = "";
@@ -360,6 +363,8 @@ public class MainActivity extends PBase {
                 gl.vend = "0";
                 gl.rutatipog = "V";
                 gl.wsURL = "http://192.168.1.1/wsAndr/wsAndr.asmx";
+                gl.permitir_cantidad_mayor=false;
+                gl.permitir_producto_nuevo=false;
 
             }
 
@@ -440,6 +445,7 @@ public class MainActivity extends PBase {
             app.parametrosExtra();
             app.parametrosGlobales();
             app.parametrosBarras();
+
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             msgbox(e.getMessage());

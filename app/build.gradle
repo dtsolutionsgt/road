@@ -5,6 +5,7 @@ android {
     defaultConfig {
         applicationId "com.dts.roadp"
         minSdkVersion 23
+        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
         renderscriptTargetApi 28
         renderscriptSupportModeEnabled true
@@ -22,6 +23,10 @@ android {
     //#HS_20181127_1734 Agregue lintOptions porque no deja generar APK.
     lintOptions {
         checkReleaseBuilds false
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
 }

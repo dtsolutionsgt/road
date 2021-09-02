@@ -11,8 +11,10 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -83,7 +85,8 @@ public class Venta extends PBase {
 
 	private AlertDialog.Builder dialogBarra;
 
-	@Override
+	@RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_venta);

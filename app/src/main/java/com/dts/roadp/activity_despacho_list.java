@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -72,23 +74,24 @@ public class activity_despacho_list extends PBase {
             };
         });
 
-        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                selid = 0;
 
-            selid = 0;
+                if (position >= 0) {
+                    Object lvObj = listView.getItemAtPosition(position);
+                    clsClasses.clsDs_pedido item = (clsClasses.clsDs_pedido) lvObj;
 
-            if (position>=0){
-                Object lvObj = listView.getItemAtPosition(position);
-                clsClasses.clsDs_pedido item = (clsClasses.clsDs_pedido)lvObj;
+                    adapter.setSelectedIndex(position);
 
-                adapter.setSelectedIndex(position);
-
-                gl.iddespacho=item.corel;
-                gl.pedCorel=item.add1;
-                msgAskNoDespachar("Quiere cancelar la entrega de la prefactura " + gl.iddespacho);
-
+                    gl.iddespacho = item.corel;
+                    gl.pedCorel = item.add1;
+                    msgAskNoDespachar("Quiere cancelar la entrega de la prefactura " + gl.iddespacho);
+                }
+                return true;
             }
 
-            return true;
         });
 
     }
@@ -193,6 +196,7 @@ public class activity_despacho_list extends PBase {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     public void showNoDespDialog() {
         try{
             final AlertDialog Dialog;
@@ -292,6 +296,7 @@ public class activity_despacho_list extends PBase {
             dialog.setIcon(R.drawable.ic_quest);
 
             dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
                 public void onClick(DialogInterface dialog, int which) {
                    showNoDespDialog();
                 }

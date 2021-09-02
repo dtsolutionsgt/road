@@ -1208,6 +1208,7 @@ public class BaseDatosScript {
 					"[ID_FACTURACION] INTEGER NOT NULL,"+
 					"[MODIF_PRECIO] INTEGER NOT NULL,"+
 					"[INGRESA_CANASTAS] INTEGER DEFAULT 0 NOT NULL,"+
+                    "[PRIORIZACION] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);
@@ -2118,6 +2119,30 @@ public class BaseDatosScript {
 					"[PRODUCTO])"+
 					");";
 			database.execSQL(vSQL);
+
+            //#JP 20210831
+            vSQL = "CREATE TABLE [P_CANAL](" +
+                    "[CODIGO] TEXT NOT NULL," +
+                    "[NOMBRE] TEXT NOT NULL,"+
+                    "PRIMARY KEY ([CODIGO])"+
+                    ");";
+            database.execSQL(vSQL);
+
+            //#JP 20210831
+            vSQL = "CREATE TABLE [P_CANALSUB](" +
+                    "[CODIGO] TEXT NOT NULL," +
+                    "[CANAL] TEXT NOT NULL," +
+                    "[NOMBRE] TEXT NOT NULL,"+
+                    "PRIMARY KEY ([CODIGO])"+
+                    ");";
+            database.execSQL(vSQL);
+
+            //#JP 20210831
+            vSQL = "CREATE TABLE [P_PRIORIZACION](" +
+                    "[CODIGO] TEXT NOT NULL," +
+                    "PRIMARY KEY ([CODIGO])"+
+                    ");";
+            database.execSQL(vSQL);
 
 			return 1;
 

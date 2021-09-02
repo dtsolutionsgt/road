@@ -3201,7 +3201,7 @@ public class ComWS extends PBase {
 				SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
 				SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
 				SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
-				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO, INGRESA_CANASTAS ";
+				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO, INGRESA_CANASTAS, PRIORIZACION ";
 				SQL += "FROM P_CLIENTE ";
 				SQL += "WHERE (CODIGO IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "') )) ";
 
@@ -3538,6 +3538,21 @@ public class ComWS extends PBase {
 			SQL = "SELECT * FROM P_REF3";
 			return SQL;
 		}
+
+        if (TN.equalsIgnoreCase("P_CANAL")) {
+            SQL = "SELECT * FROM P_CANAL";
+            return SQL;
+        }
+
+        if (TN.equalsIgnoreCase("P_CANALSUB")) {
+            SQL = "SELECT * FROM P_CANALSUB";
+            return SQL;
+        }
+
+        if (TN.equalsIgnoreCase("P_PRIORIZACION")) {
+            SQL = "SELECT * FROM P_PRIORIZACION";
+            return SQL;
+        }
 
 
 		// Objetivos
@@ -4205,7 +4220,7 @@ public class ComWS extends PBase {
 
 			switch (indicetabla) {
 				case -4:
-					nombretabla = "CARGA_SUPERVISOR";break;
+					nombretabla="CARGA_SUPERVISOR";break;
 				case -3:
 					nombretabla="P_PARAMEXT";break;
 				case -2:
@@ -4376,14 +4391,21 @@ public class ComWS extends PBase {
 					nombretabla="P_RAZON_DESP_INCOMP";
 					break;
                 case 71:
-                    nombretabla = "P_STOCK_PV";
-                    break;
-				case 72://#CKFK 20210813 Cambié esto para el final
-					nombretabla="Procesando tablas ...";break;
-				case 73:
+                    nombretabla = "P_STOCK_PV";break;
+				case 72:
+					nombretabla="P_CANAL";break;
+                case 73:
+                    nombretabla="P_CANALSUB";break;
+                case 74:
+                    nombretabla="P_PRIORIZACION";break;
+                case 75://#CKFK 20210813 Cambié esto para el final
+                    nombretabla="Procesando tablas ...";break;
+
+                case 76:
 					procesaDatos();
 					ejecutar = false;
                     break;
+
 			}
 
 			if (ejecutar) executaTabla();

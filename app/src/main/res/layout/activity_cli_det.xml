@@ -7,6 +7,8 @@
     android:background="@layout/back"
     tools:context=".CliDet">
 
+
+
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="match_parent"
@@ -41,55 +43,102 @@
             android:text="Ruta"
             android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/lblNom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:paddingLeft="5dp"
-            android:paddingTop="3dp"
-            android:paddingRight="5dp"
-            android:paddingBottom="3dp"
-            android:text="Nombre"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="18sp"
-            android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/lblPres"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/lblNom"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:paddingBottom="3dp"
-            android:text="Representante"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="18sp" />
+        <ScrollView
+            android:id="@+id/scroll1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/txtRuta"
+            android:layout_marginBottom="5dp">
 
-        <TextView
-            android:id="@+id/lblDir"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/lblProd"
-            android:layout_below="@+id/lblPres"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="80dp"
-            android:layout_weight="1"
-            android:width="0dip"
-            android:clickable="true"
-            android:maxLines="100"
-            android:onClick="showDir"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:scrollHorizontally="false"
-            android:text="Direccion"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/lblClaseSub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/lblClase"
+                    android:paddingStart="5dp"
+                    android:text="Subclase"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/lblClase"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/lblDir"
+                    android:layout_alignParentBottom="false"
+                    android:background="#F0F0F0"
+                    android:paddingStart="5dp"
+                    android:text="Clase"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/lblNom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:paddingLeft="5dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="5dp"
+                    android:paddingBottom="3dp"
+                    android:text="Nombre"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblPres"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/lblNom"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentRight="true"
+                    android:background="#F0F0F0"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:paddingBottom="3dp"
+                    android:text="Representante"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/lblDir"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/lblPres"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="0dp"
+                    android:layout_weight="1"
+                    android:width="0dip"
+                    android:clickable="true"
+                    android:maxLines="100"
+                    android:onClick="showDir"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:scrollHorizontally="false"
+                    android:text="Direccion"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/textView100"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/lblClaseSub"
+                    android:background="#F0F0F0"
+                    android:paddingStart="5dp"
+                    android:paddingTop="0dp"
+                    android:text="Priorizacion"
+                    android:textSize="18sp" />
+            </RelativeLayout>
+        </ScrollView>
+
+
 
         <TextView
             android:id="@+id/lblCant"

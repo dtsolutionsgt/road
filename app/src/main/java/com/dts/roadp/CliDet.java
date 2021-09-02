@@ -3,7 +3,6 @@ package com.dts.roadp;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,12 +15,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
-import android.service.autofill.Dataset;
 import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -45,7 +42,8 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 public class CliDet extends PBase {
 
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
-	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago,lblRuta,lblRuta2, lblDespacho;
+	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago;
+	private TextView lblRuta,lblRuta2, lblDespacho, lblCanal, lblCanalsub,lblPrior;
 	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol,imgRoadTit, imgTel, imgWhatsApp, imgWaze, imgVenta, imgPreventa, imgDespacho, imgCamara, imgMap;
 	private EditText txtRuta;
@@ -54,7 +52,7 @@ public class CliDet extends PBase {
 	private PhotoViewAttacher zoomFoto;
 	private AppMethods app;
 
-	private String cod,tel, Nombre, NIT, sgp1, sgp2;
+	private String cod,tel, Nombre, NIT, sgp1, sgp2, canal, canalsub,prior;
 	private String imagenbase64,path,fechav;
 	private Boolean imgPath, imgDB, ventaGPS,flagGPS=true,permiteVenta=true,clicred;
 	private double gpx,gpy,credito,clim,cused,cdisp,cred;
@@ -86,9 +84,14 @@ public class CliDet extends PBase {
 		lblClientePago = (TextView) findViewById(R.id.lblClientePago);
 		lblRuta = (TextView) findViewById(R.id.lblRuta);lblRuta.setVisibility(View.INVISIBLE);
 		lblRuta2 = (TextView) findViewById(R.id.lblRuta2);lblRuta2.setVisibility(View.INVISIBLE);
+        lblCanal = findViewById(R.id.lblClase);
+        lblCanalsub = findViewById(R.id.lblClaseSub);
+        lblPrior = findViewById(R.id.textView100);
+
 		txtRuta = (EditText) findViewById(R.id.txtRuta);txtRuta.setVisibility(View.INVISIBLE);
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
+
 
 		lblDespacho = (TextView) findViewById(R.id.lblDespacho);
 
@@ -421,8 +424,9 @@ public class CliDet extends PBase {
 		try {
 
 			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
-					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO,INGRESA_CANASTAS "+
-					"FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
+					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO,INGRESA_CANASTAS, " +
+                    "CANAL,SUBCANAL,PRIORIZACION "+
+					" FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 
@@ -474,6 +478,9 @@ public class CliDet extends PBase {
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
 			gl.clitipo = DT.getString(16);
 			gl.ingresaCanastas = DT.getInt(18) == 1;
+            canal =DT.getString(19);
+            canalsub =DT.getString(20);
+            prior=DT.getString(21);
 
 			if(DT!=null) DT.close();
 
@@ -490,7 +497,25 @@ public class CliDet extends PBase {
             DT.moveToFirst();
             pedclinue=DT.getInt(0)==1;
 
-		} catch (Exception e) {
+            sql="SELECT NOMBRE FROM P_CANAL WHERE CODIGO='"+canal+"'";
+            DT=Con.OpenDT(sql);
+            try {
+                DT.moveToFirst();lblCanal.setText("Canal : "+DT.getString(0));
+            } catch (Exception e) {
+                lblCanal.setText("Canal : ");
+            }
+
+            sql="SELECT NOMBRE FROM P_CANALSUB WHERE CODIGO='"+canalsub+"'";
+            DT=Con.OpenDT(sql);
+            try {
+                DT.moveToFirst();lblCanalsub.setText("Subcanal : "+DT.getString(0));
+            } catch (Exception e) {
+                lblCanalsub.setText("Subcanal : ");
+            }
+
+            lblPrior.setText("Priorización : "+prior);
+
+      	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}

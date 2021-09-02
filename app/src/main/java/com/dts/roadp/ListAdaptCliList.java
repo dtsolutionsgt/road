@@ -50,7 +50,7 @@ public class ListAdaptCliList extends BaseAdapter {
 
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder;
-		int val,cobro,ppago,iconid;
+		int val,cobro,ppago,iconid,despacho;
 	
 		if (convertView == null) {
 			
@@ -62,6 +62,7 @@ public class ListAdaptCliList extends BaseAdapter {
 			holder.imgBand = (ImageView) convertView.findViewById(R.id.imgNext);
 			holder.imgCobro = (ImageView) convertView.findViewById(R.id.imageView8);
 			holder.imgPPago = (ImageView) convertView.findViewById(R.id.imageView7);
+			holder.imgDespacho = (ImageView) convertView.findViewById(R.id.imgDespacho);
 			
 			convertView.setTag(holder);
 		} else {
@@ -74,6 +75,7 @@ public class ListAdaptCliList extends BaseAdapter {
 		val= items.get(position).Bandera;
 		cobro= items.get(position).Cobro;
 		ppago= items.get(position).ppend;
+		despacho= items.get(position).prefacturas;
 
 		iconid=R.drawable.blank24;
 		if (val>0) iconid=R.drawable.disable24;
@@ -82,6 +84,7 @@ public class ListAdaptCliList extends BaseAdapter {
 
 		if (cobro==1) holder.imgCobro.setImageResource(R.drawable.cobro48);else holder.imgCobro.setImageResource(R.drawable.blank24);
 		if (ppago==1) holder.imgPPago.setImageResource(R.drawable.pago_pend);else holder.imgPPago.setImageResource(R.drawable.blank24);
+		if (despacho==1) holder.imgDespacho.setImageResource(R.drawable.pedido);else holder.imgDespacho.setImageResource(R.drawable.blank24);
 
 		if(selectedIndex!= -1 && position == selectedIndex) {
 			convertView.setBackgroundColor(Color.rgb(26,138,198));
@@ -95,7 +98,7 @@ public class ListAdaptCliList extends BaseAdapter {
 	
 	static class ViewHolder {
 		TextView  lblCod,lblDesc;
-		ImageView  imgBand,imgCobro,imgPPago;
+		ImageView  imgBand,imgCobro,imgPPago,imgDespacho;
 	}
 	
 }

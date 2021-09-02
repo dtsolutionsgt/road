@@ -85,6 +85,8 @@ public class Menu extends PBase {
 
 			if (rutatipo.equalsIgnoreCase("T")) {
 				sdoc="Factura + Pedido";
+			} if (rutatipo.equalsIgnoreCase("D")) {
+				sdoc="Prefactura";iicon=102;
 			} else {
 				if (rutatipo.equalsIgnoreCase("V")) {
 					sdoc="Venta";iicon=102;
@@ -140,7 +142,9 @@ public class Menu extends PBase {
 			//#CKFK 20190423 Quité esta validación de configuración de impresora
 			//ConfImpresora();
 
-		}catch (Exception e) 		{
+            validaParametros();
+
+		} catch (Exception e) 		{
 			Log.e("Mnu", e.getMessage());
 		}
 
@@ -395,7 +399,7 @@ public class Menu extends PBase {
 					if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
 						mu.msgbox("No puede realizar esta acción");
 					}else {
-						if (rutatipo.equalsIgnoreCase("P")) {
+						if (rutatipo.equalsIgnoreCase("P") || rutatipo.equalsIgnoreCase("T")) {
 							showInvMenuPreventa();
 						} else {
 							showInvMenuVenta();
@@ -979,7 +983,10 @@ public class Menu extends PBase {
 			final String[] selitems = new String[itemcnt];
 
 			selitems[itempos]="Existencias";itempos++;
-            selitems[itempos]="Existencias pedidos";itempos++;
+
+		   if (rutatipo.equals("P") || rutatipo.equals("T")){
+				selitems[itempos]="Existencias pedidos";itempos++;
+			}
 
 			if (gl.peAceptarCarga) {
 				selitems[itempos]="Aceptar Inventario";itempos++;
@@ -1963,8 +1970,6 @@ public class Menu extends PBase {
 		return (cantstock + cantbolsa + cantcan > 0);
 	}
 
-
-
 	public void getWSURLs() {
 		Cursor dt;
 
@@ -1985,6 +1990,28 @@ public class Menu extends PBase {
 		}
 
 	}
+
+    public void validaParametros() {
+        Cursor dt;
+
+        try {
+
+            sql="SELECT IMPRESION,ENVIO_AUTO_PEDIDOS FROM P_RUTA";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+
+            if (dt.getString(0).equalsIgnoreCase("N")) {
+                msgbox("La ruta tiene deshabilitada la impresión");
+            }
+
+            if (dt.getInt(1)==1) {
+                msgbox("Envio de pedidos habilitado");
+            }
+
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+        }
+    }
 
 
 	//endregion

@@ -38,8 +38,8 @@ import java.util.concurrent.ExecutionException;
 public class FacturaRes extends PBase {
 
 	private ListView listView;
-	private TextView lblPago,lblFact,lblTalon,lblMPago,lblCred,lblPend,lblCash;
-	private ImageView imgBon,imgMPago,imgCred,imgPend, imgCash, imgBack;
+	private TextView lblPago,lblFact,lblTalon,lblMPago,lblCred,lblPend,lblCash,lblCanastas;
+	private ImageView imgBon,imgMPago,imgCred,imgPend, imgCash, imgBack, imgCanastas;
 	private CheckBox contadoCheck;
 	private TextView lblVuelto;
 	private EditText txtVuelto;
@@ -86,6 +86,7 @@ public class FacturaRes extends PBase {
 		lblCred = (TextView) findViewById(R.id.lblPend);
 		lblPend = (TextView) findViewById(R.id.lblCVence2);
 		lblCash = (TextView) findViewById(R.id.textView4);
+		lblCanastas = (TextView) findViewById(R.id.lblCanastas);
 
 		imgBon = (ImageView) findViewById(R.id.imageView6);
 		imgMPago = (ImageView) findViewById(R.id.imageView1);
@@ -93,6 +94,7 @@ public class FacturaRes extends PBase {
 		imgPend = (ImageView) findViewById(R.id.imageView12);
 		imgCash = (ImageView) findViewById(R.id.imageView2);
 		imgBack = (ImageView) findViewById(R.id.imageView5);
+		imgCanastas = (ImageView) findViewById(R.id.imgCanastas);
 
 		contadoCheck = (CheckBox) findViewById(R.id.checkContado);
 		rl_facturares=(RelativeLayout)findViewById(R.id.relativeLayout1);rl_facturares.setVisibility(View.VISIBLE);
@@ -108,6 +110,7 @@ public class FacturaRes extends PBase {
 		gl.cobroPendiente = false;
 		dispventa = gl.dvdispventa;dispventa=mu.round(dispventa,2);
 		notaC = gl.tiponcredito;
+		gl.corelFac=gl.ruta+"_"+mu.getCorelBase();
 
 		app = new AppMethods(this, gl, Con, db);
 
@@ -289,6 +292,8 @@ public class FacturaRes extends PBase {
 	public void paySelect(View view) {
 
 		try{
+			if (!tieneCanastas()) return;
+
 			if (fcorel==0) {
 				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
 			}
@@ -332,9 +337,44 @@ public class FacturaRes extends PBase {
 		}
 	}
 
+	private boolean tieneCanastas() {
+		if (gl.ingresaCanastas) {
+
+			long fecha = app.fechaFactTol(du.getActDateTime());
+
+			String sql = "SELECT ifnull(count(*), 0) as cant FROM T_CANASTA " +
+					"WHERE ruta='" + gl.ruta + "' " +
+					"AND ANULADO=0 " +
+					"AND cliente='" + gl.cliente + "' " +
+					"AND CORELTRANS='"+gl.corelFac+"' "+
+					"AND fecha=" + fecha;
+
+			Cursor DT = Con.OpenDT(sql);
+
+			if (DT != null) {
+				if(DT.getCount() >= 1) {
+					DT.moveToFirst();
+					int cant = DT.getInt(0);
+					if (cant >= 1) {
+						return true;
+					}else {
+						toastcent("Debe registrar canastas antes de pagar.");
+						Intent canastas = new Intent(this, Canastas.class);
+						startActivity(canastas);
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
 	public void payCash(View view) {
 
 		try{
+
+			if (!tieneCanastas()) return;
 
 			if (fcorel==0) {
 				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
@@ -353,6 +393,7 @@ public class FacturaRes extends PBase {
 	public void payCred(View view) {
 
 		try{
+			if (!tieneCanastas()) return;
 
 			if (fcorel==0) {
 				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
@@ -435,6 +476,8 @@ public class FacturaRes extends PBase {
 
 	public void pendientePago(View view){
 		try{
+			if (!tieneCanastas()) return;
+
 			askPendientePago();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -492,6 +535,17 @@ public class FacturaRes extends PBase {
 			mu.msgbox( e.getMessage());
 		}
 
+	}
+
+	public void showCanastas(View view) {
+		try {
+			Intent iCanasta = new Intent(this, Canastas.class);
+			startActivity(iCanasta);
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox( e.getMessage());
+		}
 	}
 
 	private void updDesc(){
@@ -742,7 +796,8 @@ public class FacturaRes extends PBase {
 		double vcant,vpeso,vfactor,peso,factpres,vtot,vprec;
 		int mitem,bitem;
 		int dev_ins=1;
-		corel=gl.ruta+"_"+mu.getCorelBase();
+		corel=gl.corelFac;
+
 
         sql="SELECT MAX(ITEM) FROM D_FACT_LOG";
         dt=Con.OpenDT(sql);
@@ -801,7 +856,27 @@ public class FacturaRes extends PBase {
 			ins.add("ADD3",gl.ref3);
 
 			ins.add("DEPOS","N");
-			ins.add("PEDCOREL","");
+
+			if (gl.iddespacho !=null ) {
+				if (!gl.iddespacho.isEmpty()) {
+					ins.add("PEDCOREL",gl.pedCorel);
+				}else{
+					ins.add("PEDCOREL","");
+				}
+			}else{
+				ins.add("PEDCOREL","");
+			}
+
+			if (gl.iddespacho !=null ) {
+				if (!gl.iddespacho.isEmpty()) {
+					ins.add("DESPCOREL",gl.iddespacho);
+				}else{
+					ins.add("DESPCOREL","");
+				}
+			}else{
+				ins.add("DESPCOREL","");
+			}
+
 			ins.add("REFERENCIA","");
 
 			if (gl.dvbrowse!=0){
@@ -815,6 +890,16 @@ public class FacturaRes extends PBase {
 			ins.add("VEHICULO",gl.vehiculoID);//#HS_20181207 Agregue parametro de vehiculoID
 			ins.add("CODIGOLIQUIDACION",0);
 			ins.add("RAZON_ANULACION","");
+
+			if (gl.iddespacho !=null ) {
+				if (!gl.iddespacho.isEmpty()) {
+					ins.add("CODIGO_RUTA_PEDIDO",gl.rutaPedido);
+				}else{
+					ins.add("CODIGO_RUTA_PEDIDO","");
+				}
+			}else{
+				ins.add("CODIGO_RUTA_PEDIDO","");
+			}
 
 			db.execSQL(ins.sql());
 
@@ -832,6 +917,14 @@ public class FacturaRes extends PBase {
 			bonsave.save();
 
 			//endregion
+
+			sql="INSERT INTO D_CANASTA (RUTA, FECHA, CLIENTE, PRODUCTO, CANTREC, CANTENTR, STATCOM, CORELTRANS, ANULADO, UNIDBAS) " +
+					"SELECT RUTA, FECHA, CLIENTE, PRODUCTO, CANTREC, CANTENTR, STATCOM, CORELTRANS, ANULADO, UNIDBAS " +
+					"FROM T_CANASTA WHERE CORELTRANS='"+gl.corelFac+"'";
+			db.execSQL(sql);
+
+			sql="DELETE FROM T_CANASTA";
+			db.execSQL(sql);
 
 			//region Devolución de  producto.
 			if (gl.dvbrowse!=0){
@@ -883,7 +976,6 @@ public class FacturaRes extends PBase {
 				ins.add("IMPRES",0);
 
 				db.execSQL(ins.sql());
-
 
 				sql="SELECT Item,CODIGO,CANT,CODDEV,TOTAL,PRECIO,PRECLISTA,REF,PESO,LOTE,UMVENTA,UMSTOCK,UMPESO,FACTOR,POR_PESO FROM T_CxCD WHERE CANT>0";
 				DT=Con.OpenDT(sql);
@@ -1054,6 +1146,37 @@ public class FacturaRes extends PBase {
 
 			//endregion
 
+			//region D_FACTURAD_MODIF
+
+			sql="SELECT COREL, ANULADO, PRODUCTO, CANTSOLICITADA, UMVENTASOLICITADA, PESOSOLICITADO, CANTENTREGADA, " +
+				"UMVENTAENTREGADA, PESOENTREGADO, IDRAZON, PEDCOREL, STATCOM, DESPCOREL FROM T_FACTURAD_MODIF";
+			dt=Con.OpenDT(sql);
+
+			dt.moveToFirst();
+			while (!dt.isAfterLast()) {
+
+				ins.init("D_FACTURAD_MODIF");
+				ins.add("COREL",corel);
+				ins.add("ANULADO",0);
+				ins.add("PRODUCTO",dt.getString(2));
+				ins.add("CANTSOLICITADA",dt.getDouble(3));
+				ins.add("UMVENTASOLICITADA",dt.getString(4));
+				ins.add("PESOSOLICITADO",dt.getDouble(5));
+				ins.add("CANTENTREGADA",dt.getDouble(6));
+				ins.add("UMVENTAENTREGADA",dt.getString(7));
+				ins.add("PESOENTREGADO",dt.getDouble(8));
+				ins.add("IDRAZON",dt.getString(9));
+				ins.add("PEDCOREL",dt.getString(10));
+				ins.add("STATCOM",dt.getString(11));
+				ins.add("DESPCOREL",dt.getString(12));
+
+				db.execSQL(ins.sql());
+
+				dt.moveToNext();
+			}
+
+			//endregion
+
 			//region D_FACTURAP
 
 			if(!gl.cobroPendiente) {
@@ -1132,10 +1255,11 @@ public class FacturaRes extends PBase {
 
 			//#CKFK 20190720 Modifiqué la información que se guarda en D_FACTURA_BARRA y en D_STOCKB_DEV porque se estaban
 			//guardando las barras sin repesaje.
+			//#CKFK 20210803 Agregué el campo Reservado
 			sql=" INSERT INTO D_FACTURA_BARRA "+
 				" SELECT  S.RUTA, B.BARRA, S.CODIGO, S.CANT, S.COREL, S.PRECIO, B.PESO, S.DOCUMENTO, " +
 				" S.FECHA, S.ANULADO, S.CENTRO, S.STATUS, S.ENVIADO, S.CODIGOLIQUIDACION, " +
-				" S.COREL_D_MOV, S.UNIDADMEDIDA, S.DOC_ENTREGA " +
+				" S.COREL_D_MOV, S.UNIDADMEDIDA, S.DOC_ENTREGA, S.RESERVADO " +
 				" FROM P_STOCKB S INNER JOIN T_BARRA B ON S.BARRA = B.BARRA ";
 			db.execSQL(sql);
 
@@ -1302,6 +1426,16 @@ public class FacturaRes extends PBase {
 
 			//endregion
 
+			//region Despacho
+
+			if (gl.coddespacho !=null){
+				if (!gl.coddespacho.isEmpty()) {
+					db.execSQL("UPDATE DS_PEDIDO SET BANDERA='S' WHERE COREL='"+gl.coddespacho+"'");
+				}
+			}
+
+			//endregion
+
 			//region Actualización del último correlativo
 
 			sql="UPDATE P_COREL SET CORELULT="+fcorel+"  WHERE RUTA='"+gl.ruta+"'";
@@ -1405,7 +1539,9 @@ public class FacturaRes extends PBase {
 				sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
 				db.execSQL(sql);
 
-				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0)";
+				//KM120821 Agregué validacion para no eliminar eliminar el stock de las canastas
+				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0) " +
+					"AND CODIGO NOT IN(SELECT CODIGO FROM P_PRODUCTO WHERE ES_CANASTA = 1)";
 				db.execSQL(sql);
 
 				// Factura Stock
@@ -1529,7 +1665,9 @@ public class FacturaRes extends PBase {
 				sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (LOTE='"+lote+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
 				db.execSQL(sql);
 
-				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0)";
+				//KM120821 Agregué validacion para no eliminar eliminar el stock de las canastas
+				sql="DELETE FROM P_STOCK WHERE (CANT<=0) AND (CANTM<=0) " +
+					"AND CODIGO NOT IN(SELECT CODIGO FROM P_PRODUCTO WHERE ES_CANASTA = 1)";
 				db.execSQL(sql);
 
 
@@ -2532,6 +2670,9 @@ public class FacturaRes extends PBase {
 			db.execSQL("DELETE FROM T_PAGO");
 
 			db.execSQL("DELETE FROM T_BONITEM WHERE PRODID='*'");
+
+			sql="DELETE FROM T_FACTURAD_MODIF";
+			db.execSQL(sql);
 
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

@@ -26,7 +26,7 @@ public class ProdCant extends PBase {
 
 	private EditText txtCant,txtPeso;
 	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot,lblCodProd;
-	private TextView lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso,lblPesoUni;
+	private TextView lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso,lblPesoUni, lblPesoOriginal, lblCantOriginal;
 	private ImageView imgProd,imgUpd,imgDel;	
 	
 	private Precio prc;
@@ -54,7 +54,7 @@ public class ProdCant extends PBase {
 
 		if (rutatipo.equalsIgnoreCase("V")) imgUpd.setVisibility(View.INVISIBLE);
 		imgUpd.setVisibility(View.INVISIBLE);
-		
+
 		prc=new Precio(this,mu,gl.peDec);
 		getDisp();
 
@@ -150,6 +150,7 @@ public class ProdCant extends PBase {
  	private void setHandlers(){
 
 		try{
+
 			txtCant.addTextChangedListener(new TextWatcher() {
 
 				public void afterTextChanged(Editable s) {}
@@ -541,7 +542,7 @@ public class ProdCant extends PBase {
 				return;
 			}
 
-			if (rutatipo.equalsIgnoreCase("V")) {
+			if (rutatipo.equalsIgnoreCase("V") || rutatipo.equalsIgnoreCase("D") ) {
 				if (cant > idisp) {
 					mu.msgbox("Cantidad mayor que disponible.");
 					txtCant.requestFocus();
@@ -642,6 +643,8 @@ public class ProdCant extends PBase {
 			imgProd=(ImageView) findViewById(R.id.imgPFoto);
 			imgUpd=(ImageView) findViewById(R.id.ImageView1);
 			imgDel=(ImageView) findViewById(R.id.imageView2);
+			lblPesoOriginal=(TextView) findViewById(R.id.textView9);lblPesoOriginal.setVisibility(View.VISIBLE);
+			lblCantOriginal=(TextView) findViewById(R.id.textView10);lblCantOriginal.setVisibility(View.VISIBLE);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

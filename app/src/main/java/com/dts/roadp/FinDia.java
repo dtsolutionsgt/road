@@ -61,7 +61,7 @@ public class FinDia extends PBase {
         app = new AppMethods(this, gl, Con, db);
 
         gl.validimp=app.validaImpresora();
-        if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+        //if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
         gl.devfindia=app.getDevolBod();
 
@@ -69,7 +69,8 @@ public class FinDia extends PBase {
         if (rutatipo.equalsIgnoreCase("T")) {
             fullfd = true;
         } else {
-            if (rutatipo.equalsIgnoreCase("V")) fullfd = true;
+            if (rutatipo.equalsIgnoreCase("V") ||
+                rutatipo.equalsIgnoreCase("D") ) fullfd = true;
             else fullfd = false;
         }
 
@@ -269,6 +270,11 @@ public class FinDia extends PBase {
                     sql = "DELETE FROM D_BONIFFALT";
                     db.execSQL(sql);
 
+                    //CKFK 20210828 Agregué el limpiar la tabla del inventario de Preventa
+                    // cuando se hace el fin de día
+                    sql = "DELETE FROM P_STOCK_PV";
+                    db.execSQL(sql);
+
                     DT.moveToNext();
                 }
             }
@@ -403,6 +409,9 @@ public class FinDia extends PBase {
 			/*sql="UPDATE P_RUTA SET Email='0'";
 			db.execSQL(sql);*/
 
+            sql = "DELETE FROM D_CANASTA WHERE STATCOM= 'S'";
+            db.execSQL(sql);
+
             db.setTransactionSuccessful();
             db.endTransaction();
 
@@ -526,6 +535,11 @@ public class FinDia extends PBase {
 
             if (fullfd) {
 
+                if (rutatipo.equals("C") && claseFinDia.getCantCanasta() == 0) {
+                    msgExit("No hay canastas, no se puede realizar el Fin de Día");
+                    return false;
+                }
+
                 if (claseFinDia.getCantFactura() == 0) {
                     msgExit("No hay facturas, no se puede realizar el Fin de Día");
                     return false;
@@ -535,6 +549,12 @@ public class FinDia extends PBase {
                     msgPendPago("Existen facturas pendientes de pago. No se puede realizar fin del día");
                     return false;
                 }
+
+                //#CKFK 20210824 Valida si existen despachos pendientes de entregar
+               /* if (!validaDespachosPendientes()) {
+                    msgDespachosPendientesEntrega("Existen prefacturas pendientes de entrega. No se puede realizar fin del día");
+                    return false;
+                }*/
 
                 if (gl.peModal.equalsIgnoreCase("APR")) {
                     setFactCor();
@@ -626,6 +646,23 @@ public class FinDia extends PBase {
                     "(SELECT DISTINCT D_FACTURA_1.COREL " +
                     "FROM D_FACTURA AS D_FACTURA_1 INNER JOIN " +
                     "D_FACTURAP ON D_FACTURA_1.COREL=D_FACTURAP.COREL))";
+            dt = Con.OpenDT(sql);
+
+            return (dt.getCount() == 0);
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            msgbox(new Object() {
+            }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+            return false;
+        }
+
+    }
+
+    private boolean validaDespachosPendientes() {
+        Cursor dt;
+
+        try {
+            sql = "SELECT COREL FROM DS_PEDIDO WHERE (ANULADO='N') AND BANDERA = 'N'";
             dt = Con.OpenDT(sql);
 
             return (dt.getCount() == 0);
@@ -2497,6 +2534,27 @@ public class FinDia extends PBase {
             dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     gl.filtrocli = 2;
+                    startActivity(new Intent(FinDia.this, Clientes.class));
+                }
+            });
+
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+    }
+
+    private void msgDespachosPendientesEntrega(String msg) {
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle(R.string.app_name);
+            dialog.setMessage(msg);
+
+            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    gl.filtrocli = 3;
                     startActivity(new Intent(FinDia.this, Clientes.class));
                 }
             });

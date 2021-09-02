@@ -368,7 +368,9 @@ public class Anulacion extends PBase {
 
 			}
 
-			sql="DELETE FROM P_STOCK WHERE CANT=0 AND CANTM=0";
+			//KM120821 Agregué validacion para no eliminar el stock de las canastas
+			sql="DELETE FROM P_STOCK WHERE CANT=0 AND CANTM=0 " +
+				"AND CODIGO NOT IN(SELECT CODIGO FROM P_PRODUCTO WHERE ES_CANASTA=1)";
 			db.execSQL(sql);
 
 			listItems();
@@ -400,17 +402,20 @@ public class Anulacion extends PBase {
 
             if (toledano) {
 
-                sql="SELECT PRODUCTO,CANT,PESO FROM D_PEDIDOD WHERE COREL='"+itemid+"'";
+                sql="SELECT PRODUCTO,CANTPROC,PESO FROM D_PEDIDOD WHERE COREL='"+itemid+"'";
                 dt=Con.OpenDT(sql);
 
                 dt.moveToFirst();
                 while (!dt.isAfterLast()) {
+
                     prid=dt.getString(0);
                     dcant=dt.getDouble(1);
                     dpeso=dt.getDouble(2);
 
-                    sql="UPDATE P_STOCK_PV SET CANT=CANT+"+dcant+",PESO=PESO+"+dpeso+" WHERE (CODIGO='"+prid+"') ";
-                    db.execSQL(sql);
+                    if (dcant>0) {
+                        sql="UPDATE P_STOCK_PV SET CANT=CANT+"+dcant+",PESO=PESO+"+dpeso+" WHERE (CODIGO='"+prid+"') ";
+                        db.execSQL(sql);
+                    }
 
                     dt.moveToNext();
                 }
@@ -461,6 +466,9 @@ public class Anulacion extends PBase {
 			sql="UPDATE D_FACTURAD SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
 
+			sql="UPDATE D_FACTURAD_MODIF SET Anulado=1 WHERE COREL='"+itemid+"'";
+			db.execSQL(sql);
+
 			sql="UPDATE D_FACTURAP SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
 
@@ -485,6 +493,7 @@ public class Anulacion extends PBase {
             db.execSQL(sql);
 
 			anulBonif(itemid);
+			anularCanastas(itemid);
 
 			// Nota credito
 //
@@ -502,6 +511,11 @@ public class Anulacion extends PBase {
 
 			//ImpresionFactura();
 
+			//Despacho
+			sql="UPDATE DS_PEDIDO SET BANDERA='N' WHERE COREL IN (" +
+				"SELECT DESPCOREL FROM D_FACTURA WHERE COREL = '"+itemid+"')";
+			db.execSQL(sql);
+
 			if(dt!=null) dt.close();
 
 			vAnulFactura=true;
@@ -513,6 +527,49 @@ public class Anulacion extends PBase {
 
 		return vAnulFactura;
 
+	}
+
+	private void anularCanastas(String itemid) {
+		try {
+			String sql;
+			sql = "SELECT PRODUCTO, SUM(CANTENTR) AS CANT " +
+					"FROM D_CANASTA WHERE CORELTRANS='"+itemid+"' " +
+					"AND ANULADO=0 " +
+					"AND CANTENTR > 0 " +
+					"GROUP BY PRODUCTO";
+
+			Cursor can = Con.OpenDT(sql);
+
+			if (can != null || can.getCount() > 0) {
+				can.moveToFirst();
+
+				while (!can.isAfterLast()) {
+					float cant=0;
+					String codigo="";
+					codigo = can.getString(0);
+					cant = can.getFloat(1);
+
+					Cursor stock = Con.OpenDT("SELECT CANT FROM P_STOCK WHERE CODIGO='"+codigo+"'");
+					if (stock != null && stock.getCount() >= 1) {
+						stock.moveToFirst();
+						cant += stock.getFloat(0);
+					}
+
+
+					upd.init("P_STOCK");
+					upd.Where("CODIGO='"+codigo+"'");
+					upd.add("CANT", cant);
+					db.execSQL(upd.SQL());
+					can.moveToNext();
+				}
+
+				sql = "UPDATE D_CANASTA SET ANULADO=1 WHERE CORELTRANS='"+itemid+"'";
+				db.execSQL(sql);
+			}
+
+		}catch (Exception e) {
+			addlog("anularCanastas", e.getMessage(), null);
+		}
 	}
 	
 	private void anulBonif(String itemid) {

@@ -50,7 +50,7 @@
                 android:layout_toRightOf="@+id/imgRoadTit"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:text="Pedidos"
+                android:text="Lista de pedidos"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#1A8AC6" />
         </RelativeLayout>
@@ -95,9 +95,10 @@
         android:layout_toLeftOf="@+id/imgImg"
         android:clickable="true"
         android:gravity="center_vertical|center_horizontal"
+        android:maxLines="2"
         android:onClick="nuevoPedido"
         android:paddingTop="5dp"
-        android:text="Crear nuevo pedido"
+        android:text="Nombre cliente"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="22sp"
         android:textStyle="bold" />
@@ -114,6 +115,24 @@
             android:background="@layout/blue_strip" >
 
             <TextView
+                android:id="@+id/textView88"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentRight="false"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="13dp"
+                android:gravity="center_horizontal"
+                android:paddingRight="10dp"
+                android:text="DTSolutions"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
                 android:id="@+id/textView9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -125,7 +144,23 @@
                 android:text="DTSolutions"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#FFFFFF"
-                android:textSize="15sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
         </RelativeLayout>
 
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/textView89"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imgImg"
+        android:layout_alignStart="@+id/imgImg"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:gravity="center_horizontal"
+        android:text="PREVENTA"
+        android:textSize="10sp"
+        android:textStyle="bold" />
+
+</RelativeLayout>

@@ -77,7 +77,7 @@ public class Reimpresion extends PBase {
 
 		app = new AppMethods(this, gl, Con, db);
 		gl.validimp=app.validaImpresora();
-		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+		//if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
 		if (!gl.debug)imgPrint.setVisibility(View.INVISIBLE);
 		else imgPrint.setVisibility(View.VISIBLE);
@@ -157,6 +157,7 @@ public class Reimpresion extends PBase {
 		switch (tipo) {
 		case 0:
 			docPed = new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp,"");
+			docPed.global=gl;
 			lblTipo.setText("Pedido");break;
 		case 1:
 			cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.numSerie, "");
@@ -446,15 +447,17 @@ public class Reimpresion extends PBase {
 	private void imprPedido() {
 		try{
 
-			if(prn.isEnabled()){
+			//if(prn.isEnabled()){
+                docPed.global=gl;
+                docPed.deviceid =gl.numSerie;
 				docPed.buildPrint(itemid,1,"");
 				prn.printask(printcallback);
-			}else if(!prn.isEnabled()){
-				docPed.buildPrint(itemid,1,"");
-				toast("Reimpresion pedido");
-			}
+			//} else if(!prn.isEnabled()){
+			//	docPed.buildPrint(itemid,1,"");
+			toast("Reimpresion pedido");
+			//}
 
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 		

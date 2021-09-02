@@ -4,12 +4,13 @@ public class clsClasses {
 	
 	public class clsCD {
 		public String Cod,Desc,Text,um;
-		public boolean bandera,disp;
+		public boolean bandera,disp, es_despacho;
+		public double faltante, cantOriginal, pesoOriginal;
 	}
 	
 	public class clsCDB {
 		public String Cod,Desc,Adds;
-		public int Bandera,Cobro,ppend;
+		public int Bandera,Cobro,ppend, prefacturas;
 		public double valor,coorx,coory;
 	}
 
@@ -21,7 +22,7 @@ public class clsClasses {
 	}
 	
 	public class clsExist {
-		public String Cod,Desc,Fecha,Valor,ValorM,ValorT,Peso,PesoM,PesoT,Lote,Doc,Centro,Stat;
+		public String Cod,Desc,Fecha,Valor,ValorM,ValorT,Peso,PesoM,PesoT,Lote,Doc,Centro,Stat,Estado;
 		public double cant,cantm;
 		public int id,flag,items;
 	}
@@ -38,7 +39,7 @@ public class clsClasses {
 	}	
 	
 	public class clsVenta {
-		public String Cod,Nombre,um,val,valp,sdesc,ums;
+		public String Cod,Nombre,um,val,valp,sdesc,ums,PE;
 		public double Cant,Peso,Prec,Desc,Total,imp,percep, precio,factor;
 
 	}
@@ -116,4 +117,71 @@ public class clsClasses {
 	public class clsBarras{
 		public String barra,peso;
 	}
+
+	public class clsDs_pedido {
+		public String corel;
+		public String anulado;
+		public long fecha;
+		public String empresa;
+		public String ruta;
+		public String vendedor;
+		public String cliente;
+		public double kilometraje;
+		public long fechaentr;
+		public String direntrega;
+		public double total;
+		public double desmonto;
+		public double impmonto;
+		public double peso;
+		public String bandera;
+		public String statcom;
+		public String calcobj;
+		public int  impres;
+		public String add1;
+		public String add2;
+		public String add3;
+	}
+
+	public class clsDs_pedidod {
+		public String corel;
+		public String producto;
+		public String empresa;
+		public String anulado;
+		public double cant;
+		public double precio;
+		public double imp;
+		public double des;
+		public double desmon;
+		public double total;
+		public double preciodoc;
+		public double peso;
+		public double val1;
+		public String val2;
+		public String ruta;
+		public String umventa;
+		public String umstock;
+		public String umpeso;
+		public double cantOriginal;
+		public double pesoOriginal;
+	}
+
+
+	public class clsTipoCanastas {
+		public String codigo, desccorta, desclarga;
+		public int tenregado, trecibido;
+		public Boolean totales=true;
+	}
+
+	public class clsCanasta {
+		public String ruta, cliente, producto;
+		public int idCanasta, fecha, cantrec, cantentr;
+		public String codigo, desccorta, desclarga, fechaFormato;
+		public boolean editar;
+	}
+
+    public class clsPedItem {
+        public String producto;
+        public double cant;
+	}
+
 }

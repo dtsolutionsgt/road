@@ -45,6 +45,7 @@ public class Clientes extends PBase {
 	private ArrayList<clsCDB> items = new ArrayList<clsCDB>();
 	private ArrayList<String> cobros = new ArrayList<String>();
 	private ArrayList<String> ppago = new ArrayList<String>();
+	private ArrayList<String> prefacturas = new ArrayList<String>();
 
 	private AlertDialog.Builder mMenuDlg;
 	private ArrayList<String> listcode = new ArrayList<String>();
@@ -351,6 +352,25 @@ public class Clientes extends PBase {
 				}
 			}
 
+			//#CKFK 20210803 Agregué filtro por prefacturas
+			prefacturas.clear();
+			sql = "SELECT DISTINCT CLIENTE " +
+				  "FROM DS_PEDIDO " +
+				  "WHERE ANULADO = 'N' AND BANDERA = 'N'";
+
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
+				for (int i = 0; i < DT.getCount(); i++) {
+					ss = DT.getString(0);
+					if (!prefacturas.contains(ss)) {
+						prefacturas.add(ss);
+					}
+					DT.moveToNext();
+				}
+			}
+
 			sql = "SELECT DISTINCT P_CLIRUTA.CLIENTE,P_CLIENTE.NOMBRE,P_CLIRUTA.BANDERA,P_CLIENTE.COORX,P_CLIENTE.COORY " +
 					"FROM P_CLIRUTA INNER JOIN P_CLIENTE ON P_CLIRUTA.CLIENTE=P_CLIENTE.CODIGO " +
 					"WHERE (1=1) ";
@@ -393,6 +413,8 @@ public class Clientes extends PBase {
 					else vItem.Cobro = 0;
 					if (ppago.contains(ss)) vItem.ppend = 1;
 					else vItem.ppend = 0;
+					if (prefacturas.contains(ss)) vItem.prefacturas = 1;
+					else vItem.prefacturas = 0;
 
 					switch (spinFilt.getSelectedItemPosition()) {
 						case 0:
@@ -403,6 +425,9 @@ public class Clientes extends PBase {
 							break;
 						case 2:
 							if (vItem.ppend == 1) items.add(vItem);
+							break;
+						case 3:
+							if (vItem.prefacturas == 1) items.add(vItem);
 							break;
 					}
 
@@ -685,6 +710,9 @@ public class Clientes extends PBase {
 			flist.add("Todos");
 			flist.add("Con cobros");
 			flist.add("Pago pendiente");
+			if (gl.rutatipog.equals("T") || gl.rutatipog.equals("D")){
+				flist.add("Prefacturas");
+			}
 
 			ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, flist);
 			dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -929,7 +957,21 @@ public class Clientes extends PBase {
 	}
 
 	private void enviaPedido() {
-		if (gl.tolsuper && gl.tolpedsend) {
+		boolean autoenvio=false;
+
+		try {
+			sql = "SELECT ENVIO_AUTO_PEDIDOS FROM P_RUTA";
+			Cursor DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
+				autoenvio = DT.getInt(0)==1;
+			}
+		} catch (Exception e) {
+			autoenvio=false;
+		}
+
+		if (gl.tolsuper && autoenvio) {
 			gl.tolpedsend=false;
 
 			//if (getWSURL())

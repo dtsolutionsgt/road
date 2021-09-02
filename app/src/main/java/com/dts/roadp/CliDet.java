@@ -42,16 +42,17 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 public class CliDet extends PBase {
 
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
-	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago,lblRuta,lblRuta2;
+	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago;
+	private TextView lblRuta,lblRuta2, lblDespacho, lblCanal, lblCanalsub,lblPrior;
 	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
-	private ImageView imgCobro,imgDevol,imgRoadTit;
+	private ImageView imgCobro,imgDevol,imgRoadTit, imgTel, imgWhatsApp, imgWaze, imgVenta, imgPreventa, imgDespacho, imgCamara, imgMap;
 	private EditText txtRuta;
 	private RadioButton chknc,chkncv;
 
 	private PhotoViewAttacher zoomFoto;
 	private AppMethods app;
 
-	private String cod,tel, Nombre, NIT, sgp1, sgp2;
+	private String cod,tel, Nombre, NIT, sgp1, sgp2, canal, canalsub,prior;
 	private String imagenbase64,path,fechav;
 	private Boolean imgPath, imgDB, ventaGPS,flagGPS=true,permiteVenta=true,clicred;
 	private double gpx,gpy,credito,clim,cused,cdisp,cred;
@@ -83,9 +84,16 @@ public class CliDet extends PBase {
 		lblClientePago = (TextView) findViewById(R.id.lblClientePago);
 		lblRuta = (TextView) findViewById(R.id.lblRuta);lblRuta.setVisibility(View.INVISIBLE);
 		lblRuta2 = (TextView) findViewById(R.id.lblRuta2);lblRuta2.setVisibility(View.INVISIBLE);
+        lblCanal = findViewById(R.id.lblClase);
+        lblCanalsub = findViewById(R.id.lblClaseSub);
+        lblPrior = findViewById(R.id.textView100);
+
 		txtRuta = (EditText) findViewById(R.id.txtRuta);txtRuta.setVisibility(View.INVISIBLE);
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
+
+
+		lblDespacho = (TextView) findViewById(R.id.lblDespacho);
 
 		//	relMain=(RelativeLayout) findViewById(R.id.relclimain);
 		relV=(RelativeLayout) findViewById(R.id.relVenta);
@@ -96,10 +104,13 @@ public class CliDet extends PBase {
 		imgCobro= (ImageView) findViewById(R.id.imageView2);
 		imgDevol= (ImageView) findViewById(R.id.imageView1);
 		imgRoadTit = (ImageView) findViewById(R.id.imgRoadTit);
+		imgDespacho = (ImageView) findViewById(R.id.imgDespacho);
 
 		app = new AppMethods(this, gl, Con, db);
 
 		cod=gl.cliente;
+
+		gl.iddespacho = null;
 
 		ventaGPS=gl.peVentaGps!=0;
 		rangoGPS=gl.peLimiteGPS+gl.peMargenGPS;
@@ -134,7 +145,11 @@ public class CliDet extends PBase {
 
 		miniFachada();
 
+		validaDespacho();
+
 		setHandlers();
+
+		gl.corelFac="";
 
 	}
 
@@ -197,19 +212,21 @@ public class CliDet extends PBase {
 	}
 
 	public void showDespacho(View view) {
-
 		if (!permiteVenta) {
-			msgbox("¡Distancia del cliente mayor que permitida!\nPara realizar la venta debe asercarse más al cliente.");return;
-		}
+			msgbox("¡Distancia del cliente mayor que permitida!\nPara realizar la venta debe acercarse más al cliente.");return;
+		}else{
+			try{
+				gl.banderaCobro = false;
 
-		try {
-			mu.msgbox("La funcionalidad no esta implementada.");
+				if (!validaVenta()) return;//Se valida si hay correlativos de factura para la venta
 
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				if(porcentaje == false) VerificaCantidadDesp();
+
+			} catch (Exception e){
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+				mu.msgbox("doVenta: " + e.getMessage());
+			}
 		}
-		//gl.rutatipo="D";
-		//runVenta();
 	}
 
 	public void showCredit(View viev){
@@ -323,6 +340,15 @@ public class CliDet extends PBase {
 		mostraRutaSupervisor();
 	}
 
+	public void showCanastas(View view) {
+		try {
+			Intent i = new Intent(this, Canastas.class);
+			startActivity(i);
+		} catch (Exception e) {
+
+		}
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         String paht;
@@ -338,18 +364,21 @@ public class CliDet extends PBase {
                     paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
                 }
 
-				Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
-				bitmap1 = redimensionarImagen(bitmap1, 640, 360);
+                try {
+                    Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
+                    bitmap1 = redimensionarImagen(bitmap1, 640, 360);
 
-				FileOutputStream out = new FileOutputStream(paht);
-				bitmap1.compress(Bitmap.CompressFormat.JPEG, 50, out);
-				out.flush();
-				out.close();
+                    FileOutputStream out = new FileOutputStream(paht);
+                    bitmap1.compress(Bitmap.CompressFormat.JPEG, 50, out);
+                    out.flush();
+                    out.close();
 
-                File iarchivo = new File(paht);
-				imgRoadTit.setImageURI(Uri.fromFile(iarchivo));
-			}catch (Exception e){
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+                    File iarchivo = new File(paht);
+                    imgRoadTit.setImageURI(Uri.fromFile(iarchivo));
+                } catch (Exception e) { }
+
+			} catch (Exception e){
+				//addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				mu.msgbox("onActivityResult: " + e.getMessage());
 			}
 
@@ -401,8 +430,9 @@ public class CliDet extends PBase {
 		try {
 
 			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
-					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO "+
-					"FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
+					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO,INGRESA_CANASTAS, " +
+                    "CANAL,SUBCANAL,PRIORIZACION "+
+					" FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 
@@ -453,6 +483,10 @@ public class CliDet extends PBase {
 			gl.vcheque = DT.getString(14).equalsIgnoreCase("S");
 			gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
 			gl.clitipo = DT.getString(16);
+			gl.ingresaCanastas = DT.getInt(18) == 1;
+            canal =DT.getString(19);
+            canalsub =DT.getString(20);
+            prior=DT.getString(21);
 
 			if(DT!=null) DT.close();
 
@@ -469,7 +503,25 @@ public class CliDet extends PBase {
             DT.moveToFirst();
             pedclinue=DT.getInt(0)==1;
 
-		} catch (Exception e) {
+            sql="SELECT NOMBRE FROM P_CANAL WHERE CODIGO='"+canal+"'";
+            DT=Con.OpenDT(sql);
+            try {
+                DT.moveToFirst();lblCanal.setText("Canal : "+DT.getString(0));
+            } catch (Exception e) {
+                lblCanal.setText("Canal : ");
+            }
+
+            sql="SELECT NOMBRE FROM P_CANALSUB WHERE CODIGO='"+canalsub+"'";
+            DT=Con.OpenDT(sql);
+            try {
+                DT.moveToFirst();lblCanalsub.setText("Subcanal : "+DT.getString(0));
+            } catch (Exception e) {
+                lblCanalsub.setText("Subcanal : ");
+            }
+
+            lblPrior.setText("Priorización : "+prior);
+
+      	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());
 		}
@@ -545,6 +597,7 @@ public class CliDet extends PBase {
         Cursor dt;
 
         try {
+
             sql="SELECT COREL FROM D_PEDIDO WHERE (CLIENTE='"+gl.cliente+"') AND (ANULADO='N') AND (STATCOM='N')";
             dt=Con.OpenDT(sql);
             gl.modpedid="";
@@ -711,6 +764,32 @@ public class CliDet extends PBase {
 
 	}
 
+	private void validaDespacho() {
+
+		try {
+
+			lblDespacho.setVisibility(View.INVISIBLE);
+			imgDespacho.setVisibility(View.INVISIBLE);
+			relD.setVisibility(View.GONE);
+
+			clsDs_pedidoObj Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
+			Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
+
+			if (Ds_pedidoObj!= null){
+
+				if (Ds_pedidoObj.count>0) {
+
+					lblDespacho.setVisibility(View.VISIBLE);
+					imgDespacho.setVisibility(View.VISIBLE);
+					relD.setVisibility(View.VISIBLE);
+				}
+			}
+
+		} catch (Exception e) {
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+	}
+
 	//endregion
 
 	//region  Aux
@@ -770,6 +849,28 @@ public class CliDet extends PBase {
 					return;
 				}else {
 					runVenta();
+				}
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
+	}
+
+	public void VerificaCantidadDesp(){
+		Float cantidad;
+		gl.rutatipo="V";
+		//Asigna conexión actual a la forma de Existencias.
+		cantidad = Float.valueOf(CantExistencias());
+
+		try{
+			if(cantidad == 0){
+				mu.msgbox("No hay existencias disponibles.");
+			}else{
+				try {
+					startActivity(new Intent(this, activity_despacho_list.class));
+				} catch (Exception e) {
+					addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 				}
 			}
 		}catch (Exception e){
@@ -992,12 +1093,13 @@ public class CliDet extends PBase {
 			if (flag) relP.setVisibility(View.VISIBLE);else relP.setVisibility(View.GONE);
 
 			flag=false;
-			//if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
+
+			if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
 			if (flag) relD.setVisibility(View.VISIBLE);else relD.setVisibility(View.GONE);
 
             clinue=esClienteNuevo();
 
-			if (clinue){
+			if (clinue || rt.equalsIgnoreCase("C")){
 				imgDevol.setVisibility(View.INVISIBLE);
 				lblDevol.setVisibility(View.INVISIBLE);
 				imgCobro.setVisibility(View.INVISIBLE);

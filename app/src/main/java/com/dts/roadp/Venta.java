@@ -56,7 +56,7 @@ public class Venta extends PBase {
 
 	private int browse;
 
-	private double cant,desc,mdesc,prec,precsin,imp,impval;
+	private double cant,desc,mdesc,prec,precsin,imp,impval,cantOriginal,pesoOriginal;
 	private double descmon,tot,totsin,percep,ttimp,ttperc,ttsin,prodtot;
 	private double px,py,cpx,cpy,cdist;
 
@@ -303,6 +303,7 @@ public class Venta extends PBase {
 
 	public void muestraProdBarraDespacho(View view) {
 		try {
+			browse=6;
 			startActivity(new Intent(Venta.this,despacho_barras.class));
 		} catch (Exception e) {}
 	}
@@ -671,7 +672,7 @@ public class Venta extends PBase {
 			gl.prod=prodid;
 			gl.precprev=0;
 
-            if (pedido) {
+			if (pedido) {
                 startActivity(new Intent(this,ProdCantPrev.class));
             } else {
                 startActivity(new Intent(this,ProdCant.class));
@@ -2692,6 +2693,8 @@ public class Venta extends PBase {
 					ins.add("VAL4","");
 					ins.add("PERCEP",percep);
 					ins.add("SIN_EXISTENCIA",0);
+					ins.add("CANTORIGINAL",item.cantOriginal);
+					ins.add("PESOORIGINAL",item.pesoOriginal);
 
 					db.execSQL(ins.sql());
 
@@ -2716,6 +2719,8 @@ public class Venta extends PBase {
 					ins.add("VAL2","");
 					ins.add("VAL3",0);
 					ins.add("VAL4","");
+					ins.add("CANTORIGINAL",item.cantOriginal);
+					ins.add("PESOORIGINAL",item.pesoOriginal);
 
 					db.execSQL(ins.sql());
 
@@ -3049,7 +3054,8 @@ public class Venta extends PBase {
 			lblPrec= (TextView) findViewById(R.id.lblPNum);
 			lblTot= (TextView) findViewById(R.id.lblTot);
 			lblTit= (TextView) findViewById(R.id.txtRoadTit);
-            lblVer= (TextView) findViewById(R.id.textView96);lblVer.setText(gl.parNumVer.replace("/",""));
+            lblVer= (TextView) findViewById(R.id.textView96);
+            lblVer.setText(gl.parNumVer.replace("/",""));
 
 			imgroad= (ImageView) findViewById(R.id.imgRoadTit);
 			imgscan= (ImageView) findViewById(R.id.imageView13);imgscan.setVisibility(View.INVISIBLE);
@@ -3230,11 +3236,16 @@ public class Venta extends PBase {
             for (int i = 0; i <Ds_pedidodObj.count; i++) {
 
                 producto = Ds_pedidodObj.items.get(i).producto.toString();
-                UM = Ds_pedidodObj.items.get(i).umventa.toString();
+                if (prodPorPeso(producto)){
+					UM = Ds_pedidodObj.items.get(i).umstock.toString();
+				}else{
+					UM = Ds_pedidodObj.items.get(i).umventa.toString();
+				}
+
                 cant = Ds_pedidodObj.items.get(i).cant;
 
             sql = "SELECT PRODUCTO FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
-                    " AND CANT = " + cant + " AND UMVENTA = '" + um + "'";
+                    " AND CANT = " + cant + " AND UM = '" + um + "'";
             DT = Con.OpenDT(sql);
 
 				cantReg += DT.getCount();
@@ -3643,7 +3654,7 @@ public class Venta extends PBase {
 			}
 
 			if (browse==6) {
-				browse=4;return;
+				browse=4;listItems();return;
 			}
 
 		}catch (Exception e)

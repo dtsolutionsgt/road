@@ -454,7 +454,7 @@ public class Reimpresion extends PBase {
 				prn.printask(printcallback);
 			//} else if(!prn.isEnabled()){
 			//	docPed.buildPrint(itemid,1,"");
-			//	toast("Reimpresion pedido");
+			toast("Reimpresion pedido");
 			//}
 
 		} catch (Exception e){

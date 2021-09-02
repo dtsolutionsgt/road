@@ -57,7 +57,9 @@ public class Producto extends PBase {
 			
 		prodtipo=gl.prodtipo;
 		gl.prodtipo=0;
+
 		this.setTitle("Producto");
+
 		if (prodtipo==1) this.setTitle("Producto con existencia");
 
         modotol=gl.peModal.equalsIgnoreCase("TOL");
@@ -298,9 +300,10 @@ public class Producto extends PBase {
 					}
 					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO='" + vF + "')) ";
 					sql+="UNION ";
+					//#CKFK 20210827 Cambié esto (P_PRODUCTO.TIPO ='S') por esto (P_PRODUCTO.TIPO ='P')
 					sql+="SELECT DISTINCT P_PRODUCTO.CODIGO,P_PRODUCTO.DESCCORTA,''  " +
 							"FROM P_PRODUCTO "  +
-							"WHERE (P_PRODUCTO.TIPO ='S')  AND (P_PRODUCTO.ES_VENDIBLE=1) ";
+							"WHERE (P_PRODUCTO.TIPO ='P')  AND (P_PRODUCTO.ES_VENDIBLE=1) ";
 					if (!mu.emptystr(famid)){
 						if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
 					}

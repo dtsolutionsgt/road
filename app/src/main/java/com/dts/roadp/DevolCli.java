@@ -105,8 +105,12 @@ public class DevolCli extends PBase {
 
 			browse=1;
 			itempos=-1;
+
+			if (gl.rutatipo.equalsIgnoreCase("P")) gl.prodtipo=0;else gl.prodtipo=1;
+
 			Intent intent = new Intent(this,Producto.class);
 			startActivity(intent);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("showProd:  " + e.getMessage());

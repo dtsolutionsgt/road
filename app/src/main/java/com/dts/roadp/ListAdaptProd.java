@@ -62,7 +62,9 @@ public class ListAdaptProd extends BaseAdapter {
 			holder.lblExtra = (TextView) convertView.findViewById(R.id.textView1);
 			holder.img1 = convertView.findViewById(R.id.imageView17);
 			holder.lblFaltante = (TextView) convertView.findViewById(R.id.lblFaltante);
-			
+			holder.lblCantOriginal = (TextView) convertView.findViewById(R.id.lblCantOriginal);
+			holder.lblPesoOriginal = (TextView) convertView.findViewById(R.id.lblPesoOriginal);
+
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
@@ -74,6 +76,8 @@ public class ListAdaptProd extends BaseAdapter {
 		holder.lblDesc.setText(items.get(position).Desc);
 		holder.lblExtra.setText(items.get(position).Text);
 		holder.lblFaltante.setText("Faltante: " + items.get(position).faltante);
+		holder.lblCantOriginal.setText("Cant original: " + items.get(position).cantOriginal);
+		holder.lblPesoOriginal.setText("Peso original: " + items.get(position).pesoOriginal);
 
 		if (items.get(position).bandera) {
             holder.img1.setVisibility(View.VISIBLE);
@@ -87,6 +91,14 @@ public class ListAdaptProd extends BaseAdapter {
 			holder.lblFaltante.setVisibility(View.GONE);
 		}
 
+		if (items.get(position).es_despacho) {
+			holder.lblCantOriginal.setVisibility(View.VISIBLE);
+			holder.lblPesoOriginal.setVisibility(View.VISIBLE);
+		} else {
+			holder.lblCantOriginal.setVisibility(View.GONE);
+			holder.lblPesoOriginal.setVisibility(View.GONE);
+		}
+
 		if(selectedIndex!= -1 && position == selectedIndex) {
 			convertView.setBackgroundColor(Color.rgb(26,138,198));
         } else {
@@ -98,7 +110,7 @@ public class ListAdaptProd extends BaseAdapter {
 	
 	
 	static class ViewHolder {
-		TextView  lblCod,lblDesc,lblExtra,lblFaltante;
+		TextView  lblCod,lblDesc,lblExtra,lblFaltante,lblCantOriginal,lblPesoOriginal;
 		ImageView img1;
 	}
 	

@@ -344,16 +344,16 @@ public class DevolBodCan extends PBase {
         String pcod,plote,um,barra,barrapallet;
         Double pcant,pcantm,ppeso;
 
-        ocultaEnvio();
-
-        corel=gl.ruta+"_"+mu.getCorelBase();
-
-        gl.devfindia=app.getDevolBod();
-
-        fecha=du.getActDateTime();
-        if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
-
         try {
+
+            ocultaEnvio();
+
+            corel=gl.ruta+"_"+mu.getCorelBase();
+
+            gl.devfindia=app.getDevolBod();
+
+            fecha=du.getActDateTime();
+            if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
 
             db.beginTransaction();
 

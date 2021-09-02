@@ -135,6 +135,19 @@ public class clsDs_pedidoObj {
 
     }
 
+    public void updateBandera(clsClasses.clsDs_pedido item) {
+
+        upd.init("Ds_pedido");
+
+        upd.add("BANDERA",item.bandera);
+        upd.Where("(COREL='"+item.corel+"')");
+
+        db.execSQL(upd.SQL());
+
+        //Toast toast= Toast.makeText(cont,upd.sql(), Toast.LENGTH_LONG);toast.show();
+
+    }
+
     private void deleteItem(clsClasses.clsDs_pedido item) {
         sql="DELETE FROM Ds_pedido WHERE (COREL='"+item.corel+"')";
         db.execSQL(sql);

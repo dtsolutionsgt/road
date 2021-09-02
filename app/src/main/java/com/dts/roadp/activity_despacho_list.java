@@ -65,6 +65,7 @@ public class activity_despacho_list extends PBase {
                 gl.iddespacho=item.corel;
                 gl.cliente = item.cliente;
                 gl.pedCorel=item.add1;
+                gl.rutaPedido = item.add2;
 
                 iniciaVenta();
 
@@ -100,6 +101,7 @@ public class activity_despacho_list extends PBase {
 
         gl.iddespacho="";
         gl.pedCorel="";
+        gl.rutaPedido = "";
 
         try {
             Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
@@ -239,15 +241,21 @@ public class activity_despacho_list extends PBase {
             gl.coddespacho=gl.iddespacho;
 
             clsClasses.clsDs_pedidod item;
+            clsClasses.clsDs_pedido iteme;
 
             clsDs_pedidodObj Ds_pedidodObj=new clsDs_pedidodObj(this,Con,db);
             Ds_pedidodObj.fill("WHERE COREL='"+gl.coddespacho+"'");
+
+            clsDs_pedidoObj Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
+            Ds_pedidoObj.fill("WHERE COREL='"+gl.coddespacho+"'");
+
+            iteme=Ds_pedidoObj.items.get(0);
 
             for (int i = 0; i <Ds_pedidodObj.count; i++) {
 
                 item=Ds_pedidodObj.items.get(i);
 
-                ins.init("D_DESPACHADO_NO_ENTREGADO");
+                ins.init("D_DESPACHOD_NO_ENTREGADO");
                 ins.add("COREL",item.corel);
                 ins.add("ANULADO",item.anulado);
                 ins.add("PRODUCTO",item.producto);
@@ -261,7 +269,13 @@ public class activity_despacho_list extends PBase {
                 ins.add("STATCOM","N");
 
                 db.execSQL(ins.sql());
+
             }
+
+            iteme.bandera = "S";
+            Ds_pedidoObj.updateBandera(iteme);
+
+            listItems();
 
         } catch (SQLException e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

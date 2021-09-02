@@ -4,8 +4,8 @@ public class clsClasses {
 	
 	public class clsCD {
 		public String Cod,Desc,Text,um;
-		public boolean bandera,disp;
-		public double faltante;
+		public boolean bandera,disp, es_despacho;
+		public double faltante, cantOriginal, pesoOriginal;
 	}
 	
 	public class clsCDB {
@@ -161,6 +161,8 @@ public class clsClasses {
 		public String umventa;
 		public String umstock;
 		public String umpeso;
+		public double cantOriginal;
+		public double pesoOriginal;
 	}
 
 

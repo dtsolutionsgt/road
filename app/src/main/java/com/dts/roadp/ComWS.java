@@ -5995,7 +5995,7 @@ public class ComWS extends PBase {
 					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "')";
 			dbld.add(ss);
 
-			ss = " UPDATE P_STOCK_PV SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
+			ss = " UPDATE P_STOCK_PV SET ENVIADO = 1 " +
 				 " WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + sFecha + "' AND ENVIADO = 0 " +
 				 " AND DOCUMENTO IN (SELECT DISTINCT DOCUMENTO FROM P_STOCK_PV WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "')";
 			dbld.add(ss);

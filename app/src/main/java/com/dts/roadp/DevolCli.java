@@ -62,7 +62,7 @@ public class DevolCli extends PBase {
 
 		browse=0;
 		fecha=du.getActDateTime();
-		gl.devrazon="0";
+		gl.devrazon="0"; gl.cordevdes="";
 
 		clearData();
 
@@ -97,16 +97,23 @@ public class DevolCli extends PBase {
 		fdevol.deviceid =gl.numSerie;
 	}
 
-
 	// Events
 
 	public void showProd(View view) {
-		try{
+		try {
+            sql = "SELECT VENTA FROM P_RUTA";
+            Cursor DT = Con.OpenDT(sql);
+            DT.moveToFirst();
+            gl.rutatipo = DT.getString(0);
 
 			browse=1;
 			itempos=-1;
 
-			if (gl.rutatipo.equalsIgnoreCase("P")) gl.prodtipo=0;else gl.prodtipo=1;
+			if (gl.rutatipo.equalsIgnoreCase("P")) {
+			    gl.prodtipo=0;
+            } else {
+			    gl.prodtipo=1;
+            }
 
 			Intent intent = new Intent(this,Producto.class);
 			startActivity(intent);
@@ -130,7 +137,6 @@ public class DevolCli extends PBase {
 		}
 
 	}
-
 
 	// Main
 
@@ -395,7 +401,7 @@ public class DevolCli extends PBase {
 		String corel,pcod;
 		Double pcant;
 
-		gl.dvcorreld = obtienecorrel("D");
+		gl.dvcorreld = obtienecorrel("D");gl.cordevdes=gl.dvcorreld;
 		gl.dvcorrelnc = obtienecorrel("NC");
 
 		fecha=du.getActDateTime();
@@ -538,32 +544,29 @@ public class DevolCli extends PBase {
 				createDoc();
 				//msgAskSave("Aplicar pago y crear un recibo");
 
-			}else{
-
-				try{
-
+			} else {
+				try {
 					Intent i = new Intent(this, CliDet.class);
 					gl.dvbrowse=3;
 					gl.dvdispventa = cntotl;
 					gl.dvestado = estado;
 					startActivity(i);
-
-				}catch (Exception e){
+				} catch (Exception e){
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				}
-
 			}
-
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
+            gl.dvcorreld="";
 			mu.msgbox(e.getMessage());
 		}
 	}
 
 	private void createDoc(){
-
 		String vModo="";
+
+        if (gl.rutatipo.equalsIgnoreCase("D")) gl.closeCliDet=false;
 
 		try{
 
@@ -575,7 +578,7 @@ public class DevolCli extends PBase {
 				//#CKFK 20190401 09:47AM Agregué la funcionalidad de enviar el nombre del archivo a imprimir
 				prn.printask(printcallback, "printnc.txt");
 
-			}else if(!prn.isEnabled()){
+			} else if(!prn.isEnabled()){
 
 				fdevol.buildPrint(gl.dvcorrelnc,0,vModo);
 				limpiavariables_devol();
@@ -716,8 +719,6 @@ public class DevolCli extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
 	}
 
 	private void msgAskDel(String msg) {

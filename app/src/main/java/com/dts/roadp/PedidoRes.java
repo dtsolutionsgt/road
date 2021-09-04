@@ -737,7 +737,6 @@ public class PedidoRes extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 
 	private void setActDate(){

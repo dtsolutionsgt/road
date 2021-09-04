@@ -173,7 +173,6 @@ public class CliDet extends PBase {
 		}
 	}
 
-
 	//region  Events
 
 	public void showVenta(View view){
@@ -498,10 +497,11 @@ public class CliDet extends PBase {
 			lblRuta.setText("Ruta: ");
 			txtRuta.setText(gl.rutasup);
 
-			sql="SELECT PEDIDOS_CLINUEVO FROM P_RUTA ";
+			sql="SELECT PEDIDOS_CLINUEVO,VENTA FROM P_RUTA ";
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
             pedclinue=DT.getInt(0)==1;
+            gl.rutatipo = DT.getString(1);
 
             sql="SELECT NOMBRE FROM P_CANAL WHERE CODIGO='"+canal+"'";
             DT=Con.OpenDT(sql);
@@ -519,7 +519,7 @@ public class CliDet extends PBase {
                 lblCanalsub.setText("Subcanal : ");
             }
 
-            lblPrior.setText("Priorización : "+prior);
+            lblPrior.setText("Categorización : "+prior);
 
       	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1069,12 +1069,14 @@ public class CliDet extends PBase {
 		try{
 			gl.dvbrowse=0;
 			gl.devtipo=tdev;
+            if (gl.rutatipo.equalsIgnoreCase("D")) {
+                browse=4;gl.closeCliDet=true;
+            }
 			Intent intent = new Intent(this,DevolCli.class);
 			startActivity(intent);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 
 	private void habilitaOpciones() {
@@ -1344,9 +1346,6 @@ public class CliDet extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
-
 	}
 
 	private void msgAskTipoDev() {
@@ -1406,12 +1405,9 @@ public class CliDet extends PBase {
 
 			alert.show();
 
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
-
 	}
 
 	private void msgAskVenta() {
@@ -1489,20 +1485,24 @@ public class CliDet extends PBase {
 				showData();return;
 			}
 
+            if (browse==4) {
+                browse=0;
+                if (!gl.cordevdes.isEmpty()) {
+                    showDespacho(null);
+                }
+                return;
+            }
+
 			if (gl.dvbrowse!=0){
-
 				gl.rutatipo = "V";
-
 				browse =3;
-
 				if (browse==3){//Se utiliza para la devolución de cliente.
 					initVenta();return;
 				}return;
-
 			}
 
 
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	}

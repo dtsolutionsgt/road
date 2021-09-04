@@ -49,7 +49,7 @@ public class Producto extends PBase {
 		setContentView(R.layout.activity_producto);
 		
 		super.InitBase();
-		addlog("Producto",""+du.getActDateTime(),gl.vend);
+		//addlog("Producto",""+du.getActDateTime(),gl.vend);
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		txtFilter = (EditText) findViewById(R.id.editText1);
@@ -227,7 +227,7 @@ public class Producto extends PBase {
 				}
 
 			});
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
@@ -384,7 +384,8 @@ public class Producto extends PBase {
 		adapter=new ListAdaptProd(this,vitems);
 		listView.setAdapter(adapter);
 		
-		if (prodtipo==1) dispUmCliente();
+		//if (prodtipo==1) dispUmCliente();
+        if (gl.rutatipo.equalsIgnoreCase("V")) dispUmCliente();
 
 		if (cantidad==1) {
 

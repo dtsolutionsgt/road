@@ -117,6 +117,7 @@ public class despacho_barras extends PBase {
         initValues();
 
         txtBarra.requestFocus();txtBarra.setText("");
+        dialogBarra= new AlertDialog.Builder(this);
 
         //spinFam.requestFocus();
 
@@ -638,7 +639,9 @@ public class despacho_barras extends PBase {
                     }
                 }
 
-                toast("¡La barra "+barcode+" no existe!");
+                msgbox("¡La barra "+barcode+" no existe!");
+                txtBarra.setText("");
+                txtBarra.requestFocus();
 
             } catch (Exception e) {
                 msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());

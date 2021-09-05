@@ -410,10 +410,9 @@ public class ComWS extends PBase {
 				}
 			}
 
-			//#CKFK 20210813 Alquien puso esto en comentario por facilidad para pruebas
 			if (gl.banderafindia) {
 				if (!puedeComunicar()) {
-					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+					mu.msgbox("No ha hecho fin de día, no puede comunicar datos");
 					return;
 				}
 			}
@@ -4605,6 +4604,14 @@ public class ComWS extends PBase {
 				return false;
 			}
 
+			updateDespachos();
+			if (!fstr.equals("Sync OK")) {
+				dbld.savelog();
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
+				return false;
+			}
+
 			if (!update_Corel_GrandTotal()) {
 				dbld.savelog();
 				addlog(new Object() {
@@ -5998,6 +6005,39 @@ public class ComWS extends PBase {
 			ss = " UPDATE P_STOCK_PV SET ENVIADO = 1 " +
 				 " WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + sFecha + "' AND ENVIADO = 0 " +
 				 " AND DOCUMENTO IN (SELECT DISTINCT DOCUMENTO FROM P_STOCK_PV WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "')";
+			dbld.add(ss);
+
+			if (envioparcial && !esEnvioManual) {
+				if (commitSQL() == 0) {
+					fterr += "\n" + sstr;
+					errflag = true;
+				}
+			}
+
+		} catch (Exception e) {
+			errflag = true;
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+			//fterr=fterr+fstr;
+		}
+
+	}
+
+	public void updateDespachos() {
+		DU = new DateUtils();
+		String sFecha;
+		int rslt;
+		long vfecha = clsAppM.fechaFactTol(du.getActDate());
+		sFecha = DU.univfechasql(vfecha);
+		String corel_d_mov = Get_Corel_D_Mov();
+
+		try {
+
+			if (envioparcial) dbld.clear();
+
+			ss = " UPDATE DS_PEDIDO SET STATCOM = 'S' " +
+					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA ='" + sFecha + "') AND STATCOM = 'N' " ;
 			dbld.add(ss);
 
 			if (envioparcial && !esEnvioManual) {

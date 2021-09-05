@@ -519,7 +519,7 @@ public class CliDet extends PBase {
                 lblCanalsub.setText("Subcanal : ");
             }
 
-            lblPrior.setText("Priorización : "+prior);
+            lblPrior.setText("Categorización : "+prior);
 
       	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

@@ -1253,9 +1253,12 @@ public class Venta extends PBase {
 				umfactor = pesoprom;
 			}
 
-			if (disp>0) return disp;
+			if (dt!=null) dt.close();
 
-			dt.close();
+			if (disp>0) {
+				idisp = disp;
+				return disp;
+			}
 
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1270,7 +1273,7 @@ public class Venta extends PBase {
 				umstock=dt.getString(0);
 			}
 
-			dt.close();
+			if (dt!=null) dt.close();
 
 			//sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+um+"') AND (UNIDADMINIMA='"+ubas+"')";
 			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodDesp+"') AND (UNIDADSUPERIOR='"+umDesp+"') ";
@@ -1285,7 +1288,7 @@ public class Venta extends PBase {
 				toast("No existe factor de conversión para "+umDesp);return 0;
 			}
 
-			dt.close();
+			if (dt!=null) dt.close();
 
 			//sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+ubas+"')";
 			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodDesp+"') AND (UNIDADSUPERIOR='"+umstock+"')";
@@ -1298,7 +1301,7 @@ public class Venta extends PBase {
 				//#EJC20181127: No mostrar mensaje por versión de aprofam.
 				toast("No existe factor de conversión para "+umDesp);return 0;
 			}
-			dt.close();
+			if (dt!=null) dt.close();
 
 			umfactor=umf1/umf2;
 
@@ -1328,7 +1331,9 @@ public class Venta extends PBase {
 				pesostock=0;
 			}
 
-			dt.close();
+			if (dt!=null) dt.close();
+
+			idisp = disp;
 
 			return disp;
 
@@ -3501,21 +3506,23 @@ public class Venta extends PBase {
             clsClasses.clsDs_pedidod item;
 
             clsDs_pedidodObj Ds_pedidodObj=new clsDs_pedidodObj(this,Con,db);
-            Ds_pedidodObj.fill("WHERE COREL='"+gl.coddespacho+"'");
+            Ds_pedidodObj.fill("WHERE COREL='"+gl.iddespacho+"'");
 
             for (int i = 0; i <Ds_pedidodObj.count; i++) {
 
                 producto = Ds_pedidodObj.items.get(i).producto.toString();
-                if (prodPorPeso(producto)){
-					UM = Ds_pedidodObj.items.get(i).umstock.toString();
-				}else{
-					UM = Ds_pedidodObj.items.get(i).umventa.toString();
-				}
+                UM = Ds_pedidodObj.items.get(i).umventa.toString();
 
                 cant = Ds_pedidodObj.items.get(i).cant;
 
-            sql = "SELECT PRODUCTO FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
-                    " AND CANT = " + cant + " AND UM = '" + um + "'";
+				if (prodPorPeso(producto)){
+					sql = "SELECT PRODUCTO, CANT, UMSTOCK FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
+							" AND CANT = " + cant + " AND UMSTOCK = '" + UM + "'";
+				}else{
+					sql = "SELECT PRODUCTO, CANT, UM FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
+							" AND CANT = " + cant + " AND UM = '" + UM + "'";
+				}
+
             DT = Con.OpenDT(sql);
 
 				cantReg += DT.getCount();
@@ -3526,7 +3533,7 @@ public class Venta extends PBase {
 					DT.moveToFirst();
 
 					cantvend = DT.getDouble(1);
-					UMV = (DT.getString(2).toString().equals(gl.umpeso)?DT.getString(3):DT.getString(2));
+					UMV = DT.getString(2);
 
 				}else{
 					cantvend = 0;
@@ -3594,10 +3601,9 @@ public class Venta extends PBase {
 
 				if(DT!=null) DT.close();
 
-
 			}
 
-			rslt = regdif>0;
+			rslt = (regdif>0?true:false);
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

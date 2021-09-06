@@ -1029,7 +1029,8 @@ public class BaseDatosScript {
 					"PESOENTR INTEGER DEFAULT 0,"+
 					"ANULADO INTEGER DEFAULT 0,"+
 					"UNIDBAS TEXT DEFAULT 'UN'," +
-					"CODIGOLIQUIDACION INTEGER DEFAULT 0"+
+					"CODIGOLIQUIDACION INTEGER DEFAULT 0,"+
+					"VENDEDOR TEXT "+
 					");";
 			database.execSQL(vSQL);
 
@@ -2405,7 +2406,8 @@ public class BaseDatosScript {
 					"PESOENTR INTEGER DEFAULT 0,"+
 					"ANULADO INTEGER DEFAULT 0,"+
 					"UNIDBAS TEXT DEFAULT 'UN'," +
-					"CODIGOLIQUIDACION INTEGER DEFAULT 0"+
+					"CODIGOLIQUIDACION INTEGER DEFAULT 0,"+
+					"VENDEDOR TEXT "+
 					");";
 			database.execSQL(vSQL);
 

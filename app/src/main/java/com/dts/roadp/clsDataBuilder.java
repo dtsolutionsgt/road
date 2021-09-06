@@ -122,7 +122,7 @@ public class clsDataBuilder {
 					                       "REFERENCIA, ASIGNACION, SUPERVISOR, AYUDANTE, VEHICULO, CODIGOLIQUIDACION, " +
 					                       "RAZON_ANULACION, CODIGO_RUTA_PEDIDO, DESPCOREL";
 			if (tn.equals("D_CANASTA")) SS="SELECT RUTA,FECHA,CLIENTE,PRODUCTO,CANTREC,CANTENTR,STATCOM,CORELTRANS,PESOREC,PESOENTR," +
-											"ANULADO,UNIDBAS,CODIGOLIQUIDACION";
+											"ANULADO,UNIDBAS,CODIGOLIQUIDACION,VENDEDOR";
 		} catch (Exception e) {
 			err=e.getMessage();//return false;
 			throw new RuntimeException(err);

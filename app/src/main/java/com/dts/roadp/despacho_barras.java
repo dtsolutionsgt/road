@@ -117,6 +117,7 @@ public class despacho_barras extends PBase {
         initValues();
 
         txtBarra.requestFocus();txtBarra.setText("");
+        dialogBarra= new AlertDialog.Builder(this);
 
         //spinFam.requestFocus();
 
@@ -394,7 +395,6 @@ public class despacho_barras extends PBase {
 
                 //if (!app.prodBarra(itemid)) appProd();
             }
-
         }
 
         private void appProd(){
@@ -617,13 +617,18 @@ public class despacho_barras extends PBase {
                     bbolsa=barraBolsa();
                     if (bbolsa==1) {
                         txtBarra.setText("");
+                        txtBarra.requestFocus();
                         listItems();
                         return;
                     } else if (bbolsa==-1) {
                         toast("Barra vendida");
+                        txtBarra.setText("");
+                        txtBarra.requestFocus();
                         return;
                     }else if (bbolsa==-2) {
                         msgbox("Esa barra está reservada para otros despachos");
+                        txtBarra.setText("");
+                        txtBarra.requestFocus();
                         return;
                     }else if (bbolsa==-3) {
                         msgbox("Al cliente no se le pueden vender productos nuevos");
@@ -634,15 +639,16 @@ public class despacho_barras extends PBase {
                     }
                 }
 
-                toast("¡La barra "+barcode+" no existe!");
+                msgbox("¡La barra "+barcode+" no existe!");
+                txtBarra.setText("");
+                txtBarra.requestFocus();
 
             } catch (Exception e) {
                 msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
                 Log.d("VENTA","trans fail "+e.getMessage());
             }
 
-            txtBarra.setText("");
-            txtBarra.requestFocus();
+
         } else {
             toastlong("¡Conteste la pregunta por favor!");
             txtBarra.setText("");
@@ -673,7 +679,9 @@ public class despacho_barras extends PBase {
                     toastlong("¡La barra es parte de una bonificacion!");
                     db.setTransactionSuccessful();
                     db.endTransaction();
-                    txtBarra.setText("");return;
+                    txtBarra.requestFocus();
+                    txtBarra.setText("");
+                    return;
                 }else{
                     db.endTransaction();
                 }

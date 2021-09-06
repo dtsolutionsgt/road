@@ -56,11 +56,11 @@ public class Venta extends PBase {
 
 	private int browse;
 
-	private double cant,desc,mdesc,prec,precsin,imp,impval,cantOriginal,pesoOriginal;
-	private double descmon,tot,totsin,percep,ttimp,ttperc,ttsin,prodtot;
+	private double cant,desc,mdesc,prec,precsin,imp,impval,cantOriginal,pesoOriginal, umfactor,pesoprom=0,pesostock=0;
+	private double descmon,tot,totsin,percep,ttimp,ttperc,ttsin,prodtot,ipeso,icant,idisp;
 	private double px,py,cpx,cpy,cdist;
 
-	private String emp,cliid,rutatipo,prodid,um,tiposcan;
+	private String emp,cliid,rutatipo,prodid,um,tiposcan,umstock,upres;
 	private int nivel,dweek,clidia,scanc=0;
 	private boolean sinimp,rutapos,softscanexist,porpeso,usarscan,contrans,pedido;
 
@@ -854,12 +854,16 @@ public class Venta extends PBase {
 			if (prodPorPeso(prodid)) {
 				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, gl.dpeso,um);
 				if (prcEsp.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,gl.dpeso)) {
-					if (prcEsp.precioespecial>0) prec=prcEsp.precioespecial;
+					prc=prcEsp;
+					//if (prcEsp.precioespecial>0) prec=prcEsp.precioespecial;
+					if (prc.precioespecial>0) prec=prc.precioespecial;
 				}
 			} else {
 				prec = prc.precio(prodid, cant, nivel, um, gl.umpeso, 0,um);
 				if (prcEsp.existePrecioEspecial(prodid,cant,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
-					if (prcEsp.precioespecial>0) prec=prcEsp.precioespecial;
+					prc=prcEsp;
+					//if (prcEsp.precioespecial>0) prec=prcEsp.precioespecial;
+					if (prc.precioespecial>0) prec=prc.precioespecial;
 				}
 			}
 
@@ -1205,6 +1209,269 @@ public class Venta extends PBase {
         }
 
     }
+
+	//endregion
+
+	//region disponible
+
+	private double getDisp(String prodDesp, String umDesp) {
+
+		Cursor dt;
+		double disp = 0;
+		double umf1 =1;
+		double umf2 =1;
+
+		try {
+
+			pesostock=0;
+
+			sql=" SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO " +
+					" FROM P_STOCK WHERE (CODIGO='"+prodDesp+"') AND (UNIDADMEDIDA='"+umDesp+"')";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0) {
+
+				dt.moveToFirst();
+
+				umstock = um;
+				umfactor = 1;
+
+				disp = dt.getDouble(0);
+				ipeso = dt.getDouble(1);
+
+				if (disp>0) {
+					pesostock = ipeso / disp;
+				} else {
+					pesostock = ipeso / 1;
+				}
+			} else {
+				pesostock=0;
+			}
+
+			//#CKFK 20190517 Agregué para que el umfactor sea igual al peso promedio en el pedido y se calcule correctamente
+			if(gl.rutatipo.equalsIgnoreCase("P")){
+				umfactor = pesoprom;
+			}
+
+			if (dt!=null) dt.close();
+
+			if (disp>0) {
+				idisp = disp;
+				return disp;
+			}
+
+		} catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
+		try {
+			sql="SELECT UNIDADMEDIDA FROM P_STOCK WHERE (CODIGO='"+prodDesp+"')";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0){
+				dt.moveToFirst();
+				umstock=dt.getString(0);
+			}
+
+			if (dt!=null) dt.close();
+
+			//sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+um+"') AND (UNIDADMINIMA='"+ubas+"')";
+			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodDesp+"') AND (UNIDADSUPERIOR='"+umDesp+"') ";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()>0) {
+				dt.moveToFirst();
+				umf1=dt.getDouble(0);
+			} else 	{
+				umf1=1;
+				//#EJC20181127: No mostrar mensaje por versión de aprofam.
+				toast("No existe factor de conversión para "+umDesp);return 0;
+			}
+
+			if (dt!=null) dt.close();
+
+			//sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodid+"') AND (UNIDADSUPERIOR='"+umstock+"') AND (UNIDADMINIMA='"+ubas+"')";
+			sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+prodDesp+"') AND (UNIDADSUPERIOR='"+umstock+"')";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()>0) {
+				dt.moveToFirst();
+				umf2=dt.getDouble(0);
+			} else {
+				umf2=1;
+				//#EJC20181127: No mostrar mensaje por versión de aprofam.
+				toast("No existe factor de conversión para "+umDesp);return 0;
+			}
+			if (dt!=null) dt.close();
+
+			umfactor=umf1/umf2;
+
+			/*
+			if (umf1>=umf2) {
+				umfactor=umf1/umf2;
+			} else {
+				umfactor=umf2/umf1;
+			}
+			*/
+
+			sql="SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO FROM P_STOCK " +
+					" WHERE (CODIGO='"+prodDesp+"') AND (UNIDADMEDIDA='"+umstock+"')";
+			dt=Con.OpenDT(sql);
+
+			if(dt.getCount()>0){
+
+				dt.moveToFirst();
+
+				disp=dt.getDouble(0);
+				if (!porpeso) {
+					disp=disp/umfactor;
+				}
+				ipeso=dt.getDouble(1);
+				pesostock = ipeso/disp;
+			} else {
+				pesostock=0;
+			}
+
+			if (dt!=null) dt.close();
+
+			idisp = disp;
+
+			return disp;
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+
+		return 0;
+	}
+
+	private String applyCant(double cantDesp, double pesoDesp) {
+		double ppeso = 0;
+		String respuesta="";
+		try {
+
+			if (cantDesp < 0) {
+				respuesta = "Cantidad incorrecta";
+				return respuesta;
+			}
+
+			if (rutatipo.equalsIgnoreCase("V") || rutatipo.equalsIgnoreCase("D") ) {
+				if (cantDesp > idisp) {
+					respuesta = "Cantidad mayor que disponible.";
+					return respuesta;
+				}
+			}
+
+			if (porpeso) {
+
+				String spp = String.valueOf(pesoDesp);
+
+				try {
+					ppeso = Double.parseDouble(spp);
+					if (ppeso <= 0) throw new Exception();
+				} catch (Exception e) {
+					if (porpeso) {
+						respuesta = "Peso incorrecto";
+						return respuesta;
+					}
+				}
+			} else {
+				if(Double.isNaN(pesostock))	pesostock=1;
+				if (pesoprom == 0) ppeso = pesostock * cant;
+				else ppeso = pesoprom * cant;
+			}
+
+			if (porpeso && (gl.rutatipo.equalsIgnoreCase("V") || gl.rutatipo.equalsIgnoreCase("D"))) {
+				if (!checkLimits(ppeso,cant*umfactor)) {
+					respuesta = "Peso incorrecto";
+					return respuesta;
+				}
+			}
+
+			ppeso=mu.round(ppeso,3);
+
+			gl.dval = cant;
+			gl.dpeso = ppeso;
+			gl.um = upres;
+			gl.umpres = upres;
+			gl.umstock = umstock;
+			gl.umfactor = umfactor;
+			gl.prectemp = prec;
+
+		} catch (Exception e) {
+			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+		return respuesta;
+
+	}
+
+	private boolean checkLimits(double vpeso,double opeso) {
+
+		Cursor dt;
+		double pmin,pmax;
+		String ss;
+
+		try {
+
+			sql="SELECT PORCMINIMO,PORCMAXIMO FROM P_PORCMERMA WHERE PRODUCTO='"+prodid+"'";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount() == 0) {
+				//toast("No está definido rango de repesaje para el producto, no se podrá modificar el peso");
+				return true;
+			}
+
+			dt.moveToFirst();
+
+			pmin = opeso - dt.getDouble(0) * opeso / 100;
+			pmax = opeso + dt.getDouble(1) * opeso / 100;
+
+			if(dt!=null) dt.close();
+
+			if (vpeso<pmin) {
+				ss="El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por debajo de los porcentajes permitidos," +
+						" minimo : "+mu.frmdecimal(pmin, gl.peDecImp)+", no se puede aplicar.";
+				msgbox(ss);return false;
+			}
+
+			if (vpeso>pmax) {
+				ss="El repesaje ("+mu.frmdecimal(vpeso, gl.peDecImp)+") está por encima de los percentajes permitidos," +
+						" máximo : "+mu.frmdecimal(pmax, gl.peDecImp)+", no se puede aplicar.";
+				msgbox(ss);return false;
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return true;
+	}
+
+	private boolean validaRango() {
+
+		Cursor dt;
+		double pmin,pmax;
+		String ss;
+
+		try {
+
+			sql="SELECT PORCMINIMO,PORCMAXIMO FROM P_PORCMERMA WHERE PRODUCTO='"+prodid+"'";
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount() == 0) {
+				return false;
+			} else {
+				return true;
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+		return true;
+	}
 
 	//endregion
 
@@ -2663,7 +2930,7 @@ public class Venta extends PBase {
 				gl.umpeso =item.umpeso;
 				gl.dpeso =item.peso;
 
-				//#CKFK 20210729 Obtener el precio del produdcto
+				//#CKFK 20210729 Obtener el precio del producto
 				getPrecio();
 
 				item.precio = prec;
@@ -2673,30 +2940,38 @@ public class Venta extends PBase {
 				item.total = prodtot;
 
 				if (!app.prodBarra(item.producto)){
-					ins.init("T_VENTA");
-					ins.add("PRODUCTO",item.producto);
-					ins.add("EMPRESA",emp);
-					ins.add("UM",umv);
-					ins.add("CANT",item.cant);
-					ins.add("UMSTOCK",ums);
-					ins.add("FACTOR",app.factorPres(item.producto,umv,ums));
-					ins.add("PRECIO",item.precio);
-					ins.add("IMP",item.imp);
-					ins.add("DES",item.des);
-					ins.add("DESMON",item.desmon);
-					ins.add("TOTAL",item.total);
-					ins.add("PRECIODOC",item.precio);
-					ins.add("PESO",item.peso);
-					ins.add("VAL1",i+1);
-					ins.add("VAL2","");
-					ins.add("VAL3",0);
-					ins.add("VAL4","");
-					ins.add("PERCEP",percep);
-					ins.add("SIN_EXISTENCIA",0);
-					ins.add("CANTORIGINAL",item.cantOriginal);
-					ins.add("PESOORIGINAL",item.pesoOriginal);
 
-					db.execSQL(ins.sql());
+					if (getDisp(item.producto, item.umventa) > 0){
+
+						if (applyCant(cant,gl.dpeso).equals("")){
+
+							ins.init("T_VENTA");
+							ins.add("PRODUCTO",item.producto);
+							ins.add("EMPRESA",emp);
+							ins.add("UM",umv);
+							ins.add("CANT",item.cant);
+							ins.add("UMSTOCK",ums);
+							ins.add("FACTOR",app.factorPres(item.producto,umv,ums));
+							ins.add("PRECIO",item.precio);
+							ins.add("IMP",item.imp);
+							ins.add("DES",item.des);
+							ins.add("DESMON",item.desmon);
+							ins.add("TOTAL",item.total);
+							ins.add("PRECIODOC",item.precio);
+							ins.add("PESO",item.peso);
+							ins.add("VAL1",i+1);
+							ins.add("VAL2","");
+							ins.add("VAL3",0);
+							ins.add("VAL4","");
+							ins.add("PERCEP",percep);
+							ins.add("SIN_EXISTENCIA",0);
+							ins.add("CANTORIGINAL",item.cantOriginal);
+							ins.add("PESOORIGINAL",item.pesoOriginal);
+
+							db.execSQL(ins.sql());
+
+						}
+					}
 
 				}else{
 					ins.init("T_VENTA_DESPACHO");
@@ -3231,21 +3506,23 @@ public class Venta extends PBase {
             clsClasses.clsDs_pedidod item;
 
             clsDs_pedidodObj Ds_pedidodObj=new clsDs_pedidodObj(this,Con,db);
-            Ds_pedidodObj.fill("WHERE COREL='"+gl.coddespacho+"'");
+            Ds_pedidodObj.fill("WHERE COREL='"+gl.iddespacho+"'");
 
             for (int i = 0; i <Ds_pedidodObj.count; i++) {
 
                 producto = Ds_pedidodObj.items.get(i).producto.toString();
-                if (prodPorPeso(producto)){
-					UM = Ds_pedidodObj.items.get(i).umstock.toString();
-				}else{
-					UM = Ds_pedidodObj.items.get(i).umventa.toString();
-				}
+                UM = Ds_pedidodObj.items.get(i).umventa.toString();
 
                 cant = Ds_pedidodObj.items.get(i).cant;
 
-            sql = "SELECT PRODUCTO FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
-                    " AND CANT = " + cant + " AND UM = '" + um + "'";
+				if (prodPorPeso(producto)){
+					sql = "SELECT PRODUCTO, CANT, UMSTOCK FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
+							" AND CANT = " + cant + " AND UMSTOCK = '" + UM + "'";
+				}else{
+					sql = "SELECT PRODUCTO, CANT, UM FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
+							" AND CANT = " + cant + " AND UM = '" + UM + "'";
+				}
+
             DT = Con.OpenDT(sql);
 
 				cantReg += DT.getCount();
@@ -3256,7 +3533,7 @@ public class Venta extends PBase {
 					DT.moveToFirst();
 
 					cantvend = DT.getDouble(1);
-					UMV = (DT.getString(2).toString().equals(gl.umpeso)?DT.getString(3):DT.getString(2));
+					UMV = DT.getString(2);
 
 				}else{
 					cantvend = 0;
@@ -3324,10 +3601,9 @@ public class Venta extends PBase {
 
 				if(DT!=null) DT.close();
 
-
 			}
 
-			rslt = regdif>0;
+			rslt = (regdif>0?true:false);
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

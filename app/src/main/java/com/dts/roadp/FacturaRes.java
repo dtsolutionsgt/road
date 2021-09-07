@@ -927,7 +927,7 @@ public class FacturaRes extends PBase {
 			db.execSQL(sql);
 
 			//region Devolución de  producto.
-			if (gl.dvbrowse!=0){
+			if (gl.dvbrowse!=0) {
 
 				Cursor DT;
 				String pcod;
@@ -1450,6 +1450,18 @@ public class FacturaRes extends PBase {
 			db.execSQL(ins.sql());
 
 			//endregion
+
+            //region actualizacion de Nota credito
+
+            if (gl.devtotal>0) {
+                sql="UPDATE D_CxC SET REFERENCIA='"+corel+"' WHERE COREL='"+gl.devcord+"'";
+                db.execSQL(sql);
+
+                sql="UPDATE D_NOTACRED SET FACTURA='"+corel+"' WHERE COREL='"+gl.devcornc+"'";
+                db.execSQL(sql);
+            }
+
+            //endregion
 
 			db.setTransactionSuccessful();
 			db.endTransaction();

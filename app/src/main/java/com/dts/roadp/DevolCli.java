@@ -62,7 +62,7 @@ public class DevolCli extends PBase {
 
 		browse=0;
 		fecha=du.getActDateTime();
-		gl.devrazon="0"; gl.cordevdes="";
+		gl.devrazon="0"; gl.devcord ="";gl.devtotal=0;
 
 		clearData();
 
@@ -111,8 +111,10 @@ public class DevolCli extends PBase {
 
 			if (gl.rutatipo.equalsIgnoreCase("P")) {
 			    gl.prodtipo=0;
+            } else if (gl.rutatipo.equalsIgnoreCase("D")){
+			    gl.prodtipo=4;
             } else {
-			    gl.prodtipo=1;
+                gl.prodtipo=1;
             }
 
 			Intent intent = new Intent(this,Producto.class);
@@ -401,8 +403,8 @@ public class DevolCli extends PBase {
 		String corel,pcod;
 		Double pcant;
 
-		gl.dvcorreld = obtienecorrel("D");gl.cordevdes=gl.dvcorreld;
-		gl.dvcorrelnc = obtienecorrel("NC");
+		gl.dvcorreld = obtienecorrel("D");gl.devcord=gl.dvcorreld;
+		gl.dvcorrelnc = obtienecorrel("NC");gl.devcornc=gl.dvcorrelnc;
 
 		fecha=du.getActDateTime();
 		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
@@ -540,6 +542,7 @@ public class DevolCli extends PBase {
 
 				gl.closeCliDet = true;
 				gl.closeVenta = true;
+                gl.devtotal = cntotl;
 
 				createDoc();
 				//msgAskSave("Aplicar pago y crear un recibo");
@@ -548,7 +551,7 @@ public class DevolCli extends PBase {
 				try {
 					Intent i = new Intent(this, CliDet.class);
 					gl.dvbrowse=3;
-					gl.dvdispventa = cntotl;
+					gl.dvdispventa = cntotl;gl.devtotal = cntotl;
 					gl.dvestado = estado;
 					startActivity(i);
 				} catch (Exception e){

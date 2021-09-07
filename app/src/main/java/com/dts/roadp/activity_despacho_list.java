@@ -337,10 +337,49 @@ public class activity_despacho_list extends PBase {
 
     }
 
+    public void cancelaNotaCredito() {
+        try {
+            db.beginTransaction();
+
+            db.execSQL("DELETE FROM D_CxC WHERE COREL='"+gl.devcord+"'");
+            db.execSQL("DELETE FROM D_CxCD WHERE COREL='"+gl.devcord+"'");
+
+            db.execSQL("DELETE FROM D_NOTACRED WHERE COREL='"+gl.devcornc+"'");
+            db.execSQL("DELETE FROM D_NOTACREDD WHERE COREL='"+gl.devcornc+"'");
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
+            finish();
+        } catch (Exception e) {
+            db.endTransaction();
+            msgbox(e.getMessage());
+        }
+   }
+
 //endregion
 
 //region Dialogs
 
+    private void msgAskExit(String msg) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+        dialog.setTitle("Devolución");
+        dialog.setMessage(msg);
+
+        dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                cancelaNotaCredito();
+            }
+        });
+
+        dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {}
+        });
+
+        dialog.show();
+
+    }
 
 //endregion
 
@@ -353,6 +392,15 @@ public class activity_despacho_list extends PBase {
            Ds_pedidoObj.reconnect(Con,db);
         } catch (Exception e) {
             msgbox(e.getMessage());
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (gl.devtotal>0) {
+            msgAskExit("Está seguro de abandonar la venta? No se podrá aplicar la nota de crédito y se elminará la devolución");
+        } else {
+            super.onBackPressed();
         }
     }
 

@@ -216,11 +216,8 @@ public class CliDet extends PBase {
 		}else{
 			try{
 				gl.banderaCobro = false;
-
 				if (!validaVenta()) return;//Se valida si hay correlativos de factura para la venta
-
 				if(porcentaje == false) VerificaCantidadDesp();
-
 			} catch (Exception e){
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				mu.msgbox("doVenta: " + e.getMessage());
@@ -1487,7 +1484,7 @@ public class CliDet extends PBase {
 
             if (browse==4) {
                 browse=0;
-                if (!gl.cordevdes.isEmpty()) {
+                if (!gl.devcord.isEmpty()) {
                     showDespacho(null);
                 }
                 return;

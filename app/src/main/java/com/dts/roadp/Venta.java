@@ -249,15 +249,22 @@ public class Venta extends PBase {
 					//Toast.makeText(this,s, Toast.LENGTH_SHORT).show();
 					gl.bonus.add(clsBonG.items.get(i));
 				}
-			} else {
-
 			}
 
+            if (gl.devtotal>0) {
+                if (tot<gl.devtotal){
+                    mu.msgbox("No puede totalizar la factura, es menor al monto permitido para la nota de crédito: " + gl.devtotal);return;
+                }
+            }
+
+			/*
 			if (gl.dvbrowse!=0){
 				if (tot<gl.dvdispventa){
 					mu.msgbox("No puede totalizar la factura, es menor al monto permitido para la nota de crédito: " + gl.dvdispventa);return;
 				}
 			}
+			*/
+
 			gl.brw=0;
 
 			if (rutatipo.equalsIgnoreCase("V")) {
@@ -2793,8 +2800,17 @@ public class Venta extends PBase {
 
 		String cliid=gl.cliente;
 
-		try
-		{
+		try {
+            db.beginTransaction();
+
+            if (gl.devtotal>0) {
+                db.execSQL("DELETE FROM D_CxC WHERE COREL='"+gl.devcord+"'");
+                db.execSQL("DELETE FROM D_CxCD WHERE COREL='"+gl.devcord+"'");
+
+                db.execSQL("DELETE FROM D_NOTACRED WHERE COREL='"+gl.devcornc+"'");
+                db.execSQL("DELETE FROM D_NOTACREDD WHERE COREL='"+gl.devcornc+"'");
+            }
+
 			upd.init("P_CLIRUTA");
 			upd.add("BANDERA",cna);
 			upd.Where("CLIENTE='"+cliid+"' AND DIA="+dweek);
@@ -2818,6 +2834,10 @@ public class Venta extends PBase {
 			} catch (Exception e) {
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),csql);
 			}
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
@@ -3198,7 +3218,7 @@ public class Venta extends PBase {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle(R.string.app_name);
-			dialog.setMessage(msg  + " ?");
+			dialog.setMessage(msg);
 			dialog.setIcon(R.drawable.ic_quest);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
@@ -3211,17 +3231,13 @@ public class Venta extends PBase {
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					;
-				}
+				public void onClick(DialogInterface dialog, int which) {}
 			});
 
 			dialog.show();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
 	}
 
 	private void msgAskDel(String msg) {
@@ -3249,10 +3265,8 @@ public class Venta extends PBase {
 
 	}
 
-	private void msgAskBarra(String msg)
-	{
-		try
-		{
+	private void msgAskBarra(String msg) 	{
+		try {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle(R.string.app_name);
@@ -3273,9 +3287,7 @@ public class Venta extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
-	}
+    }
 
 	//endregion
 
@@ -3942,12 +3954,11 @@ public class Venta extends PBase {
 	
 	@Override
 	public void onBackPressed() {
-		try{
-			msgAskExit("Salir sin terminar venta");
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
+	    if (gl.devtotal>0) {
+            msgAskExit("¿Está seguro de abandonar la venta? No se podrá aplicar la nota de crédito y se elminará la devolución");
+        } else {
+            msgAskExit("¿Salir sin terminar venta?");
+        }
 	}
 
 	//endregion

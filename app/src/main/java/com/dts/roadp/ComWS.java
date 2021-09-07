@@ -210,7 +210,7 @@ public class ComWS extends PBase {
 		txtUser = new EditText(this, null);
 		txtPassword = new EditText(this, null);
 
-		txtVersion.setText(gl.parFechaVer);
+		txtVersion.setText(gl.parNumVer + gl.parFechaVer);
 
 		if (gl.ruta.isEmpty()) {
 			ruta = txtRuta.getText().toString();

@@ -338,7 +338,7 @@ public class Menu extends PBase {
 						if (rutatipo.equalsIgnoreCase("T")) {
 							showPrintMenuTodo();
 						} else {
-							if (rutatipo.equalsIgnoreCase("V")) {
+							if (rutatipo.equalsIgnoreCase("V") || rutatipo.equalsIgnoreCase("D")) {
 								if (gl.peAceptarCarga) {
 									showPrintMenuVentaApr();
 								} else {
@@ -364,7 +364,7 @@ public class Menu extends PBase {
 							if (rutatipo.equalsIgnoreCase("T")) {
 								showVoidMenuTodo();
 							} else {
-								if (rutatipo.equalsIgnoreCase("V")) {
+								if (rutatipo.equalsIgnoreCase("V") || rutatipo.equalsIgnoreCase("D")) {
 									showVoidMenuVenta();
 								} else {
 									showVoidMenuPreventa();

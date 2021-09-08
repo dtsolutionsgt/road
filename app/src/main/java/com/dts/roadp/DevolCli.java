@@ -413,7 +413,7 @@ public class DevolCli extends PBase {
 
 		try {
 
-			if (gl.tiponcredito==1){
+			if (gl.tiponcredito==1 | gl.tiponcredito==2){
 
 				db.beginTransaction();
 
@@ -543,6 +543,7 @@ public class DevolCli extends PBase {
 				gl.closeCliDet = true;
 				gl.closeVenta = true;
                 gl.devtotal = cntotl;
+                gl.despdevflag=true;
 
 				createDoc();
 				//msgAskSave("Aplicar pago y crear un recibo");

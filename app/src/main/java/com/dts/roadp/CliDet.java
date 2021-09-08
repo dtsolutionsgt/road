@@ -138,7 +138,7 @@ public class CliDet extends PBase {
 		calcCredit();
 		credito=gl.credito;
 
-		browse=0;
+		//browse=0;
 		merc=1;
 
 		habilitaOpciones();
@@ -1063,11 +1063,21 @@ public class CliDet extends PBase {
 	}
 
 	private void setDevType(String tdev) {
-		try{
+		try {
+
 			gl.dvbrowse=0;
 			gl.devtipo=tdev;
-            if (gl.rutatipo.equalsIgnoreCase("D")) {
-                browse=4;gl.closeCliDet=true;
+
+            sql = "SELECT VENTA FROM P_RUTA";
+            Cursor DT = Con.OpenDT(sql);
+            DT.moveToFirst();
+            String srutatipo = DT.getString(0);
+
+            if (srutatipo.equalsIgnoreCase("D")) {
+
+                int ii=gl.tiponcredito;
+
+                gl.despdevflag=false;gl.closeCliDet=true;
             }
 			Intent intent = new Intent(this,DevolCli.class);
 			startActivity(intent);
@@ -1472,6 +1482,12 @@ public class CliDet extends PBase {
 			calcCredit();
 			habilitaOpciones();
 
+			if (gl.despdevflag) {
+                gl.despdevflag=false;
+                showDespacho(null);
+                return;
+            }
+
 			if (browse==1) {
 				browse=0;
 				initVenta();return;
@@ -1481,14 +1497,6 @@ public class CliDet extends PBase {
 				browse=0;
 				showData();return;
 			}
-
-            if (browse==4) {
-                browse=0;
-                if (!gl.devcord.isEmpty()) {
-                    showDespacho(null);
-                }
-                return;
-            }
 
 			if (gl.dvbrowse!=0){
 				gl.rutatipo = "V";

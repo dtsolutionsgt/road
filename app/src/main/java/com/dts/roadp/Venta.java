@@ -2953,6 +2953,7 @@ public class Venta extends PBase {
 				//#CKFK 20210729 Obtener el precio del producto
 				getPrecio();
 
+
 				item.precio = prec;
 				item.imp= prc.imp;
 				item.des = desc;
@@ -2960,37 +2961,42 @@ public class Venta extends PBase {
 				item.total = prodtot;
 
 				if (!app.prodBarra(item.producto)){
+					if (prec!=0){
 
-					if (getDisp(item.producto, item.umventa) > 0){
+						if (getDisp(item.producto, item.umventa) > 0){
 
-						if (applyCant(cant,gl.dpeso).equals("")){
+							if (applyCant(cant,gl.dpeso).equals("")){
 
-							ins.init("T_VENTA");
-							ins.add("PRODUCTO",item.producto);
-							ins.add("EMPRESA",emp);
-							ins.add("UM",umv);
-							ins.add("CANT",item.cant);
-							ins.add("UMSTOCK",ums);
-							ins.add("FACTOR",app.factorPres(item.producto,umv,ums));
-							ins.add("PRECIO",item.precio);
-							ins.add("IMP",item.imp);
-							ins.add("DES",item.des);
-							ins.add("DESMON",item.desmon);
-							ins.add("TOTAL",item.total);
-							ins.add("PRECIODOC",item.precio);
-							ins.add("PESO",item.peso);
-							ins.add("VAL1",i+1);
-							ins.add("VAL2","");
-							ins.add("VAL3",0);
-							ins.add("VAL4","");
-							ins.add("PERCEP",percep);
-							ins.add("SIN_EXISTENCIA",0);
-							ins.add("CANTORIGINAL",item.cantOriginal);
-							ins.add("PESOORIGINAL",item.pesoOriginal);
+								ins.init("T_VENTA");
+								ins.add("PRODUCTO",item.producto);
+								ins.add("EMPRESA",emp);
+								ins.add("UM",umv);
+								ins.add("CANT",item.cant);
+								ins.add("UMSTOCK",ums);
+								ins.add("FACTOR",app.factorPres(item.producto,umv,ums));
+								ins.add("PRECIO",item.precio);
+								ins.add("IMP",item.imp);
+								ins.add("DES",item.des);
+								ins.add("DESMON",item.desmon);
+								ins.add("TOTAL",item.total);
+								ins.add("PRECIODOC",item.precio);
+								ins.add("PESO",item.peso);
+								ins.add("VAL1",i+1);
+								ins.add("VAL2",i+1);
+								ins.add("VAL3",0);
+								ins.add("VAL4","");
+								ins.add("PERCEP",percep);
+								ins.add("SIN_EXISTENCIA",0);
+								ins.add("CANTORIGINAL",item.cantOriginal);
+								ins.add("PESOORIGINAL",item.pesoOriginal);
 
-							db.execSQL(ins.sql());
+								db.execSQL(ins.sql());
 
+							}
 						}
+
+					}else{
+						toast("Precio del producto es 0, no se puede agregar a la venta");
 					}
 
 				}else{
@@ -3011,7 +3017,7 @@ public class Venta extends PBase {
 					ins.add("PRECIODOC",item.precio);
 					ins.add("PESO",item.peso);
 					ins.add("VAL1",i+1);
-					ins.add("VAL2","");
+					ins.add("VAL2",i+1);
 					ins.add("VAL3",0);
 					ins.add("VAL4","");
 					ins.add("CANTORIGINAL",item.cantOriginal);
@@ -3021,7 +3027,6 @@ public class Venta extends PBase {
 
 					cantProdBarra +=1;
 				}
-
 			}
 
 			if (cantProdBarra>0){
@@ -3535,9 +3540,9 @@ public class Venta extends PBase {
 							" AND CANT = " + cant + " AND UM = '" + UM + "'";
 				}
 
-            DT = Con.OpenDT(sql);
+            	DT = Con.OpenDT(sql);
 
-				cantReg += DT.getCount();
+				cantReg = DT.getCount();
 
 				//#CKFK se van a insertar en la tabla de modificación de la factura los productos con diferencia
 				if (cantReg>0){

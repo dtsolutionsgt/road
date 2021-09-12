@@ -220,7 +220,7 @@ public class CliDet extends PBase {
 				if(porcentaje == false) VerificaCantidadDesp();
 			} catch (Exception e){
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-				mu.msgbox("doVenta: " + e.getMessage());
+				mu.msgbox("showDespacho: " + e.getMessage());
 			}
 		}
 	}

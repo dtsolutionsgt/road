@@ -140,7 +140,12 @@ public class Venta extends PBase {
 		browse=0;
 		gl.closeVenta = false;
 
-		showCredit();
+		if (gl.iddespacho ==null ) {
+			if (gl.iddespacho.isEmpty()) {
+				showCredit();
+			}
+		}
+
 		setGPS();
 		cliPorDia();
 		validaNivelPrecio();
@@ -391,6 +396,7 @@ public class Venta extends PBase {
 						clsVenta vItem = (clsVenta)lvObj;
 
 						prodid=vItem.Cod;
+						gl.um=vItem.um;
 						adapter.setSelectedIndex(position);
 
 						//#CKFK 20190517 Agregué la validación de que esta pantalla solo se levanta cuando sea venta directa
@@ -1034,7 +1040,7 @@ public class Venta extends PBase {
             }
 
 			ins.add("VAL1",0);
-			ins.add("VAL2","");
+			ins.add("VAL2","0");
             if (gl.tolprodcrit) ins.add("VAL3",1);else ins.add("VAL3",0);
 			ins.add("VAL4","");
 			ins.add("PERCEP",percep);
@@ -1097,7 +1103,7 @@ public class Venta extends PBase {
                 }
 
                 ins.add("VAL1",0);
-                ins.add("VAL2","");
+                ins.add("VAL2","0");
                 if (gl.tolprodcrit) ins.add("VAL3",1);else ins.add("VAL3",0);
                 ins.add("VAL4","");
                 ins.add("PERCEP",percep);
@@ -1931,7 +1937,7 @@ public class Venta extends PBase {
 
 			ins.add("PESO", ppeso);
 			ins.add("VAL1", 0);
-			ins.add("VAL2", "");
+			ins.add("VAL2", "0");
 			ins.add("VAL3", 0);
 			ins.add("VAL4", "");
 			ins.add("PERCEP", percep);
@@ -2346,7 +2352,7 @@ public class Venta extends PBase {
 
 			ins.add("PESO",ppeso);
 			ins.add("VAL1",0);
-			ins.add("VAL2","");
+			ins.add("VAL2","0");
 			ins.add("VAL3",0);
 			ins.add("VAL4","");
 			ins.add("PERCEP",percep);
@@ -3518,6 +3524,7 @@ public class Venta extends PBase {
 		boolean rslt=false;
 
         try {
+
             DT = null;
 
             clsClasses.clsDs_pedidod item;
@@ -3863,7 +3870,8 @@ public class Venta extends PBase {
 			}
 
 			mMenuDlg = new AlertDialog.Builder(this);
-			mMenuDlg.setTitle("Razón de modificación " + prod);
+			mMenuDlg.setTitle("Razón de modificación\n" + prod + " " + app.getNombreProducto(prod));
+            mMenuDlg.setCancelable(false);
 
 			mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
@@ -3879,6 +3887,10 @@ public class Venta extends PBase {
 			mMenuDlg.setNegativeButton("Regresar", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
+
+					sql="DELETE FROM T_FACTURAD_MODIF";
+					db.execSQL(sql);
+
 				}
 			});
 

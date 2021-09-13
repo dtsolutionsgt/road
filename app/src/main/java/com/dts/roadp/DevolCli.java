@@ -269,10 +269,9 @@ public class DevolCli extends PBase {
 			((appGlobals) vApp).prod=prodid;
 			Intent intent = new Intent(this,DevCliCant.class);
 			startActivity(intent);
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 
 	private void updCant(int item){

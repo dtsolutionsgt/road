@@ -23,6 +23,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -41,6 +42,7 @@ public class Clientes extends PBase {
 	private Spinner spinList, spinFilt;
 	private EditText txtFiltro;
 	private TextView lblCant;
+	private ImageView cliNuevo;
 
 	private ArrayList<clsCDB> items = new ArrayList<clsCDB>();
 	private ArrayList<String> cobros = new ArrayList<String>();
@@ -85,6 +87,7 @@ public class Clientes extends PBase {
 		spinFilt = (Spinner) findViewById(R.id.spinner8);
 		txtFiltro = (EditText) findViewById(R.id.txtMonto);
 		lblCant = (TextView) findViewById(R.id.lblCant);
+		cliNuevo = (ImageView) findViewById(R.id.imgImg);
 
 		app = new AppMethods(this, gl, Con, db);
 		gl.validimp = app.validaImpresora();
@@ -99,6 +102,12 @@ public class Clientes extends PBase {
 
 		if (gl.tolsuper) spinList.setVisibility(View.INVISIBLE);
 		fillSpinners();
+
+		if (gl.rutatipog.equals("C")){
+			cliNuevo.setVisibility(View.INVISIBLE);
+		}else{
+			cliNuevo.setVisibility(View.VISIBLE);
+		}
 
 		listItems();
 

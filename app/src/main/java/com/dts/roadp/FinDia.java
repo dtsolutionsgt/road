@@ -70,7 +70,8 @@ public class FinDia extends PBase {
             fullfd = true;
         } else {
             if (rutatipo.equalsIgnoreCase("V") ||
-                rutatipo.equalsIgnoreCase("D") ) fullfd = true;
+                rutatipo.equalsIgnoreCase("D")  ||
+                rutatipo.equalsIgnoreCase("C")) fullfd = true;
             else fullfd = false;
         }
 
@@ -229,6 +230,8 @@ public class FinDia extends PBase {
                     db.execSQL(sql);
                     sql = "DELETE FROM D_FACTURA_BARRA WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
+                    sql = "DELETE FROM D_FACTURAD_MODIF WHERE COREL='" + corel + "'";
+                    db.execSQL(sql);
                     sql = "DELETE FROM D_STOCKB_DEV WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
                     sql = "DELETE FROM D_BONIF WHERE COREL='" + corel + "'";
@@ -242,6 +245,8 @@ public class FinDia extends PBase {
                     sql = "DELETE FROM D_REL_PROD_BON WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
                     sql = "DELETE FROM D_BONIFFALT";
+                    db.execSQL(sql);
+                    sql = "DELETE FROM D_CANASTA WHERE CORELTRANS='" + corel + "'";
                     db.execSQL(sql);
 
                     DT.moveToNext();
@@ -412,6 +417,9 @@ public class FinDia extends PBase {
             sql = "DELETE FROM D_CANASTA WHERE STATCOM= 'S'";
             db.execSQL(sql);
 
+            sql = "DELETE FROM D_DESPACHOD_NO_ENTREGADO WHERE STATCOM= 'S'";
+            db.execSQL(sql);
+
             db.setTransactionSuccessful();
             db.endTransaction();
 
@@ -540,7 +548,7 @@ public class FinDia extends PBase {
                     return false;
                 }
 
-                if (claseFinDia.getCantFactura() == 0) {
+                if (claseFinDia.getCantFactura() == 0 && !rutatipo.equals("C")) {
                     msgExit("No hay facturas, no se puede realizar el Fin de Día");
                     return false;
                 }
@@ -2648,6 +2656,18 @@ public class FinDia extends PBase {
             sql = " SELECT SUM(S.PESO) AS PESOTOT, SUM(S.CANT)AS CANTUNI " +
             " FROM D_CXC E, D_CxCD S, P_PRODUCTO P WHERE E.COREL = S.COREL AND S.CODIGO= P.CODIGO AND E.ANULADO = 'N' ";
 
+            DT=Con.OpenDT(sql);
+
+            if (DT.getCount()!=0)
+            {
+                DT.moveToFirst();
+
+                vTotalLbsB +=   DT.getDouble(0);
+                vTotalUB += DT.getDouble(1);
+            }
+            //Canastas.
+            sql = "SELECT IFNULL(SUM(PESOREC),0) AS PESO, IFNULL(SUM(CANTREC),0) AS CANT" +
+                    " FROM D_CANASTA WHERE ANULADO = 0 AND STATCOM = 'N'";
             DT=Con.OpenDT(sql);
 
             if (DT.getCount()!=0)

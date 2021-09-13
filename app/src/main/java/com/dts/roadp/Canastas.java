@@ -386,7 +386,7 @@ public class Canastas extends PBase {
         String sql = "SELECT CANT FROM P_STOCK WHERE CODIGO='"+prod+"'";
         Cursor st = Con.OpenDT(sql);
 
-        if (st != null || st.getCount() >= 1){
+        if (st != null && st.getCount() > 0){
             st.moveToFirst();
 
             int cant = st.getInt(0);

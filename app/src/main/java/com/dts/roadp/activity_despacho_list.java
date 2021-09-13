@@ -43,6 +43,8 @@ public class activity_despacho_list extends PBase {
 
         setHandlers();
 
+        showCredit();
+
         listaModificacion();
         listItems();
 
@@ -207,6 +209,7 @@ public class activity_despacho_list extends PBase {
 
             mMenuDlg = new AlertDialog.Builder(this);
             mMenuDlg.setTitle("Razón de modificación");
+            mMenuDlg.setCancelable(false);
 
             mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
@@ -241,44 +244,49 @@ public class activity_despacho_list extends PBase {
         try
         {
 
-            gl.coddespacho=gl.iddespacho;
+            if (scna=="" || scna.isEmpty()){
+                msgbox("Seleccione una razón de modificación");
+            }else{
+                gl.coddespacho=gl.iddespacho;
 
-            clsClasses.clsDs_pedidod item;
-            clsClasses.clsDs_pedido iteme;
+                clsClasses.clsDs_pedidod item;
+                clsClasses.clsDs_pedido iteme;
 
-            clsDs_pedidodObj Ds_pedidodObj=new clsDs_pedidodObj(this,Con,db);
-            Ds_pedidodObj.fill("WHERE COREL='"+gl.coddespacho+"'");
+                clsDs_pedidodObj Ds_pedidodObj=new clsDs_pedidodObj(this,Con,db);
+                Ds_pedidodObj.fill("WHERE COREL='"+gl.coddespacho+"'");
 
-            clsDs_pedidoObj Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
-            Ds_pedidoObj.fill("WHERE COREL='"+gl.coddespacho+"'");
+                clsDs_pedidoObj Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
+                Ds_pedidoObj.fill("WHERE COREL='"+gl.coddespacho+"'");
 
-            iteme=Ds_pedidoObj.items.get(0);
+                iteme=Ds_pedidoObj.items.get(0);
 
-            for (int i = 0; i <Ds_pedidodObj.count; i++) {
+                for (int i = 0; i <Ds_pedidodObj.count; i++) {
 
-                item=Ds_pedidodObj.items.get(i);
+                    item=Ds_pedidodObj.items.get(i);
 
-                ins.init("D_DESPACHOD_NO_ENTREGADO");
-                ins.add("COREL",item.corel);
-                ins.add("ANULADO",item.anulado);
-                ins.add("PRODUCTO",item.producto);
-                ins.add("CANTSOLICITADA",item.cant);
-                ins.add("UMVENTASOLICITADA",item.umventa);
-                ins.add("PESOSOLICITADO",item.peso);
-                ins.add("CANTENTREGADA",0);
-                ins.add("UMVENTAENTREGADA","");
-                ins.add("PESOENTREGADO",0);
-                ins.add("IDRAZON",scna);
-                ins.add("STATCOM","N");
+                    ins.init("D_DESPACHOD_NO_ENTREGADO");
+                    ins.add("COREL",item.corel);
+                    ins.add("ANULADO",item.anulado);
+                    ins.add("PRODUCTO",item.producto);
+                    ins.add("CANTSOLICITADA",item.cant);
+                    ins.add("UMVENTASOLICITADA",item.umventa);
+                    ins.add("PESOSOLICITADO",item.peso);
+                    ins.add("CANTENTREGADA",0);
+                    ins.add("UMVENTAENTREGADA","");
+                    ins.add("PESOENTREGADO",0);
+                    ins.add("IDRAZON",scna);
+                    ins.add("STATCOM","N");
 
-                db.execSQL(ins.sql());
+                    db.execSQL(ins.sql());
+
+                }
+
+                iteme.bandera = "S";
+                Ds_pedidoObj.updateBandera(iteme);
+
+                listItems();
 
             }
-
-            iteme.bandera = "S";
-            Ds_pedidoObj.updateBandera(iteme);
-
-            listItems();
 
         } catch (SQLException e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -312,6 +320,36 @@ public class activity_despacho_list extends PBase {
         }
 
 
+    }
+
+    private void showCredit(){
+        try{
+            if (hasCredits()){
+                Intent intent = new Intent(this,Cobro.class);
+                startActivity(intent);
+            }
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+    }
+
+    private boolean hasCredits(){
+        Cursor DT;
+
+        try {
+            sql="SELECT SALDO FROM P_COBRO WHERE CLIENTE='"+gl.cliente+"'";
+            DT=Con.OpenDT(sql);
+
+            boolean rslt=DT.getCount()>0;
+            if(DT!=null) DT.close();
+
+            if (rslt) return true;
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox(e.getMessage());
+        }
+
+        return false;
     }
 
 //endregion

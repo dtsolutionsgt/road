@@ -119,7 +119,7 @@ public class ProdCantPrev extends PBase {
     }
 
     public void doHint(View view) {
-        String ss="LA CANTIDAD EXEDENTE A "+strdisp+" PODRIA NO ENTREGAR SE";
+        String ss="LA CANTIDAD EXCEDENTE A "+strdisp+" PODRIA NO ENTREGARSE";
         toastlong(ss);
     }
 

@@ -4477,7 +4477,7 @@ public class ComWS extends PBase {
 		try {
 
 			envioFacturas();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4485,7 +4485,7 @@ public class ComWS extends PBase {
 			}
 
 			envioCanastas();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4493,7 +4493,7 @@ public class ComWS extends PBase {
 			}
 
 			envioDespachosNoEntregados();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4501,7 +4501,7 @@ public class ComWS extends PBase {
 			}
 
 			envioPedidos();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4509,7 +4509,7 @@ public class ComWS extends PBase {
 			}
 
 			envioNotasCredito();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4517,7 +4517,7 @@ public class ComWS extends PBase {
 			}
 
 			envioNotasDevolucion();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4525,7 +4525,7 @@ public class ComWS extends PBase {
 			}
 
 			envioCobros();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4533,7 +4533,7 @@ public class ComWS extends PBase {
 			}
 
 			envioDepositos();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4541,7 +4541,7 @@ public class ComWS extends PBase {
 			}
 
 			envio_D_MOV();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4549,7 +4549,7 @@ public class ComWS extends PBase {
 			}
 
 			envioCli();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4557,7 +4557,7 @@ public class ComWS extends PBase {
 			}
 
 			envioAtten();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4565,7 +4565,7 @@ public class ComWS extends PBase {
 			}
 
 			envioCoord();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4573,7 +4573,7 @@ public class ComWS extends PBase {
 			}
 
 			envioSolicitud();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4581,7 +4581,7 @@ public class ComWS extends PBase {
 			}
 
 			envioRating();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4589,7 +4589,8 @@ public class ComWS extends PBase {
 			}
 
 			updateAcumulados();
-			if (!fstr.equals("Sync OK")) {
+			//if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4597,7 +4598,7 @@ public class ComWS extends PBase {
 			}
 
 			updateInventario();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
                 }.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4605,7 +4606,7 @@ public class ComWS extends PBase {
 			}
 
 			updateDespachos();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4621,7 +4622,7 @@ public class ComWS extends PBase {
 
 			envioFinDia();
 
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");

@@ -2803,6 +2803,7 @@ public class Venta extends PBase {
 		try {
             db.beginTransaction();
 
+            // JP 20210913 Borra las CxC y Nota Credito si existe una devolucion
             if (gl.devtotal>0) {
                 db.execSQL("DELETE FROM D_CxC WHERE COREL='"+gl.devcord+"'");
                 db.execSQL("DELETE FROM D_CxCD WHERE COREL='"+gl.devcord+"'");
@@ -3060,8 +3061,7 @@ public class Venta extends PBase {
 				cmdBarrasDespacho.setVisibility(View.VISIBLE);
 			}
 
-
-		}catch (Exception e){
+		} catch (Exception e){
 
 		}
 	}

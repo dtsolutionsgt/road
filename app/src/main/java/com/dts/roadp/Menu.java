@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dts.roadp.clsClasses.clsMenu;
 
@@ -287,26 +288,32 @@ public class Menu extends PBase {
 						Intent intentp = new Intent(this, CliPos.class);
 						startActivity(intentp);
 					} else {
-						gl.filtrocli=-1;
-						Intent intent = new Intent(this, Clientes.class);
-						//Asigna conexión actual al siguiente activity.
 
-						//#HS_201811 Verifica si hay existencias disponibles.
+						if (!cierreRealizado()){
 
-						cantidad = CantExistencias();
+							gl.filtrocli=-1;
+							Intent intent = new Intent(this, Clientes.class);
+							//Asigna conexión actual al siguiente activity.
 
-						//#HS_20181206 Verifica el usuario si es DTS.
-						if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")){
-							mu.msgbox("No puede realizar esta acción");
-						}else {
+							//#HS_201811 Verifica si hay existencias disponibles.
 
-							if(gl.vnivel == 1){
-								msgAskSupervisor1();
-							}else {
-								startActivity(intent);
+							if (rutatipo.equals("V") || rutatipo.equals("D")){
+								cantidad = CantExistencias();
 							}
-						}
 
+							//#HS_20181206 Verifica el usuario si es DTS.
+							if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")){
+								mu.msgbox("No puede realizar esta acción");
+							}else {
+
+								if(gl.vnivel == 1){
+									msgAskSupervisor1();
+								}else {
+									startActivity(intent);
+								}
+							}
+
+						}
 					}
 
 					break;
@@ -331,7 +338,7 @@ public class Menu extends PBase {
 						if (rutatipo.equalsIgnoreCase("T")) {
 							showPrintMenuTodo();
 						} else {
-							if (rutatipo.equalsIgnoreCase("V")) {
+							if (rutatipo.equalsIgnoreCase("V") || rutatipo.equalsIgnoreCase("D")) {
 								if (gl.peAceptarCarga) {
 									showPrintMenuVentaApr();
 								} else {
@@ -357,7 +364,7 @@ public class Menu extends PBase {
 							if (rutatipo.equalsIgnoreCase("T")) {
 								showVoidMenuTodo();
 							} else {
-								if (rutatipo.equalsIgnoreCase("V")) {
+								if (rutatipo.equalsIgnoreCase("V") || rutatipo.equalsIgnoreCase("D")) {
 									showVoidMenuVenta();
 								} else {
 									showVoidMenuPreventa();
@@ -445,7 +452,29 @@ public class Menu extends PBase {
 	//endregion
 
 	//region Reimpresion
-	
+
+	private boolean cierreRealizado(){
+		int fechaUltimoCierre;
+		boolean rslt=false;
+		clsFinDia claseFinDia;
+
+		claseFinDia = new clsFinDia(this);
+
+		try{
+
+			fechaUltimoCierre = claseFinDia.ultimoCierreFecha();
+			if (du.getActDate() == fechaUltimoCierre) {
+				msgbox("Fin de Día ya fue efectuado el día de hoy, cargue datos nuevamente");
+
+				rslt = true;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+		return rslt;
+	}
+
 	public void showPrintMenuTodo() {
 
 		try{

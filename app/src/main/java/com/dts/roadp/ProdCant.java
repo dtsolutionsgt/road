@@ -688,11 +688,19 @@ public class ProdCant extends PBase {
 			cant=mu.round(cant,deccant);
 
 			if (cant<=0) {
-				mu.msgbox("Cantidad incorrecta");return 2;
+				if (!txtCant.getText().toString().trim().isEmpty()){
+					mu.msgbox("Cantidad incorrecta");
+				}
+				return 2;
 			}
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			cant=-1;mu.msgbox("Cantidad incorrecta");return 2;
+			//cant=-1;
+			cant=0;
+			if (!txtCant.getText().toString().trim().isEmpty()){
+				mu.msgbox("Cantidad incorrecta");
+			}
+			return 2;
 		}
 
 		// ajuste a unidades menores

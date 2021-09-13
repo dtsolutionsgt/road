@@ -138,7 +138,7 @@ public class CliDet extends PBase {
 		calcCredit();
 		credito=gl.credito;
 
-		browse=0;
+		//browse=0;
 		merc=1;
 
 		habilitaOpciones();
@@ -172,7 +172,6 @@ public class CliDet extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	}
-
 
 	//region  Events
 
@@ -217,14 +216,11 @@ public class CliDet extends PBase {
 		}else{
 			try{
 				gl.banderaCobro = false;
-
 				if (!validaVenta()) return;//Se valida si hay correlativos de factura para la venta
-
 				if(porcentaje == false) VerificaCantidadDesp();
-
 			} catch (Exception e){
 				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-				mu.msgbox("doVenta: " + e.getMessage());
+				mu.msgbox("showDespacho: " + e.getMessage());
 			}
 		}
 	}
@@ -498,10 +494,11 @@ public class CliDet extends PBase {
 			lblRuta.setText("Ruta: ");
 			txtRuta.setText(gl.rutasup);
 
-			sql="SELECT PEDIDOS_CLINUEVO FROM P_RUTA ";
+			sql="SELECT PEDIDOS_CLINUEVO,VENTA FROM P_RUTA ";
             DT=Con.OpenDT(sql);
             DT.moveToFirst();
             pedclinue=DT.getInt(0)==1;
+            gl.rutatipo = DT.getString(1);
 
             sql="SELECT NOMBRE FROM P_CANAL WHERE CODIGO='"+canal+"'";
             DT=Con.OpenDT(sql);
@@ -519,7 +516,7 @@ public class CliDet extends PBase {
                 lblCanalsub.setText("Subcanal : ");
             }
 
-            lblPrior.setText("Priorización : "+prior);
+            lblPrior.setText("Categorización : "+prior);
 
       	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1066,15 +1063,27 @@ public class CliDet extends PBase {
 	}
 
 	private void setDevType(String tdev) {
-		try{
+		try {
+
 			gl.dvbrowse=0;
 			gl.devtipo=tdev;
+
+            sql = "SELECT VENTA FROM P_RUTA";
+            Cursor DT = Con.OpenDT(sql);
+            DT.moveToFirst();
+            String srutatipo = DT.getString(0);
+
+            if (srutatipo.equalsIgnoreCase("D")) {
+
+                int ii=gl.tiponcredito;
+
+                gl.despdevflag=false;gl.closeCliDet=true;
+            }
 			Intent intent = new Intent(this,DevolCli.class);
 			startActivity(intent);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 
 	private void habilitaOpciones() {
@@ -1344,9 +1353,6 @@ public class CliDet extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
-
 	}
 
 	private void msgAskTipoDev() {
@@ -1406,12 +1412,9 @@ public class CliDet extends PBase {
 
 			alert.show();
 
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
-
-
 	}
 
 	private void msgAskVenta() {
@@ -1479,6 +1482,12 @@ public class CliDet extends PBase {
 			calcCredit();
 			habilitaOpciones();
 
+			if (gl.despdevflag) {
+                gl.despdevflag=false;
+                showDespacho(null);
+                return;
+            }
+
 			if (browse==1) {
 				browse=0;
 				initVenta();return;
@@ -1490,19 +1499,15 @@ public class CliDet extends PBase {
 			}
 
 			if (gl.dvbrowse!=0){
-
 				gl.rutatipo = "V";
-
 				browse =3;
-
 				if (browse==3){//Se utiliza para la devolución de cliente.
 					initVenta();return;
 				}return;
-
 			}
 
 
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	}

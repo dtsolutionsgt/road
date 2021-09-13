@@ -61,7 +61,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/lblClase"
                     android:paddingStart="5dp"
-                    android:text="Subclase"
+                    android:text="Subcanal"
                     android:textSize="18sp" />
 
                 <TextView
@@ -72,7 +72,7 @@
                     android:layout_alignParentBottom="false"
                     android:background="#F0F0F0"
                     android:paddingStart="5dp"
-                    android:text="Clase"
+                    android:text="Canal"
                     android:textSize="18sp" />
 
                 <TextView
@@ -133,7 +133,7 @@
                     android:background="#F0F0F0"
                     android:paddingStart="5dp"
                     android:paddingTop="0dp"
-                    android:text="Priorizacion"
+                    android:text="Categorización"
                     android:textSize="18sp" />
             </RelativeLayout>
         </ScrollView>

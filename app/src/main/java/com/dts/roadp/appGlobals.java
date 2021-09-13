@@ -29,7 +29,7 @@ public class appGlobals extends Application {
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
 	public boolean permitir_cantidad_mayor, permitir_producto_nuevo,pedidomod;
 	public int mpago;
-	public String prodCanasta, corelFac;
+	public String prodCanasta, corelFac, devcord;
 	public boolean ingresaCanastas;
 
     public ArrayList<clsClasses.clsPedItem> peditems= new ArrayList<clsClasses.clsPedItem>();
@@ -44,9 +44,9 @@ public class appGlobals extends Application {
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;
 	public double dvfactor,dvpeso,dvprec,dvpreclista,dvtotal;
 	public int dvbrowse=0,tienelote,facturaVen,brw=0;
-    public boolean dvporpeso,devfindia,devprncierre,gpspass;
-    public double dvdispventa;
-    public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc;
+    public boolean dvporpeso,devfindia,devprncierre,gpspass,despdevflag;
+    public double dvdispventa,devtotal;
+    public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc,devcornc;
 
 	// Parametros Extra
 	public String peModal,peMon,peFormatoFactura,CodDev;

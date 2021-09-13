@@ -210,7 +210,7 @@ public class ComWS extends PBase {
 		txtUser = new EditText(this, null);
 		txtPassword = new EditText(this, null);
 
-		txtVersion.setText(gl.parFechaVer);
+		txtVersion.setText(gl.parNumVer + gl.parFechaVer);
 
 		if (gl.ruta.isEmpty()) {
 			ruta = txtRuta.getText().toString();
@@ -410,10 +410,9 @@ public class ComWS extends PBase {
 				}
 			}
 
-			//#CKFK 20210813 Alquien puso esto en comentario por facilidad para pruebas
 			if (gl.banderafindia) {
 				if (!puedeComunicar()) {
-					mu.msgbox("No ha hecho fin de dia, no puede comunicar datos");
+					mu.msgbox("No ha hecho fin de día, no puede comunicar datos");
 					return;
 				}
 			}
@@ -4478,7 +4477,7 @@ public class ComWS extends PBase {
 		try {
 
 			envioFacturas();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4486,7 +4485,7 @@ public class ComWS extends PBase {
 			}
 
 			envioCanastas();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4494,7 +4493,7 @@ public class ComWS extends PBase {
 			}
 
 			envioDespachosNoEntregados();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4502,7 +4501,7 @@ public class ComWS extends PBase {
 			}
 
 			envioPedidos();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4510,7 +4509,7 @@ public class ComWS extends PBase {
 			}
 
 			envioNotasCredito();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4518,7 +4517,7 @@ public class ComWS extends PBase {
 			}
 
 			envioNotasDevolucion();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4526,7 +4525,7 @@ public class ComWS extends PBase {
 			}
 
 			envioCobros();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4534,7 +4533,7 @@ public class ComWS extends PBase {
 			}
 
 			envioDepositos();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4542,7 +4541,7 @@ public class ComWS extends PBase {
 			}
 
 			envio_D_MOV();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4550,7 +4549,7 @@ public class ComWS extends PBase {
 			}
 
 			envioCli();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4558,7 +4557,7 @@ public class ComWS extends PBase {
 			}
 
 			envioAtten();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4566,7 +4565,7 @@ public class ComWS extends PBase {
 			}
 
 			envioCoord();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4574,7 +4573,7 @@ public class ComWS extends PBase {
 			}
 
 			envioSolicitud();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4582,7 +4581,7 @@ public class ComWS extends PBase {
 			}
 
 			envioRating();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4590,7 +4589,8 @@ public class ComWS extends PBase {
 			}
 
 			updateAcumulados();
-			if (!fstr.equals("Sync OK")) {
+			//if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -4598,10 +4598,18 @@ public class ComWS extends PBase {
 			}
 
 			updateInventario();
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
                 }.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
+				return false;
+			}
+
+			updateDespachos();
+			if (errflag) {
+				dbld.savelog();
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
 
@@ -4614,7 +4622,7 @@ public class ComWS extends PBase {
 
 			envioFinDia();
 
-			if (!fstr.equals("Sync OK")) {
+			if (errflag) {
 				dbld.savelog();
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
@@ -5995,9 +6003,42 @@ public class ComWS extends PBase {
 					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "')";
 			dbld.add(ss);
 
-			ss = " UPDATE P_STOCK_PV SET ENVIADO = 1, COREL_D_MOV = '" + corel_d_mov + "' " +
+			ss = " UPDATE P_STOCK_PV SET ENVIADO = 1 " +
 				 " WHERE RUTA  = '" + gl.ruta + "' AND FECHA = '" + sFecha + "' AND ENVIADO = 0 " +
 				 " AND DOCUMENTO IN (SELECT DISTINCT DOCUMENTO FROM P_STOCK_PV WHERE RUTA = '" + gl.ruta + "' AND FECHA = '" + sFecha + "')";
+			dbld.add(ss);
+
+			if (envioparcial && !esEnvioManual) {
+				if (commitSQL() == 0) {
+					fterr += "\n" + sstr;
+					errflag = true;
+				}
+			}
+
+		} catch (Exception e) {
+			errflag = true;
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+			//fterr=fterr+fstr;
+		}
+
+	}
+
+	public void updateDespachos() {
+		DU = new DateUtils();
+		String sFecha;
+		int rslt;
+		long vfecha = clsAppM.fechaFactTol(du.getActDate());
+		sFecha = DU.univfechasql(vfecha);
+		String corel_d_mov = Get_Corel_D_Mov();
+
+		try {
+
+			if (envioparcial) dbld.clear();
+
+			ss = " UPDATE DS_PEDIDO SET STATCOM = 'S' " +
+					" WHERE RUTA  = '" + gl.ruta + "' AND (FECHA ='" + sFecha + "') AND STATCOM = 'N' " ;
 			dbld.add(ss);
 
 			if (envioparcial && !esEnvioManual) {

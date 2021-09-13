@@ -145,7 +145,8 @@ public class Canastas extends PBase {
                     "b.CODIGO, " +
                     "b.DESCCORTA, " +
                     "b.DESCLARGA, " +
-                    "a.STATCOM " +
+                    "a.STATCOM, " +
+                    "a.VENDEDOR  " +
                 "FROM "+tabla+" a " +
                 "INNER JOIN P_PRODUCTO b ON b.CODIGO = a.PRODUCTO " +
                 "WHERE a.CLIENTE = '" + gl.cliente +"' " +
@@ -172,6 +173,7 @@ public class Canastas extends PBase {
                 item.desccorta = DT.getString(7);
                 item.desclarga = DT.getString(8);
                 item.editar = DT.getString(9).equalsIgnoreCase("N");
+                item.vendedor = DT.getString(10);
 
                 items.add(item);
                 tEntr += item.cantentr;
@@ -280,6 +282,7 @@ public class Canastas extends PBase {
                 ins.add("CANTENTR", cantEntr);
                 ins.add("STATCOM", "N");
                 ins.add("CORELTRANS", (gl.corelFac == null || gl.corelFac.isEmpty()) ? "": gl.corelFac);
+                ins.add("VENDEDOR", gl.vend);
 
                 db.execSQL(ins.sql());
             } else {
@@ -383,7 +386,7 @@ public class Canastas extends PBase {
         String sql = "SELECT CANT FROM P_STOCK WHERE CODIGO='"+prod+"'";
         Cursor st = Con.OpenDT(sql);
 
-        if (st != null || st.getCount() >= 1){
+        if (st != null && st.getCount() > 0){
             st.moveToFirst();
 
             int cant = st.getInt(0);

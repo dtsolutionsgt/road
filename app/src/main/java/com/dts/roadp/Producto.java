@@ -49,7 +49,7 @@ public class Producto extends PBase {
 		setContentView(R.layout.activity_producto);
 		
 		super.InitBase();
-		addlog("Producto",""+du.getActDateTime(),gl.vend);
+		//addlog("Producto",""+du.getActDateTime(),gl.vend);
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		txtFilter = (EditText) findViewById(R.id.editText1);
@@ -227,7 +227,7 @@ public class Producto extends PBase {
 				}
 
 			});
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
@@ -300,10 +300,10 @@ public class Producto extends PBase {
 					}
 					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO='" + vF + "')) ";
 					sql+="UNION ";
-					//#CKFK 20210827 Cambié esto (P_PRODUCTO.TIPO ='S') por esto (P_PRODUCTO.TIPO ='P')
+
 					sql+="SELECT DISTINCT P_PRODUCTO.CODIGO,P_PRODUCTO.DESCCORTA,''  " +
 							"FROM P_PRODUCTO "  +
-							"WHERE (P_PRODUCTO.TIPO ='P')  AND (P_PRODUCTO.ES_VENDIBLE=1) ";
+							"WHERE (P_PRODUCTO.TIPO ='S')  AND (P_PRODUCTO.ES_VENDIBLE=1) ";
 					if (!mu.emptystr(famid)){
 						if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
 					}
@@ -336,7 +336,14 @@ public class Producto extends PBase {
 
                     if (ordPorNombre) sql+="ORDER BY NOMBRE"; else sql+="ORDER BY CODIGO";
 					break;
-			}
+
+                case 4:
+                    sql="SELECT CODIGO,DESCCORTA,UNIDBAS FROM P_PRODUCTO WHERE 1=1 ";
+                    if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
+                    if (vF.length()>0) sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";
+                    if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
+                    break;
+            }
 				
 			DT=Con.OpenDT(sql);
 
@@ -384,7 +391,8 @@ public class Producto extends PBase {
 		adapter=new ListAdaptProd(this,vitems);
 		listView.setAdapter(adapter);
 		
-		if (prodtipo==1) dispUmCliente();
+		//if (prodtipo==1) dispUmCliente();
+        if (gl.rutatipo.equalsIgnoreCase("V")) dispUmCliente();
 
 		if (cantidad==1) {
 
@@ -474,7 +482,6 @@ public class Producto extends PBase {
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()>0) {
-
 				dt.moveToFirst();
 				disp_und =dt.getDouble(0);
 				disp_peso =dt.getDouble(1);
@@ -515,7 +522,6 @@ public class Producto extends PBase {
 
 			if (dt.getCount()>0){
 				dt.moveToFirst();
-
 				umstock=dt.getString(0);
 			}
 
@@ -594,23 +600,25 @@ public class Producto extends PBase {
 		spinlist.add("< TODAS >");
 		  
 		try {
-			
-			switch (prodtipo) {  
-			case 0: // Preventa
-				sql="SELECT Codigo,Nombre FROM P_LINEA ORDER BY Nombre";break;
-			case 1:  // Venta   
-				sql="SELECT DISTINCT P_PRODUCTO.LINEA,P_LINEA.NOMBRE "+
-				     "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_STOCK.CODIGO=P_PRODUCTO.CODIGO " +
-				     "INNER JOIN P_LINEA ON P_PRODUCTO.LINEA=P_LINEA.CODIGO " +
-				     "WHERE (P_STOCK.CANT > 0) ORDER BY P_LINEA.NOMBRE";
-				break;	
-			case 2: // Mercadeo propio
-				sql="SELECT Codigo,Nombre FROM P_LINEA ORDER BY Nombre";break;
-			case 3:  // Mercadeo comp
-				sql="SELECT Codigo,Nombre FROM P_MERMARCACOMP ORDER BY Nombre";break;	
-			}			
-						
-			DT=Con.OpenDT(sql);					
+
+            switch (prodtipo) {
+                case 0: // Preventa
+                    sql="SELECT Codigo,Nombre FROM P_LINEA ORDER BY Nombre";break;
+                case 1:  // Venta
+                    sql="SELECT DISTINCT P_PRODUCTO.LINEA,P_LINEA.NOMBRE "+
+                            "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_STOCK.CODIGO=P_PRODUCTO.CODIGO " +
+                            "INNER JOIN P_LINEA ON P_PRODUCTO.LINEA=P_LINEA.CODIGO " +
+                            "WHERE (P_STOCK.CANT > 0) ORDER BY P_LINEA.NOMBRE";
+                    break;
+                case 2: // Mercadeo propio
+                    sql="SELECT Codigo,Nombre FROM P_LINEA ORDER BY Nombre";break;
+                case 3:  // Mercadeo comp
+                    sql="SELECT Codigo,Nombre FROM P_MERMARCACOMP ORDER BY Nombre";break;
+                case 4: // Preventa
+                    sql="SELECT Codigo,Nombre FROM P_LINEA ORDER BY Nombre";break;
+            }
+
+            DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 					  

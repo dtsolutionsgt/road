@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="@layout/back"
     android:clickable="true"
-    android:onClick="muestraProdBarraDespacho"
     tools:context=".Venta">
 
     <RelativeLayout
@@ -74,6 +73,7 @@
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="0dp"
             android:layout_marginBottom="0dp"
+            android:paddingBottom="3dp"
             android:text="TextView"
             android:textColor="#1A8AC6"
             android:textSize="10sp" />

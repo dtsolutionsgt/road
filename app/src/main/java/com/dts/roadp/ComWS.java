@@ -861,6 +861,8 @@ public class ComWS extends PBase {
 
 			envioFacturas();
 
+			envioCanastas();
+
 			envioPedidos();
 
 			envioNotasCredito();
@@ -1235,6 +1237,7 @@ public class ComWS extends PBase {
 			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_COBRO WHERE STATCOM<>'S'", "Rec: ");
 			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_DEPOS WHERE STATCOM<>'S'", "Dep: ");
 			pend = pend + getDocCount("SELECT IFNULL(COUNT(COREL),0) FROM D_MOV WHERE STATCOM<>'S'", "Inv : ");
+			pend = pend + getDocCount("SELECT IFNULL(COUNT(IDCANASTA),0) FROM D_CANASTA WHERE STATCOM<>'S'", "Can : ");
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -3808,8 +3811,10 @@ public class ComWS extends PBase {
 
                 dt = Con.OpenDT(sql);
                 if (dt.getCount() == 0) {
-                    toastlong("La carga de productos está vacia");
-                    return false;
+                	if (!rutatipo.equals("C")){
+						toastlong("La de carga inventario de productos está vacia");
+						return false;
+					}
                 }
 
 			}
@@ -3842,6 +3847,7 @@ public class ComWS extends PBase {
 				db.execSQL("UPDATE D_MOV SET STATCOM='S'");
 				db.execSQL("UPDATE D_CLINUEVO SET STATCOM='S'");
 				db.execSQL("UPDATE D_ATENCION SET STATCOM='S'");
+				db.execSQL("UPDATE D_CANASTA SET STATCOM='S'");
 				db.execSQL("UPDATE D_CLICOORD SET STATCOM='S'");
 				db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
 				db.execSQL("UPDATE D_RATING SET STATCOM='S'");
@@ -3875,6 +3881,7 @@ public class ComWS extends PBase {
 			db.execSQL("UPDATE D_MOV SET STATCOM='S'");
 			db.execSQL("UPDATE D_CLINUEVO SET STATCOM='S'");
 			db.execSQL("UPDATE D_ATENCION SET STATCOM='S'");
+			db.execSQL("UPDATE D_CANASTA SET STATCOM='S'");
 			db.execSQL("UPDATE D_CLICOORD SET STATCOM='S'");
 			db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
 			db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
@@ -4473,11 +4480,13 @@ public class ComWS extends PBase {
 		}
 
 		items.clear();
+		dbld.clear();
 		dbld.clearlog();
 
 		generaArchivoBck();
 
 		dbld.clearlog();
+		dbld.clear();
 
 		try {
 

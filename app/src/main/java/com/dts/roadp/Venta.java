@@ -2816,6 +2816,8 @@ public class Venta extends PBase {
 
                 db.execSQL("DELETE FROM D_NOTACRED WHERE COREL='"+gl.devcornc+"'");
                 db.execSQL("DELETE FROM D_NOTACREDD WHERE COREL='"+gl.devcornc+"'");
+
+                gl.devtotal=0;
             }
 
 			upd.init("P_CLIRUTA");

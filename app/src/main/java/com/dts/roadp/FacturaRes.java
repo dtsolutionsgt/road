@@ -1459,6 +1459,8 @@ public class FacturaRes extends PBase {
 
                 sql="UPDATE D_NOTACRED SET FACTURA='"+corel+"' WHERE COREL='"+gl.devcornc+"'";
                 db.execSQL(sql);
+
+                gl.devtotal=0;
             }
 
             //endregion

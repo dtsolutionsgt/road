@@ -474,7 +474,13 @@ public class DevolBodCan extends PBase {
 
             }
 
-            sql="SELECT CODIGO,SUM(CANT),SUM(PESO),LOTE,UMVENTA FROM D_CXCD INNER JOIN D_CxC ON D_CxC.COREL = D_CxCD.COREL WHERE D_CxC.STATCOM='N' GROUP BY CODIGO,UMVENTA,LOTE";
+            sql="SELECT CODIGO,SUM(CANT),SUM(PESO),LOTE,UMVENTA " +
+                    "FROM D_CXCD INNER JOIN D_CxC ON D_CxC.COREL = D_CxCD.COREL " +
+                    "WHERE D_CxC.STATCOM='N' GROUP BY CODIGO,UMVENTA,LOTE " +
+                    "UNION " +
+                    "SELECT PRODUCTO, SUM(CANTREC), SUM(PESOREC), '',UNIDBAS " +
+                    "FROM D_CANASTA WHERE STATCOM = 'N' " +
+                    "GROUP BY PRODUCTO, UNIDBAS ";
             DT=Con.OpenDT(sql);
 
             if(DT.getCount()>0){
@@ -688,10 +694,17 @@ public class DevolBodCan extends PBase {
         long cantcan=0,cantstock=0,cantbolsa=0;
 
         try {
-            sql="SELECT IFNULL(SUM(CANT),0) FROM P_STOCK WHERE CANT+CANTM>0";
-            dt=Con.OpenDT(sql);
+            sql = "SELECT IFNULL(SUM(CANT),0) FROM D_CXC E INNER JOIN D_CXCD D ON  E.COREL = D.COREL WHERE E.ANULADO = 'N'";
+            dt = Con.OpenDT(sql);
+            if (dt!=null){
+                cantstock += dt.getLong(0);
+            }
 
-            cantstock=dt.getLong(0);
+            sql = "SELECT IFNULL(SUM(CANTREC),0) FROM D_CANASTA WHERE ANULADO = 0";
+            dt = Con.OpenDT(sql);
+            if (dt!=null){
+                cantstock += dt.getLong(0);
+            }
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

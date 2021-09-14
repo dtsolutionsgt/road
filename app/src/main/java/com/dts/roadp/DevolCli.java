@@ -412,7 +412,9 @@ public class DevolCli extends PBase {
 
 		try {
 
-			if (gl.tiponcredito==1 | gl.tiponcredito==2){
+            gl.despdevflag=true;
+
+			if (gl.tiponcredito==1  ){
 
 				db.beginTransaction();
 
@@ -542,7 +544,6 @@ public class DevolCli extends PBase {
 				gl.closeCliDet = true;
 				gl.closeVenta = true;
                 gl.devtotal = cntotl;
-                gl.despdevflag=true;
 
 				createDoc();
 				//msgAskSave("Aplicar pago y crear un recibo");
@@ -554,6 +555,7 @@ public class DevolCli extends PBase {
 					gl.dvdispventa = cntotl;gl.devtotal = cntotl;
 					gl.dvestado = estado;
 					startActivity(i);
+					finish();
 				} catch (Exception e){
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				}

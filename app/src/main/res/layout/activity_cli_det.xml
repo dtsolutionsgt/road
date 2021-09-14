@@ -117,7 +117,7 @@
                     android:layout_weight="1"
                     android:width="0dip"
                     android:clickable="true"
-                    android:maxLines="100"
+                    android:maxLines="1"
                     android:onClick="showDir"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"

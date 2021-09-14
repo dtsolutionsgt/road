@@ -3538,6 +3538,11 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
+        if (TN.equalsIgnoreCase("P_DEPAR")) {
+            SQL = "SELECT * FROM P_DEPAR";
+            return SQL;
+        }
+
 		if (TN.equalsIgnoreCase("P_REF1")) {
 			SQL = "SELECT * FROM P_REF1";
 			return SQL;
@@ -4409,7 +4414,7 @@ public class ComWS extends PBase {
                 case 73:
                     nombretabla="P_CANALSUB";break;
                 case 74:
-                    nombretabla="P_PRIORIZACION";break;
+                    nombretabla="P_DEPAR";break;
                 case 75://#CKFK 20210813 Cambié esto para el final
                     nombretabla="Procesando tablas ...";break;
 

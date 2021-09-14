@@ -345,7 +345,16 @@ public class CliDet extends PBase {
 		}
 	}
 
-	@Override
+    public void showDir(View view) {
+        try{
+            mu.msgbox(lblDir.getText().toString());
+            //msgAskEditCliente();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+    }
+
+    @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         String paht;
 
@@ -886,16 +895,6 @@ public class CliDet extends PBase {
 			} else {
 				initVenta();
 			}
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-		}
-
-	}
-
-	public void showDir(View view) {
-		try{
-			//mu.msgbox(lblDir.getText().toString() + "\n" + lblRep.getText().toString());
-			msgAskEditCliente();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

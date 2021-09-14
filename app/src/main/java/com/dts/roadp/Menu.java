@@ -88,12 +88,12 @@ public class Menu extends PBase {
 				sdoc="Factura + Pedido";
 			} if (rutatipo.equalsIgnoreCase("D")) {
 				sdoc="Prefactura";iicon=102;
-			} else {
-				if (rutatipo.equalsIgnoreCase("V")) {
+			} if (rutatipo.equalsIgnoreCase("V")) {
 					sdoc="Venta";iicon=102;
-				} else {
-					sdoc="Preventa";iicon=101;
-				}
+			}if (rutatipo.equalsIgnoreCase("C")) {
+					sdoc="Canastas";iicon=101;
+			}else{
+				sdoc="Preventa";iicon=101;
 			}
 
 			if (rutatipo.equalsIgnoreCase("R")) {
@@ -408,7 +408,9 @@ public class Menu extends PBase {
 					}else {
 						if (rutatipo.equalsIgnoreCase("P") || rutatipo.equalsIgnoreCase("T")) {
 							showInvMenuPreventa();
-						} else {
+						} if (rutatipo.equalsIgnoreCase("C")) {
+							showInvMenuCanastas();
+						}else {
 							showInvMenuVenta();
 						}
 					}
@@ -1119,8 +1121,51 @@ public class Menu extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	}	
-	
+	}
+
+	public void showInvMenuCanastas() 	{
+
+		try{
+			final AlertDialog Dialog;
+			int itemcnt=1,itempos=0;
+
+			final String[] selitems = new String[itemcnt];
+
+			selitems[itempos]="Devolucion a bodega";
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.inventario48);
+			menudlg.setTitle("Inventario");
+
+			menudlg.setItems(selitems ,	new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+					String mt=selitems[item];
+
+					if (mt.equalsIgnoreCase("Devolucion a bodega")) menuDevBod();
+
+					dialog.cancel();
+				}
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
 	public void showInvMenuPos() {
 
 		try{
@@ -1985,6 +2030,10 @@ public class Menu extends PBase {
 			cantbolsa = dt.getLong(0);
 
 			sql = "SELECT IFNULL(SUM(CANT),0) FROM D_CXC E INNER JOIN D_CXCD D ON  E.COREL = D.COREL WHERE E.ANULADO = 'N'";
+			dt = Con.OpenDT(sql);
+			cantcan = dt.getLong(0);
+
+			sql = "SELECT IFNULL(SUM(CANTREC),0) FROM D_CANASTA WHERE ANULADO = 0";
 			dt = Con.OpenDT(sql);
 			cantcan = dt.getLong(0);
 

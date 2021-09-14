@@ -687,6 +687,8 @@ public class MainActivity extends PBase {
             db.execSQL(sql);
             sql="DELETE FROM D_FACTURAF";
             db.execSQL(sql);
+            sql="DELETE FROM D_FACTURAD_MODIF";
+            db.execSQL(sql);
 
             sql = "DELETE FROM D_PEDIDO";
             db.execSQL(sql);
@@ -713,6 +715,9 @@ public class MainActivity extends PBase {
             db.execSQL(sql);
 
             sql = "DELETE FROM D_ATENCION";
+            db.execSQL(sql);
+
+            sql = "DELETE FROM D_CANASTAS";
             db.execSQL(sql);
 
             sql = "DELETE FROM D_RATING";

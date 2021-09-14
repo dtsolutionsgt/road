@@ -527,7 +527,6 @@ public class CliDet extends PBase {
 
 	private void calcCredit() {
 
-
 		try{
 			NumberFormat format = NumberFormat.getInstance();
 			format.setGroupingUsed(true);
@@ -1502,11 +1501,10 @@ public class CliDet extends PBase {
 				gl.rutatipo = "V";
 				browse =3;
 				if (browse==3){//Se utiliza para la devolución de cliente.
-					initVenta();return;
-				}return;
+					initVenta();
+					return;
+				} return;
 			}
-
-
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

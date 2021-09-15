@@ -109,9 +109,9 @@ public class DevolCli extends PBase {
 			browse=1;
 			itempos=-1;
 
-			if (gl.rutatipo.equalsIgnoreCase("P")) {
+			if (gl.rutatipo.equalsIgnoreCase("P") ) {
 			    gl.prodtipo=0;
-            } else if (gl.rutatipo.equalsIgnoreCase("D")){
+            } else if (gl.rutatipo.equalsIgnoreCase("D")|| gl.rutatipo.equalsIgnoreCase("V")){
 			    gl.prodtipo=4;
             } else {
                 gl.prodtipo=1;

@@ -141,9 +141,7 @@ public class Venta extends PBase {
 		gl.closeVenta = false;
 
 		if (gl.iddespacho ==null ) {
-			if (gl.iddespacho.isEmpty()) {
-				showCredit();
-			}
+			showCredit();
 		}
 
 		setGPS();

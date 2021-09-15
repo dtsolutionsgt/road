@@ -86,13 +86,13 @@ public class Menu extends PBase {
 
 			if (rutatipo.equalsIgnoreCase("T")) {
 				sdoc="Factura + Pedido";
-			} if (rutatipo.equalsIgnoreCase("D")) {
+			} else if (rutatipo.equalsIgnoreCase("D")) {
 				sdoc="Prefactura";iicon=102;
-			} if (rutatipo.equalsIgnoreCase("V")) {
-					sdoc="Venta";iicon=102;
-			}if (rutatipo.equalsIgnoreCase("C")) {
-					sdoc="Canastas";iicon=101;
-			}else{
+			} else if (rutatipo.equalsIgnoreCase("V")) {
+				sdoc="Venta";iicon=102;
+			}else if (rutatipo.equalsIgnoreCase("C")) {
+				sdoc="Canastas";iicon=101;
+			}else if (rutatipo.equalsIgnoreCase("P")) {
 				sdoc="Preventa";iicon=101;
 			}
 

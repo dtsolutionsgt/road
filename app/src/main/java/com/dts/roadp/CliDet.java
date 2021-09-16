@@ -43,7 +43,7 @@ public class CliDet extends PBase {
 
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago;
-	private TextView lblRuta,lblRuta2, lblDespacho, lblCanal, lblCanalsub,lblPrior;
+	private TextView lblRuta,lblRuta2, lblDespacho, lblCanal, lblCanalsub,lblPrior,lblProv,lblDist;
 	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
 	private ImageView imgCobro,imgDevol,imgRoadTit, imgTel, imgWhatsApp, imgWaze, imgVenta, imgPreventa, imgDespacho, imgCamara, imgMap;
 	private EditText txtRuta;
@@ -87,6 +87,8 @@ public class CliDet extends PBase {
         lblCanal = findViewById(R.id.lblClase);
         lblCanalsub = findViewById(R.id.lblClaseSub);
         lblPrior = findViewById(R.id.textView100);
+        lblProv = findViewById(R.id.textView98);
+        lblDist= findViewById(R.id.textView99);
 
 		txtRuta = (EditText) findViewById(R.id.txtRuta);txtRuta.setVisibility(View.INVISIBLE);
 		chknc = new RadioButton(this,null);
@@ -346,12 +348,7 @@ public class CliDet extends PBase {
 	}
 
     public void showDir(View view) {
-        try{
-            mu.msgbox(lblDir.getText().toString());
-            //msgAskEditCliente();
-        }catch (Exception e){
-            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-        }
+	    mu.msgbox(lblDir.getText().toString());
     }
 
     @Override
@@ -427,6 +424,7 @@ public class CliDet extends PBase {
 		Cursor DT;
 		int uvis,dcred;
 		String contr,sgps="0.00000000 , 0.00000000";
+		String idmuni,iddep,muni,dep;
 
 		lblNom.setText("");lblRep.setText("");
 		lblDir.setText("");lblAten.setText("");lblTel.setText("");
@@ -436,7 +434,7 @@ public class CliDet extends PBase {
 
 			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
 					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO,INGRESA_CANASTAS, " +
-                    "CANAL,SUBCANAL,PRIORIZACION "+
+                    "CANAL,SUBCANAL,PRIORIZACION,MUNICIPIO "+
 					" FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
@@ -492,6 +490,7 @@ public class CliDet extends PBase {
             canal =DT.getString(19);
             canalsub =DT.getString(20);
             prior=DT.getString(21);
+            idmuni=DT.getString(22);
 
 			if(DT!=null) DT.close();
 
@@ -527,6 +526,23 @@ public class CliDet extends PBase {
 
             lblPrior.setText("Categorización : "+prior);
 
+            lblProv.setText("Provincia : ");lblDist.setText("Distrito : ");
+            try {
+                sql="SELECT DEPAR, NOMBRE FROM P_MUNI WHERE CODIGO='"+idmuni+"'";
+                DT=Con.OpenDT(sql);
+                DT.moveToFirst();
+
+                iddep=DT.getString(0);
+                lblDist.setText("Distrito : "+DT.getString(1));
+
+                try {
+                    sql="SELECT NOMBRE FROM P_DEPAR WHERE CODIGO='"+iddep+"'";
+                    DT=Con.OpenDT(sql);
+                    DT.moveToFirst();
+
+                    lblProv.setText("Provincia : "+DT.getString(0));
+                } catch (Exception e) {}
+            } catch (Exception e) {}
       	} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox(e.getMessage());

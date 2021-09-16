@@ -1190,6 +1190,7 @@ public class BaseDatosScript {
 					"[TELEFONO] TEXT NOT NULL,"+
 					"[DIRTIPO] TEXT NOT NULL,"+
 					"[DIRECCION] TEXT NOT NULL,"+
+                    "[MUNICIPIO] TEXT NOT NULL,"+
 					"[SUCURSAL] TEXT NOT NULL,"+
 					"[COORX] REAL NOT NULL,"+
 					"[COORY] REAL NOT NULL,"+

@@ -140,10 +140,10 @@ public class Venta extends PBase {
 		browse=0;
 		gl.closeVenta = false;
 
-		if (gl.iddespacho==null ) {
-			//if (gl.iddespacho.isEmpty()) {
+		if (gl.iddespacho ==null ) {
+			if (gl.iddespacho.isEmpty()) {
 				showCredit();
-			//}
+			}
 		}
 
 		setGPS();

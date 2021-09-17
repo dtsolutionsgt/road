@@ -207,18 +207,18 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:visibility="invisible" />
 
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView6"
-            android:layout_alignParentLeft="true"
-            android:paddingLeft="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:text="Disponible : "
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="20sp" />
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView6"
+        android:layout_alignParentLeft="true"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:text="Disponible : "
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="20sp" />
 
         <RelativeLayout
             android:id="@+id/relativeLayout1"
@@ -287,20 +287,20 @@
 
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/lblDisp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/textView8"
-            android:layout_alignBottom="@+id/textView8"
-            android:layout_toRightOf="@+id/textView8"
-            android:gravity="center_vertical"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="0.00"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+    <TextView
+        android:id="@+id/lblDisp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/textView8"
+        android:layout_alignBottom="@+id/textView8"
+        android:layout_toRightOf="@+id/textView8"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="0.00"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/imgImg"
@@ -399,19 +399,19 @@
             android:textStyle="bold"
             android:visibility="invisible" />
 
-        <TextView
-            android:id="@+id/lblPNum"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/lblPend"
-            android:layout_toRightOf="@+id/textView6"
-            android:paddingLeft="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="10dp"
-            android:text="Precio"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+    <TextView
+        android:id="@+id/lblPNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/lblPend"
+        android:layout_toRightOf="@+id/textView6"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="10dp"
+        android:text="Precio"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
         <TextView
             android:id="@+id/lblPend"

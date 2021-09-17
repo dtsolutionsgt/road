@@ -113,8 +113,8 @@ public class DevolCli extends PBase {
 			    gl.prodtipo=0;
             } else if (gl.rutatipo.equalsIgnoreCase("D")){
 			    gl.prodtipo=4;
-            } else {
-                gl.prodtipo=1;
+            } else if (gl.rutatipo.equalsIgnoreCase("V")){
+                gl.prodtipo=4;
             }
 
 			Intent intent = new Intent(this,Producto.class);
@@ -542,7 +542,7 @@ public class DevolCli extends PBase {
 				db.execSQL(sql);
 
 				gl.closeCliDet = true;
-				gl.closeVenta = true;
+    			gl.closeVenta = true;
                 gl.devtotal = cntotl;
 
 				createDoc();

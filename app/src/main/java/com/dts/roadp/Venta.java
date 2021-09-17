@@ -486,7 +486,6 @@ public class Venta extends PBase {
 //				}, 300);
 			}
 		});
-
 	}
 
 	@Override

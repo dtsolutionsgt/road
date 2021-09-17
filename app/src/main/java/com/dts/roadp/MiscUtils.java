@@ -48,6 +48,10 @@ public class MiscUtils {
 		return curr+ffrmdec.format(val);
 	}
 
+    public String frmcur0(double val) {
+        return curr+ffrmint.format(val);
+    }
+
 	//#CKFK 20190226 Agregué esta función porque necesito el formato sin moneda
 	public String frmcur_sm(double val) {
 		return ffrmdec.format(val);

@@ -45,7 +45,7 @@ public class CliDet extends PBase {
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago;
 	private TextView lblRuta,lblRuta2, lblDespacho, lblCanal, lblCanalsub,lblPrior;
-	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
+	private RelativeLayout relV,relP,relD,relCamara,relCanasta;
 	private ImageView imgCobro,imgDevol,imgRoadTit, imgTel, imgWhatsApp, imgWaze, imgVenta, imgPreventa, imgDespacho, imgCamara, imgMap;
 	private EditText txtRuta;
 	private RadioButton chknc,chkncv;
@@ -89,7 +89,12 @@ public class CliDet extends PBase {
         lblCanalsub = findViewById(R.id.lblClaseSub);
         lblPrior = findViewById(R.id.textView100);
 
-		txtRuta = (EditText) findViewById(R.id.txtRuta);txtRuta.setVisibility(View.INVISIBLE);
+		txtRuta = (EditText) findViewById(R.id.txtRuta);
+		txtRuta.setVisibility(View.INVISIBLE);
+		txtRuta.setFocusable(false);
+
+        gl.tolsuper=true;
+
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
 
@@ -101,6 +106,7 @@ public class CliDet extends PBase {
 		relP=(RelativeLayout) findViewById(R.id.relPreventa);
 		relD=(RelativeLayout) findViewById(R.id.relDespacho);
 		relCamara=(RelativeLayout) findViewById(R.id.relCamara);
+        relCanasta=(RelativeLayout) findViewById(R.id.relCanastas);
 
 		imgCobro= (ImageView) findViewById(R.id.imageView2);
 		imgDevol= (ImageView) findViewById(R.id.imageView1);
@@ -418,7 +424,7 @@ public class CliDet extends PBase {
 	private void showData() {
 		Cursor DT;
 		int uvis,dcred;
-		String contr,sgps="0.00000000 , 0.00000000";
+		String contr,sgps="0.00000000 , 0.00000000",uv,uvy,uvm,uvd;
 
 		lblNom.setText("");lblRep.setText("");
 		lblDir.setText("");lblAten.setText("");lblTel.setText("");
@@ -440,7 +446,18 @@ public class CliDet extends PBase {
 
 			tel=DT.getString(4);
 			lblTel.setText(DT.getString(4));
-			uvis=DT.getInt(3);
+			//uvis=DT.getInt(3);
+            uv=DT.getString(3);
+
+            try {
+                uvy=uv.substring(0,4);
+                uvm=uv.substring(4,6);
+                uvd=uv.substring(6,8);
+                long ff=du.cfecha(mu.CInt(uvy),mu.CInt(uvm),mu.CInt(uvd));
+                lblAten.setText(du.sfechalocal(ff));
+            } catch (Exception e) {
+                lblAten.setText("");
+            }
 
 			nivel=DT.getInt(6);
 			gl.nivel=nivel;
@@ -448,12 +465,6 @@ public class CliDet extends PBase {
 
 			contr=""+DT.getString(8);
 			gl.contrib=contr;
-
-			if (uvis<=0) {
-				lblAten.setText("");
-			} else {
-				lblAten.setText(du.sfecha(uvis));
-			}
 
 			//#CKFK 20190619 Cambié las coordenadas que se le envían al Waze, en lugar de X,Y le estoy enviando Y,X
 			sgps=mu.frmgps(DT.getDouble(10))+ " , "+ mu.frmgps(DT.getDouble(9));
@@ -541,9 +552,9 @@ public class CliDet extends PBase {
 
 			if (!gl.peModal.equalsIgnoreCase("TOL")) clicred=gl.credito>0;
 
-			lblCLim.setText(mu.frmcur(clim));
-			lblCUsed.setText(mu.frmcur(cused));
-			lblCDisp.setText(mu.frmcur(cdisp));
+			lblCLim.setText(mu.frmcur0(clim));
+			lblCUsed.setText(mu.frmcur0(cused));
+			lblCDisp.setText(mu.frmcur0(cdisp));
 
 			if (cused==0) {
 				lblCobro.setVisibility(View.INVISIBLE);
@@ -600,7 +611,6 @@ public class CliDet extends PBase {
         }
 
         try {
-
             sql="SELECT COREL FROM D_PEDIDO WHERE (CLIENTE='"+gl.cliente+"') AND (ANULADO='N') AND (STATCOM='N')";
             dt=Con.OpenDT(sql);
             gl.modpedid="";
@@ -1110,6 +1120,7 @@ public class CliDet extends PBase {
 			boolean flag;
 
 			rt=gl.rutatipog;
+            if (rt.equalsIgnoreCase("P")) relCanasta.setVisibility(View.GONE);
 
 			flag=false;
 			if (rt.equalsIgnoreCase("V") || rt.equalsIgnoreCase("T")) flag=true;

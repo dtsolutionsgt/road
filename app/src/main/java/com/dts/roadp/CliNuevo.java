@@ -118,11 +118,6 @@ public class CliNuevo extends PBase {
 		try {
 			if (!checkValues()) return;
 
-			if (gl.peModal.equalsIgnoreCase("APR")) {
-				saveData();
-				return;
-			}
-
 			msgAskSave("Crear cliente nuevo");
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -275,6 +270,7 @@ public class CliNuevo extends PBase {
 			ins.add("ID_DESPACHO", 0);
 			ins.add("ID_FACTURACION", 0);
 			ins.add("MODIF_PRECIO", 0);
+            ins.add("PRIORIZACION", "");
 
 			db.execSQL(ins.sql());
 
@@ -341,15 +337,8 @@ public class CliNuevo extends PBase {
 			db.setTransactionSuccessful();
 			db.endTransaction();
 
-			if (gl.peModal.equalsIgnoreCase("APR")) {
-				super.finish();
-
-				gl.tcorel = corel;//gl.ruta/
-				startActivity(new Intent(this, CliNuevoApr.class));
-			} else {
-				Toast.makeText(this, "Cliente nuevo creado", Toast.LENGTH_SHORT).show();
-				super.finish();
-			}
+			Toast.makeText(this, "Cliente nuevo creado", Toast.LENGTH_SHORT).show();
+			finish();
 
 		} catch (Exception e) {
 			addlog(new Object() {

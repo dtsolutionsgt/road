@@ -1,6 +1,10 @@
 package com.dts.roadp;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class DateUtils {
 	
@@ -48,6 +52,24 @@ public class DateUtils {
 			
 		return sh+":"+sm;
 	}
+
+    public String sfechalocal(long f) {
+
+        if (f==0) return "";
+
+        String s=sfecha(f);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        Date date = null;
+        try {
+            date = sdf.parse(s);
+            s = DateFormat.getDateInstance(DateFormat.MEDIUM).format(date);
+        } catch (Exception e) {
+            s="";
+        }
+
+        return s;
+    }
 
 	public String geActTimeStr(){
 		long f,ch,cm,cs;

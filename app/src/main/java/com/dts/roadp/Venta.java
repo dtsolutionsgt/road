@@ -141,7 +141,9 @@ public class Venta extends PBase {
 		gl.closeVenta = false;
 
 		if (gl.iddespacho ==null ) {
-			showCredit();
+			if (gl.iddespacho.isEmpty()) {
+				showCredit();
+			}
 		}
 
 		setGPS();
@@ -484,7 +486,6 @@ public class Venta extends PBase {
 //				}, 300);
 			}
 		});
-
 	}
 
 	@Override
@@ -598,6 +599,8 @@ public class Venta extends PBase {
 					//if (app.prodBarra(item.Cod)) {
 					    if (pedido && app.esRosty(item.Cod)) {
                             item.Cant = item.Cant * 1;
+                            //item.Cant = item.Cant / item.factor;
+                            item.um=item.ums;
                         } else {
                             item.Cant = item.Cant * item.factor;
                         }
@@ -727,7 +730,6 @@ public class Venta extends PBase {
 			lblCant.setText(mu.frmdecimal(cant, gl.peDecImp) + " " + ltrim(um, 6));
 			lblPres.setText("");
 
-
 			// Bonificacion
 
 			// Borra la anterior, si existe
@@ -807,11 +809,13 @@ public class Venta extends PBase {
 				prec=gl.precprev;
 				prc.precdoc=prec;
 				prc.tot=mu.round2(prec*cant);
+
 				if (prodPorPeso(prodid) | app.esRosty(prodid)) {
-                    prec=mu.round2(gl.precprev*factorconv);
-				    prc.precsin=mu.round2(prec*factorconv);
-                    prc.tot=mu.round2(prec*cant*factorconv);
+                    //prec=mu.round2(gl.precprev*factorconv);
+				    //prc.precsin=mu.round2(prec*factorconv);
+                    //prc.tot=mu.round2(prec*cant*factorconv);
                 }
+
 			}
 
 			tot = prc.tot;
@@ -854,7 +858,6 @@ public class Venta extends PBase {
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-
 	}
 
 	private void getPrecio(){
@@ -900,8 +903,8 @@ public class Venta extends PBase {
 
 	private void addItem(){
 		Cursor dt;
-		double precdoc,fact,cantbas,peso,cantapp,precapp;
-		String umb;
+		double precdoc,fact,cantbas,peso,cantapp,precapp,vprec=0,vprecdoc=0,pesopv;
+		String umb,vumstock,vumventa;
 
 		try {
 			//sql="DELETE FROM T_VENTA WHERE (PRODUCTO='"+prodid+"') AND (UM='"+um+"')";
@@ -975,19 +978,31 @@ public class Venta extends PBase {
             if (rutatipo.equalsIgnoreCase("V")) {
                 ins.add("CANT",cant);
             } else {
-                if (gl.tolprodcrit) {
-                    ins.add("CANT",cant-gl.cstand);
+                if (!app.esRosty(prodid)) {
+                    if (gl.tolprodcrit) {
+                        ins.add("CANT",cant-gl.cstand);
+                    } else {
+                        ins.add("CANT",cant);
+                    }
                 } else {
-                    ins.add("CANT",cant);
+                    if (gl.tolprodcrit) {
+                        ins.add("CANT",(cant-gl.cstand));
+                    } else {
+                        ins.add("CANT",cant);
+                    }
                 }
             }
 
 			if (rutatipo.equalsIgnoreCase("V")) {
-				ins.add("UMSTOCK",gl.umstock);
-                if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpres);
-			}else {
-				ins.add("UMSTOCK",gl.umstock);
-                ins.add("UM",gl.umpresp);
+				ins.add("UMSTOCK",gl.umstock);vumstock=gl.umstock;
+                if (porpeso) {
+                    ins.add("UM",gl.umpeso);vumventa=gl.umpeso;
+                } else {
+                    ins.add("UM",gl.umpres);vumventa=gl.umpres;
+                }
+			} else {
+				ins.add("UMSTOCK",gl.umstock);vumstock=gl.umstock;
+                ins.add("UM",gl.umpres);vumventa=gl.umpres;
 			}
 
 			if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
@@ -996,7 +1011,6 @@ public class Venta extends PBase {
 			ins.add("IMP",impval);
 			ins.add("DES",desc);
 			ins.add("DESMON",descmon);
-
 
             if (rutatipo.equalsIgnoreCase("V")) {
                 if (porpeso) {
@@ -1007,7 +1021,16 @@ public class Venta extends PBase {
                     ins.add("PRECIODOC",precdoc);
                 }
                 ins.add("TOTAL",prodtot);
+                ins.add("PESO",peso);
+
             } else {
+                 if (porpeso) {
+                    ins.add("PRECIO",gl.prectemp);vprec=gl.prectemp;
+                    ins.add("PRECIODOC",gl.prectemp);vprecdoc=gl.prectemp;
+                } else {
+                    ins.add("PRECIO",prec);vprec=prec;
+                    ins.add("PRECIODOC",precdoc);vprecdoc=precdoc;
+                }
 
                 if (gl.tolprodcrit) {
                     cantapp=cant-gl.cstand;
@@ -1015,26 +1038,28 @@ public class Venta extends PBase {
                     cantapp=cant;
                 }
 
-                if (porpeso) {
-                    precapp=gl.precuni*gl.umfactor*cantapp;
+                if (cant!=gl.cstand) {
+                    pesopv=gl.umfactor*(cant-gl.cstand);
                 } else {
-                    precapp=gl.precuni*cantapp;
+                    pesopv=gl.umfactor*cant;
                 }
 
-                ins.add("TOTAL",precapp);
+                ins.add("PESO",pesopv);
 
-                ins.add("PRECIODOC",gl.precuni);
-                ins.add("PRECIO",gl.precuni);
-
-            }
-
-            if (rutatipo.equalsIgnoreCase("V")) {
-                ins.add("PESO",peso);
-            } else {
-                double pps;
-                pps=peso*((cant-gl.cstand)/cant);if (pps==0) pps=peso;
-                if (app.esRosty(prodid)) pps=pps*factorconv;
-                ins.add("PESO",pps);
+                if (porpeso) {
+                    //precapp=gl.precuni*gl.umfactor*cantapp;
+                    //precapp=cantapp*gl.prectemp;
+                    precapp=pesopv*gl.prectemp;
+                    ins.add("TOTAL",precapp);
+                } else {
+                    //precapp=gl.precuni*cantapp;
+                    precapp=cantapp*prec;
+                    if (!app.esRosty(prodid)) {
+                        ins.add("TOTAL",precapp);
+                    } else {
+                        ins.add("TOTAL",precapp*factorconv);
+                    }
+                }
             }
 
 			ins.add("VAL1",0);
@@ -1071,8 +1096,11 @@ public class Venta extends PBase {
                 ins.add("EMPRESA",emp);
                 ins.add("CANT",gl.cstand);
                 //if (porpeso) ins.add("UM",gl.umpeso);else ins.add("UM",gl.umpresp);
-                ins.add("UMSTOCK",gl.um);
-                ins.add("UM",gl.umpresp);
+                //ins.add("UMSTOCK",gl.um);
+                //ins.add("UM",gl.umpresp);
+
+                ins.add("UM",vumventa);
+                ins.add("UMSTOCK",vumstock);
 
                 if ((rutatipo.equalsIgnoreCase("P")) && (gl.umfactor==0)) gl.umfactor=1;
                 ins.add("FACTOR",factorconv);
@@ -1081,23 +1109,22 @@ public class Venta extends PBase {
                 ins.add("DES",desc);
                 ins.add("DESMON",descmon);
 
+                ins.add("PRECIO",vprec);
+                ins.add("PRECIODOC",vprecdoc);
+
+                pesopv=gl.umfactor*(gl.cstand);
+                ins.add("PESO",pesopv);
 
                 if (porpeso) {
-                    precapp=gl.precuni*gl.umfactor*gl.cstand;
+                    precapp=pesopv*gl.prectemp;
+                    ins.add("TOTAL",precapp);
                 } else {
-                    precapp=gl.precuni*gl.cstand;
-                }
-
-                ins.add("TOTAL",precapp);
-
-                ins.add("PRECIODOC",gl.precuni);
-                ins.add("PRECIO",gl.precuni);
-
-                if (rutatipo.equalsIgnoreCase("V")) {
-                    ins.add("PESO",peso);
-                } else {
-                    double pps=peso*(gl.cstand/(cant));
-                    ins.add("PESO",pps);
+                    precapp=gl.cstand*vprec;
+                    if (!app.esRosty(prodid)) {
+                        ins.add("TOTAL",precapp);
+                    } else {
+                        ins.add("TOTAL",precapp*factorconv);
+                    }
                 }
 
                 ins.add("VAL1",0);

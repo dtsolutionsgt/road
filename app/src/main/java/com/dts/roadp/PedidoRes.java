@@ -82,8 +82,9 @@ public class PedidoRes extends PBase {
 		setActDate2();
 		fechae=fecha;
 		lblFecha.setText(du.sfecha(fechae));
+        app = new AppMethods(this, gl, Con, db);
 
-		setActDate();
+        setActDate();
 		dweek=mu.dayofweek();
 
 		clsDesc=new clsDescGlob(this);
@@ -505,6 +506,7 @@ public class PedidoRes extends PBase {
                     vcant = cantinv; // DT.getDouble(1);
                     vpeso = DT.getDouble(8);
                     factpres = DT.getDouble(12);
+                    if (app.esRosty(vprod)) factpres=1;
                     vfactor = vpeso / (vcant * factpres);
                     vumventa = DT.getString(11);
                     porpeso = prodPorPeso(DT.getString(0));

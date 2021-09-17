@@ -39,6 +39,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
+
 public class CliDet extends PBase {
 
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
@@ -592,6 +593,12 @@ public class CliDet extends PBase {
 	private void initVenta(){
         Cursor dt;
 
+        if (gl.rutatipo.equalsIgnoreCase("T")) {
+            if (tieneDespacho()) {
+                showDespacho(null);return;
+            }
+        }
+
         try {
 
             sql="SELECT COREL FROM D_PEDIDO WHERE (CLIENTE='"+gl.cliente+"') AND (ANULADO='N') AND (STATCOM='N')";
@@ -786,7 +793,19 @@ public class CliDet extends PBase {
 		}
 	}
 
-	//endregion
+    private boolean tieneDespacho() {
+        try {
+           clsDs_pedidoObj Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
+            Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
+            return (Ds_pedidoObj.count>0) ;
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+            return false;
+        }
+    }
+
+
+    //endregion
 
 	//region  Aux
 
@@ -1483,8 +1502,10 @@ public class CliDet extends PBase {
 
 			if (gl.despdevflag) {
                 gl.despdevflag=false;
-                showDespacho(null);
-                return;
+                if (gl.rutatipo.equalsIgnoreCase("D")) {
+                    showDespacho(null);
+                    return;
+                }
             }
 
 			if (browse==1) {

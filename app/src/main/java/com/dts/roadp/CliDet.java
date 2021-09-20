@@ -93,7 +93,7 @@ public class CliDet extends PBase {
 		txtRuta.setVisibility(View.INVISIBLE);
 		txtRuta.setFocusable(false);
 
-        gl.tolsuper=true;
+       // gl.tolsuper=true;
 
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);

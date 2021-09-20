@@ -31,6 +31,7 @@ public class appGlobals extends Application {
 	public int mpago;
 	public String prodCanasta, corelFac, devcord;
 	public boolean ingresaCanastas;
+	public String IdCanal, IdSubcanal, EditarClienteCodigo, EditarClienteNombre, EditarClienteCanal, EditarClienteSubcanal, EditarClienteRuc;
 
     public ArrayList<clsClasses.clsPedItem> peditems= new ArrayList<clsClasses.clsPedItem>();
 
@@ -54,6 +55,7 @@ public class appGlobals extends Application {
 	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre;
 	public boolean peImprFactCorrecta, pTransBarra;
 	public int peDec,peDecCant,peDecImp,peLimiteGPS,peMargenGPS,peVentaGps;
+	public Boolean peEditarNombre, peEditarNit, peEditarCanal, peEditarSubcanal;
 	
 	// Descuentos
 	

@@ -184,4 +184,15 @@ public class clsClasses {
         public double cant;
 	}
 
+	public class clsCanal {
+		public String codigo;
+		public String nombre;
+	}
+
+	public class clsSubCanal {
+		public String codigo;
+		public String nombre;
+		public String canal;
+	}
+
 }

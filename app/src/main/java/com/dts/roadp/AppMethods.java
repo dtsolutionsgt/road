@@ -403,6 +403,61 @@ public class AppMethods {
 			gl.pTransBarra =false;
 		}
 
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=25";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarNombre = false;
+
+			gl.peEditarNombre = val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarNombre =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=26";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarNit =false;
+
+			gl.peEditarNit =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarNit =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=27";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarCanal =false;
+
+			gl.peEditarCanal =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarCanal =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=28";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarSubcanal =false;
+
+			gl.peEditarSubcanal =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarSubcanal =false;
+		}
 	}
 
 	public void parametrosBarras() {

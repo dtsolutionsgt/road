@@ -931,6 +931,18 @@ public class CliDet extends PBase {
 		}
 
 	}
+	private void EditarDatosCliente()
+	{
+		browse = 2;
+		Intent intent = new Intent(this, editar_cliente.class);
+
+		gl.EditarClienteCodigo= cod;
+		gl.EditarClienteNombre = lblNom.getText().toString();
+		gl.EditarClienteRuc = lblRep.getText().toString();
+		gl.EditarClienteSubcanal = lblCanalsub.getText().toString().substring(11);
+		gl.EditarClienteCanal = lblCanal.getText().toString().substring(8);
+		startActivity(intent);
+	}
 
 	private void inputCliente() {
 
@@ -1489,13 +1501,13 @@ public class CliDet extends PBase {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle("Road");
-			dialog.setMessage("¿Quiere editar datos del cliente?");
+			dialog.setMessage("¿Editar datos de cliente?");
 
 			dialog.setIcon(R.drawable.ic_quest);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					inputCliente();
+					EditarDatosCliente();
 				}
 			});
 

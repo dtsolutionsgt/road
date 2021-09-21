@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -56,7 +57,7 @@ public class PedidoRes extends PBase {
 	private String itemid,cliid,corel;
 	private int cyear, cmonth, cday,dweek,impres;
 	
-	private double dmax,dfinmon,descpmon,descg,descgmon,tot,stot0,stot,descmon,totimp,totperc;
+	private double dmax,dfinmon,descpmon,descg,descgmon,tot,stot0,stot,descmon,totimp,totperc,dispventa;
 	private boolean acum,cleandprod,toledano,porpeso,prodstandby,impprecio;
 	
 	@Override
@@ -96,6 +97,8 @@ public class PedidoRes extends PBase {
 		
 		dmax=clsDesc.dmax;
 		acum=clsDesc.acum;
+
+        dispventa = gl.dvdispventa;dispventa=mu.round(dispventa,2);
 
 		processFinalPromo();
 		
@@ -395,8 +398,10 @@ public class PedidoRes extends PBase {
 		Cursor DT;
 		double tot,desc,imp,peso,vcant,vpeso,vfactor,factpres,cantinv;
         String vprod,vumstock,vumventa,bandisp;
+        int dev_ins=1;
 
-		corel=gl.ruta+"_"+mu.getCorelBase();
+
+        corel=gl.ruta+"_"+mu.getCorelBase();
 		fechae=du.ffecha00(fechae);
         prodstandby=false;
 
@@ -521,7 +526,134 @@ public class PedidoRes extends PBase {
 
          	if (prodstandby)  db.execSQL("UPDATE D_PEDIDO SET BANDERA='S' WHERE (COREL='"+corel+"')");
 
-			db.setTransactionSuccessful();
+
+            //region Devolución de  producto.
+            if (gl.dvbrowse!=0) {
+
+                String pcod;
+                Double pcant;
+
+                if (dev_ins==1){
+
+                    ins.init("D_CxC");
+
+                    ins.add("COREL",gl.dvcorreld);
+                    ins.add("RUTA",gl.ruta);
+                    ins.add("CLIENTE",gl.cliente);
+                    ins.add("FECHA",fecha);
+                    ins.add("ANULADO","N");
+                    ins.add("EMPRESA",gl.emp);
+                    ins.add("TIPO", gl.dvestado);
+                    ins.add("REFERENCIA",corel);
+                    ins.add("IMPRES",0);
+                    ins.add("STATCOM","N");
+                    ins.add("VENDEDOR",gl.vend);
+                    ins.add("TOTAL",dispventa);
+                    ins.add("SUPERVISOR",gl.codSupervisor);
+                    ins.add("AYUDANTE",gl.ayudanteID);
+                    ins.add("CODIGOLIQUIDACION",0);
+                    ins.add("ESTADO","S");
+
+                    db.execSQL(ins.sql());
+
+                    ins.init("D_NOTACRED");
+
+                    ins.add("COREL",gl.dvcorrelnc);
+                    ins.add("ANULADO","N");
+                    ins.add("FECHA",fecha);
+                    ins.add("RUTA",gl.ruta);
+                    ins.add("VENDEDOR",gl.vend);
+                    ins.add("CLIENTE",gl.cliente);
+                    ins.add("TOTAL",dispventa);
+                    ins.add("FACTURA",corel);
+                    ins.add("SERIE","0");
+                    ins.add("CORELATIVO",gl.dvactualnc);
+                    ins.add("STATCOM","N");
+                    ins.add("CODIGOLIQUIDACION",0);
+                    ins.add("RESOLNC","N");
+                    ins.add("SERIEFACT",0);
+                    ins.add("CORELFACT",0);
+                    ins.add("IMPRES",0);
+
+                    db.execSQL(ins.sql());
+
+                    sql="SELECT Item,CODIGO,CANT,CODDEV,TOTAL,PRECIO,PRECLISTA,REF,PESO,LOTE,UMVENTA,UMSTOCK,UMPESO,FACTOR,POR_PESO FROM T_CxCD WHERE CANT>0";
+                    DT=Con.OpenDT(sql);
+
+                    DT.moveToFirst();
+                    while (!DT.isAfterLast()) {
+
+                        pcod=DT.getString(1);
+                        pcant=DT.getDouble(2);
+
+                        ins.init("D_CxCD");
+
+                        ins.add("COREL",gl.dvcorreld);
+                        ins.add("ITEM",DT.getInt(0));
+                        ins.add("CODIGO",DT.getString(1));
+                        ins.add("CANT",DT.getDouble(2));
+                        ins.add("CODDEV",DT.getString(3));
+                        ins.add("ESTADO",gl.dvestado);
+                        ins.add("TOTAL",DT.getDouble(4));
+                        ins.add("PRECIO",DT.getDouble(5));
+                        ins.add("PRECLISTA",DT.getDouble(6));
+                        ins.add("REF",DT.getString(7));
+                        ins.add("PESO",DT.getDouble(8));
+                        ins.add("FECHA_CAD",0);
+                        ins.add("LOTE",DT.getString(9));
+                        ins.add("UMVENTA",DT.getString(10));
+                        ins.add("UMSTOCK",DT.getString(11));
+                        ins.add("UMPESO",DT.getString(12));
+                        ins.add("FACTOR",DT.getDouble(13));
+                        db.execSQL(ins.sql());
+
+                        ins.init("D_NOTACREDD");
+
+                        ins.add("COREL",gl.dvcorrelnc);
+                        ins.add("PRODUCTO",DT.getString(1));
+                        ins.add("PRECIO_ORIG",DT.getDouble(5));
+                        ins.add("PRECIO_ACT",0);
+                        ins.add("CANT",DT.getDouble(2));
+                        ins.add("PESO",DT.getDouble(8));
+                        ins.add("POR_PRESO", DT.getString(14));
+                        ins.add("UMVENTA",DT.getString(10));
+                        ins.add("UMSTOCK",DT.getString(11));
+                        ins.add("UMPESO",DT.getString(12));
+                        ins.add("FACTOR",DT.getDouble(13));
+                        db.execSQL(ins.sql());
+
+                        DT.moveToNext();
+                    }
+
+                    sql="UPDATE D_CxC SET REFERENCIA='"+corel+"' WHERE COREL='"+gl.dvcorreld+"'";
+                    db.execSQL(sql);
+
+                    sql="UPDATE D_NOTACRED SET FACTURA='"+corel+"' WHERE COREL='"+gl.dvcorrelnc+"'";
+                    db.execSQL(sql);
+
+                    gl.devtotal=0;
+
+                    sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactuald+" WHERE RUTA='"+gl.ruta+"' AND TIPO='D'";
+                    db.execSQL(sql);
+
+                    sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactualnc+" WHERE RUTA='"+gl.ruta+"' AND TIPO='NC'";
+                    db.execSQL(sql);
+
+                    Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();
+
+                    sql="DELETE FROM T_CxCD";
+                    db.execSQL(sql);
+
+                    dev_ins = 0;
+
+                }
+
+            }
+
+            //endregion
+
+
+            db.setTransactionSuccessful();
 			db.endTransaction();
 			 
 		} catch (Exception e) {

@@ -27,6 +27,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.dts.roadp.clsClasses.clsVenta;
@@ -40,6 +41,7 @@ public class Venta extends PBase {
 	private ImageView imgroad,imgscan;
 	private CheckBox chkBorrar;
 	private Button cmdBarrasDespacho;
+
 
 	private ArrayList<clsVenta> items= new ArrayList<clsVenta>();
 	private ListAdaptVenta adapter;
@@ -656,6 +658,7 @@ public class Venta extends PBase {
 			adapter.setSelectedIndex(selidx);
 			listView.smoothScrollToPosition(selidx);
 		}
+
 
 	}
 
@@ -3389,6 +3392,8 @@ public class Venta extends PBase {
 
 			cmdBarrasDespacho=(Button) findViewById(R.id.cmdBarrasDespacho);
 
+
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -3991,7 +3996,6 @@ public class Venta extends PBase {
 		{
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-
 	}
 	
 	@Override

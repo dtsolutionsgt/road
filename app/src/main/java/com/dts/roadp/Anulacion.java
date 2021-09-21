@@ -400,6 +400,12 @@ public class Anulacion extends PBase {
             sql="UPDATE D_PEDIDOD SET Anulado='S' WHERE COREL='"+itemid+"'";
             db.execSQL(sql);
 
+            sql = "UPDATE D_NOTACRED SET ANULADO ='S' WHERE FACTURA='" + itemid + "'";
+            db.execSQL(sql);
+
+            sql = "UPDATE D_CXC SET ANULADO ='S' WHERE REFERENCIA='" + itemid + "'";
+            db.execSQL(sql);
+
             if (toledano) {
 
                 sql="SELECT PRODUCTO,CANTPROC,PESO,FACTOR FROM D_PEDIDOD WHERE COREL='"+itemid+"'";

@@ -93,8 +93,6 @@ public class CliDet extends PBase {
 		txtRuta.setVisibility(View.INVISIBLE);
 		txtRuta.setFocusable(false);
 
-        gl.tolsuper=true;
-
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
 
@@ -616,10 +614,14 @@ public class CliDet extends PBase {
             gl.modpedid="";
 
             if (dt.getCount()>0) {
-                startActivity(new Intent(this,ListaPedidos.class));
+                if (gl.listapedidos) {
+                    startActivity(new Intent(this,ListaPedidos.class));
+                }
             } else {
                 startActivity(new Intent(this,Venta.class));
             }
+
+            gl.listapedidos=false;
 
             //startActivity(new Intent(this,Venta.class));
         } catch (Exception e) {
@@ -843,6 +845,7 @@ public class CliDet extends PBase {
 				if (!validaRutaSupervisor()) return;
 			}
 
+            gl.listapedidos=true;
 			runVenta();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -867,8 +870,8 @@ public class CliDet extends PBase {
 		cantidad = Float.valueOf(CantExistencias());
 
 		try{
-			if(cantidad == 0){
-				mu.msgbox("No hay existencias disponibles.");
+			if (cantidad == 0){
+                //if (gl.rutatipo.equalsIgnoreCase("V")) mu.msgbox("No hay existencias disponibles.");
 			}else{
 				if(gl.tiponcredito == 2){
 					return;
@@ -890,8 +893,8 @@ public class CliDet extends PBase {
 
 		try{
 			if(cantidad == 0){
-				mu.msgbox("No hay existencias disponibles.");
-			}else{
+                //if (gl.rutatipo.equalsIgnoreCase("V")) mu.msgbox("No hay existencias disponibles.");
+            }else{
 				try {
 					startActivity(new Intent(this, activity_despacho_list.class));
 				} catch (Exception e) {
@@ -905,7 +908,6 @@ public class CliDet extends PBase {
 	}
 
 	private void runVenta() {
-
 		try{
 			if (merc==1) {
 				browse=1;
@@ -1113,6 +1115,17 @@ public class CliDet extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	}
+
+    private void tiporuta() {
+        try {
+            sql = "SELECT VENTA FROM P_RUTA";
+            Cursor DT = Con.OpenDT(sql);
+            DT.moveToFirst();
+            gl.rutatipo = DT.getString(0);
+        } catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+    }
 
 	private void habilitaOpciones() {
 		try {
@@ -1367,12 +1380,14 @@ public class CliDet extends PBase {
 
 			dialog.setPositiveButton("Bueno", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
+                    gl.listapedidos=true;
 					setDevType("B");
 				}
 			});
 
 			dialog.setNegativeButton("Malo", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
+                    gl.listapedidos=true;
 					setDevType("M");
 				}
 			});
@@ -1530,12 +1545,12 @@ public class CliDet extends PBase {
 			}
 
 			if (gl.dvbrowse!=0){
-				gl.rutatipo = "V";
-				browse =3;
-				if (browse==3){//Se utiliza para la devolución de cliente.
-					initVenta();
-					return;
-				} return;
+				//gl.rutatipo = "V";
+                tiporuta();
+                String ss=gl.rutatipo;
+                browse=0;
+				initVenta();
+				return;
 			}
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

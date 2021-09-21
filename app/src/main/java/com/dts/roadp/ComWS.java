@@ -256,9 +256,11 @@ public class ComWS extends PBase {
 				txtEmp.setText("03");
 			}
 
-			txtWS.setText("http://200.46.46.104:8001/RDC7_SAP_PRD_ANDR/wsAndr.asmx");
+			//txtWS.setText("http://200.46.46.104:8001/RDC7_SAP_PRD_ANDR/wsAndr.asmx");
+            txtWS.setText("http://200.46.46.104:8001/RDC7_SAP_QAS_ANDR/wsAndr.asmx");
 
-			//txtRuta.setText("8001-1");
+
+            //txtRuta.setText("8001-1");
 			//txtEmp.setText("03");
 			//txtWS.setText("http://192.168.1.137/wsAndr/wsandr.asmx");
 		}

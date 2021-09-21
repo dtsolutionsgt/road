@@ -109,12 +109,13 @@ public class DevolCli extends PBase {
 			browse=1;
 			itempos=-1;
 
-			if (gl.rutatipo.equalsIgnoreCase("P")) {
-			    gl.prodtipo=0;
+			if (gl.rutatipo.equalsIgnoreCase("P") ) {
+			    //gl.prodtipo=0;
+                gl.prodtipo=4;
             } else if (gl.rutatipo.equalsIgnoreCase("D")){
 			    gl.prodtipo=4;
-            } else {
-                gl.prodtipo=1;
+            } else if (gl.rutatipo.equalsIgnoreCase("V")){
+                gl.prodtipo=4;
             }
 
 			Intent intent = new Intent(this,Producto.class);
@@ -542,7 +543,7 @@ public class DevolCli extends PBase {
 				db.execSQL(sql);
 
 				gl.closeCliDet = true;
-				gl.closeVenta = true;
+    			gl.closeVenta = true;
                 gl.devtotal = cntotl;
 
 				createDoc();
@@ -571,7 +572,8 @@ public class DevolCli extends PBase {
 	private void createDoc(){
 		String vModo="";
 
-        if (gl.rutatipo.equalsIgnoreCase("D")) gl.closeCliDet=false;
+        //if (gl.rutatipo.equalsIgnoreCase("D")) gl.closeCliDet=false;
+        if (gl.rutatipo.equalsIgnoreCase("D")) gl.closeCliDet=true;
 
 		try{
 
@@ -632,9 +634,7 @@ public class DevolCli extends PBase {
 			DT=Con.OpenDT(sql);
 
 			if(DT.getCount()>0){
-
 				DT.moveToFirst();
-
 				correl=DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)), 6);
 
 				if (tipo.equals("D")){
@@ -643,10 +643,13 @@ public class DevolCli extends PBase {
 					gl.dvactualnc = String.valueOf(DT.getInt(1));
 				}
 
-			}else{
-
+			} else {
 				correl=gl.ruta+"_"+mu.getCorelBase();
-
+                if (tipo.equals("D")){
+                    gl.dvactuald = String.valueOf(1);
+                }else{
+                    gl.dvactualnc = String.valueOf(1);
+                }
 			}
 
 		}catch (Exception e){

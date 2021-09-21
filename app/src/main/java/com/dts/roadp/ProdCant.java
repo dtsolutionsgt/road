@@ -223,9 +223,6 @@ public class ProdCant extends PBase {
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 			um=dt.getString(0);umini=um;
-            if (rutatipo.equalsIgnoreCase("P")) {
-            	if (app.prodBarra(prodid)) um=DameUnidadMinimaVenta(prodid);
-			}
 			ubas=um;umfact=um;
 			lblBU.setText(ubas);gl.ubas=ubas;upres=ubas;
 		} catch (Exception e) {

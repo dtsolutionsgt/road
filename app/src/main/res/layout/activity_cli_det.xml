@@ -8,7 +8,6 @@
     tools:context=".CliDet">
 
 
-
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="match_parent"
@@ -16,30 +15,30 @@
         android:layout_above="@+id/rellaycr"
         android:layout_below="@+id/relRoad"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="false"
-        android:layout_marginRight="64dp">
+        android:layout_alignParentTop="false">
 
         <TextView
             android:id="@+id/lblTel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="7dp"
-            android:layout_marginBottom="14dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginBottom="2dp"
             android:layout_toEndOf="@+id/lblTelefono"
             android:gravity="center"
             android:text="0000-0000"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/lblRuta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/relGPS"
+            android:layout_below="@+id/scroll1"
             android:layout_alignParentStart="true"
-            android:layout_marginStart="12dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
             android:text="Ruta"
             android:textSize="18sp" />
 
@@ -49,6 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/txtRuta"
+            android:layout_marginEnd="65dp"
             android:layout_marginBottom="5dp">
 
             <RelativeLayout
@@ -163,56 +163,61 @@
         </ScrollView>
 
 
-
         <TextView
             android:id="@+id/lblCant"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+            android:layout_alignParentEnd="false"
             android:layout_alignParentBottom="true"
-            android:layout_marginEnd="101dp"
-            android:layout_marginBottom="39dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginBottom="30dp"
+            android:layout_toEndOf="@+id/lblProd"
             android:gravity="center_horizontal"
             android:paddingLeft="5dp"
             android:text="01-01-2012"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/lblProd"
-            android:layout_width="168dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/lblCant"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="179dp"
-            android:layout_marginBottom="-21dp"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="3dp"
+            android:layout_marginBottom="30dp"
             android:gravity="center_horizontal"
-            android:text="Última atención :"
+            android:text="Últ. aten :"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="18sp" />
 
         <RelativeLayout
             android:id="@+id/relGPS"
-            android:layout_width="wrap_content"
+            android:layout_width="160dp"
             android:layout_height="32dp"
-            android:layout_above="@+id/lblProd"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/lblCant"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentBottom="true"
             android:layout_marginLeft="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="197dp"
             android:layout_marginRight="0dp"
-            android:layout_marginBottom="7dp"
+            android:layout_marginBottom="2dp"
             android:clickable="true"
             android:onClick="setGPS">
 
             <ImageView
                 android:id="@+id/imageView3"
                 android:layout_width="32dp"
-                android:layout_height="wrap_content"
+                android:layout_height="24dp"
                 android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="5dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="2dp"
+                android:layout_marginBottom="0dp"
                 android:src="@drawable/iconoubicacion" />
 
             <TextView
@@ -224,12 +229,10 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="1dp"
-                android:layout_marginRight="12dp"
+                android:layout_marginRight="2dp"
                 android:layout_marginBottom="0dp"
                 android:layout_toRightOf="@+id/imageView3"
-                android:ellipsize="end"
                 android:gravity="left|center_vertical"
-                android:maxLines="1"
                 android:text="Small Text"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textSize="12sp" />
@@ -242,20 +245,20 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="51dp"
-            android:layout_marginBottom="15dp"
-            android:text="Teléfono :"
+            android:layout_marginStart="2dp"
+            android:layout_marginBottom="2dp"
+            android:text="Tel :"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/txtRuta"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/relGPS"
             android:layout_alignParentEnd="false"
+            android:layout_alignParentBottom="true"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="13dp"
-            android:layout_marginBottom="0dp"
+            android:layout_marginBottom="60dp"
             android:layout_toEndOf="@+id/lblRuta"
             android:ems="10"
             android:inputType="textPersonName"
@@ -282,8 +285,8 @@
 
     <RelativeLayout
         android:id="@+id/rellaycr"
-        android:layout_width="302dp"
-        android:layout_height="123dp"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
         android:layout_above="@+id/RelativeLayout01"
         android:layout_alignParentBottom="false"
         android:layout_centerHorizontal="true"
@@ -292,35 +295,17 @@
         android:background="@layout/frame_rect">
 
         <TextView
-            android:id="@+id/lblFecha"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="0dp"
-            android:layout_marginTop="39dp"
-            android:paddingLeft="10dp"
-            android:paddingTop="3dp"
-            android:paddingRight="5dp"
-            android:paddingBottom="3dp"
-            android:text="Crédito"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="18sp" />
-
-        <TextView
             android:id="@+id/lblCUsed"
-            android:layout_width="120dp"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/lblCLim"
-            android:layout_alignRight="@+id/lblCDisp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:layout_marginStart="7dp"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="1dp"
             android:layout_marginRight="0dp"
-            android:layout_toEndOf="@+id/lblPTotal"
-            android:layout_toRightOf="@+id/lblCheq"
-            android:gravity="right"
-            android:paddingRight="10dp"
+            android:layout_marginBottom="0dp"
+            android:gravity="center_horizontal"
             android:paddingBottom="5dp"
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -328,35 +313,32 @@
 
         <TextView
             android:id="@+id/lblCDisp"
-            android:layout_width="135dp"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/lblPTotal"
-            android:layout_alignParentBottom="false"
-            android:layout_marginLeft="1dp"
-            android:layout_marginTop="-3dp"
-            android:layout_toRightOf="@+id/lblCheq"
-            android:gravity="right"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:gravity="center_horizontal"
             android:paddingRight="10dp"
             android:paddingBottom="5dp"
-            android:text="00.000.000.00"
+            android:text="000.000.00"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/lblCLim"
-            android:layout_width="120dp"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/lblPTotal"
             android:layout_alignRight="@+id/lblCUsed"
-            android:layout_marginStart="9dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="15dp"
             android:layout_marginLeft="1dp"
-            android:layout_marginRight="0dp"
-            android:layout_marginBottom="-6dp"
-            android:layout_toEndOf="@+id/lblBU"
-            android:layout_toRightOf="@+id/lblCheq"
-            android:gravity="right"
-            android:paddingRight="10dp"
+            android:layout_marginRight="131dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center_horizontal"
             android:paddingBottom="5dp"
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -366,35 +348,40 @@
             android:id="@+id/lblBU"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/lblFecha"
-            android:layout_alignBottom="@+id/lblFecha"
-            android:layout_marginLeft="1dp"
-            android:layout_marginBottom="0dp"
+            android:layout_above="@+id/lblCLim"
+            android:layout_alignEnd="@+id/lblCLim"
+            android:layout_alignParentStart="true"
             android:layout_toRightOf="@+id/lblFecha"
-            android:paddingBottom="3dp"
-            android:text="Límite :"
+            android:gravity="center_horizontal"
+            android:paddingBottom="5dp"
+            android:text="Límite"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
             android:id="@+id/lblPTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/lblFecha"
-            android:layout_alignLeft="@+id/lblBU"
-            android:paddingBottom="3dp"
-            android:text="Usado :"
+            android:layout_above="@+id/lblCUsed"
+            android:layout_alignStart="@+id/lblCUsed"
+            android:layout_alignEnd="@+id/lblCUsed"
+            android:gravity="center_horizontal"
+            android:paddingBottom="5dp"
+            android:text="Usado"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
             android:id="@+id/lblCheq"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/lblPTotal"
-            android:layout_alignLeft="@+id/lblPTotal"
-            android:layout_marginLeft="-27dp"
-            android:layout_marginTop="-1dp"
+            android:layout_above="@+id/lblCDisp"
+            android:layout_alignStart="@+id/lblCDisp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:gravity="center_horizontal"
             android:paddingBottom="5dp"
-            android:text="Disponible :"
+            android:text="Disponible "
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="18sp" />
 
@@ -402,8 +389,10 @@
             android:id="@+id/lblClientePago"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_above="@+id/lblBU"
             android:layout_alignParentStart="true"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="5dp"
             android:text="Contado"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textStyle="bold" />
@@ -412,23 +401,22 @@
             android:id="@+id/lblDiasCredito"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="74dp"
-            android:layout_marginBottom="76dp"
+            android:layout_above="@+id/lblCheq"
+            android:layout_alignStart="@+id/lblCheq"
+            android:layout_marginBottom="0dp"
+            android:layout_toStartOf="@+id/lblCantDias"
+            android:gravity="right"
+            android:paddingBottom="5dp"
             android:text="Días :"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
             android:id="@+id/lblCantDias"
-            android:layout_width="132dp"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/lblCLim"
-            android:layout_alignParentBottom="true"
+            android:layout_above="@+id/lblCheq"
+            android:layout_alignParentEnd="true"
             android:layout_marginStart="4dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginBottom="73dp"
-            android:layout_toEndOf="@+id/lblDiasCredito"
             android:gravity="right"
             android:paddingRight="10dp"
             android:paddingBottom="5dp"

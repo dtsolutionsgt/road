@@ -31,6 +31,16 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".editar_cliente"
+            android:exported="true"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"/>
+
+        <activity
+            android:name=".CanalSubcanal"
+            android:exported="true" />
 
         <service
             android:name=".srvBase"

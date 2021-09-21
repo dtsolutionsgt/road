@@ -16,6 +16,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -28,6 +29,7 @@ public class Producto extends PBase {
 	private ListView listView;
 	private EditText txtFilter;
 	private Spinner spinFam;
+    private ProgressBar pbar;
 	
 	private ArrayList<String> spincode= new ArrayList<String>();
 	private ArrayList<String> spinlist = new ArrayList<String>();
@@ -54,6 +56,7 @@ public class Producto extends PBase {
 		listView = (ListView) findViewById(R.id.listView1);
 		txtFilter = (EditText) findViewById(R.id.editText1);
 		spinFam = (Spinner) findViewById(R.id.spinner1);
+        pbar=findViewById(R.id.progressBar6);pbar.setVisibility(View.INVISIBLE);
 			
 		prodtipo=gl.prodtipo;
 		gl.prodtipo=0;
@@ -241,6 +244,9 @@ public class Producto extends PBase {
 		int cantidad = 0;
 		String vF,cod,name,um;
 
+        pbar.setVisibility(View.VISIBLE);
+        pbar.bringToFront();
+
 		ArrayList<clsCD> vitems = new ArrayList<clsCD>();;
 
 		items.clear();itemid="*";//famid="0";
@@ -348,7 +354,9 @@ public class Producto extends PBase {
 			DT=Con.OpenDT(sql);
 
 			cantidad = DT.getCount();
-			if (cantidad==0) return;
+			if (cantidad==0) {
+                pbar.setVisibility(View.INVISIBLE);return;
+            }
 			
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
@@ -392,7 +400,7 @@ public class Producto extends PBase {
 		listView.setAdapter(adapter);
 		
 		//if (prodtipo==1) dispUmCliente();
-        if (gl.rutatipo.equalsIgnoreCase("V")) dispUmCliente();
+        if (gl.rutatipo.equalsIgnoreCase("V") && (prodtipo!=4)) dispUmCliente();
 
 		if (cantidad==1) {
 
@@ -403,6 +411,8 @@ public class Producto extends PBase {
 
 			if (!app.prodBarra(itemid)) appProd();
 		}
+
+        pbar.setVisibility(View.INVISIBLE);
 
 	}
 	

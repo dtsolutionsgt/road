@@ -39,12 +39,13 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
+
 public class CliDet extends PBase {
 
 	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago;
 	private TextView lblRuta,lblRuta2, lblDespacho, lblCanal, lblCanalsub,lblPrior,lblProv,lblDist;
-	private RelativeLayout relV,relP,relD,relCamara;//#HS_20181213 relCamara
+	private RelativeLayout relV,relP,relD,relCamara,relCanasta;
 	private ImageView imgCobro,imgDevol,imgRoadTit, imgTel, imgWhatsApp, imgWaze, imgVenta, imgPreventa, imgDespacho, imgCamara, imgMap;
 	private EditText txtRuta;
 	private RadioButton chknc,chkncv;
@@ -90,7 +91,10 @@ public class CliDet extends PBase {
         lblProv = findViewById(R.id.textView98);
         lblDist= findViewById(R.id.textView99);
 
-		txtRuta = (EditText) findViewById(R.id.txtRuta);txtRuta.setVisibility(View.INVISIBLE);
+		txtRuta = (EditText) findViewById(R.id.txtRuta);
+		txtRuta.setVisibility(View.INVISIBLE);
+		txtRuta.setFocusable(false);
+
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
 
@@ -102,6 +106,7 @@ public class CliDet extends PBase {
 		relP=(RelativeLayout) findViewById(R.id.relPreventa);
 		relD=(RelativeLayout) findViewById(R.id.relDespacho);
 		relCamara=(RelativeLayout) findViewById(R.id.relCamara);
+        relCanasta=(RelativeLayout) findViewById(R.id.relCanastas);
 
 		imgCobro= (ImageView) findViewById(R.id.imageView2);
 		imgDevol= (ImageView) findViewById(R.id.imageView1);
@@ -423,8 +428,8 @@ public class CliDet extends PBase {
 	private void showData() {
 		Cursor DT;
 		int uvis,dcred;
-		String contr,sgps="0.00000000 , 0.00000000";
-		String idmuni,iddep,muni,dep;
+		String contr,sgps="0.00000000 , 0.00000000",uv,uvy,uvm,uvd;
+        String idmuni,iddep,muni,dep;
 
 		lblNom.setText("");lblRep.setText("");
 		lblDir.setText("");lblAten.setText("");lblTel.setText("");
@@ -446,7 +451,18 @@ public class CliDet extends PBase {
 
 			tel=DT.getString(4);
 			lblTel.setText(DT.getString(4));
-			uvis=DT.getInt(3);
+			//uvis=DT.getInt(3);
+            uv=DT.getString(3);
+
+            try {
+                uvy=uv.substring(0,4);
+                uvm=uv.substring(4,6);
+                uvd=uv.substring(6,8);
+                long ff=du.cfecha(mu.CInt(uvy),mu.CInt(uvm),mu.CInt(uvd));
+                lblAten.setText(du.sfechalocal(ff));
+            } catch (Exception e) {
+                lblAten.setText("");
+            }
 
 			nivel=DT.getInt(6);
 			gl.nivel=nivel;
@@ -454,12 +470,6 @@ public class CliDet extends PBase {
 
 			contr=""+DT.getString(8);
 			gl.contrib=contr;
-
-			if (uvis<=0) {
-				lblAten.setText("");
-			} else {
-				lblAten.setText(du.sfecha(uvis));
-			}
 
 			//#CKFK 20190619 Cambié las coordenadas que se le envían al Waze, en lugar de X,Y le estoy enviando Y,X
 			sgps=mu.frmgps(DT.getDouble(10))+ " , "+ mu.frmgps(DT.getDouble(9));
@@ -565,9 +575,9 @@ public class CliDet extends PBase {
 
 			if (!gl.peModal.equalsIgnoreCase("TOL")) clicred=gl.credito>0;
 
-			lblCLim.setText(mu.frmcur(clim));
-			lblCUsed.setText(mu.frmcur(cused));
-			lblCDisp.setText(mu.frmcur(cdisp));
+			lblCLim.setText(mu.frmcur0(clim));
+			lblCUsed.setText(mu.frmcur0(cused));
+			lblCDisp.setText(mu.frmcur0(cdisp));
 
 			if (cused==0) {
 				lblCobro.setVisibility(View.INVISIBLE);
@@ -617,17 +627,26 @@ public class CliDet extends PBase {
 	private void initVenta(){
         Cursor dt;
 
-        try {
+        if (gl.rutatipo.equalsIgnoreCase("T")) {
+            if (tieneDespacho()) {
+                showDespacho(null);return;
+            }
+        }
 
+        try {
             sql="SELECT COREL FROM D_PEDIDO WHERE (CLIENTE='"+gl.cliente+"') AND (ANULADO='N') AND (STATCOM='N')";
             dt=Con.OpenDT(sql);
             gl.modpedid="";
 
             if (dt.getCount()>0) {
-                startActivity(new Intent(this,ListaPedidos.class));
+                if (gl.listapedidos) {
+                    startActivity(new Intent(this,ListaPedidos.class));
+                }
             } else {
                 startActivity(new Intent(this,Venta.class));
             }
+
+            gl.listapedidos=false;
 
             //startActivity(new Intent(this,Venta.class));
         } catch (Exception e) {
@@ -811,7 +830,19 @@ public class CliDet extends PBase {
 		}
 	}
 
-	//endregion
+    private boolean tieneDespacho() {
+        try {
+           clsDs_pedidoObj Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
+            Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
+            return (Ds_pedidoObj.count>0) ;
+        } catch (Exception e) {
+            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+            return false;
+        }
+    }
+
+
+    //endregion
 
 	//region  Aux
 
@@ -839,6 +870,7 @@ public class CliDet extends PBase {
 				if (!validaRutaSupervisor()) return;
 			}
 
+            gl.listapedidos=true;
 			runVenta();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -863,8 +895,8 @@ public class CliDet extends PBase {
 		cantidad = Float.valueOf(CantExistencias());
 
 		try{
-			if(cantidad == 0){
-				mu.msgbox("No hay existencias disponibles.");
+			if (cantidad == 0){
+                //if (gl.rutatipo.equalsIgnoreCase("V")) mu.msgbox("No hay existencias disponibles.");
 			}else{
 				if(gl.tiponcredito == 2){
 					return;
@@ -886,8 +918,8 @@ public class CliDet extends PBase {
 
 		try{
 			if(cantidad == 0){
-				mu.msgbox("No hay existencias disponibles.");
-			}else{
+                //if (gl.rutatipo.equalsIgnoreCase("V")) mu.msgbox("No hay existencias disponibles.");
+            }else{
 				try {
 					startActivity(new Intent(this, activity_despacho_list.class));
 				} catch (Exception e) {
@@ -901,7 +933,6 @@ public class CliDet extends PBase {
 	}
 
 	private void runVenta() {
-
 		try{
 			if (merc==1) {
 				browse=1;
@@ -914,6 +945,19 @@ public class CliDet extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
+	}
+	private void EditarDatosCliente()
+	{
+		browse = 2;
+		Intent intent = new Intent(this, editar_cliente.class);
+
+
+		gl.EditarClienteCodigo= cod;
+		gl.EditarClienteNombre = lblNom.getText().toString();
+		gl.EditarClienteRuc = lblRep.getText().toString();
+		gl.EditarClienteSubcanal = lblCanalsub.getText().toString().substring(11);
+		gl.EditarClienteCanal = lblCanal.getText().toString().substring(8);
+		startActivity(intent);
 	}
 
 	private void inputCliente() {
@@ -1100,12 +1144,24 @@ public class CliDet extends PBase {
 		}
 	}
 
+    private void tiporuta() {
+        try {
+            sql = "SELECT VENTA FROM P_RUTA";
+            Cursor DT = Con.OpenDT(sql);
+            DT.moveToFirst();
+            gl.rutatipo = DT.getString(0);
+        } catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+    }
+
 	private void habilitaOpciones() {
 		try {
 			String rt;
 			boolean flag;
 
 			rt=gl.rutatipog;
+            if (rt.equalsIgnoreCase("P")) relCanasta.setVisibility(View.GONE);
 
 			flag=false;
 			if (rt.equalsIgnoreCase("V") || rt.equalsIgnoreCase("T")) flag=true;
@@ -1352,12 +1408,14 @@ public class CliDet extends PBase {
 
 			dialog.setPositiveButton("Bueno", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
+                    gl.listapedidos=true;
 					setDevType("B");
 				}
 			});
 
 			dialog.setNegativeButton("Malo", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
+                    gl.listapedidos=true;
 					setDevType("M");
 				}
 			});
@@ -1459,13 +1517,13 @@ public class CliDet extends PBase {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle("Road");
-			dialog.setMessage("¿Quiere editar datos del cliente?");
+			dialog.setMessage("¿Editar datos de cliente?");
 
 			dialog.setIcon(R.drawable.ic_quest);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					inputCliente();
+					EditarDatosCliente();
 				}
 			});
 
@@ -1498,8 +1556,10 @@ public class CliDet extends PBase {
 
 			if (gl.despdevflag) {
                 gl.despdevflag=false;
-                showDespacho(null);
-                return;
+                if (gl.rutatipo.equalsIgnoreCase("D")) {
+                    showDespacho(null);
+                    return;
+                }
             }
 
 			if (browse==1) {
@@ -1513,12 +1573,12 @@ public class CliDet extends PBase {
 			}
 
 			if (gl.dvbrowse!=0){
-				gl.rutatipo = "V";
-				browse =3;
-				if (browse==3){//Se utiliza para la devolución de cliente.
-					initVenta();
-					return;
-				} return;
+				//gl.rutatipo = "V";
+                tiporuta();
+                String ss=gl.rutatipo;
+                browse=0;
+				initVenta();
+				return;
 			}
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

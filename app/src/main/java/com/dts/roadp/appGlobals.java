@@ -27,10 +27,11 @@ public class appGlobals extends Application {
     public boolean vcredito,vcheque,vchequepost,validimp,tolsuper=false,tolpedsend,tolprodcrit;
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
-	public boolean permitir_cantidad_mayor, permitir_producto_nuevo,pedidomod;
+	public boolean permitir_cantidad_mayor, permitir_producto_nuevo,pedidomod,listapedidos;
 	public int mpago;
 	public String prodCanasta, corelFac, devcord;
 	public boolean ingresaCanastas;
+	public String IdCanal, IdSubcanal, EditarClienteCodigo, EditarClienteNombre, EditarClienteCanal, EditarClienteSubcanal, EditarClienteRuc;
 
     public ArrayList<clsClasses.clsPedItem> peditems= new ArrayList<clsClasses.clsPedItem>();
 
@@ -54,6 +55,7 @@ public class appGlobals extends Application {
 	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre;
 	public boolean peImprFactCorrecta, pTransBarra;
 	public int peDec,peDecCant,peDecImp,peLimiteGPS,peMargenGPS,peVentaGps;
+	public Boolean peEditarNombre, peEditarNit, peEditarCanal, peEditarSubcanal;
 	
 	// Descuentos
 	

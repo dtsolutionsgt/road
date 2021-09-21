@@ -388,7 +388,7 @@ public class Anulacion extends PBase {
 
     private void anulPedido(String itemid) {
         Cursor dt;
-        double dcant,dpeso;
+        double dcant,dpeso,dfact;
         String prid;
 
         try {
@@ -400,9 +400,15 @@ public class Anulacion extends PBase {
             sql="UPDATE D_PEDIDOD SET Anulado='S' WHERE COREL='"+itemid+"'";
             db.execSQL(sql);
 
+            sql = "UPDATE D_NOTACRED SET ANULADO ='S' WHERE FACTURA='" + itemid + "'";
+            db.execSQL(sql);
+
+            sql = "UPDATE D_CXC SET ANULADO ='S' WHERE REFERENCIA='" + itemid + "'";
+            db.execSQL(sql);
+
             if (toledano) {
 
-                sql="SELECT PRODUCTO,CANTPROC,PESO FROM D_PEDIDOD WHERE COREL='"+itemid+"'";
+                sql="SELECT PRODUCTO,CANTPROC,PESO,FACTOR FROM D_PEDIDOD WHERE COREL='"+itemid+"'";
                 dt=Con.OpenDT(sql);
 
                 dt.moveToFirst();
@@ -411,9 +417,11 @@ public class Anulacion extends PBase {
                     prid=dt.getString(0);
                     dcant=dt.getDouble(1);
                     dpeso=dt.getDouble(2);
+                    //dfact=dt.getDouble(3);
+                    dfact=1;
 
                     if (dcant>0) {
-                        sql="UPDATE P_STOCK_PV SET CANT=CANT+"+dcant+",PESO=PESO+"+dpeso+" WHERE (CODIGO='"+prid+"') ";
+                        sql="UPDATE P_STOCK_PV SET CANT=CANT+"+dcant*dfact+",PESO=PESO+"+dpeso+" WHERE (CODIGO='"+prid+"') ";
                         db.execSQL(sql);
                     }
 

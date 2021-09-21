@@ -30,7 +30,8 @@ public class clsDocPedido extends clsDocument {
 	
 	protected boolean buildDetail() {
 		itemData item;
-		String cu,cp;
+		String cu,cp,umm;
+		double ccant;
 
 		if (impprecio==1) return buildDetailPrecio();
 
@@ -47,8 +48,18 @@ public class clsDocPedido extends clsDocument {
 			rep.add2ss1(item.cod + " " + item.nombre,item.critico);
 			//rep.add3lrr(rep.rtrim(""+item.cant,5),item.prec,item.tot);
 
+            if (item.esbarra) {
+                ccant = item.cant * item.factor;
+            } else{
+                ccant = item.cant;
+            }
+
             if (!item.rosty) {
-                cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(item.um,6);
+                umm = item.um;
+                if (item.esbarra && item.porpeso) {
+                    umm = item.ums;
+                }
+                cu=frmdecimal(ccant,decimp)+" "+rep.ltrim(umm,6);
             } else {
                 cu=frmdecimal(item.cantrosty,decimp)+" "+rep.ltrim(item.umrosty,6);
             }
@@ -310,7 +321,7 @@ public class clsDocPedido extends clsDocument {
 
 			sql="SELECT D_PEDIDOD.PRODUCTO,P_PRODUCTO.DESCLARGA,D_PEDIDOD.CANT,D_PEDIDOD.PRECIODOC," +
 				"D_PEDIDOD.IMP, D_PEDIDOD.DES,D_PEDIDOD.DESMON, D_PEDIDOD.TOTAL, D_PEDIDOD.UMVENTA, " +
-                "D_PEDIDOD.UMPESO, D_PEDIDOD.PESO, D_PEDIDOD.SIN_EXISTENCIA, D_PEDIDOD.FACTOR " +
+                "D_PEDIDOD.UMPESO, D_PEDIDOD.PESO, D_PEDIDOD.SIN_EXISTENCIA, D_PEDIDOD.FACTOR, D_PEDIDOD.UMSTOCK " +
 				"FROM D_PEDIDOD INNER JOIN P_PRODUCTO ON D_PEDIDOD.PRODUCTO = P_PRODUCTO.CODIGO " +
 				"WHERE (D_PEDIDOD.COREL='"+corel+"')";	
 			DT=Con.OpenDT(sql);
@@ -334,13 +345,17 @@ public class clsDocPedido extends clsDocument {
 				item.peso=DT.getDouble(10);
 				if (DT.getInt(11)==0) item.critico="F";else item.critico="S";
                 item.factor=DT.getDouble(12);
+                item.ums=DT.getString(13);
+                item.esbarra=prodBarra(item.cod);
+                item.porpeso=app.ventaPeso(item.cod);
 
 				if (sinimp) item.tot=item.tot-item.imp;
 
                 rosty=app.esRosty(item.cod);
                 if (rosty) {
                     item.rosty=true;
-                    item.umrosty=app.umStockPV(item.cod);
+                    //item.umrosty=app.umStockPV(item.cod);
+                    item.umrosty=item.um;
                     item.cantrosty=item.cant*item.factor;
                 } else item.rosty=false;
 
@@ -358,8 +373,6 @@ public class clsDocPedido extends clsDocument {
 
 	//region Rosty
 
-
-
     public boolean prodBarra(String cod) {
         Cursor DT;
 
@@ -376,7 +389,6 @@ public class clsDocPedido extends clsDocument {
             return false;
         }
     }
-
 
     //endregion
 	
@@ -396,9 +408,9 @@ public class clsDocPedido extends clsDocument {
 	}
 	
 	private class itemData {
-		public String cod,nombre,um,ump,critico,umrosty;
+		public String cod,nombre,um,ump,ums,critico,umrosty;
 		public double cant,prec,imp,descper,desc,tot,peso,cantrosty,factor;
-		public boolean rosty;
+		public boolean rosty,esbarra,porpeso;
 	}
 
 	//endregion

@@ -403,6 +403,61 @@ public class AppMethods {
 			gl.pTransBarra =false;
 		}
 
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=25";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarNombre = false;
+
+			gl.peEditarNombre = val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarNombre =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=26";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarNit =false;
+
+			gl.peEditarNit =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarNit =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=27";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarCanal =false;
+
+			gl.peEditarCanal =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarCanal =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=28";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarSubcanal =false;
+
+			gl.peEditarSubcanal =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarSubcanal =false;
+		}
 	}
 
 	public void parametrosBarras() {
@@ -563,15 +618,27 @@ public class AppMethods {
         try {
             if (!prodBarra(cod)) return false;
 
-            umb=umSalida(cod);
-            ump=umVenta(cod);
-            ums=umStockPV(cod);
-            //if (ump.equalsIgnoreCase(ums))  return false;
-            if (umb.equalsIgnoreCase(ums))  return false;
+            umb=umSalida(cod);  //  SELECT UM_SALIDA FROM P_PRODUCTO
+            ump=umVenta(cod);   //  SELECT UNIDADMEDIDA FROM P_PRODPRECIO
+            ums=umStockPV(cod); //  SELECT UNIDADMEDIDA FROM P_STOCK_PV
+            if (ump.equalsIgnoreCase(ums))  return false;
+            if (ump.equalsIgnoreCase(umb))  return false;
             if (ump.equalsIgnoreCase(gl.umpeso))  return false;
 
             return  true;
-        } catch (Exception e) {
+
+/*
+            if (cod.equalsIgnoreCase("0006")) return true;
+            if (cod.equalsIgnoreCase("0629")) return true;
+            if (cod.equalsIgnoreCase("0747")) return true;
+            if (cod.equalsIgnoreCase("0506")) return true;
+            if (cod.equalsIgnoreCase("0508")) return true;
+
+            return  false;
+
+ */
+
+            } catch (Exception e) {
             toast(e.getMessage());return false;
         }
     }
@@ -684,44 +751,47 @@ public class AppMethods {
 
                 if (!ub.equalsIgnoreCase(us)) {
 
-                    sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+us+"') ";
-                    df=Con.OpenDT(sql);
-                    if (df.getCount()==0) {
-                        msgbox("No existe factor conversion para el producto : " + cod);
-                        sql = "DELETE FROM P_STOCK WHERE CODIGO='" + cod + "'";
-                        db.execSQL(sql);
-                        fact1=1;
-                    } else {
-                        df.moveToFirst();
-                        fact1=df.getDouble(0);
-                    }
+                    if (!prodBarra(cod)) {
 
-                    sql="SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='"+cod+"') AND (UNIDADSUPERIOR='"+ub+"') ";
-                    df=Con.OpenDT(sql);
-                    if (df.getCount()==0) {
-                        msgbox("No existe factor conversion para el producto : "+cod);
-                        sql="DELETE FROM P_STOCK WHERE CODIGO='"+cod+"'";
-                        db.execSQL(sql);
-                        fact2=1;
-                    } else {
-                        df.moveToFirst();
-                        fact2=df.getDouble(0);
-                    }
+                        sql = "SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='" + cod + "') AND (UNIDADSUPERIOR='" + us + "') ";
+                        df = Con.OpenDT(sql);
+                        if (df.getCount() == 0) {
+                            msgbox("No existe factor conversion para el producto : " + cod);
+                            sql = "DELETE FROM P_STOCK WHERE CODIGO='" + cod + "'";
+                            db.execSQL(sql);
+                            fact1 = 1;
+                        } else {
+                            df.moveToFirst();
+                            fact1 = df.getDouble(0);
+                        }
 
-                    if (fact1>=fact2) {
-                        fact=fact1/fact2;
-                        cant = cant * fact;
+                        sql = "SELECT FACTORCONVERSION FROM P_FACTORCONV WHERE (PRODUCTO='" + cod + "') AND (UNIDADSUPERIOR='" + ub + "') ";
+                        df = Con.OpenDT(sql);
+                        if (df.getCount() == 0) {
+                            msgbox("No existe factor conversion para el producto : " + cod);
+                            sql = "DELETE FROM P_STOCK WHERE CODIGO='" + cod + "'";
+                            db.execSQL(sql);
+                            fact2 = 1;
+                        } else {
+                            df.moveToFirst();
+                            fact2 = df.getDouble(0);
+                        }
 
-                        sql="UPDATE P_STOCK_PV SET CANT=" + cant + ",UNIDADMEDIDA='" + ub + "'  " +
-                            "WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + us + "') ";
-                        db.execSQL(sql);
-                    } else {
-                        fact=fact2/fact1;
-                        cant = cant * fact;
+                        if (fact1 >= fact2) {
+                            fact = fact1 / fact2;
+                            cant = cant * fact;
 
-                        sql="UPDATE P_STOCK_PV SET CANT=" + cant + ",UNIDADMEDIDA='" + ub + "'  " +
-                            "WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + ub + "') ";
-                        db.execSQL(sql);
+                            sql = "UPDATE P_STOCK_PV SET CANT=" + cant + ",UNIDADMEDIDA='" + ub + "'  " +
+                                    "WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + us + "') ";
+                            db.execSQL(sql);
+                        } else {
+                            fact = fact2 / fact1;
+                            cant = cant * fact;
+
+                            sql = "UPDATE P_STOCK_PV SET CANT=" + cant + ",UNIDADMEDIDA='" + ub + "'  " +
+                                    "WHERE (CODIGO='" + cod + "') AND (UNIDADMEDIDA='" + ub + "') ";
+                            db.execSQL(sql);
+                        }
                     }
                 }
 

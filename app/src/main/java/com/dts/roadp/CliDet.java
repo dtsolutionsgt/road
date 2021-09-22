@@ -353,7 +353,12 @@ public class CliDet extends PBase {
 	}
 
     public void showDir(View view) {
-	    mu.msgbox(lblDir.getText().toString());
+	    //mu.msgbox(lblDir.getText().toString());
+        try{
+            msgAskEditCliente();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
     }
 
     @Override

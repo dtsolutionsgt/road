@@ -118,7 +118,7 @@
                     android:width="0dip"
                     android:background="@drawable/frame_btn"
                     android:clickable="true"
-                    android:maxLines="1"
+                    android:maxLines="2"
                     android:onClick="showDir"
                     android:paddingLeft="5dp"
                     android:paddingTop="5dp"

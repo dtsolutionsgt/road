@@ -871,7 +871,7 @@ public class CliDet extends PBase {
 
 		try{
 			if (cantidad == 0){
-                //if (gl.rutatipo.equalsIgnoreCase("V")) mu.msgbox("No hay existencias disponibles.");
+                if (gl.rutatipo.equalsIgnoreCase("V")) mu.msgbox("No hay existencias disponibles.");
 			}else{
 				if(gl.tiponcredito == 2){
 					return;

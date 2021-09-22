@@ -443,7 +443,7 @@ public class Menu extends PBase {
 					break;
 
 			}
-		}catch (Exception e){
+		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 

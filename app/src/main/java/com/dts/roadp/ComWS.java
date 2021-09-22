@@ -160,7 +160,7 @@ public class ComWS extends PBase {
 		setContentView(R.layout.activity_com_ws);
 
 		super.InitBase();
-		addlog("ComWS", "" + du.getActDateTime(), gl.vend);
+		//addlog("ComWS", "" + du.getActDateTime(), gl.vend);
 
 		System.setProperty("line.separator", "\r\n");
 		rootdir = Environment.getExternalStorageDirectory() + "/RoadFotos/";
@@ -403,6 +403,7 @@ public class ComWS extends PBase {
 				toastcent("Por favor, espere que se termine la tarea actual.");return;
 			}
 
+
 			if (!gl.debug) {
 				if (!validaLicencia()) {
 					mu.msgbox("Licencia inválida!");
@@ -418,6 +419,7 @@ public class ComWS extends PBase {
 					return;
 				}
 			}
+
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -1621,13 +1623,13 @@ public class ComWS extends PBase {
 							listItems.add(sql);
 							sstr = str;
 						} catch (Exception e) {
-							addlog(new Object() {
-							}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+							addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 							sstr = e.getMessage();
+                            return 0;
 						}
 					}
 				}
-			}else if (delcmd.contains("commitSQL")){
+			} else if (delcmd.contains("commitSQL")){
 				//Corregir esto
 				str=xr;
 				if (str.equalsIgnoreCase("#")) {
@@ -4470,6 +4472,7 @@ public class ComWS extends PBase {
 
 		senv = "Envío terminado \n \n";
 
+
 		if (gl.peModal.equalsIgnoreCase("TOL")) {
 			rslv = validaLiquidacion();
 			if (rslv != 1) {
@@ -6359,14 +6362,11 @@ public class ComWS extends PBase {
 				scon = 1;
 			} else {
 				URL = URL_Remota;
-				if (getTest() == 1) {
-					scon = 1;
-				}
+				if (getTest() == 1) scon = 1;
 			}
 
 			if (scon == 1) {
 				fstr = "Sync OK";
-
 				if (!sendData()) {
 					fstr = "Envio incompleto : " + sstr;
 				}

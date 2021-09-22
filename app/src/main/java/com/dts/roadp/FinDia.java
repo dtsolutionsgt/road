@@ -388,6 +388,19 @@ public class FinDia extends PBase {
                 }
             }
 
+            sql = "SELECT COREL FROM D_CLIENTE_MODIF WHERE STATCOM='S'";
+            DT = Con.OpenDT(sql);
+            if (DT.getCount() > 0) {
+
+                DT.moveToFirst();
+                while (!DT.isAfterLast()) {
+                    corel = DT.getString(0);
+                    sql = "DELETE FROM D_CLIENTE_MODIF WHERE COREL='" + corel + "'";
+                    db.execSQL(sql);
+
+                    DT.moveToNext();
+                }
+            }
 
             sql = "SELECT COREL FROM D_SOLICINV WHERE STATCOM='S'";
             DT = Con.OpenDT(sql);

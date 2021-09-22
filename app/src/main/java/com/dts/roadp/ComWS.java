@@ -807,6 +807,10 @@ public class ComWS extends PBase {
 
 			envioFacturas();
 
+			envioCanastas();
+
+			envioClienteModificados();
+
 			envioPedidos();
 
 			envioNotasCredito();
@@ -866,6 +870,8 @@ public class ComWS extends PBase {
 			envioFacturas();
 
 			envioCanastas();
+
+			envioClienteModificados();
 
 			envioPedidos();
 
@@ -4518,6 +4524,14 @@ public class ComWS extends PBase {
 				return false;
 			}
 
+			envioClienteModificados();
+			if (errflag) {
+				dbld.savelog();
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
+				return false;
+			}
+
 			envioDespachosNoEntregados();
 			if (errflag) {
 				dbld.savelog();
@@ -4948,6 +4962,85 @@ public class ComWS extends PBase {
 			senv += "Canastas : " + pc + " , NO ENVIADO : " + pf + " \n";
 		} else {
 			senv += "Canastas : " + pc + "\n";
+		}
+	}
+
+	public void envioClienteModificados() {
+		Cursor DT;
+		int i, pc = 0, pcc = 0;
+		String Corel;
+
+		try {
+			sql = "SELECT COREL FROM D_CLIENTE_MODIF WHERE STATCOM='N'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() == 0) {
+				senv += "ClientesModificados : " + pc + "\n";
+				return;
+			}
+
+			pcc = DT.getCount();
+			pc = 0;
+			i = 0;
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				Corel = DT.getString(0);
+
+				try {
+
+					i += 1;
+					fprog = "ClientesModificados " + i;
+					if (!esEnvioManual) {
+						wsStask.onProgressUpdate();
+					}
+
+					if (envioparcial) dbld.clear();
+
+					dbld.insert("D_CLIENTE_MODIF", "WHERE COREL='"+Corel+"'");
+
+					if (envioparcial && !esEnvioManual) {
+						if (commitSQL() == 1) {
+							sql = "UPDATE D_CLIENTE_MODIF SET STATCOM='S' WHERE COREL='"+Corel+"'";
+							db.execSQL(sql);
+							pc += 1;
+						} else {
+							errflag = true;
+							fterr += "\n" + sstr;
+						}
+					} else pc += 1;
+
+				} catch (Exception e) {
+					errflag = true;
+
+					dbld.savelog("clientesmodificados.txt");
+
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					fterr += "\n" + e.getMessage();
+				}
+
+				DT.moveToNext();
+			}
+
+			if (DT != null) DT.close();
+
+		} catch (Exception e) {
+			errflag = true;
+
+			dbld.savelog("clientesmodificados.txt");
+
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+		}
+
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Clientesmodificados : " + pc + " , NO ENVIADO : " + pf + " \n";
+		} else {
+			senv += "Clientesmodificados : " + pc + "\n";
 		}
 	}
 

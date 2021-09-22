@@ -57,8 +57,9 @@ public class editar_cliente extends PBase {
 
     private void GuardarData() {
         Cursor DT;
-        String corel = mu.getCorelBase();
+        String corel = gl.ruta+mu.getCorelBase();
         String tabla = "D_CLIENTE_MODIF";
+        long f= du.getActDateTime();
 
         try {
 
@@ -70,27 +71,26 @@ public class editar_cliente extends PBase {
             } else {
                 //db.execSQL("DELETE FROM D_CLIENTE_MODIF");
                 if (validaCliente() == 0) {
-                    toast("ValidaCliente: "+validaCliente()+" codigo: "+codigo);
+
                     ins.init(tabla);
 
                     ins.add("COREL", corel);
                     ins.add("CODIGO", codigo);
                     ins.add("NOMBRE", nombre);
-                    ins.add("CANAL", canal);
+                    ins.add("CANAL", idCanal);
                     ins.add("NIT", ruc);
-                    ins.add("SUBCANAL", subcanal);
-                    ins.add("BLOQUEADO", "");
+                    ins.add("SUBCANAL", idSubcanal);
+                    ins.add("BLOQUEADO", "0");
                     ins.add("TIPONEG", "");
                     ins.add("TIPO", "");
                     ins.add("SUBTIPO", "");
-                    ins.add("NIVELPRECIO", "");
+                    ins.add("NIVELPRECIO", "0");
                     ins.add("MEDIAPAGO", "");
-                    ins.add("LIMITECREDITO", "");
-                    ins.add("DIACREDITO", "");
+                    ins.add("LIMITECREDITO", "0");
+                    ins.add("DIACREDITO", "0");
                     ins.add("DESCUENTO", "");
                     ins.add("BONIFICACION", "");
-                    ins.add("ULTVISITA", "");
-                    ins.add("IMPSPEC", "");
+                    ins.add("IMPSPEC", "0");
                     ins.add("INVTIPO", "");
                     ins.add("INVEQUIPO", "");
                     ins.add("INV1", "");
@@ -101,8 +101,8 @@ public class editar_cliente extends PBase {
                     ins.add("DIRTIPO", "");
                     ins.add("DIRECCION", "");
                     ins.add("SUCURSAL", "");
-                    ins.add("COORX", "");
-                    ins.add("COORY", "");
+                    ins.add("COORX", "0");
+                    ins.add("COORY", "0");
                     ins.add("FIRMADIG", "");
                     ins.add("CODBARRA", "");
                     ins.add("VALIDACREDITO", "");
@@ -113,14 +113,15 @@ public class editar_cliente extends PBase {
                     ins.add("COD_PAIS", "");
                     ins.add("FACT_VS_FACT", "");
                     ins.add("CHEQUEPOST", "");
-                    ins.add("PERCEPCION", "");
+                    ins.add("PERCEPCION", "0");
                     ins.add("TIPO_CONTRIBUYENTE", "");
-                    ins.add("ID_DESPACHO", "");
-                    ins.add("ID_FACTURACION", "");
+                    ins.add("ID_DESPACHO", "0");
+                    ins.add("ID_FACTURACION", "0");
                     ins.add("MODIF_PRECIO", "");
-                    ins.add("INGRESA_CANASTAS", "");
+                    ins.add("INGRESA_CANASTAS", "0");
                     ins.add("PRIORIZACION", "");
-                    ins.add("STATCOM", "");
+                    ins.add("STATCOM", "N");
+                    ins.add("FECHA_SISTEMA", f);
 
                     db.execSQL(ins.sql());
 
@@ -130,8 +131,10 @@ public class editar_cliente extends PBase {
                 } else {
 
                     upd.init(tabla);
-                    upd.add("CANAL", canal);
-                    upd.add("SUBCANAL", subcanal);
+                    upd.add("CANAL", idCanal);
+                    upd.add("SUBCANAL", idSubcanal);
+                    upd.add("STATCOM", "N");
+                    upd.add("FECHA_SISTEMA", f);
                     upd.Where("CODIGO='"+codigo+"'");
 
                     db.execSQL(upd.SQL());
@@ -161,6 +164,7 @@ public class editar_cliente extends PBase {
             upd.Where("CODIGO='"+codigo+"'");
 
             db.execSQL(upd.SQL());
+
         } catch (Exception e) {
             addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
             db.endTransaction();
@@ -186,8 +190,8 @@ public class editar_cliente extends PBase {
 
     private  void RegresarCLiDet() {
         limpiar();
-        //Intent intent = new Intent(this, Clientes.class);
-        //startActivity(intent);
+        Intent intent = new Intent(this, CliDet.class);
+        startActivity(intent);
         finish();
     }
 

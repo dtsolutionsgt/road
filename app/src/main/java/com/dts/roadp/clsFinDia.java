@@ -476,6 +476,19 @@ public class clsFinDia extends PBase{
                 }
             }
 
+            sql="SELECT COREL FROM D_CLIENTE_MODIF WHERE STATCOM='S'";
+            DT=Con.OpenDT(sql);
+            if (DT.getCount()>0) {
+
+                DT.moveToFirst();
+                while (!DT.isAfterLast()) {
+                    corel=DT.getString(0);
+                    sql="DELETE FROM D_CLIENTE_MODIF WHERE COREL='"+corel+"'";db.execSQL(sql);
+
+                    DT.moveToNext();
+                }
+            }
+
             //Delete D_NOTACRED y D_NOTACRED
             sql = "SELECT COREL FROM D_NOTACRED WHERE STATCOM='S'";
             DT = Con.OpenDT(sql);

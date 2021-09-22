@@ -1066,7 +1066,6 @@ public class BaseDatosScript {
 					"[DIACREDITO] INTEGER NOT NULL,"+
 					"[DESCUENTO] TEXT NOT NULL,"+
 					"[BONIFICACION] TEXT NOT NULL,"+
-					"[ULTVISITA] INTEGER NOT NULL,"+
 					"[IMPSPEC] REAL NOT NULL,"+
 					"[INVTIPO] TEXT NOT NULL,"+
 					"[INVEQUIPO] TEXT NOT NULL,"+
@@ -1099,6 +1098,7 @@ public class BaseDatosScript {
 					"[INGRESA_CANASTAS] INTEGER DEFAULT 0 NOT NULL,"+
 					"[PRIORIZACION] TEXT NOT NULL,"+
 					"[STATCOM] TEXT NOT NULL,"+
+					"[FECHA_SISTEMA] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);

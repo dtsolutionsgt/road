@@ -650,7 +650,7 @@ public class ProdCant extends PBase {
 	}
 
 	private int setCant(boolean mode){
-		double cu=0.0,tv,corig,cround,fruni,frcant,adcant,vpeso=0,opeso;
+		double cu=0.0,tv=0,corig,cround,fruni,frcant,adcant,vpeso=0,opeso;
 		boolean ajust=false;
 
 		//if (!idle) return 0;
@@ -740,13 +740,34 @@ public class ProdCant extends PBase {
 		}
 
 		try {
-			if (cant<0)	lblCant.setText(""); else lblCant.setText(String.valueOf(cant));
-			if (porpeso) {
-                //tv=prec*cant;
-				tv=prec*peso;
-            } else {
-                tv=prec*cant;
-            }
+
+			if (gl.iddespacho !=null ) {
+				if (!gl.iddespacho.isEmpty()) {
+					if (permitirCantidadMayores(prodid, cant)){
+
+						if (cant<0)	lblCant.setText(""); else lblCant.setText(String.valueOf(cant));
+						if (porpeso) {
+							//tv=prec*cant;
+							tv=prec*peso;
+						} else {
+							tv=prec*cant;
+						}
+
+					}else{
+						txtCant.setText("");
+						throw new Exception ("El cliente no puede aumentar la cantidad asignada del producto");
+					}
+				}
+			}else{
+				if (cant<0)	lblCant.setText(""); else lblCant.setText(String.valueOf(cant));
+				if (porpeso) {
+					//tv=prec*cant;
+					tv=prec*peso;
+				} else {
+					tv=prec*cant;
+				}
+			}
+
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -1044,6 +1065,45 @@ public class ProdCant extends PBase {
 		}
 	}
 
+
+	private boolean permitirCantidadMayores(String prodid, double cant){
+		Cursor dt;
+        boolean rslt=true;
+
+		try{
+
+			if (gl.iddespacho !=null ){
+
+				if (!gl.iddespacho.isEmpty()) {
+
+					sql="SELECT PRODUCTO " +
+							" FROM DS_PEDIDOD " +
+							" WHERE (PRODUCTO='"+prodid+"') " +
+							" AND (COREL = '"+gl.iddespacho+"')" +
+							" AND (CANT < "+cant+") ";
+					dt=Con.OpenDT(sql);
+
+					if (dt.getCount()>0) {
+						//Validaremos si al cliente se le pueden vender cantidad mayores
+
+						if (gl.permitir_cantidad_mayor) {
+							//Si se le pueden vender cantidades mayores
+							return true;
+						} else {
+							//No se le pueden vender cantidades mayores
+							return false;
+						}
+
+					}
+					if(dt!=null) dt.close();
+				}
+			}
+
+		}catch (Exception ex){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
+		}
+		return rslt;
+	}
 
 	//endregion
 

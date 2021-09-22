@@ -2961,7 +2961,6 @@ public class Venta extends PBase {
 			lblTit.setText("Prefactura");
 
 			gl.coddespacho=gl.iddespacho;
-			//gl.iddespacho="";
 
 			clsClasses.clsDs_pedidod item;
 
@@ -2987,7 +2986,6 @@ public class Venta extends PBase {
 
 				//#CKFK 20210729 Obtener el precio del producto
 				getPrecio();
-
 
 				item.precio = prec;
 				item.imp= prc.imp;

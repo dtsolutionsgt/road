@@ -136,7 +136,18 @@ public class Producto extends PBase {
 						gl.um = item.um;
 						gl.pprodname = prname;
 
-						appProd();
+						if (gl.iddespacho != null){
+							if (!gl.iddespacho.isEmpty()){
+                                if (permitirProducto(itemid)){
+									appProd();
+								}else{
+                                	msgbox("El cliente no puede agregar productos nuevos");
+								}
+							}
+						}else{
+							appProd();
+						}
+
 					} catch (Exception e) {
 						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 						mu.msgbox(e.getMessage());
@@ -710,6 +721,41 @@ public class Producto extends PBase {
 
     }
 
+    private boolean permitirProducto(String prodid){
+		Cursor dt;
+        boolean rslt=true;
+
+		try{
+
+			if (gl.iddespacho !=null ){
+				if (!gl.iddespacho.isEmpty()) {
+
+					sql="SELECT PRODUCTO " +
+						" FROM DS_PEDIDOD " +
+						" WHERE (PRODUCTO='"+prodid+"') AND (COREL = '"+gl.iddespacho+"') ";
+					dt=Con.OpenDT(sql);
+
+					if (dt.getCount()==0) {
+						//Es un producto nuevo, validaremos si al cliente se le pueden vender productos nuevos
+
+						if (gl.permitir_producto_nuevo) {
+							//Si se le pueden vender productos nuevos
+								rslt = true;
+						} else {
+							//No se le pueden vender productos nuevos
+							rslt = false;
+						}
+
+					}
+					if(dt!=null) dt.close();
+				}
+			}
+
+		}catch (Exception ex){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),"");
+		}
+		return  rslt;
+	}
 
 	// Activity Events
 	

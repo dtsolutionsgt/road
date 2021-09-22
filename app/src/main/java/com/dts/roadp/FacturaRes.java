@@ -1090,7 +1090,7 @@ public class FacturaRes extends PBase {
 				ins.add("PRECIODOC",dt.getDouble(7));
 				ins.add("PESO",mu.round(dt.getDouble(8),3));
 				ins.add("VAL1",dt.getDouble(9));
-				ins.add("VAL2",dt.getString(10));
+				ins.add("VAL2",dt.getDouble(9));
 				ins.add("UMVENTA",dt.getString(11));
 
 				/*
@@ -1149,7 +1149,8 @@ public class FacturaRes extends PBase {
 			//region D_FACTURAD_MODIF
 
 			sql="SELECT COREL, ANULADO, PRODUCTO, CANTSOLICITADA, UMVENTASOLICITADA, PESOSOLICITADO, CANTENTREGADA, " +
-				"UMVENTAENTREGADA, PESOENTREGADO, IDRAZON, PEDCOREL, STATCOM, DESPCOREL FROM T_FACTURAD_MODIF";
+				"UMVENTAENTREGADA, PESOENTREGADO, IDRAZON, PEDCOREL, STATCOM, DESPCOREL FROM T_FACTURAD_MODIF " +
+			    "WHERE IDRAZON <> ''";
 			dt=Con.OpenDT(sql);
 
 			dt.moveToFirst();

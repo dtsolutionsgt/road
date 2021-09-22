@@ -541,14 +541,14 @@ public class CliDet extends PBase {
 
             lblPrior.setText("Categorización : "+prior);
 
-            lblProv.setText("Provincia : ");lblDist.setText("Distrito : ");
+            lblProv.setText("Provincia : ");lblDist.setText("Distrito/Corregimiento : ");
             try {
                 sql="SELECT DEPAR, NOMBRE FROM P_MUNI WHERE CODIGO='"+idmuni+"'";
                 DT=Con.OpenDT(sql);
                 DT.moveToFirst();
 
                 iddep=DT.getString(0);
-                lblDist.setText("Distrito : "+DT.getString(1));
+                lblDist.setText("Distrito/Corregimiento : "+DT.getString(1));
 
                 try {
                     sql="SELECT NOMBRE FROM P_DEPAR WHERE CODIGO='"+iddep+"'";

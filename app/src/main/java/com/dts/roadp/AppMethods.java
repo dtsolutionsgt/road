@@ -1180,6 +1180,8 @@ public class AppMethods {
 
 			sql="SELECT prn FROM Params";
 			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return "";
+
 			dt.moveToFirst();
 			prnid=dt.getString(0);
 

@@ -1243,6 +1243,7 @@ public class BaseDatosScript {
 					"[TELEFONO] TEXT NOT NULL,"+
 					"[DIRTIPO] TEXT NOT NULL,"+
 					"[DIRECCION] TEXT NOT NULL,"+
+                    "[MUNICIPIO] TEXT NOT NULL,"+
 					"[SUCURSAL] TEXT NOT NULL,"+
 					"[COORX] REAL NOT NULL,"+
 					"[COORY] REAL NOT NULL,"+
@@ -2014,7 +2015,6 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-
 			vSQL="CREATE TABLE [P_REF1] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
@@ -2176,6 +2176,30 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+            vSQL="CREATE TABLE [P_STOCK_PV] ("+
+                    "RUTA TEXT NOT NULL,"+
+                    "CODIGO TEXT NOT NULL,"+
+                    "CANT REAL NOT NULL,"+
+                    "PESO REAL NOT NULL,"+
+                    "CANT_SOL REAL NOT NULL,"+
+                    "PESO_SOL REAL NOT NULL,"+
+                    "UNIDADMEDIDA TEXT NOT NULL,"+
+                    "DOCUMENTO TEXT NOT NULL,"+
+                    "FECHA INTEGER NOT NULL,"+
+                    "ANULADO INTEGER NOT NULL,"+
+                    "CENTRO TEXT NOT NULL,"+
+                    "ESTADO TEXT NOT NULL,"+
+                    "ENVIADO INTEGER NOT NULL,"+
+                    "PRIMARY KEY ([RUTA],[CODIGO],[UNIDADMEDIDA],[DOCUMENTO])"+
+                    ");";
+            database.execSQL(vSQL);
+
+            vSQL="CREATE INDEX P_stock_pv_idx1 ON P_stock_pv(FECHA)";database.execSQL(vSQL);
+            vSQL="CREATE INDEX P_stock_pv_idx2 ON P_stock_pv(ANULADO)";database.execSQL(vSQL);
+            vSQL="CREATE INDEX P_stock_pv_idx3 ON P_stock_pv(ESTADO)";database.execSQL(vSQL);
+            vSQL="CREATE INDEX P_stock_pv_idx4 ON P_stock_pv(ENVIADO)";database.execSQL(vSQL);
+
+
             //#JP 20210831
             vSQL = "CREATE TABLE [P_CANAL](" +
                     "[CODIGO] TEXT NOT NULL," +
@@ -2200,7 +2224,16 @@ public class BaseDatosScript {
                     ");";
             database.execSQL(vSQL);
 
-			return 1;
+            //#JP 20210913
+            vSQL = "CREATE TABLE [P_DEPAR](" +
+                    "[CODIGO] TEXT NOT NULL," +
+                    "[AREA] TEXT NOT NULL," +
+                    "[NOMBRE] TEXT NOT NULL,"+
+                    "PRIMARY KEY ([CODIGO])"+
+                    ");";
+            database.execSQL(vSQL);
+
+            return 1;
 
 		} catch (SQLiteException e) {
 			msgbox(e.getMessage());
@@ -2463,29 +2496,6 @@ public class BaseDatosScript {
 					"VENDEDOR TEXT "+
 					");";
 			database.execSQL(vSQL);
-
-			vSQL="CREATE TABLE [P_STOCK_PV] ("+
-					"RUTA TEXT NOT NULL,"+
-					"CODIGO TEXT NOT NULL,"+
-					"CANT REAL NOT NULL,"+
-					"PESO REAL NOT NULL,"+
-					"CANT_SOL REAL NOT NULL,"+
-					"PESO_SOL REAL NOT NULL,"+
-					"UNIDADMEDIDA TEXT NOT NULL,"+
-					"DOCUMENTO TEXT NOT NULL,"+
-					"FECHA INTEGER NOT NULL,"+
-					"ANULADO INTEGER NOT NULL,"+
-					"CENTRO TEXT NOT NULL,"+
-					"ESTADO TEXT NOT NULL,"+
-					"ENVIADO INTEGER NOT NULL,"+
-					"PRIMARY KEY ([RUTA],[CODIGO],[UNIDADMEDIDA],[DOCUMENTO])"+
-					");";
-			database.execSQL(vSQL);
-
-			vSQL="CREATE INDEX P_stock_pv_idx1 ON P_stock_pv(FECHA)";database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_stock_pv_idx2 ON P_stock_pv(ANULADO)";database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_stock_pv_idx3 ON P_stock_pv(ESTADO)";database.execSQL(vSQL);
-			vSQL="CREATE INDEX P_stock_pv_idx4 ON P_stock_pv(ENVIADO)";database.execSQL(vSQL);
 
 			vSQL="CREATE TABLE [T_FACTURAD_MODIF]("+
 					"[COREL] TEXT NOT NULL,"+

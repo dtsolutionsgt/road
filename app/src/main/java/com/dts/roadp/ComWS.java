@@ -3238,7 +3238,7 @@ public class ComWS extends PBase {
 				SQL = " SELECT CODIGO,NOMBRE,BLOQUEADO,TIPONEG,TIPO,SUBTIPO,CANAL,SUBCANAL, ";
 				SQL += "NIVELPRECIO,MEDIAPAGO,LIMITECREDITO,DIACREDITO,DESCUENTO,BONIFICACION, ";
 				SQL += "dbo.AndrDate(ULTVISITA),IMPSPEC,INVTIPO,INVEQUIPO,INV1,INV2,INV3, NIT, MENSAJE, ";
-				SQL += "TELEFONO,DIRTIPO, DIRECCION,SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
+				SQL += "TELEFONO,DIRTIPO, DIRECCION,MUNICIPIO, SUCURSAL,COORX, COORY, FIRMADIG, CODBARRA, VALIDACREDITO, ";
 				SQL += "PRECIO_ESTRATEGICO, NOMBRE_PROPIETARIO, NOMBRE_REPRESENTANTE, ";
 				SQL += "BODEGA, COD_PAIS, FACT_VS_FACT, CHEQUEPOST, PERCEPCION, TIPO_CONTRIBUYENTE, ID_DESPACHO, ID_FACTURACION,MODIF_PRECIO, INGRESA_CANASTAS, PRIORIZACION ";
 				SQL += "FROM P_CLIENTE ";
@@ -3562,6 +3562,11 @@ public class ComWS extends PBase {
 			SQL = "SELECT * FROM P_MUNI";
 			return SQL;
 		}
+
+        if (TN.equalsIgnoreCase("P_DEPAR")) {
+            SQL = "SELECT * FROM P_DEPAR";
+            return SQL;
+        }
 
 		if (TN.equalsIgnoreCase("P_REF1")) {
 			SQL = "SELECT * FROM P_REF1";
@@ -4438,7 +4443,7 @@ public class ComWS extends PBase {
                 case 73:
                     nombretabla="P_CANALSUB";break;
                 case 74:
-                    nombretabla="P_PRIORIZACION";break;
+                    nombretabla="P_DEPAR";break;
                 case 75://#CKFK 20210813 Cambié esto para el final
                     nombretabla="Procesando tablas ...";break;
 

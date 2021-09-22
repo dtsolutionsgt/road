@@ -1627,6 +1627,18 @@ public class ComWS extends PBase {
 						}
 					}
 				}
+			}else if (delcmd.contains("commitSQL")){
+				//Corregir esto
+				str=xr;
+				if (str.equalsIgnoreCase("#")) {
+					listItems.add(delcmd);
+				} else {
+					idbg = idbg + str;
+					ftmsg = ftmsg + "\n" + str;
+					ftflag = true;
+					sstr = str;
+					return 0;
+				}
 			}
 
 			retFillTable= 1;

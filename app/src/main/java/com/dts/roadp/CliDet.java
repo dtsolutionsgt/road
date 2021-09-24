@@ -980,7 +980,6 @@ public class CliDet extends PBase {
 		browse = 2;
 		Intent intent = new Intent(this, editar_cliente.class);
 
-
 		gl.EditarClienteCodigo= cod;
 		gl.EditarClienteNombre = lblNom.getText().toString();
 		gl.EditarClienteRuc = lblRep.getText().toString();
@@ -1254,7 +1253,6 @@ public class CliDet extends PBase {
 	private void doExit(){
 		try{
 			gl.closeCliDet=true;
-			super.finish();
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -1266,7 +1264,8 @@ public class CliDet extends PBase {
 		String sql = "";
 
 		try {
-			sql="SELECT * FROM D_CLINUEVO WHERE CODIGO='"+cod+"'";
+			sql="SELECT CODIGO FROM D_CLINUEVO WHERE CODIGO='"+cod+"' " +
+					"UNION SELECT CODIGO FROM D_CLINUEVOT WHERE CODIGO='"+cod+"'";
 			dt=Con.OpenDT(sql);
 			if (dt.getCount()==0) return false;
 

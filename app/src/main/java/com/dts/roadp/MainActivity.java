@@ -724,6 +724,9 @@ public class MainActivity extends PBase {
             sql = "DELETE FROM D_CLIENTE_MODIF";
             db.execSQL(sql);
 
+            sql = "DELETE FROM D_CLINUEVOT";
+            db.execSQL(sql);
+
             sql = "DELETE FROM D_RATING";
             db.execSQL(sql);
 

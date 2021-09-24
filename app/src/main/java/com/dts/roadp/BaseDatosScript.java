@@ -421,6 +421,51 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+			vSQL="CREATE TABLE [D_CLINUEVOT] ("+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[RUTA] TEXT NOT NULL,"+
+					"[FECHA] INTEGER NOT NULL,"+
+					"[NOMBRE] TEXT NOT NULL,"+
+					"[NEGOCIO] TEXT NOT NULL,"+
+					"[DIRECCION] TEXT NOT NULL,"+
+					"[TELEFONO] TEXT NOT NULL,"+
+					"[NIT] TEXT NOT NULL,"+
+					"[TIPONEG] TEXT NOT NULL,"+
+					"[NIVPRECIO] INTEGER NOT NULL,"+
+					"[DIA1] TEXT NOT NULL,"+
+					"[DIA2] TEXT NOT NULL,"+
+					"[DIA3] TEXT NOT NULL,"+
+					"[DIA4] TEXT NOT NULL,"+
+					"[DIA5] TEXT NOT NULL,"+
+					"[DIA6] TEXT NOT NULL,"+
+					"[DIA7] TEXT NOT NULL,"+
+					"[ORDVIS] INTEGER NOT NULL,"+
+					"[BAND1] TEXT NOT NULL,"+
+					"[BAND2] TEXT NOT NULL,"+
+					"[STATCOM] TEXT NOT NULL,"+
+					"[IMAGEN] TEXT NOT NULL,"+
+					"[CODIGO_ERP] TEXT NOT NULL,"+
+					"[COORX] REAL NOT NULL,"+
+					"[COORY] REAL NOT NULL,"+
+					"[DEPARTAMENTO] TEXT NOT NULL,"+
+					"[MUNICIPIO] TEXT NOT NULL,"+
+					"[CIUDAD] TEXT NOT NULL,"+
+					"[EMAIL] TEXT NOT NULL,"+
+					"[CONTACTO] TEXT NOT NULL,"+
+					"[CANAL] TEXT NOT NULL,"+
+					"[SUBCANAL] TEXT NOT NULL,"+
+					"[VENDEDOR] TEXT NOT NULL,"+
+					"[CSPOLLO] REAL NOT NULL,"+
+					"[CSEMBUTIDO] REAL NOT NULL,"+
+					"[CSHUEVO] REAL NOT NULL,"+
+					"[CSRES] REAL NOT NULL,"+
+					"[CSCERDO] REAL NOT NULL,"+
+					"[CSCONGELADOS] REAL NOT NULL,"+
+					"[CSSALSAS] REAL NOT NULL,"+
+					"PRIMARY KEY ([CODIGO],[RUTA])"+
+					");";
+			database.execSQL(vSQL);
+
 			vSQL="CREATE INDEX D_CLINUEVO_idx1 ON D_CLINUEVO(STATCOM)";
 			database.execSQL(vSQL);
 

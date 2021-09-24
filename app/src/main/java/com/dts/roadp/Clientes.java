@@ -146,9 +146,13 @@ public class Clientes extends PBase {
 		try {
 			gl.tcorel = mu.getCorelBase();//gl.ruta/
 
-			//Intent intent = new Intent(this,CliNuevoApr.class);
-			Intent intent = new Intent(this, CliNuevo.class);
-			startActivity(intent);
+			if(gl.peModal.equalsIgnoreCase("TOL")) {
+				Intent intent = new Intent(this, CliNuevoT.class);
+				startActivity(intent);
+			} else {
+				Intent intent = new Intent(this, CliNuevo.class);
+				startActivity(intent);
+			}
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");

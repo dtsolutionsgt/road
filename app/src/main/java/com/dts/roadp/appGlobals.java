@@ -32,6 +32,8 @@ public class appGlobals extends Application {
 	public String prodCanasta, corelFac, devcord;
 	public boolean ingresaCanastas;
 	public String IdCanal, IdSubcanal, EditarClienteCodigo, EditarClienteNombre, EditarClienteCanal, EditarClienteSubcanal, EditarClienteRuc;
+	public String CliNombre,CliNit, CliDireccion, CliProvincia, CliDistrito, CliCiudad, CliTel, CliEmail, CliContacto, CliCsPollo, CliCsEmbutido,CliCsHuevo,
+			CliCsRes, CliCsCerdo, CliCsCongelados, CliCsSalsas, IdDep, IdMun, CliCodVen="", corelCliente="", CliNomVen;
 
     public ArrayList<clsClasses.clsPedItem> peditems= new ArrayList<clsClasses.clsPedItem>();
 
@@ -40,6 +42,8 @@ public class appGlobals extends Application {
 
 	//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true por defecto estará en false
 	public boolean debug=true;
+
+	public boolean gpsCliNuevo = false;
 
 	//Devolución Cliente
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;

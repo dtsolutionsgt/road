@@ -146,12 +146,11 @@ public class editar_cliente extends PBase {
                 }
             }
 
-            RegresarCLiDet();
+            Regresar();
 
         } catch (Exception e) {
             addlog(new Object() {
             }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-            db.endTransaction();
             mu.msgbox(e.getMessage());
         }
     }
@@ -185,13 +184,12 @@ public class editar_cliente extends PBase {
 
     private  void VerCanales() {
         Intent intent = new Intent(this, CanalSubcanal.class);
+        intent.putExtra("clase", "editar_cliente");
         startActivity(intent);
     }
 
-    private  void RegresarCLiDet() {
+    private  void Regresar() {
         limpiar();
-        Intent intent = new Intent(this, CliDet.class);
-        startActivity(intent);
         finish();
     }
 
@@ -228,7 +226,7 @@ public class editar_cliente extends PBase {
     @Override
     public void onBackPressed() {
         try{
-            RegresarCLiDet();
+            super.onBackPressed();
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }

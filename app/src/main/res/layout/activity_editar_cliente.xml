@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="10sp"
     tools:context=".editar_cliente">
 
     <RelativeLayout
@@ -15,12 +16,11 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:layout_centerVertical="true"
-            android:background="#9A999E" >
-        </RelativeLayout>
+            android:background="#9A999E"></RelativeLayout>
 
         <TextView
             android:id="@+id/txtRoadTit"
@@ -58,12 +58,12 @@
     <LinearLayout
         android:id="@+id/Formulario"
         android:layout_width="375dp"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/relRoad"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="39dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="15dp"
         android:orientation="vertical">
 
@@ -74,11 +74,10 @@
 
             <TextView
                 android:id="@+id/lblNombre"
-                android:layout_width="wrap_content"
+                android:layout_width="100sp"
                 android:layout_height="wrap_content"
-                android:text="Nombre: "
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:text="Nombre"
+                android:textSize="18sp" />
 
             <EditText
                 android:id="@+id/txtNombreCliente"
@@ -91,15 +90,15 @@
         <TableRow
             android:id="@+id/trNit"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
 
             <TextView
                 android:id="@+id/lblRuc"
-                android:layout_width="wrap_content"
+                android:layout_width="100sp"
                 android:layout_height="wrap_content"
-                android:text="RUC: "
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:text="RUC"
+                android:textSize="18sp" />
 
             <EditText
                 android:id="@+id/txtNitCliente"
@@ -112,19 +111,19 @@
         <TableRow
             android:id="@+id/trCanal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
 
             <TextView
                 android:id="@+id/lblCanal"
-                android:layout_width="wrap_content"
+                android:layout_width="100sp"
                 android:layout_height="wrap_content"
-                android:text="Canal: "
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:text="Canal"
+                android:textSize="18sp" />
 
             <EditText
                 android:id="@+id/txtCanalCliente"
-                android:layout_width="270sp"
+                android:layout_width="220sp"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textPersonName" />
@@ -140,15 +139,15 @@
         <TableRow
             android:id="@+id/trSubcanal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
 
             <TextView
                 android:id="@+id/lblSubcanal"
-                android:layout_width="wrap_content"
+                android:layout_width="100sp"
                 android:layout_height="wrap_content"
-                android:text="Subcanal: "
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:text="Subcanal"
+                android:textSize="18sp" />
 
             <EditText
                 android:id="@+id/txtSubCanalCliente"
@@ -165,7 +164,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/Formulario"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="39dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="15dp"
         android:src="@drawable/next48" />
 

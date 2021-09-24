@@ -2,78 +2,73 @@ package com.dts.roadp;
 
 import android.content.Intent;
 import android.database.Cursor;
-import com.dts.roadp.clsClasses.clsCanal;
-import com.dts.roadp.clsClasses.clsSubCanal;
-
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.os.Bundle;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class CanalSubcanal extends PBase {
-
-    private ListView listaCanales,listaSubcanal;
-    private TextView txtFiltroCanal, txtFiltroCanalSub;
+public class DepartamentoMun extends PBase {
+    private ListView listaDep,listaMun;
+    private TextView txtFiltroDep, txtFiltroMun;
     private ImageView btnAceptar;
 
-    private ArrayList<clsClasses.clsCanal> items = new ArrayList<clsClasses.clsCanal>();
-    private ArrayList<clsClasses.clsSubCanal> items1 = new ArrayList<clsClasses.clsSubCanal>();
-    private clsClasses.clsCanal selitem;
-    private clsClasses.clsSubCanal selitem1;
-    private ListAdaptCanal adapter;
-    private ListAdaptSubCanal adapter1;
+    private ArrayList<clsClasses.clsDepartamento> items = new ArrayList<clsClasses.clsDepartamento>();
+    private ArrayList<clsClasses.clsMunicipio> items1 = new ArrayList<clsClasses.clsMunicipio>();
+    private clsClasses.clsDepartamento selitem;
+    private clsClasses.clsMunicipio selitem1;
+    private ListAdaptDep adapter;
+    private ListAdaptMun adapter1;
+    private String depar;
     private int selidx,selidx1;
     private String selid="",selid1="", claseNombre;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_canal_subcanal);
+        setContentView(R.layout.activity_departamento_mun);
         super.InitBase();
         claseNombre = getIntent().getStringExtra("clase");
 
-        listaCanales =  (ListView) findViewById(R.id.listaCanales);
-        listaSubcanal =  (ListView) findViewById(R.id.listaSubcanal);
-        txtFiltroCanal = (TextView) findViewById(R.id.txtFiltroCanal);
-        txtFiltroCanalSub = (TextView) findViewById(R.id.txtFiltroCanalSub);
+        listaDep =  (ListView) findViewById(R.id.listaDep);
+        listaMun =  (ListView) findViewById(R.id.listaMun);
+        txtFiltroDep= (TextView) findViewById(R.id.txtFiltroDep);
+        txtFiltroMun = (TextView) findViewById(R.id.txtFiltroMun);
 
         btnAceptar = (ImageView)findViewById(R.id.btnAceptar);
 
-        ListaCanales();
+        ListaDepartamento();
         setHandlers();
 
         btnAceptar.setOnClickListener(new View.OnClickListener() {
-            @Override
+        @Override
             public void onClick(View view) {
-                setCanales();
+                setDepartamento();
             }
         });
 
     }
 
-    private void ListaCanales(){
+    private void ListaDepartamento(){
 
         Cursor DT;
-        clsCanal item;
+        clsClasses.clsDepartamento item;
 
         items.clear();
 
         String cadena;
-        cadena=txtFiltroCanal.getText().toString().replace("'","");
+        cadena=txtFiltroDep.getText().toString().replace("'","");
         cadena=cadena.replace("\r","");
 
         try {
 
-            sql="SELECT * FROM P_CANAL";
+            sql="SELECT CODIGO,NOMBRE FROM P_DEPAR";
 
             if (cadena.length()>0) {
                 sql=sql+" WHERE NOMBRE LIKE '%" + cadena + "%' OR CODIGO LIKE '%"+cadena+"%'";
@@ -86,7 +81,7 @@ public class CanalSubcanal extends PBase {
 
                 while (!DT.isAfterLast())
                 {
-                    item = clsCls.new clsCanal();
+                    item = clsCls.new clsDepartamento();
                     item.codigo=DT.getString(0);
                     item.nombre=DT.getString(1);
 
@@ -99,8 +94,8 @@ public class CanalSubcanal extends PBase {
 
             if(DT!=null) DT.close();
 
-            adapter = new ListAdaptCanal(this,items);
-            listaCanales.setAdapter(adapter);
+            adapter = new ListAdaptDep(this,items);
+            listaDep.setAdapter(adapter);
 
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -110,18 +105,19 @@ public class CanalSubcanal extends PBase {
 
     }
 
-    private void  ListaSubCanales(){
+    private void  ListaMunicipios(){
         Cursor DT;
-        clsSubCanal item1;
+        clsClasses.clsMunicipio item1;
         items1.clear();
 
         String cadena;
-        cadena=txtFiltroCanalSub.getText().toString().replace("'","");
+        cadena=txtFiltroMun.getText().toString().replace("'","");
         cadena=cadena.replace("\r","");
 
+        toast(gl.IdDep);
         try{
-            if (gl.IdCanal.length() > 0) {
-                sql="SELECT * FROM P_CANALSUB WHERE CANAL='" + gl.IdCanal + "'";
+            if (gl.IdDep.length() > 0) {
+                sql="SELECT CODIGO,NOMBRE FROM P_MUNI WHERE DEPAR='" + gl.IdDep + "'";
 
                 if (cadena.length()>0) {
                     sql=sql+" AND NOMBRE LIKE '%" + cadena + "%' OR CODIGO LIKE '%"+cadena+"%'";
@@ -134,11 +130,10 @@ public class CanalSubcanal extends PBase {
 
                     while (!DT.isAfterLast()) {
 
-                        item1 = clsCls.new clsSubCanal();
+                        item1 = clsCls.new clsMunicipio();
 
                         item1.codigo=DT.getString(0);
-                        //item1.canal=DT.getString(1);
-                        item1.nombre=DT.getString(2);
+                        item1.nombre=DT.getString(1);
 
                         items1.add(item1);
 
@@ -149,8 +144,8 @@ public class CanalSubcanal extends PBase {
 
                 if(DT!=null) DT.close();
 
-                adapter1=new ListAdaptSubCanal(this,items1);
-                listaSubcanal.setAdapter(adapter1);
+                adapter1=new ListAdaptMun (this,items1);
+                listaMun.setAdapter(adapter1);
             }
 
         }catch (Exception e){
@@ -164,49 +159,49 @@ public class CanalSubcanal extends PBase {
     private void setHandlers(){
 
         try {
-            listaCanales.setOnItemClickListener(new OnItemClickListener() {
+            listaDep.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    Object lvObj = listaCanales.getItemAtPosition(position);
+                    Object lvObj = listaDep.getItemAtPosition(position);
 
-                    clsCanal sitem = (clsCanal) lvObj;
+                    clsClasses.clsDepartamento sitem = (clsClasses.clsDepartamento) lvObj;
                     selitem = sitem;
 
                     selid=sitem.codigo;selidx=position;
                     adapter.setSelectedIndex(position);
 
                     if (selid!=""){
-                        gl.IdCanal = sitem.codigo;
-                        gl.EditarClienteCanal  = sitem.nombre;
+                        gl.IdDep = sitem.codigo;
+                        gl.CliProvincia  = sitem.nombre;
 
-                        ListaSubCanales();
+                        ListaMunicipios();
                     }
 
                 }
             });
 
-            listaSubcanal.setOnItemClickListener(new OnItemClickListener() {
+            listaMun.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    Object lvObj = listaSubcanal.getItemAtPosition(position);
+                    Object lvObj = listaMun.getItemAtPosition(position);
 
-                    clsSubCanal sitem = (clsSubCanal) lvObj;
+                    clsClasses.clsMunicipio sitem = (clsClasses.clsMunicipio) lvObj;
                     selitem1 = sitem;
 
                     selid1=sitem.codigo;selidx1=position;
                     adapter1.setSelectedIndex(position);
 
                     if (selid1!=""){
-                        gl.IdSubcanal = sitem.codigo;
-                        gl.EditarClienteSubcanal = sitem.nombre;
+                        gl.IdMun = sitem.codigo;
+                        gl.CliDistrito = sitem.nombre;
                     }
 
                 }
             });
 
-            txtFiltroCanal.addTextChangedListener(new TextWatcher() {
+            txtFiltroDep.addTextChangedListener(new TextWatcher() {
                 public void afterTextChanged(Editable s) {
                 }
 
@@ -215,15 +210,15 @@ public class CanalSubcanal extends PBase {
 
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     int tl;
-                    tl = txtFiltroCanal.getText().toString().length();
+                    tl = txtFiltroDep.getText().toString().length();
 
                     if (tl == 0 || tl > 1) {
-                        ListaCanales();
+                        ListaDepartamento();
                     }
                 }
             });
 
-            txtFiltroCanalSub.addTextChangedListener(new TextWatcher() {
+            txtFiltroMun.addTextChangedListener(new TextWatcher() {
                 public void afterTextChanged(Editable s) {
                 }
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -231,10 +226,10 @@ public class CanalSubcanal extends PBase {
 
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     int tl;
-                    tl = txtFiltroCanalSub.getText().toString().length();
+                    tl = txtFiltroMun.getText().toString().length();
 
                     if (tl == 0 || tl > 1) {
-                        ListaSubCanales();
+                        ListaMunicipios();
                     }
                 }
             });
@@ -246,17 +241,9 @@ public class CanalSubcanal extends PBase {
 
     }
 
-    private void setCanales() {
-        if (claseNombre.equalsIgnoreCase("editar_cliente")) {
-            Intent intent = new Intent(this, editar_cliente.class);
-            startActivity(intent);
-            super.finish();
-
-        } else if(claseNombre.equalsIgnoreCase("CliNuevoT")) {
-            Intent intent = new Intent(this, CliNuevoT.class);
-            startActivity(intent);
-            super.finish();
-        }
-
+    private void setDepartamento() {
+        Intent intent = new Intent(this, CliNuevoT.class);
+        startActivity(intent);
+        super.finish();
     }
 }

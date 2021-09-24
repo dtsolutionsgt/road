@@ -4681,7 +4681,7 @@ public class ComWS extends PBase {
 			}
 
 			//listaFachada();
-            envioFotos();
+            //envioFotos();
 
 			dbld.savelog();
 			dbld.saveArchivo(du.getActDateStr());
@@ -4701,6 +4701,7 @@ public class ComWS extends PBase {
 				if (scon == 1) {
 					if (commitSQL() == 1) {
 						errflag = false;
+						envioFotos();
 						return true;
 					} else {
 						errflag = true;
@@ -5719,10 +5720,14 @@ public class ComWS extends PBase {
 		int i, pc = 0, pcc = 0;
 
 		try {
-			sql = "SELECT CODIGO FROM D_CLINUEVO WHERE STATCOM='N'";
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				sql = "SELECT CODIGO FROM D_CLINUEVOT WHERE STATCOM ='N'";
+			} else {
+				sql = "SELECT CODIGO FROM D_CLINUEVO WHERE STATCOM='N'";
+			}
 			DT = Con.OpenDT(sql);
 			if (DT.getCount() == 0) {
-				senv += "Inventario : " + pc + "\n";
+				senv += "Cliente Nuevo : " + pc + "\n";
 				return;
 			}
 
@@ -5738,7 +5743,7 @@ public class ComWS extends PBase {
 				try {
 
 					i += 1;
-					fprog = "Inventario " + i;
+					fprog = "Cliente Nuevo " + i;
 					if (!esEnvioManual) {
 						wsStask.onProgressUpdate();
 					}
@@ -5747,18 +5752,28 @@ public class ComWS extends PBase {
 						dbld.clear();
 					}
 
-					dbld.insert("D_CLINUEVO", "WHERE CODIGO='" + cor + "'");
+					//dbld.insert("D_CLINUEVO", "WHERE CODIGO='" + cor + "'");
 					if (gl.peModal.equalsIgnoreCase("APR")) {
 						dbld.insert("D_CLINUEVO_APR", "WHERE CODIGO='" + cor + "'");
+					} else if(gl.peModal.equalsIgnoreCase("TOL")) {
+						dbld.insert("D_CLINUEVOT", "WHERE CODIGO ='"+cor+"'");
+					} else {
+						dbld.insert("D_CLINUEVO", "WHERE CODIGO='" + cor + "'");
 					}
 
 					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
 
-							sql = "UPDATE D_CLINUEVO SET STATCOM='S' WHERE CODIGO='" + cor + "'";
-							db.execSQL(sql);
+							//sql = "UPDATE D_CLINUEVO SET STATCOM='S' WHERE CODIGO='" + cor + "'";
+							//db.execSQL(sql);
 							if (gl.peModal.equalsIgnoreCase("APR")) {
 								sql = "UPDATE D_CLINUEVO_APR SET STATCOM='S' WHERE CODIGO='" + cor + "'";
+								db.execSQL(sql);
+							} else if (gl.peModal.equalsIgnoreCase("TOL")){
+								sql = "UPDATE D_CLINUEVOT SET STATCOM='S' WHERE CODIGO='" + cor + "'";
+								db.execSQL(sql);
+							} else {
+								sql = "UPDATE D_CLINUEVO SET STATCOM='S' WHERE CODIGO='" + cor + "'";
 								db.execSQL(sql);
 							}
 
@@ -6292,7 +6307,7 @@ public class ComWS extends PBase {
                     trid=trid.substring(0,pp);
                     fname=imagen.getAbsolutePath();
 
-                    if (sendFoto(trid,ruta,fname)==1) imagen.delete();
+                    if (sendFoto(trid,ruta,fname, gl.peModal)==1) imagen.delete();
                 } catch (Exception e) {
                 }
             }
@@ -6304,7 +6319,7 @@ public class ComWS extends PBase {
         return false;
     }
 
-    public int sendFoto(String codigo,String ruta,String fname) {
+    public int sendFoto(String codigo,String ruta,String fname, String modal) {
         String resstr="";
 
         METHOD_NAME = "saveImageCN";
@@ -6340,6 +6355,12 @@ public class ComWS extends PBase {
             param3.setName("imgdata");
             param3.setValue(strBase64);
             request.addProperty(param3);
+
+			PropertyInfo param4 = new PropertyInfo();
+			param4.setType(String.class);
+			param4.setName("modal");
+			param4.setValue(modal);
+			request.addProperty(param4);
 
             envelope.setOutputSoapObject(request);
 

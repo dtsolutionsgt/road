@@ -10,6 +10,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.graphics.Bitmap;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
 public class CliGPS extends PBase {
@@ -80,8 +82,15 @@ public class CliGPS extends PBase {
 
 	public void applyGPS(View view) {
 		try {
-			if (latitude == 0 && longitude == 0) {
+			if (latitude == 0 && longitude == 0 && !gl.gpsCliNuevo) {
 				askApply();
+			} else if(gl.gpsCliNuevo){
+				gl.gpspx = latitude;
+				gl.gpspy = longitude;
+
+				startActivity(new Intent(this, CliNuevoT.class));
+				gl.gpsCliNuevo = false;
+				super.finish();
 			} else {
 				updateItem(latitude, longitude);
 			}

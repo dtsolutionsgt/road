@@ -195,4 +195,16 @@ public class clsClasses {
 		public String canal;
 	}
 
+	public class clsDepartamento {
+		public String codigo;
+		public String area;
+		public String nombre;
+	}
+
+	public class clsMunicipio {
+		public String codigo;
+		public String depar;
+		public String nombre;
+	}
+
 }

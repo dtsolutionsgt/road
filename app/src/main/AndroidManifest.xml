@@ -32,17 +32,34 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ListaVendedores"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".DepartamentoMun"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".CliNuevoT"
-            android:exported="true" />
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".editar_cliente"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
+            android:noHistory="true"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
         <activity
             android:name=".CanalSubcanal"
-            android:exported="true" />
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden" />
 
         <service
             android:name=".srvBase"

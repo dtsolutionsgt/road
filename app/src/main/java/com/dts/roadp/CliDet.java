@@ -183,6 +183,10 @@ public class CliDet extends PBase {
 	//region  Events
 
 	public void showVenta(View view){
+
+		//#CKFK 20210922 Inicializa la variable del total de la devolución
+		gl.devtotal=0;
+
 		if (!permiteVenta) {
 			if (gl.peVentaGps==1) {
 				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 +"!\nPara realizar la venta debe acercarse más al cliente.");
@@ -256,7 +260,27 @@ public class CliDet extends PBase {
 				msgAskGPSVenta();
 			}
 		} else {
-			msgAskTipoDev();
+
+			if (gl.rutatipo.equals("D")){
+
+				if (!clicred){
+					clsDs_pedidoObj Ds_pedidoObj;
+
+					Ds_pedidoObj=new clsDs_pedidoObj(this,Con,db);
+					Ds_pedidoObj.fill("WHERE (CLIENTE='"+gl.cliente+"') AND (BANDERA='N')");
+
+					if (Ds_pedidoObj.count>0){
+						msgAskTipoDev();
+					}else{
+						msgbox("El cliente no tiene prefacturas, no puede hacer devoluciones");
+					}
+				}else{
+					msgAskTipoDev();
+				}
+
+			}else{
+				msgAskTipoDev();
+			}
 		}
 	}
 

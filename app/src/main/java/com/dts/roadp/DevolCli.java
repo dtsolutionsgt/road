@@ -544,9 +544,16 @@ public class DevolCli extends PBase {
 
 				gl.closeCliDet = true;
     			gl.closeVenta = true;
-                gl.devtotal = cntotl;
+
+    			//#CKFK 20210922 Puse esto en comentario porque no aplica realizar
+				// esta asignación cuando no tiene una factura asociada
+                //gl.devtotal = cntotl;
 
 				createDoc();
+
+				//#CKFK 20210922 Inicializa la variable del total de la devolución
+				gl.devtotal=0;
+
 				//msgAskSave("Aplicar pago y crear un recibo");
 
 			} else {

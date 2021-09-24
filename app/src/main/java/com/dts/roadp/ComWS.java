@@ -403,6 +403,8 @@ public class ComWS extends PBase {
 				toastcent("Por favor, espere que se termine la tarea actual.");return;
 			}
 
+			lblEnv.setVisibility(View.INVISIBLE);
+			imgEnv.setVisibility(View.INVISIBLE);
 
 			if (!gl.debug) {
 				if (!validaLicencia()) {
@@ -416,6 +418,8 @@ public class ComWS extends PBase {
 			if (gl.banderafindia) {
 				if (!puedeComunicar()) {
 					mu.msgbox("No ha hecho fin de día, no puede comunicar datos");
+					lblEnv.setVisibility(View.VISIBLE);
+					imgEnv.setVisibility(View.VISIBLE);
 					return;
 				}
 			}
@@ -425,6 +429,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle("Envio");
 			dialog.setMessage("¿Enviar datos?");
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -1519,7 +1524,8 @@ public class ComWS extends PBase {
 				licResult=(Integer) getSingle(xr,"checkLicenceResult",Integer.class);
 			}else if (nombretabla.contains("commitSQL")){
 				callMethod("Commit", "SQL", value);
-				xr=getXMLRegionSingle("CommitResponse");
+				xr=getXMLRegionSingle("CommitResult");
+				xr=(String) getSingle(xr,"CommitResult",String.class);
 			}else{
 
 				value=value.replace("&", "&amp;");

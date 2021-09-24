@@ -945,7 +945,7 @@ public class Anulacion extends PBase {
 			DT=Con.OpenDT(sql);
 
 			if(DT.getCount()>0){
-				sql="INSERT INTO P_STOCK SELECT PRODUCTO, CANT, CANTM, PESO, 0, LOTE, '',0,'N', '','',0,0,'', UNIDADMEDIDA " +
+				sql="INSERT INTO P_STOCK SELECT PRODUCTO, CANT, CANTM, PESO, 0, LOTE, '',0,'N', '','',0,0,'', UNIDADMEDIDA,0 " +
 						"FROM D_MOVD WHERE (COREL='"+itemid+"')";
 				db.execSQL(sql);
 			}
@@ -957,7 +957,7 @@ public class Anulacion extends PBase {
 				sql="INSERT INTO P_STOCKB " +
 					"SELECT M.RUTA, D.BARRA, D.PRODUCTO, 1, '' AS COREL, 0 AS PRECIO, D.PESO, '' AS DOCUMENTO, " +
 					" M.FECHA, 0 AS ANULADO, '' AS CENTRO, 'A' AS ESTATUS, " +
-					"0 AS ENVIADO, 0 AS CODIGOLIQUIDACION, '' AS COREL_D_MOV, D.UNIDADMEDIDA, '' AS DOCENTREGA " +
+					"0 AS ENVIADO, 0 AS CODIGOLIQUIDACION, '' AS COREL_D_MOV, D.UNIDADMEDIDA, '' AS DOCENTREGA, 0 " +
 					"FROM D_MOV M INNER JOIN D_MOVDB D ON M.COREL = D.COREL WHERE (M.COREL='"+itemid+"')";
 				db.execSQL(sql);
 			}

@@ -694,13 +694,20 @@ public class DevolBodCan extends PBase {
         long cantcan=0,cantstock=0,cantbolsa=0;
 
         try {
-            sql = "SELECT IFNULL(SUM(CANT),0) FROM D_CXC E INNER JOIN D_CXCD D ON  E.COREL = D.COREL WHERE E.ANULADO = 'N'";
+            sql = "SELECT IFNULL(SUM(CANT),0) FROM D_CXC E INNER JOIN D_CXCD D ON  " +
+                    " E.COREL = D.COREL WHERE E.ANULADO = 'N'";
             dt = Con.OpenDT(sql);
             if (dt!=null){
                 cantstock += dt.getLong(0);
             }
 
             sql = "SELECT IFNULL(SUM(CANTREC),0) FROM D_CANASTA WHERE ANULADO = 0";
+            dt = Con.OpenDT(sql);
+            if (dt!=null){
+                cantstock += dt.getLong(0);
+            }
+
+            sql = "SELECT IFNULL(SUM(CANT),0) FROM P_STOCK ";
             dt = Con.OpenDT(sql);
             if (dt!=null){
                 cantstock += dt.getLong(0);
@@ -725,7 +732,8 @@ public class DevolBodCan extends PBase {
         }
 
         try {
-            sql="SELECT IFNULL(SUM(CANT),0) FROM D_CXC E INNER JOIN D_CXCD D ON  E.COREL = D.COREL WHERE E.ANULADO = 'N'";
+            sql="SELECT IFNULL(SUM(CANT),0) FROM D_CXC E INNER JOIN D_CXCD D " +
+                " ON  E.COREL = D.COREL WHERE E.ANULADO = 'N'";
             dt=Con.OpenDT(sql);
 
             cantcan=dt.getLong(0);

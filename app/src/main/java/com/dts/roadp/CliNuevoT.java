@@ -138,7 +138,7 @@ public class CliNuevoT extends PBase {
     }
 
     private void setCorel() {
-        gl.corelCliente = gl.ruta + mu.getCorelBase();
+        gl.corelCliente = mu.getCorelBase();
     }
 
     private void GuardarCliente() {

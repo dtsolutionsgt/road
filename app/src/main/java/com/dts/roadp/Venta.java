@@ -1395,8 +1395,9 @@ public class Venta extends PBase {
 
 			if (rutatipo.equalsIgnoreCase("V") || rutatipo.equalsIgnoreCase("D") ) {
 				if (cantDesp > idisp) {
+					cantDesp = idisp;
 					respuesta = "Cantidad mayor que disponible.";
-					return respuesta;
+					//return respuesta;
 				}
 			}
 
@@ -1415,12 +1416,12 @@ public class Venta extends PBase {
 				}
 			} else {
 				if(Double.isNaN(pesostock))	pesostock=1;
-				if (pesoprom == 0) ppeso = pesostock * cant;
-				else ppeso = pesoprom * cant;
+				if (pesoprom == 0) ppeso = pesostock * cantDesp;
+				else ppeso = pesoprom * cantDesp;
 			}
 
 			if (porpeso && (gl.rutatipo.equalsIgnoreCase("V") || gl.rutatipo.equalsIgnoreCase("D"))) {
-				if (!checkLimits(ppeso,cant*umfactor)) {
+				if (!checkLimits(ppeso,cantDesp*umfactor)) {
 					respuesta = "Peso incorrecto";
 					return respuesta;
 				}
@@ -1428,7 +1429,7 @@ public class Venta extends PBase {
 
 			ppeso=mu.round(ppeso,3);
 
-			gl.dval = cant;
+			gl.dval = cantDesp;
 			gl.dpeso = ppeso;
 			gl.um = upres;
 			gl.umpres = upres;
@@ -2954,7 +2955,7 @@ public class Venta extends PBase {
     //region Despacho
 
 	private void procesaDespacho() {
-		String umv,ums;
+		String umv,ums, respuesta;
         int cantProdBarra = 0;
 
 		try {
@@ -2998,7 +2999,25 @@ public class Venta extends PBase {
 
 						if (getDisp(item.producto, item.umventa) > 0){
 
-							if (applyCant(cant,gl.dpeso).equals("")){
+							respuesta=applyCant(cant,gl.dpeso);
+
+							if (respuesta.equals("Cantidad mayor que disponible.")){
+								respuesta="";
+								item.cant = gl.dval;
+								cant = item.cant;
+								item.peso = gl.dpeso;
+
+								//#CKFK 20210927 Vuelvo a obtener el precio del producto para obtener el total a facturar
+								getPrecio();
+
+								item.precio = prec;
+								item.imp= prc.imp;
+								item.des = desc;
+								item.desmon = prc.descmon;
+								item.total = prodtot;
+							}
+
+							if (respuesta.equals("")){
 
 								ins.init("T_VENTA");
 								ins.add("PRODUCTO",item.producto);

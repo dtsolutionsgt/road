@@ -126,39 +126,80 @@ public class activity_despacho_list extends PBase {
 
     private void iniciaVenta() {
         Cursor DT;
+        Float cantidad;
+        gl.rutatipo="D";
+        cantidad = Float.valueOf(CantExistencias());
 
-        gl.closeCliDet = false;
-        gl.closeVenta = false;
-        gl.credito=0;
-        gl.banderaCobro = false;
-        gl.rutatipo="V";
+        if(cantidad == 0){
+            if (gl.rutatipo.equalsIgnoreCase("D")) {
+                msgbox("No hay existencias disponibles, no podrá realizar las prefacturas");
+            }
+        }else{
+            gl.closeCliDet = false;
+            gl.closeVenta = false;
+            gl.credito=0;
+            gl.banderaCobro = false;
+            gl.rutatipo="V";
+
+            try {
+
+                sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
+                        "COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO "+
+                        "FROM P_CLIENTE WHERE CODIGO='"+gl.cliente+"'";
+                DT=Con.OpenDT(sql);
+                DT.moveToFirst();
+
+                gl.nivel=DT.getInt(6);
+                gl.percepcion=DT.getDouble(7);
+                gl.contrib=""+DT.getString(8);;
+                gl.media=DT.getInt(11);
+                gl.fnombre=DT.getString(0);
+                gl.fnit=DT.getString(12);
+                gl.fdir=DT.getString(2);
+                gl.vcredito = DT.getString(13).equalsIgnoreCase("S");
+                gl.vcheque = DT.getString(14).equalsIgnoreCase("S");
+                gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
+                gl.clitipo = DT.getString(16);
+
+                startActivity(new Intent(activity_despacho_list.this,Venta.class));
+                finish();
+            } catch (Exception e) {
+                msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+            }
+        }
+    }
+
+    public float CantExistencias() {
+        Cursor DT;
+        float cantidad=0,cantb=0;
 
         try {
 
-            sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
-                    "COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO "+
-                    "FROM P_CLIENTE WHERE CODIGO='"+gl.cliente+"'";
-            DT=Con.OpenDT(sql);
-            DT.moveToFirst();
+            sql = "SELECT P_STOCK.CODIGO,P_PRODUCTO.DESCLARGA,P_STOCK.CANT,P_STOCK.CANTM,P_STOCK.UNIDADMEDIDA,P_STOCK.LOTE,P_STOCK.DOCUMENTO,P_STOCK.CENTRO,P_STOCK.STATUS " +
+                    "FROM P_STOCK INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO=P_STOCK.CODIGO  WHERE 1=1 ";
+            if (Con != null){
+                DT = Con.OpenDT(sql);
+                cantidad = DT.getCount();
+            }else {
+                cantidad = 0;
+            }
 
-            gl.nivel=DT.getInt(6);
-            gl.percepcion=DT.getDouble(7);
-            gl.contrib=""+DT.getString(8);;
-            gl.media=DT.getInt(11);
-            gl.fnombre=DT.getString(0);
-            gl.fnit=DT.getString(12);
-            gl.fdir=DT.getString(2);
-            gl.vcredito = DT.getString(13).equalsIgnoreCase("S");
-            gl.vcheque = DT.getString(14).equalsIgnoreCase("S");
-            gl.vchequepost = DT.getString(15).equalsIgnoreCase("S");
-            gl.clitipo = DT.getString(16);
+            sql = "SELECT BARRA FROM P_STOCKB";
+            if (Con != null){
+                DT = Con.OpenDT(sql);
+                cantb = DT.getCount();
 
-            startActivity(new Intent(activity_despacho_list.this,Venta.class));
-            finish();
+                if(DT!=null) DT.close();
+            }else {
+                cantb = 0;
+            }
+
+            cantidad=cantidad+cantb;
         } catch (Exception e) {
-            msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+            return 0;
         }
 
+        return cantidad;
     }
 
     private void listaModificacion(){

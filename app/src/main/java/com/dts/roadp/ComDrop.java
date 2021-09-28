@@ -348,8 +348,15 @@ public class ComDrop extends Activity {
 		    db.execSQL(vSQL);
 		} catch (Exception e) {
 			MU.msgbox(e.getMessage());
-		}		
-		
+		}
+
+		try {
+			vSQL="UPDATE D_DESPACHOD_NO_ENTREGADO SET STATCOM='S'";
+			db.execSQL(vSQL);
+		} catch (Exception e) {
+			MU.msgbox(e.getMessage());
+		}
+
 	}
 	
 	

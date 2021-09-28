@@ -461,7 +461,6 @@ public class clsFinDia extends PBase{
             }
             //sql="DELETE FROM D_MOVD WHERE CODIGOLIQUIDACION=0";db.execSQL(sql);
 
-
             sql="SELECT CODIGO FROM D_CLINUEVO WHERE STATCOM='S'";
             DT=Con.OpenDT(sql);
             if (DT.getCount()>0) {
@@ -475,6 +474,20 @@ public class clsFinDia extends PBase{
                     DT.moveToNext();
                 }
             }
+
+            //#CKFK 20210928 Agregué el cliente nuevo de Toledano
+            sql="SELECT CODIGO FROM D_CLINUEVOT WHERE STATCOM='S'";
+            DT=Con.OpenDT(sql);
+            if (DT.getCount()>0) {
+
+                DT.moveToFirst();
+                while (!DT.isAfterLast()) {
+                    corel=DT.getString(0);
+                    sql="DELETE FROM D_CLINUEVOT WHERE CODIGO='"+corel+"'";db.execSQL(sql);
+                    DT.moveToNext();
+                }
+            }
+
 
             sql="SELECT COREL FROM D_CLIENTE_MODIF WHERE STATCOM='S'";
             DT=Con.OpenDT(sql);
@@ -519,7 +532,6 @@ public class clsFinDia extends PBase{
                 }
             }
 
-
             sql="SELECT COREL FROM D_SOLICINV WHERE STATCOM='S'";
             DT=Con.OpenDT(sql);
             if (DT.getCount()>0) {
@@ -530,6 +542,20 @@ public class clsFinDia extends PBase{
                     sql="DELETE FROM D_SOLICINV WHERE COREL='"+corel+"'";db.execSQL(sql);
                     sql="DELETE FROM D_SOLICINVD WHERE COREL='"+corel+"'";db.execSQL(sql);
 
+                    DT.moveToNext();
+                }
+            }
+
+            //#CKFK 20210928 Agregué el delete de los pedidos
+            sql="SELECT COREL FROM DS_PEDIDO WHERE BANDERA='S'";
+            DT=Con.OpenDT(sql);
+            if (DT.getCount()>0) {
+
+                DT.moveToFirst();
+                while (!DT.isAfterLast()) {
+                    corel=DT.getString(0);
+                    sql="DELETE FROM DS_PEDIDO WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM DS_PEDIDOD WHERE COREL='"+corel+"'";db.execSQL(sql);
                     DT.moveToNext();
                 }
             }

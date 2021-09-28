@@ -2,6 +2,7 @@ package com.dts.roadp;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -941,13 +942,15 @@ public class CliDet extends PBase {
 
 	public void VerificaCantidadDesp(){
 		Float cantidad;
-		gl.rutatipo="V";
+		gl.rutatipo="D";
 		//Asigna conexión actual a la forma de Existencias.
 		cantidad = Float.valueOf(CantExistencias());
 
 		try{
 			if(cantidad == 0){
-                //if (gl.rutatipo.equalsIgnoreCase("V")) mu.msgbox("No hay existencias disponibles.");
+                if (gl.rutatipo.equalsIgnoreCase("D")) {
+					msgAskListaPedidos("No hay existencias disponibles ¿Quiere continuar?");
+				}
             }else{
 				try {
 					startActivity(new Intent(this, activity_despacho_list.class));
@@ -1566,6 +1569,42 @@ public class CliDet extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 	}
+
+	private void msgAskListaPedidos(String msg) {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Road");
+			dialog.setMessage(msg);
+			dialog.setCancelable(false);
+
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if (gl.rutatipo.equalsIgnoreCase("D")) {
+						try {
+							startActivity(new Intent(CliDet.this, activity_despacho_list.class));
+						} catch (Exception e) {
+							addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+						}
+					}
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
+
 
 	//endregion
 

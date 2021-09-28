@@ -2999,7 +2999,7 @@ public class Venta extends PBase {
 
 						if (getDisp(item.producto, item.umventa) > 0){
 
-							respuesta=applyCant(cant,gl.dpeso);
+							respuesta=applyCant(item.cant,item.peso);
 
 							if (respuesta.equals("Cantidad mayor que disponible.")){
 								respuesta="";
@@ -3588,10 +3588,10 @@ public class Venta extends PBase {
 
 				if (prodPorPeso(producto)){
 					sql = "SELECT PRODUCTO, CANT, UMSTOCK FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
-							" AND CANT = " + cant + " AND UMSTOCK = '" + UM + "'";
+							" AND UMSTOCK = '" + UM + "'";
 				}else{
 					sql = "SELECT PRODUCTO, CANT, UM FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
-							" AND CANT = " + cant + " AND UM = '" + UM + "'";
+							" AND UM = '" + UM + "'";
 				}
 
             	DT = Con.OpenDT(sql);

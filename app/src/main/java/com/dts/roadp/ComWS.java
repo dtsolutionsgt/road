@@ -3707,7 +3707,7 @@ public class ComWS extends PBase {
 			SQL = " SELECT COREL, ANULADO, dbo.AndrDate(FECHA), EMPRESA, RUTA, VENDEDOR, CLIENTE, KILOMETRAJE, dbo.AndrDate(FECHAENTR), DIRENTREGA, " +
 					" TOTAL, DESMONTO, IMPMONTO, PESO, BANDERA, STATCOM, CALCOBJ, IMPRES, ADD1, ADD2, ADD3 "+
 					" FROM DS_PEDIDO " +
-					" WHERE RUTA='" + ActRuta + "' AND (ANULADO='N') " +
+					" WHERE RUTA='" + ActRuta + "' AND (ANULADO='N') AND (STATCOM = 'N') " +
 					"AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') ";
 			return SQL;
 		}
@@ -3880,6 +3880,7 @@ public class ComWS extends PBase {
 				db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
 				db.execSQL("UPDATE D_RATING SET STATCOM='S'");
 				db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
+				db.execSQL("UPDATE D_DESPACHOD_NO_ENTREGADO SET STATCOM='S'");
 				db.execSQL("UPDATE FINDIA SET VAL5=0, VAL4=0,VAL3=0, VAL2=0");
 				db.setTransactionSuccessful();
 				db.endTransaction();
@@ -3914,6 +3915,7 @@ public class ComWS extends PBase {
 			db.execSQL("UPDATE D_SOLICINV SET STATCOM='S'");
 			db.execSQL("UPDATE D_MOVD SET CODIGOLIQUIDACION=0");
 			db.execSQL("UPDATE D_RATING SET STATCOM='S'");
+			db.execSQL("UPDATE D_DESPACHOD_NO_ENTREGADO SET STATCOM='S'");
 			db.execSQL("UPDATE P_RUTA SET PARAM2 = ''");
 			db.setTransactionSuccessful();
 			db.endTransaction();
@@ -4516,6 +4518,7 @@ public class ComWS extends PBase {
 
 		dbld.clearlog();
 		dbld.clear();
+		senv = "";
 
 		try {
 

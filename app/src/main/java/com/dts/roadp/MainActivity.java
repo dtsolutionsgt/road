@@ -44,8 +44,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.5.26 / ";
-    private String parFechaVer = "23-09-2021";
+    private String parNumVer = "9.5.27 / ";
+    private String parFechaVer = "28-09-2021";
     private String parTipoVer = "ROAD QAS";
 
     @Override
@@ -728,6 +728,9 @@ public class MainActivity extends PBase {
             db.execSQL(sql);
 
             sql = "DELETE FROM D_RATING";
+            db.execSQL(sql);
+
+            sql = "DELETE FROM D_DESPACHOD_NO_ENTREGADO";
             db.execSQL(sql);
 
             db.setTransactionSuccessful();

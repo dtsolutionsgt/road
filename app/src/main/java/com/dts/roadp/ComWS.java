@@ -1515,17 +1515,24 @@ public class ComWS extends PBase {
 				}
 				cargasuper = iRutaSupervisor == 1;
 			}else if (nombretabla.contains("checkLicenceRuta")){
+
 				callMethod("checkLicenceRuta", "Ruta",ruta);
 				xr=getXMLRegionSingle("checkLicenceRutaResult");
 				licResultRuta=(Integer) getSingle(xr,"checkLicenceRutaResult",Integer.class);
+
 			}else if (nombretabla.contains("checkLicence")){
-				callMethod("checkLicence","Serial",licSerial);
+
+				callMethod("checkLicence","Serial",licSerial,"Name", gl.devicename, "Ruta",ruta);
+
 				xr=getXMLRegionSingle("checkLicenceResult");
 				licResult=(Integer) getSingle(xr,"checkLicenceResult",Integer.class);
+
 			}else if (nombretabla.contains("commitSQL")){
+
 				callMethod("Commit", "SQL", value);
 				xr=getXMLRegionSingle("CommitResult");
 				xr=(String) getSingle(xr,"CommitResult",String.class);
+
 			}else{
 
 				value=value.replace("&", "&amp;");
@@ -3962,13 +3969,27 @@ public class ComWS extends PBase {
 	}
 
 	private void encodeLicence() {
-		String lic;
+		String licD, LicR;
 
 		try {
-			if (licResult == 1) lic = licSerialEnc;
-			else lic = "";
-			sql = "UPDATE Params SET lic='" + lic + "'";
-			dbT.execSQL(sql);
+
+			if (licResult == 1) {
+				licD = licSerialEnc;
+				sql = "UPDATE Params SET lic='" + lic + "'";
+				dbT.execSQL(sql);
+			}else{
+				if (licResult == 2) {
+					LicR = licRutaEnc;
+					licD = licSerialEnc;
+					sql = "UPDATE Params SET lic='" + licD + "', licparam='" + LicR + "'";
+					dbT.execSQL(sql);
+
+				}else{
+					LicR = "";
+					licD = "";
+				}
+			}
+
 		} catch (Exception e) {
 			msgbox(new Object() {
 			}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());

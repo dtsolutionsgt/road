@@ -2278,6 +2278,7 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			fprog = "Actualización incompleta";
 			wsRtask.onProgressUpdate();
+			isbusy = 0;
 
 			Log.e("Error", e.getMessage());
 			try {
@@ -2517,6 +2518,7 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			fprog = "Actualización incompleta";
+			isbusy = 0;
 			wsRtask.onProgressUpdate();
 
 			Log.e("Error", e.getMessage());

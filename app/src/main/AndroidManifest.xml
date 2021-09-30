@@ -31,7 +31,14 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ped_rechazados"></activity>
+        <activity
+            android:name=".VistaPrevPedido"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"
+            android:exported="true"/>
+        <activity android:name=".ped_rechazados" />
         <activity android:name=".list_view_ped_rechazados" />
         <activity android:name=".ComWSSend" />
         <activity android:name=".comWSFotosCli" />

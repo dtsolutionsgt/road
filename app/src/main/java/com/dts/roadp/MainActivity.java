@@ -62,11 +62,11 @@ public class MainActivity extends PBase {
 
     // Grant permissions
     private void grantPermissions() {
-
         try {
             if (Build.VERSION.SDK_INT >= 20) {
 
                 if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                        && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                         && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                         && checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED
                         && checkCallingOrSelfPermission(Manifest.permission.WAKE_LOCK) == PackageManager.PERMISSION_GRANTED
@@ -76,6 +76,7 @@ public class MainActivity extends PBase {
                 } else {
                     ActivityCompat.requestPermissions(this,
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                    Manifest.permission.READ_EXTERNAL_STORAGE,
                                     Manifest.permission.ACCESS_FINE_LOCATION,
                                     Manifest.permission.CALL_PHONE,
                                     Manifest.permission.CAMERA,

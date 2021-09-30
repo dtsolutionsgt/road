@@ -259,7 +259,8 @@ public class Reimpresion extends PBase {
 			if (tipo==0) {
 				sql="SELECT D_PEDIDO.COREL,P_CLIENTE.NOMBRE,D_PEDIDO.FECHA,D_PEDIDO.TOTAL "+
 						"FROM D_PEDIDO INNER JOIN P_CLIENTE ON D_PEDIDO.CLIENTE=P_CLIENTE.CODIGO "+
-						"WHERE (D_PEDIDO.ANULADO='N') AND (D_PEDIDO.STATCOM='N') ORDER BY D_PEDIDO.COREL DESC ";
+						"WHERE (D_PEDIDO.ANULADO='N') ORDER BY D_PEDIDO.COREL DESC";
+						//AND (D_PEDIDO.STATCOM='N') #Carolina pidió que lo quitara
 			}
 
 			if (tipo==1) {

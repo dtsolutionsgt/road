@@ -9,6 +9,7 @@ import android.database.SQLException;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -20,7 +21,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-
+import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -39,70 +40,72 @@ public class PedidoRes extends PBase {
 	private EditText txtReferencia;
 	private TextView lblFecha;
 	private ImageView imgBon;
-	private ImageView imgSave;
+	private ImageView imgSave, imgPedidoPrev;
 	private Spinner spinList;
 	private ProgressBar pgSave;
-	
+
 	private List<String> spname = new ArrayList<String>();
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
 	private ListAdaptTotals adapter;
-	
+
 	private Runnable printcallback,printclose,printexit;
-	
+
 	private clsDescGlob clsDesc;
 	private printer prn;
 	private clsDocPedido pdoc;
-	
+	private clsPedidoPrev ppdoc;
+
 	private long fecha,fechae;
 	private String itemid,cliid,corel;
 	private int cyear, cmonth, cday,dweek,impres;
-	
+
 	private double dmax,dfinmon,descpmon,descg,descgmon,tot,stot0,stot,descmon,totimp,totperc;
 	private boolean acum,cleandprod;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_pedido_res);
-		
+
 		super.InitBase();
 		addlog("PedidoRes",""+du.getActDateTime(),gl.vend);
-		
+
 		listView = (ListView) findViewById(R.id.listView1);
 		txtDir = (EditText) findViewById(R.id.txtMonto);
 		txtReferencia = (EditText) findViewById(R.id.txtReferencia);
 		lblFecha = (TextView) findViewById(R.id.lblpSaldo);
 		imgBon = (ImageView) findViewById(R.id.imgDevol);
 		imgSave = (ImageView) findViewById(R.id.imgWhatsApp);
+		imgPedidoPrev = (ImageView) findViewById(R.id.imgPedidoPrev);
 		pgSave = (ProgressBar) findViewById(R.id.pgSave);
 
 		pgSave.setVisibility(View.INVISIBLE);
 		imgSave.setVisibility(View.VISIBLE);
 
 		spinList = (Spinner) findViewById(R.id.spinner1);
-		
+
 		cliid=gl.cliente;
 		gl.pedsend = false;
-		
+
 		setActDate();
 		fechae=fecha;
 		lblFecha.setText(du.sfecha_yyyy(fechae));
 		dweek=mu.dayofweek();
-		
+
 		clsDesc=new clsDescGlob(this);
-		
+
 		adjustSpinner();
 		fillSpinner();
-		
+
 		descpmon=totalDescProd();
-		
+
 		dmax=clsDesc.dmax;
 		acum=clsDesc.acum;
 
 		processFinalPromo();
-		
+
 	    processFinalPromo();
-		
+
 		printcallback= new Runnable() {
 		    public void run() {
 		    	askPrint();
@@ -125,26 +128,55 @@ public class PedidoRes extends PBase {
 		prn=new printer(this,printexit,gl.validimp);
 		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp, "");
 		pdoc.deviceid =gl.numSerie;
+
+		imgPedidoPrev.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				setVistaPrevia();
+			}
+		});
 	}
-		
-	
+	public void setVistaPrevia() {
+		boolean result;
+		ppdoc = new clsPedidoPrev(this,prn.prw,gl.peMon,gl.peDecImp, "vistaPedidop.txt");
+		result = ppdoc.buildPrint(gl.cliente, 0);
+
+		if (result) {
+			Toast.makeText(this, "Vista previa generada con éxito", Toast.LENGTH_SHORT).show();
+
+			startActivity(new Intent(this, VistaPrevPedido.class));
+			/*try {
+				File file= new File(Environment.getExternalStorageDirectory(), "vistaPedidop.txt");
+				Uri uri = Uri.fromFile(file);
+
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				intent.setDataAndType(uri, "text/plain");
+				startActivity(intent);
+
+			} catch (Exception e) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			}*/
+		}
+
+	}
+
 	// Events
-	
+
 	public void showBon(View view) {
 		Intent intent = new Intent(this,BonVenta.class);
-		startActivity(intent);	
+		startActivity(intent);
 	}
-	
-	
+
 	// Main
-	
+
 	private void processFinalPromo(){
-		
+
 		descg=gl.descglob;
-		
+
 		descgmon=(double) (stot0*descg/100);
 		totalOrder();
-		
+
 		if (descg>0) {
 			try{
 				final Handler handler = new Handler();
@@ -160,23 +192,23 @@ public class PedidoRes extends PBase {
 			}
 		}
 	}
-	
+
 	public void showPromo(){
 		try {
 			browse=1;
 			gl.promprod="";
 			gl.promcant=0;
 			gl.promdesc=descg;
-			
+
 			Intent intent = new Intent(this,DescBon.class);
-			startActivity(intent);	
+			startActivity(intent);
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox( e.getMessage());
 		}
-		
+
 	}
-	
+
 	private void updDesc(){
 		try{
 			descg=gl.promdesc;
@@ -187,10 +219,10 @@ public class PedidoRes extends PBase {
 		}
 
 	}
-	
+
 	private void totalOrder(){
 		double dmaxmon;
-		
+
 		cleandprod=false;
 
 		try{
@@ -221,77 +253,77 @@ public class PedidoRes extends PBase {
 		}
 
 	}
-	
+
 	private void fillTotals() {
-		clsClasses.clsCDB item;	
-		
+		clsClasses.clsCDB item;
+
 		items.clear();
-		
+
 		try {
-			
+
 			if (gl.sinimp) {
-				
+
 				totimp=mu.round2(totimp);
 				stot=stot-totimp;
-				
+
 				totperc=stot*(gl.percepcion/100);
 				totperc=mu.round2(totperc);
-				
+
 				tot=stot+totimp-descmon+totperc;
 				tot=mu.round2(tot);
-								
-				
+
+
 				item = clsCls.new clsCDB();
 				item.Cod="Subtotal";item.Desc=mu.frmcur(stot);item.Bandera=0;
 				items.add(item);
-				
+
 				item = clsCls.new clsCDB();
 				item.Cod="Impuesto";item.Desc=mu.frmcur(totimp);item.Bandera=0;
-				items.add(item);				
-		
+				items.add(item);
+
 				if (gl.contrib.equalsIgnoreCase("C")) {
 					item = clsCls.new clsCDB();
 					item.Cod="Percepcion";item.Desc=mu.frmcur(totperc);item.Bandera=0;
 					items.add(item);
 				}
-				
+
 				item = clsCls.new clsCDB();
 				item.Cod="Descuento";item.Desc=mu.frmcur(-descmon);item.Bandera=0;
 				items.add(item);
-				
+
 				item = clsCls.new clsCDB();
 				item.Cod="TOTAL";item.Desc=mu.frmcur(tot);item.Bandera=1;
-				items.add(item);					
-				
+				items.add(item);
+
 			} else {
-								
+
 				totimp=mu.round2(totimp);
 				tot=stot-descmon;
 				tot=mu.round2(tot);
-				
-				
+
+
 				item = clsCls.new clsCDB();
 				item.Cod="Subtotal";item.Desc=mu.frmcur(stot);item.Bandera=0;
 				items.add(item);
-				
+
 				item = clsCls.new clsCDB();
 				item.Cod="Descuento";item.Desc=mu.frmcur(-descmon);item.Bandera=0;
 				items.add(item);
-				
+
 				item = clsCls.new clsCDB();
 				item.Cod="TOTAL";item.Desc=mu.frmcur(tot);item.Bandera=1;
-				items.add(item);			
-				
+				items.add(item);
+
 			}
-					
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-		
+
 		adapter=new ListAdaptTotals(this,items);
 		listView.setAdapter(adapter);
 	}
-	
+
  	private void finishOrder(){
 
 		try{
@@ -339,32 +371,32 @@ public class PedidoRes extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		
+
 	}
- 	
+
 	private void singlePrint() {
  		prn.printask(printcallback);
  	}
-	
+
 	private boolean saveOrder(){
 		Cursor DT;
 		double tot,desc,imp,peso;
-		
+
 		corel=gl.ruta+"_"+mu.getCorelBase();
-		
+
 		try {
-			
+
 			sql="SELECT SUM(TOTAL),SUM(DESMON),SUM(IMP),SUM(PESO) FROM T_VENTA";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-			
+
 			tot=DT.getDouble(0);
 			desc=DT.getDouble(1);
 			imp=DT.getDouble(2);
 			peso=DT.getDouble(3);
-			
+
 			db.beginTransaction();
-			
+
 			ins.init("D_PEDIDO");
 			ins.add("COREL",corel);
 			ins.add("ANULADO","N");
@@ -394,15 +426,15 @@ public class PedidoRes extends PBase {
 			ins.add("SUCURSAL",gl.sucur);//Se está guardando aquí la sucursal
 			ins.add("ID_DESPACHO",0);
 			ins.add("ID_FACTURACION",0);
-		
+
 			db.execSQL(ins.sql());
-          		
+
 			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK FROM T_VENTA";
 			DT=Con.OpenDT(sql);
-	
+
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
-			
+
 			  	ins.init("D_PEDIDOD");
 				ins.add("COREL",corel);
 				ins.add("PRODUCTO",DT.getString(0));
@@ -423,104 +455,104 @@ public class PedidoRes extends PBase {
 				ins.add("FACTOR",DT.getDouble(12));
 				ins.add("UMSTOCK",DT.getString(13));
 				ins.add("UMPESO","");
-			
+
 			    db.execSQL(ins.sql());
-				
+
 			    DT.moveToNext();
 			}
 
 			db.setTransactionSuccessful();
 			db.endTransaction();
-			 
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
 		   	mu.msgbox( e.getMessage());
 		   	return false;
 		}
-		
+
 		try {
 			upd.init("P_CLIRUTA");
 			upd.add("BANDERA",0);
 			upd.Where("CLIENTE='"+cliid+"'");//AND DIA="+dweek  #CKFK 20191209 quité la condición del día para que siempre se actualice
-	
+
 			db.execSQL(upd.SQL());
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
-		}	
-		
+		}
+
 		saveAtten();
-		
+
 		return true;
 	}
-	
+
 	private double totalDescProd(){
 		Cursor DT;
-		
+
 		try {
-			sql="SELECT SUM(DESMON),SUM(TOTAL),SUM(IMP) FROM T_VENTA";	
+			sql="SELECT SUM(DESMON),SUM(TOTAL),SUM(IMP) FROM T_VENTA";
 			DT=Con.OpenDT(sql);
-				
+
 			DT.moveToFirst();
-			
+
 			tot=DT.getDouble(1);
 			stot0=tot+DT.getDouble(0);
-			
+
 			totimp=DT.getDouble(2);
-			
+
 			return DT.getDouble(0);
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			tot=0;
 			mu.msgbox( e.getMessage());return 0;
-		}	
-		
+		}
+
 	}
- 	
+
 	private void saveAtten() {
 		long ti,tf,td;
-		
+
 		ti=gl.atentini;tf=du.getActDateTime();
 		td=du.timeDiff(tf,ti);if (td<1) td=1;
-		
+
 		try {
 			ins.init("D_ATENCION");
-		
+
 			ins.add("RUTA",gl.ruta);
 			ins.add("FECHA",ti);
 			ins.add("HORALLEG",gl.ateninistr);
 			//ins.add("HORALLEG",DU.shora(ti)+":00");
 			ins.add("HORASAL",du.shora(tf)+":00");
 			ins.add("TIEMPO",td);
-			
+
 			ins.add("VENDEDOR",gl.vend);
 			ins.add("CLIENTE",gl.cliente);
 			ins.add("DIAACT",du.dayofweek(ti));
 			ins.add("DIA",du.dayofweek(ti));
 			ins.add("DIAFLAG","S");
-			
+
 			ins.add("SECUENCIA",1);
 			ins.add("SECUENACT",1);
 			ins.add("CODATEN","");
 			ins.add("KILOMET",0);
-			
+
 			ins.add("VALORVENTA",tot);
 			ins.add("VALORNEXT",0);
 			ins.add("CLIPORDIA",0);
 			ins.add("CODOPER","X");
 			ins.add("COREL",corel);
-			
+
 			ins.add("SCANNED",gl.escaneo);
 			ins.add("STATCOM","N");
 			ins.add("LLEGO_COMPETENCIA_ANTES",0);
-	
+
 			db.execSQL(ins.sql());
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//MU.msgbox("Error : " + e.getMessage());
-		}	
-		
+		}
+
 	}
 
 	private String getCodigoSAP(String vDireccion){
@@ -593,10 +625,10 @@ public class PedidoRes extends PBase {
 		}
 
 	}
-	
-	
+
+
 	// Aux
-	
+
 	private void adjustSpinner(){
 
 		try{
@@ -632,32 +664,32 @@ public class PedidoRes extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-		
-	}	
+
+	}
 
 	private void fillSpinner(){
 		Cursor DT;
-		
+
 		spname.clear();
 		/*
 		try {
 			sql="SELECT DIRECCION FROM P_CLIENTE WHERE CODIGO='"+cliid+"'";
            	DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-			
+
 			spname.add(DT.getString(0));
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			spname.add("");txtDir.setText("");
 			mu.msgbox( e.getMessage());
 	    }		*/
-		
-		
+
+
 		try {
-			
+
 			sql="SELECT DIRECCION_ENTREGA FROM P_CLIDIR WHERE CODIGO_CLIENTE='"+cliid+"' ORDER BY DIRECCION_ENTREGA";
 			DT=Con.OpenDT(sql);
-			
+
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 			  spname.add(DT.getString(0));
@@ -667,18 +699,18 @@ public class PedidoRes extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox( e.getMessage());
 	    }
-		
+
 		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, spname);
 		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		
+
 		try {
 			spinList.setAdapter(dataAdapter);
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
-	
+
 	}
-	
+
 	public void askSave(View view) {
 
 		try{
@@ -701,27 +733,27 @@ public class PedidoRes extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
-	}	
-	
+
+	}
+
 	public void setDate(){
 		lblFecha.setText(du.sfecha(fecha));
 	}
-	
+
 	private void checkPromo() {
 		Cursor DT;
-		
+
 		imgBon.setVisibility(View.INVISIBLE);
-		
+
 		try {
 			sql="SELECT ITEM FROM T_BONITEM";
            	DT=Con.OpenDT(sql);
 			if (DT.getCount()>0) imgBon.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-	    }			
+	    }
 	}
-	
+
 	private void askPrint() {
 		try{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -778,7 +810,7 @@ public class PedidoRes extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-			
+
 	}
 
     public  boolean fechaValida(){
@@ -802,7 +834,7 @@ public class PedidoRes extends PBase {
 
 
 	// Activity Events
-	
+
 	@Override
 	protected void onResume() {
 		try{
@@ -819,8 +851,8 @@ public class PedidoRes extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
-	
-	}	
-	
-	
+
+	}
+
+
 }

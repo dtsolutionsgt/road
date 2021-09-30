@@ -47,7 +47,7 @@ public class appGlobals extends Application {
 	// Parametros Extra
 	public String peModal,peMon,peFormatoFactura,CodDev, pFiltroCobros;
 	public Boolean peStockItf,peSolicInv,peAceptarCarga,peBotInv,peBotPrec,endPrint;
-	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre;
+	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre, peDepositoEfectivo;
 	public boolean peImprFactCorrecta, pTransBarra, pMostrarCodigoCliente, pMostrarRazonNoAten, pCobrosDepositados, pSolicitarFactura;
 	public int peDec,peDecCant,peDecImp,peLimiteGPS,peMargenGPS,peVentaGps;
 	
@@ -60,7 +60,7 @@ public class appGlobals extends Application {
 	// Bonificaciones
 	
 	public ArrayList<clsBonifItem> bonus = new ArrayList<clsBonifItem>();
-	
+
 	public clsDemoDlg clsDemo;
 	
 	// GPS

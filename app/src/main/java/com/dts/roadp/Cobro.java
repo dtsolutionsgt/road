@@ -14,10 +14,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -29,6 +31,7 @@ public class Cobro extends PBase {
 
 	private ListView listView;
 	private TextView lblSel,lblPag,lblPend, txtMontoDescPP;
+	private ImageView imgImprimir;
 
 	private ArrayList<clsClasses.clsCobro> items= new ArrayList<clsClasses.clsCobro>();
 	ArrayList<clsClasses.clsNCPP> docs= new ArrayList<clsClasses.clsNCPP>();
@@ -39,6 +42,7 @@ public class Cobro extends PBase {
 	private printer prn;
 	private clsDocCobro fdoc;
 	private clsDocFactura fdocf;
+	private clsDetCobro dtcobro;
 	private AppMethods app;
 
 	private String cliid,cod,itemid,prodid,sefect,corel,fserie,dtipo="",fechav,msgDesc="", cor_nc="";
@@ -65,6 +69,7 @@ public class Cobro extends PBase {
 		lblPag = (TextView) findViewById(R.id.lblPag);
 		lblPend = (TextView) findViewById(R.id.lblPend);
 		cbCheckAll= (CheckBox) findViewById(R.id.cbCheckAll);
+		imgImprimir = (ImageView) findViewById(R.id.imgImprimir);
 
 		chkFactura = new RadioButton(this,null);
 		chkContado = new RadioButton(this,null);
@@ -130,6 +135,28 @@ public class Cobro extends PBase {
 
 		fdocf = new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(cliid),gl.codCliNuevo,gl.peModal);
 		fdocf.deviceid=gl.numSerie;
+
+		imgImprimir.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				impDetCobro();
+			}
+		});
+	}
+
+	public void impDetCobro() {
+		boolean result;
+		dtcobro = new clsDetCobro(this,prn.prw,gl.peMon,gl.peDecImp, "detCobro.txt");
+
+		if (prn.isEnabled()) {
+			result = dtcobro.buildPrint(cliid,0,gl.peModal);
+			if (result) {
+				Toast.makeText(this, "Detalle de pagos generado con éxito", Toast.LENGTH_SHORT).show();
+			}
+			prn.printask();
+		}else if(!prn.isEnabled()){
+			dtcobro.buildPrint(cliid,0,gl.peModal);
+		}
 	}
 
 	// Events

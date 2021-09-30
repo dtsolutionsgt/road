@@ -517,6 +517,20 @@ public class AppMethods {
 		} catch (Exception e) {
 			gl.pMostrarRazonNoAten =false;
 		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=31";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peDepositoEfectivo =false;
+
+			gl.peDepositoEfectivo =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peDepositoEfectivo =false;
+		}
 	}
 
 	public void parametrosBarras() {

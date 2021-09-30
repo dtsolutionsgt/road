@@ -16,7 +16,7 @@ public class clsDocPedido extends clsDocument {
 	private double tot,desc,imp,stot,percep;
 	private boolean sinimp;
 	private String 	contrib;
-	private int decimp;
+	private int decimp, diasPP = 0;
 	
 	public clsDocPedido(Context context,int printwidth,String cursymbol,int decimpres, String archivo) {
 		super(context, printwidth,cursymbol,decimpres,archivo);
@@ -34,7 +34,7 @@ public class clsDocPedido extends clsDocument {
 
 		rep.line();
 		rep.add("CODIGO   DESCRIPCION                ");
-		rep.add("CANT    UM   KGS   PRECIO     VALOR ");
+		rep.add("CANT    UM             PRECIO     VALOR ");
 		rep.line();
 		//rep.empty();
 		
@@ -46,11 +46,12 @@ public class clsDocPedido extends clsDocument {
 			umTemp = (item.um.length()>2?item.um.substring(0,3):item.um);
 
 			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(umTemp,6);
-			cp=frmdecimal(0,decimp)+" "+rep.ltrim(item.ump,3);
+			//#AT 27/09/2021 Se comento porque no se  mostrará el peso en Divensa
+			//cp=frmdecimal(0,decimp)+" "+rep.ltrim(item.ump,3);
 			
-			rep.add3fact(cu+" "+cp,item.prec,item.tot);
+			rep.add3fact(cu+"    ",item.prec,item.tot);
 		}
-		
+
 		rep.line();
 		
 		return true;
@@ -81,8 +82,20 @@ public class clsDocPedido extends clsDocument {
 		bonificaciones();
 
 		rep.empty();
+		rep.add("----------------------------------------");
+		rep.add("            FIRMA CLIENTE               ");
+
+		rep.empty();
 		rep.add("No. Serie : "+deviceid);
 		rep.empty();
+
+		if (diasPP > 0) {
+			rep.add("Aplica descuento por pronto pago si paga");
+			rep.add("en los primeros "+diasPP+" dias de recibido");
+			rep.add("              el producto               ");
+		}
+
+
 
 		return super.buildFooter();
 	}	
@@ -233,6 +246,11 @@ public class clsDocPedido extends clsDocument {
 			add2=add2+" - "+DT.getString(0);
 		} catch (Exception e) {
 	    }
+
+		try {
+			diasPP = getDiasPP(cli);
+		} catch (Exception e) {
+		}
 		
 		//Toast.makeText(cont,"Percep "+percep+"  Sinimp "+sinimp, Toast.LENGTH_SHORT).show();
 		
@@ -353,6 +371,25 @@ public class clsDocPedido extends clsDocument {
 		}
 
 		rep.line();
+	}
+
+	protected int getDiasPP(String cliente) {
+		Cursor DT;
+		int result = 0;
+		try {
+			sql="SELECT RANGOINI FROM T_DESC WHERE DESCTIPO = 'P'";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			result = DT.getInt(0);
+
+			if(DT!=null) DT.close();
+
+		} catch (Exception e) {
+			Toast.makeText(cont,"Impresion bonif : "+e.getMessage(), Toast.LENGTH_LONG).show();
+		}
+
+		return result;
 	}
 
 	

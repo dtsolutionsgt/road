@@ -2,6 +2,7 @@ package com.dts.roadp;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.apache.commons.lang.StringUtils;
@@ -13,9 +14,9 @@ public class clsDocCobro extends clsDocument {
 	private ArrayList<itemData> items= new ArrayList<itemData>();
 	private ArrayList<itemDataPago> itemspago= new ArrayList<itemDataPago>();
 	
-	private double tot,desc,imp,stot,percep;
+	private double tot,desc,imp,stot,percep, descPP=0.0;
 	private boolean sinimp;
-	private String 	contrib,recfact;
+	private String 	contrib,recfact,corelCobro;
 	private boolean cobroSR=false;
 	protected MiscUtils mu;
 	
@@ -33,6 +34,7 @@ public class clsDocCobro extends clsDocument {
 
 		boolean result=false;
 		Cursor DT;
+		corelCobro = corel;
 
 		try{
 
@@ -52,7 +54,7 @@ public class clsDocCobro extends clsDocument {
 		itemDataPago itempago;
 
 		double vTempEfectivo=0;
-		double vTempCheque=0;
+		double vTempCheque=0, tmpDescpp=0;
 
 		rep.empty();
 
@@ -64,12 +66,16 @@ public class clsDocCobro extends clsDocument {
 
 		for (int i = 0; i <items.size(); i++) {
 			item=items.get(i);
-			rep.addp("No. "+ item.cod,mu.frmcur(item.tot));
+
+			tmpDescpp +=item.descpp;
+
+			rep.addtot("No. "+ item.cod,mu.frmcur(item.tot));
+			rep.addtot("PRONTO PAGO", item.descpp);
 		}
 
 		if (!cobroSR) {
 			rep.line();
-			rep.addtot("TOTAL PAGO", tot);
+			rep.addtot("TOTAL PAGO", tot-tmpDescpp);
 		}else{
 			rep.addtot("TOTAL DE COBROS", tot);
 		}
@@ -105,14 +111,17 @@ public class clsDocCobro extends clsDocument {
 		rep.empty();
 		rep.empty();
 		rep.line();
-		rep.addc("FIRMA CLIENTE");
-
+		rep.addc("FIRMA VENDEDOR");
 		rep.empty();
+
+		rep.line();
+		rep.addc("NOMBRE VENDEDOR");
+		rep.empty();
+
 		rep.add( "Serial PDA      : " + deviceid);
 		rep.empty();
 		rep.empty();
 		rep.empty();
-
 
 		return super.buildFooter();
 	}	
@@ -130,7 +139,7 @@ public class clsDocCobro extends clsDocument {
 
 			cobroSR=esCobroSR(corel);
 
-			sql="SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,FECHA, IMPRES, ANULADO FROM D_COBRO WHERE COREL='"+corel+"'";
+			sql="SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,FECHA, IMPRES, ANULADO, COREL FROM D_COBRO WHERE COREL='"+corel+"'";
 			DT=Con.OpenDT(sql);
 
 			if(DT.getCount()>0){
@@ -150,6 +159,7 @@ public class clsDocCobro extends clsDocument {
 
 				anulado=DT.getString(8);
 				impres=DT.getInt(7);
+				corelCobro =DT.getString(9);
 				cantimpres=0;
 
 				if (anulado.equals("S")?true:false){
@@ -169,8 +179,7 @@ public class clsDocCobro extends clsDocument {
 
 		} catch (Exception e) {
 			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
-	    }	
-		
+	    }
 		
 		try {
 			sql="SELECT NOMBRE FROM P_VENDEDOR  WHERE CODIGO='"+vend+"'";
@@ -243,6 +252,8 @@ public class clsDocCobro extends clsDocument {
 				item =new itemData();		  	
 				item.cod=DT.getString(0);
 				item.tot=DT.getDouble(1);
+
+				item.descpp = getDescPP(corel, DT.getString(0));
 				items.add(item);	
 				
 				DT.moveToNext();					
@@ -294,6 +305,27 @@ public class clsDocCobro extends clsDocument {
 		return true;
 	}
 
+	protected double getDescPP(String corelCobro, String documento) {
+		Cursor cursor;
+		double desc = 0;
+		try {
+			sql = "SELECT COREL, MONTODESCUENTO FROM D_NOTACRED_PP " +
+					"WHERE COREL_COBRO='" + corelCobro + "' AND FACTURA='" + documento + "'";
+			cursor = Con.OpenDT(sql);
+
+			if (cursor != null && cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				desc = cursor.getDouble(1);
+			}
+			if(cursor!=null) cursor.close();
+
+		} catch (Exception e) {
+			mu.msgbox("Ocurrió un error" + e.getMessage());
+		}
+
+		return desc;
+	}
+
 	// Aux
 	
 	public double round2(double val){
@@ -311,7 +343,7 @@ public class clsDocCobro extends clsDocument {
 	
 	private class itemData {
 		public String cod,nombre;
-		public double cant,prec,imp,descper,desc,tot;
+		public double cant,prec,imp,descpp,desc,tot;
 	}
 
 	private class itemDataPago {

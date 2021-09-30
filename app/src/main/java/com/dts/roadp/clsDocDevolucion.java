@@ -51,8 +51,8 @@ public class clsDocDevolucion extends clsDocument {
         String ss;
 
         rep.add("");
-        rep.add("CODIGO   DESCRIPCION        UM  CANT");
-        rep.add("       KGS    PRECIO           VALOR");
+        rep.add("CODIGO   DESCRIPCION            UM  CANT");
+        rep.add("         PRECIO                    VALOR");
         rep.line();
 
         for (int i = 0; i <items.size(); i++) {
@@ -61,7 +61,9 @@ public class clsDocDevolucion extends clsDocument {
             ss=rep.ltrim(item.cod+" "+item.nombre,prw-10);
             ss=ss+rep.rtrim(item.um,4)+" "+rep.rtrim(frmdecimal(item.cant,2),5);
             rep.add(ss);
-            ss=rep.rtrim(frmdecimal(item.peso,2),10)+" "+rep.rtrim(frmdecimal(item.prec,2),8);
+
+            //ss=rep.rtrim(frmdecimal(item.peso,2),10)+" "+rep.rtrim(frmdecimal(item.prec,2),8); #AT Se quitó el Kilogramos
+            ss="        "+rep.rtrim(frmdecimal(item.prec,2),8);
             ss=rep.ltrim(ss,prw-10);
             ss=ss+" "+rep.rtrim(frmdecimal(item.tot,2),9);
             rep.add(ss);
@@ -81,15 +83,16 @@ public class clsDocDevolucion extends clsDocument {
         rep.add("");
         rep.add("");
         rep.line();
-        rep.addc("Firma Cliente");
-        rep.add("");
+        rep.add("            FIRMA VENDEDOR               ");
+        rep.empty();
+        rep.empty();
+        rep.line();
+        rep.add("            NOMBRE VENDEDOR             ");
+        rep.empty();
+
         if(!corelF.isEmpty()) {
             rep.addc("Aplica a factura: " + corelF);
         }
-        rep.add("");
-        rep.addc("EXIJA SU FACTURA ORIGINAL ");
-        rep.addc("PARA COMPROBAR  EL PAGO. ");
-        rep.add("");
 
         rep.add("No. Serie : "+deviceid);
         rep.add(resol);

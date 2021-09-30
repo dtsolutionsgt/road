@@ -30,7 +30,7 @@ public class Deposito extends PBase {
 	private TextView lblEf,lblCheq,lblTot,lblBol;
 	
 	private ListView listView;
-	private ImageView btnSave,btnCancel,btnSelAll,btnSelNone;
+	private ImageView btnSave,btnCancel,btnSelAll,btnSelNone, imgCalc;
 
     private ArrayList<clsClasses.clsDepos> items = new ArrayList<clsClasses.clsDepos>();
 	private ListAdaptDepos adapter;
@@ -67,12 +67,17 @@ public class Deposito extends PBase {
 		lblCheq = (TextView) findViewById(R.id.lblCheq);lblCheq.setText(mu.frmcur(0));
 		lblTot = (TextView) findViewById(R.id.lblTot);lblTot.setText(mu.frmcur(0));
 		lblBol = (TextView) findViewById(R.id.textView2);
+		imgCalc = (ImageView) findViewById(R.id.imgCalc);
 
 		setHandlers();
 		
 		fillSpinner();		
 		fillDocList();
-		
+
+		if (!gl.peDepositoEfectivo){
+			imgCalc.setVisibility(View.INVISIBLE);
+		}
+
 		if (gl.boldep==0) {
 			//txtBol.setText(du.sfecha(fecha)+" "+du.shora(fecha)+":"+du.sSecond());
 			txtBol.setText("");
@@ -128,7 +133,7 @@ public class Deposito extends PBase {
 
 			Cursor DT;
 
-			if (gl.peModal.equalsIgnoreCase("TOL")) {
+			if (gl.peModal.equalsIgnoreCase("TOL") && gl.peDepositoEfectivo) {
 
 				sql="SELECT * FROM T_DEPOSB";
 
@@ -137,7 +142,8 @@ public class Deposito extends PBase {
 				if (DT.getCount()==0) {
 					if (tef>0){
 					msgbox("Por favor realice el desglose antes de continuar.");
-					return;}
+					return;
+					}
 				}
 			}
 
@@ -562,7 +568,7 @@ public class Deposito extends PBase {
 			}	
 
 			//Inserta y válida Desglose de depósito.
-			if (gl.peModal.equalsIgnoreCase("TOL")) {
+			if (gl.peModal.equalsIgnoreCase("TOL") && gl.peDepositoEfectivo) {
 
 				sql="SELECT * FROM T_DEPOSB";
 

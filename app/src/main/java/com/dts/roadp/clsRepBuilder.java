@@ -100,6 +100,7 @@ public class clsRepBuilder {
 				writer.write("\r\n");
 			}
 
+
 			for (int i = 0; i < items.size(); i++) {
 				try {
 					s=trim(items.get(i));
@@ -283,12 +284,31 @@ public class clsRepBuilder {
 		s2=cursym+decfrm.format(v2);
 		s3=cursym+decfrm.format(v3);
 		
-		ts=ltrim(s1,prwh)+rtrim(s2,prwq)+rtrim(s3,prwq);
+		ts=ltrim(s1,prwh-1)+rtrim(s2,prwq)+" "+rtrim(s3,prwq);
+		items.add(ts);
+	}
+
+	public void add3rrl(double v1,double v2,String s3) {
+		String s1,s2;
+
+		s1=cursym+decfrm.format(v1);
+		s2=cursym+decfrm.format(v2);
+
+		ts=ltrim(s1,prwh-1)+rtrim(s2,prwq)+" "+rtrim(s3,prwq);
 		items.add(ts);
 	}
 
 	public void add3fact(String s1,String s2,String s3) {
 		ts=ltrim(s1,prwh)+rtrim(s2,prwq)+rtrim(s3,prwq);
+		items.add(ts);
+	}
+
+	public void add3fact(String s1,double v2,String s3) {
+		String s2;
+
+		s2=cursym+decfrm.format(v2);
+
+		ts=ltrim(s1,prwh-1)+rtrim(s2,prwq)+" "+ltrim(s3,prwh);
 		items.add(ts);
 	}
 	

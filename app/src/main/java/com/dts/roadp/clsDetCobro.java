@@ -96,7 +96,7 @@ public class clsDetCobro extends clsDocument{
     protected  boolean loadHeadData(String corelCliente) {
         Cursor DT;
         super.loadHeadData(corelCliente);
-        nombre = "DETALLE DE COBROS";
+        nombre = "ESTADO DE CUENTA CLIENTE";
 
         sql = "SELECT CODIGO, NOMBRE, NIT, DIRECCION FROM P_CLIENTE WHERE CODIGO='"+corelCliente+"'";
         DT=Con.OpenDT(sql);

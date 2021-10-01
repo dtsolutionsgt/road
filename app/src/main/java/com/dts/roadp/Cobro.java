@@ -150,10 +150,13 @@ public class Cobro extends PBase {
 
 		if (prn.isEnabled()) {
 			result = dtcobro.buildPrint(cliid,0,gl.peModal);
+
 			if (result) {
 				Toast.makeText(this, "Detalle de pagos generado con éxito", Toast.LENGTH_SHORT).show();
+				//#CKFK 20211001 Subi esta línea para que se imprima el detalle de los cobros
+                 prn.printask(printcallback, "detCobro.txt");
 			}
-			prn.printask();
+
 		}else if(!prn.isEnabled()){
 			dtcobro.buildPrint(cliid,0,gl.peModal);
 		}

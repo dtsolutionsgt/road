@@ -21,6 +21,9 @@ public class clsDocument {
 	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod,docdesglose;
 	public int ffecha,pendiente,diacred,condicionPago,impprecio;
 
+	public double SumaPeso = 0;
+	public double SumaCant = 0;
+
     protected AppMethods app;
     protected appGlobals global;
 	protected android.database.sqlite.SQLiteDatabase db;
@@ -203,7 +206,6 @@ public class clsDocument {
 		
 		return true;
 	}
-
 
 	// Methods Prototypes
 	

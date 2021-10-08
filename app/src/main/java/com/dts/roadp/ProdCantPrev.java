@@ -57,7 +57,14 @@ public class ProdCantPrev extends PBase {
         prc=new Precio(this,mu,gl.peDec);
         app = new AppMethods(this, gl, Con, db);
 
-        getDisp();
+        //#CKFK 20211006 Subi ParamProd y Showdata porque debe ejecutarse antes del ShowData
+        //para tener los parámetros del producto y mostrar los datos en base a la configuración del producto
+        paramProd();
+
+        showData();
+
+        //#CKFK 20211006 Quité esto porque ya se calcula en ShowData
+       //getDisp();
 
         setHandlers();
 
@@ -69,11 +76,8 @@ public class ProdCantPrev extends PBase {
 
         gl.dval=-1;gl.gstr="";
 
-        paramProd();
-
         txtPeso.setEnabled(validaRango());
 
-        showData();
     }
 
     //region Events
@@ -681,15 +685,11 @@ public class ProdCantPrev extends PBase {
             }
             dt.close();
 
-            umfactor=umf1/umf2;
-
-			/*
-			if (umf1>=umf2) {
-				umfactor=umf1/umf2;
-			} else {
-				umfactor=umf2/umf1;
-			}
-			*/
+            //#CKFK 20211006 Agregué esta validación porque cuando la venta es por peso,
+            // el factor es el peso promedio y no se debe dividir
+            if (!porpeso){
+                umfactor=umf1/umf2;
+            }
 
             sql="SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO FROM P_STOCK_PV " +
                     " WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
@@ -806,15 +806,11 @@ public class ProdCantPrev extends PBase {
             }
             dt.close();
 
-            umfactor=umf1/umf2;
-
-			/*
-			if (umf1>=umf2) {
-				umfactor=umf1/umf2;
-			} else {
-				umfactor=umf2/umf1;
-			}
-			*/
+            //#CKFK 20211006 Agregué esta validación porque cuando la venta es por peso,
+            // el factor es el peso promedio y no se debe dividir
+            if (!porpeso){
+                umfactor=umf1/umf2;
+            }
 
             sql="SELECT IFNULL(SUM(CANT),0) AS CANT,IFNULL(SUM(PESO),0) AS PESO FROM P_STOCK_PV " +
                     " WHERE (CODIGO='"+prodid+"') AND (UNIDADMEDIDA='"+umstock+"')";
@@ -1357,6 +1353,7 @@ public class ProdCantPrev extends PBase {
         try {
             porpeso=app.ventaPeso(prodid);
             esbarra=app.prodBarra(prodid);
+            pesoprom= app.pesoProm(prodid);
 
             sql="SELECT ESTADO FROM P_STOCK_PV  WHERE CODIGO='" + prodid + "' ";
             dt=Con.OpenDT(sql);

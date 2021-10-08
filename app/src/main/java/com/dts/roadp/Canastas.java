@@ -230,6 +230,12 @@ public class Canastas extends PBase {
 
     public void guardarCanastas() {
         boolean cerrarDialog = true;
+        double pesoEntr=0;
+        double pesoRec=0;
+        double pesoProm=0;
+        double cantAct=0;
+        String umbas="";
+
         try {
             opendb();
             String tabla="D_CANASTA";
@@ -247,6 +253,11 @@ public class Canastas extends PBase {
             recibido = cantRec;
             entregado = cantEntr;
 
+            pesoProm = app.pesoPromedio(gl.prodCanasta);
+            pesoEntr = cantEntr*pesoProm;
+            pesoRec = cantRec*pesoProm;
+            umbas = app.unidBas(gl.prodCanasta);
+
             if (cantRec == 0 && cantEntr == 0) {
                 toast("El campo recibido o entregado debe ser mayor a cero.");
                 cerrarDialog = false;
@@ -263,7 +274,24 @@ public class Canastas extends PBase {
             }
 
             if (editando) {
-                actualizaStock(gl.prodCanasta, iEntregado);
+
+                if( (gl.corelFac == null || gl.corelFac.isEmpty())){
+                   // actualizaStock(gl.prodCanasta, iEntregado);
+
+                   /* sql="INSERT INTO P_STOCK  " +
+                            "VALUES('CANASTA',10,0,22.5,0,'','0082581227','202110010000',0,'3104','A',1,0,'','UN','')";
+                    db.execSQL(sql);
+                    sql="INSERT INTO P_STOCK " +
+                            "VALUES('CANASTA',20,0,45,0,'','0082581228','202110010000',0,'3104','A',1,0,'','UN','')";
+                    db.execSQL(sql);*/
+
+                    aumentaStockCanastas(gl.prodCanasta, iEntregado,
+                            umbas,
+                            iEntregado*pesoProm,pesoProm);
+                   /* rebajaStockCanastas(gl.prodCanasta, cantEntr,
+                            umbas,
+                            cantEntr*pesoProm,pesoProm);*/
+                }
             }
 
             if (entregado > 0 && !hayExistencias()) {
@@ -280,6 +308,8 @@ public class Canastas extends PBase {
                 ins.add("PRODUCTO", gl.prodCanasta);
                 ins.add("CANTREC", cantRec);
                 ins.add("CANTENTR", cantEntr);
+                ins.add("PESOREC", pesoRec);
+                ins.add("PESOENTR", pesoEntr);
                 ins.add("STATCOM", "N");
                 ins.add("CORELTRANS", (gl.corelFac == null || gl.corelFac.isEmpty()) ? "": gl.corelFac);
                 ins.add("VENDEDOR", gl.vend);
@@ -291,12 +321,20 @@ public class Canastas extends PBase {
                 upd.add("PRODUCTO", producto);
                 upd.add("CANTREC", cantRec);
                 upd.add("CANTENTR", cantEntr);
+                upd.add("PESOREC", pesoRec);
+                upd.add("PESOENTR", pesoEntr);
                 upd.add("STATCOM", "N");
                 db.execSQL(upd.SQL());
             }
             recibido=0;entregado=0;
             iEntregado=0;
-            actualizaStock(gl.prodCanasta, -cantEntr);
+
+            if( (gl.corelFac == null || gl.corelFac.isEmpty())){
+                rebajaStockCanastas(gl.prodCanasta, cantEntr,
+                                    app.unidBas(gl.prodCanasta),
+                                    pesoEntr,pesoProm);
+               // actualizaStock(gl.prodCanasta, -cantEntr);
+            }
             limpiarCanastas();
             listItems();
 
@@ -336,7 +374,7 @@ public class Canastas extends PBase {
             }
 
             //Indica la existencia actual de las canastas
-            sql = "SELECT CANT FROM P_STOCK WHERE CODIGO='"+ gl.prodCanasta +"'";
+            sql = "SELECT IFNULL(SUM(CANT), 0) FROM P_STOCK WHERE CODIGO='"+ gl.prodCanasta +"'";
             Cursor st = Con.OpenDT(sql);
 
             if (st != null && st.getCount() >= 1){
@@ -383,7 +421,7 @@ public class Canastas extends PBase {
     }
 
     private void actualizaStock(String prod, int cantidad) {
-        String sql = "SELECT CANT FROM P_STOCK WHERE CODIGO='"+prod+"'";
+        String sql = "SELECT IFNULL(SUM(CANT), 0) FROM P_STOCK WHERE CODIGO='"+prod+"'";
         Cursor st = Con.OpenDT(sql);
 
         if (st != null && st.getCount() > 0){
@@ -397,6 +435,83 @@ public class Canastas extends PBase {
             upd.add("CANT", cant);
 
             db.execSQL(upd.SQL());
+        }
+    }
+
+    private void rebajaStockCanastas(String prid,double cant,String umentr,double ppeso,double vfactor) {
+        Cursor dt;
+        double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso, vcant, totcant=0, totpeso=0;
+        String doc,stat,vumentr;
+
+        vcant=cant;vumentr=umentr;
+
+        actcant=cant;
+        actpeso=ppeso;
+
+        try {
+
+            sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
+                "FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umentr+"') ORDER BY CANT";
+
+            dt=Con.OpenDT(sql);
+
+            if (dt.getCount()==0) return;
+
+            dt.moveToFirst();
+            while (!dt.isAfterLast()) {
+
+                cant=dt.getDouble(0);totcant+=cant;
+                speso=dt.getDouble(2);totpeso+=speso;
+                doc=dt.getString(5);
+                stat=dt.getString(9);
+
+                if (actcant>cant) cantapl=cant;else cantapl=actcant;
+
+                dispcant=cant-cantapl;if (dispcant<0) dispcant=0;
+                actcant=actcant-cantapl;
+
+                pesoapl=cantapl*vfactor;
+                disppeso=speso-pesoapl;if (disppeso<0) disppeso=0;
+
+                // Stock
+                sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
+                db.execSQL(sql);
+
+                if(actcant==0) return;
+
+                dt.moveToNext();
+            }
+
+            return;
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox("rebajaStockCanastas: "+e.getMessage());
+            return;
+        }
+    }
+
+    private void aumentaStockCanastas(String prid,double cant,String umentr,double ppeso,double vfactor) {
+        Cursor dt;
+        String doc;
+
+        try {
+
+            sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
+                    "FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umentr+"') ORDER BY CANT";
+
+            dt=Con.OpenDT(sql);
+
+            if (dt.getCount()==0) return;
+
+            dt.moveToFirst();
+            doc=dt.getString(5);
+            sql="UPDATE P_STOCK SET CANT=CANT+"+cant+",PESO=PESO+"+ppeso+" WHERE (CODIGO='"+prid+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='A')";
+            db.execSQL(sql);
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+            mu.msgbox("rebajaStockCanastas: "+e.getMessage());
         }
     }
 

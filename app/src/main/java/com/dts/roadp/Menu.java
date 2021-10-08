@@ -406,11 +406,13 @@ public class Menu extends PBase {
 					if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
 						mu.msgbox("No puede realizar esta acción");
 					}else {
-						if (rutatipo.equalsIgnoreCase("P") || rutatipo.equalsIgnoreCase("T")) {
+						if (rutatipo.equalsIgnoreCase("P")) {
 							showInvMenuPreventa();
 						} if (rutatipo.equalsIgnoreCase("C")) {
 							showInvMenuCanastas();
-						}else {
+						} if (rutatipo.equalsIgnoreCase("T")) {
+							showInvMenuTodas();
+						}else if (rutatipo.equalsIgnoreCase("V")) {
 							showInvMenuVenta();
 						}
 					}
@@ -1013,11 +1015,19 @@ public class Menu extends PBase {
 
 			final String[] selitems = new String[itemcnt];
 
-			selitems[itempos]="Existencias";itempos++;
+			if (rutatipo.equals("V") || rutatipo.equals("D")){
+				selitems[itempos]="Existencias";itempos++;
+			}
 
-		   if (rutatipo.equals("P") || rutatipo.equals("T")){
+		   if (rutatipo.equals("P")){
 				selitems[itempos]="Existencias pedidos";itempos++;
 			}
+
+			if (rutatipo.equals("T")){
+				selitems[itempos]="Existencias";itempos++;
+				selitems[itempos]="Existencias pedidos";itempos++;
+			}
+
 
 			if (gl.peAceptarCarga) {
 				selitems[itempos]="Aceptar Inventario";itempos++;
@@ -1050,7 +1060,7 @@ public class Menu extends PBase {
 					String mt=selitems[item];
 
 					if (mt.equalsIgnoreCase("Existencias")) menuExist();
-                    if (mt.equalsIgnoreCase("Existencias pedidos")) menuExist();
+                    if (mt.equalsIgnoreCase("Existencias pedidos")) menuExistPed();
             		if (mt.equalsIgnoreCase("Devolucion a bodega")) menuDevBod();
 					if (mt.equalsIgnoreCase("Recarga manual")) menuRecarga();
 					if (mt.equalsIgnoreCase("Aceptar Inventario")) menuRecargaAuto();
@@ -1082,7 +1092,49 @@ public class Menu extends PBase {
 	public void showInvMenuPreventa() {
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Existencias","Existencias pedidos","Devolucion a bodega"};
+			final String[] selitems = {"Existencias pedidos","Devolucion a bodega"};
+
+			menudlg = new AlertDialog.Builder(this);
+			menudlg.setIcon(R.drawable.inventario48);
+			menudlg.setTitle("Inventario");
+
+			menudlg.setItems(selitems,	new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+
+					switch (item) {
+						case 0:
+                            menuExistPed();break;
+						case 1:
+							menuDevBod();break;
+					}
+
+					dialog.cancel();
+				}
+			});
+
+			menudlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			Dialog = menudlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch	(Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	public void showInvMenuTodas() {
+		try{
+			final AlertDialog Dialog;
+			final String[] selitems = {"Existencias", "Existencias pedidos","Devolucion a bodega"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.inventario48);
@@ -1094,8 +1146,8 @@ public class Menu extends PBase {
 					switch (item) {
 						case 0:
 							menuExist();break;
-                        case 1:
-                            menuExistPed();break;
+						case 1:
+							menuExistPed();break;
 						case 2:
 							menuDevBod();break;
 					}

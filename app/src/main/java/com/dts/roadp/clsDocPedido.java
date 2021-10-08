@@ -56,7 +56,9 @@ public class clsDocPedido extends clsDocument {
 
             if (!item.rosty) {
                 umm = item.um;
-                if (item.esbarra && item.porpeso) {
+                //#CKFK 20211006 Agregué esta validación, porque cuando el producto se vende por peso
+				//también se debe colocar la Unidad de medida de Stock
+                if ((item.esbarra && item.porpeso) || item.porpeso) {
                     umm = item.ums;
                 }
                 cu=frmdecimal(ccant,decimp)+" "+rep.ltrim(umm,6);

@@ -39,6 +39,8 @@ public class ExistPed extends PBase {
     private Runnable printclose;
 
     private AppMethods app;
+    public double SumaPeso;
+    public double SumaCantidad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,9 @@ public class ExistPed extends PBase {
         doc=new clsDocExist(this,prn.prw,"");
 
         float cant = CantExistencias();
+        doc.SumaPeso = getPeso();
+        doc.SumaCant = getCantidad();
+
         Toast.makeText(this, "Cantidad : " + (int)cant, Toast.LENGTH_SHORT).show();
     }
 
@@ -85,7 +90,9 @@ public class ExistPed extends PBase {
                 msgbox("No hay inventario disponible");
                 return;
             }
+
             if (doc.buildPrint("0",0)) prn.printask();
+
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
@@ -180,6 +187,48 @@ public class ExistPed extends PBase {
         }
 
         return cantidad;
+    }
+
+    public double getPeso() {
+        Cursor DT;
+        double sumaPesoB=0,sumaPeso=0;
+
+        sql = "SELECT IFNULL(SUM(PESO),0) AS PESOTOT " +
+                " FROM P_STOCK_PV ";
+        DT=Con.OpenDT(sql);
+
+        if (DT!=null) {
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                sumaPeso = DT.getDouble(0);
+            }
+        }
+
+        if (DT!=null) DT.close();
+
+        return sumaPeso;
+    }
+
+    public double getCantidad() {
+        Cursor DT;
+        double sumaCant=0;
+
+        sql = "SELECT IFNULL(SUM(S.CANT),0) AS CANTUNI " +
+                " FROM P_STOCK_PV S ";
+        DT=Con.OpenDT(sql);
+
+        if (DT!=null){
+
+            if (DT.getCount()>0) {
+                DT.moveToFirst();
+                sumaCant=DT.getDouble(0);
+            }
+
+        }
+
+        if(DT!=null) DT.close();
+
+        return sumaCant;
     }
 
     private void listItems() {
@@ -498,13 +547,7 @@ public class ExistPed extends PBase {
 
         protected boolean buildFooter() {
 
-            double SumaPeso = 0;
-            double SumaCant = 0;
-
             try {
-
-                SumaPeso = app.getPeso();
-                SumaCant = app.getCantidad();
 
                 rep.empty();
                 rep.add("Total unidades:  " + StringUtils.leftPad(mu.frmdecimal(SumaCant,gl.peDecImp), 10));
@@ -527,6 +570,48 @@ public class ExistPed extends PBase {
                 return false;
             }
 
+        }
+
+        public double getPeso() {
+            Cursor DT;
+            double sumaPesoB=0,sumaPeso=0;
+
+            sql = "SELECT IFNULL(SUM(PESO),0) AS PESOTOT " +
+                    " FROM P_STOCK_PV ";
+            DT=Con.OpenDT(sql);
+
+            if (DT!=null) {
+                if (DT.getCount() > 0) {
+                    DT.moveToFirst();
+                    sumaPeso = DT.getDouble(0);
+                }
+            }
+
+            if (DT!=null) DT.close();
+
+            return sumaPeso;
+        }
+
+        public double getCantidad() {
+            Cursor DT;
+            double sumaCant=0;
+
+            sql = "SELECT IFNULL(SUM(S.CANT),0) AS CANTUNI " +
+                    " FROM P_STOCK_PV S ";
+            DT=Con.OpenDT(sql);
+
+            if (DT!=null){
+
+                if (DT.getCount()>0) {
+                    DT.moveToFirst();
+                    sumaCant=DT.getDouble(0);
+                }
+
+            }
+
+            if(DT!=null) DT.close();
+
+            return sumaCant;
         }
 
     }

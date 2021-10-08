@@ -64,7 +64,7 @@ public class Exist extends PBase {
         setHandlers();
 
         try {
-            sql="DELETE FROM P_STOCK WHERE CANT+CANTM=0";
+            sql="DELETE FROM P_STOCK WHERE CANT+CANTM=0 AND CODIGO NOT IN (SELECT CODIGO FROM P_PRODUCTO WHERE ES_CANASTA = 1)";
             db.execSQL(sql);
         } catch (SQLException e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -84,6 +84,10 @@ public class Exist extends PBase {
         doc=new clsDocExist(this,prn.prw,"");
 
         float cant = CantExistencias();
+
+        doc.SumaPeso = getPeso();
+        doc.SumaCant = getCantidad();
+
         Toast.makeText(this, "Cantidad : " + (int)cant, Toast.LENGTH_SHORT).show();
 
     }
@@ -570,13 +574,7 @@ public class Exist extends PBase {
 
         protected boolean buildFooter() {
 
-            double SumaPeso = 0;
-            double SumaCant = 0;
-
             try {
-
-                SumaPeso = app.getPeso();
-                SumaCant = app.getCantidad();
 
                 rep.empty();
                 rep.add("Total unidades:  " + StringUtils.leftPad(mu.frmdecimal(SumaCant,gl.peDecImp), 10));
@@ -603,6 +601,47 @@ public class Exist extends PBase {
 
     }
 
+    public double getPeso() {
+        Cursor DT;
+        double sumaPesoB=0,sumaPeso=0;
+
+        sql = "SELECT IFNULL(SUM(PESO),0) AS PESOTOT " +
+                " FROM P_STOCK_PV ";
+        DT=Con.OpenDT(sql);
+
+        if (DT!=null) {
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                sumaPeso = DT.getDouble(0);
+            }
+        }
+
+        if (DT!=null) DT.close();
+
+        return sumaPeso;
+    }
+
+    public double getCantidad() {
+        Cursor DT;
+        double sumaCant=0;
+
+        sql = "SELECT IFNULL(SUM(S.CANT),0) AS CANTUNI " +
+                " FROM P_STOCK_PV S ";
+        DT=Con.OpenDT(sql);
+
+        if (DT!=null){
+
+            if (DT.getCount()>0) {
+                DT.moveToFirst();
+                sumaCant=DT.getDouble(0);
+            }
+
+        }
+
+        if(DT!=null) DT.close();
+
+        return sumaCant;
+    }
 
     //region Activity Events
 

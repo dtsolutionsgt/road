@@ -792,9 +792,9 @@ public class FacturaRes extends PBase {
 
 	private boolean saveOrder() {
 		Cursor dt;
-		String vprod,vumstock,vumventa,vbarra,ss;
+		String vprod,vumstock,vumventa,vbarra,ss, vumentr;
 		double vcant,vpeso,vfactor,peso,factpres,vtot,vprec;
-		int mitem,bitem;
+		int mitem,bitem,citem;
 		int dev_ins=1;
 		corel=gl.corelFac;
 
@@ -922,6 +922,34 @@ public class FacturaRes extends PBase {
 					"SELECT RUTA, FECHA, CLIENTE, PRODUCTO, CANTREC, CANTENTR, STATCOM, CORELTRANS, ANULADO, UNIDBAS, VENDEDOR " +
 					"FROM T_CANASTA WHERE CORELTRANS='"+gl.corelFac+"'";
 			db.execSQL(sql);
+
+			//region CANASTAS
+
+			sql="SELECT PRODUCTO,CANTENTR,UNIDBAS, PESOENTR FROM T_CANASTA";
+			dt=Con.OpenDT(sql);
+
+			if (dt!=null){
+
+				if(dt.getCount()>0){
+
+					dt.moveToFirst();citem=1;
+					while (!dt.isAfterLast()) {
+
+						vprod=dt.getString(0);
+						vcant= dt.getDouble(1);
+						vumentr=dt.getString(2);
+						vpeso= dt.getDouble(3);
+						vfactor = vpeso/(vcant==0?1:vcant);
+
+						rebajaStockCanastas(vprod, vcant, vumentr, vpeso,vfactor);
+
+						dt.moveToNext();citem++;
+					}
+				}
+
+			}
+
+			//endregion CANASTAS
 
 			sql="DELETE FROM T_CANASTA";
 			db.execSQL(sql);
@@ -1751,6 +1779,60 @@ public class FacturaRes extends PBase {
 			mu.msgbox("rebajaStockUM: "+e.getMessage());
 		}
 
+	}
+
+	private void rebajaStockCanastas(String prid,double cant,String umentr,double ppeso,double vfactor) {
+		Cursor dt;
+		double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso, vcant, totcant=0, totpeso=0;
+		String doc,stat,vumentr;
+
+		vcant=cant;vumentr=umentr;
+
+		actcant=cant;
+		actpeso=ppeso;
+
+		try {
+
+			sql="SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV " +
+					"FROM P_STOCK WHERE (CANT>0) AND (CODIGO='"+prid+"') AND (UNIDADMEDIDA='"+umentr+"') ORDER BY CANT";
+
+
+			dt=Con.OpenDT(sql);
+
+			if (dt.getCount()==0) return;
+
+			dt.moveToFirst();
+			while (!dt.isAfterLast()) {
+
+				cant=dt.getDouble(0);totcant+=cant;
+				speso=dt.getDouble(2);totpeso+=speso;
+				doc=dt.getString(5);
+				stat=dt.getString(9);
+
+				if (actcant>cant) cantapl=cant;else cantapl=actcant;
+
+				dispcant=cant-cantapl;if (dispcant<0) dispcant=0;
+				actcant=actcant-cantapl;
+
+				pesoapl=cantapl*vfactor;
+				disppeso=speso-pesoapl;if (disppeso<0) disppeso=0;
+
+				// Stock
+                sql="UPDATE P_STOCK SET CANT="+dispcant+",PESO="+disppeso+" WHERE (CODIGO='"+prid+"') AND (DOCUMENTO='"+doc+"') AND (STATUS='"+stat+"')";
+				db.execSQL(sql);
+
+				if(actcant==0) return;
+
+				dt.moveToNext();
+			}
+
+			return;
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox("rebajaStockCanastas: "+e.getMessage());
+			return;
+		}
 	}
 
 	private boolean consistenciaLotes() {

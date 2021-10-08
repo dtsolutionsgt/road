@@ -1205,7 +1205,9 @@ public class CliDet extends PBase {
 			flag=false;
 
 			if (rt.equalsIgnoreCase("D") || rt.equalsIgnoreCase("T")) flag=true;
-			if (flag) relD.setVisibility(View.VISIBLE);else relD.setVisibility(View.GONE);
+			if (flag){
+				validaDespacho();
+			}else relD.setVisibility(View.GONE);
 
             clinue=esClienteNuevo();
 

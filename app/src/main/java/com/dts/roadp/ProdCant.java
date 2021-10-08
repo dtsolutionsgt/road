@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.View.OnKeyListener;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -26,14 +27,16 @@ public class ProdCant extends PBase {
 
 	private EditText txtCant,txtPeso;
 	private TextView lblDesc,lblCant,lblPrec,lblDisp,lblBU,lblTot,lblCodProd;
-	private TextView lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso,lblPesoUni, lblPesoOriginal, lblCantOriginal;
-	private ImageView imgProd,imgUpd,imgDel;	
+	private TextView lblDispLbl,lblPesoLbl,lblFactor,lblCantPeso,lblPesoUni, lblPesoOriginal, lblCantOriginal,
+	                 txtCantOriginal, txtPesoOriginal;
+	private ImageView imgProd,imgUpd,imgDel;
+	private RelativeLayout rlValoresOriginales;
 	
 	private Precio prc;
 	
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact,umini;
 	private int nivel,browse=0,deccant,prevfact=1;
-	private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
+	private double cant,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0, vCantO, vPesoO;
 	private boolean pexist,esdecimal,porpeso,esbarra,idle=true;
 	private AppMethods app;
 
@@ -53,6 +56,7 @@ public class ProdCant extends PBase {
 		rutatipo=gl.rutatipo;
 
 		if (rutatipo.equalsIgnoreCase("V")) imgUpd.setVisibility(View.INVISIBLE);
+		if (rutatipo.equalsIgnoreCase("D")) rlValoresOriginales.setVisibility(View.INVISIBLE);
 		imgUpd.setVisibility(View.INVISIBLE);
 
 		prc=new Precio(this,mu,gl.peDec);
@@ -379,6 +383,34 @@ public class ProdCant extends PBase {
 		}
 
         txtPeso.setText(mu.frmdecimal(ippeso, gl.peDecImp));
+
+		try {
+
+		//	if(gl.rutatipo.equals("D")){
+
+				sql="SELECT CANT_ORIGINAL, PESO_ORIGINAL FROM DS_PEDIDOD " +
+						" WHERE (PRODUCTO='"+prodid+"') " +
+						" AND (COREL = '"+gl.iddespacho+"')";
+				dt=Con.OpenDT(sql);
+
+				if (dt!=null){
+					if (dt.getCount()>0){
+						dt.moveToFirst();
+						vCantO=dt.getDouble(0);
+						vPesoO=dt.getDouble(1);
+
+						txtCantOriginal.setText(String.valueOf(vCantO));
+						txtPesoOriginal.setText(String.valueOf(vPesoO));
+					}
+				}
+
+			//}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox("Obteniendo Cant Original y Peso Original -"+ e.getMessage());
+		}
+
 	}
 	
 	private double getDisp() {
@@ -640,8 +672,11 @@ public class ProdCant extends PBase {
 			imgProd=(ImageView) findViewById(R.id.imgPFoto);
 			imgUpd=(ImageView) findViewById(R.id.ImageView1);
 			imgDel=(ImageView) findViewById(R.id.imageView2);
-			lblPesoOriginal=(TextView) findViewById(R.id.textView9);lblPesoOriginal.setVisibility(View.VISIBLE);
-			lblCantOriginal=(TextView) findViewById(R.id.textView10);lblCantOriginal.setVisibility(View.VISIBLE);
+			lblCantOriginal=(TextView) findViewById(R.id.textView9);
+			lblPesoOriginal=(TextView) findViewById(R.id.textView10);
+			txtCantOriginal=(TextView) findViewById(R.id.textView11);
+			txtPesoOriginal=(TextView) findViewById(R.id.textView12);
+			rlValoresOriginales=(RelativeLayout) findViewById(R.id.rlValoresOriginales);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

@@ -595,6 +595,7 @@ public class Venta extends PBase {
 
                     item.Peso=DT.getDouble(9);
 					item.precio=DT.getDouble(11);
+					porpeso=prodPorPeso(item.Cod);
 
 					//if (app.prodBarra(item.Cod)) {
 					    if (pedido && app.esRosty(item.Cod)) {
@@ -602,7 +603,11 @@ public class Venta extends PBase {
                             //item.Cant = item.Cant / item.factor;
                             item.um=item.ums;
                         } else {
-                            item.Cant = item.Cant * item.factor;
+					    	if (porpeso){
+								item.Cant = item.Cant;
+							}else{
+								item.Cant = item.Cant * item.factor;
+							}
                         }
                     //}
 
@@ -1304,6 +1309,7 @@ public class Venta extends PBase {
 		}
 
 		try {
+
 			sql="SELECT UNIDADMEDIDA FROM P_STOCK WHERE (CODIGO='"+prodDesp+"')";
 			dt=Con.OpenDT(sql);
 
@@ -2997,6 +3003,9 @@ public class Venta extends PBase {
 				if (!app.prodBarra(item.producto)){
 					if (prec!=0){
 
+						porpeso=prodPorPeso(item.producto);
+						//#CKFK 20211004 Agregué esto (item.umventa.equals(gl.umpeso)?item.umstock:item.umventa) para cuando
+						//el producto sea CW y se venda por peso
 						if (getDisp(item.producto, item.umventa) > 0){
 
 							respuesta=applyCant(item.cant,item.peso);
@@ -3586,13 +3595,13 @@ public class Venta extends PBase {
 
                 cant = Ds_pedidodObj.items.get(i).cant;
 
-				if (prodPorPeso(producto)){
+				/*if (!prodPorPeso(producto) && (!app.esRosty(producto)) && (!app.prodBarra(producto)) ){
 					sql = "SELECT PRODUCTO, CANT, UMSTOCK FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
 							" AND UMSTOCK = '" + UM + "'";
-				}else{
+				}else{*/
 					sql = "SELECT PRODUCTO, CANT, UM FROM T_VENTA WHERE PRODUCTO = '" + producto + "' " +
 							" AND UM = '" + UM + "'";
-				}
+				//}
 
             	DT = Con.OpenDT(sql);
 
@@ -3882,10 +3891,12 @@ public class Venta extends PBase {
 	public void solicitaRazonModificacion(){
 		Cursor DT;
 		String prod;
+        double dif;
 
 		try{
 
-			sql = "SELECT PRODUCTO FROM T_FACTURAD_MODIF WHERE IDRAZON = ''";
+			sql = "SELECT PRODUCTO, CANTSOLICITADA - CANTENTREGADA AS DIF " +
+				  " FROM T_FACTURAD_MODIF WHERE IDRAZON = ''";
 
 			DT=Con.OpenDT(sql);
 
@@ -3896,8 +3907,9 @@ public class Venta extends PBase {
 				DT.moveToFirst();
 
 				prod = DT.getString(0);
+				dif = DT.getDouble(1);
 
-				showNoDespDialog(prod);
+				showNoDespDialog(prod,dif);
 			}else{
 				processFinishOrder();
 			}
@@ -3907,7 +3919,7 @@ public class Venta extends PBase {
 		}
 	}
 
-	public void showNoDespDialog(final String prod) {
+	public void showNoDespDialog(final String prod, final double diferencia) {
 		try{
 			final AlertDialog Dialog;
 
@@ -3917,7 +3929,9 @@ public class Venta extends PBase {
 			}
 
 			mMenuDlg = new AlertDialog.Builder(this);
-			mMenuDlg.setTitle("Razón de modificación\n" + prod + " " + app.getNombreProducto(prod));
+			mMenuDlg.setTitle("Razón de modificación por " +
+							"diferencia de " + diferencia  + " en el " +
+					         prod + " " + app.getNombreProducto(prod));
             mMenuDlg.setCancelable(false);
 
 			mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {

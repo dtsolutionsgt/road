@@ -1011,6 +1011,48 @@ public class AppMethods {
 		return  pesoprom;
 	}
 
+	public String unidBas(String cod) {
+		Cursor DT;
+		String umbas="";
+
+		try {
+			String sql = "SELECT UNIDBAS FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				umbas = DT.getString(0);
+			}
+
+			if(DT!=null) DT.close();
+		} catch (Exception e) {
+			toast(e.getMessage());
+		}
+
+		return  umbas;
+	}
+
+	public double pesoPromedio(String cod) {
+		Cursor DT;
+		double pesoprom=0;
+
+		try {
+			String sql = "SELECT PESO_PROMEDIO FROM P_PRODUCTO WHERE CODIGO='" + cod + "'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				pesoprom = DT.getDouble(0);
+			}
+
+			if(DT!=null) DT.close();
+		} catch (Exception e) {
+			toast(e.getMessage());
+		}
+
+		return  pesoprom;
+	}
+
 	public String umStock(String cod) {
 		Cursor DT;
 		String umm,sql;

@@ -76,14 +76,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.FileOutputStream;
 import java.text.ParseException;
-
-import com.dts.roadp.Base64;
 
 public class ComWS extends PBase {
 //Esto es de Kelvyn
@@ -113,6 +106,7 @@ public class ComWS extends PBase {
 
 	private ArrayList<String> listItems = new ArrayList<>();
 	private ArrayList<String> results = new ArrayList<>();
+	private ArrayList<String> listDocs = new ArrayList<>();
 
 	private ArrayList<clsClasses.clsEnvio> items = new ArrayList<clsClasses.clsEnvio>();
 	private ListAdaptEnvio adapter;
@@ -2497,7 +2491,7 @@ public class ComWS extends PBase {
 			Actualiza_FinDia();
 			encodePrinters();
 			encodeLicence();
-			encodeLicenceRuta();
+			//encodeLicenceRuta();
 
 			SetStatusRecToTrans("1");
 
@@ -2736,7 +2730,7 @@ public class ComWS extends PBase {
 			Actualiza_FinDia();
 			encodePrinters();
 			encodeLicence();
-			encodeLicenceRuta();
+			//encodeLicenceRuta();
 
 			SetStatusRecToTrans("1");
 
@@ -5671,11 +5665,20 @@ public class ComWS extends PBase {
 
 					if (envioparcial) dbld.clear();
 
-					dbld.insert("D_MOV", "WHERE COREL='" + cor + "'");
-					dbld.insert("D_MOVD", "WHERE COREL='" + cor + "'");
-					dbld.insert("D_MOVDB", "WHERE COREL='" + cor + "'");
-					dbld.insert("D_MOVDCAN", "WHERE COREL='" + cor + "'");
-					dbld.insert("D_MOVDPALLET", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOV", "WHERE COREL='" + cor + "' AND NOT EXISTS " +
+							    "(SELECT COREL FROM D_MOV WHERE COREL = '" + cor + "')");
+					dbld.insert("D_MOVD", "WHERE COREL='" + cor + "' AND NOT EXISTS " +
+					            "(SELECT M.COREL FROM D_MOVD M WHERE M.COREL = '" + cor + "' " +
+							    "AND M.PRODUCTO = D_MOVD.PRODUCTO)");
+					dbld.insert("D_MOVDB", "WHERE COREL='" + cor + "' AND NOT EXISTS " +
+							    "(SELECT M.COREL FROM D_MOVDB M WHERE M.COREL = '" + cor + "' " +
+							    "AND M.BARRA = D_MOVDB.BARRA)");
+					dbld.insert("D_MOVDCAN", "WHERE COREL='" + cor + "' AND NOT EXISTS " +
+							    "(SELECT M.COREL FROM D_MOVDCAN M WHERE M.COREL = '" + cor + "' " +
+							    "AND M.PRODUCTO = D_MOVDCAN.PRODUCTO)");
+					dbld.insert("D_MOVDPALLET", "WHERE COREL='" + cor + "' AND NOT EXISTS " +
+							    "(SELECT M.COREL FROM D_MOVDPALLET M WHERE M.COREL = '" + cor + "' " +
+							    "AND M.BARRAPALLET = D_MOVDB.BARRAPALLET)");
 
 					//#CKFK 20190412 Corregido error
 					dbld.add("INSERT INTO P_DEVOLUCIONES_SAP " +
@@ -6663,14 +6666,22 @@ public class ComWS extends PBase {
 
 		try {
 			try {
-				sql = "SELECT DOCUMENTO FROM P_STOCK";
+
+				listDocs.clear();
+				sql = "SELECT DISTINCT DOCUMENTO FROM P_STOCK " +
+					  "UNION " +
+					  "SELECT DISTINCT DOCUMENTO FROM P_STOCKB ";
 				dt = Con.OpenDT(sql);
 
-				if (dt.getCount() > 0) {
-					dt.moveToFirst();
-					docstock = dt.getString(0);
-				} else {
-					docstock = "";
+				if (dt!=null){
+					if (dt.getCount() > 0) {
+						dt.moveToFirst();
+						for (int i = 0; i < dt.getCount(); i++) {
+							docstock = dt.getString(0);
+							listDocs.add(docstock);
+							dt.moveToNext();
+						}
+					}
 				}
 
 				if (dt != null) dt.close();
@@ -6714,8 +6725,15 @@ public class ComWS extends PBase {
 			conflag = 0;
 
 			dbld.clear();
-			dbld.add("DELETE FROM P_DOC_ENVIADOS_HH WHERE DOCUMENTO='" + docstock + "'");
-			dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('" + docstock + "','" + ActRuta + "','" + univdate + "',1)");
+
+			if (listDocs.size()>0){
+				for (int i = 0; i < listDocs.size(); i++) {
+					docstock = listDocs.get(i);
+					dbld.add("DELETE FROM P_DOC_ENVIADOS_HH WHERE DOCUMENTO='" + docstock + "'");
+					dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('" + docstock + "','" + ActRuta + "','" + univdate + "',1)");
+				}
+			}
+
 			dbld.add("UPDATE P_RUTA SET IDIMPRESORA='" + parImprID + "',NUMVERSION='" + gl.parNumVer + "',ARQUITECTURA='ANDR', FECHAVERSION='" + gl.parFechaVer + "' WHERE CODIGO='" + gl.ruta + "'");
 			dbld.add("INSERT INTO P_BITACORA_VERSIONHH (RUTA,FECHA,NUMVERSION,ARQUITECTURA) " +
 					"VALUES('" + gl.ruta + "','" + du.univfechaseg() + "','" + gl.parNumVer + "','ANDR')");

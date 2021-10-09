@@ -103,12 +103,6 @@ public class CliNuevoT extends PBase {
 
         setData();
 
-        String coorx = String.valueOf(gl.gpspx);
-        String coory  = String.valueOf(gl.gpspy);
-        lbGPS.setText(coorx +" , "+coory);
-
-
-
         setDataSpinnerPrecio();
         setHandlers();
         miniFachada();
@@ -797,6 +791,10 @@ public class CliNuevoT extends PBase {
         if (gl.corelCliente.isEmpty() || gl.corelCliente == null) {
             setCorel();
         }
+
+        String coorx = String.valueOf(gl.gpspx);
+        String coory  = String.valueOf(gl.gpspy);
+        lbGPS.setText(coorx +" , "+coory);
 
         txtCliNombre.setText(gl.CliNombre);
         txtCliNit.setText(gl.CliNit);

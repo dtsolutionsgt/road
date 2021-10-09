@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -12,6 +13,7 @@ public class editar_cliente extends PBase {
 
     private TextView txtNombreCliente, txtNitCliente, txtCanalCliente, txtSubCanalCliente;
     private ImageView btnBuscarCanal, imgRegresar,imgGuardar;
+    private RelativeLayout relNomRuc;
     private String codigo, nombre, ruc, canal, subcanal, idCanal, idSubcanal;
     private TableRow trNombre, trNit;
 
@@ -27,8 +29,7 @@ public class editar_cliente extends PBase {
         txtNitCliente = (TextView) findViewById(R.id.txtNitCliente);
         txtCanalCliente = (TextView) findViewById(R.id.txtCanalCliente);
         txtSubCanalCliente = (TextView) findViewById(R.id.txtSubCanalCliente);
-        trNombre = (TableRow) findViewById(R.id.trNombre);
-        trNit = (TableRow) findViewById(R.id.trNit);
+        relNomRuc = (RelativeLayout) findViewById(R.id.relNomRuc);
 
         codigo = gl.EditarClienteCodigo;
         nombre = gl.EditarClienteNombre;
@@ -43,12 +44,8 @@ public class editar_cliente extends PBase {
         txtCanalCliente.setText(canal);
         txtSubCanalCliente.setText(subcanal);
 
-        if (!gl.peEditarNombre) {
-            trNombre.setVisibility(View.GONE);
-        }
-
-        if  (!gl.peEditarNit) {
-            trNit.setVisibility(View.GONE);
+        if (!gl.peEditarNombre || !gl.peEditarNit ) {
+            relNomRuc.setVisibility(View.GONE);
         }
 
         setHandlers();

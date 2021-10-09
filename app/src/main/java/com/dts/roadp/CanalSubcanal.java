@@ -38,8 +38,8 @@ public class CanalSubcanal extends PBase {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_canal_subcanal);
+
         super.InitBase();
-        claseNombre = getIntent().getStringExtra("clase");
 
         listaCanales =  (ListView) findViewById(R.id.listaCanales);
         listaSubcanal =  (ListView) findViewById(R.id.listaSubcanal);
@@ -50,13 +50,6 @@ public class CanalSubcanal extends PBase {
 
         ListaCanales();
         setHandlers();
-
-        btnAceptar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setCanales();
-            }
-        });
 
     }
 
@@ -239,6 +232,13 @@ public class CanalSubcanal extends PBase {
                 }
             });
 
+            btnAceptar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    finish();
+                }
+            });
+
         } catch (Exception e) {
             addlog(new Object() {
             }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -246,17 +246,8 @@ public class CanalSubcanal extends PBase {
 
     }
 
-    private void setCanales() {
-        if (claseNombre.equalsIgnoreCase("editar_cliente")) {
-            Intent intent = new Intent(this, editar_cliente.class);
-            startActivity(intent);
-            super.finish();
-
-        } else if(claseNombre.equalsIgnoreCase("CliNuevoT")) {
-            Intent intent = new Intent(this, CliNuevoT.class);
-            startActivity(intent);
-            super.finish();
-        }
-
+    @Override
+    public void onBackPressed() {
+        super.finish();
     }
 }

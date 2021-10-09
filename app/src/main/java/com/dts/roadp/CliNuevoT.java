@@ -100,37 +100,14 @@ public class CliNuevoT extends PBase {
         cb6 = (CheckBox) findViewById(R.id.checkBox6);
         cb7 = (CheckBox) findViewById(R.id.checkBox7);
 
-        if (gl.CliCodVen == null || gl.CliCodVen.isEmpty()) {
-            gl.CliCodVen = gl.vend;
-        }
 
-        txtCliNombre.setText(gl.CliNombre);
-        txtCliNit.setText(gl.CliNit);
-        txtCliDireccion.setText(gl.CliDireccion);
-        txtProvincia.setText(gl.CliProvincia);
-        txtDistrito.setText(gl.CliDistrito);
-        txtCiudad.setText(gl.CliCiudad);
-        txtCliTelefono.setText(gl.CliTel);
-        txtCliEmail.setText(gl.CliEmail);
-        txtCliContacto.setText(gl.CliContacto);
-        txtCliCanal.setText(gl.EditarClienteCanal);
-        txtCliSubCanal.setText(gl.EditarClienteSubcanal);
-        txtCodVendedor.setText(gl.CliCodVen);
-        txtPollo.setText(gl.CliCsPollo);
-        txtEmbutidos.setText(gl.CliCsEmbutido);
-        txtHuevos.setText(gl.CliCsHuevo);
-        txtRes.setText(gl.CliCsRes);
-        txtCerdo.setText(gl.CliCsCerdo);
-        txtCongelados.setText(gl.CliCsCongelados);
-        txtSalsas.setText(gl.CliCsSalsas);
+        setData();
 
         String coorx = String.valueOf(gl.gpspx);
         String coory  = String.valueOf(gl.gpspy);
         lbGPS.setText(coorx +" , "+coory);
 
-        if (gl.corelCliente.isEmpty() || gl.corelCliente == null) {
-            setCorel();
-        }
+
 
         setDataSpinnerPrecio();
         setHandlers();
@@ -623,7 +600,6 @@ public class CliNuevoT extends PBase {
             setDataClienteG();
             gl.gpsCliNuevo = true;
             startActivity(new Intent(this,CliGPS.class));
-           //super.finish();
 
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -712,35 +688,32 @@ public class CliNuevoT extends PBase {
     public void verCanales() {
         setDataClienteG();
         Intent i = new Intent(this,CanalSubcanal.class);
-        i.putExtra("clase", "CliNuevoT");
         startActivity(i);
-        super.finish();
     }
 
     public void verProvincia() {
         setDataClienteG();
         Intent i = new Intent(this,DepartamentoMun.class);
         startActivity(i);
-        super.finish();
     }
 
     public void verVendedor() {
         setDataClienteG();
         Intent i = new Intent(this,ListaVendedores.class);
         startActivity(i);
-        super.finish();
-    }
-
-    public void Regresar() {
-        limpiar();
-        super.finish();
     }
 
     @Override
     public void onBackPressed() {
         limpiar();
         super.finish();
-        startActivity(new Intent(this, Clientes.class));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setData();
+
     }
 
     private void setDataClienteG() {
@@ -813,6 +786,37 @@ public class CliNuevoT extends PBase {
         txtCerdo.setText("");
         txtCongelados.setText("");
         txtSalsas.setText("");
+    }
+
+    private void setData() {
+
+        if (gl.CliCodVen == null || gl.CliCodVen.isEmpty()) {
+            gl.CliCodVen = gl.vend;
+        }
+
+        if (gl.corelCliente.isEmpty() || gl.corelCliente == null) {
+            setCorel();
+        }
+
+        txtCliNombre.setText(gl.CliNombre);
+        txtCliNit.setText(gl.CliNit);
+        txtCliDireccion.setText(gl.CliDireccion);
+        txtProvincia.setText(gl.CliProvincia);
+        txtDistrito.setText(gl.CliDistrito);
+        txtCiudad.setText(gl.CliCiudad);
+        txtCliTelefono.setText(gl.CliTel);
+        txtCliEmail.setText(gl.CliEmail);
+        txtCliContacto.setText(gl.CliContacto);
+        txtCliCanal.setText(gl.EditarClienteCanal);
+        txtCliSubCanal.setText(gl.EditarClienteSubcanal);
+        txtCodVendedor.setText(gl.CliCodVen);
+        txtPollo.setText(gl.CliCsPollo);
+        txtEmbutidos.setText(gl.CliCsEmbutido);
+        txtHuevos.setText(gl.CliCsHuevo);
+        txtRes.setText(gl.CliCsRes);
+        txtCerdo.setText(gl.CliCsCerdo);
+        txtCongelados.setText(gl.CliCsCongelados);
+        txtSalsas.setText(gl.CliCsSalsas);
     }
 
 }

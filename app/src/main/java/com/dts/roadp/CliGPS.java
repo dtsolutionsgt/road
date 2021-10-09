@@ -88,7 +88,6 @@ public class CliGPS extends PBase {
 				gl.gpspx = latitude;
 				gl.gpspy = longitude;
 
-				startActivity(new Intent(this, CliNuevoT.class));
 				gl.gpsCliNuevo = false;
 				super.finish();
 			} else {

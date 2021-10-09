@@ -31,18 +31,7 @@ public class editar_cliente extends PBase {
         txtSubCanalCliente = (TextView) findViewById(R.id.txtSubCanalCliente);
         relNomRuc = (RelativeLayout) findViewById(R.id.relNomRuc);
 
-        codigo = gl.EditarClienteCodigo;
-        nombre = gl.EditarClienteNombre;
-        ruc = gl.EditarClienteRuc;
-        canal = gl.EditarClienteCanal;
-        subcanal = gl.EditarClienteSubcanal;
-        idCanal = gl.IdCanal;
-        idSubcanal = gl.IdSubcanal;
-
-        txtNombreCliente.setText(nombre);
-        txtNitCliente.setText(ruc);
-        txtCanalCliente.setText(canal);
-        txtSubCanalCliente.setText(subcanal);
+        setData();
 
         if (!gl.peEditarNombre || !gl.peEditarNit ) {
             relNomRuc.setVisibility(View.GONE);
@@ -181,7 +170,6 @@ public class editar_cliente extends PBase {
 
     private  void VerCanales() {
         Intent intent = new Intent(this, CanalSubcanal.class);
-        intent.putExtra("clase", "editar_cliente");
         startActivity(intent);
     }
 
@@ -220,10 +208,31 @@ public class editar_cliente extends PBase {
 
     }
 
+    private void setData() {
+        codigo = gl.EditarClienteCodigo;
+        nombre = gl.EditarClienteNombre;
+        ruc = gl.EditarClienteRuc;
+        canal = gl.EditarClienteCanal;
+        subcanal = gl.EditarClienteSubcanal;
+        idCanal = gl.IdCanal;
+        idSubcanal = gl.IdSubcanal;
+
+        txtNombreCliente.setText(nombre);
+        txtNitCliente.setText(ruc);
+        txtCanalCliente.setText(canal);
+        txtSubCanalCliente.setText(subcanal);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setData();
+    }
+
     @Override
     public void onBackPressed() {
         try{
-            super.onBackPressed();
+            Regresar();
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }

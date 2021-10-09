@@ -49,7 +49,7 @@ public class DepartamentoMun extends PBase {
         btnAceptar.setOnClickListener(new View.OnClickListener() {
         @Override
             public void onClick(View view) {
-                setDepartamento();
+                finish();
             }
         });
 
@@ -114,7 +114,6 @@ public class DepartamentoMun extends PBase {
         cadena=txtFiltroMun.getText().toString().replace("'","");
         cadena=cadena.replace("\r","");
 
-        toast(gl.IdDep);
         try{
             if (gl.IdDep.length() > 0) {
                 sql="SELECT CODIGO,NOMBRE FROM P_MUNI WHERE DEPAR='" + gl.IdDep + "'";
@@ -242,8 +241,13 @@ public class DepartamentoMun extends PBase {
     }
 
     private void setDepartamento() {
-        Intent intent = new Intent(this, CliNuevoT.class);
-        startActivity(intent);
+       //Intent intent = new Intent(this, CliNuevoT.class);
+        // startActivity(intent);
         super.finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }

@@ -981,13 +981,13 @@ public class CliDet extends PBase {
 	private void EditarDatosCliente()
 	{
 		browse = 2;
-		Intent intent = new Intent(this, editar_cliente.class);
 
 		gl.EditarClienteCodigo= cod;
 		gl.EditarClienteNombre = lblNom.getText().toString();
 		gl.EditarClienteRuc = lblRep.getText().toString();
 		gl.EditarClienteSubcanal = lblCanalsub.getText().toString().substring(11);
 		gl.EditarClienteCanal = lblCanal.getText().toString().substring(8);
+		Intent intent = new Intent(this, editar_cliente.class);
 		startActivity(intent);
 	}
 

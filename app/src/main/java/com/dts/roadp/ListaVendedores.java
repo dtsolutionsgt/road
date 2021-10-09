@@ -115,8 +115,8 @@ public class ListaVendedores extends PBase {
                         gl.CliNomVen = sitem.nombreayudante;
 
                     }
-                    toast(gl.CliCodVen);
 
+                    finish();
                 }
             });
 
@@ -139,7 +139,7 @@ public class ListaVendedores extends PBase {
             imgAceptar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Regresar();
+                    finish();
                 }
             });
         } catch (Exception e) {
@@ -147,13 +147,8 @@ public class ListaVendedores extends PBase {
         }
     }
 
-    public void Regresar() {
-        startActivity(new Intent(this, CliNuevoT.class));
-        super.finish();
-    }
-
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        super.finish();
     }
 }

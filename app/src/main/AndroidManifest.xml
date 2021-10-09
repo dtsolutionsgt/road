@@ -52,7 +52,6 @@
             android:name=".editar_cliente"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
-            android:noHistory="true"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
         <activity

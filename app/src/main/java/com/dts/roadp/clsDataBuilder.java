@@ -19,10 +19,11 @@ public class clsDataBuilder {
 	
 	protected SQLiteDatabase db;
 	protected BaseDatos Con;
+    protected BaseDatos.Insert ins;
 
-	private ArrayList<Integer> tcol=new ArrayList<Integer>();
+    private ArrayList<Integer> tcol=new ArrayList<Integer>();
+    private ArrayList<String> tnom=new ArrayList<String>();
 	private ArrayList<String> sendlog=new ArrayList<String>();
-
 
 	private DateUtils DU;
 	private MiscUtils MU;
@@ -42,6 +43,7 @@ public class clsDataBuilder {
 		try {
 			db = Con.getWritableDatabase();
 		 	Con.vDatabase =db;
+            ins=Con.Ins;
 	    } catch (Exception e) {
 	    	MU.msgbox(e.getMessage());
 	    }
@@ -74,10 +76,12 @@ public class clsDataBuilder {
 	public boolean insert(String tn,String ws){
 
 		Cursor PRG,DT;
-		String s,n,t,si;
+		String s,n,t,si,nombre,valstr;
 		int j,cc,ct;
+		double valnum;
 		
-		tcol.clear();
+		tcol.clear();tnom.clear();
+
 		String SQL_="INSERT INTO "+tn+" VALUES(";
 		String SS="SELECT ";
 		
@@ -108,6 +112,8 @@ public class clsDataBuilder {
 
 				ct=getCType(n,t);
 				tcol.add(ct);
+				tnom.add(n);
+
 				s=s+n+"  "+ct+"\n";
 
 				SS=SS+n;
@@ -115,6 +121,25 @@ public class clsDataBuilder {
 
 				PRG.moveToNext();j+=1;
 			}
+
+			/*
+
+			if (tn.equals("D_FACTURA")) {
+			    tcol.clear();tnom.clear();
+
+			    nombre="COREL";tnom.add(nombre);
+			    si el campo es numerico tcol.add(0);
+			    si no es tcol.add(getCType(nombre,"TEXT"))
+
+			     nombre="ANULADO";tnom.add(nombre);
+			     si el campo es numerico tcol.add(0);
+			    si no es tcol.add(getCType(nombre,"TEXT"))
+
+			    .....
+			    .....
+			}
+			 */
+
 
 			if (tn.equals("D_FACTURA")) SS="SELECT COREL, ANULADO, FECHA, EMPRESA, RUTA, VENDEDOR, " +
 					                       "CASE ADD1 WHEN 'NUEVO' THEN '" + codCliNuevo + "' ELSE CLIENTE END  CLIENTE, " +
@@ -143,27 +168,37 @@ public class clsDataBuilder {
 
 			DT=Con.OpenDT(SS);
 			if (DT.getCount()==0) return true;
-			
+
+			ins.init(tn);
+
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
 				  
 				si=SQL_;
+
+                for (int i = 0; i < cc; i++) {
+
+                    ct=tcol.get(i);
+                    nombre=tnom.get(i);
+
+                    if (ct==0) {
+                        s=""+DT.getDouble(i);
+                        valnum=DT.getDouble(i);
+                        ins.add(nombre,valnum);
+                    } else {
+                        if (ct==1) s="'"+DT.getString(i)+"'";
+                        if (ct==2) s="'"+DU.univfechaext(DT.getInt(i))+"'";
+                        if (ct==3) s="'"+DU.univfechaext(DT.getInt(i))+"'";
+                        valstr=s;
+                        ins.add(nombre,valstr);
+                    }
+
+                    if (i<cc-1) s=s+",";
+                    si=si+s;
+                }
 				
-				for (int i = 0; i < cc; i++) {
-
-					ct=tcol.get(i);
-
-					if (ct==0) s=""+DT.getDouble(i);
-					if (ct==1) s="'"+DT.getString(i)+"'";
-
-					if (ct==2) s="'"+DU.univfechaext(DT.getInt(i))+"'";
-					if (ct==3) s="'"+DU.univfechaext(DT.getInt(i))+"'";
-					
-					if (i<cc-1) s=s+",";
-					si=si+s;
-			    }
-				
-				si=si+")";
+				//si=si+")";
+                si=ins.sql();
 
 				items.add(si);
 				sendlog.add(si);

@@ -400,6 +400,8 @@ public class ComWS extends PBase {
 			lblEnv.setVisibility(View.INVISIBLE);
 			imgEnv.setVisibility(View.INVISIBLE);
 
+			/*
+
 			if (!gl.debug) {
 				if (!validaLicencia()) {
 					mu.msgbox("Licencia inválida!");
@@ -418,6 +420,7 @@ public class ComWS extends PBase {
 				}
 			}
 
+			 */
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 

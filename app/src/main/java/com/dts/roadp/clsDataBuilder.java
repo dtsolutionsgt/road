@@ -100,6 +100,7 @@ public class clsDataBuilder {
 				  
 				n=PRG.getString(PRG.getColumnIndex("name"));
 				t=PRG.getString(PRG.getColumnIndex("type"));
+
 				if (tn.equals("D_CANASTA") && n.equalsIgnoreCase("IDCANASTA")) {
 					PRG.moveToNext();
 					continue;

@@ -108,8 +108,7 @@ public class BaseDatos extends SQLiteOpenHelper {
 		      clVList.clear();
 		      clTable = TableName;
 		  }
-	 
-		  
+
 		  public void add(String pField, String pValue , String pTipo) {
 			  String SV;
 			  

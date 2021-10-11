@@ -400,6 +400,7 @@ public class ComWS extends PBase {
 			lblEnv.setVisibility(View.INVISIBLE);
 			imgEnv.setVisibility(View.INVISIBLE);
 
+			//JP 20211011  Quitar comentario cuando se termina el cambio
 			/*
 
 			if (!gl.debug) {

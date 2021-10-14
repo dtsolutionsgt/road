@@ -167,13 +167,21 @@ public class clsDataBuilder {
 		try {
 
 			DT=Con.OpenDT(SS);
-			if (DT.getCount()==0) return true;
-
-			ins.init(tn);
+			if (DT==null) {
+				return true;
+			}
+			if (DT.getCount()==0) {
+				return true;
+			}
+			//ins.init(tn);
 
 			DT.moveToFirst();
 			while (!DT.isAfterLast()) {
-				  
+
+                //#CKFK 20211012 Moví esto para acá, para que los valores se inicialicen
+				// cada vez que le vaya a asignar datos a una tabla
+				ins.init(tn);
+
 				si=SQL_;
 
                 for (int i = 0; i < cc; i++) {

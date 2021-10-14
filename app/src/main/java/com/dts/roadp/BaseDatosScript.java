@@ -1022,7 +1022,7 @@ public class BaseDatosScript {
 					"[PRECIO_ACT] REAL NOT NULL,"+
 					"[CANT] REAL NOT NULL,"+
 					"[PESO] REAL NOT NULL,"+
-					"[POR_PRESO] TEXT NOT NULL,"+
+					"[POR_PESO] TEXT NOT NULL,"+
 					"[UMVENTA] TEXT NOT NULL,"+
 					"[UMSTOCK] TEXT NOT NULL,"+
 					"[UMPESO] TEXT NOT NULL,"+

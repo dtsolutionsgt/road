@@ -499,7 +499,7 @@ public class DevolCli extends PBase {
 					ins.add("PRECIO_ACT",0);
 					ins.add("CANT",DT.getDouble(2));
 					ins.add("PESO",DT.getDouble(8));
-					ins.add("POR_PRESO", DT.getString(14));
+					ins.add("POR_PESO", DT.getString(14));
 					ins.add("UMVENTA",DT.getString(10));
 					ins.add("UMSTOCK",DT.getString(11));
 					ins.add("UMPESO",DT.getString(12));

@@ -764,23 +764,23 @@ public class Reimpresion extends PBase {
 				if(ncFact==1){
 					if(tipo==6){
 						fdev.buildPrint(itemid, 3, "TOL");
-						prn_nc.printask(printclose, "printnc.txt");
+						prn_nc.printask(printcallback, "printnc.txt");
 
 						toast("Reimpresión de nota de crédito y factura generada");
 					}else {
 						fdev.buildPrint(itemid, 1, "TOL");
-						prn_nc.printask(printclose, "printnc.txt");
+						prn_nc.printask(printcallback, "printnc.txt");
 						toast("Reimpresión de nota de crédito y factura generada");
 					}
 
 				}else if(ncFact==2){
 					if(tipo==6){
 						fdev.buildPrint(itemid, 3, "TOL");
-						prn_nc.printask(printclose, "printnc.txt");
+						prn_nc.printask(printcallback, "printnc.txt");
 
 						toast("Reimpresion de nota de credito generada");
 					}else{
-						fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
+						fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printcallback, "printnc.txt");
 
 						toast("Reimpresion de nota de credito generada");
 					}

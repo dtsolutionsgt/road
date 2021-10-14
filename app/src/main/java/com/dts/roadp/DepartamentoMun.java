@@ -76,18 +76,22 @@ public class DepartamentoMun extends PBase {
 
             DT=Con.OpenDT(sql);
 
-            if(DT.getCount()>0) {
-                DT.moveToFirst();
+            if (DT!=null){
 
-                while (!DT.isAfterLast())
-                {
-                    item = clsCls.new clsDepartamento();
-                    item.codigo=DT.getString(0);
-                    item.nombre=DT.getString(1);
+                if(DT.getCount()>0) {
+                    DT.moveToFirst();
 
-                    items.add(item);
+                    while (!DT.isAfterLast())
+                    {
+                        item = clsCls.new clsDepartamento();
+                        item.codigo=DT.getString(0);
+                        item.nombre=DT.getString(1);
 
-                    DT.moveToNext();
+                        items.add(item);
+
+                        DT.moveToNext();
+                    }
+
                 }
 
             }
@@ -124,19 +128,23 @@ public class DepartamentoMun extends PBase {
 
                 DT=Con.OpenDT(sql);
 
-                if(DT.getCount()>0) {
-                    DT.moveToFirst();
+                if (DT!=null){
 
-                    while (!DT.isAfterLast()) {
+                    if(DT.getCount()>0) {
+                        DT.moveToFirst();
 
-                        item1 = clsCls.new clsMunicipio();
+                        while (!DT.isAfterLast()) {
 
-                        item1.codigo=DT.getString(0);
-                        item1.nombre=DT.getString(1);
+                            item1 = clsCls.new clsMunicipio();
 
-                        items1.add(item1);
+                            item1.codigo=DT.getString(0);
+                            item1.nombre=DT.getString(1);
 
-                        DT.moveToNext();
+                            items1.add(item1);
+
+                            DT.moveToNext();
+                        }
+
                     }
 
                 }

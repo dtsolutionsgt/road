@@ -198,7 +198,10 @@ public class BaseDatos extends SQLiteOpenHelper {
 				  }
 				  
 				  S = S + SF + ") VALUES (" + SV + ")";
-				  
+
+				 /* clFList.clear();
+				  clVList.clear();*/
+
 				  return S;
 				 				  
 			  } catch (Exception e) { 

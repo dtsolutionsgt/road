@@ -414,6 +414,8 @@ public class Menu extends PBase {
 							showInvMenuTodas();
 						}else if (rutatipo.equalsIgnoreCase("V")) {
 							showInvMenuVenta();
+						}else if (rutatipo.equalsIgnoreCase("D")) {
+							showInvMenuVenta();
 						}
 					}
 

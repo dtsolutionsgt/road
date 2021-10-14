@@ -400,9 +400,6 @@ public class ComWS extends PBase {
 			lblEnv.setVisibility(View.INVISIBLE);
 			imgEnv.setVisibility(View.INVISIBLE);
 
-			//JP 20211011  Quitar comentario cuando se termina el cambio
-			/*
-
 			if (!gl.debug) {
 				if (!validaLicencia()) {
 					mu.msgbox("Licencia inválida!");
@@ -420,8 +417,6 @@ public class ComWS extends PBase {
 					return;
 				}
 			}
-
-			 */
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 

@@ -34,7 +34,9 @@
         <activity
             android:name=".ListaVendedores"
             android:exported="true"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="stateHidden"/>
         <activity
             android:name=".DepartamentoMun"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -473,7 +475,10 @@
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity android:name=".imprime_barras" />
-        <activity android:name=".desglose" />
+        <activity android:name=".desglose"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name=".Exist"
             android:label="@string/title_activity_exist"

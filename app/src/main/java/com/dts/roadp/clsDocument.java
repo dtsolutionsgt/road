@@ -90,6 +90,7 @@ public class clsDocument {
 					}
 				}
 				if (docrecibo && (reimpres==0)) flag=0;
+				if (docrecibo && (reimpres==1)) flag=1;
 				if (docdevolucion && (reimpres==1)) flag = 1;
 				if (docpedido && (reimpres==1)) flag = 1;
 			} else if(modofact.equalsIgnoreCase("*")) {

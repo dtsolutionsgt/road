@@ -66,29 +66,19 @@ public class DevolCli extends PBase {
 
 		clearData();
 
-		printcallback= new Runnable() {
-			public void run() {
-				askPrint();
-			}
+		printcallback= () -> askPrint();
+
+		printexit= () -> {
+			limpiavariables_devol();
+			DevolCli.super.finish();
 		};
 
-		printexit= new Runnable() {
-			public void run() {
-				limpiavariables_devol();
-				DevolCli.super.finish();
-			}
+		printvoid= () -> {
 		};
 
-		printvoid= new Runnable() {
-			public void run() {
-			}
-		};
-
-		printclose= new Runnable() {
-			public void run() {
-				limpiavariables_devol();
-				DevolCli.super.finish();
-			}
+		printclose= () -> {
+			limpiavariables_devol();
+			DevolCli.super.finish();
 		};
 
 		prn=new printer(this,printexit,gl.validimp);

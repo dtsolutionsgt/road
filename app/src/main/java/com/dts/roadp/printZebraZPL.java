@@ -331,6 +331,7 @@ public class printZebraZPL extends printBase {
     }
 
     private void doPrint() {
+
         printer = connect();
 
         if (printer != null) {
@@ -343,6 +344,7 @@ public class printZebraZPL extends printBase {
     }
 
     private void doPrintBarra() {
+
         printer = connect();
 
         if (printer != null) {
@@ -362,14 +364,11 @@ public class printZebraZPL extends printBase {
 
         try {
             final Handler cbhandler = new Handler();
-            cbhandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        callback.run();
-                    } catch (Exception ee) {
-                        String ss=ee.getMessage();
-                    }
+            cbhandler.postDelayed(() -> {
+                try {
+                    callback.run();
+                } catch (Exception ee) {
+                    String ss=ee.getMessage();
                 }
             }, 500);
         } catch (Exception e) {
@@ -460,6 +459,7 @@ public class printZebraZPL extends printBase {
                 printer = ZebraPrinterFactory.getInstance(connection);
                 PrinterLanguage pcLanguage = printer.getPrinterControlLanguage();
                 String pl = SGD.GET("device.languages", connection);
+                //SGD.SET("device.languages", "hybrid_xml_zpl", connection);
             } catch (ConnectionException e) {
                 setStatus("Unknown Printer Language");
                 printer = null;

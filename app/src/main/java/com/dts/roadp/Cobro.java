@@ -84,41 +84,29 @@ public class Cobro extends PBase {
 		gl.pagomodo=0;
 		cod=gl.cliente;
 
-		printcallback= new Runnable() {
-			public void run() {
-				askPrint();
+		printcallback= () -> askPrint();
+
+		printclose= () -> {
+			if(gl.banderaCobro){
+				Cobro.super.finish();
+			}else{
+				if(browse==4){
+					if (gl.validarCred==1) validaCredito(); //#CKFK 20190503 Printclose
+					browse = 0;
+				}
 			}
 		};
 
-		printclose= new Runnable() {
-			public void run() {
-
-				if(gl.banderaCobro){
-					Cobro.super.finish();
-				}else{
-					if(browse==4){
-						if (gl.validarCred==1) validaCredito(); //#CKFK 20190503 Printclose
-						browse = 0;
-					}
+		printexit= () -> {
+			if(gl.banderaCobro){
+				Cobro.super.finish();
+			}else{
+				if(browse==4){
+					if (gl.validarCred==1) validaCredito(); //#CKFK 20190503 Printclose
+					browse = 0;
 				}
-				//Cobro.super.finish();
-
 			}
-		};
-
-		printexit= new Runnable() {
-			public void run() {
-
-				if(gl.banderaCobro){
-					Cobro.super.finish();
-				}else{
-					if(browse==4){
-						if (gl.validarCred==1) validaCredito(); //#CKFK 20190503 Printclose
-						browse = 0;
-					}
-				}
-				//Cobro.super.finish();
-			}
+			//Cobro.super.finish();
 		};
 
 		prn=new printer(this,printexit,gl.validimp);
@@ -1291,16 +1279,16 @@ public class Cobro extends PBase {
 						if (dtipo.equalsIgnoreCase("R")) {
 							if (prn.isEnabled()) {
 								fdocf.buildPrint(crrf,1,gl.peModal);
-								prn.printnoask(printclose, "print.txt");
+								//prn.printnoask(printcallback, "print.txt");
 								prn.printnoask(printclose, "print.txt");
 							}
 						}else {
 							if (prn.isEnabled()) {
-
 								fdoc.buildPrint(corel,1,gl.peModal);
+								impres=0;
 								browse = 4;
-								prn.printnoask(printclose, "print.txt");
-								prn.printnoask(printclose, "print.txt");
+								//prn.printnoask(printcallback, "print.txt");
+								prn.printnoask(printcallback, "print.txt");
 							}
 						}
 

@@ -146,6 +146,8 @@ public class CanalSubcanal extends PBase {
 
                     }
 
+                }else{
+                    toast("Selecciona el canal");
                 }
 
                 if(DT!=null) DT.close();

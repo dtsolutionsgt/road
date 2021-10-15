@@ -119,41 +119,48 @@ public class DepartamentoMun extends PBase {
         cadena=cadena.replace("\r","");
 
         try{
-            if (gl.IdDep.length() > 0) {
-                sql="SELECT CODIGO,NOMBRE FROM P_MUNI WHERE DEPAR='" + gl.IdDep + "'";
+            if  (gl.IdDep!=null){
 
-                if (cadena.length()>0) {
-                    sql=sql+" AND NOMBRE LIKE '%" + cadena + "%' OR CODIGO LIKE '%"+cadena+"%'";
-                }
+                if (gl.IdDep.length() > 0) {
 
-                DT=Con.OpenDT(sql);
+                    sql="SELECT CODIGO,NOMBRE FROM P_MUNI WHERE DEPAR='" + gl.IdDep + "'";
 
-                if (DT!=null){
+                    if (cadena.length()>0) {
+                        sql=sql+" AND NOMBRE LIKE '%" + cadena + "%' OR CODIGO LIKE '%"+cadena+"%'";
+                    }
 
-                    if(DT.getCount()>0) {
-                        DT.moveToFirst();
+                    DT=Con.OpenDT(sql);
 
-                        while (!DT.isAfterLast()) {
+                    if (DT!=null){
 
-                            item1 = clsCls.new clsMunicipio();
+                        if(DT.getCount()>0) {
+                            DT.moveToFirst();
 
-                            item1.codigo=DT.getString(0);
-                            item1.nombre=DT.getString(1);
+                            while (!DT.isAfterLast()) {
 
-                            items1.add(item1);
+                                item1 = clsCls.new clsMunicipio();
 
-                            DT.moveToNext();
+                                item1.codigo=DT.getString(0);
+                                item1.nombre=DT.getString(1);
+
+                                items1.add(item1);
+
+                                DT.moveToNext();
+                            }
+
                         }
 
                     }
 
+                    if(DT!=null) DT.close();
+
+                    adapter1=new ListAdaptMun (this,items1);
+                    listaMun.setAdapter(adapter1);
                 }
-
-                if(DT!=null) DT.close();
-
-                adapter1=new ListAdaptMun (this,items1);
-                listaMun.setAdapter(adapter1);
+            }else{
+                toast("Seleccione una provincia");
             }
+
 
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);

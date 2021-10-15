@@ -42,7 +42,8 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:windowSoftInputMode="stateHidden"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"/>
         <activity
             android:name=".CliNuevoT"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -60,7 +61,8 @@
             android:name=".CanalSubcanal"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"/>
 
         <service
             android:name=".srvBase"

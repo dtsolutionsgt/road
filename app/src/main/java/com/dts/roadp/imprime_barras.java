@@ -81,10 +81,14 @@ public class imprime_barras extends PBase{
                     TextView spinlabel;
 
                     try {
+
                         spinlabel=(TextView)parentView.getChildAt(0);
-                        spinlabel.setTextColor(Color.BLACK);
-                        spinlabel.setPadding(5, 0, 0, 0);
-                        spinlabel.setTextSize(18);
+
+                        if (spinlabel!=null){
+                            spinlabel.setTextColor(Color.BLACK);
+                            spinlabel.setPadding(5, 0, 0, 0);
+                            spinlabel.setTextSize(18);
+                        }
 
                         item=spincode.get(position);
 

@@ -215,14 +215,16 @@ public class printZebraZPL extends printBase {
             dlen=ccnt*altolinea+60;
 
             ps="";
-
+            anchopapel=430;
             ps+="^XA";
             ps+="^PW"+anchopapel;
             ps+="^LL"+dlen;
 
+            //Prueba imprimir así, haber como sale..
             for (int i = 0; i <ccnt; i++) {
                 ps+="^FO,"+psx+",0";
                 ps+="^ADN,5,0";
+                //ps+="^A0N,18,20";
                 ps+="^FD";
                 ss=lines.get(i);
                 ps+=ss;

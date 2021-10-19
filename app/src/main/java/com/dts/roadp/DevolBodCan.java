@@ -668,7 +668,11 @@ public class DevolBodCan extends PBase {
 
         try{
 
-            sql = "SELECT COREL FROM D_MOVD WHERE COREL = '" + vCorel + "' AND COREL IN (SELECT COREL FROM D_MOV)";
+            sql = "SELECT COREL FROM D_MOVD WHERE COREL = '" + vCorel + "' " +
+                  "AND COREL IN (SELECT COREL FROM D_MOV) " +
+                  "UNION " +
+                  "SELECT COREL FROM D_MOVDB WHERE COREL = '" + vCorel  + "' " +
+                  "AND COREL IN (SELECT COREL FROM D_MOV) ";
             DT=Con.OpenDT(sql);
 
             if (DT.getCount()>0){

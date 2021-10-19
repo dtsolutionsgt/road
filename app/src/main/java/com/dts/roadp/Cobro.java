@@ -1065,6 +1065,7 @@ public class Cobro extends PBase {
 	private void showTotals(){
 
 		try{
+
 			total = tsel + tpagos;
 
 			lblSel.setText(mu.frmcur(total));
@@ -1073,7 +1074,7 @@ public class Cobro extends PBase {
 			/*tpend=total-tpagos;
 			plim=total-tpagos;*/
 
-			if (tsel>=0) {
+			if (tsel>=0.01) {
 				lblPend.setText(mu.frmcur(tsel));
 			} else {
 				lblPend.setText(mu.frmcur(0));
@@ -1285,7 +1286,7 @@ public class Cobro extends PBase {
 						}else {
 							if (prn.isEnabled()) {
 								fdoc.buildPrint(corel,1,gl.peModal);
-								impres=0;
+								//impres=0;
 								browse = 4;
 								//prn.printnoask(printcallback, "print.txt");
 								prn.printnoask(printcallback, "print.txt");
@@ -1328,7 +1329,7 @@ public class Cobro extends PBase {
 		try{
 
 			showTotals();
-			if(tsel>0) {
+			if(tsel>0.01) {
 				msgAskExit("Tiene documentos pendientes de pago. Salir");
 			} else {
 				super.finish();

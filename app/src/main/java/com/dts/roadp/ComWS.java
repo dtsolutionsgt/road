@@ -5664,20 +5664,11 @@ public class ComWS extends PBase {
 
 					if (envioparcial) dbld.clear();
 
-					dbld.insert("D_MOV", "WHERE COREL='" + cor + "' AND NOT EXISTS " +
-							    "(SELECT COREL FROM D_MOV WHERE COREL = '" + cor + "')");
-					dbld.insert("D_MOVD", "WHERE COREL='" + cor + "' AND NOT EXISTS " +
-					            "(SELECT M.COREL FROM D_MOVD M WHERE M.COREL = '" + cor + "' " +
-							    "AND M.PRODUCTO = D_MOVD.PRODUCTO)");
-					dbld.insert("D_MOVDB", "WHERE COREL='" + cor + "' AND NOT EXISTS " +
-							    "(SELECT M.COREL FROM D_MOVDB M WHERE M.COREL = '" + cor + "' " +
-							    "AND M.BARRA = D_MOVDB.BARRA)");
-					dbld.insert("D_MOVDCAN", "WHERE COREL='" + cor + "' AND NOT EXISTS " +
-							    "(SELECT M.COREL FROM D_MOVDCAN M WHERE M.COREL = '" + cor + "' " +
-							    "AND M.PRODUCTO = D_MOVDCAN.PRODUCTO)");
-					dbld.insert("D_MOVDPALLET", "WHERE COREL='" + cor + "' AND NOT EXISTS " +
-							    "(SELECT M.COREL FROM D_MOVDPALLET M WHERE M.COREL = '" + cor + "' " +
-							    "AND M.BARRAPALLET = D_MOVDB.BARRAPALLET)");
+					dbld.insert("D_MOV", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVD", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVDB", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVDCAN", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVDPALLET", "WHERE COREL='" + cor + "'");
 
 					//#CKFK 20190412 Corregido error
 					dbld.add("INSERT INTO P_DEVOLUCIONES_SAP " +

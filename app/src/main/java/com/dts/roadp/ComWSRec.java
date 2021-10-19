@@ -310,8 +310,7 @@ public class ComWSRec extends PBase {
 
     // WEB SERVICE - RECEPCION
 
-    private boolean getData()
-    {
+    private boolean getData() {
         Cursor DT;
         int rc,prn,jj;
         String s,val="";

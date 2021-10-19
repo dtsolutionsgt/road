@@ -47,7 +47,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -145,7 +144,7 @@ public class ComWS extends PBase {
 	//Web service adicional
 
 	private String nombretabla;
-	private int indicetabla;
+	private int indicetabla,modo_recepcion;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -311,6 +310,10 @@ public class ComWS extends PBase {
 		}
 
         actualizaEstadoPedidos();
+
+        relExist.setVisibility(View.VISIBLE);
+        relPrecio.setVisibility(View.VISIBLE);
+        relStock.setVisibility(View.VISIBLE);
 	}
 
 	private boolean dbVacia() {
@@ -340,6 +343,8 @@ public class ComWS extends PBase {
 			toastcent("Por favor, espere que se termine la tarea actual.");
 			return;
 		}
+
+        modo_recepcion=1;
 
 		lblRec.setVisibility(View.INVISIBLE);
 		imgRec.setVisibility(View.INVISIBLE);
@@ -1108,89 +1113,16 @@ public class ComWS extends PBase {
 
 	//region Main
 
-	private void runRecep() {
+    // JP20211018
+    private void runRecep() {
+        modo_recepcion=1;
+        runRecepion();
+    }
 
-		try {
-			if (isbusy == 1) return;
-
-			if (!setComParams()) return;
-
-			try{
-				//#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
-				View view = this.getCurrentFocus();
-				if (view != null) {
-					view.clearFocus();
-					keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
-				}
-			}catch (Exception e){
-			}
-
-			isbusy = 1;
-
-			if (!esvacio) {
-				ultcor_ant = ultCorel();
-				ultSerie_ant = ultSerie();
-			}
-
-			barInfo.setVisibility(View.VISIBLE);
-			barInfo.invalidate();
-			lblInfo.setText("Iniciando proceso de carga..");
-
-			lblInfo.setText("Conectando ...");
-
-			wsRtask = new AsyncCallRec();
-			wsRtask.execute();
-
-		} catch (Exception e) {
-			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-		}
-
-	}
-
-	private void runSend() {
-		int dia = du.dayofweek(du.getActDate());
-
-		try {
-			if (isbusy == 1) return;
-
-			if (!setComParams()) return;
-
-			try {
-				File f1 = new File(Environment.getExternalStorageDirectory() + "/road.db");
-				File f2 = new File(Environment.getExternalStorageDirectory() + "/road" + dia + ".db");
-				FileUtils.copyFile(f1, f2);
-			} catch (Exception e) {
-				msgbox("No se puede generar respaldo : " + e.getMessage());
-			}
-
-			isbusy = 1;
-
-			barInfo.setVisibility(View.VISIBLE);
-			barInfo.invalidate();
-			lblInfo.setText("Conectando ...");
-
-			showprogress = true;
-			wsStask = new AsyncCallSend();
-			wsStask.execute();
-
-		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-		}
-
-
-	}
-
+    // JP20211018
 	private void runExist() {
-		try {
-			super.finish();
-			startActivity(new Intent(this, ComWSExist.class));
-			relExist.setVisibility(View.VISIBLE);
-		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-		}
-
+        modo_recepcion=2;
+        runRecepion();
 	}
 
 	private void runPrecios() {
@@ -1217,7 +1149,77 @@ public class ComWS extends PBase {
 
 	}
 
-	public void writeData(View view) {
+    private void runRecepion() {
+        try {
+            if (isbusy == 1) return;
+
+            if (!setComParams()) return;
+
+            try{
+                //#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
+                View view = this.getCurrentFocus();
+                if (view != null) {
+                    view.clearFocus();
+                    keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+            }catch (Exception e){ }
+
+            isbusy = 1;
+
+            if (!esvacio) {
+                ultcor_ant = ultCorel();
+                ultSerie_ant = ultSerie();
+            }
+
+            barInfo.setVisibility(View.VISIBLE);
+            barInfo.invalidate();
+            lblInfo.setText("Iniciando proceso de carga..");
+
+            lblInfo.setText("Conectando ...");
+
+            wsRtask = new AsyncCallRec();
+            wsRtask.execute();
+
+        } catch (Exception e) {
+            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+        }
+    }
+
+    private void runSend() {
+        int dia = du.dayofweek(du.getActDate());
+
+        try {
+            if (isbusy == 1) return;
+
+            if (!setComParams()) return;
+
+            try {
+                File f1 = new File(Environment.getExternalStorageDirectory() + "/road.db");
+                File f2 = new File(Environment.getExternalStorageDirectory() + "/road" + dia + ".db");
+                FileUtils.copyFile(f1, f2);
+            } catch (Exception e) {
+                msgbox("No se puede generar respaldo : " + e.getMessage());
+            }
+
+            isbusy = 1;
+
+            barInfo.setVisibility(View.VISIBLE);
+            barInfo.invalidate();
+            lblInfo.setText("Conectando ...");
+
+            showprogress = true;
+            wsStask = new AsyncCallSend();
+            wsStask.execute();
+
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+        }
+
+
+    }
+
+    public void writeData(View view) {
 
 		try {
 			dbld.clear();
@@ -1256,6 +1258,34 @@ public class ComWS extends PBase {
 	}
 
 	//endregion
+
+    //region Modos de recepcion
+
+    private void cargaTodasTablas() {
+        try {
+            listItems.clear();
+            indicetabla=-5;nombretabla="P_PARAMEXT";
+            executaTabla();
+        } catch (Exception e) {
+            String ss=e.getMessage();
+            visibilidadBotones();
+        }
+    }
+
+    // JP20211018
+    private void cargaTablasExist() {
+        try {
+            listItems.clear();
+            indicetabla=0;nombretabla="P_STOCKINV";
+            executaTabla();
+        } catch (Exception e) {
+            String ss=e.getMessage();
+            visibilidadBotones();
+        }
+    }
+
+
+    //endregion
 
 	//region Web Service Methods
 
@@ -2604,7 +2634,6 @@ public class ComWS extends PBase {
 			procesaRuta();
             */
 
-
 			ferr = "";
 			return true;
 		} catch (Exception e) {
@@ -2612,17 +2641,6 @@ public class ComWS extends PBase {
 			return false;
 		}
 
-	}
-
-	private void cargaTablas() {
-		try {
-			listItems.clear();
-			indicetabla=-5;nombretabla="P_PARAMEXT";
-			executaTabla();
-		} catch (Exception e) {
-			String ss=e.getMessage();
-			visibilidadBotones();
-		}
 	}
 
 	private void executaTabla() {
@@ -4084,14 +4102,11 @@ public class ComWS extends PBase {
 		scon = 0;
 
 		try {
-
 			if (getTest() == 1) {
 				scon = 1;
 			} else {
 				URL = URL_Remota;
-				if (getTest() == 1) {
-					scon = 1;
-				}
+				if (getTest() == 1) scon = 1;
 			}
 
 			idbg = idbg + sstr;
@@ -4102,7 +4117,6 @@ public class ComWS extends PBase {
 			} else {
 				fstr = "No se puede conectar al web service : " + sstr;
 			}
-
 		} catch (Exception e) {
 			scon = 0;
 			fstr = "Error importando los datos: " + fstr;
@@ -4112,60 +4126,34 @@ public class ComWS extends PBase {
 	}
 
 	public void wsFinished() {
+        running = 0;
 
-		running = 0;
+        try {
+            if (fstr.equalsIgnoreCase("Sync OK")) {
 
-		try {
-			if (fstr.equalsIgnoreCase("Sync OK")) {
+                // JP20211018
+                if (modo_recepcion==1) {
+                    cargaTodasTablas();
+                } else if (modo_recepcion==2) {
+                    cargaTablasExist();
+                }
 
-				cargaTablas();
-
-				/*lblInfo.setText(" ");
-
-				/*
-				lblInfo.setText(" ");
-				s = "Recepción completa.";
-				if (stockflag == 1) s = s + "\nSe actualizó inventario.";
-
-				clsAppM.estandartInventario();
-                clsAppM.estandartInventarioPedido();
-				validaDatos(true);
-				if (stockflag == 1) sendConfirm();
-
-				msgAskExit(s);
-*/
-			} else {
-				lblInfo.setText(fstr);
-				mu.msgbox("Ocurrió error : \n" + fstr + " " + idbg + " (Registro: " + reccnt + ") ");
-				//mu.msgbox("::" + esql);
-				isbusy = 0;
-				barInfo.setVisibility(View.INVISIBLE);
-				visibilidadBotones();
-				addlog("Recepcion", fstr, idbg);
-				return;
-			}
-
-			//#CKFK 20210725 Puse esto en comentario porque no llega a esta opción
-			/*if (!vDBVacia){
-				pendientes = validaPendientes();
-
-				isbusy = 0;
-				comparaCorrel();
-
-				otrosParametros();
-			}*/
-
-			//visibilidadBotones();
-
-			if (ftflag) msgbox(ftmsg);
-		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
-		}
-
-		//if (!validaLicencia()) restartApp();
-
-	}
+            } else {
+                lblInfo.setText(fstr);
+                mu.msgbox("Ocurrió error : \n" + fstr + " " + idbg + " (Registro: " + reccnt + ") ");
+                //mu.msgbox("::" + esql);
+                isbusy = 0;
+                barInfo.setVisibility(View.INVISIBLE);
+                visibilidadBotones();
+                addlog("Recepcion", fstr, idbg);
+                return;
+            }
+            if (ftflag) msgbox(ftmsg);
+        } catch (Exception e) {
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+        }
+    }
 
     private void confImpresora() {
         try {
@@ -4251,11 +4239,15 @@ public class ComWS extends PBase {
 		@Override
 		protected void onPostExecute(Void result) {
 			try {
-				wsCallback();
+                // JP20211018
+			    if (modo_recepcion==1) {
+                    wsCallback();
+                } else if (modo_recepcion==2) {
+                    wsCallbackExist();
+                }
 			} catch (Exception e) {
 				Log.d("onPostExecute", e.getMessage());
 			}
-
 		}
 
 		@Override
@@ -4484,7 +4476,46 @@ public class ComWS extends PBase {
 
 	}
 
-	//endregion
+	// JP20211018
+    public void wsCallbackExist() {
+        boolean ejecutar=true;
+
+        cargastockpv=false;
+
+        try {
+            indicetabla++;
+
+            switch (indicetabla) {
+                case 1:
+                    nombretabla="P_STOCKINV";break;
+                case 2:
+                    nombretabla="TMP_PRECESPEC";break;
+                case 3:
+                    nombretabla="P_PRODPRECIO";break;
+                case 4:
+                    nombretabla="P_STOCK";break;
+                case 5:
+                    nombretabla="P_STOCK_PALLET";break;
+                case 6:
+                    nombretabla="P_STOCKB";break;
+                case 7:
+                    nombretabla="P_FACTORCONV";break;
+
+                case 8:
+                    procesaDatos();
+                    ejecutar = false;
+                    break;
+            }
+
+            if (ejecutar) executaTabla();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    //endregion
 
 	//region WS Envio Methods
 
@@ -7232,6 +7263,7 @@ public class ComWS extends PBase {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 		}
 
+
 	}
 
 	private void otrosParametros() {
@@ -7472,7 +7504,6 @@ public class ComWS extends PBase {
 	}
 
 	private void msgAskConfirmaRecibido() {
-
 		try {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
@@ -7497,8 +7528,6 @@ public class ComWS extends PBase {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
-
-
 	}
 
 	private void msgAskSinLicencia() {

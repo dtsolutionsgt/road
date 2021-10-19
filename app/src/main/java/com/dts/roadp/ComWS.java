@@ -1121,8 +1121,17 @@ public class ComWS extends PBase {
 
     // JP20211018
 	private void runExist() {
-        modo_recepcion=2;
-        runRecepion();
+
+		//if(TieneRuta && TieneProd && TieneClientes){
+			modo_recepcion=2;
+			runRecepion();
+//		}else{
+//			msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
+//			return false;
+//		}
+
+
+
 	}
 
 	private void runPrecios() {

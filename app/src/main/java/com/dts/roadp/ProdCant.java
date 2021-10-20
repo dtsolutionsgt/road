@@ -56,7 +56,10 @@ public class ProdCant extends PBase {
 		rutatipo=gl.rutatipo;
 
 		if (rutatipo.equalsIgnoreCase("V")) imgUpd.setVisibility(View.INVISIBLE);
-		if (rutatipo.equalsIgnoreCase("D")) rlValoresOriginales.setVisibility(View.INVISIBLE);
+
+		if (gl.iddespacho!=null) rlValoresOriginales.setVisibility(View.VISIBLE);
+		else rlValoresOriginales.setVisibility(View.INVISIBLE);
+
 		imgUpd.setVisibility(View.INVISIBLE);
 
 		prc=new Precio(this,mu,gl.peDec);

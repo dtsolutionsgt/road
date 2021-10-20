@@ -603,44 +603,74 @@ public class Exist extends PBase {
 
     public double getPeso() {
         Cursor DT;
-        double sumaPesoB=0,sumaPeso=0;
+        double vSumaPeso=0;
+        double vSumaPesoB=0;
+        double vSumaPesoTotal = 0;
 
         sql = "SELECT IFNULL(SUM(PESO),0) AS PESOTOT " +
-                " FROM P_STOCK_PV ";
+                " FROM P_STOCK ";
         DT=Con.OpenDT(sql);
 
         if (DT!=null) {
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
-                sumaPeso = DT.getDouble(0);
+                vSumaPeso = DT.getDouble(0);
+            }
+        }
+
+        if (DT!=null) DT.close();
+        sql = "SELECT IFNULL(SUM(PESO),0) AS PESOTOT " +
+                " FROM P_STOCKB ";
+        DT=Con.OpenDT(sql);
+
+        if (DT!=null) {
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                vSumaPesoB = DT.getDouble(0);
             }
         }
 
         if (DT!=null) DT.close();
 
-        return sumaPeso;
+        vSumaPesoTotal = vSumaPesoB + vSumaPeso;
+
+        return vSumaPesoTotal;
     }
 
     public double getCantidad() {
         Cursor DT;
-        double sumaCant=0;
+        double vSumaCant=0;
+        double vSumaCantB=0;
+        double vSumaCantTotal = 0;
 
-        sql = "SELECT IFNULL(SUM(S.CANT),0) AS CANTUNI " +
-                " FROM P_STOCK_PV S ";
+        sql = "SELECT IFNULL(SUM(CANT),0) AS CANT " +
+                " FROM P_STOCK ";
         DT=Con.OpenDT(sql);
 
-        if (DT!=null){
-
-            if (DT.getCount()>0) {
+        if (DT!=null) {
+            if (DT.getCount() > 0) {
                 DT.moveToFirst();
-                sumaCant=DT.getDouble(0);
+                vSumaCant = DT.getDouble(0);
             }
-
         }
 
-        if(DT!=null) DT.close();
+        if (DT!=null) DT.close();
+        sql = "SELECT IFNULL(SUM(CANT),0) AS CANT " +
+                " FROM P_STOCKB ";
+        DT=Con.OpenDT(sql);
 
-        return sumaCant;
+        if (DT!=null) {
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                vSumaCantB = DT.getDouble(0);
+            }
+        }
+
+        if (DT!=null) DT.close();
+
+        vSumaCantTotal = vSumaCantB + vSumaCant;
+
+        return vSumaCantTotal;
     }
 
     //region Activity Events

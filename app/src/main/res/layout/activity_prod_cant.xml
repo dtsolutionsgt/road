@@ -183,7 +183,7 @@
             android:paddingTop="5dp"
             android:paddingRight="5dp"
             android:paddingBottom="5dp"
-            android:text="Cant Orig.:"
+            android:text="Cant ped:"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
@@ -195,7 +195,7 @@
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:paddingBottom="5dp"
-            android:text="Peso Orig:"
+            android:text="Peso ped:"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView

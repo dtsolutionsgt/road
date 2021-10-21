@@ -75,9 +75,9 @@ public class ListAdaptProd extends BaseAdapter {
 		//holder.lblCod.setText(items.get(position).Cod+"  "+items.get(position).um);
 		holder.lblDesc.setText(items.get(position).Desc);
 		holder.lblExtra.setText(items.get(position).Text);
-		holder.lblFaltante.setText("Faltante: " + items.get(position).faltante);
-		holder.lblCantOriginal.setText("Cant original: " + items.get(position).cantOriginal);
-		holder.lblPesoOriginal.setText("Peso original: " + items.get(position).pesoOriginal);
+		holder.lblFaltante.setText("Cant a entregar: " + items.get(position).faltante);
+		holder.lblCantOriginal.setText("Cant pedida: " + items.get(position).cantOriginal);
+		holder.lblPesoOriginal.setText("Peso pedido: " + items.get(position).pesoOriginal);
 
 		if (items.get(position).bandera) {
             holder.img1.setVisibility(View.VISIBLE);

@@ -148,7 +148,7 @@
             android:ems="10"
             android:hint="http://172.16.10.9/RDC7_SAP_QAS_ANDR/wsAndr.asmx"
             android:nextFocusForward="@id/txtEmp"
-            android:text="http://172.16.10.9/RDC7_SAP_PRD_ANDR/wsAndr.asmx" />
+            android:text="http://172.16.10.9/RDC7_SAP_QAS_ANDR/wsAndr.asmx" />
 
         <TextView
             android:id="@+id/textView3"

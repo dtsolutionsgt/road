@@ -2047,7 +2047,9 @@ public class Venta extends PBase {
                     && (EsUnidadSuperior(UnidadVentaCliente, vProd)) && (!gl.umpeso.equalsIgnoreCase(UnidadVentaCliente))) {
                 varZ = DameFactor(UnidadInventario, vProd);
                 varP = DameFactor(UnidadVentaCliente, vProd);
-                if (varP>0) proporcion = varZ / varP;
+                //if (varP>0) proporcion = varZ / varP;
+                if (varP>varZ) if (varZ>0) proporcion = varP / varZ;
+				//if (varZ>varP) if (varP>0) proporcion = varP / varZ;
             } else if ((UnidadInventario.equalsIgnoreCase(UnidadVentaCliente)) | (UnidadVentaCliente.equalsIgnoreCase(gl.umpeso))) {
                 proporcion = 1;
             } else{

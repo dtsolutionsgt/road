@@ -1535,7 +1535,8 @@ public class FacturaRes extends PBase {
 			actcant=cant;
 			actpeso=ppeso;
 		} else {
-			actcant=cant*factpres;
+			//#CKFK 20211020 Cambie factpres por umfactor
+			actcant=cant*umfactor;
 			actpeso=cant*factor;
 		}
 
@@ -1658,14 +1659,19 @@ public class FacturaRes extends PBase {
 
 	private void rebajaStockBonif(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {
 		Cursor dt;
-		double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso;
-		String lote,doc,stat;
+		double cantapl,dispcant,actcant,pesoapl,disppeso,actpeso,speso, vcant,umfactor;
+		String lote,doc,stat,vumventa;
+
+		vcant=cant;vumventa=umventa;
+		umfactor=1;
+		if (!umstock.equalsIgnoreCase(umventa)) umfactor=factpres;
 
 		if (porpeso) {
 			actcant=cant;
 			actpeso=ppeso;
 		} else {
-			actcant=cant*factpres;
+			//#CKFK 20211020 Cambie factpres por umfactor
+			actcant=cant*umfactor;
 			actpeso=cant*factor;
 		}
 

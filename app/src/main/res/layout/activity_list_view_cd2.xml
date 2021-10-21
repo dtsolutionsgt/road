@@ -71,13 +71,13 @@
         android:paddingBottom="5dp"
         android:text="Diferencia"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="normal"
         tools:visibility="gone" />
 
     <TextView
         android:id="@+id/lblCantOriginal"
-        android:layout_width="170dp"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/lblFaltante"
         android:layout_alignParentStart="true"
@@ -85,9 +85,9 @@
         android:layout_marginTop="5dp"
         android:paddingLeft="5dp"
         android:paddingBottom="5dp"
-        android:text="Cantidad pedida"
+        android:text="Cant pedida:"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="normal"
         tools:visibility="gone" />
 
@@ -104,7 +104,7 @@
         android:paddingBottom="5dp"
         android:text="Peso pedido"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="normal"
         tools:visibility="gone" />
 

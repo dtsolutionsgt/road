@@ -1113,49 +1113,98 @@ public class ComWS extends PBase {
 
 	//region Main
 
+	// AT 20211019
+	private boolean tieneCatalogo() {
+		Cursor DT;
+		boolean TieneRuta = false;
+		boolean TieneClientes = false;
+		boolean TieneProd = false;
+
+		try {
+			String ntablas[] = {"P_RUTA", "P_CLIENTE", "P_PRODUCTO"};
+
+			for (int i = 0; i < ntablas.length; i++) {
+				sql ="SELECT CODIGO FROM "+ntablas[i];
+				DT=Con.OpenDT(sql);
+
+                if (DT.getCount() > 0) {
+                    if (ntablas[i] == "P_RUTA"){
+                        TieneRuta = true;
+                    } else if (ntablas[i] == "P_CLIENTE") {
+                        TieneClientes = true;
+                    } else if (ntablas[i] == "P_PRODUCTO") {
+                        TieneProd = true;
+                    }
+                }
+			}
+
+			if (TieneRuta && TieneClientes && TieneProd) {
+				return true;
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			return false;
+		}
+
+		return false;
+	}
+
     // JP20211018
     private void runRecep() {
-        modo_recepcion=1;
-        runRecepion();
+		if (tieneCatalogo()) {
+			modo_recepcion=1;
+			runRecepion();
+		} else {
+			msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
+		}
     }
 
     // JP20211018
 	private void runExist() {
-
-		//if(TieneRuta && TieneProd && TieneClientes){
+		if (tieneCatalogo()) {
 			modo_recepcion=2;
 			runRecepion();
-//		}else{
-//			msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
-//			return false;
-//		}
-
-
-
+		} else {
+			msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
+		}
 	}
 
+	// AT 20211019
 	private void runPrecios() {
-		try {
+		if(tieneCatalogo()) {
+			modo_recepcion = 3;
+			runRecepion();
+		} else {
+			msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
+		}
+		/*try {
 			super.finish();
 			startActivity(new Intent(this, ComWSPrec.class));
 			relPrecio.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-		}
+		}*/
 
 	}
 
+	// AT 20211019
 	private void runRecarga() {
-		try {
+		if(tieneCatalogo()) {
+			modo_recepcion = 4;
+			runRecepion();
+		} else {
+			msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
+		}
+		/*try {
 			super.finish();
 			startActivity(new Intent(this, ComWSRec.class));
 			relStock.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-		}
-
+		}*/
 	}
 
     private void runRecepion() {
@@ -1285,7 +1334,7 @@ public class ComWS extends PBase {
     private void cargaTablasExist() {
         try {
             listItems.clear();
-            indicetabla=0;nombretabla="P_STOCKINV";
+            indicetabla=0; nombretabla="P_STOCKINV";
             executaTabla();
         } catch (Exception e) {
             String ss=e.getMessage();
@@ -1293,7 +1342,30 @@ public class ComWS extends PBase {
         }
     }
 
+    // AT20211019
+	private void cargaTablasPrecio() {
+		try	{
+			listItems.clear();
+			indicetabla=0; nombretabla="TMP_PRECESPEC";
+			executaTabla();
+		} catch (Exception e) {
+			String ss = e.getMessage();
+			visibilidadBotones();
+		}
 
+	}
+
+	// AT20211019
+	private void cargaTablasRec() {
+		try	{
+			listItems.clear();
+			indicetabla=2; nombretabla="TMP_PRECESPEC";
+			executaTabla();
+		} catch (Exception e) {
+			String ss = e.getMessage();
+			visibilidadBotones();
+		}
+	}
     //endregion
 
 	//region Web Service Methods
@@ -3139,15 +3211,26 @@ public class ComWS extends PBase {
 
 	private boolean AddTable(String TN) {
 		String SQL;
+		String sqlDel= "DELETE FROM "+TN;
 
 		try {
 
 			fprog = TN;	if (cargastockpv) fprog="Procesando datos . . .";
          	idbg = TN;
 			wsRtask.onProgressUpdate();
-			SQL = getTableSQL(TN);
 
-			if (fillTable2(SQL, "DELETE FROM " + TN) == 1) {
+			if (modo_recepcion == 4) {
+				String ntablas[] = {"P_STOCK", "P_STOCK_PALLET", "P_STOCKB"};
+
+				for (int i = 0; i < ntablas.length; i++) {
+					if (TN == ntablas[i]) {
+						sqlDel = "DELETE FROM "+TN+" WHERE 1 = 0 ";
+					}
+				}
+			}
+
+			SQL = getTableSQL(TN);
+			if (fillTable2(SQL, sqlDel) == 1) {
 				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " ok ";
 				idbg = idbg + SQL + "#" + "PASS OK";
 				return true;
@@ -4145,7 +4228,10 @@ public class ComWS extends PBase {
                     cargaTodasTablas();
                 } else if (modo_recepcion==2) {
                     cargaTablasExist();
-                }
+                } else if(modo_recepcion == 3) {
+					cargaTablasPrecio();
+				} else if(modo_recepcion == 4) {
+					cargaTablasRec();				}
 
             } else {
                 lblInfo.setText(fstr);
@@ -4253,7 +4339,11 @@ public class ComWS extends PBase {
                     wsCallback();
                 } else if (modo_recepcion==2) {
                     wsCallbackExist();
-                }
+                } else if (modo_recepcion == 3) {
+					wsCallbackPrecio();
+				} else if (modo_recepcion == 4) {
+			    	wsCallbackExist();
+				}
 			} catch (Exception e) {
 				Log.d("onPostExecute", e.getMessage());
 			}
@@ -4496,7 +4586,7 @@ public class ComWS extends PBase {
 
             switch (indicetabla) {
                 case 1:
-                    nombretabla="P_STOCKINV";break;
+                	nombretabla="P_STOCKINV";break;
                 case 2:
                     nombretabla="TMP_PRECESPEC";break;
                 case 3:
@@ -4524,6 +4614,34 @@ public class ComWS extends PBase {
 
     }
 
+    // AT20211019
+	public void wsCallbackPrecio() {
+		boolean ejecutar=true;
+
+		cargastockpv=false;
+
+		try {
+			indicetabla++;
+
+			switch (indicetabla) {
+				case 1:
+					nombretabla = "TMP_PRECESPEC"; break;
+				case 2:
+					nombretabla = "P_PRODPRECIO"; break;
+				case 3:
+					nombretabla = "P_FACTORCONV"; break;
+				case 8:
+					procesaDatos();
+					ejecutar = false;
+					break;
+			}
+
+			if (ejecutar) executaTabla();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
     //endregion
 
 	//region WS Envio Methods

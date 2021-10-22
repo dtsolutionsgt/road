@@ -1144,6 +1144,9 @@ public class BaseDatosScript {
 					"[PRIORIZACION] TEXT NOT NULL,"+
 					"[STATCOM] TEXT NOT NULL,"+
 					"[FECHA_SISTEMA] TEXT NOT NULL,"+
+					"[CONTACTO] TEXT NOT NULL,"+
+					"[MUNICIPIO] TEXT NOT NULL,"+
+					"[EMAIL] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);

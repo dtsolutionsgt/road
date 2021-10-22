@@ -592,7 +592,7 @@ public class CliNuevoT extends PBase {
     public void setGPS(View view) {
         try{
             setDataClienteG();
-            gl.gpsCliNuevo = true;
+            gl.gpsCliente = true;
             startActivity(new Intent(this,CliGPS.class));
 
         }catch (Exception e){
@@ -759,7 +759,7 @@ public class CliNuevoT extends PBase {
         gl.CliNomVen = "";
         gl.gpspx = 0.0000;
         gl.gpspy = 0.0000;
-        gl.gpsCliNuevo = false;
+        gl.gpsCliente = false;
 
         txtCliNombre.setText("");
         txtCliNit.setText("");

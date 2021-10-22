@@ -82,13 +82,13 @@ public class CliGPS extends PBase {
 
 	public void applyGPS(View view) {
 		try {
-			if (latitude == 0 && longitude == 0 && !gl.gpsCliNuevo) {
+			if (latitude == 0 && longitude == 0 && !gl.gpsCliente) {
 				askApply();
-			} else if(gl.gpsCliNuevo){
+			} else if(gl.gpsCliente){
 				gl.gpspx = latitude;
 				gl.gpspy = longitude;
 
-				gl.gpsCliNuevo = false;
+				gl.gpsCliente = false;
 				super.finish();
 			} else {
 				updateItem(latitude, longitude);

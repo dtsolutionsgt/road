@@ -31,7 +31,7 @@ public class appGlobals extends Application {
 	public int mpago;
 	public String prodCanasta, corelFac, devcord;
 	public boolean ingresaCanastas;
-	public String IdCanal, IdSubcanal, EditarClienteCodigo, EditarClienteNombre, EditarClienteCanal, EditarClienteSubcanal, EditarClienteRuc;
+	public String IdCanal, IdSubcanal, EditarClienteCanal, EditarClienteSubcanal;
 	public String CliNombre,CliNit, CliDireccion, CliProvincia, CliDistrito, CliCiudad, CliTel, CliEmail, CliContacto, CliCsPollo, CliCsEmbutido,CliCsHuevo,
 			CliCsRes, CliCsCerdo, CliCsCongelados, CliCsSalsas, IdDep, IdMun, CliCodVen="", corelCliente="", CliNomVen;
 
@@ -43,7 +43,7 @@ public class appGlobals extends Application {
 	//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true por defecto estará en false
 	public boolean debug=true;
 
-	public boolean gpsCliNuevo = false;
+	public boolean gpsCliente = false;
 
 	//Devolución Cliente
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;
@@ -59,7 +59,7 @@ public class appGlobals extends Application {
 	public Boolean peBotStock,peVehAyud,peEnvioParcial,peOrdPorNombre;
 	public boolean peImprFactCorrecta, pTransBarra;
 	public int peDec,peDecCant,peDecImp,peLimiteGPS,peMargenGPS,peVentaGps;
-	public Boolean peEditarNombre, peEditarNit, peEditarCanal, peEditarSubcanal;
+	public Boolean peEditarNombre, peEditarNit, peEditarCanal, peEditarSubcanal, peEditarDir, peEditarContacto, peEditarEmail, peEditarTel, peEditarDistrito;
 	
 	// Descuentos
 	

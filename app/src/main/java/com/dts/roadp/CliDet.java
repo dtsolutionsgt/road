@@ -531,6 +531,7 @@ public class CliDet extends PBase {
             canalsub =DT.getString(20);
             prior=DT.getString(21);
             idmuni=DT.getString(22);
+            gl.IdMun = idmuni;
 
 			if(DT!=null) DT.close();
 
@@ -982,11 +983,13 @@ public class CliDet extends PBase {
 	{
 		browse = 2;
 
-		gl.EditarClienteCodigo= cod;
-		gl.EditarClienteNombre = lblNom.getText().toString();
-		gl.EditarClienteRuc = lblRep.getText().toString();
 		gl.EditarClienteSubcanal = lblCanalsub.getText().toString().substring(11);
 		gl.EditarClienteCanal = lblCanal.getText().toString().substring(8);
+		gl.CliProvincia = lblProv.getText().toString().substring(12);
+		gl.CliDistrito = lblDist.getText().toString().substring(25);
+		gl.IdCanal = canal;
+		gl.IdSubcanal = canalsub;
+
 		Intent intent = new Intent(this, editar_cliente.class);
 		startActivity(intent);
 	}

@@ -458,6 +458,76 @@ public class AppMethods {
 		} catch (Exception e) {
 			gl.peEditarSubcanal =false;
 		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=32";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarDir =false;
+
+			gl.peEditarDir =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarDir =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=33";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarContacto =false;
+
+			gl.peEditarContacto =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarContacto =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=34";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarEmail =false;
+
+			gl.peEditarEmail =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarEmail =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=35";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarTel =false;
+
+			gl.peEditarTel =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarTel =false;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=36";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) gl.peEditarDistrito =false;
+
+			gl.peEditarDistrito =val.equalsIgnoreCase("S");
+
+		} catch (Exception e) {
+			gl.peEditarDistrito =false;
+		}
 	}
 
 	public void parametrosBarras() {

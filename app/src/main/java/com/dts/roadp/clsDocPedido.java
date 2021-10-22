@@ -36,8 +36,8 @@ public class clsDocPedido extends clsDocument {
 		if (impprecio==1) return buildDetailPrecio();
 
 		rep.line();
-		rep.add("CODIGO   DESCRIPCION       T. PEDIDO");
-		rep.add("CANT  U-VENTA    KGS");
+		rep.add("CODIGO DESCRIPCION");
+		rep.add("CANT  U-VENTA    KGS   T. PEDIDO");
 		rep.line();
 		//rep.empty();
 		
@@ -45,7 +45,8 @@ public class clsDocPedido extends clsDocument {
 
 			item=items.get(i);
 
-			rep.add2ss1(item.cod + " " + item.nombre,item.critico);
+			rep.add(item.cod + "   " + item.nombre);
+			//rep.add2ss1(item.cod, item.nombre);
 			//rep.add3lrr(rep.rtrim(""+item.cant,5),item.prec,item.tot);
 
             if (item.esbarra) {
@@ -67,7 +68,7 @@ public class clsDocPedido extends clsDocument {
             }
 
 			cp=StringUtils.leftPad(frmdecimal(item.peso,decimp),6);
-            rep.add(cu+"  "+cp);
+            rep.add(cu+"  "+cp + "    " + item.critico);
 
 			//cp=frmdecimal(item.peso,decimp)+" "+rep.ltrim(item.ump,3);
 			//rep.addg(cu+" "+cp,"0.00","");

@@ -311,6 +311,7 @@ public class ComWS extends PBase {
 
         actualizaEstadoPedidos();
 
+		//Quitar esto al terminar el desarrollo
         relExist.setVisibility(View.VISIBLE);
         relPrecio.setVisibility(View.VISIBLE);
         relStock.setVisibility(View.VISIBLE);
@@ -1128,11 +1129,11 @@ public class ComWS extends PBase {
 				DT=Con.OpenDT(sql);
 
                 if (DT.getCount() > 0) {
-                    if (ntablas[i] == "P_RUTA"){
+                    if (ntablas[i].equals("P_RUTA")){
                         TieneRuta = true;
-                    } else if (ntablas[i] == "P_CLIENTE") {
+                    } else if (ntablas[i].equals("P_CLIENTE")) {
                         TieneClientes = true;
-                    } else if (ntablas[i] == "P_PRODUCTO") {
+                    } else if (ntablas[i].equals("P_PRODUCTO")) {
                         TieneProd = true;
                     }
                 }
@@ -2825,21 +2826,27 @@ public class ComWS extends PBase {
 			fprog = "Procesando: " + (rc - 1) + " de: " + (rc - 1);
 			wsRtask.onProgressUpdate();
 
-			Actualiza_FinDia();
-			encodePrinters();
-			encodeLicence();
-			//encodeLicenceRuta();
+			if (modo_recepcion==1){
+				Actualiza_FinDia();
+				encodePrinters();
+				encodeLicence();
+				//encodeLicenceRuta();
 
-			SetStatusRecToTrans("1");
+				SetStatusRecToTrans("1");
+
+			}
 
 			dbT.setTransactionSuccessful();
 			dbT.endTransaction();
 
-			fprog = "Documento de inventario recibido en BOF...";
-			wsRtask.onProgressUpdate();
+			if (modo_recepcion!=3){
+				fprog = "Documento de inventario recibido en BOF...";
+				wsRtask.onProgressUpdate();
 
-			fechaCarga();
-			Actualiza_Documentos();
+				fechaCarga();
+				Actualiza_Documentos();
+
+			}
 
 			fprog = "Fin de actualización";wsRtask.onProgressUpdate();
 
@@ -2854,46 +2861,50 @@ public class ComWS extends PBase {
 			lblInfo.setText(" ");
 			s = "Recepción completa.";
 
-			try {
-				Cursor dt1 = Con.OpenDT(sql);
-				sql = "SELECT VENTA FROM P_RUTA";
-				dt1 = Con.OpenDT(sql);
-				dt1.moveToFirst();
-				val = dt1.getString(0);
+			if (modo_recepcion!=3 ){
+				try {
+					Cursor dt1 = Con.OpenDT(sql);
+					sql = "SELECT VENTA FROM P_RUTA";
+					dt1 = Con.OpenDT(sql);
+					dt1.moveToFirst();
+					val = dt1.getString(0);
 
-				if (dt1 != null) dt1.close();
+					if (dt1 != null) dt1.close();
 
-			} catch (Exception e) {
-				val = "V";
+				} catch (Exception e) {
+					val = "V";
+				}
+
+				gl.rutatipo = val;
+				rutatipo = gl.rutatipo;
+				pedidos=rutatipo.equals("P");
+
+				// if (stockflag == 1) s = s + "\nSe actualizó inventario.";
+
+				if (pedidos) {
+					sql = "SELECT Codigo FROM P_STOCK_PV ";
+				} else {
+					sql = "SELECT Codigo FROM P_STOCK UNION SELECT Codigo FROM P_STOCKB ";
+				}
+				Cursor dt = Con.OpenDT(sql);
+				if (dt.getCount() > 0) s = s + "\nSe actualizó inventario.";
+
+				clsAppM.estandartInventario();
+				clsAppM.estandartInventarioPedido();
+
+				if (stockflag == 1) sendConfirm();
 			}
 
-			gl.rutatipo = val;
-			rutatipo = gl.rutatipo;
-			pedidos=rutatipo.equals("P");
+			if (modo_recepcion==1 ){
+				validaDatos(true);
 
-			// if (stockflag == 1) s = s + "\nSe actualizó inventario.";
+				comparaCorrel();
 
-            if (pedidos) {
-                sql = "SELECT Codigo FROM P_STOCK_PV ";
-            } else {
-                sql = "SELECT Codigo FROM P_STOCK UNION SELECT Codigo FROM P_STOCKB ";
-            }
-            Cursor dt = Con.OpenDT(sql);
-            if (dt.getCount() > 0) s = s + "\nSe actualizó inventario.";
+				otrosParametros();
 
-
-			clsAppM.estandartInventario();
-            clsAppM.estandartInventarioPedido();
-			validaDatos(true);
-
-			if (stockflag == 1) sendConfirm();
-			isbusy = 0;
+			}
 
 			isbusy = 0;
-
-			comparaCorrel();
-
-			otrosParametros();
 
 			visibilidadBotones();
 
@@ -3223,7 +3234,7 @@ public class ComWS extends PBase {
 				String ntablas[] = {"P_STOCK", "P_STOCK_PALLET", "P_STOCKB"};
 
 				for (int i = 0; i < ntablas.length; i++) {
-					if (TN == ntablas[i]) {
+					if (TN.equals(ntablas[i])) {
 						sqlDel = "DELETE FROM "+TN+" WHERE 1 = 0 ";
 					}
 				}
@@ -4599,7 +4610,6 @@ public class ComWS extends PBase {
                     nombretabla="P_STOCKB";break;
                 case 7:
                     nombretabla="P_FACTORCONV";break;
-
                 case 8:
                     procesaDatos();
                     ejecutar = false;
@@ -4630,7 +4640,7 @@ public class ComWS extends PBase {
 					nombretabla = "P_PRODPRECIO"; break;
 				case 3:
 					nombretabla = "P_FACTORCONV"; break;
-				case 8:
+				case 4:
 					procesaDatos();
 					ejecutar = false;
 					break;

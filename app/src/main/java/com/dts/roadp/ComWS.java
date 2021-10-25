@@ -3049,7 +3049,7 @@ public class ComWS extends PBase {
 			sql = "SELECT CORELZ, GRANDTOTAL FROM P_HANDHELD";
 			DT1 = ConT.OpenDT(sql);
 
-			if (DT1.getCount() > 0) {
+			if (DT1.getCount() > 0 ) {
 
 				DT1.moveToFirst();
 
@@ -3057,6 +3057,9 @@ public class ComWS extends PBase {
 				vGrandTotal = DT1.getFloat(1);
 
 				sql = "UPDATE FINDIA SET COREL = " + vCorelZ + ", VAL1=0, VAL2=0, VAL3=0, VAL4=0,VAL5=0, VAL6=0, VAL7=0, VAL8 = " + vGrandTotal;
+				dbT.execSQL(sql);
+			}else if (gl.rutatipo.equals("P") || gl.rutatipo.equals("C")){
+				sql = "UPDATE FINDIA SET COREL = 0, VAL1=0, VAL2=0, VAL3=0, VAL4=0,VAL5=0, VAL6=0, VAL7=0, VAL8 =0";
 				dbT.execSQL(sql);
 			}
 

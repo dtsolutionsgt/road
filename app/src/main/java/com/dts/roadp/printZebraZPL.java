@@ -223,12 +223,13 @@ public class printZebraZPL extends printBase {
             //Prueba imprimir así, haber como sale..
             for (int i = 0; i <ccnt; i++) {
                 ps+="^FO,"+psx+",0";
-                ps+="^ADN,5,0";
-                //ps+="^A0N,18,20";
+                //ps+="^ADN,5,0";
+                ps+="^A@N,20,20,TT0003M_^FH\\^CI28";
+                //ps+="^A0N,20,20^FH\\^CI28^";
                 ps+="^FD";
                 ss=lines.get(i);
                 ps+=ss;
-                ps+="^FS";
+                ps+="^FS^CI27";
                 psx =psx + altolinea;
             }
 

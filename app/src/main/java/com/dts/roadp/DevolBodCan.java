@@ -1,6 +1,7 @@
 package com.dts.roadp;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -35,8 +36,6 @@ public class DevolBodCan extends PBase {
     private list_view_dev_bod_can adapter;
 
     private clsRepBuilder rep;
-
-    private clsWSEnvio vWSEnvio;
 
     private AppMethods app;
 
@@ -560,11 +559,12 @@ public class DevolBodCan extends PBase {
 
         try{
 
-            vWSEnvio = new clsWSEnvio(this, gl.ruta, gl.emp, 1);
-            vWSEnvio.runExecuteEnvio();
-
+            gl.enviaMov =true;
+            vEnvia=true;
+            startActivity(new Intent(this, ComWS.class));
         }catch (Exception e){
             mu.toast("Ocurrió un error enviando los datos " + e.getMessage() );
+            vEnvia=false;
         }
 
         return vEnvia;

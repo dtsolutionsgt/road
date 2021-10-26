@@ -275,7 +275,9 @@ public class ComWS extends PBase {
 
 		envioparcial = gl.peEnvioParcial;
 
-		visibilidadBotones();
+		if (!gl.enviaMov){
+			visibilidadBotones();
+		}
 
 		//if (gl.autocom==1) runSend();
 
@@ -315,6 +317,21 @@ public class ComWS extends PBase {
         relExist.setVisibility(View.VISIBLE);
         relPrecio.setVisibility(View.VISIBLE);
         relStock.setVisibility(View.VISIBLE);
+
+        if (gl.enviaMov){
+			lblRec.setVisibility(View.INVISIBLE);
+			imgRec.setVisibility(View.INVISIBLE);
+			lblEnv.setVisibility(View.INVISIBLE);
+			imgEnv.setVisibility(View.INVISIBLE);
+			lblEnvM.setVisibility(View.INVISIBLE);
+			imgEnvM.setVisibility(View.INVISIBLE);
+			relPrecio.setVisibility(View.INVISIBLE);
+			relExist.setVisibility(View.INVISIBLE);
+			relStock.setVisibility(View.INVISIBLE);
+
+			runSend();
+
+		}
 	}
 
 	private boolean dbVacia() {
@@ -1153,12 +1170,8 @@ public class ComWS extends PBase {
 
     // JP20211018
     private void runRecep() {
-		if (tieneCatalogo()) {
-			modo_recepcion=1;
-			runRecepion();
-		} else {
-			msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
-		}
+		modo_recepcion=1;
+		runRecepion();
     }
 
     // JP20211018
@@ -1179,15 +1192,6 @@ public class ComWS extends PBase {
 		} else {
 			msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
 		}
-		/*try {
-			super.finish();
-			startActivity(new Intent(this, ComWSPrec.class));
-			relPrecio.setVisibility(View.VISIBLE);
-		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-		}*/
-
 	}
 
 	// AT 20211019
@@ -3300,16 +3304,36 @@ public class ComWS extends PBase {
 
 		if (TN.equalsIgnoreCase("P_STOCK")) {
 
-			if (gl.peModal.equalsIgnoreCase("TOL")) {
-				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, 0 " +
-						"FROM P_STOCK WHERE RUTA='" + ActRuta + "'  AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
-						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";
-			} else if (gl.peModal.equalsIgnoreCase("APR")) {
-				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') ";
-			} else {
-				SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA " +
-						"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') ";
+			if (modo_recepcion==1){
+				if (gl.peModal.equalsIgnoreCase("TOL")) {
+					SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, 0 " +
+							"FROM P_STOCK WHERE RUTA='" + ActRuta + "'  AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+							"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)";
+				} else if (gl.peModal.equalsIgnoreCase("APR")) {
+					SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, 0 " +
+							"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') ";
+				} else {
+					SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, 0 " +
+							"FROM P_STOCK WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsql + "') ";
+				}
+
+			}else{
+				if (gl.peModal.equalsIgnoreCase("TOL")) {
+					SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, " +
+							"STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, 0 " +
+							"FROM P_STOCK WHERE RUTA='" + gl.ruta + "' AND  (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+							"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) AND (ENVIADO = 0)" +
+							"AND DOCUMENTO NOT IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE (FECHA>='" + fsqli + "') " +
+							"AND (FECHA<='" + fsqlf + "'))";
+				} else if (gl.peModal.equalsIgnoreCase("APR")) {
+					SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, " +
+							"STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, 0 " +
+							"FROM P_STOCK WHERE RUTA='" + gl.ruta + "' AND (FECHA>='" + fsql + "') ";
+				} else {
+					SQL = "SELECT CODIGO, CANT, CANTM, PESO, plibra, LOTE, DOCUMENTO, dbo.AndrDate(FECHA), ANULADO, CENTRO, " +
+							"STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, 0 " +
+							"FROM P_STOCK WHERE RUTA='" + gl.ruta + "' AND (FECHA>='" + fsql + "') ";
+				}
 			}
 
 			esql = SQL;
@@ -3318,19 +3342,37 @@ public class ComWS extends PBase {
 
 		//CKFK 20190222 Agregué a la consulta el AND (ENVIADO = 0)
 		if (TN.equalsIgnoreCase("P_STOCKB")) {
-			SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, " +
-					"STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA, 0 " +
-					"FROM P_STOCKB WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
-					"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
+			if (modo_recepcion==1){
+				SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, " +
+						"STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA, 0 " +
+						"FROM P_STOCKB WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
+			}else{
+				SQL = "SELECT RUTA, BARRA, CODIGO, CANT, COREL, PRECIO, PESO, DOCUMENTO,dbo.AndrDate(FECHA), ANULADO, CENTRO, " +
+						"STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, UNIDADMEDIDA, DOC_ENTREGA, 0 " +
+						"FROM P_STOCKB WHERE RUTA='" + gl.ruta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) " +
+						"AND DOCUMENTO NOT IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE (FECHA>='" + fsqli + "') " +
+						"AND (FECHA<='" + fsqlf + "'))";
+			}
 			return SQL;
 		}
 
 		//CKFK 20190304 Agregué la consulta para obtener los datos de P_STOCK_PALLET
 		if (TN.equalsIgnoreCase("P_STOCK_PALLET")) {
-			SQL = "SELECT DOCUMENTO, RUTA, BARRAPALLET, CODIGO, BARRAPRODUCTO, LOTEPRODUCTO, CANT, COREL, PRECIO, PESO, " +
-					"UNIDADMEDIDA,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, DOC_ENTREGA  " +
-					"FROM P_STOCK_PALLET WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
-					"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
+			if(modo_recepcion==1){
+				SQL = "SELECT DOCUMENTO, RUTA, BARRAPALLET, CODIGO, BARRAPRODUCTO, LOTEPRODUCTO, CANT, COREL, PRECIO, PESO, " +
+						"UNIDADMEDIDA,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, DOC_ENTREGA, 0  " +
+						"FROM P_STOCK_PALLET WHERE RUTA='" + ActRuta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) ";
+			}else {
+				SQL = "SELECT DOCUMENTO, RUTA, BARRAPALLET, CODIGO, BARRAPRODUCTO, LOTEPRODUCTO, CANT, COREL, PRECIO, PESO, " +
+						"UNIDADMEDIDA,dbo.AndrDate(FECHA), ANULADO, CENTRO, STATUS, ENVIADO, CODIGOLIQUIDACION, COREL_D_MOV, DOC_ENTREGA, 0  " +
+						"FROM P_STOCK_PALLET WHERE RUTA='" + gl.ruta + "' AND (FECHA>='" + fsqli + "') AND (FECHA<='" + fsqlf + "') " +
+						"AND (STATUS='A') AND (COREL_D_MOV='') AND (CODIGOLIQUIDACION=0) AND (ANULADO=0) " +
+						"AND DOCUMENTO NOT IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH WHERE (FECHA>='" + fsqli + "') " +
+						"AND (FECHA<='" + fsqlf + "'))";
+			}
 			return SQL;
 		}
 
@@ -4673,7 +4715,6 @@ public class ComWS extends PBase {
 
 		senv = "Envío terminado \n \n";
 
-
 		if (gl.peModal.equalsIgnoreCase("TOL")) {
 			rslv = validaLiquidacion();
 			if (rslv != 1) {
@@ -4901,6 +4942,41 @@ public class ComWS extends PBase {
 				}
 			} else {
 				return true;
+			}
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+		}
+
+		return true;
+	}
+
+	private boolean sendMov() {
+		int rslv;
+
+		errflag = false;
+
+		if (getTest() == 0) {
+
+			URL = URL_Remota;
+
+			if (getTest() == 0) {
+				errflag = true;
+				return false;
+			}
+		}
+
+		senv = "Envío terminado \n \n";
+
+		try {
+
+			envio_D_MOV_Parcial();
+			if (errflag) {
+				dbld.savelog();
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
+				return false;
 			}
 
 		} catch (Exception e) {
@@ -5908,6 +5984,106 @@ public class ComWS extends PBase {
 		}
 	}
 
+	public void envio_D_MOV_Parcial() {
+		Cursor DT;
+		String cor;
+		int i, pc = 0, pcc = 0;
+
+		try {
+
+			senv = "Envío terminado \n \n";
+
+			sql = "SELECT COREL FROM D_MOV WHERE STATCOM='N' AND ANULADO = 'N'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() == 0) {
+				senv += "Inventario : " + pc + "\n";
+				return;
+			}
+
+			pcc = DT.getCount();
+			pc = 0;
+			i = 0;
+
+			DT.moveToFirst();
+
+			while (!DT.isAfterLast()) {
+
+				cor = DT.getString(0);
+
+				try {
+
+					i += 1;
+					fprog = "Inventario " + i;
+
+					dbld.clear();
+
+					dbld.insert("D_MOV", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVD", "WHERE COREL='" + cor + "' ");
+					dbld.insert("D_MOVDB", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVDCAN", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_MOVDPALLET", "WHERE COREL='" + cor + "'");
+
+					//#CKFK 20190412 Corregido error
+					dbld.add("INSERT INTO P_DEVOLUCIONES_SAP " +
+							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO,'', D.LOTE, 'N', GETDATE(), D.CANT, 'N'" +
+							" FROM D_MOV E INNER JOIN D_MOVD D ON E.COREL = D.COREL" +
+							" WHERE E.COREL = '" + cor + "'" +
+							" UNION" +
+							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO,D.BARRA, '', 'N', GETDATE(), 1, 'N'" +
+							" FROM D_MOV E INNER JOIN D_MOVDB D ON E.COREL = D.COREL" +
+							" WHERE E.COREL = '" + cor + "'");
+
+					if (commitSQL() == 1) {
+							sql = "UPDATE D_MOV SET STATCOM='S' WHERE COREL='" + cor + "'";
+							db.execSQL(sql);
+
+							sql = "UPDATE D_MOVD SET CODIGOLIQUIDACION=0 WHERE COREL='" + cor + "'";
+							db.execSQL(sql);
+
+							pc += 1;
+
+					} else {
+						errflag = true;
+						fterr += "\n" + sstr;
+					}
+
+				} catch (Exception e) {
+					errflag = true;
+
+					dbld.savelog("inventario.txt");
+
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					fterr += "\n" + e.getMessage();
+				}
+
+				DT.moveToNext();
+			}
+
+			if (DT != null) DT.close();
+
+		} catch (Exception e) {
+			errflag = true;
+
+			dbld.savelog("inventarios.txt");
+
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+		}
+
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Inventario: " + pc + " , NO ENVIADO : " + pf + ", se enviará en el fin de día \n";
+		} else {
+			senv += "Inventario: " + pc + "\n";
+		}
+
+		mu.toast(senv);
+		finish();
+	}
+
 	public void envioCli() {
 		Cursor DT;
 		String cor;
@@ -6686,8 +6862,14 @@ public class ComWS extends PBase {
 
 			if (scon == 1) {
 				fstr = "Sync OK";
-				if (!sendData()) {
-					fstr = "Envio incompleto : " + sstr;
+				if (gl.enviaMov){
+					if (!sendMov()) {
+						fstr = "Envio incompleto : " + sstr;
+					}
+				}else{
+					if (!sendData()) {
+						fstr = "Envio incompleto : " + sstr;
+					}
 				}
 			} else {
 				fstr = "No se puede conectar al web service : " + sstr;

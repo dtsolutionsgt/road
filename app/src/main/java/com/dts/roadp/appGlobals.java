@@ -30,8 +30,9 @@ public class appGlobals extends Application {
 	public boolean permitir_cantidad_mayor, permitir_producto_nuevo,pedidomod,listapedidos;
 	public int mpago;
 	public String prodCanasta, corelFac, devcord;
-	public boolean ingresaCanastas;
 	public String IdCanal, IdSubcanal, EditarClienteCanal, EditarClienteSubcanal;
+	public boolean ingresaCanastas, enviaMov;
+	public String EditarClienteCodigo, EditarClienteNombre, EditarClienteRuc;
 	public String CliNombre,CliNit, CliDireccion, CliProvincia, CliDistrito, CliCiudad, CliTel, CliEmail, CliContacto, CliCsPollo, CliCsEmbutido,CliCsHuevo,
 			CliCsRes, CliCsCerdo, CliCsCongelados, CliCsSalsas, IdDep, IdMun, CliCodVen="", corelCliente="", CliNomVen;
 

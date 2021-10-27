@@ -313,11 +313,6 @@ public class ComWS extends PBase {
 
         actualizaEstadoPedidos();
 
-		//Quitar esto al terminar el desarrollo
-        relExist.setVisibility(View.VISIBLE);
-        relPrecio.setVisibility(View.VISIBLE);
-        relStock.setVisibility(View.VISIBLE);
-
         if (gl.enviaMov){
 			lblRec.setVisibility(View.INVISIBLE);
 			imgRec.setVisibility(View.INVISIBLE);
@@ -6881,77 +6876,81 @@ public class ComWS extends PBase {
 		barInfo.setVisibility(View.INVISIBLE);
 		lblParam.setVisibility(View.INVISIBLE);
 
-		lblEnv.setVisibility(View.VISIBLE);
-		imgEnv.setVisibility(View.VISIBLE);
+		if(!gl.enviaMov){
+			lblEnv.setVisibility(View.VISIBLE);
+			imgEnv.setVisibility(View.VISIBLE);
 
-		running = 0;
+			running = 0;
 
-		//senv="Envio completo\n";
+			//senv="Envio completo\n";
 
-		try {
-			if (scon == 0) {
-				lblInfo.setText(fstr);
-				writeErrLog(fstr);
-				mu.msgbox(fstr);
-				lblInfo.setText(fstr);
-				isbusy = 0;
-				barInfo.setVisibility(View.INVISIBLE);
-				addlog("Envío", fterr + " " + fstr, esql);
-				return;
-			}
+			try {
+				if (scon == 0) {
+					lblInfo.setText(fstr);
+					writeErrLog(fstr);
+					mu.msgbox(fstr);
+					lblInfo.setText(fstr);
+					isbusy = 0;
+					barInfo.setVisibility(View.INVISIBLE);
+					addlog("Envío", fterr + " " + fstr, esql);
+					return;
+				}
 
-			if (!errflag) {
-				lblInfo.setText(" ");
+				if (!errflag) {
+					lblInfo.setText(" ");
 
-				if (!envioparcial) {
+					if (!envioparcial) {
 
-					claseFindia.updateComunicacion(2);
-					claseFindia.updateFinDia(du.getActDate());
+						claseFindia.updateComunicacion(2);
+						claseFindia.updateFinDia(du.getActDate());
+
+						findiaactivo = gl.findiaactivo;
+						if (ultimoCierreFecha() == du.getActDate()) findiaactivo = true;
+
+						if (findiaactivo) {
+							ActualizaStatcom();
+							claseFindia.eliminarTablasD();
+						}
+					}
+
+					fstr = "Envio completo ";
+					msgResultEnvio(senv);
+
+				} else {
+					lblInfo.setText(fterr);
+					isbusy = 0;
+					barInfo.setVisibility(View.INVISIBLE);
+					visibilidadBotones();
+					mu.msgbox("Ocurrió error : \n" + fterr);
+					addlog("Envío", fterr, esql);
+					return;
+				}
+
+				if (envioparcial) {
 
 					findiaactivo = gl.findiaactivo;
 					if (ultimoCierreFecha() == du.getActDate()) findiaactivo = true;
 
 					if (findiaactivo) {
-						ActualizaStatcom();
+						FinDia();
 						claseFindia.eliminarTablasD();
 					}
+
 				}
 
-				fstr = "Envio completo ";
-				msgResultEnvio(senv);
-
-			} else {
-				lblInfo.setText(fterr);
-				isbusy = 0;
-				barInfo.setVisibility(View.INVISIBLE);
 				visibilidadBotones();
-				mu.msgbox("Ocurrió error : \n" + fterr);
-				addlog("Envío", fterr, esql);
-				return;
+				//if (!errflag) ComWS.super.finish();
+
+				isbusy = 0;
+
+			} catch (Exception e) {
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 			}
 
-			if (envioparcial) {
-
-				findiaactivo = gl.findiaactivo;
-				if (ultimoCierreFecha() == du.getActDate()) findiaactivo = true;
-
-				if (findiaactivo) {
-					FinDia();
-					claseFindia.eliminarTablasD();
-				}
-
-			}
-
-			visibilidadBotones();
-			//if (!errflag) ComWS.super.finish();
-
-			isbusy = 0;
-
-		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}else{
+			gl.enviaMov = false;
 		}
-
 
 	}
 

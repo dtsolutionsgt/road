@@ -43,8 +43,8 @@ public class ResumenProductos extends PBase {
 
         lista = (ListView) findViewById(R.id.lista);
 
-        totcant = (TextView) findViewById(R.id.totcant);
-        totpeso = (TextView) findViewById(R.id.totpeso);
+        totcant = (TextView) findViewById(R.id.lblTotCant);
+        totpeso = (TextView) findViewById(R.id.lblTotPeso);
         titulo = (TextView) findViewById(R.id.txtRoadTit);
         filtro = (EditText) findViewById(R.id.filtro);
 
@@ -74,6 +74,7 @@ public class ResumenProductos extends PBase {
         Cursor DT;
         clsClasses.clsResProducto item;
         String cadena = filtro.getText().toString().replace("'","");
+        String sCant, sPeso;
 
         items.clear();
         totCant = 0.00;
@@ -95,14 +96,17 @@ public class ResumenProductos extends PBase {
 
                 while (!DT.isAfterLast())
                 {
+                    sCant = mu.frmdec(DT.getDouble(2));
+                    sPeso = mu.frmdec(DT.getDouble(3));
+
                     item = clsCls.new clsResProducto();
                     item.codigo=DT.getString(0);
                     item.nombre=DT.getString(1);
-                    item.cantidad = DT.getDouble(2);
-                    item.peso = DT.getDouble(3);
+                    item.cantidad = sCant;
+                    item.peso = sPeso;
 
-                    totCant += item.cantidad;
-                    totPeso += item.peso;
+                    totCant += DT.getDouble(2);
+                    totPeso += DT.getDouble(3);
 
                     items.add(item);
 
@@ -115,8 +119,8 @@ public class ResumenProductos extends PBase {
 
             if(DT != null) DT.close();
 
-            totcant.setText("Cant: " + String.valueOf(totCant));
-            totpeso.setText("Peso: " + String.valueOf(totPeso));
+            totcant.setText("Cant: " + mu.frmdec(totCant));
+            totpeso.setText("Peso: " + mu.frmdec(totPeso));
 
             adapter = new ListAdaptResProd(this,items);
             lista.setAdapter(adapter);
@@ -172,10 +176,9 @@ public class ResumenProductos extends PBase {
                 for (int i = 0; i <items.size(); i++) {
 
                     item=items.get(i);
-                    s1 = String.valueOf(item.cantidad);
-                    s2 = String.valueOf(item.peso);
+
                     rep.add(item.codigo + " " + item.nombre);
-                    rep.add3lrr(s1, s2, "");
+                    rep.add3lrr(item.cantidad, item.peso, "");
                 }
 
                 rep.line();
@@ -192,8 +195,8 @@ public class ResumenProductos extends PBase {
 
             try {
                 rep.empty();
-                rep.add("TOTAL CANTIDAD:     "+ totCant);
-                rep.add("TOTAL PESO:         "+ totPeso);
+                rep.add("TOTAL CANTIDAD:     "+ mu.frmdec(totCant));
+                rep.add("TOTAL PESO:         "+ mu.frmdec(totPeso));
                 rep.add("TOTAL REGISTROS:    "+ lns);
                 rep.line();
                 rep.empty();

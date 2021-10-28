@@ -64,8 +64,8 @@ public class ListAdaptResProd extends BaseAdapter {
 
         holder.lblCodigo.setText(String.valueOf(items.get(position).codigo));
         holder.lblNombre.setText(items.get(position).nombre);
-        holder.lblCant.setText("Cantidad: " + String.valueOf(items.get(position).cantidad));
-        holder.lblPeso.setText("Peso: "+ String.valueOf(items.get(position).peso));
+        holder.lblCant.setText("Cantidad: " + items.get(position).cantidad);
+        holder.lblPeso.setText("Peso: "+ items.get(position).peso);
 
         if(selectedIndex!= -1 && position == selectedIndex) {
             convertView.setBackgroundColor(Color.rgb(26,138,198));

@@ -27,7 +27,7 @@ public class ReportePrefactura extends PBase {
     private ListAdaptResPrefactura adapter;
 
     private ListView lista;
-    private TextView titulo;
+    private TextView titulo,lblTotCant, lblTotPeso,textView9;
     private EditText filtro;
     private LinearLayout totales;
 
@@ -42,11 +42,15 @@ public class ReportePrefactura extends PBase {
         filtro = (EditText) findViewById(R.id.filtro);
         lista = (ListView) findViewById(R.id.lista);
         titulo = (TextView) findViewById(R.id.txtRoadTit);
-        totales = (LinearLayout) findViewById(R.id.totales);
+        lblTotCant = (TextView) findViewById(R.id.lblTotCant);
+        lblTotPeso = (TextView) findViewById(R.id.lblTotPeso);
+        textView9 = (TextView) findViewById(R.id.textView9);
 
         if (gl.repPrefactura) {
             filtro.setVisibility(View.INVISIBLE);
-            totales.setVisibility(View.GONE);
+            lblTotCant.setVisibility(View.INVISIBLE);
+            lblTotPeso.setVisibility(View.INVISIBLE);
+            textView9.setVisibility(View.VISIBLE);
         }
 
         rep = new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "");
@@ -116,8 +120,8 @@ public class ReportePrefactura extends PBase {
                             itemP = clsCls.new clsResPrefactura();
                             itemP.codigoProd = DP.getString(0);
                             itemP.nombreProd = DP.getString(1);
-                            itemP.cantidad = DP.getDouble(2);
-                            itemP.peso = DP.getDouble(3) +" " +DP.getString(4);
+                            itemP.cantidad = mu.frmdec(DP.getDouble(2));
+                            itemP.peso = mu.frmdec(DP.getDouble(3)) +" " +DP.getString(4);
                             itemP.flag = 1;
 
                             items.add(itemP);
@@ -181,9 +185,9 @@ public class ReportePrefactura extends PBase {
                 rep.empty();
                 rep.line();lns=items.size();
 
-                rep.add("Cod.Cli   Descripción Cliente");
+                rep.add("Cod.Cli   Descripcion Cliente");
                 rep.add("No. Prefactura");
-                rep.add("Cod.Prod  Descripción Producto");
+                rep.add("Cod.Prod  Descripcion Producto");
                 rep.add("Cantidad        Peso");
                 rep.line();
 

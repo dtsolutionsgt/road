@@ -211,12 +211,13 @@ public class clsClasses {
 
 	public class clsResProducto {
 		public String codigo, nombre;
-		public double cantidad, peso;
+		public String cantidad;
+		public String peso;
 	}
 
 	public class clsResPrefactura {
 		public String codigoCli, codigoProd, nombreCli, nombreProd, Prefact;
-		public double cantidad;
+		public String cantidad;
 		public String peso;
 		public int flag;
 	}

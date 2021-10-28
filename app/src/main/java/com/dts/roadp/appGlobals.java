@@ -44,6 +44,7 @@ public class appGlobals extends Application {
 	public boolean debug=true;
 
 	public boolean gpsCliente = false;
+	public boolean repPrefactura = false;
 
 	//Devolución Cliente
 	public String devtipo,devrazon,dvumventa,dvumstock,dvumpeso,dvlote;

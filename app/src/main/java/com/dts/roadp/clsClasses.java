@@ -1,5 +1,7 @@
 package com.dts.roadp;
 
+import java.util.ArrayList;
+
 public class clsClasses {
 	
 	public class clsCD {
@@ -205,6 +207,18 @@ public class clsClasses {
 		public String codigo;
 		public String depar;
 		public String nombre;
+	}
+
+	public class clsResProducto {
+		public String codigo, nombre;
+		public double cantidad, peso;
+	}
+
+	public class clsResPrefactura {
+		public String codigoCli, codigoProd, nombreCli, nombreProd, Prefact;
+		public double cantidad;
+		public String peso;
+		public int flag;
 	}
 
 }

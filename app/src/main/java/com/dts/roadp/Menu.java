@@ -24,7 +24,10 @@ import android.widget.Toast;
 
 import com.dts.roadp.clsClasses.clsMenu;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Menu extends PBase {
 
@@ -878,30 +881,39 @@ public class Menu extends PBase {
 
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Objetivos por producto","Objetivos por familia","Objetivo por ruta","Objetivo por cobro","Inventario bodega","Consulta de precios"};
+			int tmp= 0, itemcnt = 6;
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setTitle("Consultas");
 
+			if (rutatipo.equalsIgnoreCase("D")) itemcnt = 8;
+
+			final String[] selitems = new String[itemcnt];
+
+			if (rutatipo.equalsIgnoreCase("D")) {
+				selitems[tmp] = "Resumen de prefacturas"; tmp++;
+				selitems[tmp] = "Resumen de productos"; tmp++;
+			}
+
+			selitems[tmp]="Objetivos por producto";tmp++;
+			selitems[tmp]="Objetivos por familia";tmp++;
+			selitems[tmp]="Objetivo por ruta";tmp++;
+			selitems[tmp]="Objetivo por cobro";tmp++;
+			selitems[tmp]="Inventario bodega";tmp++;
+			selitems[tmp]="Consulta de precios";tmp++;
+
 			menudlg.setItems(selitems , new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
+					String mt=selitems[item];
 
-					switch (item) {
-						case 0:
-							menuObjProd();break;
-						case 1:
-							menuObjFamilia();break;
-						case 2:
-							menuObjRuta();break;
-						case 3:
-							menuObjCobro();break;
-						case 4:
-							menuInvBod();dialog.cancel();break;
-						case 5:
-							menuPrecios();dialog.cancel();break;
-					}
-
-					//dialog.cancel();
+					if (mt.equalsIgnoreCase("Resumen de prefacturas")) menuPrefactura();
+					if (mt.equalsIgnoreCase("Resumen de productos")) menuResumenProd();
+					if (mt.equalsIgnoreCase("Objetivos por producto")) menuObjProd();
+					if (mt.equalsIgnoreCase("Objetivos por familia")) menuObjFamilia();
+					if (mt.equalsIgnoreCase("Objetivo por ruta")) menuObjRuta();
+					if (mt.equalsIgnoreCase("Objetivo por cobro")) menuObjCobro();
+					if (mt.equalsIgnoreCase("Inventario bodega")) menuInvBod();
+					if (mt.equalsIgnoreCase("Consulta de precios")) menuPrecios();
 				}
 			});
 
@@ -914,6 +926,10 @@ public class Menu extends PBase {
 
 			Dialog = menudlg.create();
 			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -987,6 +1003,27 @@ public class Menu extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
+	}
+
+	// #AT 20211027
+	private void menuPrefactura() {
+		try{
+			gl.repPrefactura = true;
+			Intent intent = new Intent(this,ReportePrefactura.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+	}
+
+	private void menuResumenProd() {
+		try{
+
+			Intent intent = new Intent(this,ResumenProductos.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 
 	//endregion

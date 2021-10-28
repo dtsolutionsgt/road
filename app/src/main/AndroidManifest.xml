@@ -32,18 +32,26 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ResumenProductos"
+            android:exported="true"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name=".ReportePrefactura"
+            android:exported="true"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
             android:name=".ListaVendedores"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:windowSoftInputMode="stateHidden"/>
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".DepartamentoMun"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
-            android:windowSoftInputMode="stateHidden"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar"/>
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".CliNuevoT"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -61,8 +69,8 @@
             android:name=".CanalSubcanal"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
-            android:windowSoftInputMode="stateHidden"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar"/>
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
 
         <service
             android:name=".srvBase"
@@ -477,7 +485,8 @@
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity android:name=".imprime_barras" />
-        <activity android:name=".desglose"
+        <activity
+            android:name=".desglose"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />

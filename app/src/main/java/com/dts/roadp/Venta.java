@@ -56,6 +56,8 @@ public class Venta extends PBase {
 	private ArrayList<String> lcodeM = new ArrayList<String>();
 	private ArrayList<String> lnameM = new ArrayList<String>();
 
+	private ArrayList<String> lProdSinInv = new ArrayList<String>();
+
 	private int browse;
 
 	private double cant,desc,mdesc,prec,precsin,imp,impval,cantOriginal,pesoOriginal, umfactor,pesoprom=0,pesostock=0;
@@ -2047,9 +2049,7 @@ public class Venta extends PBase {
                     && (EsUnidadSuperior(UnidadVentaCliente, vProd)) && (!gl.umpeso.equalsIgnoreCase(UnidadVentaCliente))) {
                 varZ = DameFactor(UnidadInventario, vProd);
                 varP = DameFactor(UnidadVentaCliente, vProd);
-                //if (varP>0) proporcion = varZ / varP;
-                if (varP>varZ) if (varZ>0) proporcion = varP / varZ;
-				//if (varZ>varP) if (varP>0) proporcion = varP / varZ;
+                if (varP>0) proporcion = varZ / varP;
             } else if ((UnidadInventario.equalsIgnoreCase(UnidadVentaCliente)) | (UnidadVentaCliente.equalsIgnoreCase(gl.umpeso))) {
                 proporcion = 1;
             } else{
@@ -2968,6 +2968,7 @@ public class Venta extends PBase {
 
 		try {
 			lblTit.setText("Prefactura");
+			lProdSinInv.clear();
 
 			gl.coddespacho=gl.iddespacho;
 
@@ -2990,7 +2991,7 @@ public class Venta extends PBase {
                 cant =item.cant;
 				//nivel =item.producto;
 				um =item.umventa;
-				gl.umpeso =item.umpeso;
+				//gl.umpeso =item.umpeso;
 				gl.dpeso =item.peso;
 
 				//#CKFK 20210729 Obtener el precio del producto
@@ -3021,6 +3022,12 @@ public class Venta extends PBase {
 								//#CKFK 20210927 Vuelvo a obtener el precio del producto para obtener el total a facturar
 								getPrecio();
 
+								if (porpeso) {
+									prodtot=mu.round(prec*item.peso,2);
+								} else {
+									prodtot=mu.round(prec*cant,2);
+								}
+
 								item.precio = prec;
 								item.imp= prc.imp;
 								item.des = desc;
@@ -3029,6 +3036,10 @@ public class Venta extends PBase {
 							}
 
 							if (respuesta.equals("")){
+
+								if (porpeso) {
+									item.total=mu.round(item.precio*item.peso,2);
+								}
 
 								ins.init("T_VENTA");
 								ins.add("PRODUCTO",item.producto);
@@ -3056,6 +3067,9 @@ public class Venta extends PBase {
 								db.execSQL(ins.sql());
 
 							}
+						}else{
+							//CKFK 20211026 Agregar productos a lista para mostrarlos
+							lProdSinInv.add(item.producto + " " + app.getNombreProducto(item.producto ));
 						}
 
 					}else{
@@ -3100,6 +3114,10 @@ public class Venta extends PBase {
 				startActivity(intent);
 			}else{
 				listItems();
+			}
+
+			if (lProdSinInv.size()>0){
+				showProdSinInvDialog();
 			}
 
 		} catch (Exception e) {
@@ -3955,6 +3973,40 @@ public class Venta extends PBase {
 					db.execSQL(sql);
 
 				}
+			});
+
+			Dialog = mMenuDlg.create();
+			Dialog.show();
+
+			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
+			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	public void showProdSinInvDialog() {
+		try{
+			final AlertDialog Dialog;
+
+			final String[] selitems = new String[lProdSinInv.size()];
+			for (int i = 0; i < lProdSinInv.size(); i++) {
+				selitems[i] = lProdSinInv.get(i);
+			}
+
+			mMenuDlg = new AlertDialog.Builder(this);
+			mMenuDlg.setTitle("Productos de lote sin inventario");
+			mMenuDlg.setCancelable(false);
+
+			mMenuDlg.setItems(selitems , new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {}
+			});
+
+			mMenuDlg.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {}
 			});
 
 			Dialog = mMenuDlg.create();

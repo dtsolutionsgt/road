@@ -30,12 +30,14 @@ public class clsRepBuilder {
 	
 	public clsRepBuilder(Context context,int printwidth,boolean regular,String cursymbol,int decimpres, String archivo) {
 		
-		cont=context; 
-		prw=printwidth;
+		cont=context;
+		//AT 20211029 Quitar comentario luego de realizar pruebas
+		//prw=printwidth
+		prw=32;
 		seplen=prw;
 		cursym=cursymbol;
 		decimp=decimpres;
-				
+
 		aux=prw;
 		prwq=(int) Math.floor(aux/4);
 		prwt=(int) Math.floor(aux/3);
@@ -256,7 +258,7 @@ public class clsRepBuilder {
 	}
 	
 	public void add3lrr(String s1,String s2,String s3) {
-		ts=ltrim(s1,prwt)+rtrim(s2,prwt)+rtrim(s3,prwt);
+		ts=ltrim(s1,prwt-2)+rtrim(s2,prwh-4)+rtrim(s3,prwh-4);
 		items.add(ts);
 	}
 	
@@ -293,7 +295,7 @@ public class clsRepBuilder {
 	}
 	
 	public void addtot(String s1,String val) {
-		ts=ltrim(s1,prw-13)+" "+rtrim(val,12);
+		ts=ltrim(s1,prw-17)+" "+rtrim(val,12);
 		items.add(ts);
 	}
 
@@ -305,7 +307,7 @@ public class clsRepBuilder {
     public void addtotD(String s1,double val) {
 		String sval;
 		sval = Double.toString(val);
-		ts=ltrim(s1,prw-13)+" "+rtrim(sval,12);
+		ts=ltrim(s1,prwh)+" "+rtrim(sval,prwh-1);
 		items.add(ts);
 	}
 
@@ -380,9 +382,9 @@ public class clsRepBuilder {
 	public void addp(String s1,String val) {
 		String ss,s3;
 		
-		s1=StringUtils.rightPad(s1,24);ss=s1+"";
+		s1=StringUtils.rightPad(s1,16);ss=s1+"";
 		s3=val;
-		s3=StringUtils.leftPad(s3,12);ss+=s3;
+		s3=StringUtils.leftPad(s3,16);ss+=s3;
 		
 		items.add(ss);
 		

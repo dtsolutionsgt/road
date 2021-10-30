@@ -358,14 +358,15 @@ public class clsDocFactura extends clsDocument {
 		String ss, umm;
 		double ccant;
 
-		rep.add("CODIGO   DESCRIPCION        UM  CANT");
-		rep.add("       KGS    PRECIO           VALOR");
+		rep.add("--------------------------------");
+		rep.add("CODIGO   DESCRIPCION    UM  CANT");
+		rep.add("       KGS    PRECIO       VALOR");
 		rep.line();
 
 		for (int i = 0; i <items.size(); i++) {
 			item = items.get(i);
 
-			ss = rep.ltrim(item.cod + " " + item.nombre, prw - 10);
+			ss = rep.ltrim(item.cod + " " + item.nombre, prw - 14);
 			if (item.um.equalsIgnoreCase(medidapeso)) {
 				umm = item.ums;
 			} else {
@@ -377,7 +378,7 @@ public class clsDocFactura extends clsDocument {
 			ss = ss + rep.rtrim(umm, 4) + " " + rep.rtrim(frmdecimal(ccant, 2), 5);
 			rep.add(ss);
 			ss = rep.rtrim(frmdecimal(item.peso, decimp), 10) + " " + rep.rtrim(frmdecimal(item.prec, 2), 8);
-			ss = rep.ltrim(ss, prw - 10);
+			ss = rep.ltrim(ss, prw - 14);
 			ss = ss + " " + rep.rtrim(frmdecimal(item.tot, 2), 9);
 			rep.add(ss);
 
@@ -566,9 +567,10 @@ public class clsDocFactura extends clsDocument {
 			rep.add("");
 			rep.addc("Se aplico nota de credito: "+corelNotaC);
 			rep.add("");
-			rep.addc("DE SER UNA VENTA AL CREDITO, SOLAMEN");
-			rep.addc("TE NUESTRO CORRESPONDIENTE RECIBO SE");
-			rep.addc("CONSIDERARA COMO EVIDENCIA  DE  PAGO");
+			rep.addc("DE SER UNA VENTA AL CREDITO, SO");
+			rep.addc("LAMENTE NUESTRO CORRESPONDIENTE");
+			rep.addc("RECIBO SE CONSIDERARA  COMO EVI");
+			rep.addc("DENCIA DE PAGO                 ");
 			rep.add("");
 
 			rep.add("Serial : "+deviceid);
@@ -591,9 +593,10 @@ public class clsDocFactura extends clsDocument {
 			rep.add("");
 
 			if (pendiente!=4){
-				rep.addc("DE SER UNA VENTA AL CREDITO, SOLAMEN");
-				rep.addc("TE NUESTRO CORRESPONDIENTE RECIBO SE");
-				rep.addc("CONSIDERARA COMO EVIDENCIA  DE  PAGO");
+				rep.addc("DE SER UNA VENTA AL CREDITO, SO");
+				rep.addc("LAMENTE NUESTRO CORRESPONDIENTE");
+				rep.addc("RECIBO SE CONSIDERARA  COMO EVI");
+				rep.addc("DENCIA DE PAGO                 ");
 				rep.add("");
 			}
 

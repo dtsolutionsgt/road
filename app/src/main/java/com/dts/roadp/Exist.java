@@ -532,7 +532,7 @@ public class Exist extends PBase {
                 rep.line();lns=items.size();
 
                 rep.add("Cod  Descripcion");
-                rep.add("Lote         Cantidad UM     Peso UM");
+                rep.add("Lote     Cantidad UM     Peso UM");
                 rep.line();
 
                 for (int i = 0; i <items.size(); i++) {

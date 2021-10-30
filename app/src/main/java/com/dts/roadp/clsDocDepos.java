@@ -240,8 +240,8 @@ public class clsDocDepos extends clsDocument {
 		if(modofact.equalsIgnoreCase("*"))detail();
 		if(modofact.equalsIgnoreCase("TOL"))detailToledano();
 
-		rep.addtot("Total efectivo :", rep.rtrim(rep.frmdec(tote),12));
-		rep.addtot("Total cheques :", rep.rtrim(rep.frmdec(totc),12));
+		rep.addtot("Total efectivo :    ", rep.rtrim(rep.frmdec(tote),12));
+		rep.addtot("Total cheques :    ", rep.rtrim(rep.frmdec(totc),12));
 		rep.line();
 		rep.addtot("Total  :", rep.rtrim(rep.frmdec(tot),12));
 		rep.line();
@@ -321,14 +321,14 @@ public class clsDocDepos extends clsDocument {
 		itemData item;
 		String ss;
 
-		rep.add("CANTIDAD      DENOMINACION     TOTAL");
+		rep.add("CANTIDAD   DENOMINACION    TOTAL");
 		rep.line();
 
 		for (int i = 0; i <itemsD.size(); i++) {
 			item=itemsD.get(i);
 
 			ss=rep.ltrim(frmdecimal(item.cant,0), prw-20);
-			ss=ss+rep.rtrim(item.denom+" ",5)+" "+rep.rtrim(frmdecimal(item.total,2),14);
+			ss=ss+rep.rtrim(item.denom+" ",5)+" "+rep.rtrim(frmdecimal(item.total,2),10);
 			rep.add(ss);
 
 		}
@@ -342,8 +342,8 @@ public class clsDocDepos extends clsDocument {
 		itemData item;
 		String ss;
 
-		rep.add("BANCO                               ");
-		rep.add("   CHEQUE        FECHA         VALOR");
+		rep.add("BANCO                           ");
+		rep.add("   CHEQUE      FECHA       VALOR");
 		rep.line();
 
 		for (int i = 0; i <itemsC.size(); i++) {
@@ -351,9 +351,9 @@ public class clsDocDepos extends clsDocument {
 
 			ss=rep.ltrim(item.banco, prw-20);
 			rep.add(ss);
-			ss=rep.rtrim(item.cuenta,10)+" "+rep.rtrim(fsfecha,15);
-			ss=rep.ltrim(ss,prw-10);
-			ss=ss+" "+rep.rtrim(frmdecimal(item.totc,2),9);
+			ss=rep.rtrim(item.cuenta,10)+" "+rep.rtrim(fsfecha,10);
+			ss=rep.ltrim(ss,prw-12);
+			ss=ss+" "+rep.rtrim(frmdecimal(item.totc,2),7);
 			rep.add(ss);
 
 		}

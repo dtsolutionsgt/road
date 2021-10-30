@@ -1359,7 +1359,7 @@ public class FinDia extends PBase {
         rep.line();
         rep.empty();
         rep.add("No. Doc");
-        rep.add("      GRAV.  NO.GR  ITBM   Total  TP");
+        rep.add("  GRAV.  NO.GR  ITBM   Total  TP");
         rep.line();
 
         try {
@@ -1430,9 +1430,9 @@ public class FinDia extends PBase {
 
                             if (!vAuxCorel.equalsIgnoreCase(DT.getString(0))){
                                 vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
-                                vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
+                                vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumanograv), 8);
                                 vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8);
-                                vCadena +=   StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
+                                vCadena +=   StringUtils.leftPad(mu.frmcur_sm(totporfila), 6) + " F";
                                 rep.add(vCadena);
                             }
 
@@ -1441,9 +1441,9 @@ public class FinDia extends PBase {
                         }  else{
 
                             vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
-                            vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
+                            vCadena +=  StringUtils.leftPad(mu.frmcur_sm(sumanograv), 8);
                             vCadena += StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8);
-                            vCadena +=  StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
+                            vCadena +=  StringUtils.leftPad(mu.frmcur_sm(totporfila), 6) + " F";
                             rep.add(vCadena);
                         }
                     }
@@ -1458,9 +1458,9 @@ public class FinDia extends PBase {
                         sumagrav = sumagrav + DT.getDouble(6);//Gravado
 
                         vCadena = StringUtils.leftPad(mu.frmcur_sm(sumagrav), 8);
-                        vCadena += StringUtils.leftPad(mu.frmcur_sm(sumanograv), 9);
+                        vCadena += StringUtils.leftPad(mu.frmcur_sm(sumanograv), 8);
                         vCadena += StringUtils.leftPad(mu.frmcur_sm(sumaimp), 8);
-                        vCadena += StringUtils.leftPad(mu.frmcur_sm(totporfila), 9) + " F";
+                        vCadena += StringUtils.leftPad(mu.frmcur_sm(totporfila), 6) + " F";
                         rep.add(vCadena);
 
                     }
@@ -1478,9 +1478,9 @@ public class FinDia extends PBase {
                 vCadena = "Total";
                 rep.add(vCadena);
                 vCadena = StringUtils.leftPad(mu.frmcur_sm(totgrav), 10, " ");
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(totnograv), 9);
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(totnograv), 7);
                 vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(TotItbm), 8);
-                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(sumados), 9);
+                vCadena = vCadena + StringUtils.leftPad(mu.frmcur_sm(sumados), 7);
                 rep.add(vCadena);
             }
 
@@ -1674,7 +1674,7 @@ public class FinDia extends PBase {
 
                         if (!anulado) TotalRecibos += DT.getDouble(1);
 
-                        vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 25);
+                        vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 24);
                         if (anulado)  vCadena += "  A";
 
                         rep.add(vCadena);
@@ -1686,7 +1686,7 @@ public class FinDia extends PBase {
             }
 
             rep.line();
-            vCadena = "Total:  " + StringUtils.leftPad(mu.frmcur_sm(TotalRecibos), 27);
+            vCadena = "Total:  " + StringUtils.leftPad(mu.frmcur_sm(TotalRecibos), 24);
             rep.add(vCadena);
             rep.empty();
 
@@ -1741,7 +1741,7 @@ public class FinDia extends PBase {
                         TotalNotaCredCred += DT.getDouble(1);
                     }
 
-                    vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 25);
+                    vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 20);
                     if (anulada)  vCadena += "  A";
 
                     rep.add(vCadena);
@@ -1773,7 +1773,7 @@ public class FinDia extends PBase {
                         TotalNotaCredCont += DT.getDouble(1);
                     }
 
-                    vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 25);
+                    vCadena += StringUtils.leftPad(mu.frmcur_sm(DT.getDouble(1)), 24);
                     if (anulada)  vCadena += "  A";
 
                     rep.add(vCadena);
@@ -1783,11 +1783,11 @@ public class FinDia extends PBase {
             }
 
             rep.line();
-            vCadena = "Total NC Credito:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCredCred), 16);
+            vCadena = "Total NC Credito:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCredCred), 13);
             rep.add(vCadena);
-            vCadena = "Total NC Contado:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCredCont), 16);
+            vCadena = "Total NC Contado:  " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCredCont), 13);
             rep.add(vCadena);
-            vCadena = "Total:             " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCred), 16);
+            vCadena = "Total:             " + StringUtils.leftPad( mu.frmcur_sm(TotalNotaCred), 13);
             rep.add(vCadena);
             rep.empty();
 
@@ -1870,41 +1870,41 @@ public class FinDia extends PBase {
             int corelativoZ = 0;
 
             //Totales para liquidacion
-            vCadena = "Facturas Credito      :" + StringUtils.leftPad(mu.frmint(vFacturasCredito), 13);
+            vCadena = "Facturas Credito  :" + StringUtils.leftPad(mu.frmint(vFacturasCredito), 13);
             rep.add(vCadena);
-            vCadena = "Facturas Contado      :" + StringUtils.leftPad(mu.frmint(vFacturasContado), 13);
+            vCadena = "Facturas Contado  :" + StringUtils.leftPad(mu.frmint(vFacturasContado), 13);
             rep.add(vCadena);
-            vCadena = "Facturas Anuladas     :" + StringUtils.leftPad(mu.frmint(vFacturasAnuladas), 13);
+            vCadena = "Facturas Anuladas :" + StringUtils.leftPad(mu.frmint(vFacturasAnuladas), 13);
             rep.add(vCadena);
-            vCadena = "Cantidad Facturas     :" + StringUtils.leftPad(mu.frmint(vTotalFacturas), 13);
+            vCadena = "Cantidad Facturas :" + StringUtils.leftPad(mu.frmint(vTotalFacturas), 13);
             rep.add(vCadena);
-            vCadena = "Recibos               :" + StringUtils.leftPad(mu.frmint(vTotRecibos), 13);
+            vCadena = "Recibos           :" + StringUtils.leftPad(mu.frmint(vTotRecibos), 13);
             rep.add(vCadena);
-            vCadena = "Recibos anulados      :" + StringUtils.leftPad(mu.frmint(vRecibosAnulados), 13);
+            vCadena = "Recibos anulados  :" + StringUtils.leftPad(mu.frmint(vRecibosAnulados), 13);
             rep.add(vCadena);
-            vCadena = "Cantidad de NC        :" + StringUtils.leftPad(mu.frmint(vNotasCredito), 13);
+            vCadena = "Cantidad de NC    :" + StringUtils.leftPad(mu.frmint(vNotasCredito), 13);
             rep.add(vCadena);
-            vCadena = "Cant. NC anuladas     :" + StringUtils.leftPad(mu.frmint(vNotasCreditoAnuladas), 13);
+            vCadena = "Cant. NC anuladas :" + StringUtils.leftPad(mu.frmint(vNotasCreditoAnuladas), 13);
             rep.add(vCadena);
             rep.empty();
 
-            vCadena = "Venta Credito         :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito), 13);
+            vCadena = "Venta Credito     :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito), 13);
             rep.add(vCadena);
-            vCadena = "Total NC Credito      :" + StringUtils.leftPad(mu.frmcur_sm(vTotalNC_Credito), 13);
+            vCadena = "Total NC Credito  :" + StringUtils.leftPad(mu.frmcur_sm(vTotalNC_Credito), 13);
             rep.add(vCadena);
-            vCadena = "Total Credito         :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito - vTotalNC_Credito), 13);
+            vCadena = "Total Credito     :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito - vTotalNC_Credito), 13);
             rep.add(vCadena);
-            vCadena = "Venta Contado         :" + StringUtils.leftPad(mu.frmcur_sm(vTotalContado), 13);
+            vCadena = "Venta Contado     :" + StringUtils.leftPad(mu.frmcur_sm(vTotalContado), 13);
             rep.add(vCadena);
-            vCadena = "Total NC Contado      :" + StringUtils.leftPad(mu.frmcur_sm(vTotalNC_Contado), 13);
+            vCadena = "Total NC Contado  :" + StringUtils.leftPad(mu.frmcur_sm(vTotalNC_Contado), 13);
             rep.add(vCadena);
-            vCadena = "Total Contado         :" + StringUtils.leftPad(mu.frmcur_sm(vTotalContado - vTotalNC_Contado), 13);
+            vCadena = "Total Contado     :" + StringUtils.leftPad(mu.frmcur_sm(vTotalContado - vTotalNC_Contado), 13);
             rep.add(vCadena);
-            vCadena = "Venta Total           :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
+            vCadena = "Venta Total       :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
             rep.add(vCadena);
-            vCadena = "Gran Total            :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
+            vCadena = "Gran Total        :" + StringUtils.leftPad(mu.frmcur_sm(vTotalCredito + vTotalContado), 13);
             rep.add(vCadena);
-            vCadena = "Total Recibos         :" + StringUtils.leftPad(mu.frmcur_sm(TotalRecibos), 13);
+            vCadena = "Total Recibos     :" + StringUtils.leftPad(mu.frmcur_sm(TotalRecibos), 13);
             rep.add(vCadena);
             rep.empty();
 
@@ -1913,9 +1913,9 @@ public class FinDia extends PBase {
 
             if (DT.getCount() > 0) {
                 DT.moveToFirst();
-                vCadena = "Siguiente Factura     :" + StringUtils.leftPad(DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)+1), 6),13);
+                vCadena = "Sig. Factura      :" + StringUtils.leftPad(DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)+1), 6),13);
             }else{
-                vCadena = "Siguiente Factura     :" + StringUtils.leftPad("0", 13);
+                vCadena = "Sig. Factura      :" + StringUtils.leftPad("0", 13);
             }
             rep.add(vCadena);
 
@@ -1924,9 +1924,9 @@ public class FinDia extends PBase {
 
             if (DT.getCount() > 0){
                 DT.moveToFirst();
-                vCadena = "Siguiente Recibo      :" + StringUtils.leftPad(DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)+1), 6),13);
+                vCadena = "Sig. Recibo       :" + StringUtils.leftPad(DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)+1), 6),13);
             }else{
-                vCadena = "Siguiente Recibo      :" + StringUtils.leftPad("0", 13);
+                vCadena = "Sig. Recibo       :" + StringUtils.leftPad("0", 13);
             }
             rep.add(vCadena);
 
@@ -1935,14 +1935,14 @@ public class FinDia extends PBase {
 
             if (DT.getCount() > 0){
                 DT.moveToFirst();
-                vCadena = "Siguiente Nota Credito:" + StringUtils.leftPad(DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)+1), 6),13);
+                vCadena = "Sig. Nota Credito :" + StringUtils.leftPad(DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)+1), 6),13);
             }else{
-                vCadena = "Siguiente Nota Credito:" + StringUtils.leftPad("0", 13);
+                vCadena = "Sig. Nota Credito :" + StringUtils.leftPad("0", 13);
             }
             rep.add(vCadena);
 
             corelativoZ = corelz + 1;
-            vCadena = "Siguiente Informe Z   :" + StringUtils.leftPad(mu.frmint(corelativoZ), 13);
+            vCadena = "Sig. Informe Z    :" + StringUtils.leftPad(mu.frmint(corelativoZ), 13);
 
             rep.add(vCadena);
 

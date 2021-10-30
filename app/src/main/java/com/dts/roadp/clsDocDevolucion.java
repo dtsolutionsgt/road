@@ -51,18 +51,18 @@ public class clsDocDevolucion extends clsDocument {
         String ss;
 
         rep.add("");
-        rep.add("CODIGO   DESCRIPCION        UM  CANT");
-        rep.add("       KGS    PRECIO           VALOR");
+        rep.add("CODIGO   DESCRIPCION    UM  CANT");
+        rep.add("       KGS    PRECIO       VALOR");
         rep.line();
 
         for (int i = 0; i <items.size(); i++) {
             item=items.get(i);
 
-            ss=rep.ltrim(item.cod+" "+item.nombre,prw-10);
+            ss=rep.ltrim(item.cod+" "+item.nombre,prw-14);
             ss=ss+rep.rtrim(item.um,4)+" "+rep.rtrim(frmdecimal(item.cant,2),5);
             rep.add(ss);
             ss=rep.rtrim(frmdecimal(item.peso,2),10)+" "+rep.rtrim(frmdecimal(item.prec,2),8);
-            ss=rep.ltrim(ss,prw-10);
+            ss=rep.ltrim(ss,prw-14);
             ss=ss+" "+rep.rtrim(frmdecimal(item.tot,2),9);
             rep.add(ss);
 

@@ -892,7 +892,7 @@ public class Menu extends PBase {
 
 			if (rutatipo.equalsIgnoreCase("D")) {
 				selitems[tmp] = "Resumen de prefacturas"; tmp++;
-				selitems[tmp] = "Resumen de productos"; tmp++;
+				selitems[tmp] = "Resumen de productos en prefacturas"; tmp++;
 			}
 
 			selitems[tmp]="Objetivos por producto";tmp++;
@@ -907,7 +907,7 @@ public class Menu extends PBase {
 					String mt=selitems[item];
 
 					if (mt.equalsIgnoreCase("Resumen de prefacturas")) menuPrefactura();
-					if (mt.equalsIgnoreCase("Resumen de productos")) menuResumenProd();
+					if (mt.equalsIgnoreCase("Resumen de productos en prefacturas")) menuResumenProd();
 					if (mt.equalsIgnoreCase("Objetivos por producto")) menuObjProd();
 					if (mt.equalsIgnoreCase("Objetivos por familia")) menuObjFamilia();
 					if (mt.equalsIgnoreCase("Objetivo por ruta")) menuObjRuta();

@@ -183,8 +183,8 @@ public class clsDocCanastaBod extends clsDocument {
 
         rep.line();
         ss=rep.rtrim("", 6)+" "+rep.rtrim(frmdecimal(totcant,2),8);
-        ss=rep.ltrim(ss,prw-10);
-        ss=ss+" "+rep.rtrim(frmdecimal(tot,3),9);
+        ss=rep.ltrim(ss,prw-15);
+        ss=ss+" "+rep.rtrim(frmdecimal(tot,3),10);
         rep.add(ss);
 
         return true;

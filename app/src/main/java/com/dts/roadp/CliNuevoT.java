@@ -100,7 +100,6 @@ public class CliNuevoT extends PBase {
         cb6 = (CheckBox) findViewById(R.id.checkBox6);
         cb7 = (CheckBox) findViewById(R.id.checkBox7);
 
-
         setData();
 
         setDataSpinnerPrecio();
@@ -305,37 +304,44 @@ public class CliNuevoT extends PBase {
         try {
             s=txtCliNombre.getText().toString();
             if (mu.emptystr(s)) {
-                mu.msgbox("Falta nombre del cliente");return false;
+                mu.msgbox("Falta nombre del cliente");
+                txtCliNombre.requestFocus();
+                return false;
             }
 
             s=txtCliNit.getText().toString();
             if (mu.emptystr(s)) {
-                mu.msgbox("Falta ruc del cliente");return false;
+                mu.msgbox("Falta RUC del cliente");
+                txtCliNit.requestFocus();
+                return false;
             }
 
             s=txtCliDireccion.getText().toString();
             if (mu.emptystr(s)) {
-                mu.msgbox("Falta dirección del cliente");return false;
+                mu.msgbox("Falta dirección del cliente");
+                txtCliDireccion.requestFocus();
+                return false;
             }
 
             s=txtCliTelefono.getText().toString();
             if (mu.emptystr(s)) {
-                mu.msgbox("Falta teléfono del cliente");return false;
-            }
-
-            s=txtCliEmail.getText().toString();
-            if (mu.emptystr(s)) {
-                mu.msgbox("Falta correo electrónico del cliente");return false;
+                mu.msgbox("Falta teléfono del cliente");
+                txtCliTelefono.requestFocus();
+                return false;
             }
 
             s=txtCliContacto.getText().toString();
             if (mu.emptystr(s)) {
-                mu.msgbox("Falta contacto del cliente");return false;
+                mu.msgbox("Falta contacto del cliente");
+                txtCliContacto.requestFocus();
+                return false;
             }
 
             s=txtCodVendedor.getText().toString();
             if (mu.emptystr(s)) {
-                mu.msgbox("Falta código del vendedor");return false;
+                mu.msgbox("Falta código del vendedor");
+                txtCodVendedor.requestFocus();
+                return false;
             }
 
             dw = c.get(Calendar.DAY_OF_WEEK);
@@ -361,6 +367,7 @@ public class CliNuevoT extends PBase {
             sc = d1 + d2 + d3 + d4 + d5 + d6 + d7;
 
             if (sc == 0) {
+
                 switch (dw) {
                     case 1:
                         d1 = 1;
@@ -384,11 +391,111 @@ public class CliNuevoT extends PBase {
                         d7 = 1;
                         break;
                 }
+
+                mu.msgbox("Debe seleccionar por lo menos un día de visita");
+                
+                cb1.requestFocus();
+                return false;
+            }
+
+            double coorx = gl.gpspx;
+            double coory = gl.gpspy;
+            if (coorx==0 || coory == 0) {
+                mu.msgbox("Debe obtener las coordenadas georeferenciales del cliente");
+                lbGPS.requestFocus();
+                return false;
+            }
+
+            String vIdDepto = gl.IdDep;
+            String vIdMuni = gl.IdMun;
+            String vIdCanal = gl.IdCanal;
+            String vIdSubcanal = gl.IdSubcanal;
+
+            if (mu.emptystr(vIdDepto)) {
+                mu.msgbox("Falta la provincia del cliente");
+                imgBuscarPro.requestFocus();
+                return false;
+            }
+
+            if (mu.emptystr(vIdMuni)) {
+                mu.msgbox("Falta el distrito del cliente");
+                imgBuscarPro.requestFocus();
+                return false;
+            }
+
+            if (mu.emptystr(vIdCanal)) {
+                mu.msgbox("Falta el canal del cliente");
+                imgBuscarCanal.requestFocus();
+                return false;
+            }
+
+            if (mu.emptystr(vIdSubcanal)) {
+                mu.msgbox("Falta el subcanal del cliente");
+                imgBuscarCanal.requestFocus();
+                return false;
+            }
+
+            s=txtCiudad.getText().toString();
+            if (mu.emptystr(s)) {
+                mu.msgbox("Falta la ciudad del cliente");
+                txtCiudad.requestFocus();
+                return false;
+            }
+
+            double vCPollo= Double.valueOf((txtPollo.getText().toString().isEmpty()?"0":txtPollo.getText().toString()));
+            if (vCPollo<=0) {
+                mu.msgbox("Falta la compra semanal de pollo del cliente");
+                txtPollo.requestFocus();
+                return false;
+            }
+
+            double vCEmbutidos= Double.valueOf((txtEmbutidos.getText().toString().isEmpty()?"0":txtEmbutidos.getText().toString()));
+            if (vCEmbutidos<=0) {
+                mu.msgbox("Falta la compra semanal de embutidos del cliente");
+                txtEmbutidos.requestFocus();
+                return false;
+            }
+
+            double vCHuevos= Double.valueOf((txtHuevos.getText().toString().isEmpty()?"0":txtHuevos.getText().toString()));
+            if (vCHuevos<=0) {
+                mu.msgbox("Falta la compra semanal de posturas del cliente");
+                txtHuevos.requestFocus();
+                return false;
+            }
+
+            double vCRes= Double.valueOf((txtRes.getText().toString().isEmpty()?"0":txtRes.getText().toString()));
+            if (vCRes<=0) {
+                mu.msgbox("Falta la compra semanal de res del cliente");
+                txtRes.requestFocus();
+                return false;
+            }
+
+            double vCCerdo= Double.valueOf((txtCerdo.getText().toString().isEmpty()?"0":txtCerdo.getText().toString()));
+            if (vCCerdo<=0) {
+                mu.msgbox("Falta la compra semanal de cerdo del cliente");
+                txtCerdo.requestFocus();
+                return false;
+            }
+
+            double vCCongelados= Double.valueOf((txtCongelados.getText().toString().isEmpty()?"0":txtCongelados.getText().toString()));
+            if (vCCongelados<=0) {
+                mu.msgbox("Falta la compra semanal de congelados del cliente");
+                txtCongelados.requestFocus();
+                return false;
+            }
+
+            double vCSalsas= Double.valueOf((txtSalsas.getText().toString().isEmpty()?"0":txtSalsas.getText().toString()));
+            if (vCSalsas<=0) {
+                mu.msgbox("Falta la compra semanal de salsas del cliente");
+                txtSalsas.requestFocus();
+                return false;
             }
 
         } catch (Exception e) {
             addlog(new Object() {
             }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(e.getMessage());
+            return  false;
         }
         return true;
     }

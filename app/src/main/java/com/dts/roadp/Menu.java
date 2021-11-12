@@ -840,7 +840,7 @@ public class Menu extends PBase {
 
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Objetivos por producto","Objetivos por familia","Objetivo por ruta","Objetivo por cobro","Inventario bodega","Consulta de precios"};
+			final String[] selitems = {"Consulta de pedidos","Objetivos por producto","Objetivos por familia","Objetivo por ruta","Objetivo por cobro","Inventario bodega","Consulta de precios"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setTitle("Consultas");
@@ -850,16 +850,18 @@ public class Menu extends PBase {
 
 					switch (item) {
 						case 0:
-							menuObjProd();break;
+							menuObjConsultaPedido();break;
 						case 1:
-							menuObjFamilia();break;
+							menuObjProd();break;
 						case 2:
-							menuObjRuta();break;
+							menuObjFamilia();break;
 						case 3:
-							menuObjCobro();break;
+							menuObjRuta();break;
 						case 4:
-							menuInvBod();dialog.cancel();break;
+							menuObjCobro();break;
 						case 5:
+							menuInvBod();dialog.cancel();break;
+						case 6:
 							menuPrecios();dialog.cancel();break;
 					}
 
@@ -949,6 +951,16 @@ public class Menu extends PBase {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
+	}
+
+	private void menuObjConsultaPedido()
+	{
+		try{
+			Intent intent = new Intent(this,ConsPedido.class);
+			startActivity(intent);
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
 	}
 
 	//endregion

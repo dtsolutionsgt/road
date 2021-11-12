@@ -57,7 +57,7 @@ public class list_view_dev_bod_can extends BaseAdapter {
             convertView = l_Inflater.inflate(R.layout.activity_list_view_dev_bod_can, null);
             holder = new list_view_dev_bod_can.ViewHolder();
 
-            holder.lblDesc = (TextView) convertView.findViewById(R.id.lblDesc);
+            holder.lblDesc = (TextView) convertView.findViewById(R.id.lblDescripcion);
             holder.lblCod = (TextView) convertView.findViewById(R.id.lblspace);
             holder.lblLote  = (TextView) convertView.findViewById(R.id.lblCodT);
             holder.lblLotem  = (TextView) convertView.findViewById(R.id.lblEstado);

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:id="@+id/lblEncabezado1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/lblCodigo"
+            android:layout_width="121dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="CODIGO" />
+
+        <TextView
+            android:id="@+id/lblDescripcion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="DESCRIPCION"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lblEncabezado2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lblEncabezado1"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/lblCant"
+            android:layout_width="25dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="CANT" />
+
+        <TextView
+            android:id="@+id/lblUm"
+            android:layout_width="10dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="UM" />
+
+        <TextView
+            android:id="@+id/lblPrecio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="PRECIO"/>
+
+        <TextView
+            android:id="@+id/lblValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="VALOR"/>
+    </LinearLayout>
+
+</RelativeLayout>

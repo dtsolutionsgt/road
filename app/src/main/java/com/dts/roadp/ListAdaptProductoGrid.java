@@ -59,7 +59,7 @@ public class ListAdaptProductoGrid extends BaseAdapter {
             holder = new ViewHolder();
 
             holder.imgEst = (ImageView) convertView.findViewById(R.id.imgNext2);
-            holder.lblDesCorta = (TextView) convertView.findViewById(R.id.lblDesc);
+            holder.lblDesCorta = (TextView) convertView.findViewById(R.id.lblDescripcion);
             holder.lblCodigo = (TextView) convertView.findViewById(R.id.lblCod);
             holder.lblDesLarga = (TextView) convertView.findViewById(R.id.lblTrat2);
 

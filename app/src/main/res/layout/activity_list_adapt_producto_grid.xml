@@ -39,7 +39,7 @@
             android:id="@+id/textView72"
             android:layout_width="wrap_content"
             android:layout_height="10dp"
-            android:layout_below="@+id/lblDesc"
+            android:layout_below="@+id/lblDescripcion"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="111dp"
             android:text="Small Text"
@@ -61,7 +61,7 @@
             android:textSize="15sp" />
 
         <TextView
-            android:id="@+id/lblDesc"
+            android:id="@+id/lblDescripcion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/lblTrat2"

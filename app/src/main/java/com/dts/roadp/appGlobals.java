@@ -92,4 +92,6 @@ public class appGlobals extends Application {
 	public int pLongitudBarra;
 	public String pPrefijoBarra;
 
+	// Parámetros para pedido
+	public String PCliente, PFecha, Ppedido, PTotal;
 }

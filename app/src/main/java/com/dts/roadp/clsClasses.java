@@ -13,8 +13,8 @@ public class clsClasses {
 	}
 	
 	public class clsCFDV {
-		public int id;
-		public String Cod,Desc,Fecha,Valor,Sid;
+		public int id,Flag;
+		public String Cod,Desc,Fecha,Valor,Sid,Nombre,Statuscom,Anulado;
 		public double val;
 	}
 	
@@ -127,5 +127,11 @@ public class clsClasses {
 	public class clsNCPP {
 		public String Factura;
 		public double MontoFact, MontoDesc, PorcDesc, MontoFactPago, Total;
+	}
+
+	public class clsCFDVDet {
+		public int Producto;
+		public String Desclarga, Umventa, Umpeso;
+		public double Cant, PrecioDoc, Imp, Des, Desmon, Total;
 	}
 }

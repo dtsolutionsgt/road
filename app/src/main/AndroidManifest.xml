@@ -32,12 +32,16 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ConPedidoDetalle"
+            android:exported="true"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
             android:name=".VistaPrevPedido"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-            android:windowSoftInputMode="stateHidden"
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:exported="true"/>
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".ped_rechazados" />
         <activity android:name=".list_view_ped_rechazados" />
         <activity android:name=".ComWSSend" />
@@ -74,6 +78,12 @@
             android:name=".CliDet"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_cli_det"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
+        <activity
+            android:name=".ConsPedido"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="Consulta de pedidos"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
         <activity

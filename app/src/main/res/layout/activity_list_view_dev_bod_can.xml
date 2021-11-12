@@ -15,7 +15,7 @@
         android:background="#BDE2F3">
 
         <TextView
-            android:id="@+id/lblDesc"
+            android:id="@+id/lblDescripcion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -33,7 +33,7 @@
             android:id="@+id/lblspace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/lblDesc"
+            android:layout_below="@+id/lblDescripcion"
             android:layout_alignParentStart="true"
             android:ellipsize="end"
             android:paddingLeft="5dp"

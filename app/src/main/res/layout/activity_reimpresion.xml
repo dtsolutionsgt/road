@@ -86,15 +86,15 @@
         android:id="@+id/imgTel"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="false"
         android:layout_below="@+id/relRoad"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentRight="true"
         android:clickable="true"
         android:onClick="printDoc"
-        android:paddingBottom="10dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
         android:paddingTop="5dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
         android:src="@drawable/reimpresion48" />
 
     <RelativeLayout

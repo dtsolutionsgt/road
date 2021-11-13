@@ -80,9 +80,13 @@ public class ListAdaptCFDV extends BaseAdapter {
 
 			if (itemDetailsrrayList.get(position).Statuscom.equalsIgnoreCase("N")) {
 				holder.iconComunicado.setImageResource(R.drawable.del_48);
+			}else {
+				holder.iconComunicado.setImageResource(R.drawable.icok);
 			}
 
 			if (itemDetailsrrayList.get(position).Anulado.equalsIgnoreCase("N")) {
+				holder.iconAnulado.setImageResource(R.drawable.icok);
+			}else{
 				holder.iconAnulado.setImageResource(R.drawable.del_48);
 			}
 		}

@@ -447,24 +447,22 @@ public class Reimpresion extends PBase {
 	private void imprPedido() {
 		try{
 
-			//if(prn.isEnabled()){
-                docPed.global=gl;
-                docPed.deviceid =gl.numSerie;
+			docPed.global=gl;
+			docPed.deviceid =gl.numSerie;
 
-                String modo = "*";
-                // #KM 2021/11/16 Inicializamos el valor por defecto
-				// se pasaba vacio docPed.buildPrint(itemid,1,"");
+			// #KM 2021/11/16 Inicializamos el valor por defecto
+			// se pasaba vacio docPed.buildPrint(itemid,1,"");
+			String modo = "*";
 
-				if (gl.peModal.equalsIgnoreCase("TOL")) {
-					modo = "TOl";
-				}
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				modo = "TOl";
+			}
 
-				docPed.buildPrint(itemid,1,modo);
-				prn.printask(printcallback);
-			//} else if(!prn.isEnabled()){
-			//	docPed.buildPrint(itemid,1,"");
+			docPed.buildPrint(itemid,0,modo);
+
+			prn.printask(printcallback);
+
 			toast("Reimpresion pedido");
-			//}
 
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -1158,6 +1156,10 @@ public class Reimpresion extends PBase {
 					try {
 
 						switch (tipo) {
+							case 0:
+								sql = "UPDATE D_PEDIDO SET IMPRES=IMPRES+1 WHERE COREL='" + itemid + "'";
+								db.execSQL(sql);
+								break;
 							case 1:
 								sql = "UPDATE D_COBRO SET IMPRES=IMPRES+1 WHERE COREL='" + itemid + "'";
 								db.execSQL(sql);

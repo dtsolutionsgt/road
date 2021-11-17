@@ -443,50 +443,50 @@ public class CliNuevoT extends PBase {
             }
 
             double vCPollo= Double.valueOf((txtPollo.getText().toString().isEmpty()?"0":txtPollo.getText().toString()));
-            if (vCPollo<=0) {
-                mu.msgbox("Falta la compra semanal de pollo del cliente");
+            if (vCPollo<0) {
+                mu.msgbox("La compra semanal de pollo del cliente debe ser mayor a 0");
                 txtPollo.requestFocus();
                 return false;
             }
 
             double vCEmbutidos= Double.valueOf((txtEmbutidos.getText().toString().isEmpty()?"0":txtEmbutidos.getText().toString()));
-            if (vCEmbutidos<=0) {
-                mu.msgbox("Falta la compra semanal de embutidos del cliente");
+            if (vCEmbutidos<0) {
+                mu.msgbox("La compra semanal de embutidos del cliente debe ser mayor a 0");
                 txtEmbutidos.requestFocus();
                 return false;
             }
 
             double vCHuevos= Double.valueOf((txtHuevos.getText().toString().isEmpty()?"0":txtHuevos.getText().toString()));
-            if (vCHuevos<=0) {
-                mu.msgbox("Falta la compra semanal de posturas del cliente");
+            if (vCHuevos<0) {
+                mu.msgbox("La compra semanal de posturas del cliente debe ser mayor a 0");
                 txtHuevos.requestFocus();
                 return false;
             }
 
             double vCRes= Double.valueOf((txtRes.getText().toString().isEmpty()?"0":txtRes.getText().toString()));
-            if (vCRes<=0) {
-                mu.msgbox("Falta la compra semanal de res del cliente");
+            if (vCRes<0) {
+                mu.msgbox("La compra semanal de res del cliente debe ser mayor a 0");
                 txtRes.requestFocus();
                 return false;
             }
 
             double vCCerdo= Double.valueOf((txtCerdo.getText().toString().isEmpty()?"0":txtCerdo.getText().toString()));
-            if (vCCerdo<=0) {
-                mu.msgbox("Falta la compra semanal de cerdo del cliente");
+            if (vCCerdo<0) {
+                mu.msgbox("La compra semanal de cerdo del cliente debe ser mayor a 0");
                 txtCerdo.requestFocus();
                 return false;
             }
 
             double vCCongelados= Double.valueOf((txtCongelados.getText().toString().isEmpty()?"0":txtCongelados.getText().toString()));
-            if (vCCongelados<=0) {
-                mu.msgbox("Falta la compra semanal de congelados del cliente");
+            if (vCCongelados<0) {
+                mu.msgbox("La compra semanal de congelados del cliente debe ser mayor a 0");
                 txtCongelados.requestFocus();
                 return false;
             }
 
             double vCSalsas= Double.valueOf((txtSalsas.getText().toString().isEmpty()?"0":txtSalsas.getText().toString()));
-            if (vCSalsas<=0) {
-                mu.msgbox("Falta la compra semanal de salsas del cliente");
+            if (vCSalsas<0) {
+                mu.msgbox("La compra semanal de salsas del cliente debe ser mayor a 0");
                 txtSalsas.requestFocus();
                 return false;
             }

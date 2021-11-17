@@ -84,7 +84,7 @@ public class ComWS extends PBase {
 	private EditText txtRuta, txtWS, txtEmp;
 	private ImageView imgRec, imgEnv, imgEnvM;
 	private RelativeLayout ralBack;
-	private RelativeLayout relExist;
+	private RelativeLayout relExist, relPedidos;
 	private RelativeLayout relPrecio;
 	private RelativeLayout relStock;
 	private TextView lblUser, lblPassword, txtVersion;
@@ -181,6 +181,8 @@ public class ComWS extends PBase {
 		imgEnvM = (ImageView) findViewById(R.id.imageView23);
 		imgRec = (ImageView) findViewById(R.id.imageView5);
 
+		relPedidos = (RelativeLayout) findViewById(R.id.relPedidos);
+
 		ralBack = (RelativeLayout) findViewById(R.id.relwsmail);
 		relExist = (RelativeLayout) findViewById(R.id.relExist);
 		relPrecio = (RelativeLayout) findViewById(R.id.relPrecio);
@@ -274,6 +276,7 @@ public class ComWS extends PBase {
 		pendientes = validaPendientes();
 
 		envioparcial = gl.peEnvioParcial;
+		gl.enviaPedidosParcial = false;
 
 		if (!gl.enviaMov){
 			visibilidadBotones();
@@ -411,6 +414,9 @@ public class ComWS extends PBase {
 	public void askSend(View view) {
 		try {
 
+			gl.enviaPedidosParcial = false;
+			gl.enviaMov = false;
+
 			if (isbusy == 1) {
 				toastcent("Por favor, espere que se termine la tarea actual.");return;
 			}
@@ -452,6 +458,50 @@ public class ComWS extends PBase {
 				public void onClick(DialogInterface dialog, int which) {
 					lblEnv.setVisibility(View.VISIBLE);
 					imgEnv.setVisibility(View.VISIBLE);
+				}
+			});
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+	}
+
+	public void askSendPedidos(View view) {
+		try {
+
+			if (isbusy == 1) {
+				toastcent("Por favor, espere que se termine la tarea actual.");return;
+			}
+
+			relPedidos.setVisibility(View.INVISIBLE);
+
+			if (!gl.debug) {
+				if (!validaLicencia()) {
+					mu.msgbox("Licencia inválida!");
+					relPedidos.setVisibility(View.VISIBLE);
+					return;
+				}
+			}
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Envío Pedidos");
+			dialog.setMessage("¿Enviar Pedidos?");
+			dialog.setCancelable(false);
+
+			gl.enviaPedidosParcial = true;
+
+			dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					runSend();
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					relPedidos.setVisibility(View.VISIBLE);
 				}
 			});
 
@@ -1105,11 +1155,10 @@ public class ComWS extends PBase {
 		startActivity(new Intent(this, ComWSFotos.class));
 	}
 
-	public void doPedidos(View view) {
-		//getWSURL();
-		//if (!gl.URLtemp.isEmpty())
-		startActivity(new Intent(this, ComWSSend.class));
-	}
+	//#CKFK 20211114 Cambié esto por la función askSendPedidos
+/*	public void doPedidos(View view) {
+        //startActivity(new Intent(this, ComWSSend.class));
+	}*/
 
 	private void setHandlers() {
 		ralBack.setOnTouchListener(new SwipeListener(this) {
@@ -1197,14 +1246,6 @@ public class ComWS extends PBase {
 		} else {
 			msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
 		}
-		/*try {
-			super.finish();
-			startActivity(new Intent(this, ComWSRec.class));
-			relStock.setVisibility(View.VISIBLE);
-		} catch (Exception e) {
-			addlog(new Object() {
-			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
-		}*/
 	}
 
     private void runRecepion() {
@@ -4985,6 +5026,43 @@ public class ComWS extends PBase {
 		return true;
 	}
 
+	private boolean sendPedidosParcial() {
+		int rslv;
+
+		errflag = false;
+
+		if (getTest() == 0) {
+
+			URL = URL_Remota;
+
+			if (getTest() == 0) {
+				errflag = true;
+				return false;
+			}
+		}
+
+		senv = "Envío terminado \n \n";
+
+		try {
+
+			envioPedidosParcial();
+			if (errflag) {
+				dbld.savelog();
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
+				return false;
+			}
+
+			gl.enviaPedidosParcial = false;
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+		}
+
+		return true;
+	}
+
 	public String sfecha(long f) {
 		long vy,vm,vd;
 		String s;
@@ -5838,6 +5916,7 @@ public class ComWS extends PBase {
 
 		//#CKFK 20190325 Sea el envío parcial o no se deben mostrar las facturas comunicadas
 		//if (envioparcial) {
+		//if (envioparcial) {
 		if (pc != pcc) {
 			int pf = pcc - pc;
 			senv += "Depósitos : " + pc + " , NO ENVIADO : " + pf + " \n";
@@ -6071,6 +6150,90 @@ public class ComWS extends PBase {
 
 		mu.toast(senv);
 		finish();
+	}
+
+	public void envioPedidosParcial() {
+		Cursor DT;
+		String cor;
+		int i, pc = 0, pcc = 0;
+
+		try {
+			sql = "SELECT COREL FROM D_PEDIDO WHERE STATCOM='N'";
+			DT = Con.OpenDT(sql);
+			if (DT.getCount() == 0) {
+				senv += "Pedidos : " + pc + "\n";
+				return;
+			}
+
+			pcc = DT.getCount();
+			pc = 0;
+			i = 0;
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				cor = DT.getString(0);
+
+				try {
+
+					i += 1;
+					fprog = "Pedido " + i;
+					if (!esEnvioManual) {
+						wsStask.onProgressUpdate();
+					}
+
+					dbld.clear();
+
+					dbld.insert("D_PEDIDO", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_PEDIDOD", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_BONIF", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_BONIF_LOTES", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_REL_PROD_BON", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_BONIFFALT", "WHERE COREL='" + cor + "'");
+
+					if (commitSQL() == 1) {
+						sql = "UPDATE D_PEDIDO SET STATCOM='S' WHERE COREL='" + cor + "'";
+						db.execSQL(sql);
+						Toast.makeText(this, "Envio correcto", Toast.LENGTH_SHORT).show();
+						pc += 1;
+					} else {
+						errflag = true;
+						fterr += "\n" + sstr;
+					}
+
+				} catch (Exception e) {
+					errflag = true;
+
+					dbld.savelog("pedidos.txt");
+
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					//fterr+="\n"+e.getMessage();
+				}
+				DT.moveToNext();
+			}
+
+			if (DT != null) DT.close();
+
+		} catch (Exception e) {
+			errflag = true;
+
+			dbld.savelog("pedidos.txt");
+
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+		}
+
+		//#CKFK 20190325 Sea el envío parcial o no se deben mostrar las facturas comunicadas
+		//if (envioparcial) {
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Pedidos : " + pc + " , NO ENVIADO : " + pf + "\n";
+		} else {
+			senv += "Pedidos : " + pc + "\n";
+		}
+		//}
 	}
 
 	public void envioCli() {
@@ -6855,11 +7018,16 @@ public class ComWS extends PBase {
 					if (!sendMov()) {
 						fstr = "Envio incompleto : " + sstr;
 					}
+				}else if (gl.enviaPedidosParcial){
+					if (!sendPedidosParcial()) {
+						fstr = "Envio incompleto : " + sstr;
+					}
 				}else{
 					if (!sendData()) {
 						fstr = "Envio incompleto : " + sstr;
 					}
 				}
+
 			} else {
 				fstr = "No se puede conectar al web service : " + sstr;
 			}
@@ -6950,6 +7118,10 @@ public class ComWS extends PBase {
 
 		}else{
 			gl.enviaMov = false;
+		}
+
+		if (gl.enviaPedidosParcial){
+			gl.enviaPedidosParcial = false;
 		}
 
 	}

@@ -82,16 +82,20 @@ public class editar_cliente extends PBase {
                 return;
             }
 
-            if (mu.emptystr(pNitCliente) ) {
-                toast("Debe ingresar el RUC del cliente");
-                txtNitCliente.requestFocus();
-                return;
+            if (rowRuc.getVisibility()!=View.GONE){
+                if (mu.emptystr(pNitCliente) ) {
+                    toast("Debe ingresar el RUC del cliente");
+                    txtNitCliente.requestFocus();
+                    return;
+                }
             }
 
-            if (mu.emptystr(pNombreCliente) ) {
-                toast("Debe ingresar el nombre del cliente");
-                txtNombreCliente.requestFocus();
-                return;
+            if (rowNombre.getVisibility()!=View.GONE){
+                if (mu.emptystr(pNombreCliente) ) {
+                    toast("Debe ingresar el nombre del cliente");
+                    txtNombreCliente.requestFocus();
+                    return;
+                }
             }
 
             if (mu.emptystr(pTelefono) ) {

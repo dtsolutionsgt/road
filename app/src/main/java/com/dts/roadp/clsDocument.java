@@ -93,6 +93,7 @@ public class clsDocument {
 				if (docrecibo && (reimpres==1)) flag=1;
 				if (docdevolucion && (reimpres==1)) flag = 1;
 				if (docpedido && (reimpres==1)) flag = 1;
+				if (docpedido && (reimpres==0)) flag = 0;
 			} else if(modofact.equalsIgnoreCase("*")) {
 				if (doccanastabod) flag = 0;
 				if (docdevolucion || docpedido) flag = 1;
@@ -101,7 +102,7 @@ public class clsDocument {
 			if (flag==0) {
 				if (!rep.save()) return false;
 			} else if (flag==1){
-				if (!rep.save(2)) return false;
+				if (!rep.save(global.pCantImpresion)) return false;
 			} else if (flag==2){
 				if (!rep.save(3)) return false;
 			} else if (flag==3){

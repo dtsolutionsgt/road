@@ -528,6 +528,15 @@ public class AppMethods {
 		} catch (Exception e) {
 			gl.peEditarDistrito =false;
 		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=37";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			gl.pCantImpresion =  dt.getInt(0);
+		} catch (Exception e) {
+			gl.pCantImpresion = 2;
+		}
 	}
 
 	public void parametrosBarras() {

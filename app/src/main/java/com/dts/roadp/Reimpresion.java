@@ -450,7 +450,16 @@ public class Reimpresion extends PBase {
 			//if(prn.isEnabled()){
                 docPed.global=gl;
                 docPed.deviceid =gl.numSerie;
-				docPed.buildPrint(itemid,1,"");
+
+                String modo = "*";
+                // #KM 2021/11/16 Inicializamos el valor por defecto
+				// se pasaba vacio docPed.buildPrint(itemid,1,"");
+
+				if (gl.peModal.equalsIgnoreCase("TOL")) {
+					modo = "TOl";
+				}
+
+				docPed.buildPrint(itemid,1,modo);
 				prn.printask(printcallback);
 			//} else if(!prn.isEnabled()){
 			//	docPed.buildPrint(itemid,1,"");

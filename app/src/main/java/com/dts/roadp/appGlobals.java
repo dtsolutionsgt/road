@@ -100,5 +100,5 @@ public class appGlobals extends Application {
 	//Parámetros configuración barra
 	public int pLongitudBarra;
 	public String pPrefijoBarra;
-
+	public int pCantImpresion;
 }

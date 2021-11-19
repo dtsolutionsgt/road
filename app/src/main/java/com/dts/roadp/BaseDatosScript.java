@@ -1288,6 +1288,7 @@ public class BaseDatosScript {
 					"[INV3] TEXT NOT NULL,"+
 					"[NIT] TEXT NOT NULL,"+
 					"[MENSAJE] TEXT NOT NULL,"+
+					"[EMAIL] TEXT NOT NULL,"+
 					"[TELEFONO] TEXT NOT NULL,"+
 					"[DIRTIPO] TEXT NOT NULL,"+
 					"[DIRECCION] TEXT NOT NULL,"+
@@ -1312,6 +1313,7 @@ public class BaseDatosScript {
 					"[MODIF_PRECIO] INTEGER NOT NULL,"+
 					"[INGRESA_CANASTAS] INTEGER DEFAULT 0 NOT NULL,"+
                     "[PRIORIZACION] TEXT NOT NULL,"+
+					"[CONTACTO] TEXT,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

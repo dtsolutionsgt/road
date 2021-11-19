@@ -197,6 +197,7 @@ public class CliNuevoT extends PBase {
             ins.add("NIT", txtCliNit.getText().toString() + "");
             ins.add("MENSAJE", "N");
             ins.add("MUNICIPIO", gl.IdMun);
+            ins.add("EMAIL", txtCliEmail.getText().toString());
             ins.add("TELEFONO", txtCliTelefono.getText().toString() + "");
             ins.add("DIRTIPO", "N");
             ins.add("DIRECCION", txtCliDireccion.getText().toString() + "");
@@ -221,6 +222,7 @@ public class CliNuevoT extends PBase {
             ins.add("ID_FACTURACION", 0);
             ins.add("MODIF_PRECIO", 0);
             ins.add("PRIORIZACION", "");
+            ins.add("CONTACTO", txtCliContacto.getText().toString());
 
             db.execSQL(ins.sql());
 

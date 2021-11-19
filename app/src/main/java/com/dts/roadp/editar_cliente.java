@@ -197,6 +197,8 @@ public class editar_cliente extends PBase {
                 upd.add("TELEFONO", txtTelefono.getText().toString());
                 upd.add("COORY", gl.gpspx);
                 upd.add("COORY", gl.gpspy);
+                upd.add("EMAIL", txtEmail.getText().toString());
+                upd.add("CONTACTO", txtContacto.getText().toString());
                 upd.Where("CODIGO='"+codigo+"'");
 
                 db.execSQL(upd.SQL());
@@ -225,6 +227,8 @@ public class editar_cliente extends PBase {
             upd.add("TELEFONO", txtTelefono.getText().toString());
             upd.add("COORX",  gl.gpspx);
             upd.add("COORY",  gl.gpspy);
+            upd.add("EMAIL", txtEmail.getText().toString());
+            upd.add("CONTACTO", txtContacto.getText().toString());
             upd.Where("CODIGO='"+codigo+"'");
 
             db.execSQL(upd.SQL());
@@ -239,7 +243,7 @@ public class editar_cliente extends PBase {
     public void getDatosCLiente() {
         Cursor DT;
         try {
-            sql = "SELECT NOMBRE, NIT, DIRECCION, TELEFONO, COORX, COORY FROM P_CLIENTE WHERE CODIGO='" + codigo + "'";
+            sql = "SELECT NOMBRE, NIT, DIRECCION, TELEFONO, COORX, COORY, EMAIL, CONTACTO FROM P_CLIENTE WHERE CODIGO='" + codigo + "'";
             DT = Con.OpenDT(sql);
             DT.moveToFirst();
 
@@ -249,6 +253,8 @@ public class editar_cliente extends PBase {
             txtTelefono.setText(DT.getString(3));
             gl.gpspx = Double.valueOf(DT.getString(4));
             gl.gpspy = Double.valueOf(DT.getString(5));
+            txtEmail.setText(DT.getString(6));
+            txtContacto.setText(DT.getString(7));
 
             /*sql = "SELECT CONTACTO, EMAIL FROM D_CLINUEVOT WHERE CODIGO='" + codigo + "'";
             DT = Con.OpenDT(sql);

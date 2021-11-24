@@ -7186,7 +7186,11 @@ public class ComWS extends PBase {
 		protected Void doInBackground(String... params) {
 
 			try {
-				Looper.prepare();
+				//#AT 20211124 Se ejecuta si es necesario crear una cola de mensajes
+				if (!gl.enviaPedidosParcial) {
+					Looper.prepare();
+				}
+
 				wsSendExecute();
 			} catch (Exception e) {
 				if (scon == 0) {

@@ -95,7 +95,7 @@ public class ComWS extends PBase {
 	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant, rrs,sRutaSupervisor,rrss;
 	private String licSerial, licRuta, licSerialEnc, licRutaEnc, parImprID;
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag,
-            esEnvioManual = false,pedidos, cargastockpv;
+            esEnvioManual = false,pedidos, cargastockpv,errorFlag;
 
 	private SQLiteDatabase dbT;
 	private DatabaseErrorHandler er;
@@ -276,6 +276,7 @@ public class ComWS extends PBase {
 		pendientes = validaPendientes();
 
 		envioparcial = gl.peEnvioParcial;
+
 		gl.enviaPedidosParcial = false;
 
 		if (!gl.enviaMov){
@@ -1899,6 +1900,7 @@ public class ComWS extends PBase {
 		int mTimeOut=5000;
 		String mResult,line="";
 		URL mUrl = new URL(URL);
+		errorFlag=false;
 
 		try{
 			mResult = "";xmlresult="";
@@ -1917,7 +1919,7 @@ public class ComWS extends PBase {
 
 			OutputStreamWriter wr = new OutputStreamWriter(ostream);
 
-			String body = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+			String body = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" +
 					"<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:" +
 					"xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:" +
 					"soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
@@ -1932,6 +1934,7 @@ public class ComWS extends PBase {
 			wr.flush();
 
 			int responsecode = ((HttpURLConnection) conn).getResponseCode();
+			String responsemsg = ((HttpURLConnection) conn).getResponseMessage();
 
 			//#EJC20200702:Capturar excepcion de SQL (No se sabe el error pero sabemos que no se proceso)
 			if (responsecode==500) {
@@ -1963,7 +1966,8 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
-			sstr=e.getMessage();
+			sstr= "Error al conectarse a " + mUrl.toURI() + " " + e.getMessage();
+			errorFlag=true;fterr=e.getMessage();
 			throw new Exception(sstr);
 		}
 	}
@@ -2207,7 +2211,7 @@ public class ComWS extends PBase {
 
 			return 1;
 		} catch (Exception e) {
-			sstr = e.getMessage();
+			fterr ="Causa: " + e.getCause() + "-Mensaje: " + e.getMessage();
 		}
 
 		return 0;
@@ -5059,8 +5063,6 @@ public class ComWS extends PBase {
 				return false;
 			}
 
-			gl.enviaPedidosParcial = false;
-
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
@@ -5524,7 +5526,7 @@ public class ComWS extends PBase {
 						if (commitSQL() == 1) {
 							sql = "UPDATE D_PEDIDO SET STATCOM='S' WHERE COREL='" + cor + "'";
 							db.execSQL(sql);
-							Toast.makeText(this, "Envio correcto", Toast.LENGTH_SHORT).show();
+							//Toast.makeText(this, "Envio correcto", Toast.LENGTH_SHORT).show();
 							pc += 1;
 						} else {
 							errflag = true;
@@ -6164,8 +6166,10 @@ public class ComWS extends PBase {
 		int i, pc = 0, pcc = 0;
 
 		try {
+
 			sql = "SELECT COREL FROM D_PEDIDO WHERE STATCOM='N'";
 			DT = Con.OpenDT(sql);
+
 			if (DT.getCount() == 0) {
 				senv += "Pedidos : " + pc + "\n";
 				return;
@@ -6200,7 +6204,7 @@ public class ComWS extends PBase {
 					if (commitSQL() == 1) {
 						sql = "UPDATE D_PEDIDO SET STATCOM='S' WHERE COREL='" + cor + "'";
 						db.execSQL(sql);
-						Toast.makeText(this, "Envio correcto", Toast.LENGTH_SHORT).show();
+						//Toast.makeText(this, "Envio correcto", Toast.LENGTH_SHORT).show();
 						pc += 1;
 					} else {
 						errflag = true;
@@ -7011,6 +7015,8 @@ public class ComWS extends PBase {
 
 		try {
 
+			msgbox("Envio de pedidos parciales " + gl.enviaPedidosParcial);
+
 			if (getTest() == 1) {
 				scon = 1;
 			} else {
@@ -7040,8 +7046,8 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			scon = 0;
-			fstr = "No se puede conectar al web service. " + e.getMessage();
-			Log.d("E", fstr + sstr);
+			fstr = "No se puede conectar al web service. " + e.getMessage() + " " + fterr;
+			Log.d("E", fstr + sstr + " " + fterr);
 		}
 	}
 
@@ -7050,7 +7056,7 @@ public class ComWS extends PBase {
 		barInfo.setVisibility(View.INVISIBLE);
 		lblParam.setVisibility(View.INVISIBLE);
 
-		if(!gl.enviaMov){
+		if(!gl.enviaMov && !gl.enviaPedidosParcial){
 			lblEnv.setVisibility(View.VISIBLE);
 			imgEnv.setVisibility(View.VISIBLE);
 
@@ -7091,12 +7097,12 @@ public class ComWS extends PBase {
 					msgResultEnvio(senv);
 
 				} else {
-					lblInfo.setText(fterr);
+					lblInfo.setText(fstr);
 					isbusy = 0;
 					barInfo.setVisibility(View.INVISIBLE);
 					visibilidadBotones();
-					mu.msgbox("Ocurrió error : \n" + fterr);
-					addlog("Envío", fterr, esql);
+					mu.msgbox("Ocurrió error : \n" + fstr);
+					addlog("Envío", fstr, esql);
 					return;
 				}
 
@@ -7123,11 +7129,53 @@ public class ComWS extends PBase {
 			}
 
 		}else{
-			gl.enviaMov = false;
-		}
 
-		if (gl.enviaPedidosParcial){
-			gl.enviaPedidosParcial = false;
+			relPedidos.setVisibility(View.VISIBLE);
+
+			if (scon == 0) {
+
+				lblInfo.setText(fstr);
+				writeErrLog(fstr);
+				mu.msgbox("Ocurrió error con la comunicación al Web Service, \n" +
+						"el protocolo de seguridad no permitió el acceso: \n" + fstr);
+				lblInfo.setText(fstr);
+				isbusy = 0;
+				barInfo.setVisibility(View.INVISIBLE);
+				addlog("Envío", fterr + " " + fstr, esql);
+				return;
+			}
+
+			if (!errflag){
+
+				if (gl.enviaPedidosParcial) {
+					gl.enviaPedidosParcial = false;
+				}
+
+				if (gl.enviaMov) gl.enviaMov = false;
+
+				fstr = "Envio completo ";
+				msgResultEnvioParcial(senv);
+				return;
+
+			} else {
+
+				lblInfo.setText(fstr);
+				isbusy = 0;
+
+				barInfo.setVisibility(View.INVISIBLE);
+				if (scon == 1) {
+					mu.msgbox("Ocurrió error con la comunicación al Web Service, \n" +
+							"si se pudo establecer conexión al servidor pero  \n" +
+							"el protocolo de seguridad no permitió el acceso: \n" + fstr);
+				} else if (scon == 1) {
+					mu.msgbox("Ocurrió error no se pudo establecer conexión al servidor \n" + fstr);
+			    }
+
+				addlog("Envío", fstr, esql);
+				return;
+
+			}
+
 		}
 
 	}
@@ -7893,6 +7941,27 @@ public class ComWS extends PBase {
 			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					startActivity(new Intent(ComWS.this, rating.class));
+					ComWS.super.finish();
+				}
+			});
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+	}
+
+	private void msgResultEnvioParcial(String msg) {
+		try {
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg);
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
 					ComWS.super.finish();
 				}
 			});

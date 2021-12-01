@@ -1,6 +1,7 @@
 package com.dts.roadp;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -9,9 +10,11 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import java.util.ArrayList;
@@ -19,11 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Repesaje extends PBase {
-
     private ListView listView;
-    private TextView lblPrec,lblCant,lblPeso,lblOPeso,lblOCant;
-    private EditText txtPeso,txtBol,txtCan;
-
+    private TextView lblPrec,lblCant,lblPeso,lblOPeso,lblOCant,lblResultadoD;
+    private EditText txtPeso,txtBol,txtCan, txtPesoD;
+    private ImageView btnConvertir;
     private AppMethods app;
     private Precio prc;
 
@@ -49,7 +51,6 @@ public class Repesaje extends PBase {
         addlog("Repesaje",""+du.getActDateTime(),gl.vend);
 
         listView = (ListView) findViewById(R.id.listView1);
-
         txtPeso= (EditText) findViewById(R.id.editText);
         txtBol= (EditText) findViewById(R.id.editText4);
         txtCan= (EditText) findViewById(R.id.editText5);
@@ -59,6 +60,8 @@ public class Repesaje extends PBase {
         lblPeso= (TextView) findViewById(R.id.textView55);
         lblOPeso= (TextView) findViewById(R.id.textView59);
         lblOCant= (TextView) findViewById(R.id.textView60);
+
+        btnConvertir = (ImageView) findViewById(R.id.btnConvertir);
 
         prodid=gl.gstr;
 
@@ -78,6 +81,75 @@ public class Repesaje extends PBase {
 
 
     //region Events
+    public void dialogCalcLbsKgs() {
+        LayoutInflater inflater = getLayoutInflater();
+        View vistaDialog = inflater.inflate(R.layout.dialog_calculadora_kgs, null, false);
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+        txtPesoD = (EditText) vistaDialog.findViewById(R.id.txtPesoD);
+        lblResultadoD= (TextView) vistaDialog.findViewById(R.id.lblResultadoD);
+
+        setHandlerCalc();
+        dialog.setIcon(R.drawable.ic_quest);
+        dialog.setTitle("¿Convertir  LBS a KGS?");
+        dialog.setView(vistaDialog);
+
+        dialog.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                txtPeso.setText(lblResultadoD.getText().toString());
+                txtPeso.selectAll();
+            }
+        });
+
+        dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+
+        dialog.show();
+    }
+
+    public void setHandlerCalc() {
+        txtPesoD.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) { } });
+
+        txtPesoD.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+
+                    if (!txtPesoD.getText().toString().isEmpty()) {
+                        convertirLbsToKgs();
+                    } else {
+                        toast("Debe ingresar un valor mayor a 0");
+
+                        final Handler cbhandler = new Handler();
+                        cbhandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                txtPesoD.requestFocus();
+                            }
+                        }, 500);
+                    }
+
+                }
+                return false;
+            }
+        });
+    }
+
+    public void convertirLbsToKgs()
+    {
+        double factor = 2.20462262, resultado;
+
+        resultado = Double.valueOf(txtPesoD.getText().toString()) / factor;
+        lblResultadoD.setText(String.valueOf(mu.frmdecimal(resultado,3 )));
+
+        txtPesoD.requestFocus();
+        txtPesoD.selectAll();
+    }
 
     public void doSave(View view) {
         try{
@@ -125,7 +197,8 @@ public class Repesaje extends PBase {
 
     private void setHandlers() {
 
-        try{listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        try{
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 try {
@@ -181,6 +254,14 @@ public class Repesaje extends PBase {
                         }
                     }
                     return false;
+                }
+            });
+
+            btnConvertir.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialogCalcLbsKgs();
+                    txtPesoD.requestFocus();
                 }
             });
 

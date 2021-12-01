@@ -1439,7 +1439,7 @@ public class Menu extends PBase {
 	public void showInvMenuUtils() {
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ","Soporte","Serial del dipositivo","Impresión de barras", "Rating ROAD"};
+			final String[] selitems = {"Configuracion de impresora","Tablas","Correlativo CierreZ","Calculadora Kgs","Soporte","Serial del dipositivo","Impresión de barras", "Rating ROAD"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.utils48);
@@ -1456,12 +1456,14 @@ public class Menu extends PBase {
 						case 2:
 							menuCorelZ();break;
 						case 3:
-							startActivity(new Intent(Menu.this,Soporte.class));break;
+							startActivity(new Intent(Menu.this, CalculadoraKgs.class));break;
 						case 4:
-							msgbox("Serial# : "+gl.deviceId);break;
+							startActivity(new Intent(Menu.this,Soporte.class));break;
 						case 5:
-							startActivity(new Intent(Menu.this,imprime_barras.class));break;
+							msgbox("Serial# : "+gl.deviceId);break;
 						case 6:
+							startActivity(new Intent(Menu.this,imprime_barras.class));break;
+						case 7:
 							startActivity(new Intent(Menu.this,rating.class));break;
 
 					}

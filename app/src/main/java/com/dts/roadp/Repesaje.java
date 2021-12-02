@@ -98,6 +98,7 @@ public class Repesaje extends PBase {
         dialog.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                convertirLbsToKgs();
                 txtPeso.setText(lblResultadoD.getText().toString());
                 txtPeso.selectAll();
             }

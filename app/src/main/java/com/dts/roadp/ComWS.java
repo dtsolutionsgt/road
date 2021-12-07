@@ -6093,7 +6093,8 @@ public class ComWS extends PBase {
 					fprog = "Inventario " + i;
 
 					dbld.clear();
-
+					dbld.add("IF NOT EXISTS(SELECT COREL FROM D_MOV WHERE COREL = '" + cor + "')  " +
+							" BEGIN ");
 					dbld.insert("D_MOV", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_MOVD", "WHERE COREL='" + cor + "' ");
 					dbld.insert("D_MOVDB", "WHERE COREL='" + cor + "'");
@@ -6109,6 +6110,7 @@ public class ComWS extends PBase {
 							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO,D.BARRA, '', 'N', GETDATE(), 1, 'N'" +
 							" FROM D_MOV E INNER JOIN D_MOVDB D ON E.COREL = D.COREL" +
 							" WHERE E.COREL = '" + cor + "'");
+					dbld.add(" END ");
 
 					if (commitSQL() == 1) {
 							sql = "UPDATE D_MOV SET STATCOM='S' WHERE COREL='" + cor + "'";
@@ -6156,8 +6158,8 @@ public class ComWS extends PBase {
 			senv += "Inventario: " + pc + "\n";
 		}
 
-		mu.toast(senv);
-		finish();
+/*		mu.toast(senv);
+		finish();*/
 	}
 
 	public void envioPedidosParcial() {
@@ -7187,10 +7189,10 @@ public class ComWS extends PBase {
 
 			try {
 				//#AT 20211124 Se ejecuta si es necesario crear una cola de mensajes
-				if (!gl.enviaPedidosParcial) {
+				/*if (gl.enviaMov || gl.enviaPedidosParcial){
 					Looper.prepare();
-				}
-
+				}*/
+				Looper.prepare();
 				wsSendExecute();
 			} catch (Exception e) {
 				if (scon == 0) {
@@ -7207,6 +7209,9 @@ public class ComWS extends PBase {
 			try {
 				wsSendFinished();
 				Looper.loop();
+				/*if (gl.enviaMov || gl.enviaPedidosParcial){
+					Looper.loop();
+				}*/
 			} catch (Exception e) {
 				Log.d("onPostExecute", e.getMessage());
 			}

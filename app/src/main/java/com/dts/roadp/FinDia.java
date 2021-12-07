@@ -99,18 +99,28 @@ public class FinDia extends PBase {
     //region Events
 
     public void iniciaCierre(View view) {
-        //#HS_20181128_0906 Agregue validacion para FinDia.
-        if (gl.banderafindia) {
-           //if (validaFinDia()) #CKFK 20190305 Quité la validación de aquí
-             if (!yaInicioFinDia())  {
-                 msgAskFinDiaTrue();
-             }else{
-                 validaFinDia();
-             }
-        } else {
-            //if (validaFinDia()) #CKFK 20190305 Quité la validación de aquí
+       iniciaCierreDia();
+    }
+
+    public void iniciaCierreDia(){
+
+        try{
+            //#HS_20181128_0906 Agregue validacion para FinDia.
+            if (gl.banderafindia) {
+                //if (validaFinDia()) #CKFK 20190305 Quité la validación de aquí
+                if (!yaInicioFinDia())  {
+                    msgAskFinDiaTrue();
+                }else{
+                    validaFinDia();
+                }
+            } else {
+                //if (validaFinDia()) #CKFK 20190305 Quité la validación de aquí
                 msgAsk();
+            }
+        } catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
+
     }
 
     //endregion
@@ -774,6 +784,7 @@ public class FinDia extends PBase {
         try{
             Intent intent = new Intent(this, ComWS.class);
             startActivity(intent);
+
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }
@@ -852,7 +863,7 @@ public class FinDia extends PBase {
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Productos : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + "Productos : " + e.getMessage());
             fail = true;
         }
 
@@ -905,7 +916,7 @@ public class FinDia extends PBase {
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Facturas : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + "Facturas : " + e.getMessage());
             fail = true;
         }
 
@@ -965,7 +976,7 @@ public class FinDia extends PBase {
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Facturas credito : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +"Facturas credito : " + e.getMessage());
             fail = true;
         }
 
@@ -1019,7 +1030,7 @@ public class FinDia extends PBase {
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Pedidos : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + "Pedidos : " + e.getMessage());
             fail = true;
         }
 
@@ -1172,7 +1183,7 @@ public class FinDia extends PBase {
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Devolucion a bodega : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +"Devolucion a bodega : " + e.getMessage());
             fail = true;
         }
 
@@ -1259,7 +1270,7 @@ public class FinDia extends PBase {
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Inventario dañado : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +"Inventario dañado : " + e.getMessage());
             fail = true;
         }
 
@@ -1487,7 +1498,7 @@ public class FinDia extends PBase {
 
         } catch(Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Facturas : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +"Facturas : " + e.getMessage());
             fail = true;
         }
     }
@@ -1635,7 +1646,7 @@ public class FinDia extends PBase {
 
         } catch(Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Pedidos: " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +"Pedidos: " + e.getMessage());
             fail = true;
         }
     }
@@ -1691,7 +1702,7 @@ public class FinDia extends PBase {
             rep.empty();
 
         }catch (Exception ex){
-            mu.msgbox("Cobros: " + ex.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +"Cobros: " + ex.getMessage());
             fail = true;
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
         }
@@ -1792,7 +1803,7 @@ public class FinDia extends PBase {
             rep.empty();
 
         }catch (Exception ex){
-            mu.msgbox("Notas de crédito: " + ex.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +"Notas de crédito: " + ex.getMessage());
             fail = true;
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
 
@@ -2769,16 +2780,18 @@ public class FinDia extends PBase {
             sql="SELECT val5 FROM findia ";
             DT=Con.OpenDT(sql);
 
-            if (DT.getCount()>0){
-                DT.moveToFirst();
+            if (DT!=null){
+                if (DT.getCount()>0){
+                    DT.moveToFirst();
 
-                vInicio=((DT.getInt(0)==5));
+                    vInicio=((DT.getInt(0)==5));
 
+                }
             }
 
         }catch (Exception ex){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),ex.getMessage(),sql);
-            mu.msgbox(ex.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + ex.getMessage());
         }
 
         return vInicio;
@@ -2807,7 +2820,7 @@ public class FinDia extends PBase {
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Recibos : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + "Recibos : " + e.getMessage());
             fail = true;
         }
 
@@ -2828,7 +2841,7 @@ public class FinDia extends PBase {
             depc = DT.getDouble(1);
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Depositos : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +"Depositos : " + e.getMessage());
             fail = true;
             depe = 0;
             depc = 0;
@@ -2880,7 +2893,7 @@ public class FinDia extends PBase {
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Det. ventas : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +"Det. ventas : " + e.getMessage());
             fail = true;
         }
 
@@ -2925,7 +2938,7 @@ public class FinDia extends PBase {
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox("Det. ventas : " + e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +"Det. ventas : " + e.getMessage());
             fail = true;
         }
 

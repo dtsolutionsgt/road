@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -73,27 +74,51 @@ public class DevolBodCan extends PBase {
 
         printclose = new Runnable() {
             public void run() {
-                /*if (!gl.devfindia) {
-                    if (!EnviaDev()) {
-                        mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                if (!gl.devfindia) {
+                    if (!prn_can.isEnabled()) {
+                        if (!EnviaDev()) {
+                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                        }
+                    }else{
+                        toastlong("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
                     }
-                }*/
 
-                gl.closeDevBod = true;
-                DevolBodCan.super.finish();
+                   //#CKFK 20211204 Agregué esta validació
+                    if (!prn_can.isEnabled()) {
+                        gl.closeDevBod=true;
+                        DevolBodCan.super.finish();
+                    }else{
+                        pbar.setVisibility(View.INVISIBLE);
+                        gl.closeDevBod=true;
+                        DevolBodCan.super.finish();
+                    }
+
+                }
             }
         };
 
         printexit = new Runnable() {
             public void run() {
                 if (!gl.devfindia) {
-                    if (!EnviaDev()) {
-                        mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                    if (!prn_can.isEnabled()) {
+                        if (!EnviaDev()) {
+                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                        }
+                    }else{
+                        toastlong("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
                     }
                 }
 
-                gl.closeDevBod = true;
-                DevolBodCan.super.finish();
+                //#CKFK 20211204 Agregué esta validació
+                if (!prn_can.isEnabled()) {
+                    gl.closeDevBod=true;
+                    DevolBodCan.super.finish();
+                }else{
+                    pbar.setVisibility(View.INVISIBLE);
+                    gl.closeDevBod=true;
+                    DevolBodCan.super.finish();
+                }
+
             }
         };
 
@@ -330,7 +355,7 @@ public class DevolBodCan extends PBase {
 
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-            mu.msgbox(e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +e.getMessage());
         }
 
         adapter = new list_view_dev_bod_can(this, items);
@@ -539,7 +564,7 @@ public class DevolBodCan extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             db.endTransaction();
             habilitaEnvio();
-            mu.msgbox( e.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
     }
@@ -562,6 +587,7 @@ public class DevolBodCan extends PBase {
             gl.enviaMov =true;
             vEnvia=true;
             startActivity(new Intent(this, ComWS.class));
+
         }catch (Exception e){
             mu.toast("Ocurrió un error enviando los datos " + e.getMessage() );
             vEnvia=false;
@@ -655,7 +681,7 @@ public class DevolBodCan extends PBase {
             if(DT!=null) DT.close();
 
         }catch (Exception ex){
-            mu.msgbox("Ocurrió un error "+ex.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +"Ocurrió un error "+ex.getMessage());
         }
 
         return vtieneCanasta;
@@ -683,7 +709,7 @@ public class DevolBodCan extends PBase {
             if(DT!=null) DT.close();
 
         }catch (Exception ex){
-            mu.msgbox("Ocurrió un error "+ex.getMessage());
+            mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " +"Ocurrió un error "+ex.getMessage());
         }
 
         return vtienePaseante;
@@ -823,13 +849,25 @@ public class DevolBodCan extends PBase {
 
                     if (!imprimecopias){
                         if (!gl.devfindia) {
-                            if (!EnviaDev()){
-                                toastlong("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
-                            }
+                           if (!prn_can.isEnabled()) {
+                                if (!EnviaDev()){
+                                    toastlong("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                                }
+                           }else{
+                               toastlong("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                           }
                         }
 
-                        gl.closeDevBod=true;
-                        DevolBodCan.super.finish();
+                        //#CKFK 20211204 Agregué esta validació
+                        if (!prn_can.isEnabled()) {
+                            gl.closeDevBod=true;
+                            DevolBodCan.super.finish();
+                        }else{
+                            pbar.setVisibility(View.INVISIBLE);
+                            gl.closeDevBod=true;
+                            DevolBodCan.super.finish();
+                        }
+
                     }
                 }
             });
@@ -839,13 +877,25 @@ public class DevolBodCan extends PBase {
                     prn_can.printask(printclose, "printdevcan.txt");
 
                     if (!gl.devfindia) {
-                        if (!EnviaDev()){
-                            mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                        if (!prn_can.isEnabled()) {
+                            if (!EnviaDev()){
+                                mu.toast("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
+                            }
+                        }else{
+                            toastlong("No se pudo enviar la devolución a bodega y a canastas, se enviarán en el fin de día");
                         }
                     }
 
-                    gl.closeDevBod=true;
-                    DevolBodCan.super.finish();
+                    //#CKFK 20211204 Agregué esta validació
+                    if (!prn_can.isEnabled()) {
+                        gl.closeDevBod=true;
+                        DevolBodCan.super.finish();
+                    }else{
+                        pbar.setVisibility(View.INVISIBLE);
+                        gl.closeDevBod=true;
+                        DevolBodCan.super.finish();
+                    }
+
                 }
             });
 

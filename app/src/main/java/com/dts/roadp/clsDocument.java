@@ -101,7 +101,15 @@ public class clsDocument {
 			if (flag==0) {
 				if (!rep.save()) return false;
 			} else if (flag==1){
-				if (!rep.save(global.pCantImpresion)) return false;
+				if  (docpedido){
+					if (global != null){
+						if (!rep.save(global.pCantImpresion)) return false;
+					}else{
+						if (!rep.save(2)) return false;
+					}
+				}else{
+					if (!rep.save(2)) return false;
+				}
 			} else if (flag==2){
 				if (!rep.save(3)) return false;
 			} else if (flag==3){

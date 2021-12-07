@@ -7189,10 +7189,10 @@ public class ComWS extends PBase {
 
 			try {
 				//#AT 20211124 Se ejecuta si es necesario crear una cola de mensajes
-				/*if (gl.enviaMov || gl.enviaPedidosParcial){
+				if (!gl.enviaMov && !gl.enviaPedidosParcial){
 					Looper.prepare();
-				}*/
-				Looper.prepare();
+				}
+				//Looper.prepare();
 				wsSendExecute();
 			} catch (Exception e) {
 				if (scon == 0) {

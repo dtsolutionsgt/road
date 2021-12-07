@@ -64,6 +64,7 @@ public class ListAdaptResPrefactura extends BaseAdapter {
             holder.lblCodPrefact = (TextView) convertView.findViewById(R.id.lblCodPrefact);
             holder.lblCantProd = (TextView) convertView.findViewById(R.id.lblCantProd);
             holder.lblPesoProd = (TextView) convertView.findViewById(R.id.lblPesoProd);
+            holder.lblRuta = (TextView) convertView.findViewById(R.id.lblRuta);
             holder.relEncabezado = (RelativeLayout) convertView.findViewById(R.id.relEncabezado);
             holder.relDet2 = (RelativeLayout) convertView.findViewById(R.id.relDet2);
             holder.relDetProd = (RelativeLayout) convertView.findViewById(R.id.relDetProd);
@@ -75,7 +76,8 @@ public class ListAdaptResPrefactura extends BaseAdapter {
 
         holder.lblCodigo.setText(String.valueOf(items.get(position).codigoCli));
         holder.lblNombre.setText(items.get(position).nombreCli);
-        holder.lblCodPrefact.setText("Prefactura: "+items.get(position).Prefact);
+        holder.lblCodPrefact.setText("Prefactura No.: "+items.get(position).Prefact);
+        holder.lblRuta.setText("Ruta: "+items.get(position).ruta);
         holder.lblCodProd.setText("Cod. Producto: " + items.get(position).codigoProd);
         holder.lblNomProd.setText(items.get(position).nombreProd);
         holder.lblCantProd.setText("Cant: "+String.valueOf(items.get(position).cantidad));
@@ -87,7 +89,6 @@ public class ListAdaptResPrefactura extends BaseAdapter {
 
         if (items.get(position).flag == 0) {
             holder.relEncabezado.setVisibility(View.VISIBLE);
-
         }
 
         if (items.get(position).flag == 1) {
@@ -106,7 +107,7 @@ public class ListAdaptResPrefactura extends BaseAdapter {
 
 
     static class ViewHolder {
-        TextView  lblCodigo,lblNombre,lblCant, lblPeso, lblNomProd, lblCodProd, lblCodPrefact, lblCantProd, lblPesoProd;
+        TextView  lblCodigo,lblNombre,lblCant, lblPeso, lblNomProd, lblCodProd, lblCodPrefact, lblCantProd, lblPesoProd, lblRuta;
         RelativeLayout relEncabezado, relDet2, relDetProd;
     }
 }

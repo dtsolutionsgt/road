@@ -78,7 +78,6 @@ public class ReportePrefactura extends PBase {
         Cursor DT, DP, DD;
         String pcliente, sqlP, sqlProd, pedido;
         clsClasses.clsResPrefactura item, itemP;
-        String cadena = filtro.getText().toString().replace("'","");
 
         try {
             sql = "SELECT DISTINCT C.CODIGO,C.NOMBRE"+
@@ -90,7 +89,7 @@ public class ReportePrefactura extends PBase {
                 while (!DT.isAfterLast()) {
                     pcliente = DT.getString(0);
 
-                    sqlP ="SELECT D.COREL AS COREL" +
+                    sqlP ="SELECT D.COREL AS COREL, ADD2 AS RUTA" +
                             " FROM DS_PEDIDO D" +
                             " WHERE D.CLIENTE ='"+pcliente+"'";
                     DD = Con.OpenDT(sqlP);
@@ -108,6 +107,7 @@ public class ReportePrefactura extends PBase {
                     item.codigoCli = DT.getString(0);
                     item.nombreCli = DT.getString(1);
                     item.Prefact = DD.getString(0);
+                    item.ruta = DD.getString(1);
                     item.flag = 0;
 
                     items.add(item);

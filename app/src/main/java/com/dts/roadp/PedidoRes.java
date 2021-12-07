@@ -55,7 +55,7 @@ public class PedidoRes extends PBase {
 	
 	private long fecha,fechae;
 	private String itemid,cliid,corel;
-	private int cyear, cmonth, cday,dweek,impres;
+	private int cyear, cmonth, cday,dweek,impres, presday;
 	
 	private double dmax,dfinmon,descpmon,descg,descgmon,tot,stot0,stot,descmon,totimp,totperc,dispventa;
 	private boolean acum,cleandprod,toledano,porpeso,prodstandby,impprecio;
@@ -79,14 +79,14 @@ public class PedidoRes extends PBase {
 		cliid=gl.cliente;
 		gl.tolpedsend=false;
         toledano=gl.peModal.equalsIgnoreCase("TOL");
-		
+
+		setActDate();
+		dweek=mu.dayofweek();
+
 		setActDate2();
 		fechae=fecha;
 		lblFecha.setText(du.sfecha(fechae));
         app = new AppMethods(this, gl, Con, db);
-
-        setActDate();
-		dweek=mu.dayofweek();
 
 		clsDesc=new clsDescGlob(this);
 
@@ -876,10 +876,14 @@ public class PedidoRes extends PBase {
 	private void setActDate(){
 		try{
 			final Calendar c = Calendar.getInstance();
+
 			cyear = c.get(Calendar.YEAR);
 			cmonth = c.get(Calendar.MONTH)+1;
 			cday = c.get(Calendar.DAY_OF_MONTH);
 			fecha=du.cfecha(cyear,cmonth,cday);
+
+			presday = c.get(Calendar.DAY_OF_WEEK);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -888,11 +892,17 @@ public class PedidoRes extends PBase {
 	private void setActDate2(){
 		try{
 			final Calendar c = Calendar.getInstance();
-			c.add(Calendar.DATE,1);
+
+			if (presday == 7)
+				c.add(Calendar.DATE,2);
+			else
+				c.add(Calendar.DATE,1);
+
 			cyear = c.get(Calendar.YEAR);
 			cmonth = c.get(Calendar.MONTH)+1;
 			cday = c.get(Calendar.DAY_OF_MONTH);
 			fecha=du.cfecha(cyear,cmonth,cday);
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

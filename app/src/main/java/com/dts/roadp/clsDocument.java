@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class clsDocument {
 
-	public String nombre,numero,serie,ruta,vendedor,cliente,nit,tipo,ref,medidapeso;
+	public String nombre,numero,serie,ruta,vendedor,cliente,nit,tipo,ref,medidapeso, rutapv;
 	public String resol,resfecha,resvence,resrango,fsfecha,fsfechaent,modofact;
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;
@@ -282,6 +282,10 @@ public class clsDocument {
 
         if (!emptystr(nit)) {
         	rep.add("RUC : "+nit);
+		}
+
+		if (!emptystr(rutapv)) {
+			rep.add("Ruta Preventa: "+rutapv);
 		}
 
         if (!emptystr(clidir)) rep.add("Dir : "+clidir);

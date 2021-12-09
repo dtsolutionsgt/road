@@ -76,8 +76,8 @@ public class ListAdaptResPrefactura extends BaseAdapter {
 
         holder.lblCodigo.setText(String.valueOf(items.get(position).codigoCli));
         holder.lblNombre.setText(items.get(position).nombreCli);
-        holder.lblCodPrefact.setText("Prefactura No.: "+items.get(position).Prefact);
-        holder.lblRuta.setText("Ruta: "+items.get(position).ruta);
+        holder.lblCodPrefact.setText("Pref. No. "+items.get(position).Prefact);
+        holder.lblRuta.setText("Ruta Preventa: "+items.get(position).rutapreventa);
         holder.lblCodProd.setText("Cod. Producto: " + items.get(position).codigoProd);
         holder.lblNomProd.setText(items.get(position).nombreProd);
         holder.lblCantProd.setText("Cant: "+String.valueOf(items.get(position).cantidad));

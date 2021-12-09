@@ -216,7 +216,7 @@ public class clsClasses {
 	}
 
 	public class clsResPrefactura {
-		public String codigoCli, codigoProd, nombreCli, nombreProd, Prefact, ruta, cantidad, peso;
+		public String codigoCli, codigoProd, nombreCli, nombreProd, Prefact, rutapreventa, cantidad, peso;
 		public int flag;
 	}
 

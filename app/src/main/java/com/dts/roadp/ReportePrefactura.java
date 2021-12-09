@@ -32,6 +32,7 @@ public class ReportePrefactura extends PBase {
     private LinearLayout totales;
 
     public int lns;
+    public String rutapreventa = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,12 +66,12 @@ public class ReportePrefactura extends PBase {
             }
         };
 
+        loadData();
+
         prn=new printer(this,printclose,gl.validimp);
         doc=new clsResPrefactura(this,prn.prw,"");
 
         titulo.setText("Reporte de Prefacturas");
-
-        loadData();
     }
 
     //region Set Data
@@ -92,9 +93,10 @@ public class ReportePrefactura extends PBase {
                     sqlP ="SELECT D.COREL AS COREL, ADD2 AS RUTA" +
                             " FROM DS_PEDIDO D" +
                             " WHERE D.CLIENTE ='"+pcliente+"'";
-                    DD = Con.OpenDT(sqlP);
 
+                    DD = Con.OpenDT(sqlP);
                     DD.moveToFirst();
+                    rutapreventa = DD.getString(1);
                     pedido = DD.getString(0);
 
                     sqlProd = "SELECT P.CODIGO,P.DESCCORTA, D.CANT,D.PESO, D.UMVENTA" +
@@ -107,7 +109,7 @@ public class ReportePrefactura extends PBase {
                     item.codigoCli = DT.getString(0);
                     item.nombreCli = DT.getString(1);
                     item.Prefact = DD.getString(0);
-                    item.ruta = DD.getString(1);
+                    item.rutapreventa = rutapreventa;
                     item.flag = 0;
 
                     items.add(item);
@@ -174,6 +176,7 @@ public class ReportePrefactura extends PBase {
             vendedor=gl.vendnom;
             cliente="";
             vendcod=gl.vend;
+            rutapv = rutapreventa;
             fsfecha=du.getActDateStr();
 
         }

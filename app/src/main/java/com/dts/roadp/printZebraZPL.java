@@ -460,6 +460,8 @@ public class printZebraZPL extends printBase {
                 printer = ZebraPrinterFactory.getInstance(connection);
                 PrinterLanguage pcLanguage = printer.getPrinterControlLanguage();
                 String pl = SGD.GET("device.languages", connection);
+                SGD.SET("device.languages", "hybrid_xml_zpl", connection);
+
             } catch (ConnectionException e) {
                 setStatus("Unknown Printer Language");
                 printer = null;

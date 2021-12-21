@@ -33,8 +33,8 @@ public class clsDocPedido extends clsDocument {
         String umTemp="";
 
 		rep.line();
-		rep.add("CODIGO   DESCRIPCION                ");
-		rep.add("CANT    UM             PRECIO     VALOR ");
+		rep.add("CODIGO   DESCRIPCION            ");
+		rep.add3fact("CANT    UM","PRECIO","VALOR");
 		rep.line();
 		//rep.empty();
 		
@@ -45,11 +45,11 @@ public class clsDocPedido extends clsDocument {
 
 			umTemp = (item.um.length()>2?item.um.substring(0,3):item.um);
 
-			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(umTemp,6);
+			cu=frmdecimal(item.cant,decimp)+" "+rep.ltrim(umTemp,5);
 			//#AT 27/09/2021 Se comento porque no se  mostrará el peso en Divensa
 			//cp=frmdecimal(0,decimp)+" "+rep.ltrim(item.ump,3);
 			
-			rep.add3fact(cu+"    ",item.prec,item.tot);
+			rep.add3fact(cu+" ",item.prec,item.tot);
 		}
 
 		rep.line();
@@ -82,17 +82,21 @@ public class clsDocPedido extends clsDocument {
 		bonificaciones();
 
 		rep.empty();
-		rep.add("----------------------------------------");
-		rep.add("            FIRMA CLIENTE               ");
+		rep.line();
+		rep.ctrim("FIRMA CLIENTE");
 
 		rep.empty();
-		rep.add("No. Serie : "+deviceid);
+		rep.add("Observaciones: " + add3);
+		rep.empty();
+
+		rep.empty();
+		rep.add("No. Serie : "+(deviceid.isEmpty()?"":deviceid));
 		rep.empty();
 
 		if (diasPP > 0) {
-			rep.add("Aplica descuento por pronto pago si paga");
-			rep.add("en los primeros "+diasPP+" dias de recibido");
-			rep.add("              el producto               ");
+			rep.add("Aplica descuento por pronto pago si ");
+			rep.add("paga en los primeros "+diasPP+" dias");
+			rep.add("de recibido el producto");
 		}
 
 
@@ -111,7 +115,7 @@ public class clsDocPedido extends clsDocument {
 		nombre="PEDIDO";
 		
 		try {
-			sql=" SELECT COREL,'' as CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2, IMPRES, ANULADO " +
+			sql=" SELECT COREL,'' as CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2, IMPRES, ANULADO, ADD3 " +
 				" FROM D_PEDIDO WHERE COREL='"+corel+"'";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
@@ -151,12 +155,13 @@ public class clsDocPedido extends clsDocument {
 			
 			add1=DT.getString(10);
 			add2=DT.getString(11);
+			add3=DT.getString(14);
 			
 		} catch (Exception e) {
 			Toast.makeText(cont,"Ped head 1 : "+e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 	    }	
 		
-		try {
+		/*try {
 			sql="SELECT RESOL,FECHARES,FECHAVIG,SERIE,CORELINI,CORELFIN FROM P_COREL";
 			DT=Con.OpenDT(sql);	
 			DT.moveToFirst();
@@ -168,7 +173,7 @@ public class clsDocPedido extends clsDocument {
 			
 		} catch (Exception e) {
 			Toast.makeText(cont,"Ped head 2 : "+e.getMessage(), Toast.LENGTH_SHORT).show();return false;
-	    }	
+	    }	*/
 		
 		try {
 			sql="SELECT INITPATH FROM P_EMPRESA WHERE EMPRESA='"+empp+"'";

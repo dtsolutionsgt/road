@@ -145,18 +145,7 @@ public class PedidoRes extends PBase {
 			Toast.makeText(this, "Vista previa generada con éxito", Toast.LENGTH_SHORT).show();
 
 			startActivity(new Intent(this, VistaPrevPedido.class));
-			/*try {
-				File file= new File(Environment.getExternalStorageDirectory(), "vistaPedidop.txt");
-				Uri uri = Uri.fromFile(file);
 
-				Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				intent.setDataAndType(uri, "text/plain");
-				startActivity(intent);
-
-			} catch (Exception e) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-			}*/
 		}
 
 	}

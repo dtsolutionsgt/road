@@ -146,6 +146,7 @@ public class Reimpresion extends PBase {
 		switch (tipo) {
 			case 0:
 				docPed = new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp,"");
+				docPed.deviceid = gl.numSerie;
 				lblTipo.setText("Pedido");break;
 			case 1:
 				cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.numSerie, "");
@@ -419,10 +420,10 @@ public class Reimpresion extends PBase {
 		try{
 
 			if(prn.isEnabled()){
-				docPed.buildPrint(itemid,1,"");
+				docPed.buildPrint(itemid,1,gl.peModal);
 				prn.printask(printcallback);
 			}else if(!prn.isEnabled()){
-				docPed.buildPrint(itemid,1,"");
+				docPed.buildPrint(itemid,1,gl.peModal);
 				toast("Reimpresion pedido");
 			}
 

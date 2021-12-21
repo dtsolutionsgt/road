@@ -82,7 +82,7 @@ public class clsDocCobro extends clsDocument {
 
 		rep.empty();
 
-		rep.add("--------- DETALLE DE PAGO ------------");
+		rep.ctrim("--------- DETALLE DE PAGO ------------");
 		rep.add("CHEQUES:");
 
 		for (int i = 0; i <itemspago.size(); i++) {

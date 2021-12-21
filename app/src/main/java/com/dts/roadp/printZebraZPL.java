@@ -210,6 +210,7 @@ public class printZebraZPL extends printBase {
             if (prwidth>35) anchopapel=350; //#CKFK 20190614 Agregué esta condición para el ancho del papel
             if (prwidth>40) anchopapel=300;
             if (prwidth>60) anchopapel=400;
+            anchopapel = 500;
 
             ccnt=lines.size();
             dlen=ccnt*altolinea+60;

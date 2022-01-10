@@ -10,7 +10,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.graphics.Bitmap;
@@ -21,12 +20,11 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
 public class CliGPS extends PBase {

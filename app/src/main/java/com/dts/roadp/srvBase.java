@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

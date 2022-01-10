@@ -2,7 +2,7 @@ package com.dts.roadp;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,7 +12,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.commons.lang.StringUtils;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 

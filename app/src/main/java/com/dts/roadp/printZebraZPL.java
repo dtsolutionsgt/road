@@ -222,7 +222,7 @@ public class printZebraZPL extends printBase {
 
             //Prueba imprimir así, haber como sale..
             for (int i = 0; i <ccnt; i++) {
-                ps+="^FO,"+psx+",0";
+                ps+="^FO,"+psx+",0 ^A 0, 40 ";
                 ps+="^ADN,5,0";
                 //ps+="^A@N,20,20,TT0003M_^FH\\^CI28";
                 //ps+="^A0N,20,20^FH\\^CI28^";

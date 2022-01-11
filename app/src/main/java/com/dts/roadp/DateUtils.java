@@ -107,10 +107,10 @@ public class DateUtils {
 		
 		//yyyyMMdd hh:mm:ss
 		
-		vy=(int) f/100000000;f=f % 100000000;
-		vm=(int) f/1000000;f=f % 1000000;
-		vd=(int) f/10000;f=f % 10000;
-		h= (int) f/100;
+		vy=(long) f/100000000;f=f % 100000000;
+		vm=(long) f/1000000;f=f % 1000000;
+		vd=(long) f/10000;f=f % 10000;
+		h= (long) f/100;
 		m= f % 100;
 		
 		s="20";

@@ -195,8 +195,8 @@ public class clsDataBuilder {
                         ins.add(nombre,valnum);
                     } else {
                         if (ct==1) s="'"+DT.getString(i)+"'";
-                        if (ct==2) s="'"+DU.univfechaext(DT.getInt(i))+"'";
-                        if (ct==3) s="'"+DU.univfechaext(DT.getInt(i))+"'";
+                        if (ct==2) s="'"+DU.univfechaext(DT.getLong(i))+"'";
+                        if (ct==3) s="'"+DU.univfechaext(DT.getLong(i))+"'";
                         valstr=s;
                         ins.add(nombre,valstr);
                     }

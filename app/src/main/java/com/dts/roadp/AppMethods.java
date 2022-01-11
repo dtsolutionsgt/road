@@ -1172,6 +1172,10 @@ public class AppMethods {
             DT.moveToFirst();
             umm=DT.getString(0);
 
+			/*if (umm.equals("KG")){
+				msgbox("Error con el UMSTOCK en la tabla P_STOCK_PV, llegó " + gl.umstock);
+			}*/
+
             if(DT!=null) DT.close();
 
             return  umm;

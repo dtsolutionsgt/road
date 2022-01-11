@@ -970,6 +970,12 @@ public class Venta extends PBase {
             gl.umstock=app.umStockPV(prodid);
         }
 
+        //#CKFK 20211221 Agregué esta validación para que no se guarde la UMSTOCK incorrecta
+		if (gl.umstock.equals("KG")){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),"Error con el UMSTOCK " + gl.umstock,"Error");
+			app.umSalida(prodid);
+		}
+
 		try {
 
             double factorconv=DameProporcionVenta(prodid,gl.cliente,gl.nivel);

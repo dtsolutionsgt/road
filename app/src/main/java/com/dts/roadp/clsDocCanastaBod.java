@@ -61,7 +61,7 @@ public class clsDocCanastaBod extends clsDocument {
             ref=DT.getString(3);
             vend=DT.getString(4);
 
-            ffecha=DT.getInt(5);
+            ffecha=DT.getLong(5);
             fsfecha=sfecha(ffecha);
 
             corel=serie;

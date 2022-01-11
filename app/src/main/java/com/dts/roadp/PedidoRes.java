@@ -397,7 +397,7 @@ public class PedidoRes extends PBase {
 	private boolean saveOrder(){
 		Cursor DT;
 		double tot,desc,imp,peso,vcant,vpeso,vfactor,factpres,cantinv;
-        String vprod,vumstock,vumventa,bandisp;
+        String vprod,vumstock,vumventa,bandisp, vumstockaux = "";
         int dev_ins=1;
 
 
@@ -494,7 +494,16 @@ public class PedidoRes extends PBase {
 
                 ins.add("UMVENTA", DT.getString(11));
                 ins.add("FACTOR", DT.getDouble(12));
-                ins.add("UMSTOCK", DT.getString(13));
+
+                //#CKFK 20211221 Agregué la validacion de que si se está guardando la UMSTOCK incorrecta  se reemplace
+				vumstockaux="";
+                if (DT.getString(13).equals("KG")) {
+					vumstockaux=app.umSalida(DT.getString(0));
+					ins.add("UMSTOCK", vumstockaux);
+				}else{
+                	ins.add("UMSTOCK", DT.getString(13));
+				}
+
                 ins.add("UMPESO", gl.umpeso);
                 ins.add("SIN_EXISTENCIA", DT.getInt(14)); //JP20210614
 

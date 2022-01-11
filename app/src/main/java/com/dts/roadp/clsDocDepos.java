@@ -61,7 +61,7 @@ public class clsDocDepos extends clsDocument {
 			numc=DT.getInt(6);
 			serie=corel;
 
-			fsfecha=du.sfecha(DT.getInt(7));
+			fsfecha=du.sfecha(DT.getLong(7));
 
 		} catch (Exception e) {
 			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;

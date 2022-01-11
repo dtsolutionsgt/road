@@ -2657,8 +2657,8 @@ public class ComWS extends PBase {
 			fprog = "Documento de inventario recibido en BOF...";
 			wsRtask.onProgressUpdate();
 
-			fechaCarga();
-			Actualiza_Documentos();
+			//fechaCarga();
+			//Actualiza_Documentos();
 
 			fprog = "Fin de actualización";
 			wsRtask.onProgressUpdate();
@@ -2888,8 +2888,8 @@ public class ComWS extends PBase {
 				fprog = "Documento de inventario recibido en BOF...";
 				wsRtask.onProgressUpdate();
 
-				fechaCarga();
-				Actualiza_Documentos();
+				//fechaCarga();
+				//Actualiza_Documentos();
 
 			}
 
@@ -5993,6 +5993,8 @@ public class ComWS extends PBase {
 
 					if (envioparcial) dbld.clear();
 
+					dbld.add("IF NOT EXISTS(SELECT COREL FROM D_MOV WHERE COREL = '" + cor + "')  " +
+							" BEGIN ");
 					dbld.insert("D_MOV", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_MOVD", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_MOVDB", "WHERE COREL='" + cor + "'");
@@ -6008,6 +6010,7 @@ public class ComWS extends PBase {
 							" SELECT D.COREL, E.COREL, 0, E.RUTA, E.FECHA, D.PRODUCTO,D.BARRA, '', 'N', GETDATE(), 1, 'N'" +
 							" FROM D_MOV E INNER JOIN D_MOVDB D ON E.COREL = D.COREL" +
 							" WHERE E.COREL = '" + cor + "'");
+					dbld.add(" END ");
 
 					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {
@@ -7315,8 +7318,11 @@ public class ComWS extends PBase {
 			dbld.add("INSERT INTO P_BITACORA_VERSIONHH (RUTA,FECHA,NUMVERSION,ARQUITECTURA) " +
 					"VALUES('" + gl.ruta + "','" + du.univfechaseg() + "','" + gl.parNumVer + "','ANDR')");
 
-			if (commitSQL() == 1) conflag = 1;
-			else conflag = 0;
+			if (commitSQL() == 1){
+				conflag = 1;
+			}else {
+				conflag = 0;
+			}
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -7585,15 +7591,15 @@ public class ComWS extends PBase {
 		return fecha;
 	}
 
-	private int ultimoCierreFecha() {
+	private long ultimoCierreFecha() {
 		Cursor DT;
-		int rslt = 0;
+		long rslt = 0;
 
 		try {
 			sql = "SELECT val1 FROM FinDia";
 			DT = Con.OpenDT(sql);
 			DT.moveToFirst();
-			rslt = DT.getInt(0);
+			rslt = DT.getLong(0);
 
 			if (DT != null) DT.close();
 

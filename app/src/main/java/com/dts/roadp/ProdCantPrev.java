@@ -909,6 +909,11 @@ public class ProdCantPrev extends PBase {
             gl.um = upres;
             gl.umpres = upres;gl.umpresp=upres;
             gl.umstock = umstock;
+            //#CKFK 20211221 Agregué esta validación para que no se guarde la UMSTOCK incorrecta
+            if (gl.umstock.equals("KG")){
+                addlog(new Object(){}.getClass().getEnclosingMethod().getName(),"Error con el UMSTOCK " + gl.umstock,"Error");
+                gl.umstock = app.umSalida(prodid);
+            }
             gl.umfactor = umfactor;
             gl.prectemp = prec;
 

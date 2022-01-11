@@ -147,7 +147,7 @@ public class BaseDatos extends SQLiteOpenHelper {
 			  
 		  }
 
-		  public void add(String pField, int pValue) {
+		  public void add(String pField, long pValue) {
 			  String SV;
 			  
 			  try 

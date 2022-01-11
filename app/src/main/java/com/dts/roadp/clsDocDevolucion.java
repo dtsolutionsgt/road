@@ -123,7 +123,7 @@ public class clsDocDevolucion extends clsDocument {
             cli=DT.getString(2);
 
             tot=DT.getDouble(3);
-            ffecha=DT.getInt(4);fsfecha=sfecha(ffecha);
+            ffecha=DT.getLong(4);fsfecha=sfecha(ffecha);
 
             anulado=DT.getString(6);
             impres=DT.getInt(7);

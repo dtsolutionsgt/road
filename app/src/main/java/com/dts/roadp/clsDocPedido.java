@@ -195,8 +195,8 @@ public class clsDocPedido extends clsDocument {
 			}
 
 			empp=DT.getString(8);
-			ffecha=DT.getInt(9);fsfecha=sfecha(ffecha);
-            int fefecha=DT.getInt(14);fsfechaent=sfecha(fefecha);
+			ffecha=DT.getLong(9);fsfecha=sfecha(ffecha);
+            long fefecha=DT.getLong(14);fsfechaent=sfecha(fefecha);
 
 			add1=DT.getString(10);
 			add2=DT.getString(11);

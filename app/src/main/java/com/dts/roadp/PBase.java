@@ -6,6 +6,7 @@ import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -46,6 +47,7 @@ public class PBase extends Activity {
 		Con = new BaseDatos(this);
 
 	    opendb();
+
 	    ins=Con.Ins;upd=Con.Upd;
 		
 		vApp=this.getApplication();
@@ -200,6 +202,7 @@ public class PBase extends Activity {
 			}
 	    } catch (Exception e) {
 	    	//mu.msgbox(e.getMessage());
+			Log.w("Error",e.getMessage());
 	    	active= 0;
 	    }
 	}			

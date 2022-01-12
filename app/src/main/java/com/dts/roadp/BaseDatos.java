@@ -21,14 +21,15 @@ public class BaseDatos extends SQLiteOpenHelper {
 	  public Update Upd;
 	  private BaseDatosScript DBScript;
 
-	  private static final String DATABASE_NAME =
+	  public static final String DATABASE_NAME =
 			               Environment.getExternalStorageDirectory().getPath() + "/road.db";
+
 	  private static final int DATABASE_VERSION = 1;
 	  	
 	  public BaseDatos(Context context) {
-		 		  	  
+
 	    super(context, DATABASE_NAME, null, DATABASE_VERSION);
-	    		       
+
 	    Ins=new Insert();
 	    Upd=new Update();
 	    
@@ -350,6 +351,3 @@ public class BaseDatos extends SQLiteOpenHelper {
 		
 		}   	  
 }
-
-
-	  

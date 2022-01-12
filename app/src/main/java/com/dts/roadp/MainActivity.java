@@ -95,9 +95,11 @@ public class MainActivity extends PBase {
     }
 
     private void startApplication() {
+
         File ffile;
 
         try {
+
             super.InitBase();
 
             this.setTitle("ROAD");

@@ -39,13 +39,16 @@ android {
     lintOptions {
         checkReleaseBuilds false
     }
-
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
 
-    buildToolsVersion '26.0.0'
+ //   buildToolsVersion '26.0.0'
 //    ndkVersion '23.1.7779620'
 
 }

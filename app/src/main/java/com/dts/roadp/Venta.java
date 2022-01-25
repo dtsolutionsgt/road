@@ -2925,8 +2925,8 @@ public class Venta extends PBase {
 
 			ins.add("RUTA",gl.ruta);
 			ins.add("FECHA",ti);
-			ins.add("HORALLEG",du.shora(ti)+":00");
-			ins.add("HORASAL",du.shora(tf)+":00");
+			ins.add("HORALLEG",gl.ateninistr);
+			ins.add("HORASAL",du.shoraseg(tf));
 			ins.add("TIEMPO",td);
 
 			ins.add("VENDEDOR",gl.vend);

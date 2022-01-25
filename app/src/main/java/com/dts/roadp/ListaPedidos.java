@@ -80,7 +80,8 @@ public class ListaPedidos extends PBase {
     public void listItems() {
         Cursor DT;
         clsClasses.clsCFDV vItem;
-        int f,pcant=0;
+        int pcant=0;
+        long f;
         double val,ptot=0;
         String sf,sval;
 
@@ -103,7 +104,7 @@ public class ListaPedidos extends PBase {
 
                     vItem.Cod=DT.getString(0);
                     vItem.Desc=DT.getString(0);
-                    f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);
+                    f=DT.getLong(2);sf=du.sfecha(f)+" "+du.shora(f);
                     vItem.Fecha=sf;
                     val=DT.getDouble(3);ptot+=val;
                     try {

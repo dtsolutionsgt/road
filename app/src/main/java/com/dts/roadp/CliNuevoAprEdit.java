@@ -30,7 +30,8 @@ public class CliNuevoAprEdit extends PBase {
 	private int cyear,cmonth,cday,dweek;
 	
 	private String cli,cui,idmun="*",idrel,idgru,idesc,idest,idgen;
-	private int numhij,fechanac=0;
+	private int numhij;
+	private long fechanac=0;
 
 	final String[] itemrel = {"CATOLICA", "EVANGELICA", "MORMON", "TESTIGO JEHOVA", "OTROS"}; 
 	final String[] itemgru = {"LADINO", "INDIGENA", "MORENO DE COLOR", "NO APLICA"};	
@@ -298,7 +299,7 @@ public class CliNuevoAprEdit extends PBase {
 
 			dt.moveToFirst();
 			
-			fechanac=dt.getInt(0);
+			fechanac=dt.getLong(0);
 			cui=dt.getString(1);
 			idmun=dt.getString(2);
 			idrel=dt.getString(3);

@@ -271,7 +271,8 @@ public class Reimpresion extends PBase {
 	public void listItems() {
 		Cursor DT;
 		clsClasses.clsCFDV vItem;	
-		int vP,f;
+		int vP;
+		long f;
 		double val;
 		String id,sf,sval,tm;
 			
@@ -345,7 +346,7 @@ public class Reimpresion extends PBase {
 						} else if (tipo==1||tipo==6){
 							sf=DT.getString(0);
 						}else {
-							f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);
+							f=DT.getLong(2);sf=du.sfecha(f)+" "+du.shora(f);
 						}
 
 						vItem.Fecha=sf;
@@ -919,7 +920,7 @@ public class Reimpresion extends PBase {
 
 	private boolean aprLoadHeadData(String corel) {
 		Cursor DT;
-		int ff;
+		long ff;
 					
 		try {
 			sql="SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,SERIEFACT,CORELFACT FROM D_NOTACRED WHERE COREL='"+corel+"'";
@@ -948,8 +949,8 @@ public class Reimpresion extends PBase {
 			DT.moveToFirst();
 			
 			presol="Resolucion No. : "+DT.getString(0);
-			ff=DT.getInt(1);presfecha="De Fecha : "+du.sfecha(ff);
-			ff=DT.getInt(2);presvence="Resolucion vence : "+du.sfecha(ff);		
+			ff=DT.getLong(1);presfecha="De Fecha : "+du.sfecha(ff);
+			ff=DT.getLong(2);presvence="Resolucion vence : "+du.sfecha(ff);
 			presrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
 			
 		} catch (Exception e) {

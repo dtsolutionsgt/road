@@ -10,14 +10,23 @@ public class DateUtils {
 	
 	public DateUtils() {
 	}
-	
+
+	//#CKFK20220116 Modifiqué esta función para que se manejen los segundo también
 	public String sfecha(long f) {
 		long vy,vm,vd;
 		String s;
+
+		if (String.valueOf(f).length()==12){
+			f = f/1000000;
+		}else{
+			f = f/10000;
+		}
 		
-		vy=(long) f/100000000;f=f % 100000000;
-		vm=(long) f/1000000;f=f % 1000000;
-		vd=(long) f/10000;f=f % 10000;
+		vy=(long) f/10000;
+		f=f % 10000;
+		vm=(long) f/100;
+		f=f % 100;
+		vd=(long) f;
 		
 		s="";
 		if (vd>9) { s=s+String.valueOf(vd)+"/";} else {s=s+"0"+String.valueOf(vd)+"/";}  
@@ -51,6 +60,18 @@ public class DateUtils {
 		h=(int) h/100;if (h>9) {sh=String.valueOf(h);} else {sh="0"+String.valueOf(h);}
 			
 		return sh+":"+sm;
+	}
+
+	public String shoraseg(long vValue) {
+		long h,m,s;
+		String sh,sm,ss;
+
+		h=vValue % 1000000;
+		m=h % 10000 / 100;if (m>9) {sm=String.valueOf(m);} else {sm="0"+String.valueOf(m);}
+		s=h % 100;if (s>9) {ss=String.valueOf(s);} else {ss="0"+String.valueOf(s);}
+		h=(int) h/10000;if (h>9) {sh=String.valueOf(h);} else {sh="0"+String.valueOf(h);}
+
+		return sh+":"+sm+":"+ss;
 	}
 
     public String sfechalocal(long f) {
@@ -100,13 +121,18 @@ public class DateUtils {
 		
 		return sss;
 	}
-	
+
+	//#CKFK20220117 Lo modifiqué porque la fecha ahora se maneja con segundos
 	public String univfecha(long f) {
 		long vy,vm,vd,m,h;
 		String s;
 		
 		//yyyyMMdd hh:mm:ss
-		
+
+		if (String.valueOf(f).length()==12){
+			f  = Long.valueOf( String.valueOf(f).substring(0,10));
+		}
+
 		vy=(long) f/100000000;f=f % 100000000;
 		vm=(long) f/1000000;f=f % 1000000;
 		vd=(long) f/10000;f=f % 10000;
@@ -176,7 +202,42 @@ public class DateUtils {
 		return s;
 	}
 
+	//#CKFK20220216 Modifiqué esta función para que se manejen los segundos también
 	public String univfechaext(long f) {
+		long vy,vm,vd;
+		long vFecha,vhora,vmin,vseg;
+		String s, ss, sm, sh;
+
+		//yyyyMMdd hh:mm:ss
+
+		if (String.valueOf(f).length()==12){
+			vFecha = f/1000000;
+			vhora  = Long.valueOf( String.valueOf(f).substring(6,12));
+			vmin=vhora % 10000 / 100;if (vmin>9) {sm=String.valueOf(vmin);} else {sm="0"+String.valueOf(vmin);}
+			vseg=vhora % 100;if (vseg>9) {ss=String.valueOf(vseg);} else {ss="0"+String.valueOf(vseg);}
+			vhora=(int) vhora/10000;if (vhora>9) {sh=String.valueOf(vhora);} else {sh="0"+String.valueOf(vhora);}
+
+			s =  vFecha + " " + sh+":"+sm+":"+ss;
+
+		}else{
+
+			vy=(long) f/10000;
+			f=f % 10000;
+			vm=(long) f/100;
+			f=f % 100;
+			vd=(long) f;
+
+			s=""+vy;
+			if (vm>9) s=s+vm; else s=s+"0"+vm;
+			if (vd>9) s=s+vd; else s=s+"0"+vd;
+			s=vy+" "+vm+":"+vd+":00"; //#HS_20181128_1102 Agregue " "+vm+":"+vd+":00" para que devolviera la hora.
+
+		}
+
+		return s;
+	}
+
+	public String univfechaext_original(long f) {
 		long vy,vm,vd;
 		String s;
 
@@ -194,7 +255,29 @@ public class DateUtils {
 		return s;
 	}
 
+	//#CKFK20220116 Modifiqué esta función para los casos en que la fecha se maneja con segundos
 	public String univfechasql(long f) {
+		long vy,vm,vd;
+		String sy,sm,sd;
+
+		//yyyy-MM-dd
+
+		if (String.valueOf(f).length()==12){
+			f  = Long.valueOf( String.valueOf(f).substring(0,10));
+		}
+
+		vy=(long) f/100000000;f=f % 100000000;
+		vm=(long) f/1000000;f=f % 1000000;
+		vd=(long) f/10000;f=f % 10000;
+
+		if (vy>9) sy="20"+vy; else sy="200"+vy;
+		if (vm>9) sm=""+vm; else sm="0"+vm;
+		if (vd>9) sd=""+vd; else sd="0"+vd;
+
+		return sy+sm+sd;
+	}
+
+	public String univfechasql_original(long f) {
 		long vy,vm,vd;
 		String sy,sm,sd;
 
@@ -238,12 +321,12 @@ public class DateUtils {
 		c=year % 100;
 		c=c*10000+month*100+day;
 
-		return c*10000;
+		return c*1000000;
 	}
 	
-	public long parsedate(int date,int hour,int min) {
+	public long parsedate(long date,int hour,int min,int seg) {
 		long f;
-		f=date+100*hour+min;
+		f=date+10000*hour+100*min+seg;
 		return f;
 	}
 		
@@ -357,7 +440,7 @@ public class DateUtils {
 	
 	public long getActDateTime(){
 		long f,fecha;
-		int cyear,cmonth,cday,ch,cm;
+		int cyear,cmonth,cday,ch,cm,cs;
 		
 		final Calendar c = Calendar.getInstance();
 		cyear = c.get(Calendar.YEAR);
@@ -365,9 +448,10 @@ public class DateUtils {
 		cday = c.get(Calendar.DAY_OF_MONTH);
 		ch=c.get(Calendar.HOUR_OF_DAY);
 		cm=c.get(Calendar.MINUTE);
+		cs=c.get(Calendar.SECOND);
 
 		f=cfecha(cyear,cmonth,cday);
-		fecha=f+ch*100+cm;
+		fecha=f+ch*10000+cm*100+cs;
 
 		return fecha;
 	}

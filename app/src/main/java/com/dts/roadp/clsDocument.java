@@ -600,8 +600,33 @@ public class clsDocument {
 			return false;
 		}
 	}
-	
+
+	//#CKFK20220116 Modifiqué esta función para que se manejen los segundo también
 	public String sfecha(long f) {
+		long vy,vm,vd;
+		String s;
+
+		if (String.valueOf(f).length()==12){
+			f = f/1000000;
+		}else{
+			f = f/10000;
+		}
+
+		vy=(long) f/10000;
+		f=f % 10000;
+		vm=(long) f/100;
+		f=f % 100;
+		vd=(long) f;
+
+		s="";
+		if (vd>9) { s=s+String.valueOf(vd)+"/";} else {s=s+"0"+String.valueOf(vd)+"/";}
+		if (vm>9) { s=s+String.valueOf(vm)+"/20";} else {s=s+"0"+String.valueOf(vm)+"/20";}
+		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
+
+		return s;
+	}
+
+	public String sfecha_original(long f) {
 		long vy,vm,vd;
 		String s;
 		
@@ -618,6 +643,31 @@ public class clsDocument {
 	}
 
 	public String sfecha_dos(long f) {
+
+		long vy,vm,vd;
+		String s;
+
+		if (String.valueOf(f).length()==12){
+			f = f/1000000;
+		}else{
+			f = f/10000;
+		}
+
+		vy=(long) f/10000;
+		f=f % 10000;
+		vm=(long) f/100;
+		f=f % 100;
+		vd=(long) f;
+
+		s="";
+		if (vd>9) { s=s+String.valueOf(vd)+"/";} else {s=s+"0"+String.valueOf(vd)+"/";}
+		if (vm>9) { s=s+String.valueOf(vm)+"/";} else {s=s+"0"+String.valueOf(vm)+"/";}
+		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
+
+		return s;
+	}
+
+	public String sfecha_dos_original(long f) {
 		long vy,vm,vd;
 		String s;
 

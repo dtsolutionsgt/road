@@ -151,7 +151,7 @@ public class clsDocPedido extends clsDocument {
 	protected boolean loadHeadData(String corel) {
 		Cursor DT;
 		String cli,vend,val,empp, anulado;
-		int ff;
+		long ff;
 		int impres, cantimpres;
 				
 		super.loadHeadData(corel);
@@ -195,8 +195,10 @@ public class clsDocPedido extends clsDocument {
 			}
 
 			empp=DT.getString(8);
-			ffecha=DT.getLong(9);fsfecha=sfecha(ffecha);
-            long fefecha=DT.getLong(14);fsfechaent=sfecha(fefecha);
+			ffecha=DT.getLong(9);
+			fsfecha=sfecha(ffecha);
+            long fefecha=DT.getLong(14);
+            fsfechaent=sfecha(fefecha);
 
 			add1=DT.getString(10);
 			add2=DT.getString(11);
@@ -214,8 +216,8 @@ public class clsDocPedido extends clsDocument {
 				DT.moveToFirst();
 
 				resol="Resolucion No. : "+DT.getString(0);
-				ff=DT.getInt(1);resfecha="De Fecha : "+sfecha(ff);
-				ff=DT.getInt(2);resvence="Resolucion vence : "+sfecha(ff);
+				ff=DT.getLong(1);resfecha="De Fecha : "+sfecha(ff);
+				ff=DT.getLong(2);resvence="Resolucion vence : "+sfecha(ff);
 				resrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
 			}
 			

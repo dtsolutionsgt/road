@@ -34,7 +34,7 @@ public class ProdCantPrev extends PBase {
 
     private String prodid,prodimg,proddesc,rutatipo,um,umv,umstock,umstocklab,ubas,upres,umfact,umini,strdisp;
     private int nivel,browse=0,deccant,prevfact=1;
-    private double cant,cexist,cstand,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0,cant_venta;
+    private double cant,cexist,cstand,peso,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0,cant_venta, idispEnPed;
     private boolean pexist,esdecimal,porpeso,esbarra,idle=true,critico;
     private AppMethods app;
 
@@ -218,10 +218,12 @@ public class ProdCantPrev extends PBase {
     //region Main
 
     private void showData() {
-        Cursor dt;
+        Cursor dt, dtTipo=null;
         double ippeso=0;
 
         try {
+
+            idispEnPed = 0;
 
             sql="SELECT UNIDADMEDIDA FROM P_PRODPRECIO WHERE (CODIGO='"+prodid+"') AND (NIVEL="+gl.nivel+")";
             dt=Con.OpenDT(sql);
@@ -325,16 +327,39 @@ public class ProdCantPrev extends PBase {
         if (gl.sinimp) prec=prc.precsin;
 
         try {
-            sql="SELECT CANT,PESO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
+            sql="SELECT CANT, PESO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
             dt=Con.OpenDT(sql);
 
-            if(dt.getCount()>0){
+            if(dt.getCount()>1) {
+
+                if(dt!=null) dt.close();
+
+                sql="SELECT SUM(CANT) AS CANT,SUM(PESO) AS PESO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
+                dt=Con.OpenDT(sql);
+
+                if(dt.getCount()>0){
+                    dt.moveToFirst();
+                    icant=dt.getDouble(0);
+                    ippeso=dt.getDouble(1);
+                }
+
+                sql="SELECT CANT FROM T_VENTA WHERE PRODUCTO='"+prodid+"' AND VAL2 = 'F' ";
+                dtTipo=Con.OpenDT(sql);
+                if(dtTipo.getCount()>0){
+                    dtTipo.moveToFirst();
+                    idispEnPed=dtTipo.getDouble(0);
+                }
+
+                if(dtTipo!=null) dtTipo.close();
+            }else{
+
                 dt.moveToFirst();
                 icant=dt.getDouble(0);
                 ippeso=dt.getDouble(1);
             }
 
             if(dt!=null) dt.close();
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             icant=0;ippeso=0;
@@ -348,6 +373,9 @@ public class ProdCantPrev extends PBase {
         }
 
         idisp=getDisp();
+        if (gl.pedidomod){
+            idisp +=idispEnPed;
+        }
         idisp=mu.trunc(idisp);
 
         if (porpeso) {

@@ -114,8 +114,10 @@ public class clsDocFactura extends clsDocument {
 			DT.moveToFirst();
 			
 			resol="Resolucion No.: "+DT.getString(0);
-			ff=DT.getLong(1);resfecha="De Fecha: "+sfecha_dos(ff);
-			ff=DT.getLong(2);resvence="Vigente hasta: "+sfecha_dos(ff);
+			ff=Long.valueOf( String.valueOf(DT.getLong(1)).substring(1,12));
+			resfecha="De Fecha: "+sfecha_dos(ff);
+			ff=Long.valueOf( String.valueOf(DT.getLong(2)).substring(1,12));
+			resvence="Vigente hasta: "+sfecha_dos(ff);
 			//#EJC20181130: Se cambió el mensaje por revisión de auditor de SAT.
 //			ff=DT.getInt(2);resvence="Resolucion vence : "+sfecha(ff);
 			resrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
@@ -565,7 +567,8 @@ public class clsDocFactura extends clsDocument {
 			rep.line();
 			rep.addc("Firma Cliente");
 			rep.add("");
-			rep.addc("Se aplico nota de credito: "+corelNotaC);
+			rep.addc("Se aplico nota de credito: ");
+			rep.addc(corelNotaC);
 			rep.add("");
 			rep.addc("DE SER UNA VENTA AL CREDITO, SO");
 			rep.addc("LAMENTE NUESTRO CORRESPONDIENTE");

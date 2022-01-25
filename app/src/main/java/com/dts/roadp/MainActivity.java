@@ -41,8 +41,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.5.66 / ";
-    private String parFechaVer = "06-01-2022";
+    private String parNumVer = "9.5.69 / ";
+    private String parFechaVer = "20-01-2022";
     private String parTipoVer = "ROAD PRD";
 
     @Override
@@ -153,7 +153,7 @@ public class MainActivity extends PBase {
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
             if (gl.debug) {
-                 txtUser.setText("00107349");txtPass.setText("123"); // 6056-5
+                 txtUser.setText("00100739");txtPass.setText("inicio01"); // 6056-5
                 //txtUser.setText("00100938");txtPass.setText("MZ"); // 8001-1
                 //txtUser.setText("00100825");txtPass.setText("cesar"); // 0002-1
                 //txtUser.setText("00100993");txtPass.setText("2613");

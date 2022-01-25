@@ -1423,7 +1423,7 @@ public class Anulacion extends PBase {
 
 	private boolean aprLoadHeadData(String corel) {
 		Cursor DT;
-		int ff;
+		long ff;
 					
 		try {
 			sql="SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL FROM D_NOTACRED WHERE COREL='"+corel+"'";
@@ -1443,8 +1443,8 @@ public class Anulacion extends PBase {
 			DT.moveToFirst();
 			
 			presol="Resolucion No. : "+DT.getString(0);
-			ff=DT.getInt(1);presfecha="De Fecha : "+du.sfecha(ff);
-			ff=DT.getInt(2);presvence="Resolucion vence : "+du.sfecha(ff);		
+			ff=DT.getLong(1);presfecha="De Fecha : "+du.sfecha(ff);
+			ff=DT.getLong(2);presvence="Resolucion vence : "+du.sfecha(ff);
 			presrango="Serie : "+DT.getString(3)+" del "+DT.getInt(4)+" al "+DT.getInt(5);
 
 			sql="SELECT NOMBRE FROM P_VENDEDOR  WHERE CODIGO='"+pvend+"'";

@@ -808,7 +808,7 @@ public class PedidoRes extends PBase {
 			ins.add("FECHA",ti);
 			ins.add("HORALLEG",gl.ateninistr);
 			//ins.add("HORALLEG",DU.shora(ti)+":00");
-			ins.add("HORASAL",du.shora(tf)+":00");
+			ins.add("HORASAL",du.shoraseg(tf));
 			ins.add("TIEMPO",td);
 			
 			ins.add("VENDEDOR",gl.vend);

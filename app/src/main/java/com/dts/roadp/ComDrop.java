@@ -142,7 +142,8 @@ public class ComDrop extends Activity {
 		Cursor DT;
 		clsDataBuilder dbld;
 		String s,fruta,hora;
-		int ccorel,fecha;
+		int ccorel;
+		long fecha;
 		
 		try {
 
@@ -282,7 +283,7 @@ public class ComDrop extends Activity {
 					while (!DT.isAfterLast()) {
 					  
 						s=DT.getString(0);
-						fecha=DT.getInt(1);  
+						fecha=DT.getLong(1);
 						hora=DT.getString(2);  
 						
 						dbld.insert("D_ATENCION" ,"WHERE (RUTA='"+s+"') AND (FECHA="+fecha+") AND (HORALLEG='"+hora+"') ");

@@ -163,7 +163,7 @@ public class Canastas extends PBase {
                 clsClasses.clsCanasta item = clsCls.new clsCanasta();
 
                 item.idCanasta = DT.getInt(0);
-                item.fecha = DT.getInt(1);
+                item.fecha = DT.getLong(1);
                 item.fechaFormato = du.sfecha(item.fecha);
                 item.cliente = DT.getString(2);
                 item.producto = DT.getString(3);

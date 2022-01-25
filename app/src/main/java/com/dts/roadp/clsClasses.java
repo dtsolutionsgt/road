@@ -176,9 +176,10 @@ public class clsClasses {
 
 	public class clsCanasta {
 		public String ruta, cliente, producto, vendedor;
-		public int idCanasta, fecha, cantrec, cantentr;
+		public int idCanasta, cantrec, cantentr;
 		public String codigo, desccorta, desclarga, fechaFormato;
 		public boolean editar;
+		public long fecha;
 	}
 
     public class clsPedItem {

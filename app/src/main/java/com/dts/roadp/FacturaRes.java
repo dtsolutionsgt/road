@@ -1399,7 +1399,7 @@ public class FacturaRes extends PBase {
 				ins.add("LOTE",lote );lotelote=lote;
 
 				ins.add("DOCUMENTO",doc);
-				ins.add("FECHA",dt.getInt(6));
+				ins.add("FECHA",dt.getLong(6));
 				ins.add("ANULADO",dt.getInt(7));
 				ins.add("CENTRO",dt.getString(8));
 				ins.add("STATUS",stat);
@@ -1626,7 +1626,7 @@ public class FacturaRes extends PBase {
 			ins.add("FECHA",ti);
 			ins.add("HORALLEG",gl.ateninistr);
 			//ins.add("HORALLEG",DU.shora(ti)+":00");
-			ins.add("HORASAL",du.shora(tf)+":00");
+			ins.add("HORASAL",du.shoraseg(tf));
 			ins.add("TIEMPO",td);
 
 			ins.add("VENDEDOR",gl.vend);

@@ -176,7 +176,8 @@ public class Anulacion extends PBase {
 	public void listItems() {
 		Cursor DT;
 		clsClasses.clsCFDV vItem;	
-		int vP,f;
+		int vP;
+		long f;
 		double val;
 		String id,sf,sval;
 			
@@ -242,11 +243,12 @@ public class Anulacion extends PBase {
 					if (tipo==2) vItem.Desc+=" - "+DT.getString(4);
 					
 					if (tipo==3) {
-						sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);;
+						sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);
 					}else if(tipo==1||tipo==6){
 						sf=DT.getString(0);
 					}else{
-						f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);
+						//#CKFK 20220125 Modifiqué esto porque ya sfecha tiee los segundos
+						f=DT.getLong(2);sf=du.sfecha(f);//+" "+du.shora(f);
 					}
 					
 					vItem.Fecha=sf;
@@ -527,7 +529,8 @@ public class Anulacion extends PBase {
 		doc="";stat="";lot="";
 
 		try{
-			sql = "SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV,CODIGO,UNIDADMEDIDA FROM D_FACTURA_STOCK " +
+			sql = "SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION," +
+					"COREL_D_MOV,CODIGO,UNIDADMEDIDA FROM D_FACTURA_STOCK " +
 					"WHERE (COREL='" + corel + "') ";
 			dt = Con.OpenDT(sql);
 
@@ -557,7 +560,7 @@ public class Anulacion extends PBase {
 					ins.add("LOTE", lot);
 					ins.add("DOCUMENTO", doc);
 
-					ins.add("FECHA", dt.getInt(6));
+					ins.add("FECHA", dt.getLong(6));
 					ins.add("ANULADO", dt.getInt(7));
 					ins.add("CENTRO", dt.getString(8));
 					ins.add("STATUS", stat);
@@ -596,7 +599,8 @@ public class Anulacion extends PBase {
 		doc="";stat="";lot="";
 
 		try{
-			sql = "SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO,CODIGOLIQUIDACION,COREL_D_MOV FROM D_FACTURA_STOCK " +
+			sql = "SELECT CANT,CANTM,PESO,plibra,LOTE,DOCUMENTO,FECHA,ANULADO,CENTRO,STATUS,ENVIADO," +
+					"CODIGOLIQUIDACION,COREL_D_MOV FROM D_FACTURA_STOCK " +
 					"WHERE (COREL='" + corel + "') AND (CODIGO='" + pcod + "') AND (UNIDADMEDIDA='" + um + "')";
 			dt = Con.OpenDT(sql);
 
@@ -624,7 +628,7 @@ public class Anulacion extends PBase {
 					ins.add("LOTE", lot);
 					ins.add("DOCUMENTO", doc);
 
-					ins.add("FECHA", dt.getInt(6));
+					ins.add("FECHA", dt.getLong(6));
 					ins.add("ANULADO", dt.getInt(7));
 					ins.add("CENTRO", dt.getString(8));
 					ins.add("STATUS", stat);
@@ -690,7 +694,7 @@ public class Anulacion extends PBase {
 					ins.add("LOTE", lot);
 					ins.add("DOCUMENTO", doc);
 
-					ins.add("FECHA", dt.getInt(6));
+					ins.add("FECHA", dt.getLong(6));
 					ins.add("ANULADO", dt.getInt(7));
 					ins.add("CENTRO", dt.getString(8));
 					ins.add("STATUS", stat);

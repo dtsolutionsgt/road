@@ -89,7 +89,7 @@ public class PedidoRes extends PBase {
 
 		setActDate();
 		fechae=fecha;
-		lblFecha.setText(du.sfecha_yyyy(fechae));
+		lblFecha.setText(du.sfecha(fechae));
 		dweek=mu.dayofweek();
 
 		clsDesc=new clsDescGlob(this);
@@ -512,7 +512,7 @@ public class PedidoRes extends PBase {
 			ins.add("FECHA",ti);
 			ins.add("HORALLEG",gl.ateninistr);
 			//ins.add("HORALLEG",DU.shora(ti)+":00");
-			ins.add("HORASAL",du.shora(tf)+":00");
+			ins.add("HORASAL",du.shoraseg(tf));
 			ins.add("TIEMPO",td);
 
 			ins.add("VENDEDOR",gl.vend);

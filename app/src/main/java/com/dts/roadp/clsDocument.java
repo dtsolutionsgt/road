@@ -19,7 +19,8 @@ public class clsDocument {
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",add3="",deviceid;
 	public clsRepBuilder rep;
 	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod,docdesglose;
-	public int ffecha,pendiente,diacred,condicionPago;
+	public int pendiente,diacred,condicionPago;
+	public long ffecha;
 
 	protected android.database.sqlite.SQLiteDatabase db;
 	protected BaseDatos Con;
@@ -575,13 +576,38 @@ public class clsDocument {
 		}
 	}
 
-	public String sfecha(int f) {
-		int vy,vm,vd;
+	//#CKFK20220116 Modifiqué esta función para que se manejen los segundo también
+	public String sfecha(long f) {
+		long vy,vm,vd;
 		String s;
 
-		vy=(int) f/100000000;f=f % 100000000;
-		vm=(int) f/1000000;f=f % 1000000;
-		vd=(int) f/10000;f=f % 10000;
+		if (String.valueOf(f).length()==12){
+			f = f/1000000;
+		}else{
+			f = f/10000;
+		}
+
+		vy=(long) f/10000;
+		f=f % 10000;
+		vm=(long) f/100;
+		f=f % 100;
+		vd=(long) f;
+
+		s="";
+		if (vd>9) { s=s+String.valueOf(vd)+"/";} else {s=s+"0"+String.valueOf(vd)+"/";}
+		if (vm>9) { s=s+String.valueOf(vm)+"/20";} else {s=s+"0"+String.valueOf(vm)+"/20";}
+		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
+
+		return s;
+	}
+
+	public String sfecha_original(long f) {
+		long vy,vm,vd;
+		String s;
+
+		vy=(long) f/100000000;f=f % 100000000;
+		vm=(long) f/1000000;f=f % 1000000;
+		vd=(long) f/10000;f=f % 10000;
 
 		s="";
 		if (vd>9) { s=s+String.valueOf(vd)+"-";} else {s=s+"0"+String.valueOf(vd)+"-";}

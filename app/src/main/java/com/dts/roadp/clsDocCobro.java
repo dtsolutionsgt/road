@@ -154,7 +154,7 @@ public class clsDocCobro extends clsDocument {
 				cli=DT.getString(4);
 
 				tot=DT.getDouble(5);
-				ffecha=DT.getInt(6);
+				ffecha=DT.getLong(6);
 				fsfecha=sfecha(ffecha);
 
 				anulado=DT.getString(8);

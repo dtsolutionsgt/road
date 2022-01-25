@@ -328,7 +328,7 @@ public class ComWS extends PBase {
 
 			if (gl.banderafindia) {
 
-				int fechaUltimoCierre;
+				long fechaUltimoCierre;
 
 				fechaUltimoCierre = claseFindia.ultimoCierreFecha();
 
@@ -4160,9 +4160,12 @@ public class ComWS extends PBase {
 		}
 
 		items.clear();
+		dbld.clear();
+		dbld.clearlog();
 
 		generaArchivoBck();
 
+		dbld.clear();
 		dbld.clearlog();
 
 		try {
@@ -5238,7 +5241,7 @@ public class ComWS extends PBase {
 	public void envioAtten() {
 		Cursor DT;
 		String cor, hora;
-		int fecha;
+		long fecha;
 
 		fprog = " ";
 		if (!esEnvioManual){
@@ -5254,7 +5257,7 @@ public class ComWS extends PBase {
 			while (!DT.isAfterLast()) {
 
 				cor = DT.getString(0);
-				fecha = DT.getInt(1);
+				fecha = DT.getLong(1);
 				hora = DT.getString(2);
 
 				try {
@@ -6322,9 +6325,9 @@ public class ComWS extends PBase {
 		return serie;
 	}
 	//#HS_20181121_1048 Se creo la funcion Get_Fecha_Inventario().
-	private int Get_Fecha_Inventario() 	{
+	private long Get_Fecha_Inventario() 	{
 		Cursor DT;
-		int fecha = 0;
+		long fecha = 0;
 
 		try {
 
@@ -6333,9 +6336,9 @@ public class ComWS extends PBase {
 
 			if(DT.getCount()>0){
                 DT.moveToFirst();
-				fecha=DT.getInt(0);
+				fecha=DT.getLong(0);
 				if (fecha==0) 				{
-					fecha = 1001010000 ;//#HS_20181129_0945 Cambie los valores de fecha porque deben se yymmdd hhmm
+					fecha = 1901010000 ;//#HS_20181129_0945 Cambie los valores de fecha porque deben se yymmdd hhmm
 				}
 			}
 
@@ -6403,7 +6406,7 @@ public class ComWS extends PBase {
 
 				//#HS_20181121_0910 Se creó la funcion Get_Fecha_Inventario().
 				if (!esvacio){
-					int fc=Get_Fecha_Inventario();
+					long fc=Get_Fecha_Inventario();
 					recep=fc==du.getActDate();
 				}
 

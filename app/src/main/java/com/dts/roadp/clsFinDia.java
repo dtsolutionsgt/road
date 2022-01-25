@@ -88,7 +88,7 @@ public class clsFinDia extends PBase{
     }
 
     //#HS_20181121_1642 Esta función anteriormente pertenecía a la clase FinDia.
-    public int ultimoCierreFecha() {
+    public long ultimoCierreFecha() {
         Cursor DT;
         int rslt=0;
 
@@ -612,7 +612,7 @@ public class clsFinDia extends PBase{
 
         Cursor DT;
         boolean vFinDia = false;
-        int fechaUltimoCierre = ultimoCierreFecha();
+        long fechaUltimoCierre = ultimoCierreFecha();
 
         try{
 

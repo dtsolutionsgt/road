@@ -491,11 +491,19 @@ public class clsDocument {
         idx=lu.indexOf("@Cliente");
         if (idx>=0) {
             if (emptystr(cliente)) return "@@";
-            if(l.length()>20){
+            /*if(l.length()>20){
 				l=l.replace("@Cliente",clicod+" - "+cliente);
 				return l;
+			}*/
+			//#CKFK20220201 Modifiqué la forma de generar los datos del cliente
+            l=l.replace("@Cliente",clicod+"\n");
+
+            if (cliente.length()>prw){
+            	l=l+cliente.substring(0,prw)+"\n"+cliente.substring(prw,cliente.length());
+			}else{
+				l=l+cliente;
 			}
-            l=l.replace("@Cliente",clicod+" - "+rep.ltrim(cliente, 20));return l;
+            return l;
         }
 
         return l;

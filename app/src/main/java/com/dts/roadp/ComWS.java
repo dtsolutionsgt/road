@@ -4839,6 +4839,7 @@ public class ComWS extends PBase {
 
 		senv = "Envío terminado \n \n";
 
+
 		if (gl.peModal.equalsIgnoreCase("TOL")) {
 			rslv = validaLiquidacion();
 			if (rslv != 1) {

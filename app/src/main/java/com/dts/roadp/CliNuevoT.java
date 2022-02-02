@@ -331,6 +331,13 @@ public class CliNuevoT extends PBase {
                 return false;
             }
 
+            s=txtCliEmail.getText().toString();
+            if (mu.emptystr(s)) {
+                mu.msgbox("Falta correo del cliente");
+                txtCliEmail.requestFocus();
+                return false;
+            }
+
             s=txtCliContacto.getText().toString();
             if (mu.emptystr(s)) {
                 mu.msgbox("Falta contacto del cliente");
@@ -443,10 +450,24 @@ public class CliNuevoT extends PBase {
                 return false;
             }
 
+            s=txtPollo.getText().toString();
+            if (mu.emptystr(s)) {
+                mu.msgbox("Falta ingresar la compra semanal de pollo");
+                txtPollo.requestFocus();
+                return false;
+            }
+
             double vCPollo= Double.valueOf((txtPollo.getText().toString().isEmpty()?"0":txtPollo.getText().toString()));
             if (vCPollo<0) {
                 mu.msgbox("La compra semanal de pollo del cliente debe ser mayor a 0");
                 txtPollo.requestFocus();
+                return false;
+            }
+
+            s=txtEmbutidos.getText().toString();
+            if (mu.emptystr(s)) {
+                mu.msgbox("Falta ingresar la compra semanal de embutidos");
+                txtEmbutidos.requestFocus();
                 return false;
             }
 
@@ -457,10 +478,24 @@ public class CliNuevoT extends PBase {
                 return false;
             }
 
+            s=txtHuevos.getText().toString();
+            if (mu.emptystr(s)) {
+                mu.msgbox("Falta ingresar la compra semanal de huevos");
+                txtHuevos.requestFocus();
+                return false;
+            }
+
             double vCHuevos= Double.valueOf((txtHuevos.getText().toString().isEmpty()?"0":txtHuevos.getText().toString()));
             if (vCHuevos<0) {
                 mu.msgbox("La compra semanal de posturas del cliente debe ser mayor a 0");
                 txtHuevos.requestFocus();
+                return false;
+            }
+
+            s=txtRes.getText().toString();
+            if (mu.emptystr(s)) {
+                mu.msgbox("Falta ingresar la compra semanal de res");
+                txtRes.requestFocus();
                 return false;
             }
 
@@ -471,6 +506,12 @@ public class CliNuevoT extends PBase {
                 return false;
             }
 
+            s=txtCerdo.getText().toString();
+            if (mu.emptystr(s)) {
+                mu.msgbox("Falta ingresar la compra semanal de cerdo");
+                txtCerdo.requestFocus();
+                return false;
+            }
             double vCCerdo= Double.valueOf((txtCerdo.getText().toString().isEmpty()?"0":txtCerdo.getText().toString()));
             if (vCCerdo<0) {
                 mu.msgbox("La compra semanal de cerdo del cliente debe ser mayor a 0");
@@ -478,10 +519,23 @@ public class CliNuevoT extends PBase {
                 return false;
             }
 
+            s=txtCongelados.getText().toString();
+            if (mu.emptystr(s)) {
+                mu.msgbox("Falta ingresa la compra semanal de congelados");
+                txtCongelados.requestFocus();
+                return false;
+            }
             double vCCongelados= Double.valueOf((txtCongelados.getText().toString().isEmpty()?"0":txtCongelados.getText().toString()));
             if (vCCongelados<0) {
                 mu.msgbox("La compra semanal de congelados del cliente debe ser mayor a 0");
                 txtCongelados.requestFocus();
+                return false;
+            }
+
+            s=txtSalsas.getText().toString();
+            if (mu.emptystr(s)) {
+                mu.msgbox("Falta ingresa la compra semanal de salsas");
+                txtSalsas.requestFocus();
                 return false;
             }
 

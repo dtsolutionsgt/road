@@ -405,10 +405,13 @@ public class clsRepBuilder {
 	public String frmdec(double val) {
 		return cursym+decfrm.format(val);
 	}
-	
+
+	//#CKFK20220201 Modifiqué el trim para el cliente
 	private String trim(String ss) {
 		int l=ss.length();
-		if (l>prw) ss=ss.substring(0,prw);	
+		if (!ss.contains("Cliente:")){
+			if (l>prw) ss=ss.substring(0,prw);
+		}
 		return ss;
 	}
 	

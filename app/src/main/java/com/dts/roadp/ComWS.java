@@ -132,8 +132,8 @@ public class ComWS extends PBase {
 	private static String sstr, fstr, fprog, finf, ferr, fterr, idbg, dbg, ftmsg, esql, ffpos;
 	private int scon, running, pflag, stockflag, conflag;
 	private String ftext, slsync, senv, gEmpresa, ActRuta, mac, rootdir;
-	private String fsql, fsqli, fsqlf, strliqid,argstr,xmlresult;
-	private boolean rutapos, ftflag, esvacio, liqid, cargasuper, autoenvio;
+	private String fsql, fsqli, fsqlf, strliqid,argstr,xmlresult, hEnvio;
+	private boolean rutapos, ftflag, esvacio, liqid, cargasuper, autoenvio, resultado;
 
 	private final String NAMESPACE = "http://tempuri.org/";
 	private String METHOD_NAME, URL, URL_Remota;
@@ -1684,7 +1684,15 @@ public class ComWS extends PBase {
 				xr=getXMLRegionSingle("CommitResult");
 				xr=(String) getSingle(xr,"CommitResult",String.class);
 
-			}else{
+			} else if (nombretabla.contains("CommitEnvio")) {
+
+				String fecha = du.getActDateStr();
+
+				callMethod("CommitEnvio", "SQL", value, "pHash", hEnvio, "pFechaHH", fecha, "pRuta", gl.ruta, "pVendedor", gl.vend);
+				xr = getXMLRegionSingle("CommitEnvioResult");
+				xr = (String) getSingle(xr, "CommitEnvioResult", String.class);
+
+			} else{
 
 				value=value.replace("&", "&amp;");
 				value=value.replace("\"", "&quot;");
@@ -1719,7 +1727,7 @@ public class ComWS extends PBase {
                 }
             }
 
-			if (!delcmd.contains("commitSQL")){
+			if (!delcmd.equals("commitSQL") && !delcmd.contains("CommitEnvio")){
 				tabla=delcmd.substring(12);
 				switch (tabla){
 
@@ -1799,7 +1807,7 @@ public class ComWS extends PBase {
 						}
 					}
 				}
-			} else if (delcmd.contains("commitSQL")){
+			} else if (delcmd.contains("commitSQL") || delcmd.contains("CommitEnvio") ){
 				//Corregir esto
 				str=xr;
 				if (str.equalsIgnoreCase("#")) {
@@ -2041,6 +2049,29 @@ public class ComWS extends PBase {
 		return result;
 	}
 
+	// #AT 20220131 Valida si existe hash
+	public boolean validaHash() {
+		String xr;
+		METHOD_NAME = "Existe_Hash_Envio";
+		sstr = "OK";
+
+		try {
+
+			callMethod("Existe_Hash_Envio", "Hash", hEnvio);
+			xr = getXMLRegionSingle("Existe_Hash_EnvioResult");
+			resultado = (boolean) getSingle(xr, "Existe_Hash_EnvioResult", Boolean.class);
+
+			return resultado;
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			sstr = e.getMessage();
+		}
+
+		return false;
+	}
+
 	public int commitSQL() {
 		int rc;
 		String s, ss="";
@@ -2048,7 +2079,7 @@ public class ComWS extends PBase {
 		//e hice modificaciones en la función para garantizar esta funcionalidad
 		int vCommit=0;
 
-		METHOD_NAME = "Commit";
+		METHOD_NAME = "CommitEnvio";
 		sstr = "OK";
 
 		if (dbld.size() == 0) vCommit =1;//return 1
@@ -2069,13 +2100,20 @@ public class ComWS extends PBase {
 		s=s.replace("<", "&lt;");
 		s=s.replace(">", "&gt;");
 
-		nombretabla = "commitSQL";
+		nombretabla = "CommitEnvio";
 
-		String hEnvio = md5(s);
+		hEnvio = md5(s);
 
-		vCommit=fillTable2(s,"commitSQL");
+		//#AT 20220202 Si ya existe el Hash es porque ya se enviaron datos
+		//retorna vCommit 1; si no hace el proceso de envió
+		if (validaHash()) {
+			vCommit = 1;
+		} else {
+			vCommit=fillTable2(s,"CommitEnvio");
+		}
 
 		return vCommit;
+
 	}
 
     public int commitSQLs() {
@@ -3316,7 +3354,7 @@ public class ComWS extends PBase {
 		}
 	}
 
-	private boolean AddTableVL(String TN) {
+	private boolean AddTableVL_Original(String TN) {
 		String SQL;
 
 		try {
@@ -3327,6 +3365,35 @@ public class ComWS extends PBase {
 			SQL = getTableSQL(TN);
 
 			if (fillTable(SQL, "DELETE FROM " + TN) == 1) {
+				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " ok ";
+				idbg = idbg + SQL + "#" + "PASS OK";
+				return true;
+			} else {
+				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " fail " + sstr;
+				idbg = idbg + SQL + "#" + " PASS FAIL  ";
+				fstr = "Tabla:" + TN + " " + sstr;
+				return false;
+			}
+
+		} catch (Exception e) {
+			fstr = "Tabla:" + TN + ", " + e.getMessage();
+			idbg = idbg + e.getMessage();
+			return false;
+		}
+	}
+
+	private boolean AddTableVL(String TN) {
+		String SQL;
+
+		try {
+
+			nombretabla = TN;
+			fprog = TN;
+			idbg = TN;
+			//wsRtask.onProgressUpdate();
+			SQL = getTableSQL(TN);
+
+			if (fillTable2(SQL, "DELETE FROM " + TN) == 1) {
 				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " ok ";
 				idbg = idbg + SQL + "#" + "PASS OK";
 				return true;
@@ -7204,7 +7271,11 @@ public class ComWS extends PBase {
 			try {
 				//#AT 20211124 Se ejecuta si es necesario crear una cola de mensajes
 				if (!gl.enviaMov && !gl.enviaPedidosParcial){
-					Looper.prepare();
+					if (Looper.myLooper() == null)
+					{
+						Looper.prepare();
+					}
+					//Looper.prepare();
 				}
 				//Looper.prepare();
 				wsSendExecute();

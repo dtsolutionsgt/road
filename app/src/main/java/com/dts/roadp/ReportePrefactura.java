@@ -2,7 +2,6 @@ package com.dts.roadp;
 
 import android.content.Context;
 import android.database.Cursor;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;

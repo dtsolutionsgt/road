@@ -779,7 +779,7 @@ public class PedidoRes extends PBase {
 						String vModo=(gl.peModal.equalsIgnoreCase("TOL")?"TOL":"*");
 						pdoc.buildPrint(corel,1,vModo);
 
-						prn.printask(printclose);
+						prn.printask(printexit);
 
 					}
 				}

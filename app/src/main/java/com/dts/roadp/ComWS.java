@@ -551,6 +551,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle("Envio");
 			dialog.setMessage("¿Va a realizar la COMUNICACIÓN MANUAL, está seguro?");
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -583,6 +584,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle("Envio");
 			dialog.setMessage("La COMUNICACIÓN MANUAL no envía los datos directamente a liquidación,¿está seguro?");
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -611,6 +613,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle("Envio");
 			dialog.setMessage("¿Comunicación correcta?");
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -640,6 +643,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle("Envio");
 			dialog.setMessage("¿Está seguro de que la comunicacion NO fue correcta?");
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -1042,6 +1046,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle("Existencias bodega");
 			dialog.setMessage("¿Actualizar existencias?");
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -1077,6 +1082,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle("Precios");
 			dialog.setMessage("¿Actualizar precios?");
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -1111,6 +1117,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle("Recarga de inventario");
 			dialog.setMessage("¿Recargar inventario?");
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -4839,7 +4846,6 @@ public class ComWS extends PBase {
 
 		senv = "Envío terminado \n \n";
 
-
 		if (gl.peModal.equalsIgnoreCase("TOL")) {
 			rslv = validaLiquidacion();
 			if (rslv != 1) {
@@ -8034,6 +8040,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle(R.string.app_name);
 			dialog.setMessage(msg);
+			dialog.setCancelable(false);
 			dialog.setIcon(R.drawable.ic_quest);
 
 			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -8056,6 +8063,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle(R.string.app_name);
 			dialog.setMessage(msg);
+			dialog.setCancelable(false);
 			dialog.setIcon(R.drawable.ic_quest);
 
 			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -8079,6 +8087,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle(R.string.app_name);
 			dialog.setMessage(msg);
+			dialog.setCancelable(false);
 			dialog.setIcon(R.drawable.ic_quest);
 
 			dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
@@ -8110,6 +8119,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle(R.string.app_name);
 			dialog.setMessage(msg);
+			dialog.setCancelable(false);
 			dialog.setIcon(R.drawable.ic_quest);
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
@@ -8137,6 +8147,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle(R.string.app_name);
 			dialog.setMessage("Está seguro de salir de la aplicación?");
+			dialog.setCancelable(false);
 			dialog.setIcon(R.drawable.ic_quest);
 
 			dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
@@ -8166,6 +8177,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle("Recepción");
 			dialog.setMessage("¿Recibir datos nuevos?");
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Recibir", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -8194,6 +8206,7 @@ public class ComWS extends PBase {
 
 			dialog.setTitle("Licencia");
 			dialog.setMessage("El dispositivo no tiene licencia válida");
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {

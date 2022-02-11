@@ -2932,12 +2932,9 @@ public class ComWS extends PBase {
 				encodeLicence();
 				//encodeLicenceRuta();
 
+				fechaCarga();
 				SetStatusRecToTrans("1");
-
 			}
-
-			dbT.setTransactionSuccessful();
-			dbT.endTransaction();
 
 			if (modo_recepcion!=3){
 				fprog = "Documento de inventario recibido en BOF...";
@@ -2947,6 +2944,9 @@ public class ComWS extends PBase {
 				//Actualiza_Documentos();
 
 			}
+
+			dbT.setTransactionSuccessful();
+			dbT.endTransaction();
 
 			fprog = "Fin de actualización";wsRtask.onProgressUpdate();
 
@@ -4355,17 +4355,17 @@ public class ComWS extends PBase {
 	private void fechaCarga() {
 
 		try {
-			dbT.beginTransaction();
+			//dbT.beginTransaction();
 
 			dbT.execSQL("DELETE FROM P_FECHA");
 
 			sql = "INSERT INTO P_FECHA VALUES('" + gl.ruta + "'," + du.getActDate() + ")";
 			dbT.execSQL(sql);
 
-			dbT.setTransactionSuccessful();
-			dbT.endTransaction();
+			//dbT.setTransactionSuccessful();
+			//dbT.endTransaction();
 		} catch (Exception e) {
-			dbT.endTransaction();
+			//dbT.endTransaction();
 		}
 
 	}

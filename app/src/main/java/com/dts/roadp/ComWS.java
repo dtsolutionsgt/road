@@ -300,7 +300,7 @@ public class ComWS extends PBase {
 		} else {
 			if (gl.tolsuper) relPedidos.setVisibility(View.VISIBLE);
 		}
-		if (!autoenvio && rutatipo.equals("P")) {
+		if (!autoenvio && (rutatipo.equals("P") || rutatipo.equals("T"))) {
             relPedidos.setVisibility(View.VISIBLE);
         }
 
@@ -1298,7 +1298,7 @@ public class ComWS extends PBase {
     }
 
     private void runSend() {
-        int dia = du.dayofweek(du.getActDate());
+        long dia = du.dayofweek(du.getActDate());
 
         try {
             if (isbusy == 1) return;
@@ -2884,7 +2884,9 @@ public class ComWS extends PBase {
 
 				writer.close();
 
-			} catch (Exception ex){}
+			} catch (Exception ex){
+
+			}
 
 
 			dbT.beginTransaction();
@@ -2901,6 +2903,7 @@ public class ComWS extends PBase {
 					dbT.execSQL(sql);
 				} catch (Exception e) {
 					ferr += " " +e.getMessage();
+					addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 				}
 
 				try {
@@ -6827,7 +6830,7 @@ public class ComWS extends PBase {
 
 	public void updateAcumulados() {
 		long ff;
-		int oyear, omonth, rslt;
+		long oyear, omonth, rslt;
 
 		ff = du.getActDate();
 		oyear = du.getyear(ff);

@@ -886,11 +886,11 @@ public class Menu extends PBase {
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setTitle("Consultas");
 
-			if (rutatipo.equalsIgnoreCase("D")) itemcnt = 8;
+			if (rutatipo.equalsIgnoreCase("D") || rutatipo.equalsIgnoreCase("T")) itemcnt = 8;
 
 			final String[] selitems = new String[itemcnt];
 
-			if (rutatipo.equalsIgnoreCase("D")) {
+			if (rutatipo.equalsIgnoreCase("D") || rutatipo.equalsIgnoreCase("T")) {
 				selitems[tmp] = "Resumen de prefacturas"; tmp++;
 				selitems[tmp] = "Resumen de productos en prefacturas"; tmp++;
 			}

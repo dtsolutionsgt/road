@@ -3697,6 +3697,9 @@ public class Venta extends PBase {
 					ins.add("UMVENTAENTREGADA",UM);
 					ins.add("PESOENTREGADO",0);
 					ins.add("IDRAZON","");
+					ins.add("PEDCOREL","");
+					ins.add("STATCOM","N");
+					ins.add("DESPCOREL","");
 
 					db.execSQL(ins.sql());
 

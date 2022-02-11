@@ -572,7 +572,7 @@ public class Clientes extends PBase {
 			getLocation();
 			if (latitude + longitude == 0) throw new Exception();
 		} catch (Exception e) {
-			toast("No se puede definit posición actual");return;
+			toast("No se puede definir posición actual");return;
 		}
 
 		for (int i = 0; i < items.size(); i++) {

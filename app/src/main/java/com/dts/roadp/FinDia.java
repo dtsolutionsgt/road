@@ -157,7 +157,9 @@ public class FinDia extends PBase {
             try {
                 File f1 = new File(Environment.getExternalStorageDirectory() + "/SyncFold/findia.txt");
                 File f2 = new File(Environment.getExternalStorageDirectory() + "/print.txt");
-                FileUtils.copyFile(f1, f2);
+                if (f1.exists()){
+                    FileUtils.copyFile(f1, f2);
+                }
             } catch (Exception e) {
                 addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
                 msgExit("No se pudo crear archivo de impresión.");

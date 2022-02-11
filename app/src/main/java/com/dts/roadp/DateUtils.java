@@ -332,28 +332,35 @@ public class DateUtils {
 		
 	public int getyear(long f) {
 		int vy;
+		long tmp;
 				
-		vy=(int) f/100000000;f=f % 100000000;
-		vy=vy+2000;
+		tmp=(long) f/1000000;
+		f=tmp / 10000;
+		vy=(int)f+2000;
 		
 		return vy;
 	}
 	
 	public int getmonth(long f) {
-		int vy,vm;
+		long vy;
+		int vm;
 				
-		vy=(int) f/100000000;f=f % 100000000;
-		vm=(int) f/1000000;f=f % 1000000;
+		vy=(long) f/1000000;
+		f=vy % 1000000;
+		f=(int) f%10000;
+		vm=(int)f /100;
 				
 		return vm;
 	}
 	
 	public int getday(long f) {
-		int vy,vm,vd;
-				
-		vy=(int) f/100000000;f=f % 100000000;
-		vm=(int) f/1000000;f=f % 1000000;
-		vd=(int) f/10000;f=f % 10000;
+		long vy;
+		int vm,vd;
+
+		vy=(long) f/1000000;
+		f=vy % 1000000;
+		vm=(int) f%10000;
+		vd=(int)f %100;
 		
 		return vd;
 	}
@@ -393,8 +400,8 @@ public class DateUtils {
 		
 	}
 	
-	public int dayofweek(long f) {
-		int y,m,d,dw;
+	public long dayofweek(long f) {
+		long y,m,d,dw;
 	     
 		final Calendar c = Calendar.getInstance();
 		

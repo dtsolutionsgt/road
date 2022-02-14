@@ -10,6 +10,7 @@ public class clsDocFactura extends clsDocument {
 
 	private ArrayList<itemData> items= new ArrayList<itemData>();
 	private ArrayList<itemData> bons= new ArrayList<itemData>();
+	private ArrayList<itemData> canastas = new ArrayList<itemData>();
 
 	private double tot,desc,imp,stot,percep,totNotaC;
 	private boolean sinimp;
@@ -334,6 +335,8 @@ public class clsDocFactura extends clsDocument {
 					DT.moveToNext();
 				}
 
+				getCanastas(corel);
+
 				if(DT!=null) DT.close();
 			} catch (Exception e) {
 				Toast.makeText(cont,"Impresion bonif : "+e.getMessage(), Toast.LENGTH_LONG).show();
@@ -343,6 +346,40 @@ public class clsDocFactura extends clsDocument {
 			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();
 	    }		
 		
+		return true;
+	}
+
+	//Cargar canastas
+	protected boolean getCanastas(String corel) {
+		Cursor DT;
+		itemData canasta;
+		canastas.clear();
+
+		try	{
+			sql = "SELECT REPLACE(P_PRODUCTO.DESCCORTA, 'CANASTA', '') AS NOMBRE,D_CANASTA.CANTENTR, D_CANASTA.CANTREC FROM D_CANASTA " +
+                  "INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO = D_CANASTA.PRODUCTO " +
+                  "WHERE coreltrans = '"+corel+"'";
+
+			DT=Con.OpenDT(sql);
+			if (DT.getCount() > 0) DT.moveToFirst();
+
+			while (!DT.isAfterLast()) {
+				canasta = new itemData();
+
+				canasta.nombre = DT.getString(0);
+				canasta.cant = DT.getDouble(1);
+				canasta.auxcant = DT.getDouble(2);
+
+				canastas.add(canasta);
+				DT.moveToNext();
+			}
+
+			if (DT != null) DT.close();
+
+		} catch (Exception e) {
+			Toast.makeText(cont,"Canastas : "+e.getMessage(), Toast.LENGTH_LONG).show();
+		}
+
 		return true;
 	}
 
@@ -497,6 +534,26 @@ public class clsDocFactura extends clsDocument {
 		rep.add("");
 	}
 
+	//Canastas
+	public void canastas() {
+		itemData item;
+
+		if (canastas.size()==0) return;
+
+		rep.add("Canastas Entregadas:");
+		for (int i = 0; i < canastas.size(); i++) {
+			item=canastas.get(i);
+			rep.addCanasta(item.nombre,item.cant);
+		}
+
+		rep.add("Canastas Retiradas:");
+		for (int i = 0; i < canastas.size(); i++) {
+			item=canastas.get(i);
+			rep.addCanasta(item.nombre,item.auxcant);
+		}
+		rep.add("");
+	}
+
 	// Pie por empresa
 
 	protected boolean buildFooter() {
@@ -563,6 +620,7 @@ public class clsDocFactura extends clsDocument {
 			rep.add("Total de items: "+totitems);
 			rep.add("");
 			bonificaciones();
+			canastas();
 			rep.add("");
 			rep.line();
 			rep.addc("Firma Cliente");
@@ -590,6 +648,7 @@ public class clsDocFactura extends clsDocument {
 			rep.add("Total de items: "+totitems);
 			rep.add("");
 			bonificaciones();
+			canastas();
 			rep.add("");
 			rep.line();
 			rep.addc("Firma Cliente");
@@ -631,7 +690,7 @@ public class clsDocFactura extends clsDocument {
 	
 	private class itemData {
 		public String cod,nombre,um,ump,ums;
-		public double cant,peso,prec,imp,descper,desc,tot,fact;
+		public double cant,peso,prec,imp,descper,desc,tot,fact, auxcant;
 		public boolean esbarra;
 	}
 

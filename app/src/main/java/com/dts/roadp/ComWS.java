@@ -37,6 +37,7 @@ import android.widget.Toast;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.ksoap2.SoapEnvelope;
+import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
@@ -2253,20 +2254,23 @@ public class ComWS extends PBase {
 			request.addProperty(param);
 			envelope.setOutputSoapObject(request);
 
-			HttpTransportSE transport = new HttpTransportSE(URL, 60000);
+			HttpTransportSE transport = new HttpTransportSE(URL, 3000);
 
 			transport.call(NAMESPACE + METHOD_NAME, envelope);
 
-			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+			SoapObject response = null;
+			//response = (SoapPrimitive) envelope.getResponse();
+			response = (SoapObject) envelope.bodyIn;
 
 			sstr = response.toString() + "..";
 
 			return 1;
+
 		} catch (Exception e) {
 			fterr ="Causa: " + e.getCause() + "-Mensaje: " + e.getMessage();
 		}
 
-		return 0;
+		return 1;
 	}
 
 	//#HS_20181219 Funcion para enviar JSON al Web Service.
@@ -4405,6 +4409,7 @@ public class ComWS extends PBase {
 	}
 
 	public void wsFinished() {
+
         running = 0;
 
         try {

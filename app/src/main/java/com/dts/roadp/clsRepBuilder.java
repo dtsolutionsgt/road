@@ -319,6 +319,14 @@ public class clsRepBuilder {
 		items.add(ts);
 	}
 
+	public void addCanasta(String s1,double val) {
+		String sval;
+
+		sval = Double.toString(val);
+		ts=ltrim(s1,prw-13)+" : "+rtrim(sval,8);
+		items.add(ts);
+	}
+
 	public void addtotpeso(String s1,double val) {
 		String sval;
 

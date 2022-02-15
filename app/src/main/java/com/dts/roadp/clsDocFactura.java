@@ -356,9 +356,11 @@ public class clsDocFactura extends clsDocument {
 		canastas.clear();
 
 		try	{
-			sql = "SELECT REPLACE(P_PRODUCTO.DESCCORTA, 'CANASTA', '') AS NOMBRE,D_CANASTA.CANTENTR, D_CANASTA.CANTREC FROM D_CANASTA " +
-                  "INNER JOIN P_PRODUCTO ON P_PRODUCTO.CODIGO = D_CANASTA.PRODUCTO " +
-                  "WHERE coreltrans = '"+corel+"'";
+			sql = "SELECT REPLACE(P.DESCCORTA, 'CANASTA', '') AS NOMBRE, IFNULL(C.CANTENTR, 0) AS CANTENTR, IFNULL(C.CANTREC, 0) AS CANTREC " +
+                  "FROM P_PRODUCTO AS P " +
+                  "CROSS JOIN D_FACTURA F " +
+                  "LEFT JOIN D_CANASTA C ON P.CODIGO = C.PRODUCTO AND C.CORELTRANS = F.COREL " +
+	              "WHERE (P.ES_CANASTA = 1) AND (F.COREL = '"+corel+"')";
 
 			DT=Con.OpenDT(sql);
 			if (DT.getCount() > 0) DT.moveToFirst();
@@ -551,7 +553,6 @@ public class clsDocFactura extends clsDocument {
 			item=canastas.get(i);
 			rep.addCanasta(item.nombre,item.auxcant);
 		}
-		rep.add("");
 	}
 
 	// Pie por empresa

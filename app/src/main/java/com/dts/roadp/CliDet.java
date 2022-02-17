@@ -485,9 +485,9 @@ public class CliDet extends PBase {
             uv=DT.getString(3);
 
             try {
-                uvy=uv.substring(0,4);
-                uvm=uv.substring(4,6);
-                uvd=uv.substring(6,8);
+                uvy=uv.substring(0,2);
+                uvm=uv.substring(2,4);
+                uvd=uv.substring(4,6);
                 long ff=du.cfecha(mu.CInt(uvy),mu.CInt(uvm),mu.CInt(uvd));
                 lblAten.setText(du.sfechalocal(ff));
             } catch (Exception e) {

@@ -4165,6 +4165,7 @@ public class ComWS extends PBase {
 
 		generaArchivoBck();
 
+		items.clear();
 		dbld.clear();
 		dbld.clearlog();
 

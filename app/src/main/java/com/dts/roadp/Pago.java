@@ -355,9 +355,10 @@ public class Pago extends PBase {
 				return;
 			}
 
-			// Tarjeta
+			// Cheque postfechado
+			//#CKFK 20220217 Por cuestiones de interface con Divensa coloqué el pago de cheque postfechado como tipo C antes era K
 			if (s.equalsIgnoreCase("3")) {
-				cpago=3;tpago="K";
+				cpago=3;tpago="C";
 				showBancoDialog();
 				return;
 			}

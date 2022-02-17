@@ -335,6 +335,7 @@ public class Deposito extends PBase {
 			while (!DT.isAfterLast()) {
 				
 				sql="SELECT SUM(Valor)	FROM D_COBROP WHERE (COREL='"+DT.getString(0)+"') AND  (TIPO='E')";
+
 				DTD=Con.OpenDT(sql);
 				try {
 					DTD.moveToFirst();

@@ -28,10 +28,11 @@ public class appGlobals extends Application {
 	public boolean closeCliDet,closeVenta,promapl,pagado,pagocobro,sinimp,rutapos,devol,modoadmin;
 	public boolean usarpeso,banderafindia,depparc,incNoLectura,cobroPendiente,findiaactivo,banderaCobro;
 	public boolean permitir_cantidad_mayor, permitir_producto_nuevo,pedidomod,listapedidos;
+	public boolean validar_posicion_georef;
 	public int mpago;
 	public String prodCanasta, corelFac, devcord;
 	public String IdCanal, IdSubcanal, EditarClienteCanal, EditarClienteSubcanal;
-	public boolean ingresaCanastas, enviaMov, enviaPedidosParcial;
+	public boolean ingresaCanastas, enviaMov, enviaPedidosParcial, enviaClientes;
 	public String EditarClienteCodigo, EditarClienteNombre, EditarClienteRuc;
 	public String CliNombre,CliNit, CliDireccion, CliProvincia, CliDistrito, CliCiudad, CliTel, CliEmail, CliContacto, CliCsPollo, CliCsEmbutido,CliCsHuevo,
 			CliCsRes, CliCsCerdo, CliCsCongelados, CliCsSalsas, IdDep, IdMun, CliCodVen="", corelCliente="", CliNomVen;

@@ -61,6 +61,7 @@ public class CliDet extends PBase {
 	private int nivel,browse,merc,rangoGPS,modoGPS;
 	private boolean porcentaje = false,clinue,pedclinue;
 	private byte[] imagenBit;
+	private Boolean georefCanasta, georefPreventa, georefPrefactura, georefAutoVenta;
 
 
 	@Override
@@ -117,17 +118,36 @@ public class CliDet extends PBase {
 		app = new AppMethods(this, gl, Con, db);
 
 		cod=gl.cliente;
+		showData();
 
 		gl.iddespacho = null;
 
-		ventaGPS=gl.peVentaGps!=0;
-		rangoGPS=gl.peLimiteGPS+gl.peMargenGPS;
-		flagGPS=ventaGPS;
-		if (rangoGPS<=1) flagGPS=false;
-		if (gl.gpsdist<1) flagGPS=false;
+		if (gl.peModal.equalsIgnoreCase("TOL")) {
+			//#AT 20220303 Para Toledado tanto la ruta como el cliente deben estan en true para realizar la validación
+			if (gl.validar_posicion_georef) {
+				validaGeoreferencia();
+			} else {
+				ventaGPS = false;
+			}
+		} else {
+			//#AT 20220303 Para los clientes que no sean Toledano se valida GPS en base a tabla P_PARAMEXT
+			ventaGPS=gl.peVentaGps!=0;
+		}
 
+		//#AT 20220303 La bandera flagGPS se llena con las condiciones que estan definidas aquí arriba
+		flagGPS=ventaGPS;
+
+		//#AT 20220303 Aquí validamos si el cliente está en un rango válido en caso de que se deba validar la distancia GPS
 		if (flagGPS) {
-			permiteVenta=gl.gpsdist<=rangoGPS;
+			rangoGPS=gl.peLimiteGPS+gl.peMargenGPS;
+
+			if (rangoGPS <= 1)  {
+				permiteVenta = true;
+			} else if (gl.gpsdist < 1) {
+				permiteVenta = true;
+			} else {
+				permiteVenta = gl.gpsdist <= rangoGPS;
+			}
 		} else {
 			permiteVenta=true;
 		}
@@ -142,7 +162,7 @@ public class CliDet extends PBase {
 			imgDevol.setVisibility(View.INVISIBLE);
 		}*/
 
-		showData();
+		//showData();
 		calcCredit();
 		credito=gl.credito;
 
@@ -181,6 +201,37 @@ public class CliDet extends PBase {
 		}
 	}
 
+	public void validaGeoreferencia() {
+		ventaGPS = false;
+
+		try {
+			switch (gl.rutatipog) {
+				case "C": //Canasta
+					if (georefCanasta) {
+						ventaGPS = true;
+					}
+					break;
+				case "P": //Preventa
+					if (georefPreventa) {
+						ventaGPS = true;
+					}
+					break;
+				case "D": //Prefactura
+					if (georefPrefactura) {
+						ventaGPS = true;
+					}
+					break;
+				case "V": // AutoVenta
+					if (georefAutoVenta) {
+						ventaGPS = true;
+					}
+					break;
+			}
+		} catch (Exception e) {
+			mu.msgbox("Valida georeferencia TOL: "+ e.getMessage());
+		}
+	}
+
 	//region  Events
 
 	public void showVenta(View view){
@@ -190,7 +241,7 @@ public class CliDet extends PBase {
 
 		if (!permiteVenta) {
 			if (gl.peVentaGps==1) {
-				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 +"!\nPara realizar la venta debe acercarse más al cliente.");
+				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 +"!\nPara realizar la venta debe acercarse más al cliente. "+ " validar_posicion_georef: " +gl.validar_posicion_georef+" georefAutoVenta: " + georefAutoVenta);
 				return;
 			} else {
 				modoGPS=1;
@@ -469,8 +520,8 @@ public class CliDet extends PBase {
 
 			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
 					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO,INGRESA_CANASTAS, " +
-                    "CANAL,SUBCANAL,PRIORIZACION,MUNICIPIO "+
-					" FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
+                    "CANAL,SUBCANAL,PRIORIZACION,MUNICIPIO, GEOREFERENCIA_CANASTA, GEOREFERENCIA_PREVENTA, GEOREFERENCIA_PREFACTURA, GEOREFERENCIA_AUTOVENTA "+
+					"FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
 
@@ -478,6 +529,11 @@ public class CliDet extends PBase {
 			lblRep.setText(DT.getString(12));
 			lblDir.setText(DT.getString(2));
 			lblCantDias.setText(DT.getString(17));
+
+			georefCanasta    = (DT.getInt(23) == 1 ? true : false);
+			georefPreventa   = (DT.getInt(24) == 1 ? true : false);
+			georefPrefactura = (DT.getInt(25) == 1 ? true : false);
+			georefAutoVenta  = (DT.getInt(26) == 1 ? true : false);
 
 			tel=DT.getString(4);
 			lblTel.setText(DT.getString(4));

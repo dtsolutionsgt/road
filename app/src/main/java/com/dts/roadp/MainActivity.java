@@ -332,7 +332,7 @@ public class MainActivity extends PBase {
         try {
             //#HS_20181122_1505 Se agrego el campo Impresion.
             sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR," +
-                  "PERMITIR_PRODUCTO_NUEVO, PERMITIR_CANTIDAD_MAYOR FROM P_RUTA";
+                  "PERMITIR_PRODUCTO_NUEVO, PERMITIR_CANTIDAD_MAYOR, VALIDAR_POSICION_GEOREFERENCIAL FROM P_RUTA";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -357,6 +357,8 @@ public class MainActivity extends PBase {
 
                 gl.permitir_cantidad_mayor=(DT.getInt(8)==1?true:false);
                 gl.permitir_producto_nuevo=(DT.getInt(9)==1?true:false);
+                gl.validar_posicion_georef = (DT.getInt(10)==1?true:false);
+
 
             } else {
 

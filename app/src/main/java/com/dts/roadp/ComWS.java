@@ -91,7 +91,7 @@ public class ComWS extends PBase {
 	private RelativeLayout ralBack;
 	private RelativeLayout relExist, relPedidos;
 	private RelativeLayout relPrecio;
-	private RelativeLayout relStock;
+	private RelativeLayout relStock, relClientes;
 	private TextView lblUser, lblPassword, txtVersion;
 	private EditText txtUser, txtPassword;
 	private CheckBox cbSuper;
@@ -193,6 +193,8 @@ public class ComWS extends PBase {
 		relPrecio = (RelativeLayout) findViewById(R.id.relPrecio);
 		relStock = (RelativeLayout) findViewById(R.id.relStock);
 		RelativeLayout relPedidos = (RelativeLayout) findViewById(R.id.relPedidos);
+		relClientes = (RelativeLayout) findViewById(R.id.relClientes);
+
 		relPedidos.setVisibility(View.INVISIBLE);
 
 		cbSuper = (CheckBox) findViewById(R.id.checkBox8);
@@ -283,6 +285,7 @@ public class ComWS extends PBase {
 		envioparcial = gl.peEnvioParcial;
 
 		gl.enviaPedidosParcial = false;
+		gl.enviaClientes = false;
 
 		if (!gl.enviaMov){
 			visibilidadBotones();
@@ -307,6 +310,7 @@ public class ComWS extends PBase {
 
 		if (gl.ruta.isEmpty()) {
 		    relPedidos.setVisibility(View.INVISIBLE);
+		    relClientes.setVisibility(View.INVISIBLE);
         }
 
         pedidos=rutatipo.equals("P");
@@ -423,6 +427,7 @@ public class ComWS extends PBase {
 
 			gl.enviaPedidosParcial = false;
 			gl.enviaMov = false;
+			gl.enviaClientes = false;
 
 			if (isbusy == 1) {
 				toastcent("Por favor, espere que se termine la tarea actual.");return;
@@ -509,6 +514,50 @@ public class ComWS extends PBase {
 			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					relPedidos.setVisibility(View.VISIBLE);
+				}
+			});
+
+			dialog.show();
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+	}
+
+	public void askSendClientes(View view) {
+		try {
+
+			if (isbusy == 1) {
+				toastcent("Por favor, espere que se termine la tarea actual.");return;
+			}
+
+			relClientes.setVisibility(View.INVISIBLE);
+
+			if (!gl.debug) {
+				if (!validaLicencia()) {
+					mu.msgbox("Licencia inválida!");
+					relClientes.setVisibility(View.VISIBLE);
+					return;
+				}
+			}
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Envío Clientes");
+			dialog.setMessage("¿Enviar Clientes Nuevos?");
+			dialog.setCancelable(false);
+
+			gl.enviaClientes = true;
+
+			dialog.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					runSend();
+				}
+			});
+
+			dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					relClientes.setVisibility(View.VISIBLE);
 				}
 			});
 
@@ -5162,6 +5211,41 @@ public class ComWS extends PBase {
 		return true;
 	}
 
+	private boolean sendClientes() {
+		int rslv;
+
+		errflag = false;
+
+		if (getTest() == 0) {
+
+			URL = URL_Remota;
+
+			if (getTest() == 0) {
+				errflag = true;
+				return false;
+			}
+		}
+
+		senv = "Envío terminado \n \n";
+
+		try {
+
+			envioClientesParcial();
+			if (errflag) {
+				dbld.savelog();
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
+				return false;
+			}
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+		}
+
+		return true;
+	}
+
 	public String sfecha(long f) {
 		long vy,vm,vd;
 		String s;
@@ -6346,6 +6430,96 @@ public class ComWS extends PBase {
 		//}
 	}
 
+	public void envioClientesParcial() {
+		Cursor DT;
+		String cor;
+		int i, pc = 0, pcc = 0;
+
+		try {
+			if (gl.peModal.equalsIgnoreCase("TOL")) {
+				sql = "SELECT CODIGO FROM D_CLINUEVOT WHERE STATCOM ='N'";
+			} else {
+				sql = "SELECT CODIGO FROM D_CLINUEVO WHERE STATCOM='N'";
+			}
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() == 0) {
+				senv += "Clientes : " + pc + "\n";
+				return;
+			}
+
+			pcc = DT.getCount();
+			pc = 0;
+			i = 0;
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				cor = DT.getString(0);
+
+				try {
+
+					i += 1;
+					fprog = "Cliente " + i;
+					if (!esEnvioManual) {
+						wsStask.onProgressUpdate();
+					}
+
+					dbld.clear();
+
+					if (gl.peModal.equalsIgnoreCase("TOL")) {
+						dbld.insert("D_CLINUEVOT", "WHERE CODIGO='" + cor + "'");
+					} else {
+						dbld.insert("D_CLINUEVO", "WHERE CODIGO='" + cor + "'");
+					}
+
+					if (commitSQL() == 1) {
+						if (gl.peModal.equalsIgnoreCase("TOL")) {
+							sql = "UPDATE D_CLINUEVOT SET STATCOM='S' WHERE CODIGO='" + cor + "'";
+						} else {
+							sql = "UPDATE D_CLINUEVO SET STATCOM='S' WHERE CODIGO='" + cor + "'";
+						}
+
+						db.execSQL(sql);
+						//Toast.makeText(this, "Envio correcto", Toast.LENGTH_SHORT).show();
+						pc += 1;
+					} else {
+						errflag = true;
+						fterr += "\n" + sstr;
+					}
+
+				} catch (Exception e) {
+					errflag = true;
+
+					dbld.savelog("clientes.txt");
+
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					//fterr+="\n"+e.getMessage();
+				}
+				DT.moveToNext();
+			}
+
+			if (DT != null) DT.close();
+
+		} catch (Exception e) {
+			errflag = true;
+
+			dbld.savelog("Clientes.txt");
+
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			fstr = e.getMessage();
+		}
+
+		if (pc != pcc) {
+			int pf = pcc - pc;
+			senv += "Clientes : " + pc + " , NO ENVIADO : " + pf + "\n";
+		} else {
+			senv += "Clientes : " + pc + "\n";
+		}
+	}
+
 	public void envioCli() {
 		Cursor DT;
 		String cor;
@@ -7134,6 +7308,10 @@ public class ComWS extends PBase {
 					if (!sendPedidosParcial()) {
 						fstr = "Envio incompleto : " + sstr;
 					}
+				} else if (gl.enviaClientes) {
+					if (!sendClientes()) {
+						fstr = "Envio incompleto : " + sstr;
+					}
 				}else{
 					if (!sendData()) {
 						fstr = "Envio incompleto : " + sstr;
@@ -7156,7 +7334,7 @@ public class ComWS extends PBase {
 		barInfo.setVisibility(View.INVISIBLE);
 		lblParam.setVisibility(View.INVISIBLE);
 
-		if(!gl.enviaMov && !gl.enviaPedidosParcial){
+		if(!gl.enviaMov && !gl.enviaPedidosParcial && !gl.enviaClientes){
 			lblEnv.setVisibility(View.VISIBLE);
 			imgEnv.setVisibility(View.VISIBLE);
 
@@ -7231,6 +7409,7 @@ public class ComWS extends PBase {
 		}else{
 
 			relPedidos.setVisibility(View.VISIBLE);
+			relClientes.setVisibility(View.VISIBLE);
 
 			if (scon == 0) {
 
@@ -7249,6 +7428,10 @@ public class ComWS extends PBase {
 
 				if (gl.enviaPedidosParcial) {
 					gl.enviaPedidosParcial = false;
+				}
+
+				if (gl.enviaClientes) {
+					gl.enviaClientes = false;
 				}
 
 				if (gl.enviaMov) gl.enviaMov = false;
@@ -7287,7 +7470,7 @@ public class ComWS extends PBase {
 
 			try {
 				//#AT 20211124 Se ejecuta si es necesario crear una cola de mensajes
-				if (!gl.enviaMov && !gl.enviaPedidosParcial){
+				if (!gl.enviaMov && !gl.enviaPedidosParcial && !gl.enviaClientes){
 					if (Looper.myLooper() == null)
 					{
 						Looper.prepare();

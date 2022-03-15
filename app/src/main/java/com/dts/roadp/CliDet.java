@@ -138,9 +138,8 @@ public class CliDet extends PBase {
 		flagGPS=ventaGPS;
 
 		//#AT 20220303 Aquí validamos si el cliente está en un rango válido en caso de que se deba validar la distancia GPS
+		rangoGPS=gl.peLimiteGPS+gl.peMargenGPS;
 		if (flagGPS) {
-			rangoGPS=gl.peLimiteGPS+gl.peMargenGPS;
-
 			if (rangoGPS <= 1)  {
 				permiteVenta = true;
 			} else if (gl.gpsdist < 1) {
@@ -157,6 +156,7 @@ public class CliDet extends PBase {
 		sgp2 =" ( "+mu.frmint(rangoGPS)+"m ) ";
 		sgp1 =" ( "+mu.frmint(gl.gpsdist)+"m ) ";
 
+		Toast.makeText(this, "permiteVenta: "+permiteVenta+ " validar_posicion_georef: "+gl.validar_posicion_georef, Toast.LENGTH_SHORT).show();
 		/*if (!gl.devol) {
 			lblDevol.setVisibility(View.INVISIBLE);
 			imgDevol.setVisibility(View.INVISIBLE);
@@ -235,13 +235,14 @@ public class CliDet extends PBase {
 	//region  Events
 
 	public void showVenta(View view){
+		Toast.makeText(this, "gl.validar_posicion_georef: "+gl.validar_posicion_georef+" georefAutoVenta: "+georefAutoVenta+" permiteVenta: "+permiteVenta+ "Distancia Clie-Vend: "+(gl.gpsdist - rangoGPS)+" MargenGps: "+rangoGPS, Toast.LENGTH_LONG).show();
 
 		//#CKFK 20210922 Inicializa la variable del total de la devolución
 		gl.devtotal=0;
 
 		if (!permiteVenta) {
 			if (gl.peVentaGps==1) {
-				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 +"!\nPara realizar la venta debe acercarse más al cliente. "+ " validar_posicion_georef: " +gl.validar_posicion_georef+" georefAutoVenta: " + georefAutoVenta);
+				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 +"!\nPara realizar la venta debe acercarse más al cliente.");
 				return;
 			} else {
 				modoGPS=1;
@@ -253,7 +254,7 @@ public class CliDet extends PBase {
 	}
 
 	public void showPreventa(View view) {
-
+		Toast.makeText(this, "gl.validar_posicion_georef: "+gl.validar_posicion_georef+" georefPreventa: "+georefPreventa+" permiteVenta: "+permiteVenta + " Distancia Clie-Vend: "+(gl.gpsdist - rangoGPS)+" MargenGps: "+rangoGPS, Toast.LENGTH_LONG).show();
 	    if (clinue) {
             if (!pedclinue) {
                 msgbox("No se permite crear pedido al cliente nuevo.");return;
@@ -291,7 +292,7 @@ public class CliDet extends PBase {
 	public void showCredit(View viev){
 		if (!permiteVenta) {
 			if (gl.peVentaGps == 1) {
-				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\nPara realizar el cobro debe asercarse más al cliente.");
+				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\nPara realizar el cobro debe acercarse más al cliente.");
 				return;
 			} else {
 				modoGPS = 3;
@@ -303,6 +304,8 @@ public class CliDet extends PBase {
 	}
 
 	public void showDevol(View view){
+		Toast.makeText(this, "gl.validar_posicion_georef: "+gl.validar_posicion_georef+" georefPrefactura: "+georefPrefactura+" permiteVenta: "+permiteVenta+ " Distancia Clie-Vend: "+(gl.gpsdist - rangoGPS)+" MargenGps: "+rangoGPS, Toast.LENGTH_LONG).show();
+
 		if (!permiteVenta) {
 			if (gl.peVentaGps == 1) {
 				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que permitida "+ sgp2 + "!\nPara realizar la devolución debe asercarse más al cliente.");

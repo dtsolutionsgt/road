@@ -558,7 +558,7 @@ public class CliDet extends PBase {
 			gl.contrib=contr;
 
 			//#CKFK 20190619 Cambié las coordenadas que se le envían al Waze, en lugar de X,Y le estoy enviando Y,X
-			sgps=mu.frmgps(DT.getDouble(10))+ " , "+ mu.frmgps(DT.getDouble(9));
+			sgps=mu.frmgps(DT.getDouble(9))+ " , "+ mu.frmgps(DT.getDouble(10));
 			lblGPS.setText(sgps);
 
 			gl.media=DT.getInt(11);

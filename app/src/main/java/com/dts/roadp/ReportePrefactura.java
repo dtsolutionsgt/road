@@ -175,7 +175,7 @@ public class ReportePrefactura extends PBase {
             vendedor=gl.vendnom;
             cliente="";
             vendcod=gl.vend;
-            rutapv = rutapreventa;
+            //rutapv = rutapreventa;
             fsfecha=du.getActDateStr();
 
         }
@@ -188,7 +188,7 @@ public class ReportePrefactura extends PBase {
                 rep.line();lns=items.size();
 
                 rep.add("Cod.Cli   Descripcion Cliente");
-                rep.add("No. Prefactura");
+                rep.add("No. Prefactura  Ruta Preventa");
                 rep.add("Cod.Prod  Descripcion Producto");
                 rep.add("Cantidad        Peso");
                 rep.line();
@@ -201,7 +201,7 @@ public class ReportePrefactura extends PBase {
                         case 0:
                             rep.empty();
                             rep.add(item.codigoCli + " " + item.nombreCli);
-                            rep.add(item.Prefact);
+                            rep.add(item.Prefact + "  " + item.rutapreventa);
                             break;
                         case 1:
                             rep.add(item.codigoProd + "  " + item.nombreProd);

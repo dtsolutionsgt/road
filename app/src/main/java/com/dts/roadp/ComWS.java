@@ -4474,7 +4474,8 @@ public class ComWS extends PBase {
                 } else if(modo_recepcion == 3) {
 					cargaTablasPrecio();
 				} else if(modo_recepcion == 4) {
-					cargaTablasRec();				}
+					cargaTablasRec();
+                }
 
             } else {
                 lblInfo.setText(fstr);
@@ -4492,6 +4493,27 @@ public class ComWS extends PBase {
             }.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
         }
     }
+
+    private void setValoresRuta() {
+		Cursor DT;
+		try	{
+			sql="SELECT PERMITIR_CANTIDAD_MAYOR, PERMITIR_PRODUCTO_NUEVO, VALIDAR_POSICION_GEOREFERENCIAL FROM P_RUTA";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+
+				DT.moveToFirst();
+
+				gl.permitir_cantidad_mayor = (DT.getInt(0) == 1 ? true : false);
+				gl.permitir_producto_nuevo = (DT.getInt(1) == 1 ? true : false);
+				gl.validar_posicion_georef = (DT.getInt(2) == 1 ? true : false);
+			}
+
+		} catch (Exception e){
+			msgbox(new Object() {
+			}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+		}
+	}
 
     private void confImpresora() {
         try {
@@ -4805,6 +4827,10 @@ public class ComWS extends PBase {
 
                 case 76:
 					procesaDatos();
+					//#AT 20220322 Se cambia el valor de las variables
+					//gl.permitir_cantidad_mayor, gl.permitir_producto_nuevo, gl.validar_posicion_georef
+					setValoresRuta();
+
 					ejecutar = false;
                     break;
 

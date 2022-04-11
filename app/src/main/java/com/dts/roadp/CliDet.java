@@ -997,8 +997,12 @@ public class CliDet extends PBase {
 					if ((claseFinDia.getDeposito() != 4) && (claseFinDia.getDocPendientesDeposito()>0)) {
 						runVenta();
 					}else{
-						msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
-						return;
+						if (claseFinDia.getDocPendientesDeposito()!=0 || claseFinDia.getDeposito() == 4)	{
+							msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
+							return;
+						}else{
+							runVenta();
+						}
 					}
 				}
 			}
@@ -1030,8 +1034,12 @@ public class CliDet extends PBase {
 						addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 					}
 				}else{
-					msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
-					return;
+					if (claseFinDia.getDocPendientesDeposito()!=0 || claseFinDia.getDeposito() == 4)	{
+						msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
+						return;
+					}else{
+						runVenta();
+					}
 				}
 			}
 		}catch (Exception e){

@@ -498,4 +498,16 @@
         android:textStyle="bold"
         android:visibility="invisible" />
 
-    </RelativeLayout>
+    <ImageView
+        android:id="@+id/imageView30"
+        android:layout_width="53dp"
+        android:layout_height="46dp"
+        android:layout_below="@id/imageView2"
+        android:layout_alignStart="@+id/imageView2"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="1dp"
+        android:src="@drawable/act_stock" />
+
+</RelativeLayout>

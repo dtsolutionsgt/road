@@ -41,8 +41,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.5.76 / ";
-    private String parFechaVer = "17-03-2022";
+    private String parNumVer = "9.5.74 / ";
+    private String parFechaVer = "16-02-2022";
     private String parTipoVer = "ROAD PRD";
 
     @Override
@@ -330,9 +330,13 @@ public class MainActivity extends PBase {
         }
 
         try {
+            //#CKFK20220411 Puse esto en comentario por solicitud de regresar a la versión 74
             //#HS_20181122_1505 Se agrego el campo Impresion.
+           /* sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR," +
+                  "PERMITIR_PRODUCTO_NUEVO, PERMITIR_CANTIDAD_MAYOR, VALIDAR_POSICION_GEOREFERENCIAL FROM P_RUTA";*/
             sql = "SELECT CODIGO,NOMBRE,VENDEDOR,VENTA,WLFOLD,IMPRESION,SUCURSAL,CELULAR," +
-                  "PERMITIR_PRODUCTO_NUEVO, PERMITIR_CANTIDAD_MAYOR, VALIDAR_POSICION_GEOREFERENCIAL FROM P_RUTA";
+                    "PERMITIR_PRODUCTO_NUEVO, PERMITIR_CANTIDAD_MAYOR FROM P_RUTA";
+
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -357,7 +361,8 @@ public class MainActivity extends PBase {
 
                 gl.permitir_cantidad_mayor=(DT.getInt(8)==1?true:false);
                 gl.permitir_producto_nuevo=(DT.getInt(9)==1?true:false);
-                gl.validar_posicion_georef = (DT.getInt(10)==1?true:false);
+                //#CKFK20220411 Puse esto en comentario por solicitud de regresar a la versión 74
+                //gl.validar_posicion_georef = (DT.getInt(10)==1?true:false);
 
 
             } else {

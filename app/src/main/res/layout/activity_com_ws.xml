@@ -506,7 +506,7 @@
         android:layout_toEndOf="@+id/textView1"
         android:clickable="true"
         android:onClick="askSendClientes"
-        tools:visibility="visible">
+        tools:visibility="invisible">
 
         <TextView
             android:id="@+id/txtCliente"

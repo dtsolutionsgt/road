@@ -596,7 +596,8 @@ public class AppMethods {
 
 		try{
 
-			sql="SELECT CODIGO FROM D_CLINUEVO WHERE CODIGO = '" + cod + "'";
+			sql="SELECT CODIGO FROM D_CLINUEVO WHERE CODIGO = '" + cod + "' UNION " +
+				"SELECT CODIGO FROM D_CLINUEVOT WHERE CODIGO = '" + cod + "' ";
 			DT=Con.OpenDT(sql);
 
 			clienteNuevo=(DT.getCount()>0);

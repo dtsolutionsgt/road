@@ -122,17 +122,18 @@ public class CliDet extends PBase {
 
 		gl.iddespacho = null;
 
-		if (gl.peModal.equalsIgnoreCase("TOL")) {
+		//#CKFK20220411 Puse esto en comentario por solicitud de regresar a la versión 74
+/*		if (gl.peModal.equalsIgnoreCase("TOL")) {
 			//#AT 20220303 Para Toledado tanto la ruta como el cliente deben estan en true para realizar la validación
 			if (gl.validar_posicion_georef) {
 				validaGeoreferencia();
 			} else {
 				ventaGPS = false;
 			}
-		} else {
+		} else {*/
 			//#AT 20220303 Para los clientes que no sean Toledano se valida GPS en base a tabla P_PARAMEXT
 			ventaGPS=gl.peVentaGps!=0;
-		}
+		//}
 
 		//#AT 20220303 La bandera flagGPS se llena con las condiciones que estan definidas aquí arriba
 		flagGPS=ventaGPS;
@@ -156,7 +157,8 @@ public class CliDet extends PBase {
 		sgp2 =" ( "+mu.frmint(rangoGPS)+"m ) ";
 		sgp1 =" ( "+mu.frmint(gl.gpsdist)+"m ) ";
 
-		Toast.makeText(this, "permiteVenta: "+permiteVenta+ " validar_posicion_georef: "+gl.validar_posicion_georef, Toast.LENGTH_SHORT).show();
+		//#CKFK20220411 Puse esto en comentario por solicitud de regresar a la versión 74
+		//Toast.makeText(this, "permiteVenta: "+permiteVenta+ " validar_posicion_georef: "+gl.validar_posicion_georef, Toast.LENGTH_SHORT).show();
 		/*if (!gl.devol) {
 			lblDevol.setVisibility(View.INVISIBLE);
 			imgDevol.setVisibility(View.INVISIBLE);
@@ -235,7 +237,8 @@ public class CliDet extends PBase {
 	//region  Events
 
 	public void showVenta(View view){
-		Toast.makeText(this, "gl.validar_posicion_georef: "+gl.validar_posicion_georef+" georefAutoVenta: "+georefAutoVenta+" permiteVenta: "+permiteVenta+ "Distancia Clie-Vend: "+(gl.gpsdist - rangoGPS)+" MargenGps: "+rangoGPS, Toast.LENGTH_LONG).show();
+		//#CKFK20220411 Puse esto en comentario por solicitud de regresar a la versión 74
+       //Toast.makeText(this, "gl.validar_posicion_georef: "+gl.validar_posicion_georef+" georefAutoVenta: "+georefAutoVenta+" permiteVenta: "+permiteVenta+ "Distancia Clie-Vend: "+(gl.gpsdist - rangoGPS)+" MargenGps: "+rangoGPS, Toast.LENGTH_LONG).show();
 
 		//#CKFK 20210922 Inicializa la variable del total de la devolución
 		gl.devtotal=0;
@@ -254,7 +257,8 @@ public class CliDet extends PBase {
 	}
 
 	public void showPreventa(View view) {
-		Toast.makeText(this, "gl.validar_posicion_georef: "+gl.validar_posicion_georef+" georefPreventa: "+georefPreventa+" permiteVenta: "+permiteVenta + " Distancia Clie-Vend: "+(gl.gpsdist - rangoGPS)+" MargenGps: "+rangoGPS, Toast.LENGTH_LONG).show();
+		//#CKFK20220411 Puse esto en comentario por solicitud de regresar a la versión 74
+		//Toast.makeText(this, "gl.validar_posicion_georef: "+gl.validar_posicion_georef+" georefPreventa: "+georefPreventa+" permiteVenta: "+permiteVenta + " Distancia Clie-Vend: "+(gl.gpsdist - rangoGPS)+" MargenGps: "+rangoGPS, Toast.LENGTH_LONG).show();
 	    if (clinue) {
             if (!pedclinue) {
                 msgbox("No se permite crear pedido al cliente nuevo.");return;
@@ -304,7 +308,8 @@ public class CliDet extends PBase {
 	}
 
 	public void showDevol(View view){
-		Toast.makeText(this, "gl.validar_posicion_georef: "+gl.validar_posicion_georef+" georefPrefactura: "+georefPrefactura+" permiteVenta: "+permiteVenta+ " Distancia Clie-Vend: "+(gl.gpsdist - rangoGPS)+" MargenGps: "+rangoGPS, Toast.LENGTH_LONG).show();
+		//#CKFK20220411 Puse esto en comentario por solicitud de regresar a la versión 74
+		//Toast.makeText(this, "gl.validar_posicion_georef: "+gl.validar_posicion_georef+" georefPrefactura: "+georefPrefactura+" permiteVenta: "+permiteVenta+ " Distancia Clie-Vend: "+(gl.gpsdist - rangoGPS)+" MargenGps: "+rangoGPS, Toast.LENGTH_LONG).show();
 
 		if (!permiteVenta) {
 			if (gl.peVentaGps == 1) {
@@ -521,9 +526,14 @@ public class CliDet extends PBase {
 
 		try {
 
-			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
+			//#CKFK20220411 Puse esto en comentario por solicitud de regresar a la versión 74
+/*			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
 					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO,INGRESA_CANASTAS, " +
                     "CANAL,SUBCANAL,PRIORIZACION,MUNICIPIO, GEOREFERENCIA_CANASTA, GEOREFERENCIA_PREVENTA, GEOREFERENCIA_PREFACTURA, GEOREFERENCIA_AUTOVENTA "+
+					"FROM P_CLIENTE WHERE CODIGO='"+cod+"'";*/
+			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
+					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO,INGRESA_CANASTAS, " +
+					"CANAL,SUBCANAL,PRIORIZACION,MUNICIPIO "+
 					"FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
@@ -533,10 +543,11 @@ public class CliDet extends PBase {
 			lblDir.setText(DT.getString(2));
 			lblCantDias.setText(DT.getString(17));
 
-			georefCanasta    = (DT.getInt(23) == 1 ? true : false);
-			georefPreventa   = (DT.getInt(24) == 1 ? true : false);
-			georefPrefactura = (DT.getInt(25) == 1 ? true : false);
-			georefAutoVenta  = (DT.getInt(26) == 1 ? true : false);
+			//#CKFK20220411 Puse esto en comentario por solicitud de regresar a la versión 74
+//			georefCanasta    = (DT.getInt(23) == 1 ? true : false);
+//			georefPreventa   = (DT.getInt(24) == 1 ? true : false);
+//			georefPrefactura = (DT.getInt(25) == 1 ? true : false);
+//			georefAutoVenta  = (DT.getInt(26) == 1 ? true : false);
 
 			tel=DT.getString(4);
 			lblTel.setText(DT.getString(4));
@@ -997,8 +1008,12 @@ public class CliDet extends PBase {
 					if ((claseFinDia.getDeposito() != 4) && (claseFinDia.getDocPendientesDeposito()>0)) {
 						runVenta();
 					}else{
-						msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
-						return;
+						if (claseFinDia.getDocPendientesDeposito()!=0 || claseFinDia.getDeposito() == 4)	{
+							msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
+							return;
+						}else{
+							runVenta();
+						}
 					}
 				}
 			}
@@ -1030,8 +1045,12 @@ public class CliDet extends PBase {
 						addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 					}
 				}else{
-					msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
-					return;
+					if (claseFinDia.getDocPendientesDeposito()!=0 || claseFinDia.getDeposito() == 4)	{
+						msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
+						return;
+					}else{
+						runVenta();
+					}
 				}
 			}
 		}catch (Exception e){

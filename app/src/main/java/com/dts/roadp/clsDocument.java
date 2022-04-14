@@ -11,6 +11,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class clsDocument {
 
@@ -613,8 +614,10 @@ public class clsDocument {
 	public String sfecha(long f) {
 		long vy,vm,vd;
 		String s;
+		String hora = "";
 
 		if (String.valueOf(f).length()==12){
+			hora = DU.shoraseg(f);
 			f = f/1000000;
 		}else{
 			f = f/10000;
@@ -631,7 +634,7 @@ public class clsDocument {
 		if (vm>9) { s=s+String.valueOf(vm)+"/20";} else {s=s+"0"+String.valueOf(vm)+"/20";}
 		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
 
-		return s;
+		return s + " " + hora;
 	}
 
 	public String sfecha_original(long f) {

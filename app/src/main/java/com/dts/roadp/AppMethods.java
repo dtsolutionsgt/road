@@ -13,6 +13,7 @@ import android.net.NetworkInfo;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.Currency;
 import java.util.Locale;
 
@@ -1439,6 +1440,34 @@ public class AppMethods {
 
 			DT.moveToFirst();
 			ff=DT.getLong(0);
+
+			if(DT!=null) DT.close();
+
+			return ff;
+		} catch (Exception e) {
+			return f0;
+		}
+	}
+
+	public long fechaHoraFactTol(long f0) {
+		Cursor DT;
+		String sql;
+		long ff;
+		int ch,cm,cs;
+
+		try {
+			sql = "SELECT FECHA FROM P_FECHA";
+			DT = Con.OpenDT(sql);
+
+			DT.moveToFirst();
+			ff=DT.getLong(0);
+
+			final Calendar c = Calendar.getInstance();
+			ch=c.get(Calendar.HOUR_OF_DAY);
+			cm=c.get(Calendar.MINUTE);
+			cs=c.get(Calendar.SECOND);
+
+			ff = ff +ch*10000+cm*100+cs;
 
 			if(DT!=null) DT.close();
 

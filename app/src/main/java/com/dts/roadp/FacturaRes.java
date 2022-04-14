@@ -76,7 +76,7 @@ public class FacturaRes extends PBase {
 		setContentView(R.layout.activity_factura_res);
 
 		super.InitBase();
-        addlog("FacturaRes",""+du.getActDateTime(),gl.vend);
+		addlog("FacturaRes", "" + du.getActDateTime(), gl.vend);
 
 		listView = (ListView) findViewById(R.id.listView1);
 		lblPago = (TextView) findViewById(R.id.TextView01);
@@ -97,20 +97,23 @@ public class FacturaRes extends PBase {
 		imgCanastas = (ImageView) findViewById(R.id.imgCanastas);
 
 		contadoCheck = (CheckBox) findViewById(R.id.checkContado);
-		rl_facturares=(RelativeLayout)findViewById(R.id.relativeLayout1);rl_facturares.setVisibility(View.VISIBLE);
-		pbar = (ProgressBar) findViewById(R.id.progressBar);pbar.setVisibility(View.INVISIBLE);
+		rl_facturares = (RelativeLayout) findViewById(R.id.relativeLayout1);
+		rl_facturares.setVisibility(View.VISIBLE);
+		pbar = (ProgressBar) findViewById(R.id.progressBar);
+		pbar.setVisibility(View.INVISIBLE);
 
-		lblVuelto = new TextView(this,null);
-		txtVuelto = new EditText(this,null);
+		lblVuelto = new TextView(this, null);
+		txtVuelto = new EditText(this, null);
 
-		cliid=gl.cliente;
-		rutapos=gl.rutapos;
-		media=gl.media;
-		credito=gl.credito;
+		cliid = gl.cliente;
+		rutapos = gl.rutapos;
+		media = gl.media;
+		credito = gl.credito;
 		gl.cobroPendiente = false;
-		dispventa = gl.dvdispventa;dispventa=mu.round(dispventa,2);
+		dispventa = gl.dvdispventa;
+		dispventa = mu.round(dispventa, 2);
 		notaC = gl.tiponcredito;
-		gl.corelFac=gl.ruta+"_"+mu.getCorelBase();
+		gl.corelFac = gl.ruta + "_" + mu.getCorelBase();
 
 		app = new AppMethods(this, gl, Con, db);
 
@@ -126,7 +129,7 @@ public class FacturaRes extends PBase {
 			//imgCred.setImageResource(R.drawable.credit);
 		}
 
-		if (media==1) {
+		if (media == 1) {
 			contadoCheck.setVisibility(View.INVISIBLE);
 			imgCred.setVisibility(View.INVISIBLE);
 			lblCred.setVisibility(View.INVISIBLE);
@@ -136,7 +139,7 @@ public class FacturaRes extends PBase {
 			lblMPago.setVisibility(View.VISIBLE);
 		}
 
-		if (media <= 3){
+		if (media <= 3) {
 			contadoCheck.setVisibility(View.INVISIBLE);
 			imgMPago.setVisibility(View.VISIBLE);
 			lblMPago.setVisibility(View.VISIBLE);
@@ -144,20 +147,20 @@ public class FacturaRes extends PBase {
 			lblCred.setVisibility(View.INVISIBLE);
 			lblCash.setVisibility(View.VISIBLE);
 			imgCash.setVisibility(View.VISIBLE);
-			if (app.esClienteNuevo(gl.cliente)){
+			if (app.esClienteNuevo(gl.cliente)) {
 				imgPend.setVisibility(View.INVISIBLE);
 				lblPend.setVisibility(View.INVISIBLE);
-			}else{
+			} else {
 				imgPend.setVisibility(View.VISIBLE);
 				lblPend.setVisibility(View.VISIBLE);
 			}
 		}
 
-		if (media==4) {
+		if (media == 4) {
 
 			if (gl.vcredito) {
 
-				if (credito<=0 || gl.facturaVen != 0) {
+				if (credito <= 0 || gl.facturaVen != 0) {
 					contadoCheck.setVisibility(View.INVISIBLE);
 					lblCash.setVisibility(View.VISIBLE);
 					imgCash.setVisibility(View.VISIBLE);
@@ -167,7 +170,7 @@ public class FacturaRes extends PBase {
 					lblCred.setVisibility(View.INVISIBLE);
 					imgMPago.setVisibility(View.VISIBLE);
 					lblMPago.setVisibility(View.VISIBLE);
-				}else if(credito > 0){
+				} else if (credito > 0) {
 					contadoCheck.setVisibility(View.VISIBLE);
 					lblCash.setVisibility(View.INVISIBLE);
 					imgCash.setVisibility(View.INVISIBLE);
@@ -192,7 +195,7 @@ public class FacturaRes extends PBase {
 
 		}
 
-		if (gl.dvbrowse!=0){
+		if (gl.dvbrowse != 0) {
 			lblCash.setVisibility(View.VISIBLE);
 			imgCash.setVisibility(View.VISIBLE);
 			lblPend.setVisibility(View.INVISIBLE);
@@ -203,9 +206,11 @@ public class FacturaRes extends PBase {
 			lblMPago.setVisibility(View.VISIBLE);
 		}
 
-		fecha=du.getActDateTime();
-		fechae=fecha;
-		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
+		fecha = du.getActDateTime();
+		fechae = fecha;
+		if (gl.peModal.equalsIgnoreCase("TOL")){
+			fecha = app.fechaFactTol(du.getActDate());
+	    }
 
 		dweek=mu.dayofweek();
 

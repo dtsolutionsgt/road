@@ -617,7 +617,7 @@ public class clsDocument {
 		String hora="";
 
 		if (String.valueOf(f).length()==12){
-			hora=DU.shora(f);
+			hora=DU.shoraseg(f);
 			f = f/1000000;
 		}else{
 			f = f/10000;

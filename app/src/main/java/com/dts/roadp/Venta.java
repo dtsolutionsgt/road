@@ -1541,7 +1541,7 @@ public class Venta extends PBase {
 			    if (gl.pPrefijoBarra.length()>0)
 			        barcode=gl.pPrefijoBarra+barcode;
 
-				gl.barra=barcode.substring(1,18);
+				gl.barra=barcode.substring(0,gl.pLongitudBarra);
 				barcode=gl.barra;
 
 			} else {
@@ -1611,7 +1611,7 @@ public class Venta extends PBase {
 		if (!isDialogBarraShowed) 	{
 
 			if (barcode.length()>18){
-				gl.barra=barcode.substring(1,18);
+				gl.barra=barcode.substring(0,18);
 				barcode=gl.barra;
 			}else{
 				gl.barra=barcode;

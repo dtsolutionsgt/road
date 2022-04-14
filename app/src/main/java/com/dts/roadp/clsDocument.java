@@ -610,11 +610,14 @@ public class clsDocument {
 	}
 
 	//#CKFK20220116 Modifiqué esta función para que se manejen los segundo también
+	//#CKFK20220416 Agregué que se mostrara la hora
 	public String sfecha(long f) {
 		long vy,vm,vd;
 		String s;
+		String hora="";
 
 		if (String.valueOf(f).length()==12){
+			hora=DU.shora(f);
 			f = f/1000000;
 		}else{
 			f = f/10000;
@@ -631,7 +634,7 @@ public class clsDocument {
 		if (vm>9) { s=s+String.valueOf(vm)+"/20";} else {s=s+"0"+String.valueOf(vm)+"/20";}
 		if (vy>9) { s=s+String.valueOf(vy);} else {s=s+"0"+String.valueOf(vy);}
 
-		return s;
+		return s + " " + hora;
 	}
 
 	public String sfecha_original(long f) {

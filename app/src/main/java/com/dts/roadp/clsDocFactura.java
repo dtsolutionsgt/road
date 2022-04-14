@@ -70,7 +70,8 @@ public class clsDocFactura extends clsDocument {
 				stot=tot+desc;
 
 				empp=DT.getString(8);
-				ffecha=DT.getLong(9);fsfecha=sfecha(ffecha);
+				//#CKFK20220413 Cambie la fecha por la fecha de entrega que tiene hora
+				ffecha=DT.getLong(14);fsfecha=sfecha(ffecha);
 
 				add1=DT.getString(10);
 				add2=DT.getString(11);

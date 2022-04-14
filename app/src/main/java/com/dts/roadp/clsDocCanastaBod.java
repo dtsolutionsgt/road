@@ -159,6 +159,8 @@ public class clsDocCanastaBod extends clsDocument {
     protected boolean detailToledano() {
         itemData item;
         String ss;
+        tot=0;
+        totcant=0;
 
         rep.add("");
         rep.add("--------------------------------");

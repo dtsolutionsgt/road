@@ -160,6 +160,9 @@ public class clsDocCanastaBod extends clsDocument {
         itemData item;
         String ss;
 
+        tot=0;
+        totcant=0;
+
         rep.add("");
         rep.add("--------------------------------");
         rep.add("CODIGO   DESCRIPCION          UM");

@@ -183,7 +183,8 @@ public class Anulacion extends PBase {
 	public void listItems() {
 		Cursor DT;
 		clsClasses.clsCFDV vItem;	
-		int vP,f;
+		int vP;
+		long f;
 		double val;
 		String id,sf,sval;
 			
@@ -211,7 +212,7 @@ public class Anulacion extends PBase {
 			}
 			
 			if (tipo==3) {
-				sql="SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO "+
+				sql="SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO, D_FACTURA.FECHA "+
 					 "FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO "+
 					 "WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') " +
 					 "ORDER BY D_FACTURA.COREL DESC ";
@@ -254,7 +255,7 @@ public class Anulacion extends PBase {
 					}else if(tipo==1||tipo==6){
 						sf=DT.getString(0);
 					}else{
-						f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);
+						f=DT.getLong(2);sf=du.sfecha(f)+" "+du.shora(f);
 					}
 					
 					vItem.Fecha=sf;

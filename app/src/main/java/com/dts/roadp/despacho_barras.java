@@ -596,7 +596,7 @@ public class despacho_barras extends PBase {
                 if (gl.pPrefijoBarra.length()>0)
                     barcode=gl.pPrefijoBarra+barcode;
 
-                gl.barra=barcode.substring(1,18);
+                gl.barra=barcode.substring(0,gl.pLongitudBarra);
                 barcode=gl.barra;
 
             } else {

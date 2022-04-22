@@ -483,6 +483,13 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX D_CLINUEVOT_IMAGEN_idx1 ON D_CLINUEVOT_IMAGEN(STATCOM)";
 			database.execSQL(vSQL);
 
+			vSQL="CREATE TABLE [TMP_D_CLINUEVOT_IMAGEN] ("+
+					"[CODIMAGEN] INTEGER NOT NULL,"+
+					"[CODIGO] TEXT NOT NULL,"+
+					"PRIMARY KEY ([CODIMAGEN])"+
+					");";
+			database.execSQL(vSQL);
+
 			vSQL="CREATE TABLE [D_CLINUEVO_APR] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+

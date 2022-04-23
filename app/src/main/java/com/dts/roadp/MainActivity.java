@@ -417,6 +417,14 @@ public class MainActivity extends PBase {
 
             if(DT!=null) DT.close();
 
+           /* db.beginTransaction();
+
+            sql="UPDATE p_banco SET cuenta='3903' WHERE CODIGO='111006'";
+            db.execSQL(sql);
+
+            db.setTransactionSuccessful();
+            db.endTransaction();*/
+
         } catch (Exception e) {
             msgbox("¡No se pudo cargar configuración de la empresa!");
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);

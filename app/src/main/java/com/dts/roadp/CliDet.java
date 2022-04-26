@@ -995,7 +995,11 @@ public class CliDet extends PBase {
 					claseFinDia = new clsFinDia(this);
 					//#CKFK 20190305 Agregué validación para verificar si ya se realizó el depósito
 					if ((claseFinDia.getDeposito() != 4) && (claseFinDia.getDocPendientesDeposito()>0)) {
-						runVenta();
+						try {
+							startActivity(new Intent(this, activity_despacho_list.class));
+						} catch (Exception e) {
+							addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+						}
 					}else{
 						msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
 						return;

@@ -1,5 +1,6 @@
 package com.dts.roadp;
 
+import android.graphics.Bitmap;
 import java.util.ArrayList;
 
 public class clsClasses {
@@ -221,4 +222,8 @@ public class clsClasses {
 		public int flag;
 	}
 
+	public class clsDocumentoImg {
+		public String nombre;
+		public Bitmap img;
+	}
 }

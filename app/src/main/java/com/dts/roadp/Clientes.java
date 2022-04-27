@@ -146,6 +146,10 @@ public class Clientes extends PBase {
 		try {
 			gl.tcorel = mu.getCorelBase();//gl.ruta/
 
+			//#AT20220422 Elimina datos de la tabla TMP_D_CLINUEVOT_IMAGEN
+			sql="DELETE FROM TMP_D_CLINUEVOT_IMAGEN";
+			db.execSQL(sql);
+
 			if(gl.peModal.equalsIgnoreCase("TOL")) {
 				Intent intent = new Intent(this, CliNuevoT.class);
 				startActivity(intent);

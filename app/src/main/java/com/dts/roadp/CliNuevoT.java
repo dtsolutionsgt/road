@@ -15,9 +15,9 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -43,7 +44,7 @@ public class CliNuevoT extends PBase {
             txtCodVendedor, txtPollo, txtEmbutidos, txtHuevos, txtRes,
             txtCerdo, txtCongelados, txtSalsas;
 
-    private int d1, d2, d3, d4, d5, d6, d7, nivel=0;
+    private int d1, d2, d3, d4, d5, d6, d7, nivel=0, tipo=0, codimg, correlativo = 0;
     private Boolean imgPath, imgDB;
     private PhotoViewAttacher zoomFoto;
 
@@ -111,6 +112,9 @@ public class CliNuevoT extends PBase {
     }
 
     private void GuardarCliente() {
+        Cursor DT;
+        int codimagen = 0;
+        String cliente = "";
 
         try {
             //Guardando Info en D_CLINUEVOT
@@ -268,6 +272,33 @@ public class CliNuevoT extends PBase {
                 }
 
             }
+
+            //#AT20220425 Guardar documentos en D_CLINUEVOT_IMAGEN
+            sql = "SELECT * FROM TMP_D_CLINUEVOT_IMAGEN WHERE CODIGO = '"+gl.corelCliente+"'";
+            DT = Con.OpenDT(sql);
+            if (DT == null || DT.getCount() == 0) return;
+
+            DT.moveToFirst();
+            while (!DT.isAfterLast()) {
+                codimagen = DT.getInt(0);
+                cliente = DT.getString(1);
+
+                ins.init("D_CLINUEVOT_IMAGEN");
+
+                ins.add("CODIMAGEN", codimagen);
+                ins.add("CODIGO", cliente);
+                ins.add("RUTA", gl.ruta);
+                ins.add("OBSERVACIONES", "");
+                ins.add("FECHA", du.getFechaActual());
+                ins.add("STATCOM", "N");
+
+                db.execSQL(ins.sql());
+
+                DT.moveToNext();
+            }
+
+            if (DT != null) DT.close();
+
             limpiar();
             Toast.makeText(this, "Cliente nuevo creado", Toast.LENGTH_SHORT).show();
             super.finish();
@@ -592,9 +623,14 @@ public class CliNuevoT extends PBase {
 
     }
 
+    public void CapturarFoto(View view) {
+        msgTomarFotos("Capturar imagen");
+    }
     //Foto
-    public void tomarFoto(View view){
+    public void tomarFoto(){
+        Cursor DT, DU;
         File URLfoto;
+        String path = "";
         int codResult = 1;
 
         try{
@@ -607,7 +643,40 @@ public class CliNuevoT extends PBase {
             StrictMode.setVmPolicy(builder.build());
 
             Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
+
+            //#AT20220422 Guardar foto
+            //Si tipo == 1 foto de cliente (fachada), si tipo == 2 fotos para documentos.
+            if (tipo == 1) {
+                path = Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg";
+            } else if (tipo == 2) {
+
+                String tmp = "SELECT * FROM D_CLINUEVOT_IMAGEN";
+                DU =Con.OpenDT(tmp);
+
+                if (DU != null && DU.getCount() > 0) {
+                    if (correlativo == 0) {
+                        sql = "SELECT MAX(CODIMAGEN) FROM D_CLINUEVOT_IMAGEN";
+                        DT = Con.OpenDT(sql);
+                        DT.moveToFirst();
+
+                        correlativo = DT.getInt(0);
+                        if (DT != null) DT.close();
+                    }
+                    codimg = correlativo +1;
+                    correlativo = codimg;
+                } else {
+                    sql = "SELECT MAX(CODIMAGEN) FROM TMP_D_CLINUEVOT_IMAGEN";
+                    DT=Con.OpenDT(sql);
+                    DT.moveToFirst();
+
+                    codimg = DT.getInt(0) +1;
+                    if(DT!=null) DT.close();
+                }
+
+                path = Environment.getExternalStorageDirectory() + "/RoadFotos/clidocs/" + codimg + ".jpg";
+            }
+
+            URLfoto = new File(path);
 
             intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
             startActivityForResult(intento1,codResult);
@@ -679,26 +748,39 @@ public class CliNuevoT extends PBase {
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        String pathFoto;
+        String pathFoto ="";
 
         if (requestCode == 1) {
             try {
-                pathFoto = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
+                if (tipo == 1) {
+                    pathFoto = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
 
-                try {
-                    Bitmap bitmap1 = BitmapFactory.decodeFile(pathFoto);
-                    bitmap1 = redimensionarImagen(bitmap1, 640, 360);
+                    try {
+                        Bitmap bitmap1 = BitmapFactory.decodeFile(pathFoto);
+                        bitmap1 = redimensionarImagen(bitmap1, 640, 360);
 
-                    FileOutputStream out = new FileOutputStream(pathFoto);
-                    bitmap1.compress(Bitmap.CompressFormat.JPEG, 50, out);
-                    out.flush();
-                    out.close();
+                        FileOutputStream out = new FileOutputStream(pathFoto);
+                        bitmap1.compress(Bitmap.CompressFormat.JPEG, 50, out);
+                        out.flush();
+                        out.close();
 
-                    File iarchivo = new File(pathFoto);
-                    imgRoadTit.setImageURI(Uri.fromFile(iarchivo));
-                } catch (Exception e) { }
+                        File iarchivo = new File(pathFoto);
+                        imgRoadTit.setImageURI(Uri.fromFile(iarchivo));
+                    } catch (Exception e) {
+                    }
+                } else if (tipo == 2) {
+                    opendb();
 
-            } catch (Exception e){
+                    ins.init("TMP_D_CLINUEVOT_IMAGEN");
+                    ins.add("CODIMAGEN", codimg);
+                    ins.add("CODIGO", gl.corelCliente);
+
+                    db.execSQL(ins.sql());
+                    db.close();
+
+                    msgCapturarDocumento("Agregar otro documento");
+                }
+            } catch (Exception e) {
                 mu.msgbox("onActivityResult: " + e.getMessage());
             }
         }
@@ -775,6 +857,89 @@ public class CliNuevoT extends PBase {
             dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     GuardarCliente();
+                }
+            });
+
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+            dialog.show();
+        }catch (Exception e){
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+
+    }
+
+    private boolean getCountTmpImg() {
+        Cursor DT;
+        try {
+            sql = "SELECT * FROM TMP_D_CLINUEVOT_IMAGEN";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                return true;
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            mu.msgbox(e.getMessage() + sql);
+            return false;
+        }
+    }
+    private void msgTomarFotos(String msg) {
+
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle(R.string.app_name);
+            dialog.setMessage("¿" + msg  + "?");
+            dialog.setIcon(R.drawable.ic_quest);
+
+            dialog.setPositiveButton("Ver Documentos", (dialog1, which) -> {
+                if (getCountTmpImg()) {
+                    startActivity(new Intent(this, CliDocumentos.class));
+                } else {
+                    toast("No hay documentos disponibles.");
+                }
+            });
+
+            dialog.setNegativeButton("Fachada", (dialog12, which) -> {
+                tipo = 1;
+                tomarFoto();
+            });
+
+            dialog.setNeutralButton("Documento", (dialog13, which) -> {
+                tipo = 2;
+                tomarFoto();
+            });
+
+            dialog.show();
+
+        }catch (Exception e){
+            addlog(Objects.requireNonNull(new Object()
+            {
+            }.getClass().getEnclosingMethod()).getName(),e.getMessage(),"");
+        }
+
+    }
+
+    private void msgCapturarDocumento(String msg) {
+        try{
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            dialog.setTitle(R.string.app_name);
+            dialog.setMessage("¿" + msg  + "?");
+            dialog.setIcon(R.drawable.ic_quest);
+
+            dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    tipo = 2;
+                    tomarFoto();
                 }
             });
 
@@ -977,6 +1142,22 @@ public class CliNuevoT extends PBase {
         txtCerdo.setText(gl.CliCsCerdo);
         txtCongelados.setText(gl.CliCsCongelados);
         txtSalsas.setText(gl.CliCsSalsas);
+    }
+
+    public void opendb() {
+        try {
+            db = Con.getWritableDatabase();
+            if (db!= null) {
+                Con.vDatabase=db;
+                active=1;
+            } else {
+                active = 0;
+            }
+        } catch (Exception e) {
+            //mu.msgbox(e.getMessage());
+            Log.w("Error",e.getMessage());
+            active= 0;
+        }
     }
 
 }

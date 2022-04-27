@@ -435,6 +435,11 @@ public class MainActivity extends PBase {
         } catch (Exception e) {}
 
         try {
+            File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clidocs");
+            directory.mkdirs();
+        } catch (Exception e) {}
+
+        try {
             File directory = new File(Environment.getExternalStorageDirectory() + "/RoadPedidos");
             directory.mkdirs();
         } catch (Exception e) {}

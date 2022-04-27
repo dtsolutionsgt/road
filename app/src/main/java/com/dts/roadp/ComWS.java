@@ -101,6 +101,7 @@ public class ComWS extends PBase {
 	private String licSerial, licRuta, licSerialEnc, licRutaEnc, parImprID;
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag,
             esEnvioManual = false,pedidos, cargastockpv,errorFlag;
+	private String clienteImg= "", rutaImg ="", fechaImg="", statcomImg ="", path="";
 
 	private SQLiteDatabase dbT;
 	private DatabaseErrorHandler er;
@@ -5143,6 +5144,7 @@ public class ComWS extends PBase {
 					if (commitSQL() == 1) {
 						errflag = false;
 						envioFotos();
+						envioDocsCliente();
 						return true;
 					} else {
 						errflag = true;
@@ -5263,6 +5265,8 @@ public class ComWS extends PBase {
 				}.getClass().getEnclosingMethod().getName(), fstr, "Error envío");
 				return false;
 			}
+
+			envioDocsCliente();
 
 		} catch (Exception e) {
 			addlog(new Object() {
@@ -6543,6 +6547,56 @@ public class ComWS extends PBase {
 			senv += "Clientes : " + pc + " , NO ENVIADO : " + pf + "\n";
 		} else {
 			senv += "Clientes : " + pc + "\n";
+		}
+	}
+
+	//#AT20220426 Envió de documentos por cliente
+	public void envioDocsCliente() {
+		Cursor DT;
+		String resultado ="", xr="";
+		try {
+
+			sql = "SELECT * FROM D_CLINUEVOT_IMAGEN WHERE STATCOM = 'N'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
+
+				while (!DT.isAfterLast()) {
+					int codigoImg = DT.getInt(0);
+					clienteImg = DT.getString(1);
+					rutaImg = DT.getString(2);
+					fechaImg = DT.getString(3);
+					statcomImg = DT.getString(5);
+
+					path = Environment.getExternalStorageDirectory() + "/RoadFotos/clidocs/" + codigoImg+ ".jpg";
+
+					Bitmap bmp = BitmapFactory.decodeFile(path);
+					ByteArrayOutputStream out = new ByteArrayOutputStream();
+					bmp.compress(Bitmap.CompressFormat.JPEG,75, out);
+					byte[] imagebyte = out.toByteArray();
+					String strBase64 = Base64.encodeBytes(imagebyte);
+
+					callMethod("GuardaDocumentosCliente",
+							"cliente", clienteImg,
+								"ruta", rutaImg,
+								"fecha", fechaImg,
+								"statcom", statcomImg,
+								"img",strBase64);
+					xr = getXMLRegionSingle("GuardaDocumentosClienteResult");
+					resultado = (String) getSingle(xr, "GuardaDocumentosClienteResult", String.class);
+
+					if (resultado.contains("#")) {
+						sql = "UPDATE D_CLINUEVOT_IMAGEN SET STATCOM ='S' WHERE CODIMAGEN = '"+codigoImg+"'";
+						db.execSQL(sql);
+					}
+
+					DT.moveToNext();
+				}
+			}
+
+		} catch (Exception e) {
+			mu.msgbox("EnvioDocumentos: "+ e.getMessage());
 		}
 	}
 

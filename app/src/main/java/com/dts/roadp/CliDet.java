@@ -997,8 +997,12 @@ public class CliDet extends PBase {
 					if ((claseFinDia.getDeposito() != 4) && (claseFinDia.getDocPendientesDeposito()>0)) {
 						runVenta();
 					}else{
-						msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
-						return;
+						if (claseFinDia.getDocPendientesDeposito()!=0 || claseFinDia.getDeposito() == 4)	{
+							msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
+							return;
+						}else{
+							runVenta();
+						}
 					}
 				}
 			}
@@ -1022,7 +1026,7 @@ public class CliDet extends PBase {
             }else{
 				clsFinDia claseFinDia;
 				claseFinDia = new clsFinDia(this);
-				//#CKFK 20190305 Agregué validación para verificar si ya se realizó el depósito
+				//#CKFK 20220426 Agregué validación para verificar si ya se realizó el depósito
 				if ((claseFinDia.getDeposito() != 4) && (claseFinDia.getDocPendientesDeposito()>0)) {
 					try {
 						startActivity(new Intent(this, activity_despacho_list.class));
@@ -1030,8 +1034,16 @@ public class CliDet extends PBase {
 						addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 					}
 				}else{
-					msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
-					return;
+					if (claseFinDia.getDocPendientesDeposito()!=0 || claseFinDia.getDeposito() == 4)	{
+						msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
+						return;
+					}else{
+						try {
+							startActivity(new Intent(this, activity_despacho_list.class));
+						} catch (Exception e) {
+							addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+						}
+					}
 				}
 			}
 		}catch (Exception e){

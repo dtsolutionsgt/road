@@ -6871,6 +6871,13 @@ public class ComWS extends PBase {
 			dbld.add("DELETE FROM D_REPFINDIA WHERE RUTA='" + gl.ruta + "'");
 			dbld.insert("D_REPFINDIA", "WHERE (LINEA>=0)");
 
+			dbld.add("IF NOT EXISTS(SELECT RUTA FROM D_FINDIA WHERE RUTA = '" + gl.ruta + "' " +
+					"AND fecha = '" + du.getActDate() + "')  " +
+					" BEGIN ");
+			dbld.add("INSERT INTO D_FINDIA (RUTA, FECHA, FINDIA)" +
+					" VALUES ('" + gl.ruta + "','" + du.getActDate() + "',1)");
+			dbld.add(" END ");
+
 			if (envioparcial && !esEnvioManual) {
 				if (commitSQL() == 1) {
 					pc = 3;

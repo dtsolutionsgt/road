@@ -1149,8 +1149,9 @@ public class CliDet extends PBase {
 
 	public void setGPS(View view) {
 		try{
-			browse=2;
-			startActivity(new Intent(this,CliGPS.class));
+			//#CKFK20220516 Se puso en comentario porque se va a modificar con los demás datos del cliente
+			//browse=2;
+			//startActivity(new Intent(this,CliGPS.class));
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

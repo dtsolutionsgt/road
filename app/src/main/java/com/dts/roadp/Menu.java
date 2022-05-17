@@ -322,6 +322,7 @@ public class Menu extends PBase {
 					break;
 
 				case 2:  // Comunicacion
+					gl.enviaMov=false;
 					getWSURLs();
 					gl.findiaactivo=false;
 					gl.tipo = 0;

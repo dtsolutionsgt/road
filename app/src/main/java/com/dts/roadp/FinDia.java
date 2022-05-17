@@ -105,6 +105,9 @@ public class FinDia extends PBase {
     public void iniciaCierreDia(){
 
         try{
+
+            gl.enviaMov =false;
+
             //#HS_20181128_0906 Agregue validacion para FinDia.
             if (gl.banderafindia) {
                 //if (validaFinDia()) #CKFK 20190305 Quité la validación de aquí

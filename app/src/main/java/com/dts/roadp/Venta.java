@@ -12,6 +12,7 @@ import android.inputmethodservice.ExtractEditText;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -1611,7 +1612,11 @@ public class Venta extends PBase {
 		if (!isDialogBarraShowed) 	{
 
 			if (barcode.length()>18){
-				gl.barra=barcode.substring(0,18);
+				if (Build.VERSION.SDK_INT >= 28){
+					gl.barra=barcode.substring(0,18);
+				}else{
+					gl.barra=barcode.substring(1,18);
+				}
 				barcode=gl.barra;
 			}else{
 				gl.barra=barcode;

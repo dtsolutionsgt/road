@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -663,7 +664,11 @@ public class despacho_barras extends PBase {
         if (!isDialogBarraShowed) 	{
 
             if (barcode.length()>18){
-                gl.barra=barcode.substring(0,18);
+                if (Build.VERSION.SDK_INT >= 28){
+                    gl.barra=barcode.substring(0,18);
+                }else{
+                    gl.barra=barcode.substring(1,18);
+                }
                 barcode=gl.barra;
             }else{
                 gl.barra=barcode;

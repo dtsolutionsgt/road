@@ -2980,9 +2980,10 @@ public class ComWS extends PBase {
 			fprog = "Procesando: " + (rc - 1) + " de: " + (rc - 1);
 			wsRtask.onProgressUpdate();
 
+			encodePrinters();
+
 			if (modo_recepcion==1){
 				Actualiza_FinDia();
-				encodePrinters();
 				encodeLicence();
 				//encodeLicenceRuta();
 

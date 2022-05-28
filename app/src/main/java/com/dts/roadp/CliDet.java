@@ -1049,7 +1049,11 @@ public class CliDet extends PBase {
 						msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
 						return;
 					}else{
-						runVenta();
+						try {
+							startActivity(new Intent(this, activity_despacho_list.class));
+						} catch (Exception e) {
+							addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+						}
 					}
 				}
 			}

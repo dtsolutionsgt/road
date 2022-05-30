@@ -454,8 +454,9 @@ public class Repesaje extends PBase {
 
     private void applyBarra() {
         Cursor dt;
-        double rf,pp0,pp,ppr,tp,dtp;
+        double rf,pp0,pp,ppr,tp,dtp,factbolsa;
         String bar;
+        String umstk,umven;
 
         try {
 
@@ -471,8 +472,18 @@ public class Repesaje extends PBase {
                 tcantidad=dt.getDouble(2);
                 tp+=ppr;
 
+                umstk=app.umStock(prodid);
+                umven=app.umVenta(prodid);
+                factbolsa = app.factorPres(prodid,umven,umstk);
+
+                if (factbolsa > 1) {
+                    ttotal = tcantidad * factbolsa * tprecio;
+                }else{
+                    ttotal = tprecio;
+                }
+
                 if (prodPorPeso(prodid)) ttotal=mu.round2(tprecio*ppr);
-                else ttotal=tprecio*tcantidad;
+                //else ttotal=tprecio*tcantidad;
 
                 sql="UPDATE T_BARRA SET PESO="+ppr+", PRECIO="+ttotal+" WHERE CODIGO='"+prodid+"' AND BARRA='"+bar+"'";
                 db.execSQL(sql);

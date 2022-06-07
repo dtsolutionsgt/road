@@ -454,8 +454,8 @@ public class Repesaje extends PBase {
 
     private void applyBarra() {
         Cursor dt;
-        double rf,pp0,pp,ppr,tp,dtp;
-        String bar;
+        double rf,pp0,pp,ppr,tp,dtp, factbolsa;
+        String bar, umstk, umven;
 
         try {
 
@@ -471,8 +471,17 @@ public class Repesaje extends PBase {
                 tcantidad=dt.getDouble(2);
                 tp+=ppr;
 
+                umstk=app.umStock(prodid);
+                umven=app.umVenta(prodid);
+                factbolsa = app.factorPres(prodid,umven,umstk);
+
+                if (factbolsa > 1) {
+                    ttotal = tcantidad * factbolsa * tprecio;
+                }else{
+                    ttotal = tprecio*tcantidad;
+                }
                 if (prodPorPeso(prodid)) ttotal=mu.round2(tprecio*ppr);
-                else ttotal=tprecio*tcantidad;
+                //else ttotal=tprecio*tcantidad;
 
                 sql="UPDATE T_BARRA SET PESO="+ppr+", PRECIO="+ttotal+" WHERE CODIGO='"+prodid+"' AND BARRA='"+bar+"'";
                 db.execSQL(sql);
@@ -491,8 +500,18 @@ public class Repesaje extends PBase {
             pp=dt.getDouble(1);
             tcantidad=dt.getDouble(2);
 
+            umstk=app.umStock(prodid);
+            umven=app.umVenta(prodid);
+            factbolsa = app.factorPres(prodid,umven,umstk);
+
+            if (factbolsa > 1) {
+                ttotal = tcantidad * factbolsa * tprecio;
+            }else{
+                ttotal = tprecio*tcantidad;
+            }
+
             if (prodPorPeso(prodid)) ttotal=mu.round2(tprecio*(pp+dtp));
-            else ttotal=tprecio*tcantidad;
+            //else ttotal=tprecio*tcantidad;
 
             // agregar la diferencia a la primera barra
             sql="UPDATE T_BARRA SET PESO=PESO+"+dtp+", PRECIO="+ttotal+" WHERE CODIGO='"+prodid+"' AND BARRA='"+bar+"'";
@@ -504,8 +523,18 @@ public class Repesaje extends PBase {
             dt.moveToFirst();
             tcantidad=dt.getDouble(0);
 
+            umstk=app.umStock(prodid);
+            umven=app.umVenta(prodid);
+            factbolsa = app.factorPres(prodid,umven,umstk);
+
+            if (factbolsa > 1) {
+                ttotal = tcantidad * factbolsa * tprecio;
+            }else{
+                ttotal = tprecio*tcantidad;
+            }
+
            if (prodPorPeso(prodid)) ttotal=mu.round2(tprecio*tpeso);
-           else ttotal=tprecio*tcantidad;
+           //else ttotal=tprecio*tcantidad;
 
            lblPrec.setText(mu.frmdecimal(ttotal,2));
 

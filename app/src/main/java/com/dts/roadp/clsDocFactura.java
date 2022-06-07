@@ -45,7 +45,7 @@ public class clsDocFactura extends clsDocument {
 
 
 		try {
-			sql=" SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2,IMPRES, ANULADO " +
+			sql=" SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2,IMPRES, ANULADO, FECHAENTR " +
 				" FROM D_FACTURA WHERE COREL='"+corel+"'";
 			DT=Con.OpenDT(sql);
 
@@ -107,7 +107,7 @@ public class clsDocFactura extends clsDocument {
 			}
 
 		} catch (Exception e) {
-			//Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
+			Toast.makeText(cont,e.getMessage(), Toast.LENGTH_SHORT).show();return false;
 	    }	
 		
 		try {

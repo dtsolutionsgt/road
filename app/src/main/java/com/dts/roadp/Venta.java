@@ -987,7 +987,15 @@ public class Venta extends PBase {
 			ins.init("T_VENTA");
 
 			ins.add("PRODUCTO",prodid);
-            ins.add("SIN_EXISTENCIA",0);
+			ins.add("SIN_EXISTENCIA",0);
+
+			//#CKFK20220606 Validamos si es con existencia o sin existencia por el tipo de producto
+			/*if (gl.tolprodcrit) {
+				ins.add("SIN_EXISTENCIA",1);
+			} else {
+				ins.add("SIN_EXISTENCIA",0);
+			}*/
+
 			ins.add("EMPRESA",emp);
 
             if (rutatipo.equalsIgnoreCase("V")) {

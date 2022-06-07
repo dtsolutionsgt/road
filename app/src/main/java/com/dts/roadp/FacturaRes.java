@@ -292,11 +292,14 @@ public class FacturaRes extends PBase {
 	public void paySelect(View view) {
 
 		try{
+
 			if (!tieneCanastas()) return;
 
 			if (fcorel==0) {
 				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
 			}
+
+			rl_facturares.setVisibility(View.INVISIBLE);
 
 			gl.pagoval=tot;
 			gl.pagolim=tot;
@@ -305,11 +308,13 @@ public class FacturaRes extends PBase {
 
 			Intent intent = new Intent(this,Pago.class);
 			startActivity(intent);
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 			mu.msgbox("paySelect: " + e.getMessage());
+		}finally {
+			rl_facturares.setVisibility(View.VISIBLE);
 		}
-
 	}
 
 	public void checkedBox(View view){
@@ -380,14 +385,17 @@ public class FacturaRes extends PBase {
 				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
 			}
 
+			rl_facturares.setVisibility(View.INVISIBLE);
+
 			//inputEfectivo();
 			inputVuelto();
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("payCash: " + e.getMessage());
+		}finally {
+			rl_facturares.setVisibility(View.VISIBLE);
 		}
-
 	}
 
 	public void payCred(View view) {
@@ -399,11 +407,15 @@ public class FacturaRes extends PBase {
 				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
 			}
 
+			rl_facturares.setVisibility(View.VISIBLE);
+
 			inputCredito();
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("payCred: " + e.getMessage());
+		}finally {
+			rl_facturares.setVisibility(View.VISIBLE);
 		}
 
 	}
@@ -815,6 +827,19 @@ public class FacturaRes extends PBase {
 
 			db.beginTransaction();
 
+			//#CKFK0220606 Agregué estas validaciones al inicio del guardar de la factura
+			if (!consistenciaLotes()) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),"Inconsistencia de lotes , producto : "+consprod+" / "+corel,"");
+				db.endTransaction();
+				mu.msgbox("Inconsistencia de lotes , producto : "+consprod+" / "+corel);return false;
+			};
+
+			if (!consistenciaBarras()) {
+				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),"Inconsistencia de barras "+corel,"");
+				db.endTransaction();
+				mu.msgbox("Inconsistencia de barras , producto : "+consprod+" / "+corel);return false;
+			};
+
 			//region D_FACTURA
 
 			sql="SELECT SUM(TOTAL),SUM(DESMON),SUM(IMP),SUM(PESO) FROM T_VENTA";
@@ -1164,13 +1189,6 @@ public class FacturaRes extends PBase {
 
 				dt.moveToNext();
 			}
-
-			if (!consistenciaLotes()) {
-				addlog(new Object(){}.getClass().getEnclosingMethod().getName(),"Inconsistencia de lotes , producto : "+consprod+" / "+corel,"");
-				db.endTransaction();
-				mu.msgbox("Inconsistencia de lotes , producto : "+consprod+" / "+corel);return false;
-			};
-
 
 			//endregion
 
@@ -1871,6 +1889,38 @@ public class FacturaRes extends PBase {
 			return true;
 		} catch (Exception e) {
 			consprod=prod;
+			return false;
+		}
+
+	}
+
+	private boolean consistenciaBarras() {
+		Cursor dt,dtl;
+		String barra="", barra2="", proddup="";
+
+		consprod="";
+
+		try {
+			sql="SELECT BARRA,CODIGO,PESO FROM T_BARRA WHERE BARRA IN (SELECT BARRA FROM D_STOCKB_DEV)";
+			dt=Con.OpenDT(sql);
+			if (dt.getCount()==0) return true;
+
+			dt.moveToFirst();
+			while (!dt.isAfterLast()) {
+				barra=dt.getString(0);
+				proddup=dt.getString(1);
+
+				sql="SELECT BARRA FROM D_STOCKB_DEV WHERE (BARRA='" + barra + "') ";
+				dtl=Con.OpenDT(sql);
+
+				if (barra.equals(barra2)) throw new Exception("Barra duplicada " + barra);
+
+				dt.moveToNext();
+			}
+
+			return true;
+		} catch (Exception e) {
+			consprod=proddup;
 			return false;
 		}
 

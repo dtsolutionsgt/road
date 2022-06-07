@@ -290,6 +290,15 @@ public class CliDet extends PBase {
 	}
 
 	public void showCredit(View viev){
+
+		clsFinDia claseFinDia;
+		claseFinDia = new clsFinDia(this);
+		//#CKFK20220530 Agregué validación para verificar si ya se realizó el depósito
+		if (claseFinDia.getDeposito() == 4)	{
+			msgbox("Ya realizó el depósito, no puede hacer nuevas cobros o anule el depósito realizado");
+			return;
+		}
+
 		if (!permiteVenta) {
 			if (gl.peVentaGps == 1) {
 				msgbox("¡Distancia del cliente "+ sgp1 +" es mayor que la permitida "+ sgp2 + "!\nPara realizar el cobro debe acercarse más al cliente.");
@@ -304,6 +313,15 @@ public class CliDet extends PBase {
 	}
 
 	public void showDevol(View view){
+
+		clsFinDia claseFinDia;
+		claseFinDia = new clsFinDia(this);
+		//#CKFK20220530 Agregué validación para verificar si ya se realizó la devolución a Bodega
+		if ((claseFinDia.getDevBodega() == 5)) {
+			msgbox("Ya realizó la devolución a Bodega, no puede hacer nuevas notas de Crédito o anule la devolución realizada");
+			return;
+		}
+
 		Toast.makeText(this, "gl.validar_posicion_georef: "+gl.validar_posicion_georef+" georefPrefactura: "+georefPrefactura+" permiteVenta: "+permiteVenta+ " Distancia Clie-Vend: "+(gl.gpsdist - rangoGPS)+" MargenGps: "+rangoGPS, Toast.LENGTH_LONG).show();
 
 		if (!permiteVenta) {

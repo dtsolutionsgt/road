@@ -1776,7 +1776,7 @@ public class ComWS extends PBase {
                     }
                 }
             } else {
-                if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK")) {
+                if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK") || delcmd.equalsIgnoreCase("DELETE FROM P_STOCKB")) {
                     if (rc == 1) {
                         stockflag = 0;
                     } else {
@@ -2551,8 +2551,6 @@ public class ComWS extends PBase {
 
 		try {
 
-
-
 			if (TieneInventarioSinVentas()) {
 				return false;
 			}
@@ -2980,14 +2978,18 @@ public class ComWS extends PBase {
 			fprog = "Procesando: " + (rc - 1) + " de: " + (rc - 1);
 			wsRtask.onProgressUpdate();
 
-			encodePrinters();
-
 			if (modo_recepcion==1){
 				Actualiza_FinDia();
 				encodeLicence();
 				//encodeLicenceRuta();
 
+				encodePrinters();
+
 				fechaCarga();
+				//SetStatusRecToTrans("1");
+			}
+
+			if (modo_recepcion==1 || modo_recepcion==2){
 				SetStatusRecToTrans("1");
 			}
 
@@ -3042,12 +3044,17 @@ public class ComWS extends PBase {
 					sql = "SELECT Codigo FROM P_STOCK UNION SELECT Codigo FROM P_STOCKB ";
 				}
 				Cursor dt = Con.OpenDT(sql);
-				if (dt.getCount() > 0) s = s + "\nSe actualizó inventario.";
+				if (dt.getCount() > 0){
+					stockflag = 1;
+					s = s + "\nSe actualizó inventario.";
+				}
 
 				clsAppM.estandartInventario();
 				clsAppM.estandartInventarioPedido();
 
-				if (stockflag == 1) sendConfirm();
+				if (stockflag == 1) {
+					sendConfirm();
+				}
 			}
 
 			if (modo_recepcion==1 ){
@@ -3388,7 +3395,7 @@ public class ComWS extends PBase {
          	idbg = TN;
 			wsRtask.onProgressUpdate();
 
-			if (modo_recepcion == 4) {
+			if (modo_recepcion == 4 || modo_recepcion == 2) {
 				String ntablas[] = {"P_STOCK", "P_STOCK_PALLET", "P_STOCKB"};
 
 				for (int i = 0; i < ntablas.length; i++) {
@@ -8045,7 +8052,8 @@ public class ComWS extends PBase {
 			imgRec.setVisibility(View.INVISIBLE);
 
 			//Tiene documentos
-			boolean TieneFact, TienePedidos, TieneCobros, TieneDevol, YaComunico, TieneInventario, TieneCanastas, TieneOtros;
+			boolean TieneFact, TienePedidos, TieneCobros, TieneDevol, YaComunico, TieneInventario,
+					TieneCanastas, TieneOtros, TieneAtenciones;
 
 			if (!envioparcial) {
 				TieneFact = (clsAppM.getDocCountTipo("Facturas", false) > 0 ? true : false);
@@ -8055,6 +8063,7 @@ public class ComWS extends PBase {
 				YaComunico = (claseFindia.getComunicacion() == 2 ? true : false);
 				TieneInventario = (clsAppM.getDocCountTipo("Inventario", false) > 0 ? true : false);
 				TieneCanastas = (clsAppM.getDocCountTipo("Canastas", false) > 0 ? true : false);
+				TieneAtenciones = (clsAppM.getDocCountTipo("Atenciones", false) > 0 ? true : false);
 			} else {
 				TieneFact = (clsAppM.getDocCountTipo("Facturas", true) > 0 ? true : false);
 				TienePedidos = (clsAppM.getDocCountTipo("Pedidos", true) > 0 ? true : false);
@@ -8063,6 +8072,7 @@ public class ComWS extends PBase {
 				YaComunico = (claseFindia.getComunicacion() == 2 ? true : false);
 				TieneInventario = (clsAppM.getDocCountTipo("Inventario", true) > 0 ? true : false);
 				TieneCanastas = (clsAppM.getDocCountTipo("Canastas", true) > 0 ? true : false);
+				TieneAtenciones = (clsAppM.getDocCountTipo("Atenciones", true) > 0 ? true : false);
 			}
 
 			if (gl.peModal.equalsIgnoreCase("TOL")) {
@@ -8099,7 +8109,8 @@ public class ComWS extends PBase {
 						}
 					}
 				} else {
-					if ((!YaComunico) && !(TieneFact || TienePedidos || TieneCanastas) && !TieneCobros && !TieneDevol) {
+					if ((!YaComunico) && !(TieneFact || TienePedidos || TieneCanastas) && !TieneCobros && !TieneDevol
+					    && !(rutatipo.equalsIgnoreCase("P") && TieneAtenciones)) {
 						lblRec.setVisibility(View.VISIBLE);
 						imgRec.setVisibility(View.VISIBLE);
 						lblEnv.setVisibility(View.INVISIBLE);

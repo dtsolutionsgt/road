@@ -292,7 +292,7 @@ public class Menu extends PBase {
 						startActivity(intentp);
 					} else {
 
-						if (!cierreRealizado()){
+						if (!cierreRealizado() && !cierreZGenerado()){
 
 							gl.filtrocli=-1;
 							Intent intent = new Intent(this, Clientes.class);
@@ -475,6 +475,28 @@ public class Menu extends PBase {
 			fechaUltimoCierre = claseFinDia.ultimoCierreFecha();
 			if (du.getActDate() == fechaUltimoCierre) {
 				msgbox("Fin de Día ya fue efectuado el día de hoy, cargue datos nuevamente");
+
+				rslt = true;
+			}
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+		return rslt;
+	}
+
+	private boolean cierreZGenerado(){
+		int CierreZ;
+		boolean rslt=false;
+		clsFinDia claseFinDia;
+
+		claseFinDia = new clsFinDia(this);
+
+		try{
+
+			CierreZ = claseFinDia.getGeneroCierreZ();
+			if (CierreZ == 6) {
+				msgbox("Cierre  Z ya fue efectuado el día de hoy, comunique los datos y cargue datos nuevamente");
 
 				rslt = true;
 			}
@@ -2129,7 +2151,7 @@ public class Menu extends PBase {
 
 			sql = "SELECT IFNULL(SUM(CANTREC),0) FROM D_CANASTA WHERE ANULADO = 0";
 			dt = Con.OpenDT(sql);
-			cantcan = dt.getLong(0);
+			cantcan += dt.getLong(0);
 
 			if(dt!=null) dt.close();
 

@@ -120,6 +120,11 @@ public class AppMethods {
 				case "Canastas":
 					sql="SELECT COUNT(IDCANASTA) AS CANT FROM D_CANASTA WHERE STATCOM = 'N'";
 					break;
+
+				case "Atenciones":
+					sql="SELECT COUNT(RUTA) AS CANT FROM D_ATENCION";
+					sql += (sinEnviar?" WHERE STATCOM = 'N'":"");
+					break;
 			}
 
 			DT=Con.OpenDT(sql);

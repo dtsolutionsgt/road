@@ -305,7 +305,8 @@ public class Producto extends PBase {
 					if (!mu.emptystr(famid)){
 						if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (P_PRODUCTO.LINEA='"+famid+"') ";
 					}
-					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') OR (P_PRODUCTO.CODIGO='" + vF + "')) ";
+					if (vF.length()>0) sql=sql+"AND ((P_PRODUCTO.DESCCORTA LIKE '%" + vF + "%') " +
+							                     "OR (P_PRODUCTO.CODIGO='" + vF + "')) ";
 					sql+="UNION ";
 
 					sql+="SELECT DISTINCT P_PRODUCTO.CODIGO, P_PRODUCTO.DESCCORTA, P_PRODPRECIO.UNIDADMEDIDA " +
@@ -349,7 +350,8 @@ public class Producto extends PBase {
 				case 3:  // Mercadeo comp
 					sql="SELECT CODIGO,NOMBRE,'' FROM P_MERPRODCOMP WHERE 1=1 ";
 					if (!mu.emptystr(famid)) {sql=sql+"AND (MARCA='"+famid+"') ";}
-					if (vF.length()>0) {sql=sql+"AND ((NOMBRE LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";}
+					if (vF.length()>0) {sql=sql+"AND ((NOMBRE LIKE '%" + vF + "%')" +
+							                    " OR (CODIGO LIKE '%" + vF + "%')) ";}
 
                     if (ordPorNombre) sql+="ORDER BY NOMBRE"; else sql+="ORDER BY CODIGO";
 					break;
@@ -357,7 +359,9 @@ public class Producto extends PBase {
                 case 4:
                     sql="SELECT CODIGO,DESCCORTA,UNIDBAS FROM P_PRODUCTO WHERE (P_PRODUCTO.ES_VENDIBLE=1) ";
                     if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
-                    if (vF.length()>0) sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";
+                    if (vF.length()>0) sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') " +
+							                   "OR (CODIGO LIKE '%" + vF + "%')" +
+							                   "OR (CODBARRA = '" + vF + "')) ";
                     if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
                     break;
             }

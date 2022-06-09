@@ -64,6 +64,7 @@ dependencies {
     implementation files('src/main/jniLibs/httpcore-4.4.10.jar')
     implementation files('src/main/jniLibs/httpclient-4.5.6.jar')
     implementation files('src/main/jniLibs/ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar')
+    implementation files('libs/SLN_INTEGRADOR_EDOC_PANAMA.jar')
 
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'

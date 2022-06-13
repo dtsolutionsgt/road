@@ -355,11 +355,13 @@ public class Producto extends PBase {
 					break;
 
                 case 4:
-                    sql="SELECT CODIGO,DESCCORTA,UNIDBAS FROM P_PRODUCTO WHERE (P_PRODUCTO.ES_VENDIBLE=1) ";
-                    if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
-                    if (vF.length()>0) sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') OR (CODIGO LIKE '%" + vF + "%')) ";
-                    if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
-                    break;
+					sql="SELECT CODIGO,DESCCORTA,UNIDBAS FROM P_PRODUCTO WHERE (P_PRODUCTO.ES_VENDIBLE=1) ";
+					if (!famid.equalsIgnoreCase("0")) sql=sql+"AND (LINEA='"+famid+"') ";
+					if (vF.length()>0) sql=sql+"AND ((DESCCORTA LIKE '%" + vF + "%') " +
+							" OR (CODIGO LIKE '%" + vF + "%') " +
+							" OR (CODBARRA = '" + vF + "')) ";
+					if (ordPorNombre) sql+="ORDER BY DESCCORTA"; else sql+="ORDER BY CODIGO";
+					break;
             }
 				
 			DT=Con.OpenDT(sql);

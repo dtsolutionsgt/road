@@ -255,7 +255,7 @@ public class ComWS extends PBase {
 				txtEmp.setText("320");
 			}
 
-			txtWS.setText("http://52.41.114.122/wsAndr/wsandr.asmx");
+			txtWS.setText("http://104.209.134.3/wsAndr/wsandr.asmx");
 
 			//txtRuta.setText("8001-1");
 			//txtEmp.setText("03");

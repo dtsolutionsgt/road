@@ -16,6 +16,11 @@ public class DateUtils {
 		long vy,vm,vd;
 		String s;
 
+		if (String.valueOf(f).length()==14) {
+			s = String.valueOf(f).substring(2, 14);
+			f = Long.valueOf(s);
+		}
+
 		if (String.valueOf(f).length()==12){
 			f = f/1000000;
 		}else{

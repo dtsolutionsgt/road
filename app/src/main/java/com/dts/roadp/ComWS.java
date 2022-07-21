@@ -201,8 +201,8 @@ public class ComWS extends PBase {
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
 			if (mu.emptystr(txtRuta.getText().toString())) {
-				txtRuta.setText("1");
-				txtEmp.setText("009");
+				txtRuta.setText("200");
+				txtEmp.setText("320");
 				txtWS.setText("http://190.34.215.189/wsandr/wsandr.asmx");
 			}
 		}
@@ -3091,7 +3091,7 @@ public class ComWS extends PBase {
 
 		//#HS_20181212 Agregue campos ID_TRANSACCION, REFERENCIA, ASIGNACION.
 		if (TN.equalsIgnoreCase("P_COBRO")) {
-			SQL = "SELECT  DOCUMENTO, EMPRESA, RUTA, CLIENTE, TIPODOC, VALORORIG, SALDO, CANCELADO, dbo.AndrDate(FECHAEMIT),dbo.AndrDate(FECHAV),'' AS CONTRASENA, ID_TRANSACCION, REFERENCIA, ASIGNACION ";
+			SQL = "SELECT  DOCUMENTO, EMPRESA, RUTA, CLIENTE, TIPODOC, VALORORIG, SALDO, CANCELADO, dbo.AndrDateIni(FECHAEMIT),dbo.AndrDateIni(FECHAV),'' AS CONTRASENA, ID_TRANSACCION, REFERENCIA, ASIGNACION ";
 			SQL += "FROM P_COBRO WHERE (RUTA='" + ActRuta + "') AND CLIENTE IN (SELECT CLIENTE FROM P_CLIRUTA WHERE (RUTA='" + ActRuta + "')) ";
 			return SQL;
 		}

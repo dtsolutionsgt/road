@@ -1603,10 +1603,11 @@ public class BaseDatosScript {
 					"[EMPRESA] TEXT NOT NULL,"+
 					"[DESCRIPCION] TEXT NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
-					"[DIRECCION] INTEGER NOT NULL,"+
+					"[DIRECCION] TEXT NOT NULL,"+
 					"[TELEFONO] TEXT NOT NULL,"+
 					"[NIT] TEXT NOT NULL,"+
 					"[TEXTO] TEXT NOT NULL,"+
+					"[TIPO_SUCURSAL] INTEGER NOT NULL," +
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

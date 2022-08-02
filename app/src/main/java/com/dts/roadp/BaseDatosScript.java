@@ -1829,7 +1829,6 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-
 			vSQL="CREATE TABLE [P_MEDIAPAGO] ("+
 					"[CODIGO] INTEGER NOT NULL,"+
 					"[NOMBRE] TEXT NOT NULL,"+
@@ -2307,6 +2306,15 @@ public class BaseDatosScript {
                     "PRIMARY KEY ([CODIGO])"+
                     ");";
             database.execSQL(vSQL);
+
+			//#CKFK20220802 Agregué la tabla P_MEDIDA
+			vSQL="CREATE TABLE [P_MEDIDA] ("+
+					"[CODIGO] INTEGER NOT NULL,"+
+					"[DESCRIPCION] TEXT NOT NULL,"+
+					"[CODIGO_CGI] TEXT NOT NULL,"+
+					"PRIMARY KEY ([CODIGO])"+
+					");";
+			database.execSQL(vSQL);
 
             return 1;
 

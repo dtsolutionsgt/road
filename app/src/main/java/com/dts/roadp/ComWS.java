@@ -3931,6 +3931,11 @@ public class ComWS extends PBase {
             return SQL;
         }
 
+		if (TN.equalsIgnoreCase("P_MEDIDA")) {
+			SQL = "SELECT CODIGO, DESCRIPCION, CODIGO_CGI FROM P_MEDIDA";
+			return SQL;
+		}
+
 		if (TN.equalsIgnoreCase("P_REF1")) {
 			SQL = "SELECT * FROM P_REF1";
 			return SQL;
@@ -4831,10 +4836,12 @@ public class ComWS extends PBase {
                     nombretabla="P_CANALSUB";break;
                 case 74:
                     nombretabla="P_DEPAR";break;
-                case 75://#CKFK 20210813 Cambié esto para el final
+				case 75:
+					nombretabla="P_MEDIDA";break;
+                case 76://#CKFK 20210813 Cambié esto para el final
                     nombretabla="Procesando tablas ...";break;
 
-                case 76:
+                case 77:
 					procesaDatos();
 					//#AT 20220322 Se cambia el valor de las variables
 					//gl.permitir_cantidad_mayor, gl.permitir_producto_nuevo, gl.validar_posicion_georef

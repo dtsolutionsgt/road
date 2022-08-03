@@ -85,9 +85,15 @@ public class ListAdaptCFDV extends BaseAdapter {
 			}
 
 			if (itemDetailsrrayList.get(position).Anulado.equalsIgnoreCase("N")) {
-				holder.iconAnulado.setImageResource(R.drawable.icok);
+				//holder.iconAnulado.setImageResource(R.drawable.icok);
+				holder.relConsPedido.setBackgroundColor(Color.rgb(97,224,135));
+				holder.iconAnulado.setVisibility(View.INVISIBLE);
+				holder.lblAnulado.setVisibility(View.INVISIBLE);
 			}else{
-				holder.iconAnulado.setImageResource(R.drawable.del_48);
+				holder.relConsPedido.setBackgroundColor(Color.rgb(248,160,165));
+				holder.iconAnulado.setVisibility(View.VISIBLE);
+				holder.lblAnulado.setVisibility(View.VISIBLE);
+				//holder.iconAnulado.setImageResource(R.drawable.del_48);
 			}
 		}
 

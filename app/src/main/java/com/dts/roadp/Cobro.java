@@ -751,7 +751,7 @@ public class Cobro extends PBase {
 
 							vItem = clsCls.new clsNCPP();
 							vItem.Factura = DT.getString(1);
-							vItem.MontoFact =  DT.getLong(2);
+							vItem.MontoFact =  DT.getDouble(2);
 							vItem.MontoDesc = vItem.MontoFact*(desc/100);
 							vItem.PorcDesc =  desc;
 							vItem.MontoFactPago = vItem.MontoFact-vItem.MontoDesc;

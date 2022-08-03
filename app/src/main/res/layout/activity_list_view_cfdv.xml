@@ -102,7 +102,8 @@
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="0dp"
             android:layout_toStartOf="@+id/lblAnulado"
-            android:src="@drawable/icok" />
+            android:src="@drawable/del_48"
+            tools:visibility="invisible" />
     </RelativeLayout>
 
 </RelativeLayout>

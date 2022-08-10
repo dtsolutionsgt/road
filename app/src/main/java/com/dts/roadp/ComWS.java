@@ -4049,7 +4049,9 @@ public class ComWS extends PBase {
 		}
 
 		if (TN.equalsIgnoreCase("P_SUCURSAL")) {
-			SQL = " SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO, TIPO_SUCURSAL " +
+			/*SQL = " SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO, TIPO_SUCURSAL " +
+					" FROM P_SUCURSAL WHERE CODIGO IN (SELECT SUCURSAL FROM P_RUTA WHERE CODIGO = '" + ActRuta + "')";*/
+			SQL = " SELECT CODIGO, EMPRESA, DESCRIPCION, NOMBRE, DIRECCION, TELEFONO, NIT, TEXTO " +
 					" FROM P_SUCURSAL WHERE CODIGO IN (SELECT SUCURSAL FROM P_RUTA WHERE CODIGO = '" + ActRuta + "')";
 			return SQL;
 		}
@@ -4836,12 +4838,12 @@ public class ComWS extends PBase {
                     nombretabla="P_CANALSUB";break;
                 case 74:
                     nombretabla="P_DEPAR";break;
-				case 75:
-					nombretabla="P_MEDIDA";break;
-                case 76://#CKFK 20210813 Cambié esto para el final
+				/*case 75:
+					nombretabla="P_MEDIDA";break;*/
+                case 75://#CKFK 20210813 Cambié esto para el final
                     nombretabla="Procesando tablas ...";break;
 
-                case 77:
+                case 76:
 					procesaDatos();
 					//#AT 20220322 Se cambia el valor de las variables
 					//gl.permitir_cantidad_mayor, gl.permitir_producto_nuevo, gl.validar_posicion_georef

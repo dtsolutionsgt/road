@@ -1598,7 +1598,7 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-			vSQL="CREATE TABLE [P_SUCURSAL] ("+
+			/*vSQL="CREATE TABLE [P_SUCURSAL] ("+
 					"[CODIGO] TEXT NOT NULL,"+
 					"[EMPRESA] TEXT NOT NULL,"+
 					"[DESCRIPCION] TEXT NOT NULL,"+
@@ -1608,6 +1608,17 @@ public class BaseDatosScript {
 					"[NIT] TEXT NOT NULL,"+
 					"[TEXTO] TEXT NOT NULL,"+
 					"[TIPO_SUCURSAL] INTEGER NOT NULL," +
+					"PRIMARY KEY ([CODIGO])"+
+					");";*/
+			vSQL="CREATE TABLE [P_SUCURSAL] ("+
+					"[CODIGO] TEXT NOT NULL,"+
+					"[EMPRESA] TEXT NOT NULL,"+
+					"[DESCRIPCION] TEXT NOT NULL,"+
+					"[NOMBRE] TEXT NOT NULL,"+
+					"[DIRECCION] TEXT NOT NULL,"+
+					"[TELEFONO] TEXT NOT NULL,"+
+					"[NIT] TEXT NOT NULL,"+
+					"[TEXTO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

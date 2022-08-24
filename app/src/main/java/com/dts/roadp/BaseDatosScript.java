@@ -754,6 +754,31 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX D_FACTURAD_MODIF_IDX2 ON D_FACTURAD_MODIF(ANULADO)";
 			database.execSQL(vSQL);
 
+			vSQL = "CREATE TABLE  [D_FACTURA_CONTROL_CONTINGENCIA](" +
+					"[IdTablaControl] INTEGER NOT NULL," +
+					"[Cufe] TEXT," +
+					"[TipoDocumento] TEXT," +
+					"[NumeroDocumento] TEXT," +
+					"[Sucursal] TEXT," +
+					"[Caja] TEXT," +
+					"[Estado] TEXT," +
+					"[Mensaje] TEXT," +
+					"[Valor_XML] TEXT," +
+					"[FechaEnvio] TEXT," +
+					"[TipoFactura] TEXT," +
+					"[Fecha_Agr] TEXT," +
+					"[QR] TEXT," +
+					"[COREL] TEXT," +
+					"[RUTA] TEXT," +
+					"[VENDEDOR] TEXT," +
+					"[HOST] TEXT," +
+					"[CODIGOLIQUIDACION] INTEGER," +
+					"[CORELATIVO] TEXT," +
+					"[QRIMAGE] TEXT," +
+					" PRIMARY KEY ([IdTablaControl])" +
+					" );";
+			database.execSQL(vSQL);
+
 			vSQL="CREATE TABLE [D_MOV] ("+
 					"[COREL] TEXT NOT NULL,"+
 					"[RUTA] TEXT NOT NULL,"+
@@ -1532,7 +1557,6 @@ public class BaseDatosScript {
 			vSQL="CREATE INDEX P_PRODUCTO_idx3 ON P_PRODUCTO(DESCCORTA)";
 			database.execSQL(vSQL);
 
-
 			vSQL="CREATE TABLE [P_DESCUENTO] ("+
 					"[CLIENTE] TEXT NOT NULL,"+
 					"[CTIPO] INTEGER NOT NULL,"+
@@ -1607,8 +1631,23 @@ public class BaseDatosScript {
 					"[TELEFONO] TEXT NOT NULL,"+
 					"[NIT] TEXT NOT NULL,"+
 					"[TEXTO] TEXT NOT NULL,"+
+					"[TIPO_SUCURSAL] INTEGER,"+
+			        "[CORREO] TEXT,"+
+			        "[COORDENADA_X] REAL NOT NULL,"+
+			        "[COORDENADA_Y] REAL NOT NULL,"+
+			        "[CODUBI] TEXT NOT NULL,"+
+			        "[TIPORUC] TEXT,"+
+					"[CODMUNI] TEXT,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
+			database.execSQL(vSQL);
+
+			vSQL="CREATE TABLE [P_MEDIDA](" +
+					"[CODIGO] TEXT NOT NULL," +
+					"[DESCRIPCION] TEXT," +
+					"[CODIGO_DGI] TEXT," +
+					" PRIMARY KEY([CODIGO])" +
+					" );";
 			database.execSQL(vSQL);
 
 			vSQL="CREATE TABLE [P_STOCK] ("+

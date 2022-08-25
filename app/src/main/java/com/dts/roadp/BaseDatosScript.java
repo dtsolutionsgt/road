@@ -1364,6 +1364,7 @@ public class BaseDatosScript {
 					"[GEOREFERENCIA_PREVENTA] INTEGER DEFAULT 0 NOT NULL,"+
 					"[GEOREFERENCIA_AUTOVENTA] INTEGER DEFAULT 0 NOT NULL,"+
 					"[TIPORECEPTOR] TEXT,"+
+					"[CIUDAD] TEXT,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

@@ -827,9 +827,13 @@ public class MainActivity extends PBase {
         String lic, lickey, licruta, rutaencrypt;
         Integer msgLic = 0;
 
-        if (gl.debug) return true;
+        if (gl.debug) {
+            return true;
+        }else{
+            return true;
+        }
 
-        try {
+      /*  try {
 
             lickey = cu.encrypt(gl.deviceId);
             rutaencrypt = cu.encrypt(gl.ruta);
@@ -878,9 +882,9 @@ public class MainActivity extends PBase {
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
             mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " : " + e.getMessage());
-        }
+        }*/
 
-        return false;
+        //return false;
 
     }
 

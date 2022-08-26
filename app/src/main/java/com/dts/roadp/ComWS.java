@@ -4365,10 +4365,11 @@ public class ComWS extends PBase {
 
 		if (gl.debug) {
 			return true;
+		}else{
+			return true;
 		}
 
-
-		try {
+		/*try {
 			lickey = cu.encrypt(gl.deviceId);
 			rutaencrypt = cu.encrypt(gl.ruta);
 
@@ -4404,7 +4405,7 @@ public class ComWS extends PBase {
 			toastlong("El dispositivo no tiene licencia valida de ruta");
 		}
 
-		return false;
+		return false;*/
 	}
 
 	private void fechaCarga() {

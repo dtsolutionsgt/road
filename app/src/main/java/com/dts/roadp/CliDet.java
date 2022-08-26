@@ -986,7 +986,7 @@ public class CliDet extends PBase {
 
 		try{
 			if (cantidad == 0){
-                if (gl.rutatipo.equalsIgnoreCase("V")) mu.msgbox("No hay existencias disponibles.");
+				if (gl.rutatipo.equalsIgnoreCase("V")) mu.msgbox("No hay existencias disponibles.");
 			}else{
 				if(gl.tiponcredito == 2){
 					return;
@@ -1020,13 +1020,13 @@ public class CliDet extends PBase {
 
 		try{
 			if(cantidad == 0){
-                if (gl.rutatipo.equalsIgnoreCase("D")) {
+				if (gl.rutatipo.equalsIgnoreCase("D")) {
 					msgAskListaPedidos("No hay existencias disponibles ¿Quiere continuar?");
 				}
-            }else{
+			}else{
 				clsFinDia claseFinDia;
 				claseFinDia = new clsFinDia(this);
-				//#CKFK 20190305 Agregué validación para verificar si ya se realizó el depósito
+				//#CKFK 20220426 Agregué validación para verificar si ya se realizó el depósito
 				if ((claseFinDia.getDeposito() != 4) && (claseFinDia.getDocPendientesDeposito()>0)) {
 					try {
 						startActivity(new Intent(this, activity_despacho_list.class));
@@ -1038,7 +1038,11 @@ public class CliDet extends PBase {
 						msgbox("Ya realizó el depósito, no puede hacer nuevas facturas o anule el depósito realizado");
 						return;
 					}else{
-						runVenta();
+						try {
+							startActivity(new Intent(this, activity_despacho_list.class));
+						} catch (Exception e) {
+							addlog(new Object() { }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+						}
 					}
 				}
 			}

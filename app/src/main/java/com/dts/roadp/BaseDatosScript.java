@@ -775,7 +775,7 @@ public class BaseDatosScript {
 					"[CODIGOLIQUIDACION] INTEGER," +
 					"[CORELATIVO] TEXT," +
 					"[QRIMAGE] TEXT," +
-					" PRIMARY KEY ([IdTablaControl])" +
+					" PRIMARY KEY ([IdTablaControl],[Cufe])" +
 					" );";
 			database.execSQL(vSQL);
 
@@ -1548,6 +1548,7 @@ public class BaseDatosScript {
                     "[UNIGRASAP] REAL NOT NULL,"+
                     "[UM_SALIDA] TEXT NOT NULL," +
 					"[ES_CANASTA] INTEGER NOT NULL,"+
+					"[SUBBODEGA] TEXT,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

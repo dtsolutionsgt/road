@@ -241,7 +241,7 @@ public class DepositoParc extends PBase {
 	
 		try {
 			
-			sql="SELECT COREL,ITEM,VALOR,DESC1,DESC2 FROM D_COBROP WHERE TIPO='C' AND DEPOS<>'S' ";
+			sql="SELECT COREL,ITEM,VALOR,DESC1,DESC2 FROM D_COBROP WHERE TIPO='C' AND DEPOS<>'S' AND ANULADO = 'N' ";
 			DT=Con.OpenDT(sql);
 			
 			DT.moveToFirst();
@@ -271,7 +271,7 @@ public class DepositoParc extends PBase {
 		
 		try {
 			
-			sql="SELECT COREL,ITEM,VALOR,DESC1,DESC2 FROM D_FACTURAP WHERE TIPO='C' AND DEPOS<>'S' ";
+			sql="SELECT COREL,ITEM,VALOR,DESC1,DESC2 FROM D_FACTURAP WHERE TIPO='C' AND DEPOS<>'S' AND ANULADO = 'N' ";
 			DT=Con.OpenDT(sql);
 			
 			DT.moveToFirst();
@@ -500,7 +500,7 @@ public class DepositoParc extends PBase {
 		try {
 			limf=0;limc=0;depos=0;
 			
-			sql="SELECT SUM(TOTAL) FROM D_FACTURA WHERE ANULADO='N'";
+			sql="SELECT SUM(TOTAL) FROM D_FACTURA WHERE ANULADO='N' ";
 			dt=Con.OpenDT(sql);
 
 			if (dt.getCount()>0) {

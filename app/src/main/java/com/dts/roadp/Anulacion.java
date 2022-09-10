@@ -780,13 +780,48 @@ public class Anulacion extends PBase {
 	}
 	
 	private void anulDeposParc(String itemid) {
+		Cursor DT;
+		String tdoc = "";
+
 		try{
+
+			db.beginTransaction();
+
 			sql="UPDATE D_DEPOS SET Anulado='S' WHERE COREL='"+itemid+"'";
 			db.execSQL(sql);
+
+			sql="SELECT DISTINCT DOCCOREL,TIPODOC FROM D_DEPOSD WHERE (COREL='"+itemid+"')";
+			DT=Con.OpenDT(sql);
+
+			DT.moveToFirst();
+			while (!DT.isAfterLast()) {
+
+				tdoc=DT.getString(1);
+
+				if (tdoc.equalsIgnoreCase("F")) {
+					sql="UPDATE D_FACTURA SET DEPOS='N' WHERE (COREL='"+DT.getString(0)+"')";
+				} else {
+					sql="UPDATE D_COBRO SET DEPOS='N' WHERE (COREL='"+DT.getString(0)+"')";
+				}
+
+				db.execSQL(sql);
+
+				DT.moveToNext();
+			}
+
+			if(DT!=null) DT.close();
+
+			sql="UPDATE FinDia SET val3 = 0, val4=0";
+			db.execSQL(sql);
+
+			db.setTransactionSuccessful();
+			db.endTransaction();
+
 		}catch (Exception e){
+
+			db.endTransaction();
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
-
 	}	
 	
 	private void anulRecarga(String itemid) {

@@ -95,41 +95,50 @@ public class ReportePrefactura extends PBase {
 
                     DD = Con.OpenDT(sqlP);
                     DD.moveToFirst();
-                    rutapreventa = DD.getString(1);
-                    pedido = DD.getString(0);
 
-                    sqlProd = "SELECT P.CODIGO,P.DESCCORTA, D.CANT,D.PESO, D.UMVENTA" +
-                            " FROM DS_PEDIDOD D INNER JOIN P_PRODUCTO P ON D.PRODUCTO = P.CODIGO" +
-                            " WHERE D.COREL='"+pedido+"'";
+                    if (DD.getCount() > 0 && DD != null) {
+                        while (!DD.isAfterLast()) {
 
-                    DP = Con.OpenDT(sqlProd);
+                            rutapreventa = DD.getString(1);
+                            pedido = DD.getString(0);
 
-                    item  = clsCls.new clsResPrefactura();
-                    item.codigoCli = DT.getString(0);
-                    item.nombreCli = DT.getString(1);
-                    item.Prefact = DD.getString(0);
-                    item.rutapreventa = rutapreventa;
-                    item.flag = 0;
+                            sqlProd = "SELECT P.CODIGO,P.DESCCORTA, D.CANT,D.PESO, D.UMVENTA" +
+                                    " FROM DS_PEDIDOD D INNER JOIN P_PRODUCTO P ON D.PRODUCTO = P.CODIGO" +
+                                    " WHERE D.COREL='"+pedido+"'";
 
-                    items.add(item);
+                            DP = Con.OpenDT(sqlProd);
 
-                    if (DP.getCount() > 0) {
-                        DP.moveToFirst();
+                            item  = clsCls.new clsResPrefactura();
+                            item.codigoCli = DT.getString(0);
+                            item.nombreCli = DT.getString(1);
+                            item.Prefact = DD.getString(0);
+                            item.rutapreventa = rutapreventa;
+                            item.flag = 0;
 
-                        while (!DP.isAfterLast()) {
+                            items.add(item);
 
-                            itemP = clsCls.new clsResPrefactura();
-                            itemP.codigoProd = DP.getString(0);
-                            itemP.nombreProd = DP.getString(1);
-                            itemP.cantidad = mu.frmdec(DP.getDouble(2));
-                            itemP.peso = mu.frmdec(DP.getDouble(3)) +" " +DP.getString(4);
-                            itemP.flag = 1;
+                            if (DP.getCount() > 0) {
+                                DP.moveToFirst();
 
-                            items.add(itemP);
+                                while (!DP.isAfterLast()) {
 
-                            DP.moveToNext();
+                                    itemP = clsCls.new clsResPrefactura();
+                                    itemP.codigoProd = DP.getString(0);
+                                    itemP.nombreProd = DP.getString(1);
+                                    itemP.cantidad = mu.frmdec(DP.getDouble(2));
+                                    itemP.peso = mu.frmdec(DP.getDouble(3)) +" " +DP.getString(4);
+                                    itemP.flag = 1;
+
+                                    items.add(itemP);
+
+                                    DP.moveToNext();
+                                }
+                            }
+
+                            DD.moveToNext();
                         }
                     }
+
                     DT.moveToNext();
                 }
 

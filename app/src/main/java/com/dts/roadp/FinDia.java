@@ -247,6 +247,8 @@ public class FinDia extends PBase {
                     db.execSQL(sql);
                     sql = "DELETE FROM D_FACTURAD_MODIF WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
+                    sql = "DELETE FROM D_FACTURA_CONTROL_CONTINGENCIA WHERE COREL='" + corel + "'";
+                    db.execSQL(sql);
                     sql = "DELETE FROM D_STOCKB_DEV WHERE COREL='" + corel + "'";
                     db.execSQL(sql);
                     sql = "DELETE FROM D_BONIF WHERE COREL='" + corel + "'";

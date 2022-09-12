@@ -226,4 +226,21 @@ public class clsClasses {
 		public String nombre;
 		public Bitmap img;
 	}
+
+	public class clsSucursal {
+		public String codigo, empresa, descripcion, nombre, telefono, nit, direccion, texto, correo, corx, cory, codubi, tipoRuc, codMuni = "", tipoSucursal;
+	}
+
+	public class clsCliente {
+		public String  tipoContribuyente, tipoRec, email, telefono, codPais, nombre, direccion, ciudad, muni = "", nit;
+	}
+
+	public class clsProducto {
+		public String  codigo, nombre, um, subBodega;
+	}
+
+	public class clsControlFEL {
+		int Id, CodLiquidacion;
+		String Cufe = "", TipoDoc = "", NumDoc = "", Sucursal = "", Caja = "", Estado = "", Mensaje = "", ValorXml = "", FechaEnvio = "", TipFac = "", FechaAgr = "", QR = "", Corel = "",Ruta = "", Vendedor = "", Host = "", Correlativo = "", QRImg = "";
+	}
 }

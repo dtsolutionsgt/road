@@ -498,5 +498,21 @@ public class DateUtils {
 		
 		return f;
 	}
+
+	public String getFechaCompleta() {
+		Calendar c = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		String strDate = sdf.format(c.getTime());
+
+		return strDate;
+	}
+
+	public String getFechaCompletaTest() {
+		Calendar c = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:ssZ");
+		String strDate = sdf.format(c.getTime());
+
+		return strDate;
+	}
 	
 }

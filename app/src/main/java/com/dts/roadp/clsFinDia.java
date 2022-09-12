@@ -376,6 +376,7 @@ public class clsFinDia extends PBase{
                     sql="DELETE FROM D_FACTURA_STOCK WHERE COREL='"+corel+"'";db.execSQL(sql);
                     sql="DELETE FROM D_FACTURAF WHERE COREL='"+corel+"'";db.execSQL(sql);
                     sql="DELETE FROM D_FACTURAD_MODIF WHERE COREL='"+corel+"'";db.execSQL(sql);
+                    sql="DELETE FROM D_FACTURA_CONTROL_CONTINGENCIA WHERE COREL='"+corel+"'";db.execSQL(sql);
                     sql="DELETE FROM D_CANASTA WHERE CORELTRANS='"+corel+"'";db.execSQL(sql);
 
                     sql = "DELETE FROM D_STOCKB_DEV WHERE COREL='" + corel + "'";db.execSQL(sql);

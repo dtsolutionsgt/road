@@ -31,9 +31,18 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.edocsdk.Fimador;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+
+import Entidades.Detalle;
+import Entidades.Receptor;
+import Entidades.RespuestaEdoc;
+import Entidades.gFormaPago;
+import Entidades.gRucRec;
+import Entidades.gUbiRec;
+import Entidades.rFE;
 
 public class FacturaRes extends PBase {
 
@@ -68,6 +77,15 @@ public class FacturaRes extends PBase {
 	private double dispventa;
 	private boolean acum,cleandprod,peexit,pago,saved,rutapos,porpeso,pagocompleto=false;
 
+	private clsClasses.clsMunicipio Municipio = clsCls.new clsMunicipio();
+	private clsClasses.clsDepartamento Departamento = clsCls.new clsDepartamento();
+	private clsClasses.clsSucursal Sucursal = clsCls.new clsSucursal();
+	private clsClasses.clsCliente Cliente = clsCls.new clsCliente();
+	private clsClasses.clsProducto Producto = clsCls.new clsProducto();
+	private clsClasses.clsControlFEL ControlFEL = clsCls.new clsControlFEL();
+
+	private rFE Factura = new rFE();
+	private Detalle detalle = new Detalle();
 
 	@SuppressLint("MissingPermission")
 	@Override
@@ -926,9 +944,139 @@ public class FacturaRes extends PBase {
 				ins.add("CODIGO_RUTA_PEDIDO","");
 			}
 
-			db.execSQL(ins.sql());
+			//region Emisor
+			if (getSucursal()) {
 
-			//endregion
+				//region Encabezado Factura FEL
+				Factura.gDGen.iTpEmis = "01"; // 'Fijo salvo que sea autorización en contingencia cambiar a valor 04
+				Factura.gDGen.iDoc = "01"; //'Para Factura fijo.
+				Factura.gDGen.dNroDF = String.valueOf(fcorel); //P_COREL.Correlativo
+				Factura.gDGen.dPtoFacDF = fserie; // BeSucursal.CODIGO '"002" 'Punto de Facturación del documento fiscal. (Ruta, Serie del disp.)
+				Factura.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";// 'Fecha de la FM.
+				Factura.gDGen.iNatOp = "01"; //'Venta fijo.
+				Factura.gDGen.iTipoOp = 1; //'Fijo.
+				Factura.gDGen.iDest = 1; //'Fijo 1
+				Factura.gDGen.iFormCAFE = 2; //'Fijo 2.
+				Factura.gDGen.iEntCAFE = 1; //'Fijo 2
+				Factura.gDGen.dEnvFE = 1; //'Fijo 1
+				Factura.gDGen.iProGen = 2; //'Fijo 2
+				Factura.gDGen.iTipoTranVenta = 1; // Fijo 1
+				Factura.gDGen.iTipoSuc = 2; //'Fijo 2
+				//endregion Encabezado Factura FEL
+
+				//region Emisor
+				Factura.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";  //'BeSucursal.NOMBRE
+				//El teléfono debe llevar el formato XXX-YYYY
+				Factura.gDGen.Emisor.dTfnEm = Sucursal.telefono;
+				Factura.gDGen.Emisor.dSucEm = Sucursal.codigo;
+				Factura.gDGen.Emisor.dCorElectEmi = Sucursal.correo;
+				//Las coordenadas van con signo y sin espacios.
+				Factura.gDGen.Emisor.dCoordEm = "+" + Sucursal.corx + ",-" + Sucursal.cory;
+				Factura.gDGen.Emisor.gUbiEm.dCodUbi = Sucursal.codubi;
+
+				Factura.gDGen.Emisor.dDirecEm = Sucursal.direccion;
+				Factura.gDGen.Emisor.gRucEmi.dRuc = Sucursal.nit;
+				Factura.gDGen.Emisor.gRucEmi.dDV = Sucursal.texto;
+				Factura.gDGen.Emisor.gRucEmi.dTipoRuc = Sucursal.tipoRuc;
+
+				if (!Sucursal.codMuni.isEmpty() || Sucursal.codMuni != null) {
+
+					getMunicipio(Sucursal.codMuni);
+					getDepartamento(Municipio.depar);
+
+					if (Municipio.nombre.contains("/")) {
+
+						String[] DireccionCompleta = Municipio.nombre.split("/");
+
+						Factura.gDGen.Emisor.gUbiEm.dCorreg = DireccionCompleta[1].trim().toUpperCase();
+						Factura.gDGen.Emisor.gUbiEm.dDistr = DireccionCompleta[0].trim().toUpperCase();
+
+						if (!Departamento.nombre.isEmpty()) {
+							Factura.gDGen.Emisor.gUbiEm.dProv = Departamento.nombre.toUpperCase();
+						} else {
+							Factura.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
+						}
+
+					} else {
+						msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+						return false;
+					}
+
+				}
+				//endregion Emisor
+
+				//region Receptor
+				if (!gl.cliente.isEmpty()) {
+
+					getCliente(gl.cliente);
+
+					Factura.gDGen.Receptor = new Receptor();
+					Factura.gDGen.Receptor.gRucRec = new gRucRec();
+					Factura.gDGen.Receptor.gUbiRec = new gUbiRec();
+
+					Factura.gDGen.Receptor.gRucRec.dTipoRuc = Cliente.tipoContribuyente;
+					Factura.gDGen.Receptor.iTipoRec = Cliente.tipoRec;
+					Factura.gDGen.Receptor.dCorElectRec = Cliente.email;
+					Factura.gDGen.Receptor.dTfnRec = Cliente.telefono;
+					Factura.gDGen.Receptor.cPaisRec = Cliente.codPais;
+					Factura.gDGen.Receptor.dNombRec = Cliente.nombre;
+					Factura.gDGen.Receptor.dDirecRec = Cliente.direccion;
+					Factura.gDGen.Receptor.gUbiRec.dCodUbi = Cliente.ciudad;
+
+					if (!Cliente.muni.isEmpty() || Cliente.muni != null) {
+
+						getMunicipio(Cliente.muni);
+						getDepartamento(Municipio.depar);
+
+						if (Municipio.nombre.contains("/")) {
+
+							String[] DireccionCompleta = Municipio.nombre.split("/");
+
+							Factura.gDGen.Receptor.gUbiRec.dCorreg = DireccionCompleta[1].trim().toUpperCase();
+							Factura.gDGen.Receptor.gUbiRec.dDistr = DireccionCompleta[0].trim().toUpperCase();
+
+							if (!Departamento.nombre.isEmpty()) {
+								Factura.gDGen.Receptor.gUbiRec.dProv = Departamento.nombre.toUpperCase();
+							} else {
+								Factura.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
+							}
+
+						} else {
+							msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+							return false;
+						}
+					}
+
+					if (!Cliente.nit.contains("D")) {
+						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
+						return false;
+					} else {
+						String[] DVRuc = Cliente.nit.split("DV");
+
+						if (Factura.gDGen.Receptor.gRucRec.dTipoRuc.equals("01") || Factura.gDGen.Receptor.gRucRec.dTipoRuc.equals("03")) {
+							if (DVRuc.length > 1) {
+								Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+								Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
+							}
+						} else {
+							if (DVRuc.length > 1) {
+								Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+								Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
+							} else {
+								Factura.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
+								Factura.gDGen.Receptor.gRucRec.dDV = "";
+							}
+						}
+					}
+				} else {
+					msgbox("No se pudo obtener los datos del cliente");
+				}
+				//endregion Receptor
+			} else {
+				msgbox("No se pudo obtener los datos de la sucursal");
+			}
+
+			db.execSQL(ins.sql());
 
 			//region Bonificacion
 
@@ -1121,12 +1269,18 @@ public class FacturaRes extends PBase {
 			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK FROM T_VENTA";
 			dt=Con.OpenDT(sql);
 
+			Double TotalFact = 0.0;
+			int ContadorItem = 1;
+
 			dt.moveToFirst();
 			while (!dt.isAfterLast()) {
+
+				Detalle detalle = new Detalle();
 
 				porpeso=prodPorPeso(dt.getString(0));
 				factpres=dt.getDouble(12);
 				peso=dt.getDouble(8);
+
 				vumstock=app.umStock(dt.getString(0));
 
 			  	ins.init("D_FACTURAD");
@@ -1185,10 +1339,79 @@ public class FacturaRes extends PBase {
 					ins.add("UMVENTA", vumventa);
 
 					db.execSQL(ins.sql());
+
 				}
+
+				//AT20220822 Acá va el detalle de la factura
+				getProducto(dt.getString(0));
+
+				detalle.dSecItem = ContadorItem;
+				detalle.dDescProd = Producto.nombre; //Hay que ver de donde se obtiene el nombre del producto
+				detalle.dCodProd = Producto.codigo;
+
+				if (!Producto.um.isEmpty()) {
+					String CodDGI;
+
+					if (porpeso) {
+						CodDGI = getUMDGI(gl.umpeso);
+					} else {
+						CodDGI = getUMDGI(Producto.um);
+					}
+
+					if (!CodDGI.isEmpty()) {
+						detalle.cUnidad = CodDGI.toLowerCase();
+					} else {
+						detalle.cUnidad = Producto.um.toLowerCase(); //Utiliza codigo de la cgi hy que sacarlo con una consulta
+					}
+				}
+
+				//Definir que se va enviar en la cantidad.
+				if (porpeso) {
+					detalle.dCantCodInt = String.valueOf(vpeso);
+				} else {
+					if (app.esRosty(Producto.codigo)) {
+						detalle.dCantCodInt = String.valueOf(vcant * factpres);
+					} else {
+						detalle.dCantCodInt = String.valueOf(vcant);
+					}
+				}
+
+				String TotalItem = String.valueOf(mu.round2(dt.getDouble(6)));
+
+				detalle.dCodCPBSabr = Producto.subBodega.substring(0,2);
+				detalle.dCodCPBScmp = Producto.subBodega;
+				detalle.gPrecios.dPrUnit = String.valueOf(dt.getDouble(7));
+				detalle.gPrecios.dPrUnitDesc = "0.000000";
+				detalle.gPrecios.dPrItem = TotalItem;
+				detalle.gPrecios.dValTotItem = TotalItem;
+				detalle.gITBMSItem.dTasaITBMS = "00";
+				detalle.gITBMSItem.dValITBMS = "0.00";
+
+				Factura.Detalles.add(detalle);
+
+				ContadorItem++;
+				TotalFact += mu.round2(dt.getDouble(6));
 
 				dt.moveToNext();
 			}
+
+			gFormaPago Pagos = new gFormaPago();
+
+			String Total = String.valueOf(TotalFact);
+
+			Factura.gTot.dTotNeto = Total;
+			Factura.gTot.dTotITBMS = "0.00";
+			Factura.gTot.dTotGravado = "0.00";
+			Factura.gTot.dTotDesc = "0.00";
+			Factura.gTot.dVTot = Total;
+			Factura.gTot.dTotRec = Total;
+			Factura.gTot.dNroItems = String.valueOf(Factura.Detalles.size());
+			Factura.gTot.dVTotItems = Total;
+			Pagos.dVlrCuota = Total;
+			//AT20220823 Formas de pago
+			Pagos.iFormaPago = "01";
+			Factura.gTot.iPzPag = "1";
+			Factura.gTot.gFormaPago.add(Pagos);
 
 			//endregion
 
@@ -1535,9 +1758,249 @@ public class FacturaRes extends PBase {
             mu.msgbox("Error (factura) " + e.getMessage());return false;
         }
 
+		try {
+			Fimador Xlm = new Fimador(this);
+
+			String urltoken = "https://labpa.guru-soft.com/EdocPanama/4.0/Autenticacion/Api/ServicioEDOC?Id=1";
+			String usuario = "edocTOLEDANO_8945";
+			String clave = "wsTOLEDANO_8945";
+			String urlDoc = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/FacturaEnte";
+
+			RespuestaEdoc respuestageneradaBTB = Xlm.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, "2");
+
+			if (!respuestageneradaBTB.Estado.isEmpty() || respuestageneradaBTB.Estado != null) {
+
+				ControlFEL.Cufe = respuestageneradaBTB.Cufe;
+				ControlFEL.TipoDoc = Factura.gDGen.iDoc;
+				ControlFEL.NumDoc = Factura.gDGen.dNroDF;
+				ControlFEL.Sucursal = Factura.gDGen.dPtoFacDF;
+				ControlFEL.Caja = fserie;
+
+				if (respuestageneradaBTB.Estado.equals("21")) {
+					ControlFEL.Estado = "01";
+				} else {
+					ControlFEL.Estado = respuestageneradaBTB.Estado;
+				}
+
+				ControlFEL.Mensaje = respuestageneradaBTB.MensajeRespuesta;
+				ControlFEL.ValorXml = respuestageneradaBTB.XML;
+
+				String[] fechaEnvio = Factura.gDGen.dFechaEm.split("-05:00", 0);
+				ControlFEL.FechaEnvio = fechaEnvio[0];
+				ControlFEL.TipFac = Factura.gDGen.iDoc;
+				ControlFEL.FechaAgr = String.valueOf(du.getFechaCompleta());
+				ControlFEL.QR = respuestageneradaBTB.UrlCodeQR;
+				ControlFEL.Corel = corel;
+				ControlFEL.Ruta = gl.ruta;
+				ControlFEL.Vendedor = gl.vend;
+				ControlFEL.Correlativo = String.valueOf(fcorel);
+
+				if (respuestageneradaBTB.Estado.equals("2") || respuestageneradaBTB.Estado.equals("20")) {
+					toastlong("FACTURA CERTIFICADA CON EXITO -- " +" ESTADO: "+ respuestageneradaBTB.Estado +" - " + respuestageneradaBTB.MensajeRespuesta);
+				} else {
+					toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: "+ respuestageneradaBTB.Estado +" - " + respuestageneradaBTB.MensajeRespuesta);
+				}
+
+				InsertarFELControl();
+			}
+
+		} catch (Exception e){
+			Log.e("respuestageneradaBTB", e.getMessage());
+		}
+
 		saveAtten(tot);
 
 		return true;
+	}
+
+	public void getMunicipio(String CodMuni) {
+		Cursor dt;
+		try {
+			sql= "SELECT * FROM P_MUNI WHERE CODIGO = '"+CodMuni+"'";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			if (dt.getCount() > 0) {
+				Municipio.codigo = dt.getString(0);
+				Municipio.depar = dt.getString(1);
+				Municipio.nombre = dt.getString(2);
+			} else {
+				return;
+			}
+
+			if(dt!=null) dt.close();
+
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName()+" - "+e.getMessage());
+		}
+	}
+
+	public void getDepartamento(String CodDep) {
+		Cursor dt;
+		try {
+			sql= "SELECT * FROM P_DEPAR WHERE CODIGO = '"+CodDep+"'";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			if (dt.getCount() > 0) {
+				Departamento.nombre = dt.getString(2);
+			} else {
+				return;
+			}
+
+			if(dt!=null) dt.close();
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName()+" - "+e.getMessage());
+		}
+	}
+
+	private void getCliente(String CodCliente) {
+		Cursor dt;
+		try {
+			sql= "SELECT NOMBRE, TIPO_CONTRIBUYENTE, TIPORECEPTOR, EMAIL, TELEFONO, COD_PAIS, DIRECCION, CIUDAD, NIT, MUNICIPIO FROM P_CLIENTE WHERE CODIGO = '"+CodCliente+"'";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			if (dt.getCount() > 0) {
+				Cliente.nombre = dt.getString(0);
+				Cliente.tipoContribuyente = dt.getString(1);
+				Cliente.tipoRec = dt.getString(2);
+				Cliente.email = dt.getString(3);
+				Cliente.telefono = dt.getString(4);
+				Cliente.codPais = dt.getString(5);
+				Cliente.direccion = dt.getString(6);
+				Cliente.ciudad = dt.getString(7);
+				Cliente.nit = dt.getString(8);
+				Cliente.muni = dt.getString(9);
+			} else {
+				return;
+			}
+
+			if(dt!=null) dt.close();
+
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName()+" - "+e.getMessage());
+		}
+	}
+
+	private Boolean getSucursal() {
+		Cursor dt;
+		Boolean existe = false;
+
+		try {
+			sql="SELECT * FROM P_SUCURSAL";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			if (dt.getCount() > 0) {
+				Sucursal.codigo = dt.getString(0);
+				Sucursal.descripcion = dt.getString(2);
+				Sucursal.nombre = dt.getString(3);
+				Sucursal.direccion = dt.getString(4);
+				Sucursal.telefono = dt.getString(5);
+				Sucursal.nit = dt.getString(6);
+				Sucursal.texto = dt.getString(7);
+				Sucursal.tipoSucursal = dt.getString(8);
+				Sucursal.correo = dt.getString(9);
+				Sucursal.corx = dt.getString(10);
+				Sucursal.cory = dt.getString(11);
+				Sucursal.codubi = dt.getString(12);
+				Sucursal.tipoRuc = dt.getString(13);
+				Sucursal.codMuni = dt.getString(14);
+
+				existe = true;
+			}
+
+			if (dt != null) dt.close();
+
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
+
+		return existe;
+	}
+
+	private void getProducto(String Codigo) {
+		Cursor dt;
+		try {
+
+			sql="SELECT DESCLARGA, UNIDBAS, SUBBODEGA  FROM P_PRODUCTO " +
+				" WHERE CODIGO = '"+Codigo+"'";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			if (dt.getCount() > 0) {
+				Producto.codigo = Codigo;
+				Producto.nombre = dt.getString(0);
+				Producto.um = dt.getString(1);
+				Producto.subBodega = dt.getString(2);
+			}
+
+			if (dt != null) dt.close();
+
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
+	}
+
+	private String getUMDGI(String CodigoUM) {
+		Cursor dt;
+		String Codigo="";
+		try {
+			sql="SELECT CODIGO_DGI  FROM P_MEDIDA " +
+					" WHERE CODIGO = '"+CodigoUM+"'";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			if (dt.getCount() > 0) {
+				Codigo = dt.getString(0);
+			}
+
+			if (dt != null) dt.close();
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
+
+		return Codigo;
+	}
+
+	private void InsertarFELControl() {
+		Cursor dt;
+		try {
+
+			sql = "SELECT MAX(IdTablaControl) FROM D_FACTURA_CONTROL_CONTINGENCIA";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+			ControlFEL.Id = dt.getInt(0) + 1;
+
+			ins.init("D_FACTURA_CONTROL_CONTINGENCIA");
+
+			ins.add("IdTablaControl", ControlFEL.Id);
+			ins.add("Cufe", ControlFEL.Cufe);
+			ins.add("TipoDocumento", ControlFEL.TipoDoc);
+			ins.add("NumeroDocumento", ControlFEL.NumDoc);
+			ins.add("Sucursal", ControlFEL.Sucursal);
+			ins.add("Caja", ControlFEL.Caja);
+			ins.add("Estado", ControlFEL.Estado);
+			ins.add("Mensaje", ControlFEL.Mensaje);
+			ins.add("Valor_XML", ControlFEL.ValorXml);
+			ins.add("FechaEnvio", ControlFEL.FechaEnvio);
+			ins.add("TipoFactura", ControlFEL.TipFac);
+			ins.add("Fecha_Agr", ControlFEL.FechaAgr);
+			ins.add("QR", ControlFEL.QR);
+			ins.add("COREL", ControlFEL.Corel);
+			ins.add("RUTA", ControlFEL.Ruta);
+			ins.add("VENDEDOR", ControlFEL.Vendedor);
+			ins.add("HOST", ControlFEL.Host);
+			ins.add("CODIGOLIQUIDACION", ControlFEL.CodLiquidacion);
+			ins.add("CORELATIVO", ControlFEL.Correlativo);
+			ins.add("QRIMAGE", ControlFEL.QRImg);
+
+			db.execSQL(ins.sql());
+
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
 	}
 
 	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {

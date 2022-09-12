@@ -97,7 +97,7 @@ public class clsDataBuilder {
 			String vSQL = "PRAGMA table_info('"+tn+"')"; 
 			PRG=db.rawQuery(vSQL, null);
 			cc=PRG.getCount();
-			if (tn.equalsIgnoreCase("D_CANASTA")) cc--;
+			if (tn.equalsIgnoreCase("D_CANASTA") || tn.equalsIgnoreCase("D_FACTURA_CONTROL_CONTINGENCIA")) cc--;
 			PRG.moveToFirst();j=0;
 		
 			while (!PRG.isAfterLast()) {
@@ -106,6 +106,11 @@ public class clsDataBuilder {
 				t=PRG.getString(PRG.getColumnIndex("type"));
 
 				if (tn.equals("D_CANASTA") && n.equalsIgnoreCase("IDCANASTA")) {
+					PRG.moveToNext();
+					continue;
+				}
+
+				if (tn.equals("D_FACTURA_CONTROL_CONTINGENCIA") && n.equalsIgnoreCase("IdTablaControl")) {
 					PRG.moveToNext();
 					continue;
 				}

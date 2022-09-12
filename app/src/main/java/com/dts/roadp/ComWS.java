@@ -5397,6 +5397,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_FACTURAD_LOTES", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_FACTURAF", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_FACTURAD_MODIF", "WHERE COREL='" + cor + "'");
+					dbld.insert("D_FACTURA_CONTROL_CONTINGENCIA", "WHERE COREL = '"+ cor +"'");
 
 					dbld.insert("D_STOCKB_DEV", "WHERE COREL='" + cor + "'");
 					dbld.insert("D_BONIF", "WHERE COREL='" + cor + "'");

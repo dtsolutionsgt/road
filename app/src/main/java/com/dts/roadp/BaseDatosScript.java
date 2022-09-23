@@ -1882,6 +1882,7 @@ public class BaseDatosScript {
 					"[ACTIVO] TEXT NOT NULL,"+
 					"[NIVEL] INTEGER NOT NULL,"+
 					"[PORCOBRO] TEXT NOT NULL,"+
+					"[VIA_PAGO_DGI] TEXT,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

@@ -1621,6 +1621,10 @@ public class BaseDatosScript {
 					"[LOTE_POR_DEFECTO] TEXT NOT NULL,"+
 					"[INCIDENCIA_NO_LECTURA] INTEGER NOT NULL," +
 					"[IMPRIMIR_TOTALES_PEDIDO] INTEGER,"+
+					"[URL_AUTENTICACION] TEXT,"+
+					"[USUARIO_API] TEXT,"+
+			        "[CLAVE_API] TEXT,"+
+			        "[URL_ANULACION] TEXT,"+
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
 			database.execSQL(vSQL);

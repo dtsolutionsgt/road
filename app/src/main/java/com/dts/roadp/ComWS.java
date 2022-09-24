@@ -399,7 +399,7 @@ public class ComWS extends PBase {
 
 			if (gl.banderafindia) {
 
-				int fechaUltimoCierre;
+				long fechaUltimoCierre;
 
 				fechaUltimoCierre = claseFindia.ultimoCierreFecha();
 
@@ -8119,7 +8119,7 @@ public class ComWS extends PBase {
 					}
 				} else {
 					if ((!YaComunico) && !(TieneFact || TienePedidos || TieneCanastas) && !TieneCobros && !TieneDevol
-					    && !(rutatipo.equalsIgnoreCase("P") && TieneAtenciones)) {
+					    && !(rutatipo.equalsIgnoreCase("P") && !TieneAtenciones)) {
 						lblRec.setVisibility(View.VISIBLE);
 						imgRec.setVisibility(View.VISIBLE);
 						lblEnv.setVisibility(View.INVISIBLE);

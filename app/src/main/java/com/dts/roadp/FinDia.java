@@ -171,7 +171,7 @@ public class FinDia extends PBase {
 
             //#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
             if (gl.banderafindia) {
-                if (claseFinDia.getComunicacion() != 4) {
+                if (claseFinDia.getComunicacion() != 2) {
                     msgAskComunicacion();
                     return;
                 }
@@ -575,7 +575,8 @@ public class FinDia extends PBase {
 
     private boolean validaFinDia() {
         Cursor DT;
-        int pend, fechaUltimoCierre;
+        int pend;
+        long fechaUltimoCierre;
 
         claseFinDia = new clsFinDia(this);
 
@@ -622,7 +623,6 @@ public class FinDia extends PBase {
             }
 
             if (du.getActDate() == fechaUltimoCierre) {
-                msgExit("Fin de Día ya fue efectuado el día de hoy");
 
                 Toast.makeText(FinDia.this, "Cierre del día completo.", Toast.LENGTH_SHORT).show();
 
@@ -630,7 +630,9 @@ public class FinDia extends PBase {
                 gl.modoadmin = false;
                 gl.autocom = 1;
 
-                FinDia.super.finish();
+                //FinDia.super.finish();
+
+                msgExit("Fin de Día ya fue efectuado el día de hoy");
 
                 return false;
             }
@@ -674,7 +676,7 @@ public class FinDia extends PBase {
                 }
 
                 //#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
-                if (claseFinDia.getComunicacion() != 4) {
+                if (claseFinDia.getComunicacion() != 2) {
                         msgAskComunicacion();
                         return false;
                 }
@@ -2559,6 +2561,7 @@ public class FinDia extends PBase {
         try{
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
+            dialog.setCancelable(false);
             dialog.setTitle(R.string.app_name);
             dialog.setMessage(msg);
 

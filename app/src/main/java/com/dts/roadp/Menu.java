@@ -431,6 +431,7 @@ public class Menu extends PBase {
 					if(gl.vendnom.equalsIgnoreCase("DTS") && gl.vend.equalsIgnoreCase("DTS")) {
 						mu.msgbox("No puede realizar esta acción");
 					}else {
+						gl.findiaactivo = false;
 						Intent intent8 = new Intent(this, FinDia.class);
 						startActivity(intent8);
 					}
@@ -464,7 +465,7 @@ public class Menu extends PBase {
 	//region Reimpresion
 
 	private boolean cierreRealizado(){
-		int fechaUltimoCierre;
+		long fechaUltimoCierre;
 		boolean rslt=false;
 		clsFinDia claseFinDia;
 

@@ -171,7 +171,7 @@ public class FinDia extends PBase {
 
             //#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
             if (gl.banderafindia) {
-                if (claseFinDia.getComunicacion() != 4) {
+                if (claseFinDia.getComunicacion() != 2) {
                     msgAskComunicacion();
                     return;
                 }
@@ -577,7 +577,8 @@ public class FinDia extends PBase {
 
     private boolean validaFinDia() {
         Cursor DT;
-        int pend, fechaUltimoCierre;
+        int pend;
+        long fechaUltimoCierre;
 
         claseFinDia = new clsFinDia(this);
 
@@ -678,7 +679,7 @@ public class FinDia extends PBase {
                 }
 
                 //#CKFK 20190304 Agregué validación para verificar si ya se realizó la comunicación de los datos.
-                if (claseFinDia.getComunicacion() != 4) {
+                if (claseFinDia.getComunicacion() != 2) {
                         msgAskComunicacion();
                         return false;
                 }

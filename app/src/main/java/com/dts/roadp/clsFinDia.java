@@ -106,9 +106,9 @@ public class clsFinDia extends PBase{
     }
 
     //#HS_20181121_1642 Esta función anteriormente pertenecía a la clase FinDia.
-    public int ultimoCierreFecha() {
+    public long ultimoCierreFecha() {
         Cursor DT;
-        int rslt=0;
+        long rslt=0;
 
         try {
             sql="SELECT val1 FROM FinDia";
@@ -116,7 +116,7 @@ public class clsFinDia extends PBase{
 
             if(DT.getCount()>0){
                 DT.moveToFirst();
-                rslt=DT.getInt(0);
+                rslt=DT.getLong(0);
             }
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -693,7 +693,7 @@ public class clsFinDia extends PBase{
 
         Cursor DT;
         boolean vFinDia = false;
-        int fechaUltimoCierre = ultimoCierreFecha();
+        long fechaUltimoCierre = ultimoCierreFecha();
 
         try{
 

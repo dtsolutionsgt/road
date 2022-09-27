@@ -606,6 +606,8 @@ public class BaseDatosScript {
 					"[RAZON_ANULACION] TEXT NOT NULL,"+
 					"[CODIGO_RUTA_PEDIDO] TEXT,"+
 					"[DESPCOREL] TEXT,"+
+					"[CERTIFICADA_DGI] INTEGER NOT NULL,"+
+					"[CUFE] TEXT,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);
@@ -614,7 +616,6 @@ public class BaseDatosScript {
 			database.execSQL(vSQL);
 			vSQL="CREATE INDEX D_FACTURA_idx2 ON D_FACTURA(FECHA)";
 			database.execSQL(vSQL);
-
 
 			vSQL="CREATE TABLE [D_FACTURAD] ("+
 					"[COREL] TEXT NOT NULL,"+
@@ -775,7 +776,7 @@ public class BaseDatosScript {
 					"[CODIGOLIQUIDACION] INTEGER," +
 					"[CORELATIVO] TEXT," +
 					"[QRIMAGE] TEXT," +
-					" PRIMARY KEY ([IdTablaControl],[Cufe])" +
+					" PRIMARY KEY ([IdTablaControl])" +
 					" );";
 			database.execSQL(vSQL);
 
@@ -1056,6 +1057,8 @@ public class BaseDatosScript {
 					"[SERIEFACT] TEXT NOT NULL,"+
 					"[CORELFACT] INTEGER NOT NULL,"+
 					"[IMPRES] INTEGER NOT NULL,"+
+					"[CERTIFICADA_DGI] INTEGER NOT NULL,"+
+					"[CUFE] TEXT,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);
@@ -1625,6 +1628,7 @@ public class BaseDatosScript {
 					"[USUARIO_API] TEXT,"+
 			        "[CLAVE_API] TEXT,"+
 			        "[URL_ANULACION] TEXT,"+
+					"[URL_CONSULTA_DOCUMENTOS_POR_CRITERIO] TEXT,"+
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
 			database.execSQL(vSQL);

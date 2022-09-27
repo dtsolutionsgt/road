@@ -604,7 +604,7 @@ public class FinDia extends PBase {
                 }
 
                 //#CKFK 20210824 Valida si existen despachos pendientes de entregar
-                if (gl.rutatipo.equals("D")){
+                if (rutatipo.equals("D")){
                     if (!validaDespachosPendientes()) {
                         msgDespachosPendientesEntrega("Existen prefacturas pendientes de entrega. No se puede realizar fin del día");
                         return false;

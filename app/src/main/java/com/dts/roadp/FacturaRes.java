@@ -33,13 +33,17 @@ import android.widget.Toast;
 
 import com.example.edocsdk.Fimador;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import Entidades.Detalle;
 import Entidades.Receptor;
 import Entidades.RespuestaEdoc;
 import Entidades.gFormaPago;
+import Entidades.gPagPlazo;
 import Entidades.gRucRec;
 import Entidades.gUbiRec;
 import Entidades.rFE;
@@ -1380,6 +1384,13 @@ public class FacturaRes extends PBase {
 
 				detalle.dCodCPBSabr = Producto.subBodega.substring(0,2);
 				detalle.dCodCPBScmp = Producto.subBodega;
+
+				if (Factura.gDGen.Receptor.iTipoRec.equals("03") ) {
+					if (Producto.subBodega.isEmpty()) {
+						toastlong("El código de familia  no puede ser vacío, para este tipo de receptor.");
+					}
+				}
+
 				detalle.gPrecios.dPrUnit = String.valueOf(dt.getDouble(7));
 				detalle.gPrecios.dPrUnitDesc = "0.000000";
 				detalle.gPrecios.dPrItem = TotalItem;
@@ -1407,12 +1418,6 @@ public class FacturaRes extends PBase {
 			Factura.gTot.dTotRec = Total;
 			Factura.gTot.dNroItems = String.valueOf(Factura.Detalles.size());
 			Factura.gTot.dVTotItems = Total;
-			Pagos.dVlrCuota = Total;
-			//AT20220823 Formas de pago
-			Pagos.iFormaPago = "01";
-			Factura.gTot.iPzPag = "1";
-			Factura.gTot.gFormaPago.add(Pagos);
-
 			//endregion
 
 			//region D_FACTURAD_MODIF
@@ -1448,11 +1453,13 @@ public class FacturaRes extends PBase {
 			//endregion
 
 			//region D_FACTURAP
-
+			int CodPago = 0;
 			if(!gl.cobroPendiente) {
 
 				sql = "SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
 				dt = Con.OpenDT(sql);
+
+				CodPago = Integer.valueOf(dt.getInt(1));
 
 				dt.moveToFirst();
 				while (!dt.isAfterLast()) {
@@ -1505,6 +1512,32 @@ public class FacturaRes extends PBase {
 				}
 
 			}
+
+			//AT20220823 Formas de pago
+			if (CodPago == 4) {
+				Pagos.iFormaPago = "01";
+				Factura.gTot.iPzPag = "2";
+
+				Factura.gTot.gPagPlazo = new ArrayList();
+				gPagPlazo PagoPlazo = new gPagPlazo();
+				PagoPlazo.dSecItem = "1";
+
+				SimpleDateFormat fecha = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(fecha.parse(du.getFechaCompleta()));
+				calendar.add(Calendar.DAY_OF_YEAR, Cliente.diascredito);
+
+				PagoPlazo.dFecItPlazo = fecha.format(calendar.getTime())+"-05:00";
+				PagoPlazo.dValItPlazo = Total;
+				Factura.gTot.gPagPlazo.add(PagoPlazo);
+			} else {
+				Pagos.iFormaPago = "02";
+				Factura.gTot.iPzPag = "1";
+			}
+
+			Pagos.dVlrCuota = Total;
+			Factura.gTot.gFormaPago.add(Pagos);
+
 
 			//endregion
 
@@ -1759,49 +1792,52 @@ public class FacturaRes extends PBase {
         }
 
 		try {
-			Fimador Xlm = new Fimador(this);
+			if (!gl.cobroPendiente && saved) {
 
-			String urltoken = "https://labpa.guru-soft.com/EdocPanama/4.0/Autenticacion/Api/ServicioEDOC?Id=1";
-			String usuario = "edocTOLEDANO_8945";
-			String clave = "wsTOLEDANO_8945";
-			String urlDoc = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/FacturaEnte";
+				Fimador Xlm = new Fimador(this);
 
-			RespuestaEdoc respuestageneradaBTB = Xlm.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, "2");
+				String urltoken = "https://labpa.guru-soft.com/EdocPanama/4.0/Autenticacion/Api/ServicioEDOC?Id=1";
+				String usuario = "edocTOLEDANO_8945";
+				String clave = "wsTOLEDANO_8945";
+				String urlDoc = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/FacturaEnte";
 
-			if (!respuestageneradaBTB.Estado.isEmpty() || respuestageneradaBTB.Estado != null) {
+				RespuestaEdoc respuestageneradaBTB = Xlm.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, "2");
 
-				ControlFEL.Cufe = respuestageneradaBTB.Cufe;
-				ControlFEL.TipoDoc = Factura.gDGen.iDoc;
-				ControlFEL.NumDoc = Factura.gDGen.dNroDF;
-				ControlFEL.Sucursal = Factura.gDGen.dPtoFacDF;
-				ControlFEL.Caja = fserie;
+				if (!respuestageneradaBTB.Estado.isEmpty() || respuestageneradaBTB.Estado != null) {
 
-				if (respuestageneradaBTB.Estado.equals("21")) {
-					ControlFEL.Estado = "01";
-				} else {
-					ControlFEL.Estado = respuestageneradaBTB.Estado;
+					ControlFEL.Cufe = respuestageneradaBTB.Cufe;
+					ControlFEL.TipoDoc = Factura.gDGen.iDoc;
+					ControlFEL.NumDoc = Factura.gDGen.dNroDF;
+					ControlFEL.Sucursal = Factura.gDGen.dPtoFacDF;
+					ControlFEL.Caja = fserie;
+
+					if (respuestageneradaBTB.Estado.equals("21")) {
+						ControlFEL.Estado = "01";
+					} else {
+						ControlFEL.Estado = respuestageneradaBTB.Estado;
+					}
+
+					ControlFEL.Mensaje = respuestageneradaBTB.MensajeRespuesta;
+					ControlFEL.ValorXml = respuestageneradaBTB.XML;
+
+					String[] fechaEnvio = Factura.gDGen.dFechaEm.split("-05:00", 0);
+					ControlFEL.FechaEnvio = fechaEnvio[0];
+					ControlFEL.TipFac = Factura.gDGen.iDoc;
+					ControlFEL.FechaAgr = String.valueOf(du.getFechaCompleta());
+					ControlFEL.QR = respuestageneradaBTB.UrlCodeQR;
+					ControlFEL.Corel = corel;
+					ControlFEL.Ruta = gl.ruta;
+					ControlFEL.Vendedor = gl.vend;
+					ControlFEL.Correlativo = String.valueOf(fcorel);
+
+					if (respuestageneradaBTB.Estado.equals("2") || respuestageneradaBTB.Estado.equals("20")) {
+						toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + respuestageneradaBTB.Estado + " - " + respuestageneradaBTB.MensajeRespuesta);
+					} else {
+						toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + respuestageneradaBTB.Estado + " - " + respuestageneradaBTB.MensajeRespuesta);
+					}
+
+					InsertarFELControl();
 				}
-
-				ControlFEL.Mensaje = respuestageneradaBTB.MensajeRespuesta;
-				ControlFEL.ValorXml = respuestageneradaBTB.XML;
-
-				String[] fechaEnvio = Factura.gDGen.dFechaEm.split("-05:00", 0);
-				ControlFEL.FechaEnvio = fechaEnvio[0];
-				ControlFEL.TipFac = Factura.gDGen.iDoc;
-				ControlFEL.FechaAgr = String.valueOf(du.getFechaCompleta());
-				ControlFEL.QR = respuestageneradaBTB.UrlCodeQR;
-				ControlFEL.Corel = corel;
-				ControlFEL.Ruta = gl.ruta;
-				ControlFEL.Vendedor = gl.vend;
-				ControlFEL.Correlativo = String.valueOf(fcorel);
-
-				if (respuestageneradaBTB.Estado.equals("2") || respuestageneradaBTB.Estado.equals("20")) {
-					toastlong("FACTURA CERTIFICADA CON EXITO -- " +" ESTADO: "+ respuestageneradaBTB.Estado +" - " + respuestageneradaBTB.MensajeRespuesta);
-				} else {
-					toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: "+ respuestageneradaBTB.Estado +" - " + respuestageneradaBTB.MensajeRespuesta);
-				}
-
-				InsertarFELControl();
 			}
 
 		} catch (Exception e){
@@ -1857,7 +1893,8 @@ public class FacturaRes extends PBase {
 	private void getCliente(String CodCliente) {
 		Cursor dt;
 		try {
-			sql= "SELECT NOMBRE, TIPO_CONTRIBUYENTE, TIPORECEPTOR, EMAIL, TELEFONO, COD_PAIS, DIRECCION, CIUDAD, NIT, MUNICIPIO FROM P_CLIENTE WHERE CODIGO = '"+CodCliente+"'";
+			sql= "SELECT NOMBRE, TIPO_CONTRIBUYENTE, TIPORECEPTOR, EMAIL, TELEFONO, COD_PAIS, DIRECCION, CIUDAD, NIT, MUNICIPIO, MEDIAPAGO, DIACREDITO " +
+			     " FROM P_CLIENTE WHERE CODIGO = '"+CodCliente+"'";
 			dt=Con.OpenDT(sql);
 			dt.moveToFirst();
 
@@ -1872,6 +1909,8 @@ public class FacturaRes extends PBase {
 				Cliente.ciudad = dt.getString(7);
 				Cliente.nit = dt.getString(8);
 				Cliente.muni = dt.getString(9);
+				Cliente.mediapago = Integer.valueOf(dt.getString(10));
+				Cliente.diascredito = Integer.valueOf(dt.getString(11));
 			} else {
 				return;
 			}

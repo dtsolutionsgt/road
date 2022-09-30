@@ -4,6 +4,7 @@ import static android.util.Base64.NO_WRAP;
 import static android.util.Base64.encodeToString;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -63,6 +64,7 @@ public class Anulacion extends PBase {
 	private int residx;
 
 	//#Anular Factura
+	private ProgressDialog progress;
 	private clsClasses.clsEmpresa Empresa = clsCls.new clsEmpresa();
 	private ConfigRetrofit retrofit = new ConfigRetrofit();
 	private Token token = new Token();
@@ -96,6 +98,7 @@ public class Anulacion extends PBase {
 		if (tipo==5) lblTipo.setText("Devolución a bodega");
 		if (tipo==6) lblTipo.setText("Nota de crédito");
 
+		ProgressDialog("Cargando pantalla...");
 		itemid="*";
 				
 		printotrodoc = new Runnable() {
@@ -333,7 +336,9 @@ public class Anulacion extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		   	mu.msgbox(e.getMessage());
-	    }
+	    } finally {
+			progress.cancel();
+		}
 			 
 		adapter=new ListAdaptCFDVB(this, items);
 		listView.setAdapter(adapter);
@@ -459,10 +464,11 @@ public class Anulacion extends PBase {
 			db.setTransactionSuccessful();
 			db.endTransaction();
 
+			progress.cancel();
 			mu.msgbox("El documento ha sido anulado.");
 
 		} catch (Exception e) {
-
+			mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" - "+ e.getMessage());
 		}
 	}
 	private void getToken() {
@@ -1796,6 +1802,7 @@ public class Anulacion extends PBase {
 					Token.execute();
 
 					if (tipo == 3) {
+						ProgressDialog("Anulando factura...");
 						AsyncAnularFactura anular = new AsyncAnularFactura();
 						anular.execute();
 					} else {
@@ -1940,6 +1947,19 @@ public class Anulacion extends PBase {
 			if (exito) {
 				AnularFactHH_DGI();
 			}
+		}
+	}
+
+	public void ProgressDialog(String mensaje) {
+		try {
+			progress = new ProgressDialog(this);
+			progress.setMessage(mensaje);
+			progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			progress.setIndeterminate(true);
+			progress.setProgress(0);
+			progress.show();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

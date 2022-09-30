@@ -36,7 +36,6 @@ import com.example.edocsdk.Fimador;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import Entidades.Detalle;
@@ -893,6 +892,7 @@ public class FacturaRes extends PBase {
 			ins.add("SERIE",fserie);
 			ins.add("CORELATIVO",fcorel);
 			ins.add("IMPRES",0);
+			ins.add("CERTIFICADA_DGI", 0);
 
 			if (gl.peModal.equalsIgnoreCase("TOL") && app.esClienteNuevo(gl.cliente)) {
 				ins.add("ADD1","NUEVO");
@@ -1830,11 +1830,16 @@ public class FacturaRes extends PBase {
 					ControlFEL.Vendedor = gl.vend;
 					ControlFEL.Correlativo = String.valueOf(fcorel);
 
+					int Certificada = 0;
 					if (respuestageneradaBTB.Estado.equals("2") || respuestageneradaBTB.Estado.equals("20")) {
+						Certificada = 1;
 						toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + respuestageneradaBTB.Estado + " - " + respuestageneradaBTB.MensajeRespuesta);
 					} else {
 						toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + respuestageneradaBTB.Estado + " - " + respuestageneradaBTB.MensajeRespuesta);
 					}
+
+					sql="UPDATE D_FACTURA SET CUFE ='"+ControlFEL.Cufe+"', CERTIFICADA_DGI="+Certificada+"  WHERE COREL='"+corel+"'";
+					db.execSQL(sql);
 
 					InsertarFELControl();
 				}

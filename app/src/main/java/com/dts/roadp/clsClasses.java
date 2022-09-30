@@ -1,7 +1,6 @@
 package com.dts.roadp;
 
 import android.graphics.Bitmap;
-import java.util.ArrayList;
 
 public class clsClasses {
 	
@@ -20,7 +19,7 @@ public class clsClasses {
     //JP20210614
 	public class clsCFDV {
 		public int id,flag,bandera;
-		public String Cod,Desc,Fecha,Valor,Sid;
+		public String Cod,Desc,Fecha,Valor,Sid, Cufe;
 		public double val;
 	}
 	
@@ -243,5 +242,9 @@ public class clsClasses {
 	public class clsControlFEL {
 		int Id, CodLiquidacion;
 		String Cufe = "", TipoDoc = "", NumDoc = "", Sucursal = "", Caja = "", Estado = "", Mensaje = "", ValorXml = "", FechaEnvio = "", TipFac = "", FechaAgr = "", QR = "", Corel = "",Ruta = "", Vendedor = "", Host = "", Correlativo = "", QRImg = "";
+	}
+
+	public class clsEmpresa {
+		String urlToken, urlAnulacion, usuarioApi, claveApi;
 	}
 }

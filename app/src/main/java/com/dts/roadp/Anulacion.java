@@ -1,9 +1,13 @@
 package com.dts.roadp;
 
+import static android.util.Base64.NO_WRAP;
+import static android.util.Base64.encodeToString;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -17,6 +21,15 @@ import android.widget.TextView;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+
+import Clases.Anulacion.AnularFactura;
+import Clases.Anulacion.ResultadoAnulacion;
+import Clases.ConfigRetrofit;
+import Clases.Token;
+import Interfaz.AnularDocs;
+import Interfaz.ServicioToken;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class Anulacion extends PBase {
 
@@ -48,6 +61,13 @@ public class Anulacion extends PBase {
 	private String presvence,presrango,pvendedor,pcliente,pclicod,pclidir;
 	private double ptot;
 	private int residx;
+
+	//#Anular Factura
+	private clsClasses.clsEmpresa Empresa = clsCls.new clsEmpresa();
+	private ConfigRetrofit retrofit = new ConfigRetrofit();
+	private Token token = new Token();
+	private ResultadoAnulacion resultado = new ResultadoAnulacion();
+	boolean exito = false;
 			
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -100,10 +120,34 @@ public class Anulacion extends PBase {
 
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
 		fdoc.medidapeso=gl.umpeso;
+		getDatosEmpresa();
 	}
 
 	//region Events
-	
+	private void getDatosEmpresa() {
+		Cursor DT;
+
+		try	{
+			sql = "SELECT URL_AUTENTICACION, URL_ANULACION, USUARIO_API, CLAVE_API FROM P_EMPRESA";
+			DT=Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			if (DT.getCount() > 0) {
+				Empresa.urlToken = DT.getString(0);
+				Empresa.urlAnulacion = DT.getString(1);
+				Empresa.usuarioApi = DT.getString(2);
+				Empresa.claveApi = DT.getString(3);
+			} else {
+				return;
+			}
+
+			if(DT!=null) DT.close();
+
+		} catch (Exception e) {
+			mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
+	}
+
 	public void anulDoc(View view){
 		try{
 			if (itemid.equalsIgnoreCase("*")) {
@@ -212,7 +256,7 @@ public class Anulacion extends PBase {
 			}
 			
 			if (tipo==3) {
-				sql="SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO "+
+				sql="SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO, D_FACTURA.CUFE "+
 					 "FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO "+
 					 "WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') " +
 					 "ORDER BY D_FACTURA.COREL DESC ";
@@ -250,7 +294,8 @@ public class Anulacion extends PBase {
 					if (tipo==2) vItem.Desc+=" - "+DT.getString(4);
 					
 					if (tipo==3) {
-						vItem.flag=DT.getInt(4);
+						vItem.flag = DT.getInt(4);
+						vItem.Cufe = DT.getString(5);
 						sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);;
 					}else if(tipo==1||tipo==6){
 						sf=DT.getString(0);
@@ -304,7 +349,6 @@ public class Anulacion extends PBase {
 	private void anulDocument() {
 		
 		try {
-			
 			db.beginTransaction();
 			
 			if (tipo==0) anulPedido(itemid);
@@ -316,10 +360,10 @@ public class Anulacion extends PBase {
 				if (depparc==0) anulDepos(itemid); else anulDeposParc(itemid);
 			}
 			
-			if (tipo==3) {
+			/*if (tipo==3) {
 				if (checkFactDepos()) return;
 				anulFactura(itemid);
-			}
+			}*/
 			
 			if (tipo==4) anulRecarga(itemid);
 			
@@ -383,6 +427,100 @@ public class Anulacion extends PBase {
 		}
 	}
 
+	private void AnularFactHH_DGI() {
+		try {
+
+			db.beginTransaction();
+
+			anulFactura(itemid);
+
+			if(tipo==3) {
+
+				clsDocFactura fdoc;
+
+				fdoc = new clsDocFactura(this, prn.prw, gl.peMon, gl.peDecImp, "", app.esClienteNuevo(pclicod), gl.codCliNuevo, gl.peModal);
+				fdoc.deviceid = gl.numSerie;
+				fdoc.medidapeso = gl.umpeso;
+				fdoc.buildPrint(itemid, 3, "TOL");
+
+				String corelNotaCred = tieneNotaCredFactura(itemid);
+
+				if (!corelNotaCred.isEmpty()) {
+					prn.printask(printotrodoc);
+				} else {
+					prn.printask(printclose);
+				}
+
+
+			}
+
+			listItems();
+
+			db.setTransactionSuccessful();
+			db.endTransaction();
+
+			mu.msgbox("El documento ha sido anulado.");
+
+		} catch (Exception e) {
+
+		}
+	}
+	private void getToken() {
+		try {
+			String base = Empresa.usuarioApi + ":" + Empresa.claveApi;
+			String Credenciales = "Basic "+ encodeToString(base.getBytes(), NO_WRAP);
+
+			ServicioToken client = retrofit.CrearServicio(ServicioToken.class);
+			Call<Token> call = client.getToken(Credenciales);
+
+			try {
+				Response<Token> response = call.execute();
+
+				if (response.isSuccessful()) {
+					token = response.body();
+				} else {
+					toastlong("Error en respuesta: " + getClass());
+				}
+			} catch (Exception ex) {
+				mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" Error en respuesta "+ ex.getMessage());
+			}
+
+		} catch (Exception e) {
+			mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
+	}
+
+	private boolean AnularFacturaDGI() {
+		try {
+			String AuthToken = "Bearer "+ token.getToken();
+
+			AnularDocs client = retrofit.CrearServicio(AnularDocs.class);
+			AnularFactura data = new AnularFactura();
+			data.setCufe(sitem.Cufe);
+			data.setMotivoAnulacion("ANULACION_POR_ERROR");
+
+			Call<ResultadoAnulacion> call = client.AnularFactura(data, AuthToken);
+
+			try {
+
+				Response<ResultadoAnulacion> response = call.execute();
+				resultado = response.body();
+
+				if (resultado.getEstado().equals("11")) {
+					exito = true;
+				} else if (resultado.getEstado().equals("3")) {
+					toastlong(resultado.getMensajeRespuesta());
+				}
+
+			} catch (Exception ex) {
+				mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" Error en respuesta "+ ex.getMessage());
+			}
+
+		} catch (Exception e) {
+			mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
+		return exito;
+	}
 	//endregion
 
 	//region Documents
@@ -1654,7 +1792,16 @@ public class Anulacion extends PBase {
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					anulDocument();
+					AsyncGetToken Token = new AsyncGetToken();
+					Token.execute();
+
+					if (tipo == 3) {
+						AsyncAnularFactura anular = new AsyncAnularFactura();
+						anular.execute();
+					} else {
+						anulDocument();
+					}
+
 				}
 			});
 			dialog.setNegativeButton("No", null);
@@ -1672,7 +1819,7 @@ public class Anulacion extends PBase {
 			sql="SELECT BOLETA_DEPOSITO,DEPOSITO_PARCIAL FROM P_EMPRESA";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
-			
+
 			gl.boldep=DT.getInt(0);
 			depparc=DT.getInt(1);
 		} catch (Exception e) {
@@ -1766,5 +1913,33 @@ public class Anulacion extends PBase {
 	}
 
 	//endregion
+	public class AsyncGetToken extends AsyncTask<Void, Void, String> {
 
+		@Override
+		protected String doInBackground(Void... vd) {
+			getToken();
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(String vdata){
+			super.onPostExecute(vdata);
+		}
+	}
+
+	public class AsyncAnularFactura extends AsyncTask<Void, Void, String> {
+
+		@Override
+		protected String doInBackground(Void... vd) {
+			AnularFacturaDGI();
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(String vdata){
+			if (exito) {
+				AnularFactHH_DGI();
+			}
+		}
+	}
 }

@@ -156,8 +156,9 @@ public class ComWS extends PBase {
 		//addlog("ComWS", "" + du.getActDateTime(), gl.vend);
 
 		System.setProperty("line.separator", "\r\n");
-		rootdir = Environment.getExternalStorageDirectory() + "/RoadFotos/";
-
+//		rootdir = Environment.getExternalStorageDirectory() + "/RoadFotos/";
+		rootdir = gl.PathDataDir + "/RoadFotos/";
+		
 		dbld = new clsDataBuilder(this);
 		claseFindia = new clsFinDia(this);
 		clsAppM = new AppMethods(this, gl, Con, db);
@@ -1295,8 +1296,10 @@ public class ComWS extends PBase {
             if (!setComParams()) return;
 
             try {
-                File f1 = new File(Environment.getExternalStorageDirectory() + "/road.db");
-                File f2 = new File(Environment.getExternalStorageDirectory() + "/road" + dia + ".db");
+                /*File f1 = new File(Environment.getExternalStorageDirectory() + "/road.db");
+                File f2 = new File(Environment.getExternalStorageDirectory() + "/road" + dia + ".db");*/
+				File f1 = new File(gl.gBaseDatos);
+				File f2 = new File(gl.PathDataDir + "/road" + dia + ".db");
                 FileUtils.copyFile(f1, f2);
             } catch (Exception e) {
                 msgbox("No se puede generar respaldo : " + e.getMessage());
@@ -2451,7 +2454,8 @@ public class ComWS extends PBase {
 				return false;
 			}
 
-			String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
+//			String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
+			String fname = gl.PathDataDir + "/roadcarga.txt";
 			wfile = new FileWriter(fname, false);
 			writer = new BufferedWriter(wfile);
 
@@ -2721,7 +2725,8 @@ public class ComWS extends PBase {
                 if (TieneInventarioSinVentas()) return false;
             }
 
-			String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
+			//String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
+			String fname = gl.PathDataDir + "/roadcarga.txt";
 			wfile = new FileWriter(fname, false);
 			writer = new BufferedWriter(wfile);
 
@@ -2798,7 +2803,8 @@ public class ComWS extends PBase {
 			if (rc == 0) return true;
 
             try {
-                String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
+                //String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
+				String fname = gl.PathDataDir + "/roadcarga.txt";
                 wfile = new FileWriter(fname, false);
                 writer = new BufferedWriter(wfile);
             } catch (IOException e) {}
@@ -6835,7 +6841,8 @@ public class ComWS extends PBase {
         int pp;
 
         try {
-            File dir = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue");
+//            File dir = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue");
+			File dir = new File(gl.PathDataDir + "/RoadFotos/clinue");
 
             for (File imagen : dir.listFiles()) {
 

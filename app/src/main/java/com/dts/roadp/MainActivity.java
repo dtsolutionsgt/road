@@ -53,6 +53,7 @@ public class MainActivity extends PBase {
             setContentView(R.layout.activity_main);
 
             grantPermissions();
+
         } catch (Exception e) {
             msgbox(new Object() {
             }.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
@@ -118,7 +119,8 @@ public class MainActivity extends PBase {
 
             try {
 
-                File file1 = new File(Environment.getExternalStorageDirectory(), "/debug.txt");
+//                File file1 = new File(Environment.getExternalStorageDirectory(), "/debug.txt");
+                File file1 = new File(gl.PathDataDir, "/debug.txt");
                 ffile = new File(file1.getPath());
                 if (ffile.exists()) {
                     gl.debug=true;
@@ -416,22 +418,26 @@ public class MainActivity extends PBase {
         gl.vendnom = "Vendedor 1";
 
         try {
-            File directory = new File(Environment.getExternalStorageDirectory() + "/SyncFold");
+//            File directory = new File(Environment.getExternalStorageDirectory() + "/SyncFold");
+            File directory = new File(gl.PathDataDir + "/SyncFold");
             directory.mkdirs();
         } catch (Exception e) {}
 
         try {
-            File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos");
+//            File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos");
+            File directory = new File(gl.PathDataDir + "/RoadFotos");
             directory.mkdirs();
         } catch (Exception e) {}
 
         try {
-            File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue");
+//            File directory = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue");
+            File directory = new File(gl.PathDataDir + "/RoadFotos/clinue");
             directory.mkdirs();
         } catch (Exception e) {}
 
         try {
-            File directory = new File(Environment.getExternalStorageDirectory() + "/RoadPedidos");
+//            File directory = new File(Environment.getExternalStorageDirectory() + "/RoadPedidos");
+            File directory = new File(gl.PathDataDir + "/RoadPedidos");
             directory.mkdirs();
         } catch (Exception e) {}
 

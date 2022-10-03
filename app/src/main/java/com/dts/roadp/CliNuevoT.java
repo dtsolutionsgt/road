@@ -553,7 +553,8 @@ public class CliNuevoT extends PBase {
             StrictMode.setVmPolicy(builder.build());
 
             Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
+//            URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
+            URLfoto = new File(gl.PathDataDir + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
 
             intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
             startActivityForResult(intento1,codResult);
@@ -571,7 +572,8 @@ public class CliNuevoT extends PBase {
 
         try {
 
-            path = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
+//            path = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
+            path = (gl.PathDataDir + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
 
             File archivo = new File(path);
 
@@ -594,7 +596,8 @@ public class CliNuevoT extends PBase {
         imgDB = false;
         try {
 
-            path = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
+//            path = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
+            path = (gl.PathDataDir + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
             File archivo = new File(path);
 
             sql = "SELECT IMAGEN FROM P_CLIENTE_FACHADA WHERE CODIGO ='"+ gl.corelCliente +"'";
@@ -629,7 +632,8 @@ public class CliNuevoT extends PBase {
 
         if (requestCode == 1) {
             try {
-                pathFoto = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
+//                pathFoto = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
+                pathFoto = (gl.PathDataDir + "/RoadFotos/clinue/" + gl.corelCliente + ".jpg");
 
                 try {
                     Bitmap bitmap1 = BitmapFactory.decodeFile(pathFoto);

@@ -301,11 +301,16 @@ public class CliDet extends PBase {
 
 			Intent intento1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-			if (clinue) {
+			/*if (clinue) {
                 URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + cod + ".jpg");
             } else {
                 URLfoto = new File(Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-            }
+            }*/
+			if (clinue) {
+				URLfoto = new File(gl.PathDataDir + "/RoadFotos/clinue/" + cod + ".jpg");
+			} else {
+				URLfoto = new File(gl.PathDataDir + "/RoadFotos/" + cod + ".jpg");
+			}
 
 			intento1.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(URLfoto));
 			startActivityForResult(intento1,codResult);
@@ -329,11 +334,17 @@ public class CliDet extends PBase {
 
 		try {
 
-		    if (clinue) {
+		    /*if (clinue) {
                 path = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + cod + ".jpg");
             } else {
                 path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-            }
+            }*/
+
+			if (clinue) {
+				path = (gl.PathDataDir + "/RoadFotos/clinue/" + cod + ".jpg");
+			} else {
+				path = (gl.PathDataDir + "/RoadFotos/" + cod + ".jpg");
+			}
 
 			File archivo = new File(path);
 
@@ -395,11 +406,17 @@ public class CliDet extends PBase {
 
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-				if (clinue) {
+				/*if (clinue) {
                     paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/clinue/" + cod + ".jpg");
                 } else {
                     paht = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
-                }
+                }*/
+
+				if (clinue) {
+					paht = (gl.PathDataDir + "/RoadFotos/clinue/" + cod + ".jpg");
+				} else {
+					paht = (gl.PathDataDir + "/RoadFotos/" + cod + ".jpg");
+				}
 
                 try {
                     Bitmap bitmap1 = BitmapFactory.decodeFile(paht);
@@ -755,7 +772,8 @@ public class CliDet extends PBase {
 		imgDB = false;
 		try {
 
-			path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+//			path = (Environment.getExternalStorageDirectory() + "/RoadFotos/" + cod + ".jpg");
+			path = (gl.PathDataDir + "/RoadFotos/" + cod + ".jpg");
 			File archivo = new File(path);
 
 			sql = "SELECT IMAGEN FROM P_CLIENTE_FACHADA WHERE CODIGO ='"+ cod +"'";

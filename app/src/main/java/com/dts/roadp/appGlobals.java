@@ -101,4 +101,8 @@ public class appGlobals extends Application {
 	public int pLongitudBarra;
 	public String pPrefijoBarra;
 	public int pCantImpresion;
+
+	//Directorio de archivos
+	public String PathDataDir = "";
+	public String gBaseDatos = "";
 }

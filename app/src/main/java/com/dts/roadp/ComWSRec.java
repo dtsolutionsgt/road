@@ -789,7 +789,7 @@ public class ComWSRec extends PBase {
             if (rc == 0) return true;
 
             try {
-                String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
+                String fname = gl.PathDataDir + "/roadcarga.txt";
                 wfile = new FileWriter(fname, false);
                 writer = new BufferedWriter(wfile);
             } catch (IOException e) {}

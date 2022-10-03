@@ -90,7 +90,7 @@ public class Soporte extends PBase {
 
     private void sendDBase() {
         body="Base de datos \n"+body;
-        fname= Environment.getExternalStorageDirectory()+"/road.db";
+        fname= Environment.getExternalStorageDirectory().getName()+"/road.db";
         file=new File(fname);
 
         send("No se pudo enviar la base de datos datos");

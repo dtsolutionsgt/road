@@ -374,7 +374,8 @@ public class ComDrop extends Activity {
 				
 			try {
 				lin=1;
-				File file = new File(Environment.getExternalStorageDirectory(), "/SyncFold/rd_param.txt");
+//				File file = new File(Environment.getExternalStorageDirectory(), "/SyncFold/rd_param.txt");
+				File file = new File(getApplicationContext().getDataDir().getPath(), "/SyncFold/rd_param.txt");
 				myFile = new File(file.getPath());
 					
 				FileInputStream fIn = new FileInputStream(myFile);
@@ -450,7 +451,8 @@ public class ComDrop extends Activity {
 		fFlag=false;
 		
 		try {
-	 		File file = new File(Environment.getExternalStorageDirectory(), "/SyncFold/rd_param.txt");
+//	 		File file = new File(Environment.getExternalStorageDirectory(), "/SyncFold/rd_param.txt");
+			File file = new File(getApplicationContext().getDataDir().getPath(), "/SyncFold/rd_param.txt");
 			myFile = new File(file.getPath());
 			
 			FileInputStream fIn = new FileInputStream(myFile);

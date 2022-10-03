@@ -20,13 +20,13 @@ public class BaseDatos extends SQLiteOpenHelper {
 	  public Insert Ins;
 	  public Update Upd;
 	  private BaseDatosScript DBScript;
+	  private appGlobals gl = new appGlobals();
 
-	  private static final String DATABASE_NAME =
-			               Environment.getExternalStorageDirectory().getPath() + "/road.db";
+	  private static final String DATABASE_NAME =  "/data/user/0/com.dts.roadp/road.db";
 	  private static final int DATABASE_VERSION = 1;
-	  	
-	  public BaseDatos(Context context) {
-		 		  	  
+
+	public BaseDatos(Context context) {
+
 	    super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	    		       
 	    Ins=new Insert();

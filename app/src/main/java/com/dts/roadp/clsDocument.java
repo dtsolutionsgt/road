@@ -673,7 +673,7 @@ public class clsDocument {
 
 		try {
 
-			String fname = Environment.getExternalStorageDirectory()+"/roadlog.txt";
+			String fname = global.PathDataDir+"/roadlog.txt";
 			wfile=new FileWriter(fname,true);
 			writer = new BufferedWriter(wfile);
 

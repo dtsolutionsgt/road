@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import org.apache.commons.lang.StringUtils;
 
 public class PBase extends Activity {
 
@@ -39,18 +40,26 @@ public class PBase extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_plist_base);
+
 	}
 
 	public void InitBase(){
-		
-		Con = new BaseDatos(this);
 
+		/*Con = new BaseDatos(this,gl.PathDataDir );
 	    opendb();
-	    ins=Con.Ins;upd=Con.Upd;
-		
+	    ins=Con.Ins;upd=Con.Upd;*/
+
 		vApp=this.getApplication();
 		gl=((appGlobals) this.getApplication());
-		
+
+		gl.PathDataDir = this.getApplicationContext().getDataDir().getPath();
+
+		gl.gBaseDatos = gl.PathDataDir + "/road.db";
+
+		Con = new BaseDatos(this);
+		opendb();
+		ins=Con.Ins;upd=Con.Upd;
+
 		mu=new MiscUtils(this,gl.peMon);
 		du=new DateUtils();fecha=du.getActDateTime();
 		

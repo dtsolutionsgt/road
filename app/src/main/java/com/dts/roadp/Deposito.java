@@ -104,7 +104,7 @@ public class Deposito extends PBase {
 		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
 
 		prn=new printer(this,printclose,gl.validimp);
-		ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
+		ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "", gl.PathDataDir);
 
 		boldep=gl.boldep;
 		depparc=gl.depparc;

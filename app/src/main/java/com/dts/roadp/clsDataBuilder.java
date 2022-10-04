@@ -32,6 +32,7 @@ public class clsDataBuilder {
 	private BufferedWriter writer = null,lwriter = null,writerbk = null,lwriterbk = null;
 	private FileWriter wfile,lfile,wfilebk,lfilebk;
 	private String fname,logname,logname2,namefile, codCliNuevo,lognamebk,namefilebk;
+	private String mPathDataDir;
 
 	public clsDataBuilder(Context context) {
 		
@@ -52,13 +53,21 @@ public class clsDataBuilder {
 
 		System.setProperty("line.separator","\r\n");
 		
-		fname = Environment.getExternalStorageDirectory()+"/SyncFold/rd_data.txt";
+		/*fname = Environment.getExternalStorageDirectory()+"/SyncFold/rd_data.txt";
 		logname = Environment.getExternalStorageDirectory()+"/roadenvio.txt";
 		logname2 = Environment.getExternalStorageDirectory()+"/roadenvio_bck.txt";
 		namefile = Environment.getExternalStorageDirectory()+"/data.acr";
 
 		lognamebk = Environment.getExternalStorageDirectory()+"/roadenvio"+DU.dayofweek(fechaFactTol(DU.getActDate()))+".txt";
-		namefilebk = Environment.getExternalStorageDirectory()+"/data"+DU.dayofweek(fechaFactTol(DU.getActDate()))+".acr";
+		namefilebk = Environment.getExternalStorageDirectory()+"/data"+DU.dayofweek(fechaFactTol(DU.getActDate()))+".acr";*/
+        mPathDataDir = cCont.getApplicationContext().getDataDir().getPath();
+		fname = mPathDataDir +"/SyncFold/rd_data.txt";
+		logname = mPathDataDir +"/roadenvio.txt";
+		logname2 = mPathDataDir +"/roadenvio_bck.txt";
+		namefile = mPathDataDir +"/data.acr";
+
+		lognamebk = mPathDataDir +"/roadenvio"+DU.dayofweek(fechaFactTol(DU.getActDate()))+".txt";
+		namefilebk = mPathDataDir +"/data"+DU.dayofweek(fechaFactTol(DU.getActDate()))+".acr";
 
 	}
 	
@@ -379,7 +388,8 @@ public class clsDataBuilder {
 		String s;
 		FileWriter ffile;
 		BufferedWriter fwriter;
-		flogname =  Environment.getExternalStorageDirectory()+"/"+flogname;
+		//flogname =  Environment.getExternalStorageDirectory()+"/"+flogname;
+		flogname =  mPathDataDir +"/"+flogname;
 
 		if (sendlog.size()==0) return ;
 

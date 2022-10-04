@@ -259,10 +259,11 @@ public class FacturaRes extends PBase {
 		prn=new printer(this,printexit,gl.validimp);
 		prn_nc=new printer(this,printclose,gl.validimp);
 
-		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(cliid),gl.codCliNuevo,gl.peModal);
+		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(cliid),
+				               gl.codCliNuevo,gl.peModal, gl.PathDataDir);
 		fdoc.deviceid =gl.numSerie;fdoc.medidapeso=gl.umpeso;
 
-		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt", gl.PathDataDir);
 		fdev.deviceid =gl.numSerie;
 
 		saved=false;

@@ -649,7 +649,8 @@ public class MainActivity extends PBase {
 
         try {
             InputStream in = getResources().openRawResource(rawid);
-            File file = new File(Environment.getExternalStorageDirectory(), "/SyncFold/rd_param.txt");
+            //File file = new File(Environment.getExternalStorageDirectory(), "/SyncFold/rd_param.txt");
+            File file = new File(gl.PathDataDir, "/SyncFold/rd_param.txt");
             FileOutputStream out = new FileOutputStream(file);
 
             byte[] buff = new byte[1024];

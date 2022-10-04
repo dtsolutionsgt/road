@@ -238,8 +238,9 @@ public class UtilPrint extends PBase {
 		FileWriter wfile;
 		String fname;	
 		
-		fname = Environment.getExternalStorageDirectory()+"/"+"printtest.txt";
-		
+		//fname = Environment.getExternalStorageDirectory()+"/"+"printtest.txt";
+		fname = gl.PathDataDir +"/"+"printtest.txt";
+
 		try {
 
 			wfile=new FileWriter(fname,false);

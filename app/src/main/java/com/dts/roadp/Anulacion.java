@@ -96,9 +96,10 @@ public class Anulacion extends PBase {
 		setHandlers();
 		listItems();
 				
-		doc=new clsDocAnul(this,prn.prw,"");
+		doc=new clsDocAnul(this,prn.prw,"", gl.PathDataDir);
 
-		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
+		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"",app.esClienteNuevo(pclicod),gl.codCliNuevo,
+				gl.peModal, gl.PathDataDir);
 		fdoc.medidapeso=gl.umpeso;
 	}
 
@@ -335,7 +336,8 @@ public class Anulacion extends PBase {
 
 				clsDocFactura fdoc;
 
-				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
+				fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),
+						               gl.codCliNuevo,gl.peModal, gl.PathDataDir);
 				fdoc.deviceid =gl.numSerie;
 				fdoc.medidapeso=gl.umpeso;
 				fdoc.buildPrint(itemid, 3, "TOL");
@@ -353,7 +355,7 @@ public class Anulacion extends PBase {
 
 				clsDocDevolucion fdev;
 
-				fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+				fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt", gl.PathDataDir);
 				fdev.deviceid =gl.numSerie;
 
 				fdev.buildPrint(itemid, 3, "TOL");
@@ -1134,7 +1136,7 @@ public class Anulacion extends PBase {
 
 				if (!corelNotaCred.isEmpty()){
 
-					fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+					fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt",gl.PathDataDir);
 					fdev.deviceid =gl.numSerie;
 
 					fdev.buildPrint(corelNotaCred, 3, "TOL"); prn_nc.printnoask(printclose, "printnc.txt");
@@ -1147,7 +1149,8 @@ public class Anulacion extends PBase {
 				if (!corelFactura.isEmpty()){
 					clsDocFactura fdoc;
 
-					fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
+					fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),
+							               gl.codCliNuevo,gl.peModal, gl.PathDataDir);
 					fdoc.deviceid =gl.numSerie;
 					fdoc.medidapeso=gl.umpeso;
 					fdoc.buildPrint(corelFactura, 3, "TOL"); prn.printnoask(printclose,"print.txt");
@@ -1193,8 +1196,8 @@ public class Anulacion extends PBase {
 
 	private class clsDocAnul extends clsDocument {
 
-		public clsDocAnul(Context context, int printwidth, String archivo) {
-			super(context, printwidth ,gl.peMon,gl.peDecImp, archivo);
+		public clsDocAnul(Context context, int printwidth, String archivo, String pPathDataDir) {
+			super(context, printwidth ,gl.peMon,gl.peDecImp, archivo,pPathDataDir);
 
 			nombre="Existencias";
 			numero="";
@@ -1374,7 +1377,7 @@ public class Anulacion extends PBase {
 		
 		try {
 			
-			rep=new clsRepBuilder(this,prn.prw,true,gl.peMon,gl.peDecImp, "");
+			rep=new clsRepBuilder(this,prn.prw,true,gl.peMon,gl.peDecImp, "", gl.PathDataDir);
 			
 			buildHeader(corel,0);
 			

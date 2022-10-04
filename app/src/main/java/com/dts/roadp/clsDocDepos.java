@@ -19,8 +19,9 @@ public class clsDocDepos extends clsDocument {
 	protected MiscUtils mu;
 	protected DateUtils du;
 
-	public clsDocDepos(Context context, int printwidth,String pruta,String pvend,String cursymbol,int decimpres, String archivo) {
-		super(context, printwidth,cursymbol,decimpres, archivo);
+	public clsDocDepos(Context context, int printwidth,String pruta,String pvend,String cursymbol,int decimpres,
+					   String archivo, String pPathDataDir) {
+		super(context, printwidth,cursymbol,decimpres, archivo, pPathDataDir);
 		docfactura=false;
 
 		gl=((appGlobals) context.getApplicationContext());

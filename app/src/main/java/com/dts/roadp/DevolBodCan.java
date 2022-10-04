@@ -56,7 +56,7 @@ public class DevolBodCan extends PBase {
         lblTit = (TextView) findViewById(R.id.txtRoadTit);lblTit.setText("Devolución de canastas");
         lblTot = (TextView) findViewById(R.id.textView9);lblTot.setText("0.00");
 
-        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp,"");
+        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp,"",gl.PathDataDir);
 
         setHandlers();
 
@@ -150,11 +150,11 @@ public class DevolBodCan extends PBase {
         prn_can=new printer(this,printclose,gl.validimp);
         prn_paseante=new printer(this,printclose,gl.validimp);
 
-        fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
+        fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt", gl.PathDataDir);
         fcanastabod.deviceid =gl.deviceId;
         fcanastabod.vTipo="CANASTA";
 
-        fpaseantebod=new clsDocCanastaBod(this,prn_paseante.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
+        fpaseantebod=new clsDocCanastaBod(this,prn_paseante.prw,gl.peMon,gl.peDecImp, "printpaseante.txt", gl.PathDataDir);
         fpaseantebod.deviceid =gl.deviceId;
         fpaseantebod.vTipo="PASEANTE";
 

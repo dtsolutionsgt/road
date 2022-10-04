@@ -16,8 +16,8 @@ public class clsDocDevolucion extends clsDocument {
     private boolean sinimp;
     private String 	contrib,recfact,estadoDev,corelNC,corelF,asignacion;
 
-    public clsDocDevolucion(Context context, int printwidth, String cursym, int decimpres, String archivo) {
-        super(context, printwidth, cursym, decimpres, archivo);
+    public clsDocDevolucion(Context context, int printwidth, String cursym, int decimpres, String archivo, String pPathDataDir) {
+        super(context, printwidth, cursym, decimpres, archivo, pPathDataDir);
         docpedido=false;
         docfactura=false;
         docrecibo=false;

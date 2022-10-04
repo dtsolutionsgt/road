@@ -19,7 +19,7 @@ public class srvEnvPedido extends srvBase {
         };
 
         wscom =new wsEnvPedido(URL);
-        wscom.execute(command,corel,rnEnvioPedido);
+        wscom.execute(command,corel,rnEnvioPedido,wscom.mPathDataDir);
     }
 
     @Override

@@ -53,7 +53,7 @@ public class PBase extends Activity {
 		gl=((appGlobals) this.getApplication());
 
 		gl.PathDataDir = this.getApplicationContext().getDataDir().getPath();
-
+		gl.PathDataName = this.getApplicationContext().getDataDir().getName();
 		gl.gBaseDatos = gl.PathDataDir + "/road.db";
 
 		Con = new BaseDatos(this);
@@ -147,7 +147,8 @@ public class PBase extends Activity {
 
 		try {
 
-			String fname = Environment.getExternalStorageDirectory()+"/roadlog.txt";
+			//String fname = Environment.getExternalStorageDirectory()+"/roadlog.txt";
+			String fname = gl.PathDataDir + "/roadlog.txt";
 			wfile=new FileWriter(fname,true);
 			writer = new BufferedWriter(wfile);
 

@@ -70,7 +70,7 @@ public class Exist extends PBase {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
         }
 
-        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "");
+        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "",gl.PathDataDir);
 
         listItems();
 
@@ -506,7 +506,7 @@ public class Exist extends PBase {
     private class clsDocExist extends clsDocument {
 
         public clsDocExist(Context context, int printwidth, String archivo) {
-            super(context, printwidth,gl.peMon,gl.peDecImp, archivo);
+            super(context, printwidth,gl.peMon,gl.peDecImp, archivo, gl.PathDataDir);
 
             nombre="REPORTE DE EXISTENCIAS";
             numero="";

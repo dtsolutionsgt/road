@@ -892,7 +892,8 @@ public class comWSLic extends PBase {
         FileWriter wfile;
 
         try {
-            String fname = Environment.getExternalStorageDirectory()+"/roaderror.txt";
+            //String fname = Environment.getExternalStorageDirectory()+"/roaderror.txt";
+            String fname = gl.PathDataDir +"/roaderror.txt";
 
             wfile=new FileWriter(fname,false);
             writer = new BufferedWriter(wfile);

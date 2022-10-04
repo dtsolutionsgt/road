@@ -28,7 +28,7 @@ public class clsRepBuilder {
 	private double aux;
 	private String frmstr,ts;
 	
-	public clsRepBuilder(Context context,int printwidth,boolean regular,String cursymbol,int decimpres, String archivo) {
+	public clsRepBuilder(Context context,int printwidth,boolean regular,String cursymbol,int decimpres, String archivo, String vPathDataDir) {
 		
 		cont=context;
 		//AT 20211029 Quitar comentario luego de realizar pruebas
@@ -44,7 +44,8 @@ public class clsRepBuilder {
 		prwh=(int) Math.floor(aux/2);
 		
 		System.setProperty("line.separator","\r\n");
-		if (regular) {
+
+		/*if (regular) {
 			if (!archivo.isEmpty()){
 				fname = Environment.getExternalStorageDirectory()+"/"+archivo;
 			}else{
@@ -52,8 +53,16 @@ public class clsRepBuilder {
 			}
 		} else {
 			fname = Environment.getExternalStorageDirectory()+"/SyncFold/findia.txt";	
+		}*/
+		if (regular) {
+			if (!archivo.isEmpty()){
+				fname = vPathDataDir +"/"+archivo;
+			}else{
+				fname = vPathDataDir+"/print.txt";
+			}
+		} else {
+			fname = vPathDataDir+"/SyncFold/findia.txt";
 		}
-		
 		decfrm = new DecimalFormat("#,##0.00");
 	}	
 	

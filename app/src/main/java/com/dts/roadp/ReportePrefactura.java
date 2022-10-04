@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrTokenizer;
 
 import java.util.ArrayList;
 
@@ -54,7 +55,7 @@ public class ReportePrefactura extends PBase {
             textView9.setVisibility(View.VISIBLE);
         }
 
-        rep = new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "");
+        rep = new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "",gl.PathDataDir);
 
         app = new AppMethods(this, gl, Con, db);
         gl.validimp = app.validaImpresora();
@@ -69,7 +70,7 @@ public class ReportePrefactura extends PBase {
         loadData();
 
         prn=new printer(this,printclose,gl.validimp);
-        doc=new clsResPrefactura(this,prn.prw,"");
+        doc=new clsResPrefactura(this,prn.prw,"", gl.PathDataDir);
 
         titulo.setText("Reporte de Prefacturas");
     }
@@ -166,8 +167,8 @@ public class ReportePrefactura extends PBase {
 
     private class clsResPrefactura extends clsDocument {
 
-        public clsResPrefactura(Context context, int printwidth, String archivo) {
-            super(context, printwidth,gl.peMon,gl.peDecImp, archivo);
+        public clsResPrefactura(Context context, int printwidth, String archivo, String pPathDataDir) {
+            super(context, printwidth,gl.peMon,gl.peDecImp, archivo,pPathDataDir);
 
             nombre="REPORTE DE PREFACTURAS";
             numero="";

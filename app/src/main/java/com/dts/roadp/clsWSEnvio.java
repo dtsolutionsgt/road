@@ -300,7 +300,8 @@ public class clsWSEnvio {
 
         try {
 
-            String fname = Environment.getExternalStorageDirectory()+"/roadlog.txt";
+           // String fname = Environment.getExternalStorageDirectory()+"/roadlog.txt";
+            String fname = Cont.getDataDir().getPath() +"/roadlog.txt";
             wfile=new FileWriter(fname,true);
             writer = new BufferedWriter(wfile);
 

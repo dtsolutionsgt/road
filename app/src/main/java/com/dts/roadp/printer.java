@@ -176,18 +176,18 @@ public class printer {
 	private void setPrinterClass() {
 		switch (prid) {
 			case 1:  
-				prn=new printDMax(cont,prpar,validprint);
+				prn=new printDMax(cont,prpar,validprint,gl.PathDataDir);
 				prn.printclose=printclose;
 				break;	
 			case 2:
 				break;		
 			case 3:  
-				prn=new printZebraCPCL(cont,prpar,validprint);
+				prn=new printZebraCPCL(cont,prpar,validprint, gl.PathDataDir);
 				prn.printclose=printclose;
 				prn.prwidth=prw;
 				break;
 			case 4:
-				prn=new printZebraZPL(cont,prpar,validprint);
+				prn=new printZebraZPL(cont,prpar,validprint, gl.PathDataDir);
 				prn.printclose=printclose;
 				prn.prwidth=prw;
 				break;

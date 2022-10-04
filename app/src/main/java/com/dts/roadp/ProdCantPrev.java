@@ -284,7 +284,8 @@ public class ProdCantPrev extends PBase {
             imgProd.setVisibility(View.INVISIBLE);
             if (!mu.emptystr(prodimg)) {
                 try {
-                    prodimg = Environment.getExternalStorageDirectory()+ "/RoadFotos/"+prodimg+".jpg";
+                    //prodimg = Environment.getExternalStorageDirectory()+ "/RoadFotos/"+prodimg+".jpg";
+                    prodimg = gl.PathDataDir + "/RoadFotos/"+prodimg+".jpg";
                     File file = new File(prodimg);
                     if (file.exists()) {
                         try {
@@ -453,7 +454,8 @@ public class ProdCantPrev extends PBase {
             imgProd.setVisibility(View.INVISIBLE);
             if (!mu.emptystr(prodimg)) {
                 try {
-                    prodimg = Environment.getExternalStorageDirectory()+ "/RoadFotos/"+prodimg+".jpg";
+                   // prodimg = Environment.getExternalStorageDirectory()+ "/RoadFotos/"+prodimg+".jpg";
+                    prodimg = gl.PathDataDir + "/RoadFotos/"+prodimg+".jpg";
                     File file = new File(prodimg);
                     if (file.exists()) {
                         try {

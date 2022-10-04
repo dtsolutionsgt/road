@@ -1,17 +1,15 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
-apply plugin: 'com.google.firebase.firebase-perf'
-apply plugin: 'com.google.firebase.appdistribution'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 31
     defaultConfig {
         applicationId "com.dts.roadp"
-        minSdkVersion 28
+        minSdkVersion 24
         //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 29
-        renderscriptTargetApi 29
+        targetSdkVersion 31
+        renderscriptTargetApi 31
         renderscriptSupportModeEnabled true
 
     }

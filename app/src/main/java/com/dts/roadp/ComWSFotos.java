@@ -69,7 +69,8 @@ public class ComWSFotos extends PBase {
 
         System.setProperty("line.separator","\r\n");
 
-        rootdir= Environment.getExternalStorageDirectory()+"/RoadFotos/";
+        //rootdir= Environment.getExternalStorageDirectory()+"/RoadFotos/";
+        rootdir= gl.PathDataDir + "/RoadFotos/";
 
         clsAppM = new AppMethods(this, gl, Con, db);
 

@@ -94,18 +94,18 @@ public class Reimpresion extends PBase {
 		prn_can=new printer(this,printclose,gl.validimp);
 		prn_paseante=new printer(this,printclose,gl.validimp);
 
-		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
+		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal, gl.PathDataDir);
 		fdoc.deviceid =gl.numSerie;
 		fdoc.medidapeso=gl.umpeso;
 
-		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt", gl.PathDataDir);
 		fdev.deviceid =gl.numSerie;
 
-		fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt");
+		fcanastabod=new clsDocCanastaBod(this,prn_can.prw,gl.peMon,gl.peDecImp, "printdevcan.txt", gl.PathDataDir);
 		fcanastabod.deviceid =gl.numSerie;
 		fcanastabod.vTipo="CANASTA";
 
-		fpaseantebod=new clsDocCanastaBod(this,prn_paseante.prw,gl.peMon,gl.peDecImp, "printpaseante.txt");
+		fpaseantebod=new clsDocCanastaBod(this,prn_paseante.prw,gl.peMon,gl.peDecImp, "printpaseante.txt", gl.PathDataDir);
 		fpaseantebod.deviceid =gl.numSerie;
 		fpaseantebod.vTipo="PASEANTE";
 
@@ -156,27 +156,28 @@ public class Reimpresion extends PBase {
 
 		switch (tipo) {
 		case 0:
-			docPed = new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp,"");
+			docPed = new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp,"", gl.PathDataDir);
 			docPed.global=gl;
 			lblTipo.setText("Pedido");break;
 		case 1:
-			cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.numSerie, "");
+			cdoc=new clsDocCobro(this,prn.prw,gl.peMon,gl.peDecImp, gl.numSerie, "", gl.PathDataDir);
 			lblTipo.setText("Recibo");break;	
 		case 2:  
-			ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
+			ddoc=new clsDocDepos(this,prn.prw,gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "", gl.PathDataDir);
 			lblTipo.setText("Deposito");break;
 		case 3:  
-			fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
+			fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(pclicod),
+					               gl.codCliNuevo,gl.peModal, gl.PathDataDir);
 			fdoc.medidapeso=gl.umpeso;
 			lblTipo.setText("Factura");break;
 		case 4:  
-			mdoc=new clsDocMov(this,prn.prw,"Recarga",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
+			mdoc=new clsDocMov(this,prn.prw,"Recarga",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "", gl.PathDataDir);
 			lblTipo.setText("Recarga");break;
 		case 5:  
-			mdoc=new clsDocMov(this,prn.prw,"Dvolucion a bodega",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "");
+			mdoc=new clsDocMov(this,prn.prw,"Dvolucion a bodega",gl.ruta,gl.vendnom,gl.peMon,gl.peDecImp, "", gl.PathDataDir);
 			lblTipo.setText("Devolución a bodega");break;
 		case 6:  
-			fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+			fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt", gl.PathDataDir);
 			fdev.deviceid =gl.numSerie;
 			lblTipo.setText("Nota Crédito");break;
 			
@@ -728,7 +729,7 @@ public class Reimpresion extends PBase {
 				String corelNC=getCorelNotaCred(itemid);
 
 				if (!corelNC.isEmpty()){
-					fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+					fdev=new clsDocDevolucion(this,prn.prw,gl.peMon,gl.peDecImp, "printnc.txt", gl.PathDataDir);
 					fdev.deviceid =gl.numSerie;
 					fdev.buildPrint(corelNC, 1, "TOL"); prn_nc.printask(printclose, "printnc.txt");
 				}
@@ -889,7 +890,7 @@ public class Reimpresion extends PBase {
 		
 		try {
 			
-			rep=new clsRepBuilder(this,prn.prw,true,gl.peMon,gl.peDecImp, "");
+			rep=new clsRepBuilder(this,prn.prw,true,gl.peMon,gl.peDecImp, "",gl.PathDataDir);
 			
 			buildHeader(corel,1);
 			

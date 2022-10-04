@@ -21,6 +21,7 @@ public class clsDocument {
 	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod,docdesglose;
 	public int pendiente,diacred,condicionPago,impprecio;
 	public long ffecha;
+	public String vPathDataDir = "";
 
 	public double SumaPeso = 0;
 	public double SumaCant = 0;
@@ -41,11 +42,12 @@ public class clsDocument {
 
 	protected int prw;
 	
-	public clsDocument(Context context,int printwidth,String cursym,int decimpres, String archivo) {
+	public clsDocument(Context context,int printwidth,String cursym,int decimpres, String archivo, String pPaPathDataDir) {
 		cont=context;
 		prw=printwidth;
-		
-		rep=new clsRepBuilder(cont,prw,true,cursym,decimpres, archivo);
+		vPathDataDir = pPaPathDataDir;
+
+		rep=new clsRepBuilder(cont,prw,true,cursym,decimpres, archivo, vPathDataDir);
 		DU=new DateUtils();
 		decfrm = new DecimalFormat("#,##0.00");
 
@@ -174,14 +176,16 @@ public class clsDocument {
 		return true;
 	}
 
-	public boolean buildPrint(String corel,int reimpres,BaseDatos pCon,android.database.sqlite.SQLiteDatabase pdb ) {
+	public boolean buildPrint(String corel,int reimpres,BaseDatos pCon,android.database.sqlite.SQLiteDatabase pdb,
+							  String PathDataDir ) {
 		
 		rep.clear();
 				
 		if (!buildHeader(corel,reimpres,pCon,pdb)) return false;
 		if (!buildDetail()) return false;
 		if (!buildFooter()) return false;
-		
+
+		vPathDataDir = PathDataDir;
 		if (!rep.save()) return false;
 		
 		return true;

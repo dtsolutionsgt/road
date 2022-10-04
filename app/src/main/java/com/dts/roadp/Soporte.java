@@ -90,7 +90,8 @@ public class Soporte extends PBase {
 
     private void sendDBase() {
         body="Base de datos \n"+body;
-        fname= Environment.getExternalStorageDirectory().getName()+"/road.db";
+        //fname= Environment.getExternalStorageDirectory().getName()+"/road.db";
+        fname= gl.PathDataName + "/road.db";
         file=new File(fname);
 
         send("No se pudo enviar la base de datos datos");
@@ -99,7 +100,8 @@ public class Soporte extends PBase {
     private void sendCarga() {
         body="Carga \n"+body;
 
-       fname= Environment.getExternalStorageDirectory()+"/roadcarga.txt";
+       //fname= Environment.getExternalStorageDirectory()+"/roadcarga.txt";
+        fname= gl.PathDataDir + "/roadcarga.txt";
        file=new File(fname);
 
         send("El archivo de carga no existe. Debe realizar una carga de datos");
@@ -108,7 +110,8 @@ public class Soporte extends PBase {
     private void sendEnvio() {
         body="Envio \n"+body;
 
-        fname= Environment.getExternalStorageDirectory()+"/roadenvio.txt";
+        //fname= Environment.getExternalStorageDirectory()+"/roadenvio.txt";
+        fname= gl.PathDataDir +"/roadenvio.txt";
         file=new File(fname);
 
         send("El archivo de envio no existe. Debe realizar un envio de datos");
@@ -130,7 +133,8 @@ public class Soporte extends PBase {
 
             for (int i=0;i<8;i++){
 
-                fname= Environment.getExternalStorageDirectory()+"/roadenvio"+(i==0?"":i)+".txt";
+                //fname= Environment.getExternalStorageDirectory()+"/roadenvio"+(i==0?"":i)+".txt";
+                fname= gl.PathDataDir + "/roadenvio"+(i==0?"":i)+".txt";
                 file=new File(fname);
 
                 if(file.exists()){
@@ -158,7 +162,8 @@ public class Soporte extends PBase {
 
     private void sendError() {
         body="Error de envío \n"+body;
-        fname= Environment.getExternalStorageDirectory()+"/roaderror.txt";
+        //fname= Environment.getExternalStorageDirectory()+"/roaderror.txt";
+        fname= gl.PathDataDir +"/roaderror.txt";
         file=new File(fname);
 
         send("El archivo de detalle de error de envío no existe");
@@ -166,7 +171,8 @@ public class Soporte extends PBase {
 
     private void sendBitacora() {
         body="Bitacora \n"+body;
-        fname= Environment.getExternalStorageDirectory()+"/roadlog.txt";
+        //fname= Environment.getExternalStorageDirectory()+"/roadlog.txt";
+        fname= gl.PathDataDir +"/roadlog.txt";
         file=new File(fname);
 
         send("El archivo de bitacora no existe");

@@ -24,14 +24,15 @@ public class printEpson extends printBase{
 	private Device mDevice = null;
 	private Printer mPrinter = null;
 	private final int mRequestCode = 1001;
-
+	private String mPathDataDir = "";
 	
-	public printEpson(Context context,String printerMAC,Device device,Printer printer) {
+	public printEpson(Context context,String printerMAC,Device device,Printer printer, String pPathDataDir) {
 		super(context,printerMAC);
 		
 		mContext=context;
 		mDevice = device;
 		mPrinter = printer;
+        mPathDataDir = pPathDataDir;
 	}
 	
 	
@@ -103,7 +104,8 @@ public class printEpson extends printBase{
 		
 		try {
 			
-			File file1 = new File(Environment.getExternalStorageDirectory(), "/"+fname);
+			//File file1 = new File(Environment.getExternalStorageDirectory(), "/"+fname);
+			File file1 = new File(mPathDataDir, "/"+fname);
 			ffile = new File(file1.getPath());
 					
 			FileInputStream fIn = new FileInputStream(ffile);

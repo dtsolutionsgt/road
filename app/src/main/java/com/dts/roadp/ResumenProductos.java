@@ -47,7 +47,7 @@ public class ResumenProductos extends PBase {
         titulo = (TextView) findViewById(R.id.txtRoadTit);
         filtro = (EditText) findViewById(R.id.filtro);
 
-        rep = new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "");
+        rep = new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "",gl.PathDataDir);
 
         app = new AppMethods(this, gl, Con, db);
         gl.validimp = app.validaImpresora();
@@ -60,7 +60,7 @@ public class ResumenProductos extends PBase {
         };
 
         prn=new printer(this,printclose,gl.validimp);
-        doc=new clsResProd(this,prn.prw,"");
+        doc=new clsResProd(this,prn.prw,"", gl.PathDataDir);
 
         titulo.setText("Reporte de Productos");
 
@@ -146,8 +146,8 @@ public class ResumenProductos extends PBase {
 
     private class clsResProd extends clsDocument {
 
-        public clsResProd(Context context, int printwidth, String archivo) {
-            super(context, printwidth,gl.peMon,gl.peDecImp, archivo);
+        public clsResProd(Context context, int printwidth, String archivo, String pPathDataDir) {
+            super(context, printwidth,gl.peMon,gl.peDecImp, archivo, pPathDataDir);
 
             nombre=" REPORTE DE PRODUTOS PREFACTURA ";
             numero="";

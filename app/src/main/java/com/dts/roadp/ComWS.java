@@ -7845,7 +7845,8 @@ public class ComWS extends PBase {
 		FileWriter wfile;
 
 		try {
-			String fname = Environment.getExternalStorageDirectory() + "/roaderror.txt";
+			//String fname = Environment.getExternalStorageDirectory() + "/roaderror.txt";
+			String fname = gl.PathDataDir + "/roaderror.txt";
 
 			wfile = new FileWriter(fname, false);
 			writer = new BufferedWriter(wfile);
@@ -8230,7 +8231,9 @@ public class ComWS extends PBase {
         String fname,cor;
 
         try {
-            String path = Environment.getExternalStorageDirectory().getPath() + "/RoadPedidos";
+            //String path = Environment.getExternalStorageDirectory().getPath() + "/RoadPedidos";
+			String path = gl.PathDataDir + "/RoadPedidos";
+
             File directory = new File(path);
             File[] files = directory.listFiles();
 

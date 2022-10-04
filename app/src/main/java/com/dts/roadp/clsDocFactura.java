@@ -19,8 +19,8 @@ public class clsDocFactura extends clsDocument {
 	private String codCliNuevo, modo;
 
 	public clsDocFactura(Context context,int printwidth,String cursymbol,int decimpres, String archivo,
-						 boolean pClienteNuevo, String pCodClienteNuevo,String pModo) {
-		super(context, printwidth,cursymbol,decimpres, archivo);
+						 boolean pClienteNuevo, String pCodClienteNuevo,String pModo, String pPathDataDir) {
+		super(context, printwidth,cursymbol,decimpres, archivo, pPathDataDir);
 
 		docfactura=true;
 		docdevolucion=false;
@@ -30,6 +30,7 @@ public class clsDocFactura extends clsDocument {
 		esClienteNuevo=pClienteNuevo;
 		codCliNuevo=pCodClienteNuevo;
 		modo = pModo;
+		vPathDataDir = pPathDataDir;
 	}
 
 	protected boolean loadHeadData(String corel) {

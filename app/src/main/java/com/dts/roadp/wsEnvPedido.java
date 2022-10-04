@@ -1,5 +1,6 @@
 package com.dts.roadp;
 
+import android.app.Activity;
 import android.os.Environment;
 
 import org.ksoap2.SoapEnvelope;
@@ -20,18 +21,25 @@ public class wsEnvPedido extends wsBase {
 
     private String command,corel;
 
-    private String pdir= Environment.getExternalStorageDirectory().getPath() + "/RoadPedidos";
+    private String pdir= "";
 
+    public String mPathDataDir = "";
 
     public wsEnvPedido(String Url) {
         super(Url);
     }
 
-    public void execute(String commandlist,String correlativo,Runnable afterfinish) {
+    public void execute(String commandlist,String correlativo,Runnable afterfinish, String pPathDataDir) {
         command=commandlist;
         corel=correlativo;
         callBack=afterfinish;
+
+        mPathDataDir = pPathDataDir;
+
+        pdir = pPathDataDir + "/RoadPedidos";
+
         super.execute(callBack);
+
     }
 
     @Override

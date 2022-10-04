@@ -108,7 +108,7 @@ public class desglose extends PBase {
         };
 
         prn=new printer(this,printclose,gl.validimp);
-        fdesg=new clsDesglose(this,prn.prw,gl.ruta,0, "");
+        fdesg=new clsDesglose(this,prn.prw,gl.ruta,0, "", gl.PathDataDir);
     }
 
     private void ShowData() {

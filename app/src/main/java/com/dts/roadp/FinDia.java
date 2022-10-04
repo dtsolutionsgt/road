@@ -83,7 +83,7 @@ public class FinDia extends PBase {
             img1.setVisibility(View.INVISIBLE);
         }
 
-        rep = new clsRepBuilder(this, gl.prw, false, gl.peMon, gl.peDecImp, "");
+        rep = new clsRepBuilder(this, gl.prw, false, gl.peMon, gl.peDecImp, "",gl.PathDataDir);
         mw = 6 + gl.peDecImp + 7;
 
         printclose = new Runnable() {

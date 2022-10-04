@@ -123,7 +123,7 @@ public class PedidoRes extends PBase {
 		};
 		
 		prn=new printer(this,printexit,gl.validimp);
-		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp, "");
+		pdoc=new clsDocPedido(this,prn.prw,gl.peMon,gl.peDecImp, "", gl.PathDataDir);
 		pdoc.global=gl;
 		pdoc.deviceid =gl.numSerie;
 	}

@@ -19,8 +19,8 @@ public class clsDocCobro extends clsDocument {
 	private boolean cobroSR=false;
 	protected MiscUtils mu;
 	
-	public clsDocCobro(Context context,int printwidth,String cursymbol,int decimpres, String deviceId, String archivo) {
-		super(context, printwidth,cursymbol,decimpres, archivo);
+	public clsDocCobro(Context context,int printwidth,String cursymbol,int decimpres, String deviceId, String archivo, String pPathDataDir) {
+		super(context, printwidth,cursymbol,decimpres, archivo, pPathDataDir);
 		docfactura=false;
 		docrecibo=true;
 		docpedido=false;

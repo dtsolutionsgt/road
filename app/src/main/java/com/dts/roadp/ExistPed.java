@@ -61,7 +61,7 @@ public class ExistPed extends PBase {
 
         setHandlers();
 
-        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "");
+        rep=new clsRepBuilder(this,gl.prw,false,gl.peMon,gl.peDecImp, "",gl.PathDataDir);
 
         listItems();
 
@@ -479,7 +479,7 @@ public class ExistPed extends PBase {
     private class clsDocExist extends clsDocument {
 
         public clsDocExist(Context context, int printwidth, String archivo) {
-            super(context, printwidth,gl.peMon,gl.peDecImp, archivo);
+            super(context, printwidth,gl.peMon,gl.peDecImp, archivo, gl.PathDataDir);
 
             nombre="REPORTE DE EXISTENCIAS";
             numero="";

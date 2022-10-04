@@ -28,15 +28,18 @@ public class printDMax extends printBase {
 	private appGlobals appG;
 	private PBase clsPBase;
 	private boolean validprint;
+	private String mPathDataDir = "";
 
 	private ArrayList<String> lines = new ArrayList<String>();
 	private ArrayList<Document> documentlist = new  ArrayList<Document>();
 	
-	public printDMax(Context context,String printerMAC,boolean validprinter) {
+	public printDMax(Context context,String printerMAC,boolean validprinter, String pPathDataDir) {
 		super(context,printerMAC);
 		validprint=validprinter;
 		appG = new appGlobals();
 		clsPBase=new PBase();
+
+		mPathDataDir = pPathDataDir;
 	}
 	
 	
@@ -143,7 +146,8 @@ public class printDMax extends printBase {
 		
 		try {
 			
-			File file1 = new File(Environment.getExternalStorageDirectory(), "/"+fname);
+			//File file1 = new File(Environment.getExternalStorageDirectory(), "/"+fname);
+			File file1 = new File(mPathDataDir, "/"+fname);
 			ffile = new File(file1.getPath());
 					
 			FileInputStream fIn = new FileInputStream(ffile);

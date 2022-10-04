@@ -34,14 +34,18 @@ public class printZebraZPL extends printBase {
     private ArrayList<String> lines = new ArrayList<String>();
 
     private String ss,statstr,dbg;
-    private boolean status,validprint;;
+    private boolean status,validprint;
+
+    private String mPathDataDir;
 
     // ZQ320 AC:3F:A4:C8:5F:D9
 
 
-    public printZebraZPL(Context context, String printerMAC, boolean validprinter) {
+    public printZebraZPL(Context context, String printerMAC, boolean validprinter, String pPathDataDir) {
         super(context,printerMAC);
         validprint=validprinter;
+
+        mPathDataDir = pPathDataDir;
     }
 
     // Main
@@ -129,7 +133,8 @@ public class printZebraZPL extends printBase {
 
         try {
 
-            File file1 = new File(Environment.getExternalStorageDirectory(), "/"+fname);
+           // File file1 = new File(Environment.getExternalStorageDirectory(), "/"+fname);
+            File file1 = new File(mPathDataDir, "/"+fname);
             ffile = new File(file1.getPath());
 
             FileInputStream fIn = new FileInputStream(ffile);

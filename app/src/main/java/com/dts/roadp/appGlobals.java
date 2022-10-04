@@ -104,5 +104,7 @@ public class appGlobals extends Application {
 
 	//Directorio de archivos
 	public String PathDataDir = "";
-	public String gBaseDatos = "";
+	public String gBaseDatos =  "";
+	public String PathDataName = "";
+
 }

@@ -1,6 +1,6 @@
 package Interfaz;
 
-import Clases.Token;
+import Facturacion.Token;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;

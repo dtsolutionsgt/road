@@ -182,9 +182,9 @@ public class DevCliCant extends PBase {
 			}
 
 
-			gl.dvprec = mu.round(gl.dvprec,2);
-			gl.dvtotal= mu.round(gl.dvtotal,2);
-			gl.dvpreclista = mu.round(gl.dvpreclista,2);
+			gl.dvprec = mu.round2(gl.dvprec);
+			gl.dvtotal= mu.round2(gl.dvtotal);
+			gl.dvpreclista = mu.round2(gl.dvpreclista);
 			//hidekeyb();
 			super.finish();
 

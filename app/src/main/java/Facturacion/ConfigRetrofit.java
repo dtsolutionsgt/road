@@ -1,4 +1,4 @@
-package Clases;
+package Facturacion;
 
 import java.util.concurrent.TimeUnit;
 

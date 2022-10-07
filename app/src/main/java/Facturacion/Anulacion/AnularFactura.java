@@ -1,4 +1,4 @@
-package Clases.Anulacion;
+package Facturacion.Anulacion;
 
 public class AnularFactura {
 

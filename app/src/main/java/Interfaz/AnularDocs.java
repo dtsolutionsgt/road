@@ -1,8 +1,8 @@
 package Interfaz;
 
 
-import Clases.Anulacion.AnularFactura;
-import Clases.Anulacion.ResultadoAnulacion;
+import Facturacion.Anulacion.AnularFactura;
+import Facturacion.Anulacion.ResultadoAnulacion;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Header;

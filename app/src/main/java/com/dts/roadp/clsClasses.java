@@ -232,7 +232,7 @@ public class clsClasses {
 
 	public class clsCliente {
 		public String  tipoContribuyente, tipoRec, email, telefono, codPais, nombre, direccion, ciudad, muni = "", nit;
-		int diascredito, mediapago;
+		public int diascredito, mediapago;
 	}
 
 	public class clsProducto {
@@ -240,11 +240,11 @@ public class clsClasses {
 	}
 
 	public class clsControlFEL {
-		int Id, CodLiquidacion;
-		String Cufe = "", TipoDoc = "", NumDoc = "", Sucursal = "", Caja = "", Estado = "", Mensaje = "", ValorXml = "", FechaEnvio = "", TipFac = "", FechaAgr = "", QR = "", Corel = "",Ruta = "", Vendedor = "", Host = "", Correlativo = "", QRImg = "";
+		public int Id, CodLiquidacion;
+		public String Cufe = "", TipoDoc = "", NumDoc = "", Sucursal = "", Caja = "", Estado = "", Mensaje = "", ValorXml = "", FechaEnvio = "", TipFac = "", FechaAgr = "", QR = "", Corel = "",Ruta = "", Vendedor = "", Host = "", Correlativo = "", QRImg = "";
 	}
 
 	public class clsEmpresa {
-		String urlToken, urlAnulacion, usuarioApi, claveApi;
+		public String urlToken, urlAnulacion, usuarioApi, claveApi;
 	}
 }

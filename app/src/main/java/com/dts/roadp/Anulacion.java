@@ -23,10 +23,10 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 
-import Clases.Anulacion.AnularFactura;
-import Clases.Anulacion.ResultadoAnulacion;
-import Clases.ConfigRetrofit;
-import Clases.Token;
+import Facturacion.Anulacion.AnularFactura;
+import Facturacion.Anulacion.ResultadoAnulacion;
+import Facturacion.ConfigRetrofit;
+import Facturacion.Token;
 import Interfaz.AnularDocs;
 import Interfaz.ServicioToken;
 import retrofit2.Call;

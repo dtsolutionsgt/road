@@ -1,4 +1,4 @@
-package Clases;
+package Facturacion;
 
 public class Token {
 

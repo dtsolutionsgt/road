@@ -2,11 +2,14 @@ package com.dts.roadp;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -33,19 +36,24 @@ import android.widget.Toast;
 
 import com.example.edocsdk.Fimador;
 
-import java.text.SimpleDateFormat;
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import Entidades.Detalle;
 import Entidades.Receptor;
+import Entidades.Referencia;
 import Entidades.RespuestaEdoc;
+import Entidades.gDFRefFE;
+import Entidades.gDFRefNum;
 import Entidades.gFormaPago;
 import Entidades.gPagPlazo;
+import Entidades.gRucEmDFRef;
 import Entidades.gRucRec;
 import Entidades.gUbiRec;
 import Entidades.rFE;
+import Facturacion.CatalogoFactura;
 
 public class FacturaRes extends PBase {
 
@@ -85,10 +93,17 @@ public class FacturaRes extends PBase {
 	private clsClasses.clsSucursal Sucursal = clsCls.new clsSucursal();
 	private clsClasses.clsCliente Cliente = clsCls.new clsCliente();
 	private clsClasses.clsProducto Producto = clsCls.new clsProducto();
-	private clsClasses.clsControlFEL ControlFEL = clsCls.new clsControlFEL();
 
 	private rFE Factura = new rFE();
+	private rFE NotaCredito = new rFE();
 	private Detalle detalle = new Detalle();
+	private CatalogoFactura Catalogo;
+	private String urltoken = "https://labpa.guru-soft.com/EdocPanama/4.0/Autenticacion/Api/ServicioEDOC?Id=1";
+	private String usuario = "edocTOLEDANO_8945";
+	private String clave = "wsTOLEDANO_8945";
+	private String urlDoc = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/FacturaEnte";
+	private String urlDocNT = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/NotaCreditoEnte";
+	private String QR = "5B4D134FFAE367FD0BE91E37F958883E2C01A36A02FED9E1F41C1E53F1D59ED2D8DD481C0ED9024F348D14CCF55A9A6D5CAC14E42BCCB7F41D64E90A33B5624C";
 
 	@SuppressLint("MissingPermission")
 	@Override
@@ -283,6 +298,8 @@ public class FacturaRes extends PBase {
 
 		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 		fdev.deviceid =gl.numSerie;
+
+		Catalogo = new CatalogoFactura(this);
 
 		saved=false;
 		assignCorel();
@@ -949,135 +966,121 @@ public class FacturaRes extends PBase {
 			}
 
 			//region Emisor
-			if (getSucursal()) {
+			Sucursal = Catalogo.getSucursal();
+			Cliente = Catalogo.getCliente(gl.cliente);
 
-				//region Encabezado Factura FEL
-				Factura.gDGen.iTpEmis = "01"; // 'Fijo salvo que sea autorización en contingencia cambiar a valor 04
-				Factura.gDGen.iDoc = "01"; //'Para Factura fijo.
-				Factura.gDGen.dNroDF = String.valueOf(fcorel); //P_COREL.Correlativo
-				Factura.gDGen.dPtoFacDF = fserie; // BeSucursal.CODIGO '"002" 'Punto de Facturación del documento fiscal. (Ruta, Serie del disp.)
-				Factura.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";// 'Fecha de la FM.
-				Factura.gDGen.iNatOp = "01"; //'Venta fijo.
-				Factura.gDGen.iTipoOp = 1; //'Fijo.
-				Factura.gDGen.iDest = 1; //'Fijo 1
-				Factura.gDGen.iFormCAFE = 2; //'Fijo 2.
-				Factura.gDGen.iEntCAFE = 1; //'Fijo 2
-				Factura.gDGen.dEnvFE = 1; //'Fijo 1
-				Factura.gDGen.iProGen = 2; //'Fijo 2
-				Factura.gDGen.iTipoTranVenta = 1; // Fijo 1
-				Factura.gDGen.iTipoSuc = 2; //'Fijo 2
-				//endregion Encabezado Factura FEL
+			Factura.gDGen.iTpEmis = "01"; // 'Fijo salvo que sea autorización en contingencia cambiar a valor 04
+			Factura.gDGen.iDoc = "01"; //'Para Factura fijo.
+			Factura.gDGen.dNroDF = String.valueOf(fcorel); //P_COREL.Correlativo
+			Factura.gDGen.dPtoFacDF = fserie; // BeSucursal.CODIGO '"002" 'Punto de Facturación del documento fiscal. (Ruta, Serie del disp.)
+			Factura.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";// 'Fecha de la FM.
+			Factura.gDGen.iNatOp = "01"; //'Venta fijo.
+			Factura.gDGen.iTipoOp = 1; //'Fijo.
+			Factura.gDGen.iDest = 1; //'Fijo 1
+			Factura.gDGen.iFormCAFE = 2; //'Fijo 2.
+			Factura.gDGen.iEntCAFE = 1; //'Fijo 2
+			Factura.gDGen.dEnvFE = 1; //'Fijo 1
+			Factura.gDGen.iProGen = 2; //'Fijo 2
+			Factura.gDGen.iTipoTranVenta = 1; // Fijo 1
+			Factura.gDGen.iTipoSuc = 2; //'Fijo 2
 
-				//region Emisor
-				Factura.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";  //'BeSucursal.NOMBRE
-				//El teléfono debe llevar el formato XXX-YYYY
-				Factura.gDGen.Emisor.dTfnEm = Sucursal.telefono;
-				Factura.gDGen.Emisor.dSucEm = Sucursal.codigo;
-				Factura.gDGen.Emisor.dCorElectEmi = Sucursal.correo;
-				//Las coordenadas van con signo y sin espacios.
-				Factura.gDGen.Emisor.dCoordEm = "+" + Sucursal.corx + ",-" + Sucursal.cory;
-				Factura.gDGen.Emisor.gUbiEm.dCodUbi = Sucursal.codubi;
+			Factura.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";  //'BeSucursal.NOMBRE
+			Factura.gDGen.Emisor.dTfnEm = Sucursal.telefono;
+			Factura.gDGen.Emisor.dSucEm = Sucursal.codigo;
+			Factura.gDGen.Emisor.dCorElectEmi = Sucursal.correo;
+			Factura.gDGen.Emisor.dCoordEm = "+" + Sucursal.corx + ",-" + Sucursal.cory;
+			Factura.gDGen.Emisor.gUbiEm.dCodUbi = Sucursal.codubi;
+			Factura.gDGen.Emisor.dDirecEm = Sucursal.direccion;
+			Factura.gDGen.Emisor.gRucEmi.dRuc = Sucursal.nit;
+			Factura.gDGen.Emisor.gRucEmi.dDV = Sucursal.texto;
+			Factura.gDGen.Emisor.gRucEmi.dTipoRuc = Sucursal.tipoRuc;
 
-				Factura.gDGen.Emisor.dDirecEm = Sucursal.direccion;
-				Factura.gDGen.Emisor.gRucEmi.dRuc = Sucursal.nit;
-				Factura.gDGen.Emisor.gRucEmi.dDV = Sucursal.texto;
-				Factura.gDGen.Emisor.gRucEmi.dTipoRuc = Sucursal.tipoRuc;
+			if (!Sucursal.codMuni.isEmpty() || Sucursal.codMuni != null) {
 
-				if (!Sucursal.codMuni.isEmpty() || Sucursal.codMuni != null) {
+				Municipio = clsCls.new clsMunicipio();
+				Departamento = clsCls.new clsDepartamento();
+				Municipio = Catalogo.getMunicipio(Sucursal.codMuni);
+				Departamento = Catalogo.getDepartamento(Municipio.depar);
 
-					getMunicipio(Sucursal.codMuni);
-					getDepartamento(Municipio.depar);
+				if (Municipio.nombre.contains("/")) {
 
-					if (Municipio.nombre.contains("/")) {
+					String[] DireccionCompleta = Municipio.nombre.split("/");
 
-						String[] DireccionCompleta = Municipio.nombre.split("/");
+					Factura.gDGen.Emisor.gUbiEm.dCorreg = DireccionCompleta[1].trim().toUpperCase();
+					Factura.gDGen.Emisor.gUbiEm.dDistr = DireccionCompleta[0].trim().toUpperCase();
 
-						Factura.gDGen.Emisor.gUbiEm.dCorreg = DireccionCompleta[1].trim().toUpperCase();
-						Factura.gDGen.Emisor.gUbiEm.dDistr = DireccionCompleta[0].trim().toUpperCase();
-
-						if (!Departamento.nombre.isEmpty()) {
-							Factura.gDGen.Emisor.gUbiEm.dProv = Departamento.nombre.toUpperCase();
-						} else {
-							Factura.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
-						}
-
+					if (!Departamento.nombre.isEmpty()) {
+						Factura.gDGen.Emisor.gUbiEm.dProv = Departamento.nombre.toUpperCase();
 					} else {
-						msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
-						return false;
+						Factura.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
 					}
 
+				} else {
+					msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+					return false;
 				}
-				//endregion Emisor
 
-				//region Receptor
-				if (!gl.cliente.isEmpty()) {
+			}
 
-					getCliente(gl.cliente);
+			Factura.gDGen.Receptor = new Receptor();
+			Factura.gDGen.Receptor.gRucRec = new gRucRec();
+			Factura.gDGen.Receptor.gUbiRec = new gUbiRec();
 
-					Factura.gDGen.Receptor = new Receptor();
-					Factura.gDGen.Receptor.gRucRec = new gRucRec();
-					Factura.gDGen.Receptor.gUbiRec = new gUbiRec();
+			Factura.gDGen.Receptor.gRucRec.dTipoRuc = Cliente.tipoContribuyente;
+			Factura.gDGen.Receptor.iTipoRec = Cliente.tipoRec;
+			Factura.gDGen.Receptor.dCorElectRec = Cliente.email;
+			Factura.gDGen.Receptor.dTfnRec = Cliente.telefono;
+			Factura.gDGen.Receptor.cPaisRec = Cliente.codPais;
+			Factura.gDGen.Receptor.dNombRec = Cliente.nombre;
+			Factura.gDGen.Receptor.dDirecRec = Cliente.direccion;
+			Factura.gDGen.Receptor.gUbiRec.dCodUbi = Cliente.ciudad;
 
-					Factura.gDGen.Receptor.gRucRec.dTipoRuc = Cliente.tipoContribuyente;
-					Factura.gDGen.Receptor.iTipoRec = Cliente.tipoRec;
-					Factura.gDGen.Receptor.dCorElectRec = Cliente.email;
-					Factura.gDGen.Receptor.dTfnRec = Cliente.telefono;
-					Factura.gDGen.Receptor.cPaisRec = Cliente.codPais;
-					Factura.gDGen.Receptor.dNombRec = Cliente.nombre;
-					Factura.gDGen.Receptor.dDirecRec = Cliente.direccion;
-					Factura.gDGen.Receptor.gUbiRec.dCodUbi = Cliente.ciudad;
+			if (!Cliente.muni.isEmpty() || Cliente.muni != null) {
 
-					if (!Cliente.muni.isEmpty() || Cliente.muni != null) {
+				Municipio = clsCls.new clsMunicipio();
+				Departamento = clsCls.new clsDepartamento();
+				Municipio = Catalogo.getMunicipio(Cliente.muni);
+				Departamento = Catalogo.getDepartamento(Municipio.depar);
 
-						getMunicipio(Cliente.muni);
-						getDepartamento(Municipio.depar);
+				if (Municipio.nombre.contains("/")) {
 
-						if (Municipio.nombre.contains("/")) {
+					String[] DireccionCompleta = Municipio.nombre.split("/");
 
-							String[] DireccionCompleta = Municipio.nombre.split("/");
+					Factura.gDGen.Receptor.gUbiRec.dCorreg = DireccionCompleta[1].trim().toUpperCase();
+					Factura.gDGen.Receptor.gUbiRec.dDistr = DireccionCompleta[0].trim().toUpperCase();
 
-							Factura.gDGen.Receptor.gUbiRec.dCorreg = DireccionCompleta[1].trim().toUpperCase();
-							Factura.gDGen.Receptor.gUbiRec.dDistr = DireccionCompleta[0].trim().toUpperCase();
-
-							if (!Departamento.nombre.isEmpty()) {
-								Factura.gDGen.Receptor.gUbiRec.dProv = Departamento.nombre.toUpperCase();
-							} else {
-								Factura.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
-							}
-
-						} else {
-							msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
-							return false;
-						}
+					if (!Departamento.nombre.isEmpty()) {
+						Factura.gDGen.Receptor.gUbiRec.dProv = Departamento.nombre.toUpperCase();
+					} else {
+						Factura.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
 					}
 
-					if (!Cliente.nit.contains("D")) {
-						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
-						return false;
-					} else {
-						String[] DVRuc = Cliente.nit.split("DV");
+				} else {
+					msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+					return false;
+				}
+			}
 
-						if (Factura.gDGen.Receptor.gRucRec.dTipoRuc.equals("01") || Factura.gDGen.Receptor.gRucRec.dTipoRuc.equals("03")) {
-							if (DVRuc.length > 1) {
-								Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-								Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
-							}
-						} else {
-							if (DVRuc.length > 1) {
-								Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-								Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
-							} else {
-								Factura.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
-								Factura.gDGen.Receptor.gRucRec.dDV = "";
-							}
-						}
+			if (!Cliente.nit.contains("D")) {
+				msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
+				return false;
+			} else {
+				String[] DVRuc = Cliente.nit.split("DV");
+
+				if (Factura.gDGen.Receptor.gRucRec.dTipoRuc.equals("01") || Factura.gDGen.Receptor.gRucRec.dTipoRuc.equals("03")) {
+					if (DVRuc.length > 1) {
+						Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+						Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
 					}
 				} else {
-					msgbox("No se pudo obtener los datos del cliente");
+					if (DVRuc.length > 1) {
+						Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+						Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
+					} else {
+						Factura.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
+						Factura.gDGen.Receptor.gRucRec.dDV = "";
+					}
 				}
-				//endregion Receptor
-			} else {
-				msgbox("No se pudo obtener los datos de la sucursal");
 			}
 
 			db.execSQL(ins.sql());
@@ -1179,15 +1182,140 @@ public class FacturaRes extends PBase {
 				ins.add("SERIEFACT",0);
 				ins.add("CORELFACT",0);
 				ins.add("IMPRES",0);
+				ins.add("CERTIFICADA_DGI", 0);
 
 				db.execSQL(ins.sql());
+
+				int vNroDF;
+				String vSerie;
+
+				vNroDF = Integer.valueOf(gl.dvcorrelnc.substring(3,9));
+				vSerie = StringUtils.right("000" + gl.dvcorrelnc.substring(0,3), 3);
+
+				NotaCredito.gDGen.iTpEmis = "01";
+				NotaCredito.gDGen.iDoc = "04"; //Tipo de documento (04:Nota de Crédito  referente a facturas, 06:Nota de crédito genérica )
+				NotaCredito.gDGen.dNroDF = String.valueOf(vNroDF);
+				NotaCredito.gDGen.dPtoFacDF = vSerie; //000
+				NotaCredito.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";
+				NotaCredito.gDGen.iNatOp = "01";
+				NotaCredito.gDGen.iTipoOp = 1;
+				NotaCredito.gDGen.iDest = 1;
+				NotaCredito.gDGen.iFormCAFE = 1;
+				NotaCredito.gDGen.iEntCAFE = 1;
+				NotaCredito.gDGen.dEnvFE = 1;
+				NotaCredito.gDGen.iProGen = 2;
+				NotaCredito.gDGen.iTipoTranVenta = 1;
+				NotaCredito.gDGen.iTipoSuc = 2;
+
+				//Datos Emisor
+				NotaCredito.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
+				NotaCredito.gDGen.Emisor.dTfnEm = Sucursal.telefono;
+				NotaCredito.gDGen.Emisor.dSucEm = Sucursal.codigo;
+				NotaCredito.gDGen.Emisor.dCorElectEmi = Sucursal.correo;
+				NotaCredito.gDGen.Emisor.dCoordEm = "+" + Sucursal.corx + ",-" + Sucursal.cory;
+				NotaCredito.gDGen.Emisor.gUbiEm.dCodUbi = Sucursal.codubi;
+				NotaCredito.gDGen.Emisor.dDirecEm = Sucursal.direccion;
+				NotaCredito.gDGen.Emisor.gRucEmi.dRuc = Sucursal.nit;
+				NotaCredito.gDGen.Emisor.gRucEmi.dDV = Sucursal.texto;
+				NotaCredito.gDGen.Emisor.gRucEmi.dTipoRuc = Sucursal.tipoRuc;
+
+				if (!Sucursal.codMuni.isEmpty() || Sucursal.codMuni != null) {
+
+					Municipio = clsCls.new clsMunicipio();
+					Departamento = clsCls.new clsDepartamento();
+					Municipio = Catalogo.getMunicipio(Sucursal.codMuni);
+					Departamento = Catalogo.getDepartamento(Municipio.depar);
+
+					if (Municipio.nombre.contains("/")) {
+
+						String[] DireccionCompleta = Municipio.nombre.split("/");
+
+						NotaCredito.gDGen.Emisor.gUbiEm.dCorreg = DireccionCompleta[1].trim().toUpperCase();
+						NotaCredito.gDGen.Emisor.gUbiEm.dDistr = DireccionCompleta[0].trim().toUpperCase();
+
+						if (!Departamento.nombre.isEmpty()) {
+							NotaCredito.gDGen.Emisor.gUbiEm.dProv = Departamento.nombre.toUpperCase();
+						} else {
+							NotaCredito.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
+						}
+
+					} else {
+						msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+						return false;
+					}
+
+				}
+
+				NotaCredito.gDGen.Receptor = new Receptor();
+				NotaCredito.gDGen.Receptor.gRucRec = new gRucRec();
+				NotaCredito.gDGen.Receptor.gUbiRec = new gUbiRec();
+				NotaCredito.gDGen.Receptor.gRucRec.dTipoRuc = Cliente.tipoContribuyente;
+				NotaCredito.gDGen.Receptor.iTipoRec = Cliente.tipoRec;
+				NotaCredito.gDGen.Receptor.dCorElectRec = Cliente.email;
+				NotaCredito.gDGen.Receptor.dTfnRec = Cliente.telefono;
+				NotaCredito.gDGen.Receptor.cPaisRec = Cliente.codPais;
+				NotaCredito.gDGen.Receptor.dNombRec = Cliente.nombre;
+				NotaCredito.gDGen.Receptor.dDirecRec = Cliente.direccion;
+				NotaCredito.gDGen.Receptor.gUbiRec.dCodUbi = Cliente.ciudad;
+
+				if (!Cliente.muni.isEmpty() || Cliente.muni != null) {
+
+					Municipio = clsCls.new clsMunicipio();
+					Departamento = clsCls.new clsDepartamento();
+					Municipio = Catalogo.getMunicipio(Cliente.muni);
+					Departamento = Catalogo.getDepartamento(Municipio.depar);
+
+					if (Municipio.nombre.contains("/")) {
+
+						String[] DireccionCompleta = Municipio.nombre.split("/");
+
+						NotaCredito.gDGen.Receptor.gUbiRec.dCorreg = DireccionCompleta[1].trim().toUpperCase();
+						NotaCredito.gDGen.Receptor.gUbiRec.dDistr = DireccionCompleta[0].trim().toUpperCase();
+
+						if (!Departamento.nombre.isEmpty()) {
+							NotaCredito.gDGen.Receptor.gUbiRec.dProv = Departamento.nombre.toUpperCase();
+						} else {
+							NotaCredito.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
+						}
+
+					} else {
+						msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+						return false;
+					}
+				}
+
+				if (!Cliente.nit.contains("D")) {
+					msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
+					return false;
+				} else {
+					String[] DVRuc = Cliente.nit.split("DV");
+
+					if (NotaCredito.gDGen.Receptor.gRucRec.dTipoRuc.equals("01") || NotaCredito.gDGen.Receptor.gRucRec.dTipoRuc.equals("03")) {
+						if (DVRuc.length > 1) {
+							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+							NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
+						}
+					} else {
+						if (DVRuc.length > 1) {
+							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+							NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
+						} else {
+							NotaCredito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
+							NotaCredito.gDGen.Receptor.gRucRec.dDV = "";
+						}
+					}
+				}
 
 				sql="SELECT Item,CODIGO,CANT,CODDEV,TOTAL,PRECIO,PRECLISTA,REF,PESO,LOTE,UMVENTA,UMSTOCK,UMPESO,FACTOR,POR_PESO FROM T_CxCD WHERE CANT>0";
 				DT=Con.OpenDT(sql);
 
 				DT.moveToFirst();
+				int Correlativo = 1;
+				double TotalAcumulado = 0;
 				while (!DT.isAfterLast()) {
+					Detalle detalle = new Detalle();
 
+					pcod=DT.getString(1);
 					pcod=DT.getString(1);
 					pcant=DT.getDouble(2);
 
@@ -1227,6 +1355,9 @@ public class FacturaRes extends PBase {
 					ins.add("FACTOR",DT.getDouble(13));
 					db.execSQL(ins.sql());
 
+					Double ntPeso = DT.getDouble(8);
+					Double ntFactor = DT.getDouble(13);
+
 					if (!gl.peModal.equalsIgnoreCase("TOL")) {
 
 						try {
@@ -1245,9 +1376,73 @@ public class FacturaRes extends PBase {
 
 					}
 
+					Producto = clsCls.new clsProducto();
+					Producto = Catalogo.getProducto(pcod);
+
+					detalle.dSecItem = Correlativo;
+					detalle.dDescProd = Producto.nombre; //Hay que ver de donde se obtiene el nombre del producto
+					detalle.dCodProd = Producto.codigo;
+
+					if (!Producto.um.isEmpty()) {
+						String CodDGI;
+
+						if (prodPorPeso(Producto.codigo)) {
+							CodDGI = Catalogo.getUMDGI(gl.umpeso);
+						} else {
+							CodDGI = Catalogo.getUMDGI(Producto.um);
+						}
+
+						if (!CodDGI.isEmpty()) {
+							detalle.cUnidad = CodDGI.toLowerCase();
+						} else {
+							detalle.cUnidad = Producto.um.toLowerCase();
+						}
+					}
+
+					if (prodPorPeso(Producto.codigo)) {
+						detalle.dCantCodInt = String.valueOf(mu.round2(ntPeso));
+					} else {
+						if (app.esRosty(Producto.codigo)) {
+							detalle.dCantCodInt = String.valueOf(mu.round2(pcant * ntFactor));
+						} else {
+							detalle.dCantCodInt = String.valueOf(pcant);
+						}
+					}
+
+					//String TotalItem = String.valueOf(mu.round2(Double.valueOf(detalle.dCantCodInt) * DT.getDouble(5)));
+					String TotalItem = String.valueOf(DT.getDouble(4));
+
+					detalle.dCodCPBSabr = Producto.subBodega.substring(0,2);
+					detalle.dCodCPBScmp = Producto.subBodega;
+					detalle.gPrecios.dPrUnit = String.valueOf(DT.getDouble(5));
+					detalle.gPrecios.dPrUnitDesc = "0.000000";
+					detalle.gPrecios.dPrItem = TotalItem;
+					detalle.gPrecios.dValTotItem = TotalItem;
+					detalle.gITBMSItem.dTasaITBMS = "00";
+					detalle.gITBMSItem.dValITBMS = "0.00";
+
+					NotaCredito.Detalles.add(detalle);
+
+					Correlativo++;
+					TotalAcumulado += mu.round2(Double.valueOf(TotalItem));
 					DT.moveToNext();
 
 				}
+				String TotalNT = String.valueOf(TotalAcumulado);
+				NotaCredito.gTot.dTotNeto = TotalNT;
+				NotaCredito.gTot.dTotITBMS = "0.00";
+				NotaCredito.gTot.dTotGravado = "0.00";
+				NotaCredito.gTot.dTotDesc = "0.00";
+				NotaCredito.gTot.dVTot = TotalNT;
+				NotaCredito.gTot.dTotRec = TotalNT;
+				NotaCredito.gTot.dNroItems = String.valueOf(NotaCredito.Detalles.size());
+				NotaCredito.gTot.dVTotItems = TotalNT;
+
+				gFormaPago PagosNt = new gFormaPago();
+				PagosNt.iFormaPago = "02";
+				NotaCredito.gTot.iPzPag = "1";
+				PagosNt.dVlrCuota = TotalNT;
+				NotaCredito.gTot.gFormaPago.add(PagosNt);
 
 				sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactuald+" WHERE RUTA='"+gl.ruta+"' AND TIPO='D'";
 				db.execSQL(sql);
@@ -1273,8 +1468,8 @@ public class FacturaRes extends PBase {
 			sql="SELECT PRODUCTO,CANT,PRECIO,IMP,DES,DESMON,TOTAL,PRECIODOC,PESO,VAL1,VAL2,UM,FACTOR,UMSTOCK FROM T_VENTA";
 			dt=Con.OpenDT(sql);
 
-			Double TotalFact = 0.0;
-			int ContadorItem = 1;
+			double TotalFact = 0;
+			int CorrelativoFac = 1;
 
 			dt.moveToFirst();
 			while (!dt.isAfterLast()) {
@@ -1347,9 +1542,10 @@ public class FacturaRes extends PBase {
 				}
 
 				//AT20220822 Acá va el detalle de la factura
-				getProducto(dt.getString(0));
+				Producto = clsCls.new clsProducto();
+				Producto = Catalogo.getProducto(vprod);
 
-				detalle.dSecItem = ContadorItem;
+				detalle.dSecItem = CorrelativoFac;
 				detalle.dDescProd = Producto.nombre; //Hay que ver de donde se obtiene el nombre del producto
 				detalle.dCodProd = Producto.codigo;
 
@@ -1357,9 +1553,9 @@ public class FacturaRes extends PBase {
 					String CodDGI;
 
 					if (porpeso) {
-						CodDGI = getUMDGI(gl.umpeso);
+						CodDGI = Catalogo.getUMDGI(gl.umpeso);
 					} else {
-						CodDGI = getUMDGI(Producto.um);
+						CodDGI = Catalogo.getUMDGI(Producto.um);
 					}
 
 					if (!CodDGI.isEmpty()) {
@@ -1400,7 +1596,7 @@ public class FacturaRes extends PBase {
 
 				Factura.Detalles.add(detalle);
 
-				ContadorItem++;
+				CorrelativoFac++;
 				TotalFact += mu.round2(dt.getDouble(6));
 
 				dt.moveToNext();
@@ -1522,12 +1718,7 @@ public class FacturaRes extends PBase {
 				gPagPlazo PagoPlazo = new gPagPlazo();
 				PagoPlazo.dSecItem = "1";
 
-				SimpleDateFormat fecha = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTime(fecha.parse(du.getFechaCompleta()));
-				calendar.add(Calendar.DAY_OF_YEAR, Cliente.diascredito);
-
-				PagoPlazo.dFecItPlazo = fecha.format(calendar.getTime())+"-05:00";
+				PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
 				PagoPlazo.dValItPlazo = Total;
 				Factura.gTot.gPagPlazo.add(PagoPlazo);
 			} else {
@@ -1771,10 +1962,10 @@ public class FacturaRes extends PBase {
 			db.setTransactionSuccessful();
 			db.endTransaction();
 
-			if(gl.dvbrowse!=0){
+			/*if(gl.dvbrowse!=0){
 				gl.dvbrowse =0;
 				gl.tiponcredito=0;
-			}
+			}*/
 
 			saved=true;
 
@@ -1794,59 +1985,122 @@ public class FacturaRes extends PBase {
 		try {
 			if (!gl.cobroPendiente && saved) {
 
-				Fimador Xlm = new Fimador(this);
+				Fimador Firmador = new Fimador(this);
+				RespuestaEdoc RespuestaEdocFac, RespuestaEdocNT = null;
 
-				String urltoken = "https://labpa.guru-soft.com/EdocPanama/4.0/Autenticacion/Api/ServicioEDOC?Id=1";
-				String usuario = "edocTOLEDANO_8945";
-				String clave = "wsTOLEDANO_8945";
-				String urlDoc = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/FacturaEnte";
+				if (ConexionValida()) {
+					RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, "2");
+				} else {
+					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 
-				RespuestaEdoc respuestageneradaBTB = Xlm.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, "2");
+				}
 
-				if (!respuestageneradaBTB.Estado.isEmpty() || respuestageneradaBTB.Estado != null) {
+				if (!RespuestaEdocFac.Estado.isEmpty() || RespuestaEdocFac.Estado != null) {
 
-					ControlFEL.Cufe = respuestageneradaBTB.Cufe;
+					clsClasses.clsControlFEL ControlFEL = clsCls.new clsControlFEL();
+					clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
+
+					ControlFEL.Cufe = RespuestaEdocFac.Cufe;
 					ControlFEL.TipoDoc = Factura.gDGen.iDoc;
 					ControlFEL.NumDoc = Factura.gDGen.dNroDF;
-					ControlFEL.Sucursal = Factura.gDGen.dPtoFacDF;
+					ControlFEL.Sucursal = gl.sucur;
 					ControlFEL.Caja = fserie;
 
-					if (respuestageneradaBTB.Estado.equals("21")) {
+					if (RespuestaEdocFac.Estado.equals("21") || RespuestaEdocFac.Estado.equals("20")) {
 						ControlFEL.Estado = "01";
 					} else {
-						ControlFEL.Estado = respuestageneradaBTB.Estado;
+						ControlFEL.Estado = RespuestaEdocFac.Estado;
 					}
 
-					ControlFEL.Mensaje = respuestageneradaBTB.MensajeRespuesta;
-					ControlFEL.ValorXml = respuestageneradaBTB.XML;
+					ControlFEL.Mensaje = RespuestaEdocFac.MensajeRespuesta;
+					ControlFEL.ValorXml = RespuestaEdocFac.XML;
 
 					String[] fechaEnvio = Factura.gDGen.dFechaEm.split("-05:00", 0);
 					ControlFEL.FechaEnvio = fechaEnvio[0];
 					ControlFEL.TipFac = Factura.gDGen.iDoc;
 					ControlFEL.FechaAgr = String.valueOf(du.getFechaCompleta());
-					ControlFEL.QR = respuestageneradaBTB.UrlCodeQR;
+					ControlFEL.QR = RespuestaEdocFac.UrlCodeQR;
 					ControlFEL.Corel = corel;
 					ControlFEL.Ruta = gl.ruta;
 					ControlFEL.Vendedor = gl.vend;
 					ControlFEL.Correlativo = String.valueOf(fcorel);
 
-					int Certificada = 0;
-					if (respuestageneradaBTB.Estado.equals("2") || respuestageneradaBTB.Estado.equals("20")) {
-						Certificada = 1;
-						toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + respuestageneradaBTB.Estado + " - " + respuestageneradaBTB.MensajeRespuesta);
+					if (RespuestaEdocFac.Estado.equals("2")) {
+
+						toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+						Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, 1, corel);
+
+						if (gl.dvbrowse!=0) {
+							gDFRefNum gDFRefNum= new gDFRefNum();
+							gDFRefNum.gDFRefFE = new gDFRefFE();
+							gDFRefNum.gDFRefFE.dCUFERef = ControlFEL.Cufe;
+
+							Referencia referencia= new Referencia();
+							referencia.dFechaDFRef = ControlFEL.FechaEnvio+"-05:00";
+							referencia.dNombEmRef = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
+							referencia.gRucEmDFRef = new gRucEmDFRef();
+							referencia.gRucEmDFRef.dRuc =  Sucursal.nit;
+							referencia.gRucEmDFRef.dTipoRuc = Sucursal.tipoRuc;
+							referencia.gRucEmDFRef.dDV = Sucursal.texto;
+							referencia.gDFRefNum = gDFRefNum;
+
+							NotaCredito.gDGen.Referencia.add(referencia);
+
+							RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, "2");
+
+							if (RespuestaEdocNT != null) {
+								ControlNotaCredito.Cufe = RespuestaEdocNT.Cufe;
+								ControlNotaCredito.TipoDoc = NotaCredito.gDGen.iDoc;
+								ControlNotaCredito.NumDoc = NotaCredito.gDGen.dNroDF;
+								ControlNotaCredito.Sucursal = gl.sucur;
+								ControlNotaCredito.Caja = NotaCredito.gDGen.dPtoFacDF;
+
+								if (RespuestaEdocNT.Estado.equals("21")) {
+									ControlNotaCredito.Estado = "01";
+								} else {
+									ControlNotaCredito.Estado = RespuestaEdocNT.Estado;
+								}
+
+								ControlNotaCredito.Mensaje = RespuestaEdocNT.MensajeRespuesta;
+								ControlNotaCredito.ValorXml = RespuestaEdocNT.XML;
+
+								String[] FechaEnv = NotaCredito.gDGen.dFechaEm.split("-05:00", 0);
+								ControlNotaCredito.FechaEnvio = FechaEnv[0];
+								ControlNotaCredito.TipFac = NotaCredito.gDGen.iDoc;
+								ControlNotaCredito.FechaAgr = String.valueOf(du.getFechaCompleta());
+								ControlNotaCredito.QR = RespuestaEdocNT.UrlCodeQR;
+								ControlNotaCredito.Corel = gl.devcornc;
+								ControlNotaCredito.Ruta = gl.ruta;
+								ControlNotaCredito.Vendedor = gl.vend;
+								ControlNotaCredito.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
+
+								if (RespuestaEdocNT.Estado.equals("2")) {
+									toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
+									Catalogo.UpdateEstadoNotaCredito(ControlNotaCredito.Cufe, 1);
+								} else {
+									toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
+								}
+
+								Catalogo.InsertarFELControl(ControlNotaCredito);
+							}
+						}
+
 					} else {
-						toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + respuestageneradaBTB.Estado + " - " + respuestageneradaBTB.MensajeRespuesta);
+						toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 					}
-
-					sql="UPDATE D_FACTURA SET CUFE ='"+ControlFEL.Cufe+"', CERTIFICADA_DGI="+Certificada+"  WHERE COREL='"+corel+"'";
-					db.execSQL(sql);
-
-					InsertarFELControl();
+					Catalogo.InsertarFELControl(ControlFEL);
 				}
 			}
 
 		} catch (Exception e){
 			Log.e("respuestageneradaBTB", e.getMessage());
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
+		if(gl.dvbrowse!=0){
+			gl.dvbrowse =0;
+			gl.tiponcredito=0;
 		}
 
 		saveAtten(tot);
@@ -1854,197 +2108,21 @@ public class FacturaRes extends PBase {
 		return true;
 	}
 
-	public void getMunicipio(String CodMuni) {
-		Cursor dt;
+	public boolean ConexionValida() {
+		boolean valida = false;
 		try {
-			sql= "SELECT * FROM P_MUNI WHERE CODIGO = '"+CodMuni+"'";
-			dt=Con.OpenDT(sql);
-			dt.moveToFirst();
+			ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-			if (dt.getCount() > 0) {
-				Municipio.codigo = dt.getString(0);
-				Municipio.depar = dt.getString(1);
-				Municipio.nombre = dt.getString(2);
-			} else {
-				return;
+			if (networkInfo != null && networkInfo.isConnected()) {
+				valida = true;
 			}
-
-			if(dt!=null) dt.close();
-
-		} catch (Exception e) {
-			msgbox(new Object() {}.getClass().getEnclosingMethod().getName()+" - "+e.getMessage());
-		}
-	}
-
-	public void getDepartamento(String CodDep) {
-		Cursor dt;
-		try {
-			sql= "SELECT * FROM P_DEPAR WHERE CODIGO = '"+CodDep+"'";
-			dt=Con.OpenDT(sql);
-			dt.moveToFirst();
-
-			if (dt.getCount() > 0) {
-				Departamento.nombre = dt.getString(2);
-			} else {
-				return;
-			}
-
-			if(dt!=null) dt.close();
-		} catch (Exception e) {
-			msgbox(new Object() {}.getClass().getEnclosingMethod().getName()+" - "+e.getMessage());
-		}
-	}
-
-	private void getCliente(String CodCliente) {
-		Cursor dt;
-		try {
-			sql= "SELECT NOMBRE, TIPO_CONTRIBUYENTE, TIPORECEPTOR, EMAIL, TELEFONO, COD_PAIS, DIRECCION, CIUDAD, NIT, MUNICIPIO, MEDIAPAGO, DIACREDITO " +
-			     " FROM P_CLIENTE WHERE CODIGO = '"+CodCliente+"'";
-			dt=Con.OpenDT(sql);
-			dt.moveToFirst();
-
-			if (dt.getCount() > 0) {
-				Cliente.nombre = dt.getString(0);
-				Cliente.tipoContribuyente = dt.getString(1);
-				Cliente.tipoRec = dt.getString(2);
-				Cliente.email = dt.getString(3);
-				Cliente.telefono = dt.getString(4);
-				Cliente.codPais = dt.getString(5);
-				Cliente.direccion = dt.getString(6);
-				Cliente.ciudad = dt.getString(7);
-				Cliente.nit = dt.getString(8);
-				Cliente.muni = dt.getString(9);
-				Cliente.mediapago = Integer.valueOf(dt.getString(10));
-				Cliente.diascredito = Integer.valueOf(dt.getString(11));
-			} else {
-				return;
-			}
-
-			if(dt!=null) dt.close();
-
-		} catch (Exception e) {
-			msgbox(new Object() {}.getClass().getEnclosingMethod().getName()+" - "+e.getMessage());
-		}
-	}
-
-	private Boolean getSucursal() {
-		Cursor dt;
-		Boolean existe = false;
-
-		try {
-			sql="SELECT * FROM P_SUCURSAL";
-			dt=Con.OpenDT(sql);
-			dt.moveToFirst();
-
-			if (dt.getCount() > 0) {
-				Sucursal.codigo = dt.getString(0);
-				Sucursal.descripcion = dt.getString(2);
-				Sucursal.nombre = dt.getString(3);
-				Sucursal.direccion = dt.getString(4);
-				Sucursal.telefono = dt.getString(5);
-				Sucursal.nit = dt.getString(6);
-				Sucursal.texto = dt.getString(7);
-				Sucursal.tipoSucursal = dt.getString(8);
-				Sucursal.correo = dt.getString(9);
-				Sucursal.corx = dt.getString(10);
-				Sucursal.cory = dt.getString(11);
-				Sucursal.codubi = dt.getString(12);
-				Sucursal.tipoRuc = dt.getString(13);
-				Sucursal.codMuni = dt.getString(14);
-
-				existe = true;
-			}
-
-			if (dt != null) dt.close();
 
 		} catch (Exception e) {
 			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
 		}
 
-		return existe;
-	}
-
-	private void getProducto(String Codigo) {
-		Cursor dt;
-		try {
-
-			sql="SELECT DESCLARGA, UNIDBAS, SUBBODEGA  FROM P_PRODUCTO " +
-				" WHERE CODIGO = '"+Codigo+"'";
-			dt=Con.OpenDT(sql);
-			dt.moveToFirst();
-
-			if (dt.getCount() > 0) {
-				Producto.codigo = Codigo;
-				Producto.nombre = dt.getString(0);
-				Producto.um = dt.getString(1);
-				Producto.subBodega = dt.getString(2);
-			}
-
-			if (dt != null) dt.close();
-
-		} catch (Exception e) {
-			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
-		}
-	}
-
-	private String getUMDGI(String CodigoUM) {
-		Cursor dt;
-		String Codigo="";
-		try {
-			sql="SELECT CODIGO_DGI  FROM P_MEDIDA " +
-					" WHERE CODIGO = '"+CodigoUM+"'";
-			dt=Con.OpenDT(sql);
-			dt.moveToFirst();
-
-			if (dt.getCount() > 0) {
-				Codigo = dt.getString(0);
-			}
-
-			if (dt != null) dt.close();
-		} catch (Exception e) {
-			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
-		}
-
-		return Codigo;
-	}
-
-	private void InsertarFELControl() {
-		Cursor dt;
-		try {
-
-			sql = "SELECT MAX(IdTablaControl) FROM D_FACTURA_CONTROL_CONTINGENCIA";
-			dt=Con.OpenDT(sql);
-			dt.moveToFirst();
-			ControlFEL.Id = dt.getInt(0) + 1;
-
-			ins.init("D_FACTURA_CONTROL_CONTINGENCIA");
-
-			ins.add("IdTablaControl", ControlFEL.Id);
-			ins.add("Cufe", ControlFEL.Cufe);
-			ins.add("TipoDocumento", ControlFEL.TipoDoc);
-			ins.add("NumeroDocumento", ControlFEL.NumDoc);
-			ins.add("Sucursal", ControlFEL.Sucursal);
-			ins.add("Caja", ControlFEL.Caja);
-			ins.add("Estado", ControlFEL.Estado);
-			ins.add("Mensaje", ControlFEL.Mensaje);
-			ins.add("Valor_XML", ControlFEL.ValorXml);
-			ins.add("FechaEnvio", ControlFEL.FechaEnvio);
-			ins.add("TipoFactura", ControlFEL.TipFac);
-			ins.add("Fecha_Agr", ControlFEL.FechaAgr);
-			ins.add("QR", ControlFEL.QR);
-			ins.add("COREL", ControlFEL.Corel);
-			ins.add("RUTA", ControlFEL.Ruta);
-			ins.add("VENDEDOR", ControlFEL.Vendedor);
-			ins.add("HOST", ControlFEL.Host);
-			ins.add("CODIGOLIQUIDACION", ControlFEL.CodLiquidacion);
-			ins.add("CORELATIVO", ControlFEL.Correlativo);
-			ins.add("QRIMAGE", ControlFEL.QRImg);
-
-			db.execSQL(ins.sql());
-
-		} catch (Exception e) {
-			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
-		}
+		return valida;
 	}
 
 	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {

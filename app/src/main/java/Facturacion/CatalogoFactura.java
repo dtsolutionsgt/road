@@ -37,7 +37,7 @@ public class CatalogoFactura extends PBase {
             app = new AppMethods(cont,gl,Con,db);
 
         } catch (Exception e) {
-            Toast.makeText(cont, "Printer : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(cont, "CatalogoFactura : " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

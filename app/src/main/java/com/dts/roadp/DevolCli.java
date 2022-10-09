@@ -1,10 +1,13 @@
 package com.dts.roadp;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -491,6 +494,7 @@ public class DevolCli extends PBase {
 
 				NotaCredito.gDGen.iTpEmis = "01";
 				NotaCredito.gDGen.iDoc = "06"; //Tipo de documento (04:Nota de Crédito  referente a facturas, 06:Nota de crédito genérica )
+				//(05:Nota de debito  referente a facturas, 07:Nota de debito genérica )
 				NotaCredito.gDGen.dNroDF = String.valueOf(vNroDF);
 				NotaCredito.gDGen.dPtoFacDF = vSerie; //000
 				NotaCredito.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";
@@ -677,7 +681,7 @@ public class DevolCli extends PBase {
 					}
 
 					detalle.dSecItem = Correlativo;
-					detalle.dDescProd = Producto.nombre; //Hay que ver de donde se obtiene el nombre del producto
+					detalle.dDescProd = Producto.nombre;
 					detalle.dCodProd = Producto.codigo;
 
 					if (!Producto.um.isEmpty()) {
@@ -776,7 +780,16 @@ public class DevolCli extends PBase {
 				RespuestaEdoc RespuestaEdoc =  null;
 
 				clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
-				RespuestaEdoc = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDoc, "2");
+
+				if (ConexionValida()) {
+					RespuestaEdoc = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDoc, "2");
+				} else {
+					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,"/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+				}
+
+				if (RespuestaEdoc == null) {
+					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,"/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+				}
 
 				if (RespuestaEdoc != null) {
 					if (!RespuestaEdoc.Estado.isEmpty() || RespuestaEdoc.Estado != null) {
@@ -809,6 +822,8 @@ public class DevolCli extends PBase {
 						if (RespuestaEdoc.Estado.equals("2")) {
 							toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + RespuestaEdoc.MensajeRespuesta);
 							Catalogo.UpdateEstadoNotaCredito(RespuestaEdoc.Cufe, 1);
+						} else {
+							toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + RespuestaEdoc.MensajeRespuesta);
 						}
 					}
 
@@ -852,6 +867,8 @@ public class DevolCli extends PBase {
 			db.endTransaction();
             gl.dvcorreld="";
 			mu.msgbox(e.getMessage());
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -910,6 +927,22 @@ public class DevolCli extends PBase {
 	}
 
 	// Aux
+	public boolean ConexionValida() {
+		boolean valida = false;
+		try {
+			ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+			if (networkInfo != null && networkInfo.isConnected()) {
+				valida = true;
+			}
+
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
+
+		return valida;
+	}
 
 	private String obtienecorrel(String tipo){
 		String correl="";

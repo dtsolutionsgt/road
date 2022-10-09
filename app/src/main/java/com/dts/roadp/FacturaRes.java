@@ -1992,7 +1992,10 @@ public class FacturaRes extends PBase {
 					RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, "2");
 				} else {
 					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+				}
 
+				if	(RespuestaEdocFac == null) {
+					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 				}
 
 				if (!RespuestaEdocFac.Estado.isEmpty() || RespuestaEdocFac.Estado != null) {

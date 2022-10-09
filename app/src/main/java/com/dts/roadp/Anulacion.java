@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 
+import Entidades.rFE;
 import Facturacion.Anulacion.AnularFactura;
 import Facturacion.Anulacion.ResultadoAnulacion;
 import Facturacion.ConfigRetrofit;
@@ -70,6 +71,8 @@ public class Anulacion extends PBase {
 	private Token token = new Token();
 	private ResultadoAnulacion resultado = new ResultadoAnulacion();
 	boolean exito = false;
+
+	private rFE NotaDebito = new rFE();
 			
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -510,12 +513,15 @@ public class Anulacion extends PBase {
 			try {
 
 				Response<ResultadoAnulacion> response = call.execute();
-				resultado = response.body();
 
-				if (resultado.getEstado().equals("11")) {
-					exito = true;
-				} else if (resultado.getEstado().equals("3")) {
-					toastlong(resultado.getMensajeRespuesta());
+				if (response.isSuccessful()) {
+					resultado = response.body();
+
+					if (resultado.getEstado().equals("11")) {
+						exito = true;
+					} else if (resultado.getEstado().equals("3")) {
+						toastlong(resultado.getMensajeRespuesta());
+					}
 				}
 
 			} catch (Exception ex) {
@@ -526,6 +532,28 @@ public class Anulacion extends PBase {
 			mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
 		}
 		return exito;
+	}
+
+	private void CrearNotaDebito() {
+		try {
+
+			/*NotaDebito.gDGen.iTpEmis = "01";
+			NotaDebito.gDGen.iDoc = "07"; //Tipo de documento //(05:Nota de debito  referente a facturas, 07:Nota de debito genérica )
+			NotaDebito.gDGen.dNroDF = String.valueOf(vNroDF); //Acá va un número entero 19
+			NotaDebito.gDGen.dPtoFacDF = vSerie; //000 003
+			NotaDebito.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";
+			NotaDebito.gDGen.iNatOp = "01";
+			NotaDebito.gDGen.iTipoOp = 1;
+			NotaDebito.gDGen.iDest = 1;
+			NotaDebito.gDGen.iFormCAFE = 1;
+			NotaDebito.gDGen.iEntCAFE = 1;
+			NotaDebito.gDGen.dEnvFE = 1;
+			NotaDebito.gDGen.iProGen = 2;
+			NotaDebito.gDGen.iTipoTranVenta = 1;
+			NotaDebito.gDGen.iTipoSuc = 2;*/
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" - " + e.getMessage());
+		}
 	}
 	//endregion
 
@@ -1803,7 +1831,7 @@ public class Anulacion extends PBase {
 
 					if (tipo == 3) {
 						ProgressDialog("Anulando factura...");
-						AsyncAnularFactura anular = new AsyncAnularFactura();
+						AsyncAnularDocumento anular = new AsyncAnularDocumento();
 						anular.execute();
 					} else {
 						anulDocument();
@@ -1934,7 +1962,7 @@ public class Anulacion extends PBase {
 		}
 	}
 
-	public class AsyncAnularFactura extends AsyncTask<Void, Void, String> {
+	public class AsyncAnularDocumento extends AsyncTask<Void, Void, String> {
 
 		@Override
 		protected String doInBackground(Void... vd) {
@@ -1946,6 +1974,9 @@ public class Anulacion extends PBase {
 		protected void onPostExecute(String vdata){
 			if (exito) {
 				AnularFactHH_DGI();
+			} else {
+				progress.cancel();
+				toast("Error");
 			}
 		}
 	}

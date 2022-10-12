@@ -792,6 +792,8 @@ public class DevolCli extends PBase {
 				}
 
 				if (RespuestaEdoc != null) {
+					int EstadoNT = 0;
+
 					if (!RespuestaEdoc.Estado.isEmpty() || RespuestaEdoc.Estado != null) {
 
 						ControlNotaCredito.Cufe = RespuestaEdoc.Cufe;
@@ -807,7 +809,7 @@ public class DevolCli extends PBase {
 						}
 
 						ControlNotaCredito.Mensaje = RespuestaEdoc.MensajeRespuesta;
-						ControlNotaCredito.ValorXml = RespuestaEdoc.XML;
+						ControlNotaCredito.ValorXml = RespuestaEdoc.XML != null ? Catalogo.ReplaceXML(RespuestaEdoc.XML) : "";;
 
 						String[] FechaEnv = NotaCredito.gDGen.dFechaEm.split("-05:00", 0);
 						ControlNotaCredito.FechaEnvio = FechaEnv[0];
@@ -821,12 +823,13 @@ public class DevolCli extends PBase {
 
 						if (RespuestaEdoc.Estado.equals("2")) {
 							toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + RespuestaEdoc.MensajeRespuesta);
-							Catalogo.UpdateEstadoNotaCredito(RespuestaEdoc.Cufe, 1);
+							EstadoNT = 1;
 						} else {
 							toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + RespuestaEdoc.MensajeRespuesta);
 						}
 					}
 
+					Catalogo.UpdateEstadoNotaCredito(RespuestaEdoc.Cufe, EstadoNT);
 					Catalogo.InsertarFELControl(ControlNotaCredito);
 				}
 

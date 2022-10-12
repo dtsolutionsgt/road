@@ -19,13 +19,27 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.edocsdk.Fimador;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 
+import Entidades.Detalle;
+import Entidades.Receptor;
+import Entidades.Referencia;
+import Entidades.RespuestaEdoc;
+import Entidades.gDFRefFE;
+import Entidades.gDFRefNum;
+import Entidades.gFormaPago;
+import Entidades.gPagPlazo;
+import Entidades.gRucEmDFRef;
+import Entidades.gRucRec;
+import Entidades.gUbiRec;
 import Entidades.rFE;
 import Facturacion.Anulacion.AnularFactura;
 import Facturacion.Anulacion.ResultadoAnulacion;
+import Facturacion.CatalogoFactura;
 import Facturacion.ConfigRetrofit;
 import Facturacion.Token;
 import Interfaz.AnularDocs;
@@ -73,7 +87,22 @@ public class Anulacion extends PBase {
 	boolean exito = false;
 
 	private rFE NotaDebito = new rFE();
-			
+	private CatalogoFactura Catalogo;
+	private String cliente;
+	private clsClasses.clsCliente Cliente;
+	private clsClasses.clsSucursal Sucursal;
+	private clsClasses.clsMunicipio Municipio;
+	private clsClasses.clsDepartamento Departamento;
+	private ArrayList<clsClasses.clsBeNotaCreditoDet> DetalleNT;
+	private clsClasses.clsProducto Producto;
+
+	private String urltoken = "https://labpa.guru-soft.com/EdocPanama/4.0/Autenticacion/Api/ServicioEDOC?Id=1";
+	private String usuario = "edocTOLEDANO_8945";
+	private String clave = "wsTOLEDANO_8945";
+	private String urlDoc = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/NotaDebitoFirmadaEnte";
+	private String QR = "5B4D134FFAE367FD0BE91E37F958883E2C01A36A02FED9E1F41C1E53F1D59ED2D8DD481C0ED9024F348D14CCF55A9A6D5CAC14E42BCCB7F41D64E90A33B5624C";
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -126,6 +155,7 @@ public class Anulacion extends PBase {
 
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
 		fdoc.medidapeso=gl.umpeso;
+		Catalogo = new CatalogoFactura(this);
 		getDatosEmpresa();
 	}
 
@@ -190,7 +220,10 @@ public class Anulacion extends PBase {
 						clsClasses.clsCFDV vItem = (clsClasses.clsCFDV)lvObj;
 
 						itemid=vItem.Cod;
+						cliente = vItem.Desc.split(" -")[0];
 						adapter.setSelectedIndex(position);
+						Cliente = Catalogo.getCliente(cliente);
+						//CrearNotaDebito();
 
 						sitem=vItem;
 					} catch (Exception e) {
@@ -537,7 +570,10 @@ public class Anulacion extends PBase {
 	private void CrearNotaDebito() {
 		try {
 
-			/*NotaDebito.gDGen.iTpEmis = "01";
+			int vNroDF = Integer.valueOf(itemid.substring(3,9));
+			String vSerie = StringUtils.right("000" + itemid.substring(0,3), 3);
+
+			NotaDebito.gDGen.iTpEmis = "01";
 			NotaDebito.gDGen.iDoc = "07"; //Tipo de documento //(05:Nota de debito  referente a facturas, 07:Nota de debito genérica )
 			NotaDebito.gDGen.dNroDF = String.valueOf(vNroDF); //Acá va un número entero 19
 			NotaDebito.gDGen.dPtoFacDF = vSerie; //000 003
@@ -550,7 +586,261 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.dEnvFE = 1;
 			NotaDebito.gDGen.iProGen = 2;
 			NotaDebito.gDGen.iTipoTranVenta = 1;
-			NotaDebito.gDGen.iTipoSuc = 2;*/
+			NotaDebito.gDGen.iTipoSuc = 2;
+
+			Sucursal = Catalogo.getSucursal();
+
+			NotaDebito.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
+			NotaDebito.gDGen.Emisor.dTfnEm = Sucursal.telefono;
+			NotaDebito.gDGen.Emisor.dSucEm = Sucursal.codigo;
+			NotaDebito.gDGen.Emisor.dCorElectEmi = Sucursal.correo;
+			NotaDebito.gDGen.Emisor.dCoordEm = "+" + Sucursal.corx + ",-" + Sucursal.cory;
+			NotaDebito.gDGen.Emisor.gUbiEm.dCodUbi = Sucursal.codubi;
+			NotaDebito.gDGen.Emisor.dDirecEm = Sucursal.direccion;
+			NotaDebito.gDGen.Emisor.gRucEmi.dRuc = Sucursal.nit;
+			NotaDebito.gDGen.Emisor.gRucEmi.dDV = Sucursal.texto;
+			NotaDebito.gDGen.Emisor.gRucEmi.dTipoRuc = Sucursal.tipoRuc;
+
+			if (!Sucursal.codMuni.isEmpty() || Sucursal.codMuni != null) {
+				Municipio = clsCls.new clsMunicipio();
+				Departamento = clsCls.new clsDepartamento();
+
+				Municipio = Catalogo.getMunicipio(Sucursal.codMuni);
+				Departamento = Catalogo.getDepartamento(Municipio.depar);
+
+				if (Municipio.nombre.contains("/")) {
+
+					String[] DireccionCompleta = Municipio.nombre.split("/");
+
+					NotaDebito.gDGen.Emisor.gUbiEm.dCorreg = DireccionCompleta[1].trim().toUpperCase();
+					NotaDebito.gDGen.Emisor.gUbiEm.dDistr = DireccionCompleta[0].trim().toUpperCase();
+
+					if (!Departamento.nombre.isEmpty()) {
+						NotaDebito.gDGen.Emisor.gUbiEm.dProv = Departamento.nombre.toUpperCase();
+					} else {
+						NotaDebito.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
+					}
+
+				} else {
+					msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+					return;
+				}
+
+			}
+
+			NotaDebito.gDGen.Receptor = new Receptor();
+			NotaDebito.gDGen.Receptor.gRucRec = new gRucRec();
+			NotaDebito.gDGen.Receptor.gUbiRec = new gUbiRec();
+			NotaDebito.gDGen.Receptor.gRucRec.dTipoRuc = Cliente.tipoContribuyente;
+			NotaDebito.gDGen.Receptor.iTipoRec = Cliente.tipoRec;
+			NotaDebito.gDGen.Receptor.dCorElectRec = Cliente.email;
+			NotaDebito.gDGen.Receptor.dTfnRec = Cliente.telefono;
+			NotaDebito.gDGen.Receptor.cPaisRec = Cliente.codPais;
+			NotaDebito.gDGen.Receptor.dNombRec = Cliente.nombre;
+			NotaDebito.gDGen.Receptor.dDirecRec = Cliente.direccion;
+			NotaDebito.gDGen.Receptor.gUbiRec.dCodUbi = Cliente.ciudad;
+
+			if (!Cliente.muni.isEmpty() || Cliente.muni != null) {
+				Municipio = clsCls.new clsMunicipio();
+				Departamento = clsCls.new clsDepartamento();
+
+				Municipio = Catalogo.getMunicipio(Cliente.muni);
+				Departamento = Catalogo.getDepartamento(Municipio.depar);
+
+				if (Municipio.nombre.contains("/")) {
+
+					String[] DireccionCompleta = Municipio.nombre.split("/");
+
+					NotaDebito.gDGen.Receptor.gUbiRec.dCorreg = DireccionCompleta[1].trim().toUpperCase();
+					NotaDebito.gDGen.Receptor.gUbiRec.dDistr = DireccionCompleta[0].trim().toUpperCase();
+
+					if (!Departamento.nombre.isEmpty()) {
+						NotaDebito.gDGen.Receptor.gUbiRec.dProv = Departamento.nombre.toUpperCase();
+					} else {
+						NotaDebito.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
+					}
+
+				} else {
+					msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+					return;
+				}
+			}
+
+			if (!Cliente.nit.contains("D")) {
+				msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
+				return;
+			} else {
+				String[] DVRuc = Cliente.nit.split("DV");
+
+				if (NotaDebito.gDGen.Receptor.gRucRec.dTipoRuc.equals("01") || NotaDebito.gDGen.Receptor.gRucRec.dTipoRuc.equals("03")) {
+					if (DVRuc.length > 1) {
+						NotaDebito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+						NotaDebito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
+					}
+				} else {
+					if (DVRuc.length > 1) {
+						NotaDebito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+						NotaDebito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
+					} else {
+						NotaDebito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
+						NotaDebito.gDGen.Receptor.gRucRec.dDV = "";
+					}
+				}
+			}
+
+			DetalleNT = Catalogo.GetDetalleNT(itemid);
+
+			int Correlativo = 1;
+			double TotalAcumulado = 0;
+			for (int i=0; i < DetalleNT.size(); i++) {
+				Detalle detalle = new Detalle();
+
+				Producto = clsCls.new clsProducto();
+				Producto = Catalogo.getProducto(DetalleNT.get(i).codigoProd);
+
+				detalle.dSecItem = Correlativo;
+				detalle.dDescProd = Producto.nombre;
+				detalle.dCodProd = Producto.codigo;
+
+				if (!Producto.um.isEmpty()) {
+					String CodDGI;
+
+					if (DetalleNT.get(i).porpeso.equals("S")) {
+						CodDGI = Catalogo.getUMDGI(DetalleNT.get(i).umpeso);
+					} else {
+						CodDGI = Catalogo.getUMDGI(Producto.um);
+					}
+
+					if (!CodDGI.isEmpty()) {
+						detalle.cUnidad = CodDGI.toLowerCase();
+					} else {
+						detalle.cUnidad = Producto.um.toLowerCase();
+					}
+				}
+
+				if (DetalleNT.get(i).porpeso.equals("S")) {
+					detalle.dCantCodInt = String.valueOf(DetalleNT.get(i).peso);
+				} else {
+					if (app.esRosty(Producto.codigo)) {
+						detalle.dCantCodInt = String.valueOf(mu.round2(Double.valueOf(DetalleNT.get(i).cant) * Double.valueOf(DetalleNT.get(i).factor)));
+					} else {
+						detalle.dCantCodInt = String.valueOf(DetalleNT.get(i).cant);
+					}
+				}
+
+				//String TotalItem = String.valueOf(mu.round2(Double.valueOf(detalle.dCantCodInt) * DT.getDouble(5)));
+				String TotalItem = DetalleNT.get(i).peso;
+
+				detalle.dCodCPBSabr = Producto.subBodega.substring(0,2);
+				detalle.dCodCPBScmp = Producto.subBodega;
+				detalle.gPrecios.dPrUnit = DetalleNT.get(i).precio;
+				detalle.gPrecios.dPrUnitDesc = "0.000000";
+				detalle.gPrecios.dPrItem = TotalItem;
+				detalle.gPrecios.dValTotItem = TotalItem;
+				detalle.gITBMSItem.dTasaITBMS = "00";
+				detalle.gITBMSItem.dValITBMS = "0.00";
+
+				NotaDebito.Detalles.add(detalle);
+
+				Correlativo++;
+				TotalAcumulado += mu.round2(Double.valueOf(TotalItem));
+			}
+
+			String TotalNT = String.valueOf(mu.round2(TotalAcumulado));
+
+			NotaDebito.gTot.dTotNeto = TotalNT;
+			NotaDebito.gTot.dTotITBMS = "0.00";
+			NotaDebito.gTot.dTotGravado = "0.00";
+			NotaDebito.gTot.dTotDesc = "0.00";
+			NotaDebito.gTot.dVTot = TotalNT;
+			NotaDebito.gTot.dTotRec = TotalNT;
+			NotaDebito.gTot.dNroItems = String.valueOf(NotaDebito.Detalles.size());
+			NotaDebito.gTot.dVTotItems = TotalNT;
+
+			gFormaPago PagosNt = new gFormaPago();
+
+			if (Cliente.mediapago == 4) {
+				PagosNt.iFormaPago = "01";
+				NotaDebito.gTot.iPzPag = "2";
+
+				NotaDebito.gTot.gPagPlazo = new ArrayList();
+				gPagPlazo PagoPlazo = new gPagPlazo();
+				PagoPlazo.dSecItem = "1";
+				PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
+				PagoPlazo.dValItPlazo = TotalNT;
+				NotaDebito.gTot.gPagPlazo.add(PagoPlazo);
+			} else {
+				PagosNt.iFormaPago = "02";
+				NotaDebito.gTot.iPzPag = "1";
+			}
+
+			String corelFactura=tieneFacturaNC(itemid);
+
+			if (!corelFactura.isEmpty()) {
+
+
+				gDFRefNum gDFRefNum= new gDFRefNum();
+				gDFRefNum.gDFRefFE = new gDFRefFE();
+				gDFRefNum.gDFRefFE.dCUFERef = getCufe(corelFactura);
+
+				Referencia referencia= new Referencia();
+				referencia.dFechaDFRef = NotaDebito.gDGen.dFechaEm;
+				referencia.dNombEmRef = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
+				referencia.gRucEmDFRef = new gRucEmDFRef();
+				referencia.gRucEmDFRef.dRuc =  Sucursal.nit;
+				referencia.gRucEmDFRef.dTipoRuc = Sucursal.tipoRuc;
+				referencia.gRucEmDFRef.dDV = Sucursal.texto;
+				referencia.gDFRefNum = gDFRefNum;
+
+				NotaDebito.gDGen.Referencia.add(referencia);
+			}
+
+			RespuestaEdoc RespuestaEdocND = new RespuestaEdoc();
+			clsClasses.clsControlFEL ControNotaDebito = clsCls.new clsControlFEL();
+			Fimador Firmador = new Fimador(this);
+			int EstadoND = 0;
+
+			RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, "2");
+
+			if (RespuestaEdocND != null) {
+				ControNotaDebito.Cufe = RespuestaEdocND.Cufe;
+				ControNotaDebito.TipoDoc = NotaDebito.gDGen.iDoc;
+				ControNotaDebito.NumDoc = NotaDebito.gDGen.dNroDF;
+				ControNotaDebito.Sucursal = gl.sucur;
+				ControNotaDebito.Caja = NotaDebito.gDGen.dPtoFacDF;
+
+				if (RespuestaEdocND.Estado.equals("21")) {
+					ControNotaDebito.Estado = "01";
+				} else {
+					ControNotaDebito.Estado = RespuestaEdocND.Estado;
+				}
+
+				ControNotaDebito.Mensaje = RespuestaEdocND.MensajeRespuesta;
+				ControNotaDebito.ValorXml = RespuestaEdocND.XML;
+
+				String[] FechaEnv = NotaDebito.gDGen.dFechaEm.split("-05:00", 0);
+				ControNotaDebito.FechaEnvio = FechaEnv[0];
+				ControNotaDebito.TipFac = NotaDebito.gDGen.iDoc;
+				ControNotaDebito.FechaAgr = String.valueOf(du.getFechaCompleta());
+				ControNotaDebito.QR = RespuestaEdocND.UrlCodeQR;
+				ControNotaDebito.Corel = gl.devcornc;
+				ControNotaDebito.Ruta = gl.ruta;
+				ControNotaDebito.Vendedor = gl.vend;
+				ControNotaDebito.Correlativo = String.valueOf(NotaDebito.gDGen.dNroDF);
+
+				if (RespuestaEdocND.Estado.equals("2")) {
+					EstadoND = 1;
+					toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
+
+				} else {
+					toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
+				}
+
+				/*Catalogo.UpdateEstadoNotaCredito(ControlNotaCredito.Cufe, EstadoNT);
+				Catalogo.InsertarFELControl(ControlNotaCredito);*/
+
+			}
+
 		} catch (Exception e) {
 			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" - " + e.getMessage());
 		}
@@ -1233,6 +1523,28 @@ public class Anulacion extends PBase {
 		}
 
 		return vtieneFacturaNC;
+	}
+
+	private String getCufe(String Factura){
+
+		Cursor DT;
+		String Cufe= "";
+
+		try{
+
+			sql = "SELECT CUFE FROM D_FACTURA WHERE COREL = '" + Factura + "'";
+			DT=Con.OpenDT(sql);
+
+			if (DT.getCount()>0){
+				DT.moveToFirst();
+				Cufe = DT.getString(0);
+			}
+
+		}catch (Exception ex){
+			mu.msgbox("Ocurrió un error "+ex.getMessage());
+		}
+
+		return Cufe;
 	}
 
 	private String tieneNotaCredFactura(String vCorel){

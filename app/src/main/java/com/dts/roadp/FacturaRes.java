@@ -2002,6 +2002,7 @@ public class FacturaRes extends PBase {
 
 					clsClasses.clsControlFEL ControlFEL = clsCls.new clsControlFEL();
 					clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
+					int EstadoFac = 0, EstadoNT = 0;
 
 					ControlFEL.Cufe = RespuestaEdocFac.Cufe;
 					ControlFEL.TipoDoc = Factura.gDGen.iDoc;
@@ -2015,8 +2016,9 @@ public class FacturaRes extends PBase {
 						ControlFEL.Estado = RespuestaEdocFac.Estado;
 					}
 
+
 					ControlFEL.Mensaje = RespuestaEdocFac.MensajeRespuesta;
-					ControlFEL.ValorXml = RespuestaEdocFac.XML;
+					ControlFEL.ValorXml = RespuestaEdocFac.XML != null ? Catalogo.ReplaceXML(RespuestaEdocFac.XML) : "";
 
 					String[] fechaEnvio = Factura.gDGen.dFechaEm.split("-05:00", 0);
 					ControlFEL.FechaEnvio = fechaEnvio[0];
@@ -2029,9 +2031,8 @@ public class FacturaRes extends PBase {
 					ControlFEL.Correlativo = String.valueOf(fcorel);
 
 					if (RespuestaEdocFac.Estado.equals("2")) {
-
+						EstadoFac = 1;
 						toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
-						Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, 1, corel);
 
 						if (gl.dvbrowse!=0) {
 							gDFRefNum gDFRefNum= new gDFRefNum();
@@ -2065,7 +2066,7 @@ public class FacturaRes extends PBase {
 								}
 
 								ControlNotaCredito.Mensaje = RespuestaEdocNT.MensajeRespuesta;
-								ControlNotaCredito.ValorXml = RespuestaEdocNT.XML;
+								ControlNotaCredito.ValorXml = RespuestaEdocNT.XML != null ? Catalogo.ReplaceXML(RespuestaEdocNT.XML) : "";;
 
 								String[] FechaEnv = NotaCredito.gDGen.dFechaEm.split("-05:00", 0);
 								ControlNotaCredito.FechaEnvio = FechaEnv[0];
@@ -2078,12 +2079,14 @@ public class FacturaRes extends PBase {
 								ControlNotaCredito.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
 
 								if (RespuestaEdocNT.Estado.equals("2")) {
+									EstadoNT = 1;
 									toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
-									Catalogo.UpdateEstadoNotaCredito(ControlNotaCredito.Cufe, 1);
+
 								} else {
 									toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
 								}
 
+								Catalogo.UpdateEstadoNotaCredito(ControlNotaCredito.Cufe, EstadoNT);
 								Catalogo.InsertarFELControl(ControlNotaCredito);
 							}
 						}
@@ -2091,6 +2094,8 @@ public class FacturaRes extends PBase {
 					} else {
 						toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 					}
+
+					Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
 					Catalogo.InsertarFELControl(ControlFEL);
 				}
 			}

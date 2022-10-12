@@ -247,4 +247,8 @@ public class clsClasses {
 	public class clsEmpresa {
 		public String urlToken, urlAnulacion, usuarioApi, claveApi;
 	}
+
+	public class clsBeNotaCreditoDet {
+		public String corel, producto, codigoProd, peso, cant, umpeso, factor, porpeso, precio;
+	}
 }

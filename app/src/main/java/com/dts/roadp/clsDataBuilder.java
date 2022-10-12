@@ -151,7 +151,7 @@ public class clsDataBuilder {
 					                       "KILOMETRAJE, FECHAENTR, FACTLINK, TOTAL, DESMONTO, IMPMONTO, PESO, BANDERA, "+
 					                       "STATCOM, CALCOBJ, SERIE, CORELATIVO, IMPRES, ADD1, ADD2, ADD3, DEPOS, PEDCOREL," +
 					                       "REFERENCIA, ASIGNACION, SUPERVISOR, AYUDANTE, VEHICULO, CODIGOLIQUIDACION, " +
-					                       "RAZON_ANULACION, CODIGO_RUTA_PEDIDO, DESPCOREL";
+					                       "RAZON_ANULACION, CODIGO_RUTA_PEDIDO, DESPCOREL, CERTIFICADA_DGI, CUFE";
 			if (tn.equals("D_CANASTA")) SS="SELECT RUTA,FECHA,CLIENTE,PRODUCTO,CANTREC,CANTENTR,STATCOM,CORELTRANS,PESOREC,PESOENTR," +
 											"ANULADO,UNIDBAS,CODIGOLIQUIDACION,VENDEDOR";
 
@@ -202,6 +202,9 @@ public class clsDataBuilder {
                         if (ct==1) s="'"+DT.getString(i)+"'";
                         if (ct==2) s="'"+DU.univfechaext(DT.getLong(i))+"'";
                         if (ct==3) s="'"+DU.univfechaext(DT.getLong(i))+"'";
+						if (ct == 4) {
+							s= "CONVERT(XML, '" + DT.getString(i) + "')";
+						}
                         valstr=s;
                         ins.add(nombre,valstr);
                     }
@@ -415,7 +418,9 @@ public class clsDataBuilder {
             || cn.equalsIgnoreCase("FECHANAC") || cn.equalsIgnoreCase("FECHA_SISTEMA") ) {
 			c=2;
 			if (cn.equalsIgnoreCase("FECHANAC")) c=3;
-		} else {	
+		} else if (cn.equalsIgnoreCase("Valor_XML")) {
+			c=4;
+		}else {
 			if (ct.equalsIgnoreCase("TEXT")) c=1;
 		}
 		

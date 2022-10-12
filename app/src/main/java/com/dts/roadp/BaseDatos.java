@@ -137,9 +137,14 @@ public class BaseDatos extends SQLiteOpenHelper {
 			  
 			  try  {
 				  if (pField == "") return;
-				  
-				  pValue=pValue.replace("'", "");
-				  SV="'" + pValue + "'";
+
+				  //#AT20221011 Si es XML no se realiza el replace
+				  if (pField.equals("Valor_XML")) {
+					 SV = pValue;
+				  } else {
+					  pValue=pValue.replace("'", "");
+					  SV = "'" + pValue + "'";
+				  }
 				  				  
 				  clFList.add(pField);
 		          clVList.add(SV);
@@ -162,7 +167,7 @@ public class BaseDatos extends SQLiteOpenHelper {
 			  } catch (Exception e) { }
 			  
 		  }
-		  
+
 		  public void add(String pField, double pValue) {
 			  String SV;
 			  

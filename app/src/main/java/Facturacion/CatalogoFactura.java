@@ -7,11 +7,13 @@ import android.widget.Toast;
 
 import com.dts.roadp.AppMethods;
 import com.dts.roadp.BaseDatos;
+import com.dts.roadp.DateUtils;
 import com.dts.roadp.PBase;
 import com.dts.roadp.appGlobals;
 import com.dts.roadp.clsClasses;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 
@@ -35,6 +37,7 @@ public class CatalogoFactura extends PBase {
             ins=Con.Ins;upd=Con.Upd;
 
             app = new AppMethods(cont,gl,Con,db);
+            du=new DateUtils();
 
         } catch (Exception e) {
             Toast.makeText(cont, "CatalogoFactura : " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -240,6 +243,49 @@ public class CatalogoFactura extends PBase {
         return Codigo;
     }
 
+    public ArrayList<clsClasses.clsBeNotaCreditoDet> GetDetalleNT(String Corel) {
+        ArrayList<clsClasses.clsBeNotaCreditoDet> lista = new ArrayList<>();
+        clsClasses.clsBeNotaCreditoDet item;
+        Cursor dt;
+
+        try {
+            lista. clear();
+
+            sql = "SELECT A.*, B.DESCCORTA " +
+                  " FROM D_NOTACREDD A " +
+                  " INNER JOIN P_PRODUCTO B ON B.CODIGO = A.PRODUCTO " +
+                  " WHERE A.COREL = '"+Corel+"'";
+            dt=Con.OpenDT(sql);
+
+            if (dt.getCount()>0) {
+                dt.moveToFirst();
+                while (!dt.isAfterLast()) {
+                    item = clsCls.new clsBeNotaCreditoDet();
+
+                    item.corel = dt.getString(0);
+                    item.codigoProd = dt.getString(1);
+                    item.precio = dt.getString(2);
+                    item.cant = dt.getString(4);
+                    item.peso = dt.getString(5);
+                    item.porpeso = dt.getString(6);
+                    item.umpeso = dt.getString(9);
+                    item.factor = dt.getString(10);
+                    item.producto = dt.getString(11);
+
+                    lista.add(item);
+                    dt.moveToNext();
+                }
+            }
+
+            if (dt != null) dt.close();
+
+        } catch (Exception e) {
+            msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+        }
+
+        return lista;
+    }
+
     public void UpdateEstadoNotaCredito(String Cufe, int NTCertificada) {
         try {
             sql = "UPDATE D_NOTACRED SET CUFE ='" + Cufe + "', CERTIFICADA_DGI=" + NTCertificada + "  WHERE COREL='" + gl.devcornc + "'";
@@ -249,9 +295,9 @@ public class CatalogoFactura extends PBase {
         }
     }
 
-    public void UpdateEstadoFactura(String Cufe, int NTCertificada, String corel) {
+    public void UpdateEstadoFactura(String Cufe, int EstadoFac, String corel) {
         try {
-            sql="UPDATE D_FACTURA SET CUFE ='"+Cufe+"', CERTIFICADA_DGI="+NTCertificada+"  WHERE COREL='"+corel+"'";
+            sql="UPDATE D_FACTURA SET CUFE ='"+Cufe+"', CERTIFICADA_DGI="+EstadoFac+"  WHERE COREL='"+corel+"'";
             db.execSQL(sql);
         } catch (Exception e) {
             msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" - "+ e.getMessage());
@@ -273,6 +319,25 @@ public class CatalogoFactura extends PBase {
         }
 
         return  fechaNueva;
+    }
+
+    public String ReplaceXML(String texto) {
+        String Vocales = "ÁáÉéÍíÓóÚúÑñÜü", VocalesSinAcento = "AaEeIiOoUuNnUu";
+        char[] array = texto.toCharArray();
+        try {
+
+            for (int index = 0; index < array.length; index++) {
+                int pos = Vocales.indexOf(array[index]);
+                if (pos > -1) {
+                    array[index] = VocalesSinAcento.charAt(pos);
+                }
+            }
+
+        } catch (Exception e) {
+            msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+        }
+
+        return new String(array);
     }
 
     public void opendb() {

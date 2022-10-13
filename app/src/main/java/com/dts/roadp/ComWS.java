@@ -6595,7 +6595,7 @@ public class ComWS extends PBase {
 					String strBase64 = Base64.encodeBytes(imagebyte);
 
 					callMethod("GuardaDocumentosCliente",
-							"cliente", clienteImg,
+							    "cliente", clienteImg,
 								"ruta", rutaImg,
 								"fecha", fechaImg,
 								"statcom", statcomImg,

@@ -1173,18 +1173,24 @@ public class FacturaRes extends PBase {
 				}
 
 				if (!app.prodBarra(vprod)) {
-					ins.init("D_FACTURAD_LOTES");
 
-					ins.add("COREL", corel);
-					ins.add("PRODUCTO", vprod);
-					ins.add("LOTE", lotelote);
-					ins.add("CANTIDAD", vcant);
-					ins.add("PESO", vpeso);
-					ins.add("UMSTOCK", vumstock);
-					ins.add("UMPESO", gl.umpeso);
-					ins.add("UMVENTA", vumventa);
+					if (lotelote!=null){
+						ins.init("D_FACTURAD_LOTES");
 
-					db.execSQL(ins.sql());
+						ins.add("COREL", corel);
+						ins.add("PRODUCTO", vprod);
+						ins.add("LOTE", lotelote);
+						ins.add("CANTIDAD", vcant);
+						ins.add("PESO", vpeso);
+						ins.add("UMSTOCK", vumstock);
+						ins.add("UMPESO", gl.umpeso);
+						ins.add("UMVENTA", vumventa);
+
+						db.execSQL(ins.sql());
+					}else{
+						throw new Exception("No se puede guardar un lote nulo para el Producto: " + vprod + " con Inventario en "+ vumstock);
+					}
+
 				}
 
 				dt.moveToNext();
@@ -1572,7 +1578,10 @@ public class FacturaRes extends PBase {
 
 			dt=Con.OpenDT(sql);
 
-			if (dt.getCount()==0) return;
+			if (dt.getCount()==0) {
+				msgbox("No se pudo obtener el inventario para el producto: " + prid + " con inventario en " + umstock);
+				return;
+			}
 
 			dt.moveToFirst();
 			while (!dt.isAfterLast()) {

@@ -1059,6 +1059,10 @@ public class BaseDatosScript {
 					"[IMPRES] INTEGER NOT NULL,"+
 					"[CERTIFICADA_DGI] INTEGER NOT NULL,"+
 					"[CUFE] TEXT,"+
+					"[TIPO_DOCUMENTO] [nvarchar](10),"+
+					"[COREL_REFERENCIA] [nvarchar](20),"+
+					"[ES_ANULACION] [bit],"+
+					"[CUFE_FACTURA] [nvarchar](20),"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);

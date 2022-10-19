@@ -54,7 +54,7 @@ public class appGlobals extends Application {
 	public int dvbrowse=0,tienelote,facturaVen,brw=0;
     public boolean dvporpeso,devfindia,devprncierre,gpspass,despdevflag;
     public double dvdispventa,devtotal;
-    public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc,devcornc;
+    public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc,devcornc, dvcorelnd, dvactualnd;
 
 	// Parametros Extra
 	public String peModal,peMon,peFormatoFactura,CodDev;

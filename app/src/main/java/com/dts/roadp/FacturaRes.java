@@ -1189,7 +1189,8 @@ public class FacturaRes extends PBase {
 				int vNroDF;
 				String vSerie;
 
-				vNroDF = Integer.valueOf(gl.dvcorrelnc.substring(3,9));
+				int tamanio = gl.dvcorrelnc.length();
+				vNroDF = Integer.valueOf(gl.dvcorrelnc.substring(3,tamanio));
 				vSerie = StringUtils.right("000" + gl.dvcorrelnc.substring(0,3), 3);
 
 				NotaCredito.gDGen.iTpEmis = "01";
@@ -1991,11 +1992,11 @@ public class FacturaRes extends PBase {
 				if (ConexionValida()) {
 					RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, "2");
 				} else {
-					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 				}
 
 				if	(RespuestaEdocFac == null) {
-					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 				}
 
 				if (!RespuestaEdocFac.Estado.isEmpty() || RespuestaEdocFac.Estado != null) {
@@ -2030,8 +2031,8 @@ public class FacturaRes extends PBase {
 					ControlFEL.Vendedor = gl.vend;
 					ControlFEL.Correlativo = String.valueOf(fcorel);
 
-					if (RespuestaEdocFac.Estado.equals("2")) {
-						EstadoFac = 1;
+					if (RespuestaEdocFac.Estado.equals("1")) {
+						//EstadoFac = 1;
 						toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 
 						if (gl.dvbrowse!=0) {
@@ -2050,7 +2051,8 @@ public class FacturaRes extends PBase {
 
 							NotaCredito.gDGen.Referencia.add(referencia);
 
-							RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, "2");
+							//RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, "2");
+							RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 
 							if (RespuestaEdocNT != null) {
 								ControlNotaCredito.Cufe = RespuestaEdocNT.Cufe;
@@ -2079,7 +2081,7 @@ public class FacturaRes extends PBase {
 								ControlNotaCredito.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
 
 								if (RespuestaEdocNT.Estado.equals("2")) {
-									EstadoNT = 1;
+									//EstadoNT = 1;
 									toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
 
 								} else {

@@ -138,19 +138,29 @@ public class BaseDatos extends SQLiteOpenHelper {
 			  try  {
 				  if (pField == "") return;
 
-				  //#AT20221011 Si es XML no se realiza el replace
-				  if (pField.equals("Valor_XML")) {
-					 SV = pValue;
-				  } else {
-					  pValue=pValue.replace("'", "");
-					  SV = "'" + pValue + "'";
-				  }
-				  				  
+				  pValue=pValue.replace("'", "");
+				  SV = "'" + pValue + "'";
+
 				  clFList.add(pField);
 		          clVList.add(SV);
 				  
 			  } catch (Exception e) { }
 			  
+		  }
+
+		  public void addXML(String pField, String pValue ) {
+			  String SV="";
+
+			  try  {
+				  if (pField == "") return;
+
+				  SV = pValue;
+
+				  clFList.add(pField);
+				  clVList.add(SV);
+
+			  } catch (Exception e) { }
+
 		  }
 
 		  public void add(String pField, long pValue) {

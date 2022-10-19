@@ -198,13 +198,14 @@ public class clsDataBuilder {
                         s=""+DT.getDouble(i);
                         valnum=DT.getDouble(i);
                         ins.add(nombre,valnum);
-                    } else {
+                    } else if (ct==4) {
+						s= "CONVERT(XML, '" + DT.getString(i) + "')";
+						ins.addXML(nombre,s);
+					} else {
                         if (ct==1) s="'"+DT.getString(i)+"'";
                         if (ct==2) s="'"+DU.univfechaext(DT.getLong(i))+"'";
                         if (ct==3) s="'"+DU.univfechaext(DT.getLong(i))+"'";
-						if (ct == 4) {
-							s= "CONVERT(XML, '" + DT.getString(i) + "')";
-						}
+
                         valstr=s;
                         ins.add(nombre,valstr);
                     }

@@ -251,4 +251,10 @@ public class clsClasses {
 	public class clsBeNotaCreditoDet {
 		public String corel, producto, codigoProd, peso, cant, umpeso, factor, porpeso, precio;
 	}
+
+	public class clsNotaCreditoEnc {
+		public String Corel, Anulado, Ruta, Vendedor, Cliente, Factura, Serie, Correlativo, Statcom, ResolNC, SerieFact, Cufe, TipoDocumento, CorelRef, CufeFactura;
+		public int CodigoLiquidacion, CorelFact, Impres, CertificadaDgi, EsAnulacion, Fecha;
+		public Double Total;
+	}
 }

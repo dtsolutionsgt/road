@@ -701,7 +701,7 @@ public class DevolCli extends PBase {
 					}
 
 					if (porpeso) {
-						detalle.dCantCodInt = String.valueOf(mu.round2(ntPeso));
+						detalle.dCantCodInt = String.valueOf(ntPeso);
 					} else {
 						if (app.esRosty(Producto.codigo)) {
 							detalle.dCantCodInt = String.valueOf(mu.round2(pcant * ntFactor));
@@ -784,11 +784,11 @@ public class DevolCli extends PBase {
 				if (ConexionValida()) {
 					RespuestaEdoc = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDoc, "2");
 				} else {
-					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,"/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 				}
 
 				if (RespuestaEdoc == null) {
-					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,"/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?", "/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 				}
 
 				if (RespuestaEdoc != null) {

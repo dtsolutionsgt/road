@@ -8,6 +8,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
@@ -95,6 +97,7 @@ public class Anulacion extends PBase {
 	private clsClasses.clsDepartamento Departamento;
 	private ArrayList<clsClasses.clsBeNotaCreditoDet> DetalleNT;
 	private clsClasses.clsProducto Producto;
+	private clsClasses.clsNotaCreditoEnc NotaDebitoEnc;
 
 	private String urltoken = "https://labpa.guru-soft.com/EdocPanama/4.0/Autenticacion/Api/ServicioEDOC?Id=1";
 	private String usuario = "edocTOLEDANO_8945";
@@ -410,7 +413,14 @@ public class Anulacion extends PBase {
 			
 			if (tipo==5) if (!anulDevol(itemid)) return;
 
-			if (tipo==6) anulNotaCredito(itemid);
+			if (tipo==6) {
+				if (CrearNotaDebito()) {
+					anulNotaCredito(itemid);
+				} else {
+					msgbox("Error en el processo de anulación");
+					return;
+				}
+			}
 
 			db.setTransactionSuccessful();
 			db.endTransaction();
@@ -567,14 +577,33 @@ public class Anulacion extends PBase {
 		return exito;
 	}
 
-	private void CrearNotaDebito() {
+	private boolean CrearNotaDebito() {
+		String corelFactura = "";
+		boolean exito = false;
 		try {
 
-			int vNroDF = Integer.valueOf(itemid.substring(3,9));
-			String vSerie = StringUtils.right("000" + itemid.substring(0,3), 3);
+			//AT20221014 Se Obtiene corel para guardar la nota de debito
+			gl.dvcorelnd = Catalogo.obtienecorrel("ND");
+			corelFactura=tieneFacturaNC(itemid);
+
+			if (!GuardarNotaDebito(corelFactura)) {
+				msgbox("Error al insertar la nota de debito");
+				return false;
+			}
+
+			int vNroDF = Integer.valueOf(gl.dvcorelnd.substring(3,9));
+			String vSerie = StringUtils.right("000" + gl.dvcorelnd.substring(0,3), 3);
+
+			NotaDebito = new rFE();
 
 			NotaDebito.gDGen.iTpEmis = "01";
-			NotaDebito.gDGen.iDoc = "07"; //Tipo de documento //(05:Nota de debito  referente a facturas, 07:Nota de debito genérica )
+
+			if (corelFactura.isEmpty()) {
+				NotaDebito.gDGen.iDoc = "07"; //Tipo de documento //(05:Nota de debito  referente a facturas, 07:Nota de debito genérica )
+			} else {
+				NotaDebito.gDGen.iDoc = "05";
+			}
+
 			NotaDebito.gDGen.dNroDF = String.valueOf(vNroDF); //Acá va un número entero 19
 			NotaDebito.gDGen.dPtoFacDF = vSerie; //000 003
 			NotaDebito.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";
@@ -623,7 +652,7 @@ public class Anulacion extends PBase {
 
 				} else {
 					msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
-					return;
+					return false;
 				}
 
 			}
@@ -662,13 +691,13 @@ public class Anulacion extends PBase {
 
 				} else {
 					msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
-					return;
+					return false;
 				}
 			}
 
 			if (!Cliente.nit.contains("D")) {
 				msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
-				return;
+				return false;
 			} else {
 				String[] DVRuc = Cliente.nit.split("DV");
 
@@ -719,7 +748,7 @@ public class Anulacion extends PBase {
 				}
 
 				if (DetalleNT.get(i).porpeso.equals("S")) {
-					detalle.dCantCodInt = String.valueOf(DetalleNT.get(i).peso);
+					detalle.dCantCodInt = String.valueOf(mu.round2(Double.valueOf(DetalleNT.get(i).peso)));
 				} else {
 					if (app.esRosty(Producto.codigo)) {
 						detalle.dCantCodInt = String.valueOf(mu.round2(Double.valueOf(DetalleNT.get(i).cant) * Double.valueOf(DetalleNT.get(i).factor)));
@@ -729,7 +758,7 @@ public class Anulacion extends PBase {
 				}
 
 				//String TotalItem = String.valueOf(mu.round2(Double.valueOf(detalle.dCantCodInt) * DT.getDouble(5)));
-				String TotalItem = DetalleNT.get(i).peso;
+				String TotalItem = "11.57";
 
 				detalle.dCodCPBSabr = Producto.subBodega.substring(0,2);
 				detalle.dCodCPBScmp = Producto.subBodega;
@@ -774,10 +803,7 @@ public class Anulacion extends PBase {
 				NotaDebito.gTot.iPzPag = "1";
 			}
 
-			String corelFactura=tieneFacturaNC(itemid);
-
-			if (!corelFactura.isEmpty()) {
-
+			if (!corelFactura.isEmpty() && NotaDebito.gDGen.iDoc.equals("05")) {
 
 				gDFRefNum gDFRefNum= new gDFRefNum();
 				gDFRefNum.gDFRefFE = new gDFRefFE();
@@ -800,51 +826,131 @@ public class Anulacion extends PBase {
 			Fimador Firmador = new Fimador(this);
 			int EstadoND = 0;
 
-			RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, "2");
-
-			if (RespuestaEdocND != null) {
-				ControNotaDebito.Cufe = RespuestaEdocND.Cufe;
-				ControNotaDebito.TipoDoc = NotaDebito.gDGen.iDoc;
-				ControNotaDebito.NumDoc = NotaDebito.gDGen.dNroDF;
-				ControNotaDebito.Sucursal = gl.sucur;
-				ControNotaDebito.Caja = NotaDebito.gDGen.dPtoFacDF;
-
-				if (RespuestaEdocND.Estado.equals("21")) {
-					ControNotaDebito.Estado = "01";
-				} else {
-					ControNotaDebito.Estado = RespuestaEdocND.Estado;
-				}
-
-				ControNotaDebito.Mensaje = RespuestaEdocND.MensajeRespuesta;
-				ControNotaDebito.ValorXml = RespuestaEdocND.XML;
-
-				String[] FechaEnv = NotaDebito.gDGen.dFechaEm.split("-05:00", 0);
-				ControNotaDebito.FechaEnvio = FechaEnv[0];
-				ControNotaDebito.TipFac = NotaDebito.gDGen.iDoc;
-				ControNotaDebito.FechaAgr = String.valueOf(du.getFechaCompleta());
-				ControNotaDebito.QR = RespuestaEdocND.UrlCodeQR;
-				ControNotaDebito.Corel = gl.devcornc;
-				ControNotaDebito.Ruta = gl.ruta;
-				ControNotaDebito.Vendedor = gl.vend;
-				ControNotaDebito.Correlativo = String.valueOf(NotaDebito.gDGen.dNroDF);
-
-				if (RespuestaEdocND.Estado.equals("2")) {
-					EstadoND = 1;
-					toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
-
-				} else {
-					toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
-				}
-
-				/*Catalogo.UpdateEstadoNotaCredito(ControlNotaCredito.Cufe, EstadoNT);
-				Catalogo.InsertarFELControl(ControlNotaCredito);*/
-
+			if (ConexionValida()) {
+				RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, "2");
+			} else {
+				RespuestaEdocND = Firmador.EmisionDocumentoBTC(NotaDebito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?", "/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 			}
+
+			if (RespuestaEdocND != null ) {
+				if	(RespuestaEdocND.Cufe != null) {
+					ControNotaDebito.Cufe = RespuestaEdocND.Cufe;
+					ControNotaDebito.TipoDoc = NotaDebito.gDGen.iDoc;
+					ControNotaDebito.NumDoc = NotaDebito.gDGen.dNroDF;
+					ControNotaDebito.Sucursal = gl.sucur;
+					ControNotaDebito.Caja = NotaDebito.gDGen.dPtoFacDF;
+
+					if (RespuestaEdocND.Estado.equals("21")) {
+						ControNotaDebito.Estado = "01";
+					} else {
+						ControNotaDebito.Estado = RespuestaEdocND.Estado;
+					}
+
+					ControNotaDebito.Mensaje = RespuestaEdocND.MensajeRespuesta;
+					ControNotaDebito.ValorXml = RespuestaEdocND.XML;
+
+					String[] FechaEnv = NotaDebito.gDGen.dFechaEm.split("-05:00", 0);
+					ControNotaDebito.FechaEnvio = FechaEnv[0];
+					ControNotaDebito.TipFac = NotaDebito.gDGen.iDoc;
+					ControNotaDebito.FechaAgr = String.valueOf(du.getFechaCompleta());
+					ControNotaDebito.QR = RespuestaEdocND.UrlCodeQR;
+					ControNotaDebito.Corel = gl.devcornc;
+					ControNotaDebito.Ruta = gl.ruta;
+					ControNotaDebito.Vendedor = gl.vend;
+					ControNotaDebito.Correlativo = String.valueOf(NotaDebito.gDGen.dNroDF);
+
+					if (RespuestaEdocND.Estado.equals("2")) {
+						EstadoND = 1;
+						toastlong("NOTA DE DEBITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
+					} else {
+						toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE DEBITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
+					}
+
+					Catalogo.UpdateEstadoNotaDebito(ControNotaDebito.Cufe, EstadoND, gl.dvcorelnd);
+					Catalogo.InsertarFELControl(ControNotaDebito);
+				} else {
+					toastlong("Estamos esperando una respuesta de GuruSoft");
+				}
+			}
+
+			exito = true;
 
 		} catch (Exception e) {
 			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" - " + e.getMessage());
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
+
+		return exito;
 	}
+
+	private boolean GuardarNotaDebito(String CufeFactura) {
+		boolean exito = false;
+		try {
+			//AT20221014 Se Obtiene Encabezado NT para la nota DB
+			NotaDebitoEnc =  Catalogo.GetEncNotaCredito(itemid);
+			NotaDebitoEnc.EsAnulacion = 1;
+			NotaDebitoEnc.TipoDocumento = "ND";
+
+			if (!CufeFactura.isEmpty()) {
+				NotaDebitoEnc.CufeFactura = CufeFactura;
+			}
+
+			ins.init("D_NOTACRED");
+
+			ins.add("COREL",gl.dvcorelnd+3);
+			ins.add("ANULADO","N");
+			ins.add("FECHA",NotaDebitoEnc.Fecha);
+			ins.add("RUTA", NotaDebitoEnc.Ruta);
+			ins.add("VENDEDOR",NotaDebitoEnc.Vendedor);
+			ins.add("CLIENTE", NotaDebitoEnc.Cliente);
+			ins.add("TOTAL", NotaDebitoEnc.Total);
+			ins.add("FACTURA",NotaDebitoEnc.Factura);
+			ins.add("SERIE", NotaDebitoEnc.Serie);
+			ins.add("CORELATIVO",gl.dvactualnd);
+			ins.add("STATCOM",NotaDebitoEnc.Statcom);
+			ins.add("CODIGOLIQUIDACION",NotaDebitoEnc.CodigoLiquidacion);
+			ins.add("RESOLNC",NotaDebitoEnc.ResolNC);
+			ins.add("SERIEFACT",NotaDebitoEnc.SerieFact);
+			ins.add("CORELFACT",NotaDebitoEnc.CorelFact);
+			ins.add("IMPRES",NotaDebitoEnc.Impres);
+			ins.add("CERTIFICADA_DGI", 0);
+			ins.add("TIPO_DOCUMENTO", NotaDebitoEnc.TipoDocumento);
+			ins.add("COREL_REFERENCIA", NotaDebitoEnc.Cufe);
+			ins.add("ES_ANULACION", NotaDebitoEnc.EsAnulacion);
+			ins.add("CUFE_FACTURA", NotaDebitoEnc.CufeFactura);
+
+			db.execSQL(ins.sql());
+
+			sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactualnd+" WHERE RUTA='"+gl.ruta+"' AND TIPO='ND'";
+			db.execSQL(sql);
+
+			exito = true;
+
+		} catch (Exception e) {
+			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
+
+		return exito;
+	}
+
+	public boolean ConexionValida() {
+		boolean valida = false;
+		try {
+			ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+			if (networkInfo != null && networkInfo.isConnected()) {
+				valida = true;
+			}
+
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
+
+		return valida;
+	}
+
 	//endregion
 
 	//region Documents

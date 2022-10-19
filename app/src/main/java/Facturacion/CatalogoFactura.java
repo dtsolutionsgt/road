@@ -12,6 +12,8 @@ import com.dts.roadp.PBase;
 import com.dts.roadp.appGlobals;
 import com.dts.roadp.clsClasses;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -78,6 +80,45 @@ public class CatalogoFactura extends PBase {
             ins.add("QRIMAGE", ItemFEL.QRImg);
 
             db.execSQL(ins.sql());
+
+        } catch (Exception e) {
+            msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+        }
+    }
+
+    public void InsertarNotaDebito(clsClasses.clsNotaCreditoEnc Item) {
+        try {
+            opendb();
+            db.beginTransaction();
+
+            ins.init("D_NOTACRED");
+
+            ins.add("COREL",gl.dvcorelnd);
+            ins.add("ANULADO","N");
+            ins.add("FECHA",Item.Fecha);
+            ins.add("RUTA", Item.Ruta);
+            ins.add("VENDEDOR",Item.Vendedor);
+            ins.add("CLIENTE", Item.Cliente);
+            ins.add("TOTAL", Item.Total);
+            ins.add("FACTURA",Item.Factura);
+            ins.add("SERIE", Item.Serie);
+            ins.add("CORELATIVO",gl.dvactualnd);
+            ins.add("STATCOM",Item.Statcom);
+            ins.add("CODIGOLIQUIDACION",Item.CodigoLiquidacion);
+            ins.add("RESOLNC",Item.ResolNC);
+            ins.add("SERIEFACT",Item.SerieFact);
+            ins.add("CORELFACT",Item.CorelFact);
+            ins.add("IMPRES",Item.Impres);
+            ins.add("CERTIFICADA_DGI", 0);
+            ins.add("TIPO_DOCUMENTO", Item.TipoDocumento);
+            ins.add("COREL_REFERENCIA", Item.Cufe);
+            ins.add("ES_ANULACION", Item.EsAnulacion);
+            ins.add("CUFE_FACTURA", Item.CufeFactura);
+
+            db.execSQL(ins.sql());
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
 
         } catch (Exception e) {
             msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
@@ -243,6 +284,50 @@ public class CatalogoFactura extends PBase {
         return Codigo;
     }
 
+    public clsClasses.clsNotaCreditoEnc GetEncNotaCredito(String Corel) {
+        Cursor dt;
+        clsClasses.clsNotaCreditoEnc NotaCreditoEnc = clsCls.new clsNotaCreditoEnc();
+
+        try {
+            sql = "SELECT * FROM D_NOTACRED WHERE COREL = '"+Corel+"'";
+            dt=Con.OpenDT(sql);
+
+            if (dt.getCount()>0) {
+                dt.moveToFirst();
+
+                NotaCreditoEnc.Corel = dt.getString(0);
+                NotaCreditoEnc.Anulado = dt.getString(1);
+                NotaCreditoEnc.Fecha = dt.getInt(2);
+                NotaCreditoEnc.Ruta = dt.getString(3);
+                NotaCreditoEnc.Vendedor = dt.getString(4);
+                NotaCreditoEnc.Cliente = dt.getString(5);
+                NotaCreditoEnc.Total = dt.getDouble(6);
+                NotaCreditoEnc.Factura = dt.getString(7);
+                NotaCreditoEnc.Serie = dt.getString(8);
+                NotaCreditoEnc.Correlativo = dt.getString(9);
+                NotaCreditoEnc.Statcom = dt.getString(10);
+                NotaCreditoEnc.CodigoLiquidacion = dt.getInt(11);
+                NotaCreditoEnc.ResolNC = dt.getString(12);
+                NotaCreditoEnc.SerieFact = dt.getString(13);
+                NotaCreditoEnc.CorelFact = dt.getInt(14);
+                NotaCreditoEnc.Impres = dt.getInt(15);
+                NotaCreditoEnc.CertificadaDgi =  dt.getInt(16);
+                NotaCreditoEnc.Cufe = dt.getString(17);
+                NotaCreditoEnc.TipoDocumento = dt.getString(18);
+                NotaCreditoEnc.CorelRef = dt.getString(19);
+                NotaCreditoEnc.EsAnulacion = dt.getInt(20);
+                NotaCreditoEnc.CufeFactura = dt.getString(21);
+            }
+
+            if (dt != null) dt.close();
+
+        } catch (Exception e) {
+            msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+        }
+
+        return  NotaCreditoEnc;
+    }
+
     public ArrayList<clsClasses.clsBeNotaCreditoDet> GetDetalleNT(String Corel) {
         ArrayList<clsClasses.clsBeNotaCreditoDet> lista = new ArrayList<>();
         clsClasses.clsBeNotaCreditoDet item;
@@ -304,6 +389,15 @@ public class CatalogoFactura extends PBase {
         }
     }
 
+    public void UpdateEstadoNotaDebito(String Cufe, int EstadoFac, String corel) {
+        try {
+            sql="UPDATE D_NOTACRED SET CUFE ='"+Cufe+"', CERTIFICADA_DGI="+EstadoFac+"  WHERE COREL='"+corel+"'" +" AND TIPO_DOCUMENTO = 'ND'";
+            db.execSQL(sql);
+        } catch (Exception e) {
+            msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" - "+ e.getMessage());
+        }
+    }
+
     public String FechaCredito(int diascredito) {
         String fechaNueva= "";
         try {
@@ -338,6 +432,31 @@ public class CatalogoFactura extends PBase {
         }
 
         return new String(array);
+    }
+
+    public String obtienecorrel(String tipo){
+        String correl="";
+        Cursor DT;
+
+        try {
+            sql="SELECT SERIE,ACTUAL+1,FINAL,INICIAL FROM P_CORREL_OTROS WHERE RUTA='"+gl.ruta+"' AND TIPO='"+tipo+"'";
+            DT=Con.OpenDT(sql);
+
+            if(DT.getCount()>0){
+                DT.moveToFirst();
+                correl=DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)), 6);
+
+                gl.dvactualnd = String.valueOf(DT.getInt(1));
+            }
+
+            if (DT != null) DT.close();
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+        }
+
+        return  correl;
+
     }
 
     public void opendb() {

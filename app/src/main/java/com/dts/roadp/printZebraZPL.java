@@ -292,6 +292,43 @@ public class printZebraZPL extends printBase {
         return prdata;
     }
 
+    private byte[]printQRCode(){
+        byte[] prdata = null;
+        int ccnt,dlen;
+        String ps,qr_code;
+        int altobarra,anchopapel,psx,psy;
+
+        try {
+
+            altobarra=80;//#CKFK 20190614 Modifiqué el alto de la barra a 80 antes era 100
+            psx = 20;
+            psy = 250;
+            anchopapel=500;
+            if (prwidth>35) anchopapel=350;//#CKFK 20190614 Agregué esta condición para el ancho del papel
+            if (prwidth>40) anchopapel=300;
+            if (prwidth>60) anchopapel=400;
+
+            qr_code="https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?chFE=FE0120000000894-57-103790-6739032022101100000001540030125728909403&iAmb=2&digestValue=ZcfcKdZ+Ix9v+Z+WUqmFwb8rk6er5mMUO0F0ivJRPAg=&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkaWdlc3RWYWx1ZSI6IlpjZmNLZForSXg5ditaK1dVcW1Gd2I4cms2ZXI1bU1VTzBGMGl2SlJQQWc9IiwiY2hGRSI6IkZFMDEyMDAwMDAwMDg5NC01Ny0xMDM3OTAtNjczOTAzMjAyMjEwMTEwMDAwMDAwMTU0MDAzMDEyNTcyODkwOTQwMyIsImlBbWIiOiIyIn0.JgeGgPjnJGt4B5YA8tn6zDSIVy7c_b7H-GpwQ45dsEk";
+
+            ps="";
+
+            ps+="^XA";
+            ps+="^PW"+anchopapel;
+            ps+="^FO,"+psx+","+psy+"";
+            ps+="^BQN,2,5^";
+            ps+="^FD"+qr_code;
+            ps+="^FS";
+            ps+="^XZ";
+
+            prdata =ps.getBytes();
+
+        } catch (Exception e) {
+            setStatus(e.getMessage());
+        }
+
+        return prdata;
+    }
+
     private void doStartPrint() {
         if (!validprint) {
             showmsg("¡La impresora no está autorizada!");return;

@@ -102,6 +102,7 @@ public class Exist extends PBase {
                 return;
             }
             if (doc.buildPrint("0",0)) prn.printask();
+
         }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
         }

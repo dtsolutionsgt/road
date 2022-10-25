@@ -15,7 +15,9 @@ android {
 
     }
     packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
+        resources {
+            excludes += ['META-INF/DEPENDENCIES']
+        }
     }
     buildTypes {
         release {
@@ -23,10 +25,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
-    //#HS_20181127_1734 Agregue lintOptions porque no deja generar APK.
-    lintOptions {
+    lint {
         checkReleaseBuilds false
     }
+    namespace 'com.dts.roadp'
+    //#HS_20181127_1734 Agregue lintOptions porque no deja generar APK.
 
 }
 

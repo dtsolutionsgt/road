@@ -249,7 +249,8 @@ public class clsClasses {
 	}
 
 	public class clsBeNotaCreditoDet {
-		public String corel, producto, codigoProd, peso, cant, umpeso, factor, porpeso, precio;
+		public String corel, producto, codigoProd, umpeso, porpeso, umVenta, umStock;
+		public double cant, factor, precio, precioAct, peso;
 	}
 
 	public class clsNotaCreditoEnc {

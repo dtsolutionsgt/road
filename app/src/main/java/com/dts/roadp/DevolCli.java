@@ -20,9 +20,7 @@ import com.example.edocsdk.Fimador;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import Entidades.Detalle;
 import Entidades.Receptor;
@@ -713,8 +711,11 @@ public class DevolCli extends PBase {
 					//String TotalItem = String.valueOf(mu.round2(Double.valueOf(detalle.dCantCodInt) * DT.getDouble(5)));
 					String TotalItem = String.valueOf(DT.getDouble(4));
 
-					detalle.dCodCPBSabr = Producto.subBodega.substring(0,2);
-					detalle.dCodCPBScmp = Producto.subBodega;
+					if (Producto.subBodega.length() > 1) {
+						detalle.dCodCPBSabr = Producto.subBodega.substring(0, 2);
+						detalle.dCodCPBScmp = Producto.subBodega;
+					}
+
 					detalle.gPrecios.dPrUnit = String.valueOf(DT.getDouble(5));
 					detalle.gPrecios.dPrUnitDesc = "0.000000";
 					detalle.gPrecios.dPrItem = TotalItem;
@@ -749,13 +750,7 @@ public class DevolCli extends PBase {
 					NotaCredito.gTot.gPagPlazo = new ArrayList();
 					gPagPlazo PagoPlazo = new gPagPlazo();
 					PagoPlazo.dSecItem = "1";
-
-					SimpleDateFormat fecha = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-					Calendar calendar = Calendar.getInstance();
-					calendar.setTime(fecha.parse(du.getFechaCompleta()));
-					calendar.add(Calendar.DAY_OF_YEAR, Cliente.diascredito);
-
-					PagoPlazo.dFecItPlazo = fecha.format(calendar.getTime())+"-05:00";
+					PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
 					PagoPlazo.dValItPlazo = TotalNT;
 					NotaCredito.gTot.gPagPlazo.add(PagoPlazo);
 				} else {
@@ -792,45 +787,47 @@ public class DevolCli extends PBase {
 				}
 
 				if (RespuestaEdoc != null) {
-					int EstadoNT = 0;
+					if	(RespuestaEdoc.Cufe != null) {
+						int EstadoNT = 0;
 
-					if (!RespuestaEdoc.Estado.isEmpty() || RespuestaEdoc.Estado != null) {
+						if (!RespuestaEdoc.Estado.isEmpty() || RespuestaEdoc.Estado != null) {
 
-						ControlNotaCredito.Cufe = RespuestaEdoc.Cufe;
-						ControlNotaCredito.TipoDoc = NotaCredito.gDGen.iDoc;
-						ControlNotaCredito.NumDoc = NotaCredito.gDGen.dNroDF;
-						ControlNotaCredito.Sucursal = gl.sucur;
-						ControlNotaCredito.Caja = NotaCredito.gDGen.dPtoFacDF;
+							ControlNotaCredito.Cufe = RespuestaEdoc.Cufe;
+							ControlNotaCredito.TipoDoc = NotaCredito.gDGen.iDoc;
+							ControlNotaCredito.NumDoc = NotaCredito.gDGen.dNroDF;
+							ControlNotaCredito.Sucursal = gl.sucur;
+							ControlNotaCredito.Caja = NotaCredito.gDGen.dPtoFacDF;
 
-						if (RespuestaEdoc.Estado.equals("21")) {
-							ControlNotaCredito.Estado = "01";
-						} else {
-							ControlNotaCredito.Estado = RespuestaEdoc.Estado;
+							if (RespuestaEdoc.Estado.equals("21")) {
+								ControlNotaCredito.Estado = "01";
+							} else {
+								ControlNotaCredito.Estado = RespuestaEdoc.Estado;
+							}
+
+							ControlNotaCredito.Mensaje = RespuestaEdoc.MensajeRespuesta;
+							ControlNotaCredito.ValorXml = RespuestaEdoc.XML != null ? Catalogo.ReplaceXML(RespuestaEdoc.XML) : "";
+
+							String[] FechaEnv = NotaCredito.gDGen.dFechaEm.split("-05:00", 0);
+							ControlNotaCredito.FechaEnvio = FechaEnv[0];
+							ControlNotaCredito.TipFac = NotaCredito.gDGen.iDoc;
+							ControlNotaCredito.FechaAgr = String.valueOf(du.getFechaCompleta());
+							ControlNotaCredito.QR = RespuestaEdoc.UrlCodeQR;
+							ControlNotaCredito.Corel = gl.devcornc;
+							ControlNotaCredito.Ruta = gl.ruta;
+							ControlNotaCredito.Vendedor = gl.vend;
+							ControlNotaCredito.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
+
+							if (RespuestaEdoc.Estado.equals("2")) {
+								EstadoNT = 1;
+								toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + RespuestaEdoc.MensajeRespuesta);
+							} else {
+								toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + RespuestaEdoc.MensajeRespuesta);
+							}
 						}
 
-						ControlNotaCredito.Mensaje = RespuestaEdoc.MensajeRespuesta;
-						ControlNotaCredito.ValorXml = RespuestaEdoc.XML != null ? Catalogo.ReplaceXML(RespuestaEdoc.XML) : "";;
-
-						String[] FechaEnv = NotaCredito.gDGen.dFechaEm.split("-05:00", 0);
-						ControlNotaCredito.FechaEnvio = FechaEnv[0];
-						ControlNotaCredito.TipFac = NotaCredito.gDGen.iDoc;
-						ControlNotaCredito.FechaAgr = String.valueOf(du.getFechaCompleta());
-						ControlNotaCredito.QR = RespuestaEdoc.UrlCodeQR;
-						ControlNotaCredito.Corel = gl.devcornc;
-						ControlNotaCredito.Ruta = gl.ruta;
-						ControlNotaCredito.Vendedor = gl.vend;
-						ControlNotaCredito.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
-
-						if (RespuestaEdoc.Estado.equals("2")) {
-							toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + RespuestaEdoc.MensajeRespuesta);
-							EstadoNT = 1;
-						} else {
-							toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + RespuestaEdoc.MensajeRespuesta);
-						}
+						Catalogo.UpdateEstadoNotaCredito(RespuestaEdoc.Cufe,"", EstadoNT);
+						Catalogo.InsertarFELControl(ControlNotaCredito);
 					}
-
-					Catalogo.UpdateEstadoNotaCredito(RespuestaEdoc.Cufe, EstadoNT);
-					Catalogo.InsertarFELControl(ControlNotaCredito);
 				}
 
 				Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();

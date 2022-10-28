@@ -1191,6 +1191,7 @@ public class FacturaRes extends PBase {
 
 				int tamanio = gl.dvcorrelnc.length();
 				vNroDF = Integer.valueOf(gl.dvcorrelnc.substring(3,tamanio));
+
 				vSerie = StringUtils.right("000" + gl.dvcorrelnc.substring(0,3), 3);
 
 				NotaCredito.gDGen.iTpEmis = "01";
@@ -1413,8 +1414,11 @@ public class FacturaRes extends PBase {
 					//String TotalItem = String.valueOf(mu.round2(Double.valueOf(detalle.dCantCodInt) * DT.getDouble(5)));
 					String TotalItem = String.valueOf(DT.getDouble(4));
 
-					detalle.dCodCPBSabr = Producto.subBodega.substring(0,2);
-					detalle.dCodCPBScmp = Producto.subBodega;
+					if (Producto.subBodega.length() > 1) {
+						detalle.dCodCPBSabr = Producto.subBodega.substring(0, 2);
+						detalle.dCodCPBScmp = Producto.subBodega;
+					}
+
 					detalle.gPrecios.dPrUnit = String.valueOf(DT.getDouble(5));
 					detalle.gPrecios.dPrUnitDesc = "0.000000";
 					detalle.gPrecios.dPrItem = TotalItem;
@@ -1579,7 +1583,11 @@ public class FacturaRes extends PBase {
 
 				String TotalItem = String.valueOf(mu.round2(dt.getDouble(6)));
 
-				detalle.dCodCPBSabr = Producto.subBodega.substring(0,2);
+				//Validar esto preguntar #AT20221019
+				if (Producto.subBodega.length() > 1) {
+					detalle.dCodCPBSabr = Producto.subBodega.substring(0, 2);
+				}
+
 				detalle.dCodCPBScmp = Producto.subBodega;
 
 				if (Factura.gDGen.Receptor.iTipoRec.equals("03") ) {
@@ -1995,7 +2003,7 @@ public class FacturaRes extends PBase {
 					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 				}
 
-				if	(RespuestaEdocFac == null) {
+				if	(RespuestaEdocFac.Cufe == null) {
 					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 				}
 
@@ -2031,11 +2039,12 @@ public class FacturaRes extends PBase {
 					ControlFEL.Vendedor = gl.vend;
 					ControlFEL.Correlativo = String.valueOf(fcorel);
 
-					if (RespuestaEdocFac.Estado.equals("1")) {
-						//EstadoFac = 1;
+					if (RespuestaEdocFac.Estado.equals("2")) {
+						EstadoFac = 1;
 						toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 
 						if (gl.dvbrowse!=0) {
+
 							gDFRefNum gDFRefNum= new gDFRefNum();
 							gDFRefNum.gDFRefFE = new gDFRefFE();
 							gDFRefNum.gDFRefFE.dCUFERef = ControlFEL.Cufe;
@@ -2051,8 +2060,8 @@ public class FacturaRes extends PBase {
 
 							NotaCredito.gDGen.Referencia.add(referencia);
 
-							//RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, "2");
-							RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+							RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, "2");
+							//RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 
 							if (RespuestaEdocNT != null) {
 								ControlNotaCredito.Cufe = RespuestaEdocNT.Cufe;
@@ -2068,7 +2077,7 @@ public class FacturaRes extends PBase {
 								}
 
 								ControlNotaCredito.Mensaje = RespuestaEdocNT.MensajeRespuesta;
-								ControlNotaCredito.ValorXml = RespuestaEdocNT.XML != null ? Catalogo.ReplaceXML(RespuestaEdocNT.XML) : "";;
+								ControlNotaCredito.ValorXml = RespuestaEdocNT.XML != null ? Catalogo.ReplaceXML(RespuestaEdocNT.XML) : "";
 
 								String[] FechaEnv = NotaCredito.gDGen.dFechaEm.split("-05:00", 0);
 								ControlNotaCredito.FechaEnvio = FechaEnv[0];
@@ -2081,14 +2090,14 @@ public class FacturaRes extends PBase {
 								ControlNotaCredito.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
 
 								if (RespuestaEdocNT.Estado.equals("2")) {
-									//EstadoNT = 1;
+									EstadoNT = 1;
 									toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
 
 								} else {
 									toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
 								}
 
-								Catalogo.UpdateEstadoNotaCredito(ControlNotaCredito.Cufe, EstadoNT);
+								Catalogo.UpdateEstadoNotaCredito(ControlNotaCredito.Cufe, ControlFEL.Cufe, EstadoNT);
 								Catalogo.InsertarFELControl(ControlNotaCredito);
 							}
 						}

@@ -54,6 +54,7 @@ public class CatalogoFactura extends PBase {
             sql = "SELECT MAX(IdTablaControl) FROM D_FACTURA_CONTROL_CONTINGENCIA";
             dt=Con.OpenDT(sql);
             dt.moveToFirst();
+
             ItemFEL.Id = dt.getInt(0) + 1;
 
             ins.init("D_FACTURA_CONTROL_CONTINGENCIA");
@@ -349,13 +350,17 @@ public class CatalogoFactura extends PBase {
 
                     item.corel = dt.getString(0);
                     item.codigoProd = dt.getString(1);
-                    item.precio = dt.getString(2);
-                    item.cant = dt.getString(4);
-                    item.peso = dt.getString(5);
+                    item.precio = dt.getDouble(2);
+                    item.precioAct = dt.getDouble(3);
+                    item.cant = dt.getDouble(4);
+                    item.peso = dt.getDouble(5);
                     item.porpeso = dt.getString(6);
+                    item.umVenta = dt.getString(7);
+                    item.umStock = dt.getString(8);
                     item.umpeso = dt.getString(9);
-                    item.factor = dt.getString(10);
+                    item.factor = dt.getDouble(10);
                     item.producto = dt.getString(11);
+
 
                     lista.add(item);
                     dt.moveToNext();
@@ -371,9 +376,9 @@ public class CatalogoFactura extends PBase {
         return lista;
     }
 
-    public void UpdateEstadoNotaCredito(String Cufe, int NTCertificada) {
+    public void UpdateEstadoNotaCredito(String Cufe, String CufeFact, int NTCertificada) {
         try {
-            sql = "UPDATE D_NOTACRED SET CUFE ='" + Cufe + "', CERTIFICADA_DGI=" + NTCertificada + "  WHERE COREL='" + gl.devcornc + "'";
+            sql = "UPDATE D_NOTACRED SET CUFE ='" + Cufe + "', CUFE_FACTURA ='" + CufeFact +"', CERTIFICADA_DGI=" + NTCertificada + "  WHERE COREL='" + gl.devcornc + "'";
             db.execSQL(sql);
         } catch (Exception e) {
             msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" - "+ e.getMessage());
@@ -447,6 +452,12 @@ public class CatalogoFactura extends PBase {
                 correl=DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)), 6);
 
                 gl.dvactualnd = String.valueOf(DT.getInt(1));
+
+                if (tipo.equals("D")){
+                    gl.dvactuald = String.valueOf(DT.getInt(1));
+                }else{
+                    gl.dvactualnd = String.valueOf(DT.getInt(1));
+                }
             }
 
             if (DT != null) DT.close();

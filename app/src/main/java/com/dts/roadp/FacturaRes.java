@@ -2045,7 +2045,9 @@ public class FacturaRes extends PBase {
 
 						if (gl.dvbrowse!=0) {
 
-							gDFRefNum gDFRefNum= new gDFRefNum();
+							GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
+
+							/*gDFRefNum gDFRefNum= new gDFRefNum();
 							gDFRefNum.gDFRefFE = new gDFRefFE();
 							gDFRefNum.gDFRefFE.dCUFERef = ControlFEL.Cufe;
 
@@ -2099,9 +2101,13 @@ public class FacturaRes extends PBase {
 
 								Catalogo.UpdateEstadoNotaCredito(ControlNotaCredito.Cufe, ControlFEL.Cufe, EstadoNT);
 								Catalogo.InsertarFELControl(ControlNotaCredito);
-							}
+							}*/
 						}
 
+					} else if(!ConexionValida() && ControlFEL.Estado.equals("1")) {
+						if (gl.dvbrowse!=0) {
+							GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
+						}
 					} else {
 						toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 					}
@@ -2142,6 +2148,85 @@ public class FacturaRes extends PBase {
 		}
 
 		return valida;
+	}
+
+	private void GeneraNotaCredito(String CufeFact, String FechaFact) {
+		try {
+
+			RespuestaEdoc RespuestaEdocNT = null;
+			Fimador Firmador = new Fimador(this);
+			clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
+			int EstadoNT = 0;
+
+
+			gDFRefNum gDFRefNum= new gDFRefNum();
+			gDFRefNum.gDFRefFE = new gDFRefFE();
+			gDFRefNum.gDFRefFE.dCUFERef = CufeFact;
+
+			Referencia referencia= new Referencia();
+			referencia.dFechaDFRef = FechaFact+"-05:00";
+			referencia.dNombEmRef = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
+			referencia.gRucEmDFRef = new gRucEmDFRef();
+			referencia.gRucEmDFRef.dRuc =  Sucursal.nit;
+			referencia.gRucEmDFRef.dTipoRuc = Sucursal.tipoRuc;
+			referencia.gRucEmDFRef.dDV = Sucursal.texto;
+			referencia.gDFRefNum = gDFRefNum;
+
+			NotaCredito.gDGen.Referencia.add(referencia);
+
+			if (ConexionValida()) {
+				RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, "2");
+			} else {
+				RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+			}
+
+			if (RespuestaEdocNT != null) {
+				if (RespuestaEdocNT.Cufe != null) {
+					ControlNotaCredito.Cufe = RespuestaEdocNT.Cufe;
+					ControlNotaCredito.TipoDoc = NotaCredito.gDGen.iDoc;
+					ControlNotaCredito.NumDoc = NotaCredito.gDGen.dNroDF;
+					ControlNotaCredito.Sucursal = gl.sucur;
+					ControlNotaCredito.Caja = NotaCredito.gDGen.dPtoFacDF;
+
+					if (RespuestaEdocNT.Estado.equals("21")) {
+						ControlNotaCredito.Estado = "01";
+					} else {
+						ControlNotaCredito.Estado = RespuestaEdocNT.Estado;
+					}
+
+					ControlNotaCredito.Mensaje = RespuestaEdocNT.MensajeRespuesta;
+					ControlNotaCredito.ValorXml = RespuestaEdocNT.XML != null ? Catalogo.ReplaceXML(RespuestaEdocNT.XML) : "";
+
+					String[] FechaEnv = NotaCredito.gDGen.dFechaEm.split("-05:00", 0);
+					ControlNotaCredito.FechaEnvio = FechaEnv[0];
+					ControlNotaCredito.TipFac = NotaCredito.gDGen.iDoc;
+					ControlNotaCredito.FechaAgr = String.valueOf(du.getFechaCompleta());
+					ControlNotaCredito.QR = RespuestaEdocNT.UrlCodeQR;
+					ControlNotaCredito.Corel = gl.devcornc;
+					ControlNotaCredito.Ruta = gl.ruta;
+					ControlNotaCredito.Vendedor = gl.vend;
+					ControlNotaCredito.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
+
+					if (RespuestaEdocNT.Estado.equals("2")) {
+						EstadoNT = 1;
+						toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
+
+					} else {
+						toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
+					}
+
+					Catalogo.UpdateEstadoNotaCredito(ControlNotaCredito.Cufe, CufeFact, EstadoNT);
+					Catalogo.InsertarFELControl(ControlNotaCredito);
+				} else {
+					msgbox("Campos con valores nulos.");
+				}
+			}
+
+		} catch (Exception e) {
+			mu.msgbox(new Object() {} .getClass().getEnclosingMethod().getName() +" - "+ e.getMessage());
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void rebajaStockUM(String prid,String umstock,double cant,double factor, String umventa,double factpres,double ppeso) {

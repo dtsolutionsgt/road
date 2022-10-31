@@ -298,7 +298,7 @@ public class CatalogoFactura extends PBase {
 
                 NotaCreditoEnc.Corel = dt.getString(0);
                 NotaCreditoEnc.Anulado = dt.getString(1);
-                NotaCreditoEnc.Fecha = dt.getInt(2);
+                NotaCreditoEnc.Fecha = dt.getLong(2);
                 NotaCreditoEnc.Ruta = dt.getString(3);
                 NotaCreditoEnc.Vendedor = dt.getString(4);
                 NotaCreditoEnc.Cliente = dt.getString(5);

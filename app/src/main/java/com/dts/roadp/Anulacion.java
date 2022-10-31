@@ -997,7 +997,7 @@ public class Anulacion extends PBase {
 				ins.add("COREL", gl.dvcorreld);
 				ins.add("RUTA", DT.getString(1));
 				ins.add("CLIENTE", DT.getString(2));
-				ins.add("FECHA", DT.getInt(3));
+				ins.add("FECHA", DT.getLong(3));
 				ins.add("ANULADO", "N");
 				ins.add("EMPRESA", gl.emp);
 				ins.add("TIPO", DT.getString(6));

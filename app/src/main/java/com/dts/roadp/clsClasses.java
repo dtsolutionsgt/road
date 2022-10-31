@@ -255,7 +255,8 @@ public class clsClasses {
 
 	public class clsNotaCreditoEnc {
 		public String Corel, Anulado, Ruta, Vendedor, Cliente, Factura, Serie, Correlativo, Statcom, ResolNC, SerieFact, Cufe, TipoDocumento, CorelRef, CufeFactura;
-		public int CodigoLiquidacion, CorelFact, Impres, CertificadaDgi, EsAnulacion, Fecha;
+		public int CodigoLiquidacion, CorelFact, Impres, CertificadaDgi, EsAnulacion;
+		public long Fecha;
 		public Double Total;
 	}
 }

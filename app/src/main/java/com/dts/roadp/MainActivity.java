@@ -42,7 +42,7 @@ public class MainActivity extends PBase {
     private String cs1, cs2, cs3, barcode;
 
     private String parNumVer = "9.6.0 / ";
-    private String parFechaVer = "20-09-2022";
+    private String parFechaVer = "03-11-2022";
     private String parTipoVer = "ROAD QAS";
 
     @Override

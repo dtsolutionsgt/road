@@ -159,7 +159,7 @@ public class Anulacion extends PBase {
 
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
 		fdoc.medidapeso=gl.umpeso;
-		Catalogo = new CatalogoFactura(this);
+		Catalogo = new CatalogoFactura(this, Con, db);
 		getDatosEmpresa();
 	}
 

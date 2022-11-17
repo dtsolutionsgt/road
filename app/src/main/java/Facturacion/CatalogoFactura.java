@@ -3,11 +3,10 @@ package Facturacion;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.widget.Toast;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.dts.roadp.AppMethods;
 import com.dts.roadp.BaseDatos;
-import com.dts.roadp.DateUtils;
 import com.dts.roadp.PBase;
 import com.dts.roadp.appGlobals;
 import com.dts.roadp.clsClasses;
@@ -28,22 +27,13 @@ public class CatalogoFactura extends PBase {
     private appGlobals gl;
     private AppMethods app;
 
-    public CatalogoFactura(Context contexto) {
-        cont = contexto;
+    public CatalogoFactura(Context context, BaseDatos dbconnection, SQLiteDatabase dbase) {
+        cont=context;
+        Con=dbconnection;
+        ins=Con.Ins;upd=Con.Upd;
+        db = dbase;
         gl = ((appGlobals) (((Activity) cont).getApplication()));
 
-        try {
-
-            Con = new BaseDatos(cont);
-            opendb();
-            ins=Con.Ins;upd=Con.Upd;
-
-            app = new AppMethods(cont,gl,Con,db);
-            du=new DateUtils();
-
-        } catch (Exception e) {
-            Toast.makeText(cont, "CatalogoFactura : " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
     }
 
 
@@ -475,6 +465,7 @@ public class CatalogoFactura extends PBase {
             db = Con.getWritableDatabase();
             Con.vDatabase =db;
         } catch (Exception e) {
+            msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
         }
     }
 }

@@ -7,13 +7,13 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
-import androidx.core.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.util.Log;
@@ -25,9 +25,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 
 public class MainActivity extends PBase {
@@ -163,11 +167,73 @@ public class MainActivity extends PBase {
                 //txtUser.setText("1");txtPass.setText("1");  // P001-1
             }
 
+            //#AT20221117 Set path
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                gl.PathDataDir = this.getApplicationContext().getDataDir().getPath();
+            }
+
+            //#AT20221117 Se valida si existe el archivo
+            String fname = gl.PathDataDir+"/F-8-740-190-OrielAntonioBarriaCaraballo.p12";
+            File archivo= new File(fname);
+
+            //#AT20221117 Si no existe, procede a realizar la copia
+            if (!archivo.exists()) {
+                CopiarArchivo("F-8-740-190-OrielAntonioBarriaCaraballo.p12");
+            }
+
         } catch (Exception e) {
             addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
             msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
         }
 
+    }
+
+    private void CopiarArchivo(String filename) {
+        AssetManager assetManager = getAssets();
+
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = assetManager.open(filename);
+            File outFile = new File(gl.PathDataDir, filename);
+            out = new FileOutputStream(outFile);
+
+            GeneraArchivo(in, out);
+
+            Toast.makeText(this, "Certificado guardado!", Toast.LENGTH_SHORT).show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "No se pudo copiar el certificado!", Toast.LENGTH_SHORT).show();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void GeneraArchivo(InputStream in, OutputStream out) throws IOException {
+        try {
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, e+"", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

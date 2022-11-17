@@ -102,4 +102,7 @@ public class appGlobals extends Application {
 	public int pLongitudBarra;
 	public String pPrefijoBarra;
 	public int pCantImpresion;
+
+	//Path instalación app
+	public String PathDataDir = "";
 }

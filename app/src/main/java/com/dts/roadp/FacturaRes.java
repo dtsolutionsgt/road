@@ -299,7 +299,7 @@ public class FacturaRes extends PBase {
 		fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 		fdev.deviceid =gl.numSerie;
 
-		Catalogo = new CatalogoFactura(this);
+		Catalogo = new CatalogoFactura(this, Con, db);
 
 		saved=false;
 		assignCorel();

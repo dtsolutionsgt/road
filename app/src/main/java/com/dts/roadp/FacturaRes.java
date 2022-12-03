@@ -2687,6 +2687,7 @@ public class FacturaRes extends PBase {
 				if(DT!=null) DT.close();
 
                 return rslt;
+
             }else {
 			    return 0;
             }

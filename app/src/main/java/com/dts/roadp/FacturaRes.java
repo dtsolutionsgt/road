@@ -1061,7 +1061,8 @@ public class FacturaRes extends PBase {
 				}
 			}
 
-			if (!Cliente.nit.contains("D")) {
+            //#CKFK20221206 antes así se calculaba el RUC
+            /*if (!Cliente.nit.contains("D")) {
 				msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
 				return false;
 			} else {
@@ -1077,6 +1078,43 @@ public class FacturaRes extends PBase {
 						Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
 						Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
 					} else {
+						Factura.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
+						Factura.gDGen.Receptor.gRucRec.dDV = "";
+					}
+				}
+			}*/
+
+            // #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
+			if (Factura.gDGen.Receptor.iTipoRec.equals("01") || Factura.gDGen.Receptor.iTipoRec.equals("03")) {
+
+				if (Cliente.nit.length()>0) {
+					String[] DVRuc = Cliente.nit.split(" ");
+					if (DVRuc.length > 1) {
+						Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+						if (DVRuc[1].trim().equals("")){
+							Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+						}else{
+							Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+						}
+					}else{
+						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
+						return false;
+					}
+				}else {
+					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+					return false;
+				}
+			}else{
+				if (Cliente.nit.length()>0) {
+					String[] DVRuc = Cliente.nit.split(" ");
+					if (DVRuc.length > 1) {
+						Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+						if (DVRuc[1].trim().equals("")){
+							Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+						}else{
+							Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+						}
+					}else{
 						Factura.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
 						Factura.gDGen.Receptor.gRucRec.dDV = "";
 					}
@@ -1286,22 +1324,62 @@ public class FacturaRes extends PBase {
 					}
 				}
 
-				if (!Cliente.nit.contains("D")) {
-					msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
-					return false;
-				} else {
-					String[] DVRuc = Cliente.nit.split("DV");
 
-					if (NotaCredito.gDGen.Receptor.gRucRec.dTipoRuc.equals("01") || NotaCredito.gDGen.Receptor.gRucRec.dTipoRuc.equals("03")) {
-						if (DVRuc.length > 1) {
-							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-							NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
-						}
+				//#CKFK20221206 Así se calculaba antes el RUC a enviar
+				/*				if (!Cliente.nit.contains("D")) {
+				msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
+				return false;
+			} else {
+				String[] DVRuc = Cliente.nit.split("DV");
+				if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
+					if (DVRuc.length > 1) {
+						NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
+					}
+				} else {
+					if (DVRuc.length > 1) {
+						NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
 					} else {
+						NotaCredito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = "";
+					}
+				}
+			}*/
+
+				//#CKFK20221206 Si el dTipoRuc Tipo de Contribuyente (1:Natural, 2:Jurídico)
+				// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
+				// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
+				if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
+
+					if (Cliente.nit.length()>0) {
+						String[] DVRuc = Cliente.nit.split(" ");
 						if (DVRuc.length > 1) {
 							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-							NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
-						} else {
+							if (DVRuc[1].trim().equals("")){
+								NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+							}else{
+								NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+							}
+						}else{
+							msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
+							return false;
+						}
+					}else {
+						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+						return false;
+					}
+				}else{
+					if (Cliente.nit.length()>0) {
+						String[] DVRuc = Cliente.nit.split(" ");
+						if (DVRuc.length > 1) {
+							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+							if (DVRuc[1].trim().equals("")){
+								NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+							}else{
+								NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+							}
+						}else{
 							NotaCredito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
 							NotaCredito.gDGen.Receptor.gRucRec.dDV = "";
 						}
@@ -1738,7 +1816,6 @@ public class FacturaRes extends PBase {
 			Pagos.dVlrCuota = Total;
 			Factura.gTot.gFormaPago.add(Pagos);
 
-
 			//endregion
 
 			//region D_FACTURAF
@@ -2020,7 +2097,7 @@ public class FacturaRes extends PBase {
 					ControlFEL.Caja = fserie;
 
 					if (RespuestaEdocFac.Estado.equals("21") || RespuestaEdocFac.Estado.equals("20")) {
-						ControlFEL.Estado = "01";
+						ControlFEL.Estado = "1";
 					} else {
 						ControlFEL.Estado = RespuestaEdocFac.Estado;
 					}

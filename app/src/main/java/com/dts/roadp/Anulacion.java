@@ -713,7 +713,8 @@ public class Anulacion extends PBase {
 				}
 			}
 
-			if (!Cliente.nit.contains("D")) {
+			//#CKFK20221206 Antes así se calculaba el RUC
+			/*if (!Cliente.nit.contains("D")) {
 				msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
 				return false;
 			} else {
@@ -729,6 +730,43 @@ public class Anulacion extends PBase {
 						NotaDebito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
 						NotaDebito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
 					} else {
+						NotaDebito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
+						NotaDebito.gDGen.Receptor.gRucRec.dDV = "";
+					}
+				}
+			}*/
+
+			// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
+			if (NotaDebito.gDGen.Receptor.iTipoRec.equals("01") || NotaDebito.gDGen.Receptor.iTipoRec.equals("03")) {
+
+				if (Cliente.nit.length()>0) {
+					String[] DVRuc = Cliente.nit.split(" ");
+					if (DVRuc.length > 1) {
+						NotaDebito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+						if (DVRuc[1].trim().equals("")){
+							NotaDebito.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+						}else{
+							NotaDebito.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+						}
+					}else{
+						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
+						return false;
+					}
+				}else {
+					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+					return false;
+				}
+			}else{
+				if (Cliente.nit.length()>0) {
+					String[] DVRuc = Cliente.nit.split(" ");
+					if (DVRuc.length > 1) {
+						NotaDebito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+						if (DVRuc[1].trim().equals("")){
+							NotaDebito.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+						}else{
+							NotaDebito.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+						}
+					}else{
 						NotaDebito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
 						NotaDebito.gDGen.Receptor.gRucRec.dDV = "";
 					}

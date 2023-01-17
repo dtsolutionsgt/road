@@ -95,6 +95,7 @@ public class Anulacion extends PBase {
 	private clsClasses.clsSucursal Sucursal;
 	private clsClasses.clsMunicipio Municipio;
 	private clsClasses.clsDepartamento Departamento;
+	private clsClasses.clsCiudad Ciudad;
 	private ArrayList<clsClasses.clsBeNotaCreditoDet> DetalleNT;
 	private clsClasses.clsProducto Producto;
 	private clsClasses.clsNotaCreditoEnc NotaDebitoEnc;
@@ -484,35 +485,41 @@ public class Anulacion extends PBase {
 
 			db.beginTransaction();
 
-			anulFactura(itemid);
+			if (anulFactura(itemid)){
 
-			if(tipo==3) {
+				db.setTransactionSuccessful();
+				db.endTransaction();
 
-				clsDocFactura fdoc;
+				if(tipo==3) {
 
-				fdoc = new clsDocFactura(this, prn.prw, gl.peMon, gl.peDecImp, "", app.esClienteNuevo(pclicod), gl.codCliNuevo, gl.peModal);
-				fdoc.deviceid = gl.numSerie;
-				fdoc.medidapeso = gl.umpeso;
-				fdoc.buildPrint(itemid, 3, "TOL");
+					clsDocFactura fdoc;
 
-				String corelNotaCred = tieneNotaCredFactura(itemid);
+					fdoc = new clsDocFactura(this, prn.prw, gl.peMon, gl.peDecImp, "", app.esClienteNuevo(pclicod), gl.codCliNuevo, gl.peModal);
+					fdoc.deviceid = gl.numSerie;
+					fdoc.medidapeso = gl.umpeso;
+					fdoc.buildPrint(itemid, 3, "TOL");
 
-				if (!corelNotaCred.isEmpty()) {
-					prn.printask(printotrodoc);
-				} else {
-					prn.printask(printclose);
+					String corelNotaCred = tieneNotaCredFactura(itemid);
+
+					if (!corelNotaCred.isEmpty()) {
+						prn.printask(printotrodoc);
+					} else {
+						prn.printask(printclose);
+					}
+
 				}
 
+				progress.cancel();
+				mu.msgbox("El documento ha sido anulado.");
+
+			}else{
+
+				db.setTransactionSuccessful();
+				db.endTransaction();
 
 			}
 
 			listItems();
-
-			db.setTransactionSuccessful();
-			db.endTransaction();
-
-			progress.cancel();
-			mu.msgbox("El documento ha sido anulado.");
 
 		} catch (Exception e) {
 			mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" - "+ e.getMessage());
@@ -564,7 +571,9 @@ public class Anulacion extends PBase {
 					//En espera para definir el estado correcto 11 ó 2
 					if (resultado.getEstado().equals("2")) {
 						exito = true;
-					} else if (resultado.getEstado().equals("3")) {
+					} else if (resultado.getEstado().equals("4")) {
+						exito = true;
+					} else{
 						toastlong(resultado.getMensajeRespuesta());
 					}
 				}
@@ -684,10 +693,48 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.Receptor.dTfnRec = Cliente.telefono;
 			NotaDebito.gDGen.Receptor.cPaisRec = Cliente.codPais;
 			NotaDebito.gDGen.Receptor.dNombRec = Cliente.nombre;
-			NotaDebito.gDGen.Receptor.dDirecRec = Cliente.direccion;
-			NotaDebito.gDGen.Receptor.gUbiRec.dCodUbi = Cliente.ciudad;
+			NotaDebito.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
+			NotaDebito.gDGen.Receptor.gUbiRec.dCodUbi = (Cliente.ciudad==null?"":Cliente.ciudad);
 
-			if (!Cliente.muni.isEmpty() || Cliente.muni != null) {
+			if (Cliente.ciudad != null) {
+
+				if (!Cliente.ciudad.isEmpty() ){
+
+					Ciudad = clsCls.new clsCiudad();
+
+					Ciudad = Catalogo.getCiudad(Cliente.ciudad);
+
+					if (Ciudad!=null) {
+
+						NotaDebito.gDGen.Receptor.gUbiRec.dCorreg = Ciudad.corregimiento.toUpperCase().trim();
+						NotaDebito.gDGen.Receptor.gUbiRec.dDistr = Ciudad.distrito.toUpperCase().trim();
+						NotaDebito.gDGen.Receptor.gUbiRec.dProv = Ciudad.provincia.toUpperCase().trim();
+
+						if (Ciudad.provincia.isEmpty()) {
+							NotaDebito.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
+						}
+
+					} else {
+						if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+							msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+							return false;
+						}
+					}
+				}else {
+					if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+						msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+						return false;
+					}
+				}
+			}else {
+				if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+					msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+					return false;
+				}
+			}
+
+			//#CKFK20221227 Antes se obtenia el distrito, provincia y correegimiento de esta forma
+			/*if (!Cliente.muni.isEmpty() || Cliente.muni != null) {
 				Municipio = clsCls.new clsMunicipio();
 				Departamento = clsCls.new clsDepartamento();
 
@@ -711,7 +758,7 @@ public class Anulacion extends PBase {
 					msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
 					return false;
 				}
-			}
+			}*/
 
 			//#CKFK20221206 Antes así se calculaba el RUC
 			/*if (!Cliente.nit.contains("D")) {
@@ -744,9 +791,9 @@ public class Anulacion extends PBase {
 					if (DVRuc.length > 1) {
 						NotaDebito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
 						if (DVRuc[1].trim().equals("")){
-							NotaDebito.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+							NotaDebito.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[3].trim(),2);
 						}else{
-							NotaDebito.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+							NotaDebito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
 						}
 					}else{
 						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
@@ -762,9 +809,9 @@ public class Anulacion extends PBase {
 					if (DVRuc.length > 1) {
 						NotaDebito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
 						if (DVRuc[1].trim().equals("")){
-							NotaDebito.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+							NotaDebito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
 						}else{
-							NotaDebito.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+							NotaDebito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
 						}
 					}else{
 						NotaDebito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
@@ -884,7 +931,7 @@ public class Anulacion extends PBase {
 			}
 
 			RespuestaEdoc RespuestaEdocND = new RespuestaEdoc();
-			clsClasses.clsControlFEL ControNotaDebito = clsCls.new clsControlFEL();
+			clsClasses.clsControlFEL ControlNotaDebito = clsCls.new clsControlFEL();
 			Fimador Firmador = new Fimador(this);
 			int EstadoND = 0;
 
@@ -896,30 +943,32 @@ public class Anulacion extends PBase {
 
 			if (RespuestaEdocND != null ) {
 				if	(RespuestaEdocND.Cufe != null) {
-					ControNotaDebito.Cufe = RespuestaEdocND.Cufe;
-					ControNotaDebito.TipoDoc = NotaDebito.gDGen.iDoc;
-					ControNotaDebito.NumDoc = NotaDebito.gDGen.dNroDF;
-					ControNotaDebito.Sucursal = gl.sucur;
-					ControNotaDebito.Caja = NotaDebito.gDGen.dPtoFacDF;
+					ControlNotaDebito.Cufe = RespuestaEdocND.Cufe;
+					ControlNotaDebito.TipoDoc = NotaDebito.gDGen.iDoc;
+					ControlNotaDebito.NumDoc = NotaDebito.gDGen.dNroDF;
+					ControlNotaDebito.Sucursal = gl.sucur;
+					ControlNotaDebito.Caja = NotaDebito.gDGen.dPtoFacDF;
 
 					if (RespuestaEdocND.Estado.equals("21")) {
-						ControNotaDebito.Estado = "01";
+						ControlNotaDebito.Estado = "01";
 					} else {
-						ControNotaDebito.Estado = RespuestaEdocND.Estado;
+						ControlNotaDebito.Estado = RespuestaEdocND.Estado;
 					}
 
-					ControNotaDebito.Mensaje = RespuestaEdocND.MensajeRespuesta;
-					ControNotaDebito.ValorXml = RespuestaEdocND.XML;
+					ControlNotaDebito.Mensaje = RespuestaEdocND.MensajeRespuesta;
+					ControlNotaDebito.ValorXml = RespuestaEdocND.XML;
 
 					String[] FechaEnv = NotaDebito.gDGen.dFechaEm.split("-05:00", 0);
-					ControNotaDebito.FechaEnvio = FechaEnv[0];
-					ControNotaDebito.TipFac = NotaDebito.gDGen.iDoc;
-					ControNotaDebito.FechaAgr = String.valueOf(du.getFechaCompleta());
-					ControNotaDebito.QR = RespuestaEdocND.UrlCodeQR;
-					ControNotaDebito.Corel = gl.dvcorelnd;
-					ControNotaDebito.Ruta = gl.ruta;
-					ControNotaDebito.Vendedor = gl.vend;
-					ControNotaDebito.Correlativo = String.valueOf(NotaDebito.gDGen.dNroDF);
+					ControlNotaDebito.FechaEnvio = FechaEnv[0];
+					ControlNotaDebito.TipFac = NotaDebito.gDGen.iDoc;
+					ControlNotaDebito.FechaAgr = String.valueOf(du.getFechaCompleta());
+					ControlNotaDebito.QR = RespuestaEdocND.UrlCodeQR;
+					ControlNotaDebito.Corel = gl.dvcorelnd;
+					ControlNotaDebito.Ruta = gl.ruta;
+					ControlNotaDebito.Vendedor = gl.vend;
+					ControlNotaDebito.Correlativo = String.valueOf(NotaDebito.gDGen.dNroDF);
+					ControlNotaDebito.Fecha_Autorizacion = RespuestaEdocND.FechaAutorizacion;
+					ControlNotaDebito.Numero_Autorizacion = RespuestaEdocND.NumAutorizacion;
 
 					if (RespuestaEdocND.Estado.equals("2")) {
 						EstadoND = 1;
@@ -931,7 +980,7 @@ public class Anulacion extends PBase {
 					sql="UPDATE D_NOTACRED SET CUFE ='"+RespuestaEdocND.Cufe+"', CERTIFICADA_DGI="+EstadoND+"  WHERE COREL='"+gl.dvcorelnd+"'" +" AND TIPO_DOCUMENTO = 'ND'";
 					db.execSQL(sql);
 
-					InsertarFELControl(ControNotaDebito);
+					InsertarFELControl(ControlNotaDebito);
 
 				} else {
 					toastlong("Estamos esperando una respuesta de GuruSoft");
@@ -981,6 +1030,8 @@ public class Anulacion extends PBase {
 			ins.add("CODIGOLIQUIDACION", ItemFEL.CodLiquidacion);
 			ins.add("CORELATIVO", ItemFEL.Correlativo);
 			ins.add("QRIMAGE", ItemFEL.QRImg);
+			ins.add("FECHA_AUTORIZACION", ItemFEL.Fecha_Autorizacion);
+			ins.add("NUMERO_AUTORIZACION", ItemFEL.Numero_Autorizacion);
 
 			db.execSQL(ins.sql());
 

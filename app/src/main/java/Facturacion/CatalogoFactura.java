@@ -39,6 +39,7 @@ public class CatalogoFactura extends PBase {
 
     public void InsertarFELControl(clsClasses.clsControlFEL ItemFEL) {
         Cursor dt;
+        String vFechaAutorizacion = "";
         try {
 
             sql = "SELECT MAX(IdTablaControl) FROM D_FACTURA_CONTROL_CONTINGENCIA";
@@ -69,6 +70,17 @@ public class CatalogoFactura extends PBase {
             ins.add("CODIGOLIQUIDACION", ItemFEL.CodLiquidacion);
             ins.add("CORELATIVO", ItemFEL.Correlativo);
             ins.add("QRIMAGE", ItemFEL.QRImg);
+
+            if (ItemFEL.Fecha_Autorizacion!=null){
+                vFechaAutorizacion = ItemFEL.Fecha_Autorizacion.equals("0001-01-01T00:00:00")?
+                        "1900-01-01T00:00:00":
+                        ItemFEL.Fecha_Autorizacion.toString().substring(0,ItemFEL.Fecha_Autorizacion.length()-6);
+            }else{
+                vFechaAutorizacion = "1900-01-01T00:00:00";
+            }
+
+            ins.add("FECHA_AUTORIZACION",vFechaAutorizacion);
+            ins.add("NUMERO_AUTORIZACION", ItemFEL.Numero_Autorizacion);
 
             db.execSQL(ins.sql());
 
@@ -139,6 +151,30 @@ public class CatalogoFactura extends PBase {
         return Municipio;
     }
 
+    public clsClasses.clsCiudad getCiudad(String CodCiudad) {
+        clsClasses.clsCiudad Ciudad = clsCls.new clsCiudad();
+        Cursor dt;
+        try {
+            sql= "SELECT * FROM P_CIUDAD WHERE CODIGO = '"+CodCiudad+"'";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+
+            if (dt.getCount() > 0) {
+                Ciudad.codigo = dt.getString(0);
+                Ciudad.distrito = dt.getString(1);
+                Ciudad.corregimiento = dt.getString(2);
+                Ciudad.provincia = dt.getString(3);
+            }
+
+            if(dt!=null) dt.close();
+
+        } catch (Exception e) {
+            msgbox(new Object() {}.getClass().getEnclosingMethod().getName()+" - "+e.getMessage());
+        }
+
+        return Ciudad;
+    }
+
     public clsClasses.clsDepartamento getDepartamento(String CodDep) {
         clsClasses.clsDepartamento Departamento = clsCls.new clsDepartamento();
         Cursor dt;
@@ -175,7 +211,7 @@ public class CatalogoFactura extends PBase {
                 Cliente.email = dt.getString(3);
                 Cliente.telefono = dt.getString(4);
                 Cliente.codPais = dt.getString(5);
-                Cliente.direccion = dt.getString(6);
+                Cliente.direccion = dt.getString(6).substring(0,(dt.getString(6).length()>=100?100:dt.getString(6).length()));
                 Cliente.ciudad = dt.getString(7);
                 Cliente.nit = dt.getString(8);
                 Cliente.muni = dt.getString(9);
@@ -398,7 +434,6 @@ public class CatalogoFactura extends PBase {
         try {
             SimpleDateFormat fecha = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             Calendar calendar = Calendar.getInstance();
-            calendar.setTime(fecha.parse(du.getFechaCompleta()));
             calendar.add(Calendar.DAY_OF_YEAR, diascredito);
 
             fechaNueva = fecha.format(calendar.getTime())+"-05:00";

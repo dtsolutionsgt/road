@@ -33,9 +33,8 @@ public class clsDocDepos extends clsDocument {
 		ruta=pruta;
 		vendedor=pvend;
 		vendcod=gl.vend;
+		qrCode="";
 
-
-		
 	}
 
 	protected boolean loadHeadData(String corel) {

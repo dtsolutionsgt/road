@@ -184,6 +184,37 @@ public class clsDocDevolucion extends clsDocument {
 
         cliente=val;
 
+        try {
+
+            qrCode="";
+
+            sql="SELECT CUFE, QR, Caja, FECHA_AUTORIZACION, NUMERO_AUTORIZACION" +
+                " FROM D_FACTURA_CONTROL_CONTINGENCIA WHERE COREL='"+corel+"' " +
+                "AND TipoFactura <> '01'";
+            DT=Con.OpenDT(sql);
+            DT.moveToFirst();
+
+            //CUFE=DT.getString(0);
+            Caja=DT.getString(2);
+            FechaAutorizacion=DT.getString(3);
+            NumAutorizacion=DT.getString(4);
+
+            if (DT.getString(1).length()>0){
+                qrCode="QRCode:" + DT.getString(1);
+            }else{
+                qrCode="";
+            }
+
+            if (DT.getString(0).length()>0){
+                CUFE="Consulte por la clave de acceso en https://dgi-fep.mef.gob.pa/Consultas/FacturasPorCUFE:" + DT.getString(0);
+            }else{
+                CUFE="";
+            }
+
+            if(DT!=null) DT.close();
+        } catch (Exception e) {
+        }
+
         return true;
 
     }

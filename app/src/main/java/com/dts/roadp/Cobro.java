@@ -24,6 +24,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import Entidades.Detalle;
+import Entidades.Receptor;
+import Entidades.gRucRec;
+import Entidades.gUbiRec;
+import Entidades.rFE;
+import Facturacion.CatalogoFactura;
+
 public class Cobro extends PBase {
 
 	private ListView listView;
@@ -48,6 +55,25 @@ public class Cobro extends PBase {
 	private CheckBox cbCheckAll;
 	private long fechaven;
 	private RadioButton chkFactura,chkContado;
+
+	//Factura Electronica
+	private clsClasses.clsMunicipio Municipio = clsCls.new clsMunicipio();
+	private clsClasses.clsDepartamento Departamento = clsCls.new clsDepartamento();
+	private clsClasses.clsCiudad Ciudad = clsCls.new clsCiudad();
+	private clsClasses.clsSucursal Sucursal = clsCls.new clsSucursal();
+	private clsClasses.clsCliente Cliente = clsCls.new clsCliente();
+	private clsClasses.clsProducto Producto = clsCls.new clsProducto();
+
+	private rFE Factura = new rFE();
+	private rFE NotaCredito = new rFE();
+	private Detalle detalle = new Detalle();
+	private CatalogoFactura Catalogo;
+	private String urltoken = "https://labpa.guru-soft.com/EdocPanama/4.0/Autenticacion/Api/ServicioEDOC?Id=1";
+	private String usuario = "edocTOLEDANO_8945";
+	private String clave = "wsTOLEDANO_8945";
+	private String urlDoc = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/FacturaEnte";
+	private String urlDocNT = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/NotaCreditoEnte";
+	private String QR = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -796,14 +822,157 @@ public class Cobro extends PBase {
 						DT.moveToNext();
 					}
 
+					sql = "DELETE FROM P_COBRO WHERE DOCUMENTO='" + doc + "'";
+					db.execSQL(sql);
+
+					db.setTransactionSuccessful();
+
+					db.endTransaction();
+
+					//#CKFK20230112 - Certificar factura pendiente de pago
+                    toast("Certificar factura pendiente de pago");
+/*
+					//region Factura Electrónica
+					Sucursal = Catalogo.getSucursal();
+					Cliente = Catalogo.getCliente(gl.cliente);
+
+					Factura.gDGen.iTpEmis = "01"; // 'Fijo salvo que sea autorización en contingencia cambiar a valor 04
+					Factura.gDGen.iDoc = "01"; //'Para Factura fijo.
+					Factura.gDGen.dNroDF = String.valueOf(fcorel); //P_COREL.Correlativo
+					Factura.gDGen.dPtoFacDF = fserie; // BeSucursal.CODIGO '"002" 'Punto de Facturación del documento fiscal. (Ruta, Serie del disp.)
+					Factura.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";// 'Fecha de la FM.
+					Factura.gDGen.iNatOp = "01"; //'Venta fijo.
+					Factura.gDGen.iTipoOp = 1; //'Fijo.
+					Factura.gDGen.iDest = 1; //'Fijo 1
+					Factura.gDGen.iFormCAFE = 2; //'Fijo 2.
+					Factura.gDGen.iEntCAFE = 1; //'Fijo 2
+					Factura.gDGen.dEnvFE = 1; //'Fijo 1
+					Factura.gDGen.iProGen = 2; //'Fijo 2
+					Factura.gDGen.iTipoTranVenta = 1; // Fijo 1
+					Factura.gDGen.iTipoSuc = 2; //'Fijo 2
+
+					Factura.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";  //'BeSucursal.NOMBRE
+					Factura.gDGen.Emisor.dTfnEm = Sucursal.telefono;
+					Factura.gDGen.Emisor.dSucEm = Sucursal.codigo;
+					Factura.gDGen.Emisor.dCorElectEmi = Sucursal.correo;
+					Factura.gDGen.Emisor.dCoordEm = "+" + Sucursal.corx + ",-" + Sucursal.cory;
+					Factura.gDGen.Emisor.gUbiEm.dCodUbi = Sucursal.codubi;
+					Factura.gDGen.Emisor.dDirecEm = Sucursal.direccion;
+					Factura.gDGen.Emisor.gRucEmi.dRuc = Sucursal.nit;
+					Factura.gDGen.Emisor.gRucEmi.dDV = Sucursal.texto;
+					Factura.gDGen.Emisor.gRucEmi.dTipoRuc = Sucursal.tipoRuc;
+
+					if (!Sucursal.codubi.isEmpty() || Sucursal.codubi != null) {
+						Ciudad = clsCls.new clsCiudad();
+
+						Ciudad = Catalogo.getCiudad(Sucursal.codubi);
+
+						if (Ciudad!=null) {
+
+							Factura.gDGen.Emisor.gUbiEm.dCorreg = Ciudad.corregimiento.toUpperCase().trim().trim();
+							Factura.gDGen.Emisor.gUbiEm.dDistr = Ciudad.distrito.toUpperCase().trim();
+							Factura.gDGen.Emisor.gUbiEm.dProv = Ciudad.provincia.toUpperCase().trim();
+
+							if (Ciudad.provincia.isEmpty()) {
+								Factura.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
+							}
+
+						} else {
+							msgbox("No se encontraron los datos de la ubicación para este código:" + Cliente.ciudad);
+							return false;
+						}
+					}
+
+					Factura.gDGen.Receptor = new Receptor();
+					Factura.gDGen.Receptor.gRucRec = new gRucRec();
+					Factura.gDGen.Receptor.gUbiRec = new gUbiRec();
+
+					Factura.gDGen.Receptor.gRucRec.dTipoRuc = Cliente.tipoContribuyente;
+					Factura.gDGen.Receptor.iTipoRec = Cliente.tipoRec;
+					Factura.gDGen.Receptor.dCorElectRec = Cliente.email;
+					Factura.gDGen.Receptor.dTfnRec = Cliente.telefono;
+					Factura.gDGen.Receptor.cPaisRec = Cliente.codPais;
+					Factura.gDGen.Receptor.dNombRec = Cliente.nombre;
+					Factura.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
+					Factura.gDGen.Receptor.gUbiRec.dCodUbi = (Cliente.ciudad==null?"":Cliente.ciudad);
+
+					if (Cliente.ciudad != null) {
+
+						if (!Cliente.ciudad.isEmpty() ){
+
+							Ciudad = clsCls.new clsCiudad();
+
+							Ciudad = Catalogo.getCiudad(Cliente.ciudad);
+
+							if (Ciudad!=null) {
+
+								Factura.gDGen.Receptor.gUbiRec.dCorreg = Ciudad.corregimiento.toUpperCase().trim();
+								Factura.gDGen.Receptor.gUbiRec.dDistr = Ciudad.distrito.toUpperCase().trim();
+								Factura.gDGen.Receptor.gUbiRec.dProv = Ciudad.provincia.toUpperCase().trim();
+
+								if (Ciudad.provincia.isEmpty()) {
+									Factura.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
+								}
+
+							} else {
+								if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+									msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+									return false;
+								}
+							}
+						}else {
+							if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+								msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+								return false;
+							}
+						}
+					}else {
+						if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+							msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+							return false;
+						}
+					}
+
+					// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
+					if (Factura.gDGen.Receptor.iTipoRec.equals("01") || Factura.gDGen.Receptor.iTipoRec.equals("03")) {
+
+						if (Cliente.nit.length()>0) {
+							String[] DVRuc = Cliente.nit.split(" ");
+							if (DVRuc.length > 1) {
+								Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+								if (DVRuc[1].trim().equals("")){
+									Factura.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
+								}else{
+									Factura.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
+								}
+							}else{
+								msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
+								return false;
+							}
+						}else {
+							msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+							return false;
+						}
+					}else{
+						if (Cliente.nit.length()>0) {
+							String[] DVRuc = Cliente.nit.split(" ");
+							if (DVRuc.length > 1) {
+								Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
+								if (DVRuc[1].trim().equals("")){
+									Factura.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[3].trim(),2);
+								}else{
+									Factura.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[2].trim(),2);
+								}
+							}else{
+								Factura.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
+								Factura.gDGen.Receptor.gRucRec.dDV = "";
+							}
+						}
+					}
+					//endregion Factura electrónica
+*/
 				}
 
-				sql = "DELETE FROM P_COBRO WHERE DOCUMENTO='" + doc + "'";
-				db.execSQL(sql);
-
-				db.setTransactionSuccessful();
-
-				db.endTransaction();
 			}
 
 			if(DT!=null) DT.close();

@@ -23,6 +23,8 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 
+import Facturacion.CatalogoFactura;
+
 public class Pago extends PBase {
 
 	private ListView listView;
@@ -56,6 +58,7 @@ public class Pago extends PBase {
 		setContentView(R.layout.activity_pago);
 		
 		super.InitBase();
+
 		addlog("Pago",""+du.getActDateTime(),gl.vend);
 		
 		listView = (ListView) findViewById(R.id.listView1);

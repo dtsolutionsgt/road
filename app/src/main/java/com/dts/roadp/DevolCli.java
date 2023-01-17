@@ -57,6 +57,7 @@ public class DevolCli extends PBase {
 	private rFE NotaCredito = new rFE();
 	private clsClasses.clsMunicipio Municipio = clsCls.new clsMunicipio();
 	private clsClasses.clsDepartamento Departamento = clsCls.new clsDepartamento();
+	private clsClasses.clsCiudad Ciudad = clsCls.new clsCiudad();
 	private clsClasses.clsSucursal Sucursal = clsCls.new clsSucursal();
 	private clsClasses.clsCliente Cliente = clsCls.new clsCliente();
 	private clsClasses.clsProducto Producto = clsCls.new clsProducto();
@@ -517,7 +518,29 @@ public class DevolCli extends PBase {
 				NotaCredito.gDGen.Emisor.gRucEmi.dDV = Sucursal.texto;
 				NotaCredito.gDGen.Emisor.gRucEmi.dTipoRuc = Sucursal.tipoRuc;
 
-				if (!Sucursal.codMuni.isEmpty() || Sucursal.codMuni != null) {
+				if (!Sucursal.codubi.isEmpty() || Sucursal.codubi != null) {
+					Ciudad = clsCls.new clsCiudad();
+
+					Ciudad = Catalogo.getCiudad(Sucursal.codubi);
+
+					if (Ciudad!=null) {
+
+						NotaCredito.gDGen.Emisor.gUbiEm.dCorreg = Ciudad.corregimiento.toUpperCase().trim();
+						NotaCredito.gDGen.Emisor.gUbiEm.dDistr = Ciudad.distrito.toUpperCase().trim();
+						NotaCredito.gDGen.Emisor.gUbiEm.dProv = Ciudad.provincia.toUpperCase().trim();
+
+						if (Ciudad.provincia.isEmpty()) {
+							NotaCredito.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
+						}
+
+					} else {
+						msgbox("No se encontraron los datos de la ubicación para este código:" + Cliente.ciudad);
+						return;
+					}
+				}
+
+				//#CKFK20221227 Antes se obtenia el distrito, provincia y correegimiento de esta forma
+				/*if (!Sucursal.codMuni.isEmpty() || Sucursal.codMuni != null) {
 					Municipio = clsCls.new clsMunicipio();
 					Departamento = clsCls.new clsDepartamento();
 
@@ -542,7 +565,7 @@ public class DevolCli extends PBase {
 						return;
 					}
 
-				}
+				}*/
 
 				NotaCredito.gDGen.Receptor = new Receptor();
 				NotaCredito.gDGen.Receptor.gRucRec = new gRucRec();
@@ -553,10 +576,11 @@ public class DevolCli extends PBase {
 				NotaCredito.gDGen.Receptor.dTfnRec = Cliente.telefono;
 				NotaCredito.gDGen.Receptor.cPaisRec = Cliente.codPais;
 				NotaCredito.gDGen.Receptor.dNombRec = Cliente.nombre;
-				NotaCredito.gDGen.Receptor.dDirecRec = Cliente.direccion;
-				NotaCredito.gDGen.Receptor.gUbiRec.dCodUbi = Cliente.ciudad;
+				NotaCredito.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
+				NotaCredito.gDGen.Receptor.gUbiRec.dCodUbi = (Cliente.ciudad==null?"":Cliente.ciudad);
 
-				if (!Cliente.muni.isEmpty() || Cliente.muni != null) {
+				//#CKFK20221227 Antes se obtenia el distrito, provincia y correegimiento de esta forma
+                /*if (!Cliente.muni.isEmpty() || Cliente.muni != null) {
 					Municipio = clsCls.new clsMunicipio();
 					Departamento = clsCls.new clsDepartamento();
 
@@ -578,6 +602,43 @@ public class DevolCli extends PBase {
 
 					} else {
 						msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+						return;
+					}
+				}*/
+
+				if (Cliente.ciudad != null) {
+
+					if (!Cliente.ciudad.isEmpty() ){
+
+						Ciudad = clsCls.new clsCiudad();
+
+						Ciudad = Catalogo.getCiudad(Cliente.ciudad);
+
+						if (Ciudad!=null) {
+
+							NotaCredito.gDGen.Receptor.gUbiRec.dCorreg = Ciudad.corregimiento.toUpperCase().trim();
+							NotaCredito.gDGen.Receptor.gUbiRec.dDistr = Ciudad.distrito.toUpperCase().trim();
+							NotaCredito.gDGen.Receptor.gUbiRec.dProv = Ciudad.provincia.toUpperCase().trim();
+
+							if (Ciudad.provincia.isEmpty()) {
+								NotaCredito.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
+							}
+
+						} else {
+							if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+								msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+								return;
+							}
+						}
+					}else {
+						if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+							msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+							return;
+						}
+					}
+				}else {
+					if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+						msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
 						return;
 					}
 				}
@@ -613,9 +674,9 @@ public class DevolCli extends PBase {
 						if (DVRuc.length > 1) {
 							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
 							if (DVRuc[1].trim().equals("")){
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+								NotaCredito.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[3].trim(),2);
 							}else{
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+								NotaCredito.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[2].trim(),2);
 							}
 						}else{
 							msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
@@ -631,9 +692,9 @@ public class DevolCli extends PBase {
 						if (DVRuc.length > 1) {
 							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
 							if (DVRuc[1].trim().equals("")){
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+								NotaCredito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
 							}else{
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+								NotaCredito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
 							}
 						}else{
 							NotaCredito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
@@ -820,7 +881,7 @@ public class DevolCli extends PBase {
 					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 				}
 
-				if (RespuestaEdoc == null) {
+				if	(RespuestaEdoc.Cufe == null) {
 					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?", "/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 				}
 
@@ -854,6 +915,8 @@ public class DevolCli extends PBase {
 							ControlNotaCredito.Ruta = gl.ruta;
 							ControlNotaCredito.Vendedor = gl.vend;
 							ControlNotaCredito.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
+							ControlNotaCredito.Fecha_Autorizacion = RespuestaEdoc.FechaAutorizacion;
+							ControlNotaCredito.Numero_Autorizacion = RespuestaEdoc.NumAutorizacion;
 
 							if (RespuestaEdoc.Estado.equals("2")) {
 								EstadoNT = 1;
@@ -861,6 +924,12 @@ public class DevolCli extends PBase {
 							} else {
 								toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + RespuestaEdoc.MensajeRespuesta);
 							}
+						}
+
+						try{
+							Catalogo.opendb();
+						}catch (Exception e){
+							Catalogo = new CatalogoFactura(this, Con, db);
 						}
 
 						Catalogo.UpdateEstadoNotaCredito(RespuestaEdoc.Cufe,"", EstadoNT);

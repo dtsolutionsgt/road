@@ -210,6 +210,13 @@ public class clsClasses {
 		public String nombre;
 	}
 
+	public class clsCiudad {
+		public String codigo;
+		public String distrito;
+		public String corregimiento;
+		public String provincia;
+	}
+
 	public class clsResProducto {
 		public String codigo, nombre;
 		public String cantidad;
@@ -241,8 +248,10 @@ public class clsClasses {
 
 	public class clsControlFEL {
 		public int Id, CodLiquidacion;
-		public String Cufe = "", TipoDoc = "", NumDoc = "", Sucursal = "", Caja = "", Estado = "", Mensaje = "", ValorXml = "", FechaEnvio = "", TipFac = "", FechaAgr = "", QR = "", Corel = "",Ruta = "", Vendedor = "", Host = "", Correlativo = "", QRImg = "";
-	}
+		public String Cufe = "", TipoDoc = "", NumDoc = "", Sucursal = "", Caja = "", Estado = "", Mensaje = "",
+				ValorXml = "", FechaEnvio = "", TipFac = "", FechaAgr = "", QR = "", Corel = "",Ruta = "",
+				Vendedor = "", Host = "", Correlativo = "", QRImg = "",
+				Numero_Autorizacion = "", Fecha_Autorizacion = "";	}
 
 	public class clsEmpresa {
 		public String urlToken, urlAnulacion, usuarioApi, claveApi;

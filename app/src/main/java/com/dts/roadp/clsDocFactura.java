@@ -41,8 +41,7 @@ public class clsDocFactura extends clsDocument {
 				
 		super.loadHeadData(corel);
 		
-		nombre="FACTURA";
-
+		nombre="COMPROBANTE AUXILIAR DE FACTURA ELECTRONICA FACTURA DE OPERACION INTERNA";
 
 		try {
 			sql=" SELECT SERIE,CORELATIVO,RUTA,VENDEDOR,CLIENTE,TOTAL,DESMONTO,IMPMONTO,EMPRESA,FECHA,ADD1,ADD2,IMPRES, ANULADO, FECHAENTR " +
@@ -101,7 +100,7 @@ public class clsDocFactura extends clsDocument {
 				}else if (cantimpres==-2){
 					nombre = "FACTURA PENDIENTE DE PAGO";
 				}else if (cantimpres==0){
-					nombre = "FACTURA";
+					nombre = "COMPROBANTE AUXILIAR DE FACTURA ELECTRONICA FACTURA DE OPERACIÓN INTERNA";
 				}
 
 			}
@@ -218,6 +217,41 @@ public class clsDocFactura extends clsDocument {
 			if(DT!=null) DT.close();
 		} catch (Exception e) {
 	    }
+
+		try {
+
+			qrCode="";
+
+			sql="SELECT CUFE, QR, Caja, FECHA_AUTORIZACION, NUMERO_AUTORIZACION FROM D_FACTURA_CONTROL_CONTINGENCIA WHERE COREL='"+corel+"' " +
+				"AND TipoFactura = '01'";
+			DT=Con.OpenDT(sql);
+
+			if (DT!=null){
+				if(DT.getCount()>0){
+					DT.moveToFirst();
+
+					//CUFE=DT.getString(0);
+					Caja=DT.getString(2);
+					FechaAutorizacion=DT.getString(3);
+					NumAutorizacion=DT.getString(4);
+
+					if (DT.getString(1).length()>0){
+						qrCode="QRCode:" + DT.getString(1);
+					}else{
+						qrCode="";
+					}
+
+					if (DT.getString(0).length()>0){
+						CUFE="Consulte por la clave de acceso en https://dgi-fep.mef.gob.pa/Consultas/FacturasPorCUFE:" + DT.getString(0);
+					}else{
+						CUFE="";
+					}
+				}
+			}
+
+			if(DT!=null) DT.close();
+		} catch (Exception e) {
+		}
 
 		return true;
 	}
@@ -624,9 +658,25 @@ public class clsDocFactura extends clsDocument {
 			bonificaciones();
 			canastas();
 			rep.add("");
+			rep.add("");
+			rep.add("");
 			rep.line();
 			rep.addc("Firma Cliente");
 			rep.add("");
+
+			rep.add("Desglose ITBMS");
+			rep.add2string("Monto Base","   %    Impuesto");
+			rep.add2string(decfrm.format(totalNotaC)," Exento     0.00");
+			rep.add("");
+
+			rep.addtotsp("Total Pagado:",totalNotaC);
+			rep.addtotsp("Valor Total:",totalNotaC);
+			rep.addtotsp("Total Neto:",totalNotaC);
+			rep.addtotsp("ITBMS:",0);
+			rep.addtotsp("Total Impuesto",0);
+			rep.addtotsp("Total:",totalNotaC);
+			rep.add("");
+
 			rep.addc("Se aplico nota de credito: ");
 			rep.addc(corelNotaC);
 			rep.add("");
@@ -636,10 +686,13 @@ public class clsDocFactura extends clsDocument {
 			rep.addc("DENCIA DE PAGO                 ");
 			rep.add("");
 
-			rep.add("Serial : "+deviceid);
+			/*rep.add("Serial : "+deviceid);
 			rep.add(resol);
 			rep.add(resfecha);
+			rep.add("");*/
+			rep.add(CUFE);
 			rep.add("");
+			rep.add(qrCode);
 
 		} else {
 
@@ -652,8 +705,23 @@ public class clsDocFactura extends clsDocument {
 			bonificaciones();
 			canastas();
 			rep.add("");
+			rep.add("");
+			rep.add("");
 			rep.line();
 			rep.addc("Firma Cliente");
+			rep.add("");
+
+			rep.add("Desglose ITBMS");
+			rep.add2string("Monto Base","   %    Impuesto");
+			rep.add2string(decfrm.format(totalNotaC)," Exento     0.00");
+			rep.add("");
+
+			rep.addtotsp("Total Pagado:",totalNotaC);
+			rep.addtotsp("Valor Total:",totalNotaC);
+			rep.addtotsp("Total Neto:",totalNotaC);
+			rep.addtotsp("ITBMS:",0);
+			rep.addtotsp("Total Impuesto",0);
+			rep.addtotsp("Total:",totalNotaC);
 			rep.add("");
 
 			if (pendiente!=4){
@@ -664,10 +732,13 @@ public class clsDocFactura extends clsDocument {
 				rep.add("");
 			}
 
-			rep.add("Serial : "+deviceid);
+			/*rep.add("Serial : "+deviceid);
 			rep.add(resol);
 			rep.add(resfecha);
+			rep.add("");*/
+			rep.add(CUFE);
 			rep.add("");
+			rep.add(qrCode);
 
 		}
 

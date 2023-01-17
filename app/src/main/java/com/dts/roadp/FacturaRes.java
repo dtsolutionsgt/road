@@ -2,6 +2,7 @@ package com.dts.roadp;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -65,6 +66,7 @@ public class FacturaRes extends PBase {
 	private EditText txtVuelto;
 	private RelativeLayout rl_facturares;
 	private ProgressBar pbar;
+	private ProgressDialog progress;
 
 	private List<String> spname = new ArrayList<String>();
 	private ArrayList<clsClasses.clsCDB> items= new ArrayList<clsClasses.clsCDB>();
@@ -90,6 +92,7 @@ public class FacturaRes extends PBase {
 
 	private clsClasses.clsMunicipio Municipio = clsCls.new clsMunicipio();
 	private clsClasses.clsDepartamento Departamento = clsCls.new clsDepartamento();
+	private clsClasses.clsCiudad Ciudad = clsCls.new clsCiudad();
 	private clsClasses.clsSucursal Sucursal = clsCls.new clsSucursal();
 	private clsClasses.clsCliente Cliente = clsCls.new clsCliente();
 	private clsClasses.clsProducto Producto = clsCls.new clsProducto();
@@ -346,6 +349,7 @@ public class FacturaRes extends PBase {
 
 			Intent intent = new Intent(this,Pago.class);
 			startActivity(intent);
+
 		}catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -965,7 +969,58 @@ public class FacturaRes extends PBase {
 				ins.add("CODIGO_RUTA_PEDIDO","");
 			}
 
-			//region Emisor
+			db.execSQL(ins.sql());
+
+			//region Bonificacion
+
+			clsBonifSave bonsave=new clsBonifSave(this,corel,"V");
+
+			bonsave.ruta=gl.ruta;
+			bonsave.cliente=gl.cliente;
+			bonsave.fecha=fecha;
+			bonsave.emp=gl.emp;
+
+			bonsave.save();
+
+			//endregion
+
+			//region CANASTAS
+
+			sql="INSERT INTO D_CANASTA (RUTA, FECHA, CLIENTE, PRODUCTO, CANTREC, CANTENTR, STATCOM, CORELTRANS, ANULADO, UNIDBAS, VENDEDOR, PESOREC, PESOENTR) " +
+					"SELECT RUTA, FECHA, CLIENTE, PRODUCTO, CANTREC, CANTENTR, STATCOM, CORELTRANS, ANULADO, UNIDBAS, VENDEDOR, PESOREC, PESOENTR " +
+					"FROM T_CANASTA WHERE CORELTRANS='"+gl.corelFac+"'";
+			db.execSQL(sql);
+
+			sql="SELECT PRODUCTO,CANTENTR,UNIDBAS, PESOENTR FROM T_CANASTA";
+			dt=Con.OpenDT(sql);
+
+			if (dt!=null){
+
+				if(dt.getCount()>0){
+
+					dt.moveToFirst();citem=1;
+					while (!dt.isAfterLast()) {
+
+						vprod=dt.getString(0);
+						vcant= dt.getDouble(1);
+						vumentr=dt.getString(2);
+						vpeso= dt.getDouble(3);
+						vfactor = vpeso/(vcant==0?1:vcant);
+
+						rebajaStockCanastas(vprod, vcant, vumentr, vpeso,vfactor);
+
+						dt.moveToNext();citem++;
+					}
+				}
+
+			}
+
+			sql="DELETE FROM T_CANASTA";
+			db.execSQL(sql);
+
+			//endregion CANASTAS
+
+			//region Factura Electrónica
 			Sucursal = Catalogo.getSucursal();
 			Cliente = Catalogo.getCliente(gl.cliente);
 
@@ -995,31 +1050,25 @@ public class FacturaRes extends PBase {
 			Factura.gDGen.Emisor.gRucEmi.dDV = Sucursal.texto;
 			Factura.gDGen.Emisor.gRucEmi.dTipoRuc = Sucursal.tipoRuc;
 
-			if (!Sucursal.codMuni.isEmpty() || Sucursal.codMuni != null) {
+			if (!Sucursal.codubi.isEmpty() || Sucursal.codubi != null) {
+				Ciudad = clsCls.new clsCiudad();
 
-				Municipio = clsCls.new clsMunicipio();
-				Departamento = clsCls.new clsDepartamento();
-				Municipio = Catalogo.getMunicipio(Sucursal.codMuni);
-				Departamento = Catalogo.getDepartamento(Municipio.depar);
+				Ciudad = Catalogo.getCiudad(Sucursal.codubi);
 
-				if (Municipio.nombre.contains("/")) {
+				if (Ciudad!=null) {
 
-					String[] DireccionCompleta = Municipio.nombre.split("/");
+					Factura.gDGen.Emisor.gUbiEm.dCorreg = Ciudad.corregimiento.toUpperCase().trim().trim();
+					Factura.gDGen.Emisor.gUbiEm.dDistr = Ciudad.distrito.toUpperCase().trim();
+					Factura.gDGen.Emisor.gUbiEm.dProv = Ciudad.provincia.toUpperCase().trim();
 
-					Factura.gDGen.Emisor.gUbiEm.dCorreg = DireccionCompleta[1].trim().toUpperCase();
-					Factura.gDGen.Emisor.gUbiEm.dDistr = DireccionCompleta[0].trim().toUpperCase();
-
-					if (!Departamento.nombre.isEmpty()) {
-						Factura.gDGen.Emisor.gUbiEm.dProv = Departamento.nombre.toUpperCase();
-					} else {
+					if (Ciudad.provincia.isEmpty()) {
 						Factura.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
 					}
 
 				} else {
-					msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+					msgbox("No se encontraron los datos de la ubicación para este código:" + Cliente.ciudad);
 					return false;
 				}
-
 			}
 
 			Factura.gDGen.Receptor = new Receptor();
@@ -1032,59 +1081,47 @@ public class FacturaRes extends PBase {
 			Factura.gDGen.Receptor.dTfnRec = Cliente.telefono;
 			Factura.gDGen.Receptor.cPaisRec = Cliente.codPais;
 			Factura.gDGen.Receptor.dNombRec = Cliente.nombre;
-			Factura.gDGen.Receptor.dDirecRec = Cliente.direccion;
-			Factura.gDGen.Receptor.gUbiRec.dCodUbi = Cliente.ciudad;
+			Factura.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
+			Factura.gDGen.Receptor.gUbiRec.dCodUbi = (Cliente.ciudad==null?"":Cliente.ciudad);
 
-			if (!Cliente.muni.isEmpty() || Cliente.muni != null) {
+			if (Cliente.ciudad != null) {
 
-				Municipio = clsCls.new clsMunicipio();
-				Departamento = clsCls.new clsDepartamento();
-				Municipio = Catalogo.getMunicipio(Cliente.muni);
-				Departamento = Catalogo.getDepartamento(Municipio.depar);
+				if (!Cliente.ciudad.isEmpty() ){
 
-				if (Municipio.nombre.contains("/")) {
+					Ciudad = clsCls.new clsCiudad();
 
-					String[] DireccionCompleta = Municipio.nombre.split("/");
+					Ciudad = Catalogo.getCiudad(Cliente.ciudad);
 
-					Factura.gDGen.Receptor.gUbiRec.dCorreg = DireccionCompleta[1].trim().toUpperCase();
-					Factura.gDGen.Receptor.gUbiRec.dDistr = DireccionCompleta[0].trim().toUpperCase();
+					if (Ciudad!=null) {
 
-					if (!Departamento.nombre.isEmpty()) {
-						Factura.gDGen.Receptor.gUbiRec.dProv = Departamento.nombre.toUpperCase();
+						Factura.gDGen.Receptor.gUbiRec.dCorreg = Ciudad.corregimiento.toUpperCase().trim();
+						Factura.gDGen.Receptor.gUbiRec.dDistr = Ciudad.distrito.toUpperCase().trim();
+						Factura.gDGen.Receptor.gUbiRec.dProv = Ciudad.provincia.toUpperCase().trim();
+
+						if (Ciudad.provincia.isEmpty()) {
+							Factura.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
+						}
+
 					} else {
-						Factura.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
+						if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+							msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+							return false;
+						}
 					}
-
-				} else {
-					msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+				}else {
+					if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+						msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+						return false;
+					}
+				}
+			}else {
+				if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+					msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
 					return false;
 				}
 			}
 
-            //#CKFK20221206 antes así se calculaba el RUC
-            /*if (!Cliente.nit.contains("D")) {
-				msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
-				return false;
-			} else {
-				String[] DVRuc = Cliente.nit.split("DV");
-
-				if (Factura.gDGen.Receptor.gRucRec.dTipoRuc.equals("01") || Factura.gDGen.Receptor.gRucRec.dTipoRuc.equals("03")) {
-					if (DVRuc.length > 1) {
-						Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-						Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
-					}
-				} else {
-					if (DVRuc.length > 1) {
-						Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-						Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
-					} else {
-						Factura.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
-						Factura.gDGen.Receptor.gRucRec.dDV = "";
-					}
-				}
-			}*/
-
-            // #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
+			// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
 			if (Factura.gDGen.Receptor.iTipoRec.equals("01") || Factura.gDGen.Receptor.iTipoRec.equals("03")) {
 
 				if (Cliente.nit.length()>0) {
@@ -1092,9 +1129,9 @@ public class FacturaRes extends PBase {
 					if (DVRuc.length > 1) {
 						Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
 						if (DVRuc[1].trim().equals("")){
-							Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+							Factura.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
 						}else{
-							Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+							Factura.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
 						}
 					}else{
 						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
@@ -1110,9 +1147,9 @@ public class FacturaRes extends PBase {
 					if (DVRuc.length > 1) {
 						Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
 						if (DVRuc[1].trim().equals("")){
-							Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+							Factura.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[3].trim(),2);
 						}else{
-							Factura.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+							Factura.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[2].trim(),2);
 						}
 					}else{
 						Factura.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
@@ -1120,57 +1157,7 @@ public class FacturaRes extends PBase {
 					}
 				}
 			}
-
-			db.execSQL(ins.sql());
-
-			//region Bonificacion
-
-			clsBonifSave bonsave=new clsBonifSave(this,corel,"V");
-
-			bonsave.ruta=gl.ruta;
-			bonsave.cliente=gl.cliente;
-			bonsave.fecha=fecha;
-			bonsave.emp=gl.emp;
-
-			bonsave.save();
-
-			//endregion
-
-			sql="INSERT INTO D_CANASTA (RUTA, FECHA, CLIENTE, PRODUCTO, CANTREC, CANTENTR, STATCOM, CORELTRANS, ANULADO, UNIDBAS, VENDEDOR, PESOREC, PESOENTR) " +
-					"SELECT RUTA, FECHA, CLIENTE, PRODUCTO, CANTREC, CANTENTR, STATCOM, CORELTRANS, ANULADO, UNIDBAS, VENDEDOR, PESOREC, PESOENTR " +
-					"FROM T_CANASTA WHERE CORELTRANS='"+gl.corelFac+"'";
-			db.execSQL(sql);
-
-			//region CANASTAS
-
-			sql="SELECT PRODUCTO,CANTENTR,UNIDBAS, PESOENTR FROM T_CANASTA";
-			dt=Con.OpenDT(sql);
-
-			if (dt!=null){
-
-				if(dt.getCount()>0){
-
-					dt.moveToFirst();citem=1;
-					while (!dt.isAfterLast()) {
-
-						vprod=dt.getString(0);
-						vcant= dt.getDouble(1);
-						vumentr=dt.getString(2);
-						vpeso= dt.getDouble(3);
-						vfactor = vpeso/(vcant==0?1:vcant);
-
-						rebajaStockCanastas(vprod, vcant, vumentr, vpeso,vfactor);
-
-						dt.moveToNext();citem++;
-					}
-				}
-
-			}
-
-			//endregion CANASTAS
-
-			sql="DELETE FROM T_CANASTA";
-			db.execSQL(sql);
+			//endregion Factura electrónica
 
 			//region Devolución de  producto.
 			if (gl.dvbrowse!=0) {
@@ -1259,31 +1246,25 @@ public class FacturaRes extends PBase {
 				NotaCredito.gDGen.Emisor.gRucEmi.dDV = Sucursal.texto;
 				NotaCredito.gDGen.Emisor.gRucEmi.dTipoRuc = Sucursal.tipoRuc;
 
-				if (!Sucursal.codMuni.isEmpty() || Sucursal.codMuni != null) {
+				if (!Sucursal.codubi.isEmpty() || Sucursal.codubi != null) {
+					Ciudad = clsCls.new clsCiudad();
 
-					Municipio = clsCls.new clsMunicipio();
-					Departamento = clsCls.new clsDepartamento();
-					Municipio = Catalogo.getMunicipio(Sucursal.codMuni);
-					Departamento = Catalogo.getDepartamento(Municipio.depar);
+					Ciudad = Catalogo.getCiudad(Sucursal.codubi);
 
-					if (Municipio.nombre.contains("/")) {
+					if (Ciudad!=null) {
 
-						String[] DireccionCompleta = Municipio.nombre.split("/");
+						NotaCredito.gDGen.Emisor.gUbiEm.dCorreg = Ciudad.corregimiento.toUpperCase().trim();
+						NotaCredito.gDGen.Emisor.gUbiEm.dDistr = Ciudad.distrito.toUpperCase().trim();
+						NotaCredito.gDGen.Emisor.gUbiEm.dProv = Ciudad.provincia.toUpperCase().trim();
 
-						NotaCredito.gDGen.Emisor.gUbiEm.dCorreg = DireccionCompleta[1].trim().toUpperCase();
-						NotaCredito.gDGen.Emisor.gUbiEm.dDistr = DireccionCompleta[0].trim().toUpperCase();
-
-						if (!Departamento.nombre.isEmpty()) {
-							NotaCredito.gDGen.Emisor.gUbiEm.dProv = Departamento.nombre.toUpperCase();
-						} else {
+						if (Ciudad.provincia.isEmpty()) {
 							NotaCredito.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
 						}
 
 					} else {
-						msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+						msgbox("No se encontraron los datos de la ubicación para este código:" + Cliente.ciudad);
 						return false;
 					}
-
 				}
 
 				NotaCredito.gDGen.Receptor = new Receptor();
@@ -1295,60 +1276,47 @@ public class FacturaRes extends PBase {
 				NotaCredito.gDGen.Receptor.dTfnRec = Cliente.telefono;
 				NotaCredito.gDGen.Receptor.cPaisRec = Cliente.codPais;
 				NotaCredito.gDGen.Receptor.dNombRec = Cliente.nombre;
-				NotaCredito.gDGen.Receptor.dDirecRec = Cliente.direccion;
-				NotaCredito.gDGen.Receptor.gUbiRec.dCodUbi = Cliente.ciudad;
+				NotaCredito.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
+				NotaCredito.gDGen.Receptor.gUbiRec.dCodUbi = (Cliente.ciudad==null?"":Cliente.ciudad);
 
-				if (!Cliente.muni.isEmpty() || Cliente.muni != null) {
+				if (Cliente.ciudad != null) {
 
-					Municipio = clsCls.new clsMunicipio();
-					Departamento = clsCls.new clsDepartamento();
-					Municipio = Catalogo.getMunicipio(Cliente.muni);
-					Departamento = Catalogo.getDepartamento(Municipio.depar);
+					if (!Cliente.ciudad.isEmpty() ){
 
-					if (Municipio.nombre.contains("/")) {
+						Ciudad = clsCls.new clsCiudad();
 
-						String[] DireccionCompleta = Municipio.nombre.split("/");
+						Ciudad = Catalogo.getCiudad(Cliente.ciudad);
 
-						NotaCredito.gDGen.Receptor.gUbiRec.dCorreg = DireccionCompleta[1].trim().toUpperCase();
-						NotaCredito.gDGen.Receptor.gUbiRec.dDistr = DireccionCompleta[0].trim().toUpperCase();
+						if (Ciudad!=null) {
 
-						if (!Departamento.nombre.isEmpty()) {
-							NotaCredito.gDGen.Receptor.gUbiRec.dProv = Departamento.nombre.toUpperCase();
+							NotaCredito.gDGen.Receptor.gUbiRec.dCorreg = Ciudad.corregimiento.toUpperCase().trim();
+							NotaCredito.gDGen.Receptor.gUbiRec.dDistr = Ciudad.distrito.toUpperCase().trim();
+							NotaCredito.gDGen.Receptor.gUbiRec.dProv = Ciudad.provincia.toUpperCase().trim();
+
+							if (Ciudad.provincia.isEmpty()) {
+								NotaCredito.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
+							}
+
 						} else {
-							NotaCredito.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
+							if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+								msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+								return false;
+							}
 						}
-
-					} else {
-						msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
+					}else {
+						if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+							msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+							return false;
+						}
+					}
+				}else {
+					if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+						msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
 						return false;
 					}
 				}
 
-
-				//#CKFK20221206 Así se calculaba antes el RUC a enviar
-				/*				if (!Cliente.nit.contains("D")) {
-				msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
-				return false;
-			} else {
-				String[] DVRuc = Cliente.nit.split("DV");
-				if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
-					if (DVRuc.length > 1) {
-						NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-						NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
-					}
-				} else {
-					if (DVRuc.length > 1) {
-						NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-						NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
-					} else {
-						NotaCredito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
-						NotaCredito.gDGen.Receptor.gRucRec.dDV = "";
-					}
-				}
-			}*/
-
 				//#CKFK20221206 Si el dTipoRuc Tipo de Contribuyente (1:Natural, 2:Jurídico)
-				// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
 				// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
 				if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
 
@@ -1357,9 +1325,9 @@ public class FacturaRes extends PBase {
 						if (DVRuc.length > 1) {
 							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
 							if (DVRuc[1].trim().equals("")){
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+								NotaCredito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
 							}else{
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+								NotaCredito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
 							}
 						}else{
 							msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
@@ -1375,9 +1343,9 @@ public class FacturaRes extends PBase {
 						if (DVRuc.length > 1) {
 							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
 							if (DVRuc[1].trim().equals("")){
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[3].trim();
+								NotaCredito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
 							}else{
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[2].trim();
+								NotaCredito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
 							}
 						}else{
 							NotaCredito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
@@ -1511,7 +1479,9 @@ public class FacturaRes extends PBase {
 					DT.moveToNext();
 
 				}
+
 				String TotalNT = String.valueOf(TotalAcumulado);
+
 				NotaCredito.gTot.dTotNeto = TotalNT;
 				NotaCredito.gTot.dTotITBMS = "0.00";
 				NotaCredito.gTot.dTotGravado = "0.00";
@@ -1689,18 +1659,6 @@ public class FacturaRes extends PBase {
 				dt.moveToNext();
 			}
 
-			gFormaPago Pagos = new gFormaPago();
-
-			String Total = String.valueOf(TotalFact);
-
-			Factura.gTot.dTotNeto = Total;
-			Factura.gTot.dTotITBMS = "0.00";
-			Factura.gTot.dTotGravado = "0.00";
-			Factura.gTot.dTotDesc = "0.00";
-			Factura.gTot.dVTot = Total;
-			Factura.gTot.dTotRec = Total;
-			Factura.gTot.dNroItems = String.valueOf(Factura.Detalles.size());
-			Factura.gTot.dVTotItems = Total;
 			//endregion
 
 			//region D_FACTURAD_MODIF
@@ -1765,6 +1723,40 @@ public class FacturaRes extends PBase {
 					dt.moveToNext();
 				}
 
+				//AT20220823 Formas de pago
+
+				gFormaPago Pagos = new gFormaPago();
+
+				String Total = String.valueOf(TotalFact);
+
+				Factura.gTot.dTotNeto = Total;
+				Factura.gTot.dTotITBMS = "0.00";
+				Factura.gTot.dTotGravado = "0.00";
+				Factura.gTot.dTotDesc = "0.00";
+				Factura.gTot.dVTot = Total;
+				Factura.gTot.dTotRec = Total;
+				Factura.gTot.dNroItems = String.valueOf(Factura.Detalles.size());
+				Factura.gTot.dVTotItems = Total;
+
+				if (CodPago == 4) {
+					Pagos.iFormaPago = "01";
+					Factura.gTot.iPzPag = "2";
+
+					Factura.gTot.gPagPlazo = new ArrayList();
+					gPagPlazo PagoPlazo = new gPagPlazo();
+					PagoPlazo.dSecItem = "1";
+
+					PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
+					PagoPlazo.dValItPlazo = Total;
+					Factura.gTot.gPagPlazo.add(PagoPlazo);
+				} else {
+					Pagos.iFormaPago = "02";
+					Factura.gTot.iPzPag = "1";
+				}
+
+				Pagos.dVlrCuota = Total;
+				Factura.gTot.gFormaPago.add(Pagos);
+
 			} else {
 
 				try {
@@ -1795,26 +1787,6 @@ public class FacturaRes extends PBase {
 				}
 
 			}
-
-			//AT20220823 Formas de pago
-			if (CodPago == 4) {
-				Pagos.iFormaPago = "01";
-				Factura.gTot.iPzPag = "2";
-
-				Factura.gTot.gPagPlazo = new ArrayList();
-				gPagPlazo PagoPlazo = new gPagPlazo();
-				PagoPlazo.dSecItem = "1";
-
-				PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
-				PagoPlazo.dValItPlazo = Total;
-				Factura.gTot.gPagPlazo.add(PagoPlazo);
-			} else {
-				Pagos.iFormaPago = "02";
-				Factura.gTot.iPzPag = "1";
-			}
-
-			Pagos.dVlrCuota = Total;
-			Factura.gTot.gFormaPago.add(Pagos);
 
 			//endregion
 
@@ -2045,9 +2017,6 @@ public class FacturaRes extends PBase {
 
             //endregion
 
-			db.setTransactionSuccessful();
-			db.endTransaction();
-
 			/*if(gl.dvbrowse!=0){
 				gl.dvbrowse =0;
 				gl.tiponcredito=0;
@@ -2062,6 +2031,9 @@ public class FacturaRes extends PBase {
 
 			if(dt!=null) dt.close();
 
+			db.setTransactionSuccessful();
+			db.endTransaction();
+
         } catch (Exception e) {
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
             db.endTransaction();
@@ -2069,7 +2041,10 @@ public class FacturaRes extends PBase {
         }
 
 		try {
+
 			if (!gl.cobroPendiente && saved) {
+
+				ProgressDialog("Certificando la factura");
 
 				Fimador Firmador = new Fimador(this);
 				RespuestaEdoc RespuestaEdocFac, RespuestaEdocNT = null;
@@ -2080,7 +2055,7 @@ public class FacturaRes extends PBase {
 					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 				}
 
-				if	(RespuestaEdocFac.Cufe == null) {
+			     if	(RespuestaEdocFac.Cufe == null) {
 					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 				}
 
@@ -2102,19 +2077,20 @@ public class FacturaRes extends PBase {
 						ControlFEL.Estado = RespuestaEdocFac.Estado;
 					}
 
-
 					ControlFEL.Mensaje = RespuestaEdocFac.MensajeRespuesta;
 					ControlFEL.ValorXml = RespuestaEdocFac.XML != null ? Catalogo.ReplaceXML(RespuestaEdocFac.XML) : "";
 
 					String[] fechaEnvio = Factura.gDGen.dFechaEm.split("-05:00", 0);
 					ControlFEL.FechaEnvio = fechaEnvio[0];
-					ControlFEL.TipFac = Factura.gDGen.iDoc;
+                    ControlFEL.TipFac = Factura.gDGen.iDoc;
 					ControlFEL.FechaAgr = String.valueOf(du.getFechaCompleta());
 					ControlFEL.QR = RespuestaEdocFac.UrlCodeQR;
 					ControlFEL.Corel = corel;
 					ControlFEL.Ruta = gl.ruta;
 					ControlFEL.Vendedor = gl.vend;
 					ControlFEL.Correlativo = String.valueOf(fcorel);
+					ControlFEL.Fecha_Autorizacion = RespuestaEdocFac.FechaAutorizacion;
+					ControlFEL.Numero_Autorizacion = RespuestaEdocFac.NumAutorizacion;
 
 					if (RespuestaEdocFac.Estado.equals("2")) {
 						EstadoFac = 1;
@@ -2185,19 +2161,29 @@ public class FacturaRes extends PBase {
 						if (gl.dvbrowse!=0) {
 							GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
 						}
+					} else if(ConexionValida() && !ControlFEL.Estado.equals("15")) {
+						if (gl.dvbrowse!=0) {
+							GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
+						}
 					} else {
 						toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 					}
 
 					Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
 					Catalogo.InsertarFELControl(ControlFEL);
+
+					progress.cancel();
 				}
 			}
 
 		} catch (Exception e){
+			if (progress!=null) progress.cancel();
 			Log.e("respuestageneradaBTB", e.getMessage());
 		} catch (Throwable e) {
+			if (progress!=null) progress.cancel();
 			e.printStackTrace();
+		}finally {
+			if (progress!=null) progress.cancel();
 		}
 
 		if(gl.dvbrowse!=0){
@@ -2235,7 +2221,6 @@ public class FacturaRes extends PBase {
 			clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
 			int EstadoNT = 0;
 
-
 			gDFRefNum gDFRefNum= new gDFRefNum();
 			gDFRefNum.gDFRefFE = new gDFRefFE();
 			gDFRefNum.gDFRefFE.dCUFERef = CufeFact;
@@ -2254,6 +2239,10 @@ public class FacturaRes extends PBase {
 			if (ConexionValida()) {
 				RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, "2");
 			} else {
+				RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+			}
+
+			if (RespuestaEdocNT.Cufe == null) {
 				RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 			}
 
@@ -2283,6 +2272,8 @@ public class FacturaRes extends PBase {
 					ControlNotaCredito.Ruta = gl.ruta;
 					ControlNotaCredito.Vendedor = gl.vend;
 					ControlNotaCredito.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
+					ControlNotaCredito.Fecha_Autorizacion = RespuestaEdocNT.FechaAutorizacion;
+					ControlNotaCredito.Numero_Autorizacion = RespuestaEdocNT.NumAutorizacion;
 
 					if (RespuestaEdocNT.Estado.equals("2")) {
 						EstadoNT = 1;
@@ -2957,37 +2948,6 @@ public class FacturaRes extends PBase {
 			alert.setCancelable(false);
 			alert.create();
 
-			/*alert.setPositiveButton("Vuelto", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					double pg,vuel;
-
-					peexit=false;
-					svuelt=input.getText().toString();
-					sefect=""+tot;
-
-					try {
-						pg=Double.parseDouble(svuelt);
-						if (pg<tot) {
-							msgbox("Monto menor que total");return;
-						}
-
-						vuel=pg-tot;
-					} catch (NumberFormatException e) {
-						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-						msgbox("Monto incorrecto");return;
-					}
-
-					applyCash();
-					if (vuel==0) {
-						checkPago();
-					} else {
-						vuelto("Vuelto : "+mu.frmcur(vuel));
-						//dialog.dismiss();
-					}
-
-				}
-			});*/
-
 			alert.setPositiveButton("Pagar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -3005,6 +2965,7 @@ public class FacturaRes extends PBase {
                     sefect=""+tot;
 
                     Log.d("IniApplyCAsh","todobene");
+
 					applyCash();
 					Log.d("FinApplyCAsh","todobene");
 					checkPago();
@@ -3106,14 +3067,6 @@ public class FacturaRes extends PBase {
 
 			if (epago<0) throw new Exception();
 
-			//if (epago>plim) {
-			//	MU.msgbox("Total de pago mayor que total de saldos.");return;
-			//}
-
-			//if (epago>tsel) {
-			//	msgAskOverPayd("Total de pago mayor que saldo\nContinuar");return;
-			//}
-
 			sql="DELETE FROM T_PAGO";
 			db.execSQL(sql);
 
@@ -3135,8 +3088,6 @@ public class FacturaRes extends PBase {
 			ins.add("DESC3","");
 
 		    db.execSQL(ins.sql());
-
-			//msgAskSave("Aplicar pago y crear un recibo");
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -3483,7 +3434,7 @@ public class FacturaRes extends PBase {
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle("Road");
-			dialog.setMessage("Está factura quedará PENDIENTE DE PAGO, deberá realizar el pago posteriormente. ¿Está seguro?");
+			dialog.setMessage("Esta factura quedará PENDIENTE DE PAGO, deberá realizar el pago posteriormente. ¿Está seguro?");
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
@@ -3645,6 +3596,19 @@ public class FacturaRes extends PBase {
 		}
 	}
 
+	public void ProgressDialog(String mensaje) {
+		try {
+			progress = new ProgressDialog(this);
+			progress.setMessage(mensaje);
+			progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			progress.setIndeterminate(true);
+			progress.setProgress(0);
+			progress.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void hidekeyboard() {
 		try{
 			View sview = this.getCurrentFocus();
@@ -3668,13 +3632,22 @@ public class FacturaRes extends PBase {
 		try{
 			super.onResume();
 
-			checkPromo();
-			checkPago();
-
 			if (browse==1) {
 				browse=0;
+
+				Catalogo = new CatalogoFactura(this, Con, db);
+
+				checkPromo();
+				checkPago();
+
 				if (gl.promapl) updDesc();
 				return;
+
+			}else{
+
+				checkPromo();
+				checkPago();
+
 			}
 
 		}catch (Exception e){

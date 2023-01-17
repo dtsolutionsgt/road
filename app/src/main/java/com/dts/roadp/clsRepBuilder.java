@@ -103,10 +103,30 @@ public class clsRepBuilder {
 			}
 
 			for (int i = 0; i < items.size(); i++) {
+				//#CKFK20221230 Agregar el QR
 				try {
-					s=trim(items.get(i));
-				} catch (Exception e) {
 					s="";
+					//if (!items.get(i).contains("QRCode:")){
+						s = items.get(i).trim();
+					//}
+				     /*else{
+							s = trim(items.get(i));
+						}*/
+				} catch (Exception e) {
+					s = "";
+				}
+
+				//#CKFK20221228 Corrección para que salga completo el QR y la dirección del cliente
+				if (s.length()>prw && !s.contains("QRCode:")){
+					int largo=s.length();
+					String sOriginal=s;
+					while (largo>prw) {
+						writer.write(s.substring(0,prw));
+						writer.write("\r\n");
+						s=sOriginal.substring(prw,sOriginal.length());
+						sOriginal=s;
+						largo=s.length();
+					}
 				}
 
 				writer.write(s);writer.write("\r\n");lns++;
@@ -151,9 +171,28 @@ public class clsRepBuilder {
 
 				for (int i = 0; i < items.size(); i++) {
 					try {
-						s = trim(items.get(i));
+						s="";
+						//if (!items.get(i).contains("QRCode:")){
+							s = items.get(i).trim();
+						//}
+						/*else{
+							s = trim(items.get(i));
+						}*/
 					} catch (Exception e) {
 						s = "";
+					}
+
+					//#CKFK20221228 Corrección para que salga completo el QR y la dirección del cliente
+					if (s.length()>prw && !s.contains("QRCode:")){
+						int largo=s.length();
+						String sOriginal=s;
+						while (largo>prw) {
+							writer.write(s.substring(0,prw));
+							writer.write("\r\n");
+							s=sOriginal.substring(prw,sOriginal.length());
+							sOriginal=s;
+							largo=s.length();
+						}
 					}
 
 					writer.write(s);
@@ -293,7 +332,12 @@ public class clsRepBuilder {
 		ts=ltrim(s1,prwh)+rtrim(s2,prwq)+rtrim(s3,prwq);
 		items.add(ts);
 	}
-	
+
+	public void add2string(String s1,String s2) {
+		ts=ltrim(s1,prwh)+rtrim(s2,prwh);
+		items.add(ts);
+	}
+
 	public void addtot(String s1,String val) {
 		ts=ltrim(s1,prw-17)+" "+rtrim(val,12);
 		items.add(ts);

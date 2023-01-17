@@ -776,6 +776,8 @@ public class BaseDatosScript {
 					"[CODIGOLIQUIDACION] INTEGER," +
 					"[CORELATIVO] TEXT," +
 					"[QRIMAGE] TEXT," +
+					"[FECHA_AUTORIZACION] TEXT," +
+					"[NUMERO_AUTORIZACION] TEXT," +
 					" PRIMARY KEY ([IdTablaControl])" +
 					" );";
 			database.execSQL(vSQL);
@@ -2363,7 +2365,16 @@ public class BaseDatosScript {
                     ");";
             database.execSQL(vSQL);
 
-            return 1;
+			vSQL = "CREATE TABLE [P_CIUDAD](" +
+					"[CODIGO] TEXT NOT NULL," +
+					"[DISTRITO] TEXT," +
+					"[CORREGIMIENTO] TEXT," +
+					"[PROVINCIA] TEXT,"+
+					"PRIMARY KEY ([CODIGO])"+
+					");";
+			database.execSQL(vSQL);
+
+			return 1;
 
 		} catch (SQLiteException e) {
 			msgbox(e.getMessage());
@@ -2481,7 +2492,6 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-
 			vSQL="CREATE TABLE [T_CxCD] ("+
 					"[Item] INTEGER NOT NULL,"+
 					"[CODIGO] TEXT NOT NULL,"+
@@ -2508,7 +2518,6 @@ public class BaseDatosScript {
 			database.execSQL(vSQL);
 			vSQL="CREATE INDEX T_CxCD_idx2 ON T_CxCD(CANT)";
 			database.execSQL(vSQL);
-
 
 			vSQL="CREATE TABLE [T_DEVOL] ("+
 					"[CODIGO] TEXT NOT NULL,"+
@@ -2540,7 +2549,6 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
-
 			vSQL="CREATE TABLE [T_PAGOD] ("+
 					"[ITEM] INTEGER NOT NULL,"+
 					"[DOCUMENTO] TEXT NOT NULL,"+
@@ -2550,7 +2558,6 @@ public class BaseDatosScript {
 					"PRIMARY KEY ([ITEM])"+
 					");";
 			database.execSQL(vSQL);
-
 
 			vSQL="CREATE TABLE [T_LOTES] ("+
 					"[PRODUCTO] TEXT NOT NULL,"+

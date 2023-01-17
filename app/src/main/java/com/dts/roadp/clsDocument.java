@@ -16,7 +16,7 @@ public class clsDocument {
 
 	public String nombre,numero,serie,ruta,vendedor,cliente,nit,tipo,ref,medidapeso, rutapv;
 	public String resol,resfecha,resvence,resrango,fsfecha,fsfechaent,modofact;
-	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
+	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid, qrCode,CUFE, Caja, FechaAutorizacion, NumAutorizacion;
 	public clsRepBuilder rep;
 	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod,docdesglose;
 	public int pendiente,diacred,condicionPago,impprecio;
@@ -307,6 +307,14 @@ public class clsDocument {
 				rep.add("Condiciones de pago: "+mPago);
 			}
 		}
+
+		if (docfactura || docdevolucion) {
+			rep.add("");
+			rep.add("Punto de facturación: "+Caja);
+			rep.add("Protocolo de autorización: "+(NumAutorizacion==null?"":NumAutorizacion)+" de "+
+					(FechaAutorizacion!=null?(FechaAutorizacion.equals("1900-01-01T00:00:00")?"":FechaAutorizacion):""));
+		}
+
 		rep.add("");
 
         if (docpedido) {
@@ -373,7 +381,8 @@ public class clsDocument {
         lu=l.trim();
 
         if (lu.length()==1 && lu.equalsIgnoreCase("N")) {
-            s=nombre;s=rep.ctrim(s);return s;
+            s=nombre;//s=rep.ctrim(s);
+			return s;
         }
 
         if (l.indexOf("dd-MM-yyyy")>=0) {
@@ -496,10 +505,10 @@ public class clsDocument {
 				return l;
 			}*/
 			//#CKFK20220201 Modifiqué la forma de generar los datos del cliente
-            l=l.replace("@Cliente",clicod+"\n");
+            l=l.replace("@Cliente",clicod+" ");
 
             if (cliente.length()>prw){
-            	l=l+cliente.substring(0,prw)+"\n"+cliente.substring(prw,cliente.length());
+            	l=l+cliente.substring(0,prw)+" "+cliente.substring(prw,cliente.length());
 			}else{
 				l=l+cliente;
 			}

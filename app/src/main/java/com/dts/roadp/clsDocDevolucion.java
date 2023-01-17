@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.os.IResultReceiver;
 import android.widget.Toast;
 
 import org.apache.commons.lang.StringUtils;
@@ -92,9 +93,15 @@ public class clsDocDevolucion extends clsDocument {
         rep.add("");
 
         rep.add("No. Serie : "+deviceid);
-        rep.add(resol);
-        rep.add(resfecha);
         rep.add("");
+
+        /*rep.add(resol);
+        rep.add(resfecha);
+        rep.add("");*/
+
+        rep.add(CUFE);
+        rep.add("");
+        rep.add(qrCode);
 
         return super.buildFooter();
     }
@@ -103,10 +110,14 @@ public class clsDocDevolucion extends clsDocument {
         Cursor DT;
         String cli,vend,val, anulado;
         int ff, impres, cantimpres;
+        boolean conreferencia=false;
 
         super.loadHeadData(corel);
 
-        nombre="NOTA DE CREDITO";
+        conreferencia = conReferenciaFactura(corel);
+
+        nombre="COMPROBANTE AUXILIAR DE FACTURA ELECTRONICA " + (conreferencia?"NOTA DE CRÉDITO REFERENTE A UNA O VARIAS FE":
+                                                                 "NOTA DE CRÉDITO GENERICA");
 
         try {
             sql="SELECT N.RUTA,N.VENDEDOR,N.CLIENTE,N.TOTAL,N.FECHA,N.COREL, N.ANULADO, N.IMPRES "+
@@ -140,7 +151,8 @@ public class clsDocDevolucion extends clsDocument {
             }else if (cantimpres==-1){
                 nombre = "NOTA DE CREDITO ANULADA";
             }else if (cantimpres==0){
-                nombre = "NOTA DE CREDITO";
+                nombre="COMPROBANTE AUXILIAR DE FACTURA ELECTRONICA " + (conreferencia?"NOTA DE CRÉDITO REFERENTE A UNA O VARIAS FE":
+                        "NOTA DE CRÉDITO GENERICA");
             }
 
         } catch (Exception e) {
@@ -198,15 +210,17 @@ public class clsDocDevolucion extends clsDocument {
             Caja=DT.getString(2);
             FechaAutorizacion=DT.getString(3);
             NumAutorizacion=DT.getString(4);
+            qrCode=(DT.getString(1)==null?"":DT.getString(1));
+            CUFE=(DT.getString(0)==null?"":DT.getString(0));
 
-            if (DT.getString(1).length()>0){
-                qrCode="QRCode:" + DT.getString(1);
+            if (qrCode.length()>0){
+                qrCode="QRCode:" + qrCode;
             }else{
                 qrCode="";
             }
 
-            if (DT.getString(0).length()>0){
-                CUFE="Consulte por la clave de acceso en https://dgi-fep.mef.gob.pa/Consultas/FacturasPorCUFE:" + DT.getString(0);
+            if (CUFE.length()>0){
+                CUFE="Consulte por la clave de acceso en https://dgi-fep.mef.gob.pa/Consultas/FacturasPorCUFE:" + CUFE;
             }else{
                 CUFE="";
             }
@@ -302,6 +316,26 @@ public class clsDocDevolucion extends clsDocument {
         return true;
     }
 
+    protected boolean conReferenciaFactura(String corel){
+        Cursor DT;
+        boolean resultado=false;
+
+        try{
+
+            sql="SELECT N.COREL,F.ASIGNACION, F.SERIE, F.CORELATIVO " +
+                    "FROM D_NOTACRED N INNER JOIN D_FACTURA F ON F.COREL = N.FACTURA " +
+                    "WHERE N.COREL = '"+corel+"'";
+
+            DT=Con.OpenDT(sql);
+
+            if(DT.getCount() != 0){
+                resultado = true;
+            }
+        }catch (Exception e){
+            //msgbox("Error obteniendo si la NC es con o sin referencia");
+        }
+        return resultado;
+    }
     // Aux
 
     public double round2(double val){

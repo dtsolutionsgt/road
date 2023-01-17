@@ -234,15 +234,17 @@ public class clsDocFactura extends clsDocument {
 					Caja=DT.getString(2);
 					FechaAutorizacion=DT.getString(3);
 					NumAutorizacion=DT.getString(4);
+					qrCode=(DT.getString(1)==null?"":DT.getString(1));
+					CUFE=(DT.getString(0)==null?"":DT.getString(0));
 
-					if (DT.getString(1).length()>0){
-						qrCode="QRCode:" + DT.getString(1);
+					if (qrCode.length()>0){
+						qrCode="QRCode:" + qrCode;
 					}else{
 						qrCode="";
 					}
 
-					if (DT.getString(0).length()>0){
-						CUFE="Consulte por la clave de acceso en https://dgi-fep.mef.gob.pa/Consultas/FacturasPorCUFE:" + DT.getString(0);
+					if (CUFE.length()>0){
+						CUFE="Consulte por la clave de acceso en https://dgi-fep.mef.gob.pa/Consultas/FacturasPorCUFE:" + CUFE;
 					}else{
 						CUFE="";
 					}

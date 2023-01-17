@@ -310,8 +310,8 @@ public class clsDocument {
 
 		if (docfactura || docdevolucion) {
 			rep.add("");
-			rep.add("Punto de facturación: "+Caja);
-			rep.add("Protocolo de autorización: "+(NumAutorizacion==null?"":NumAutorizacion)+" de "+
+			rep.add("Punto de facturacion: "+Caja);
+			rep.add("Protocolo de autorizacion: "+(NumAutorizacion==null?"":NumAutorizacion)+" de "+
 					(FechaAutorizacion!=null?(FechaAutorizacion.equals("1900-01-01T00:00:00")?"":FechaAutorizacion):""));
 		}
 

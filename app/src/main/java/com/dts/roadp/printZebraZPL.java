@@ -212,7 +212,7 @@ public class printZebraZPL extends printBase {
             altolinea=20;
 
             if (qrCode.length()>0){
-                altoQR = 400;
+                altoQR = 350;
             }
 
             psx = 0;
@@ -247,7 +247,7 @@ public class printZebraZPL extends printBase {
             if (qrCode.length()>0){
                 ps+="^FO,"+psx+",1";
                 ps+="^BQN,2,3^";
-                ps+="^FD"+qrCode;
+                ps+="^FD"+"   "+qrCode;
                 ps+="^FS";
             }
 

@@ -92,11 +92,11 @@ public class Cobro extends PBase {
 		super.InitBase();
 		addlog("Cobro",""+du.getActDateTime(),gl.vend);
 
-		listView = (ListView) findViewById(R.id.listView1);
-		lblSel = (TextView) findViewById(R.id.lblSel);
-		lblPag = (TextView) findViewById(R.id.lblPag);
-		lblPend = (TextView) findViewById(R.id.lblPend);
-		cbCheckAll= (CheckBox) findViewById(R.id.cbCheckAll);
+		listView = findViewById(R.id.listView1);
+		lblSel = findViewById(R.id.lblSel);
+		lblPag = findViewById(R.id.lblPag);
+		lblPend = findViewById(R.id.lblPend);
+		cbCheckAll= findViewById(R.id.cbCheckAll);
 
 		chkFactura = new RadioButton(this,null);
 		chkContado = new RadioButton(this,null);
@@ -110,6 +110,7 @@ public class Cobro extends PBase {
 		initSession();
 
 		clearAll();
+
 		listItems();
 
 		cbCheckAll.setChecked(true);
@@ -361,8 +362,8 @@ public class Cobro extends PBase {
 
 		try {
 
-			sql="SELECT DOCUMENTO,TIPODOC,VALORORIG,SALDO,FECHAEMIT,FECHAV " +
-					"FROM P_COBRO WHERE CLIENTE='"+cliid+"' ORDER BY FECHAV";
+			sql=" SELECT DOCUMENTO,TIPODOC,VALORORIG,SALDO,FECHAEMIT,FECHAV " +
+				" FROM P_COBRO WHERE CLIENTE='"+cliid+"' ORDER BY FECHAV";
 
 			DT=Con.OpenDT(sql);
 			if (DT.getCount()==0) return;
@@ -1159,16 +1160,15 @@ public class Cobro extends PBase {
 						detalle.gPrecios.dValTotItem = TotalItem;
 						detalle.gITBMSItem.dTasaITBMS = "00";
 						detalle.gITBMSItem.dValITBMS = "0.00";
-
 						Factura.Detalles.add(detalle);
 
 						CorrelativoFac++;
-						TotalFact += mu.round2(DT.getDouble(3));
+						TotalFact += mu.round2(DT2.getDouble(3));
 
 						DT2.moveToNext();
 					}
 
-					if (DT2 != null) DT.close();
+					if (DT2 != null) DT2.close();
 
 					gFormaPago Pagos = new gFormaPago();
 
@@ -1389,7 +1389,9 @@ public class Cobro extends PBase {
 	}
 
 	private void docList(){
+
 		clsClasses.clsCobro vItem;
+
 		int j=0;
 
 		try {
@@ -1408,13 +1410,11 @@ public class Cobro extends PBase {
 						j+=1;
 
 						ins.init("T_PAGOD");
-
 						ins.add("ITEM",j);
 						ins.add("DOCUMENTO",vItem.Factura);
 						ins.add("TIPODOC",vItem.Tipo);
 						ins.add("MONTO",vItem.Saldo);
 						ins.add("PAGO",0);
-
 						db.execSQL(ins.sql());
 
 					}

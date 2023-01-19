@@ -111,14 +111,14 @@ public class MainActivity extends PBase {
             gl.parFechaVer = parFechaVer;
             gl.parTipoVer = parTipoVer;
 
-            txtUser = (EditText) findViewById(R.id.txtUser);
-            txtPass = (EditText) findViewById(R.id.txtMonto);
-            lblRuta = (TextView) findViewById(R.id.lblCDisp);
-            lblRTit = (TextView) findViewById(R.id.lblCUsed);
-            lblLogin = (TextView) findViewById(R.id.lblDir);
-            lblVer = (TextView) findViewById(R.id.textView10);
-            lblID = (TextView) findViewById(R.id.textView81);
-            imgLogo = (ImageView) findViewById(R.id.imgNext);
+            txtUser = findViewById(R.id.txtUser);
+            txtPass = findViewById(R.id.txtMonto);
+            lblRuta = findViewById(R.id.lblCDisp);
+            lblRTit = findViewById(R.id.lblCUsed);
+            lblLogin = findViewById(R.id.lblDir);
+            lblVer = findViewById(R.id.textView10);
+            lblID = findViewById(R.id.textView81);
+            imgLogo = findViewById(R.id.imgNext);
 
             lblVer.setText(gl.parTipoVer + " Version " + gl.parNumVer + gl.parFechaVer);
 

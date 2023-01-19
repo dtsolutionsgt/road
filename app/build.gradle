@@ -22,10 +22,12 @@ android {
             jniLibs.srcDirs = ['libs']
         }
     }
-
     packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
+        resources {
+            excludes += ['META-INF/DEPENDENCIES']
+        }
     }
+
 
     buildTypes {
         release {
@@ -36,9 +38,6 @@ android {
     }
 
     //#HS_20181127_1734 Agregue lintOptions porque no deja generar APK.
-    lintOptions {
-        checkReleaseBuilds false
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -47,8 +46,12 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
+    lint {
+        checkReleaseBuilds false
+    }
+    namespace 'com.dts.roadp'
 
- //   buildToolsVersion '26.0.0'
+    //   buildToolsVersion '26.0.0'
 //    ndkVersion '23.1.7779620'
 
 }

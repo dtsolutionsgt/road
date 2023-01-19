@@ -1307,7 +1307,6 @@ public class Cobro extends PBase {
 				Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
 				Catalogo.InsertarFELControl(ControlFEL);
 
-
 			}
 
 		} catch (Exception e) {
@@ -1320,7 +1319,9 @@ public class Cobro extends PBase {
 	}
 
 	public boolean ConexionValida() {
+
 		boolean valida = false;
+
 		try {
 			ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 			NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();

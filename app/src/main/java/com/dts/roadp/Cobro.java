@@ -646,6 +646,7 @@ public class Cobro extends PBase {
 					}
 				}
 			} else {
+
 				if (saveCobroPendiente()) {
 
 					try {
@@ -654,10 +655,16 @@ public class Cobro extends PBase {
 
 						Handler mtimer = new Handler();
 						Runnable mrunner= () -> {
-							CertificarFactura certificar = new CertificarFactura();
-							certificar.execute();
+							CertificarFacturaDGI();
 						};
-						mtimer.postDelayed(mrunner,500);
+						mtimer.postDelayed(mrunner,1000);
+
+//						Handler mtimer = new Handler();
+//						Runnable mrunner= () -> {
+//							CertificarFactura certificar = new CertificarFactura();
+//							certificar.execute();
+//						};
+//						mtimer.postDelayed(mrunner,500);
 
 					} catch (Exception e) {
 						throw new RuntimeException(e);
@@ -1238,7 +1245,7 @@ public class Cobro extends PBase {
 
 		try	{
 
-			//ProgressDialog("Certificando factura...");
+			ProgressDialog("Certificando factura...");
 
 			Log.d("Ruta",this.getApplicationContext().getFilesDir().toString());
 
@@ -1300,13 +1307,15 @@ public class Cobro extends PBase {
 				Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
 				Catalogo.InsertarFELControl(ControlFEL);
 
-				//progress.cancel();
+
 			}
 
 		} catch (Exception e) {
 			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
+		}finally {
+			progress.cancel();
 		}
 	}
 

@@ -1,6 +1,7 @@
 package com.dts.roadp;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,7 +10,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,6 +22,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -44,7 +48,7 @@ public class Cobro extends PBase {
 
 	private ListView listView;
 	private TextView lblSel,lblPag,lblPend;
-
+	private ProgressDialog progress;
 	private ArrayList<clsClasses.clsCobro> items= new ArrayList<clsClasses.clsCobro>();
 	private ListAdaptCobro adapter;
 	private clsClasses.clsCobro selitem;
@@ -84,6 +88,7 @@ public class Cobro extends PBase {
 	private String urlDocNT = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/NotaCreditoEnte";
 	private String QR = "";
 
+	private ProgressBar prgCobro;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -100,6 +105,10 @@ public class Cobro extends PBase {
 
 		chkFactura = new RadioButton(this,null);
 		chkContado = new RadioButton(this,null);
+
+		//#EJC202301191457: PRG.
+		prgCobro = findViewById(R.id.prgcobro);
+		prgCobro.setVisibility(View.GONE);
 
 		cliid=gl.cliente;
 
@@ -624,13 +633,6 @@ public class Cobro extends PBase {
 							fdoc.buildPrint(corel, 0, gl.peModal);
 							browse = 4;
 							prn.printask(printcallback);
-
-						/*if(gl.validarCred==1){
-							validaCredito();
-						}
-
-						gl.validarCred=0;*/
-
 						} else if (!prn.isEnabled()) {
 							fdoc.buildPrint(corel, 0, gl.peModal);
 
@@ -639,18 +641,27 @@ public class Cobro extends PBase {
 							} else if (gl.validarCred == 2) {
 								Cobro.super.finish();
 							}
-
 							gl.validarCred = 0;
 						}
 					}
 				}
 			} else {
 				if (saveCobroPendiente()) {
-					CertificarFactura certificar = new CertificarFactura();
-					certificar.execute();
-					/*while (!certifico_factura_pendiente_pago){
-						//dialog, certificando....
-					}*/
+
+					try {
+
+						prgCobro.setVisibility(View.VISIBLE);
+
+						Handler mtimer = new Handler();
+						Runnable mrunner= () -> {
+							CertificarFactura certificar = new CertificarFactura();
+							certificar.execute();
+						};
+						mtimer.postDelayed(mrunner,500);
+
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
 				}
 			}
 
@@ -763,7 +774,6 @@ public class Cobro extends PBase {
 					ins.add("MONTO",tpago);
 					ins.add("PAGO",tpago);
 					ins.add("CONTRASENA","1");
-
 					db.execSQL(ins.sql());
 
 				}
@@ -791,7 +801,6 @@ public class Cobro extends PBase {
 						ins.add("DESC2",DT.getString(5));
 						ins.add("DESC3",DT.getString(6));
 						ins.add("DEPOS","N");
-
 						db.execSQL(ins.sql());
 
 						DT.moveToNext();
@@ -932,8 +941,6 @@ public class Cobro extends PBase {
 			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
 			return false;
 		}
-
-
 
 		return true;
 	}
@@ -1214,16 +1221,31 @@ public class Cobro extends PBase {
 		return true;
 	}
 
+	public void ProgressDialog(String mensaje) {
+		try {
+			progress = new ProgressDialog(this);
+			progress.setMessage(mensaje);
+			progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			progress.setIndeterminate(true);
+			progress.setProgress(0);
+			progress.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void CertificarFacturaDGI() {
 
 		try	{
+
 			//ProgressDialog("Certificando factura...");
+
+			Log.d("Ruta",this.getApplicationContext().getFilesDir().toString());
 
 			Fimador Firmador = new Fimador(this);
 			RespuestaEdoc RespuestaEdocFac, RespuestaEdocNT = null;
 
 			if (ConexionValida()) {
-				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
 				RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, "2");
 			} else {
 				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
@@ -1268,10 +1290,10 @@ public class Cobro extends PBase {
 
 				if (RespuestaEdocFac.Estado.equals("2")) {
 					EstadoFac = 1;
-					toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+					//toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 					certifico_factura_pendiente_pago =true;
 				} else {
-					toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+					//toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 					certifico_factura_pendiente_pago = false;
 				}
 
@@ -1307,27 +1329,29 @@ public class Cobro extends PBase {
 
 	private boolean certifico_factura_pendiente_pago= false;
 
-	private class CertificarFactura extends AsyncTask<String, Void, Void> {
+	private class CertificarFactura extends AsyncTask<String, Void, Boolean> {
 
 		boolean exito = false;
 
 		@Override
-		protected Void doInBackground(String... params) {
+		protected Boolean doInBackground(String... params) {
 
 			try {
 				CertificarFacturaDGI();
 			} catch (Exception e) {
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+				return false;
 			}
 
-			return null;
+			return true;
 		}
 
 		@Override
-		protected void onPostExecute(Void result) {
+		protected void onPostExecute(Boolean result) {
 			try {
 				toast("Certificó: " + certifico_factura_pendiente_pago);
+				prgCobro.setVisibility(View.GONE);
 			} catch (Exception e) {
 				addlog(new Object() {
 				}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
@@ -1955,7 +1979,6 @@ addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"
 
 			if (browse==1) {
 				browse=0;
-
 				if (gl.pagado) createDoc();
 			}
 
@@ -1966,10 +1989,8 @@ addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"
 
 			if (browse==3){
 				browse=0;
-
 				super.finish();
 			}
-
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

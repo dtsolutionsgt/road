@@ -129,12 +129,7 @@ public class CliGPS extends PBase {
 			};
 
 			final Handler handler = new Handler();
-			handler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					lastKnowPos();
-				}
-			}, 500);
+			handler.postDelayed(() -> lastKnowPos(), 500);
 		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");

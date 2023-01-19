@@ -54,6 +54,7 @@ public class Pago extends PBase {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_pago);
 		
@@ -76,25 +77,33 @@ public class Pago extends PBase {
 			}
 		}
 
-		pagolim=mu.round2(gl.pagolim);
-		cobro=gl.pagocobro;
-		cliid=gl.cliente;
-		pagomodo=gl.pagomodo;
+		try {
+			pagolim=mu.round2(gl.pagolim);
+			cobro=gl.pagocobro;
+			cliid=gl.cliente;
+			pagomodo=gl.pagomodo;
 
-		setNivel();
-		setActDate();
-		initSession();
-		
-		listPagos();
-		listBancos();
-		
-		listItems();
+			setNivel();
+			setActDate();
+			initSession();
+
+			listPagos();
+			listBancos();
+
+			listItems();
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			mu.msgbox(e.getMessage());
+			throw new RuntimeException(e);
+		}
+
 	}
-
 	
 	// Events
 	
 	public void addPayment(View view){
+
 		String s;
 
 		try{
@@ -163,25 +172,25 @@ public class Pago extends PBase {
 	private void setHandlers(){
 
 		try{
-			listView.setOnItemClickListener(new OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
 
-					try {
-						Object lvObj = listView.getItemAtPosition(position);
-						selitem = (clsClasses.clsPago)lvObj;
+			listView.setOnItemClickListener((parent, view, position, id) -> {
 
-						adapter.setSelectedIndex(position);
+				try {
+					Object lvObj = listView.getItemAtPosition(position);
+					selitem = (clsClasses.clsPago)lvObj;
 
-						selid= selitem.id;
+					adapter.setSelectedIndex(position);
 
-					} catch (Exception e) {
-						addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-						mu.msgbox( e.getMessage());
-					}
-				};
+					selid= selitem.id;
+
+				} catch (Exception e) {
+					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+					mu.msgbox( e.getMessage());
+				}
 			});
+
 		}catch (Exception e){
+			mu.msgbox( e.getMessage());
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 
@@ -191,6 +200,7 @@ public class Pago extends PBase {
 	//region Main
 
 	private void listItems(){
+
 		Cursor DT;
 		clsClasses.clsPago vItem;	
 				
@@ -206,12 +216,10 @@ public class Pago extends PBase {
 			while (!DT.isAfterLast()) {
 				  
 				vItem = clsCls.new clsPago();
-			  		  
 				vItem.id=DT.getInt(0);
 				vItem.Tipo=DT.getString(1);
 				vItem.Valor=mu.frmdec(DT.getDouble(2));
 				vItem.Num=DT.getString(3)+" - "+DT.getString(4);
-			  
 				items.add(vItem);	
 			 
 				DT.moveToNext();
@@ -229,10 +237,12 @@ public class Pago extends PBase {
 	}	
 	
 	private void addPago(){
+
 		Cursor DT;
 		int id;
 		
 		try {
+
 			sql="SELECT MAX(Item) FROM T_PAGO";	
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();	
@@ -250,11 +260,9 @@ public class Pago extends PBase {
 		try {
 			
 			ins.init("T_PAGO");
-			
 			ins.add("ITEM",id);
 			ins.add("CODPAGO",cpago);
 			ins.add("TIPO",tpago);
-
 			ins.add("VALOR",pago);
 			ins.add("DESC1",desc1);
 			ins.add("DESC2",desc2);
@@ -265,12 +273,19 @@ public class Pago extends PBase {
 		} catch (SQLException e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("Error : " + e.getMessage());
-		}	
-		
-		listItems();
-		
-		actMonto();
-		actMonto();
+		}
+
+		try {
+
+			listItems();
+
+			actMonto();
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox("Error : " + e.getMessage());
+			throw new RuntimeException(e);
+		}
 
 	}
 	
@@ -307,6 +322,7 @@ public class Pago extends PBase {
 	}
 	
 	private void finalCheck(boolean vPagoCobro) {
+
 		try{
 
 			if (!vPagoCobro){
@@ -321,7 +337,7 @@ public class Pago extends PBase {
 				}
 			}
 
-			msgAskSave("Aplicar pagos y continuar?");
+			msgAskSave("¿Aplicar pagos y continuar?");
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -737,28 +753,21 @@ public class Pago extends PBase {
 	// MsgDialogs
 	
 	private void msgAskOverPayd(String msg) {
-		try{
-			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
+		try{
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 			dialog.setTitle(R.string.app_name);
 			dialog.setMessage(msg  + " ?");
-
 			dialog.setIcon(R.drawable.ic_quest);
 			dialog.setCancelable(false);
-
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					showPagoDialog();
-				}
-			});
-
-			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					;
-				}
+			dialog.setPositiveButton("Si", (dialog1, which) -> showPagoDialog());
+			dialog.setNegativeButton("No", (dialog12, which) -> {
+				;
 			});
 
 			dialog.show();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -767,7 +776,9 @@ public class Pago extends PBase {
 	}	
 	
 	private void msgAskExit(String msg) {
+
 		try{
+
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
 			dialog.setTitle(R.string.app_name);
@@ -827,34 +838,31 @@ public class Pago extends PBase {
 	}	
 	
 	private void msgAskSave(String msg) {
+
 		try{
+
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
 			dialog.setTitle(R.string.app_name);
-			dialog.setMessage(msg  + " ?");
-
+			dialog.setMessage(msg);
 			dialog.setIcon(R.drawable.ic_quest);
 			dialog.setCancelable(false);
 
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					if (totalPago()>0){
-						gl.pagado = true;
-						if (gl.dvbrowse!=0){
-							gl.brw=1;
-						}
-						doExit();
+			dialog.setPositiveButton("Si", (dialog1, which) -> {
+				if (totalPago()>0){
+					gl.pagado = true;
+					if (gl.dvbrowse!=0){
+						gl.brw=1;
 					}
+					doExit();
 				}
 			});
 
-			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					;
-				}
+			dialog.setNegativeButton("No", (dialog12, which) -> {
+				;
 			});
 
 			dialog.show();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

@@ -1,9 +1,13 @@
 package com.dts.roadp;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -18,6 +22,8 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.example.edocsdk.Fimador;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -26,6 +32,9 @@ import java.util.Date;
 
 import Entidades.Detalle;
 import Entidades.Receptor;
+import Entidades.RespuestaEdoc;
+import Entidades.gFormaPago;
+import Entidades.gPagPlazo;
 import Entidades.gRucRec;
 import Entidades.gUbiRec;
 import Entidades.rFE;
@@ -141,6 +150,7 @@ public class Cobro extends PBase {
 
 		fdocf = new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(cliid),gl.codCliNuevo,gl.peModal);
 		fdocf.deviceid=gl.numSerie;
+		Catalogo = new CatalogoFactura(this, Con, db);
 	}
 
 	// Events
@@ -343,12 +353,14 @@ public class Cobro extends PBase {
 
 	// Main
 	private void listItems(){
+
 		Cursor DT;
 		clsClasses.clsCobro vItem;
 
 		items.clear();ttot=0;tpag=0;
 
 		try {
+
 			sql="SELECT DOCUMENTO,TIPODOC,VALORORIG,SALDO,FECHAEMIT,FECHAV " +
 					"FROM P_COBRO WHERE CLIENTE='"+cliid+"' ORDER BY FECHAV";
 
@@ -356,10 +368,10 @@ public class Cobro extends PBase {
 			if (DT.getCount()==0) return;
 
 			DT.moveToFirst();
+
 			while (!DT.isAfterLast()) {
 
 				vItem = clsCls.new clsCobro();
-
 				vItem.Factura=DT.getString(0);
 				vItem.Tipo=DT.getString(1);
 				vItem.Valor=DT.getDouble(2);
@@ -390,6 +402,7 @@ public class Cobro extends PBase {
 			listView.setAdapter(adapter);
 
 			calcSelected();
+
 			showTotals();
 
 		} catch (Exception e) {
@@ -586,29 +599,30 @@ public class Cobro extends PBase {
 				if (!applyPay()) return;
 			}
 
-			if (saveCobro()) {
-				listItems();
-				if (dtipo.equalsIgnoreCase("R")) {
-					if (prn.isEnabled()) {
-						fdocf.buildPrint(crrf,0,gl.peModal);
-						prn.printask(printcallback);
-					}else if(!prn.isEnabled()){
-						fdocf.buildPrint(crrf,0,gl.peModal);
+			if (gl.pagocobro) {
+				if (saveCobro()) {
+					listItems();
+					if (dtipo.equalsIgnoreCase("R")) {
+						if (prn.isEnabled()) {
+							fdocf.buildPrint(crrf, 0, gl.peModal);
+							prn.printask(printcallback);
+						} else if (!prn.isEnabled()) {
+							fdocf.buildPrint(crrf, 0, gl.peModal);
 
-						if(gl.validarCred==1){
-							validaCredito();
-						}else if(gl.validarCred==2){
-							Cobro.super.finish();
+							if (gl.validarCred == 1) {
+								validaCredito();
+							} else if (gl.validarCred == 2) {
+								Cobro.super.finish();
+							}
+
+							gl.validarCred = 0;
 						}
+					} else {
 
-						gl.validarCred=0;
-					}
-				}else {
-					if (prn.isEnabled()) {
-
-						fdoc.buildPrint(corel,0,gl.peModal);
-						browse = 4;
-						prn.printask(printcallback);
+						if (prn.isEnabled()) {
+							fdoc.buildPrint(corel, 0, gl.peModal);
+							browse = 4;
+							prn.printask(printcallback);
 
 						/*if(gl.validarCred==1){
 							validaCredito();
@@ -616,17 +630,26 @@ public class Cobro extends PBase {
 
 						gl.validarCred=0;*/
 
-					}else if(!prn.isEnabled()){
-						fdoc.buildPrint(corel,0,gl.peModal);
+						} else if (!prn.isEnabled()) {
+							fdoc.buildPrint(corel, 0, gl.peModal);
 
-						if(gl.validarCred==1){
-							validaCredito();
-						}else if(gl.validarCred==2){
-							Cobro.super.finish();
+							if (gl.validarCred == 1) {
+								validaCredito();
+							} else if (gl.validarCred == 2) {
+								Cobro.super.finish();
+							}
+
+							gl.validarCred = 0;
 						}
-
-						gl.validarCred=0;
 					}
+				}
+			} else {
+				if (saveCobroPendiente()) {
+					CertificarFactura certificar = new CertificarFactura();
+					certificar.execute();
+					/*while (!certifico_factura_pendiente_pago){
+						//dialog, certificando....
+					}*/
 				}
 			}
 
@@ -654,6 +677,7 @@ public class Cobro extends PBase {
 	}
 
 	private boolean saveCobro(){
+
 		Cursor DT;
 		Cursor DT2;
 		double tpago;
@@ -662,7 +686,6 @@ public class Cobro extends PBase {
 		if (!assignCorel()) return false;
 
 		corel= correlativo_recibo();
-
 		fecha=du.getActDateTime();
 		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
 
@@ -670,6 +693,7 @@ public class Cobro extends PBase {
 		try {
 
 			if (!dtipo.equalsIgnoreCase("R")) {
+
 				db.beginTransaction();
 
 				// Encabezado
@@ -707,12 +731,11 @@ public class Cobro extends PBase {
 
 					sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD";
 					DT=Con.OpenDT(sql);
-
 					DT.moveToFirst();
+
 					while (!DT.isAfterLast()) {
 
 						ins.init("D_COBROD");
-
 						ins.add("COREL",corel);
 						ins.add("ANULADO","N");
 						ins.add("EMPRESA",gl.emp);
@@ -724,16 +747,13 @@ public class Cobro extends PBase {
 						ins.add("ID_TRANSACCION",0);
 						ins.add("REFERENCIA","");
 						ins.add("ASIGNACION","");
-
 						db.execSQL(ins.sql());
-
 						DT.moveToNext();
 					}
 
 				} else {
 
 					ins.init("D_COBROD_SR");
-
 					ins.add("COREL",corel);
 					ins.add("DOCUMENTO",gl.cliente);
 					ins.add("ANULADO","N");
@@ -755,6 +775,7 @@ public class Cobro extends PBase {
 				if (DT.getCount()>0){
 
 					DT.moveToFirst();
+
 					while (!DT.isAfterLast()) {
 
 						ins.init("D_COBROP");
@@ -782,6 +803,7 @@ public class Cobro extends PBase {
 
 				db.setTransactionSuccessful();
 				db.endTransaction();
+
 			}else{
 
 				db.beginTransaction();
@@ -816,9 +838,7 @@ public class Cobro extends PBase {
 						ins.add("DESC2",DT.getString(5));
 						ins.add("DESC3",DT.getString(6));
 						ins.add("DEPOS","N");
-
 						db.execSQL(ins.sql());
-
 						DT.moveToNext();
 					}
 
@@ -826,20 +846,118 @@ public class Cobro extends PBase {
 					db.execSQL(sql);
 
 					db.setTransactionSuccessful();
-
 					db.endTransaction();
 
-					//#CKFK20230112 - Certificar factura pendiente de pago
-                    toast("Certificar factura pendiente de pago");
-/*
-					//region Factura Electrónica
+				}
+
+			}
+
+			if(DT!=null) DT.close();
+
+		} catch (Exception e) {
+			db.endTransaction();
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			mu.msgbox("saveCobro_ "+ e.getMessage());return false;
+		}
+
+		return true;
+	}
+
+	private boolean saveCobroPendiente() {
+
+		Cursor DT, DT2;
+		String doc = "";
+
+		if (!assignCorel()) return false;
+
+		corel= correlativo_recibo();
+		fecha=du.getActDateTime();
+		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
+
+		try {
+
+			db.beginTransaction();
+
+			sql="SELECT DOCUMENTO,TIPODOC,MONTO,PAGO FROM T_PAGOD";
+			DT2=Con.OpenDT(sql);
+
+			if (DT2.getCount()>0){
+				DT2.moveToFirst();
+				doc=DT2.getString(0);
+				crrf = doc;
+			}
+
+			if (DT2 != null)  DT2.close();
+
+			sql="SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
+			DT=Con.OpenDT(sql);
+
+			if (DT.getCount()>0) {
+
+				DT.moveToFirst();
+
+				while (!DT.isAfterLast()) {
+
+					ins.init("D_FACTURAP");
+					ins.add("COREL",doc);
+					ins.add("ITEM",DT.getInt(0));
+					ins.add("ANULADO","N");
+					ins.add("EMPRESA",gl.emp);
+					ins.add("CODPAGO",DT.getInt(1));
+					ins.add("TIPO",DT.getString(2));
+					ins.add("VALOR",DT.getDouble(3));
+					ins.add("DESC1",DT.getString(4));
+					ins.add("DESC2",DT.getString(5));
+					ins.add("DESC3",DT.getString(6));
+					ins.add("DEPOS","N");
+					db.execSQL(ins.sql());
+					DT.moveToNext();
+				}
+
+				sql = "DELETE FROM P_COBRO WHERE DOCUMENTO='" + doc + "'";
+				db.execSQL(sql);
+
+				db.setTransactionSuccessful();
+				db.endTransaction();
+
+			}
+
+			if (DT != null) DT.close();
+
+			LlenaDatosFactura(doc);
+
+		} catch (Exception e) {
+			db.endTransaction();
+			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+			return false;
+		}
+
+
+
+		return true;
+	}
+
+	private boolean LlenaDatosFactura(String doc) {
+
+		Cursor DT, DT2;
+
+		try {
+
+			sql="SELECT COREL, CLIENTE, SERIE, CORELATIVO FROM D_FACTURA WHERE COREL= '" + doc +"'";
+			DT = Con.OpenDT(sql);
+			DT.moveToFirst();
+
+			if (DT != null) {
+
+				if (DT.getCount() > 0) {
+
 					Sucursal = Catalogo.getSucursal();
-					Cliente = Catalogo.getCliente(gl.cliente);
+					Cliente = Catalogo.getCliente(DT.getString(1));
 
 					Factura.gDGen.iTpEmis = "01"; // 'Fijo salvo que sea autorización en contingencia cambiar a valor 04
 					Factura.gDGen.iDoc = "01"; //'Para Factura fijo.
-					Factura.gDGen.dNroDF = String.valueOf(fcorel); //P_COREL.Correlativo
-					Factura.gDGen.dPtoFacDF = fserie; // BeSucursal.CODIGO '"002" 'Punto de Facturación del documento fiscal. (Ruta, Serie del disp.)
+					Factura.gDGen.dNroDF = String.valueOf(DT.getInt(3)); //P_COREL.Correlativo
+					Factura.gDGen.dPtoFacDF = DT.getString(2); // BeSucursal.CODIGO '"002" 'Punto de Facturación del documento fiscal. (Ruta, Serie del disp.)
 					Factura.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";// 'Fecha de la FM.
 					Factura.gDGen.iNatOp = "01"; //'Venta fijo.
 					Factura.gDGen.iTipoOp = 1; //'Fijo.
@@ -863,8 +981,8 @@ public class Cobro extends PBase {
 					Factura.gDGen.Emisor.gRucEmi.dTipoRuc = Sucursal.tipoRuc;
 
 					if (!Sucursal.codubi.isEmpty() || Sucursal.codubi != null) {
-						Ciudad = clsCls.new clsCiudad();
 
+						Ciudad = clsCls.new clsCiudad();
 						Ciudad = Catalogo.getCiudad(Sucursal.codubi);
 
 						if (Ciudad!=null) {
@@ -901,7 +1019,6 @@ public class Cobro extends PBase {
 						if (!Cliente.ciudad.isEmpty() ){
 
 							Ciudad = clsCls.new clsCiudad();
-
 							Ciudad = Catalogo.getCiudad(Cliente.ciudad);
 
 							if (Ciudad!=null) {
@@ -920,13 +1037,13 @@ public class Cobro extends PBase {
 									return false;
 								}
 							}
-						}else {
+						} else {
 							if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
 								msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
 								return false;
 							}
 						}
-					}else {
+					} else {
 						if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
 							msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
 							return false;
@@ -942,48 +1059,301 @@ public class Cobro extends PBase {
 								Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
 								if (DVRuc[1].trim().equals("")){
 									Factura.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
-								}else{
+								} else{
 									Factura.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
 								}
-							}else{
+							} else {
 								msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
 								return false;
 							}
-						}else {
+						} else {
 							msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 							return false;
 						}
-					}else{
+					} else {
 						if (Cliente.nit.length()>0) {
 							String[] DVRuc = Cliente.nit.split(" ");
 							if (DVRuc.length > 1) {
 								Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
 								if (DVRuc[1].trim().equals("")){
 									Factura.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[3].trim(),2);
-								}else{
+								} else {
 									Factura.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[2].trim(),2);
 								}
-							}else{
+							} else {
 								Factura.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
 								Factura.gDGen.Receptor.gRucRec.dDV = "";
 							}
 						}
 					}
-					//endregion Factura electrónica
-*/
-				}
 
+					int CorrelativoFac = 1;
+					double TotalFact = 0;
+					String CodProducto = "";
+					boolean porpeso;
+
+					sql = "SELECT PRODUCTO, FACTOR, CANT, TOTAL, PESO, PRECIODOC FROM D_FACTURAD WHERE COREL = '" + doc + "'";
+					DT2 =Con.OpenDT(sql);
+
+					DT2.moveToFirst();
+
+					while (!DT2.isAfterLast()) {
+
+						CodProducto = DT2.getString(0);
+						Detalle detalle = new Detalle();
+
+						Producto = clsCls.new clsProducto();
+						Producto = Catalogo.getProducto(CodProducto);
+
+						detalle.dSecItem = CorrelativoFac;
+						detalle.dDescProd = Producto.nombre; //Hay que ver de donde se obtiene el nombre del producto
+						detalle.dCodProd = Producto.codigo;
+
+						porpeso= app.ventaPeso(CodProducto);
+
+						if (!Producto.um.isEmpty()) {
+							String CodDGI;
+
+							if (porpeso) {
+								CodDGI = Catalogo.getUMDGI(gl.umpeso);
+							} else {
+								CodDGI = Catalogo.getUMDGI(Producto.um);
+							}
+
+							if (!CodDGI.isEmpty()) {
+								detalle.cUnidad = CodDGI.toLowerCase();
+							} else {
+								detalle.cUnidad = Producto.um.toLowerCase(); //Utiliza codigo de la cgi hy que sacarlo con una consulta
+							}
+						}
+
+						//Definir que se va enviar en la cantidad.
+						if (porpeso) {
+							detalle.dCantCodInt = String.valueOf(DT2.getDouble(4));
+						} else {
+							if (app.esRosty(Producto.codigo)) {
+								detalle.dCantCodInt = String.valueOf(DT2.getDouble(2) * DT.getDouble(1));
+							} else {
+								detalle.dCantCodInt = String.valueOf(DT2.getDouble(2));
+							}
+						}
+
+						String TotalItem = String.valueOf(mu.round2(DT2.getDouble(3)));
+
+						//Validar esto preguntar #AT20221019
+						if (Producto.subBodega.length() > 1) {
+							detalle.dCodCPBSabr = Producto.subBodega.substring(0, 2);
+						}
+
+						detalle.dCodCPBScmp = Producto.subBodega;
+
+						if (Factura.gDGen.Receptor.iTipoRec.equals("03") ) {
+							if (Producto.subBodega.isEmpty()) {
+								toastlong("El código de familia  no puede ser vacío para este tipo de receptor.");
+							}
+						}
+
+						detalle.gPrecios.dPrUnit = String.valueOf(DT2.getDouble(5));
+						detalle.gPrecios.dPrUnitDesc = "0.000000";
+						detalle.gPrecios.dPrItem = TotalItem;
+						detalle.gPrecios.dValTotItem = TotalItem;
+						detalle.gITBMSItem.dTasaITBMS = "00";
+						detalle.gITBMSItem.dValITBMS = "0.00";
+
+						Factura.Detalles.add(detalle);
+
+						CorrelativoFac++;
+						TotalFact += mu.round2(DT.getDouble(3));
+
+						DT2.moveToNext();
+					}
+
+					if (DT2 != null) DT.close();
+
+					gFormaPago Pagos = new gFormaPago();
+
+					String Total = String.valueOf(TotalFact);
+
+					Factura.gTot.dTotNeto = Total;
+					Factura.gTot.dTotITBMS = "0.00";
+					Factura.gTot.dTotGravado = "0.00";
+					Factura.gTot.dTotDesc = "0.00";
+					Factura.gTot.dVTot = Total;
+					Factura.gTot.dTotRec = Total;
+					Factura.gTot.dNroItems = String.valueOf(Factura.Detalles.size());
+					Factura.gTot.dVTotItems = Total;
+
+					if (Cliente.mediapago == 4) {
+						Pagos.iFormaPago = "01";
+						Factura.gTot.iPzPag = "2";
+
+						Factura.gTot.gPagPlazo = new ArrayList();
+						gPagPlazo PagoPlazo = new gPagPlazo();
+						PagoPlazo.dSecItem = "1";
+
+						PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
+						PagoPlazo.dValItPlazo = Total;
+						Factura.gTot.gPagPlazo.add(PagoPlazo);
+					} else {
+						Pagos.iFormaPago = "02";
+						Factura.gTot.iPzPag = "1";
+					}
+
+					Pagos.dVlrCuota = Total;
+					Factura.gTot.gFormaPago.add(Pagos);
+
+				} // Fin count > 0
 			}
 
-			if(DT!=null) DT.close();
+			if (DT != null) DT.close();
 
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
-			db.endTransaction();
-			mu.msgbox("saveCobro_ "+ e.getMessage());return false;
+			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage() + " " + sql);
 		}
 
 		return true;
+	}
+
+	private void CertificarFacturaDGI() {
+
+		try	{
+			//ProgressDialog("Certificando factura...");
+
+			Fimador Firmador = new Fimador(this);
+			RespuestaEdoc RespuestaEdocFac, RespuestaEdocNT = null;
+
+			if (ConexionValida()) {
+				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+				RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, "2");
+			} else {
+				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+			}
+
+			if	(RespuestaEdocFac.Cufe == null) {
+				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+			}
+
+			if (!RespuestaEdocFac.Estado.isEmpty() || RespuestaEdocFac.Estado != null) {
+
+				clsClasses.clsControlFEL ControlFEL = clsCls.new clsControlFEL();
+				clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
+				int EstadoFac = 0, EstadoNT = 0;
+
+				ControlFEL.Cufe = RespuestaEdocFac.Cufe;
+				ControlFEL.TipoDoc = Factura.gDGen.iDoc;
+				ControlFEL.NumDoc = Factura.gDGen.dNroDF;
+				ControlFEL.Sucursal = gl.sucur;
+				ControlFEL.Caja = fserie;
+
+				if (RespuestaEdocFac.Estado.equals("21") || RespuestaEdocFac.Estado.equals("20")) {
+					ControlFEL.Estado = "1";
+				} else {
+					ControlFEL.Estado = RespuestaEdocFac.Estado;
+				}
+
+				ControlFEL.Mensaje = RespuestaEdocFac.MensajeRespuesta;
+				ControlFEL.ValorXml = RespuestaEdocFac.XML != null ? Catalogo.ReplaceXML(RespuestaEdocFac.XML) : "";
+
+				String[] fechaEnvio = Factura.gDGen.dFechaEm.split("-05:00", 0);
+				ControlFEL.FechaEnvio = fechaEnvio[0];
+				ControlFEL.TipFac = Factura.gDGen.iDoc;
+				ControlFEL.FechaAgr = String.valueOf(du.getFechaCompleta());
+				ControlFEL.QR = RespuestaEdocFac.UrlCodeQR;
+				ControlFEL.Corel = corel;
+				ControlFEL.Ruta = gl.ruta;
+				ControlFEL.Vendedor = gl.vend;
+				ControlFEL.Correlativo = String.valueOf(fcorel);
+				ControlFEL.Fecha_Autorizacion = RespuestaEdocFac.FechaAutorizacion;
+				ControlFEL.Numero_Autorizacion = RespuestaEdocFac.NumAutorizacion;
+
+				if (RespuestaEdocFac.Estado.equals("2")) {
+					EstadoFac = 1;
+					toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+					certifico_factura_pendiente_pago =true;
+				} else {
+					toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+					certifico_factura_pendiente_pago = false;
+				}
+
+				Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
+				Catalogo.InsertarFELControl(ControlFEL);
+
+				//progress.cancel();
+			}
+
+		} catch (Exception e) {
+			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public boolean ConexionValida() {
+		boolean valida = false;
+		try {
+			ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+			if (networkInfo != null && networkInfo.isConnected()) {
+				valida = true;
+			}
+
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
+
+		return valida;
+	}
+
+	private boolean certifico_factura_pendiente_pago= false;
+
+	private class CertificarFactura extends AsyncTask<String, Void, Void> {
+
+		boolean exito = false;
+
+		@Override
+		protected Void doInBackground(String... params) {
+
+			try {
+				CertificarFacturaDGI();
+			} catch (Exception e) {
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			try {
+				toast("Certificó: " + certifico_factura_pendiente_pago);
+			} catch (Exception e) {
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			}
+
+		}
+
+		@Override
+		protected void onPreExecute() {
+			try {
+
+			} catch (Exception e) {
+				addlog(new Object() {
+				}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			}
+		}
+
+		@Override
+		protected void onProgressUpdate(Void... values) {
+			try {
+
+			} catch (Exception e) {
+
+			}
+		}
+
 	}
 
 	private String correlativo_recibo(){
@@ -1416,63 +1786,61 @@ public class Cobro extends PBase {
 			dialog.setMessage("¿Impresión correcta?");
 			dialog.setCancelable(false);
 
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
+			dialog.setPositiveButton("Si", (dialog1, which) -> {
 
-					impres++;toast("Impres "+impres);
+				impres++;toast("Impres "+impres);
 
-					try {
-						sql="UPDATE D_COBRO SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
-						db.execSQL(sql);
-					} catch (Exception e) {
-						msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-					}
+				try {
+					sql="UPDATE D_COBRO SET IMPRES=IMPRES+1 WHERE COREL='"+corel+"'";
+					db.execSQL(sql);
+				} catch (Exception e) {
+					msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+				}
+
+				if (dtipo.equalsIgnoreCase("R")) {
+					sql="UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='"+crrf+"'";
+					db.execSQL(sql);
+				}
+
+				if (impres>1) {
+
+/* try {
+sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorreld+"'";
+db.execSQL(sql);
+} catch (Exception e) {
+addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+}*/
+
+					gl.brw=0;
+
+				} else {
 
 					if (dtipo.equalsIgnoreCase("R")) {
-						sql="UPDATE D_FACTURA SET IMPRES=IMPRES+1 WHERE COREL='"+crrf+"'";
-						db.execSQL(sql);
-					}
-
-					if (impres>1) {
-
-                       /* try {
-                            sql="UPDATE D_NOTACRED SET IMPRES=IMPRES+1 WHERE COREL='"+gl.dvcorreld+"'";
-                            db.execSQL(sql);
-                        } catch (Exception e) {
-                            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
-                        }*/
-
-						gl.brw=0;
-
-					} else {
-
-						if (dtipo.equalsIgnoreCase("R")) {
-							if (prn.isEnabled()) {
-								fdocf.buildPrint(crrf,1,gl.peModal);
-								//prn.printnoask(printcallback, "print.txt");
-								prn.printnoask(printclose, "print.txt");
-							}
-						}else {
-							if (prn.isEnabled()) {
-								fdoc.buildPrint(corel,1,gl.peModal);
-								//impres=0;
-								browse = 4;
-								//prn.printnoask(printcallback, "print.txt");
-								prn.printnoask(printcallback, "print.txt");
-							}
+						if (prn.isEnabled()) {
+							fdocf.buildPrint(crrf,1,gl.peModal);
+							//prn.printnoask(printcallback, "print.txt");
+							prn.printnoask(printclose, "print.txt");
 						}
-
+					}else {
+						if (prn.isEnabled()) {
+							fdoc.buildPrint(corel,1,gl.peModal);
+							//impres=0;
+							browse = 4;
+							//prn.printnoask(printcallback, "print.txt");
+							prn.printnoask(printcallback, "print.txt");
+						}
 					}
-
-					if(gl.validarCred==1){
-						validaCredito();//#CKFK 20190503 AskPrint
-					}else if(gl.validarCred==2){
-						Cobro.super.finish();
-					}
-
-					gl.validarCred=0;
 
 				}
+
+				if(gl.validarCred==1){
+					validaCredito();//#CKFK 20190503 AskPrint
+				}else if(gl.validarCred==2){
+					Cobro.super.finish();
+				}
+
+				gl.validarCred=0;
+
 			});
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -1518,24 +1886,11 @@ public class Cobro extends PBase {
 		try{
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
 			dialog.setTitle(R.string.app_name);
 			dialog.setMessage("¿" + msg  + "?");
-
 			dialog.setIcon(R.drawable.ic_quest);
-
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					msgAskSave("Aplicar pago y crear un recibo");
-				}
-			});
-
-			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					closekeyb();
-				}
-			});
-
+			dialog.setPositiveButton("Si", (dialog12, which) -> msgAskSave("Aplicar pago y crear un recibo"));
+			dialog.setNegativeButton("No", (dialog1, which) -> closekeyb());
 			dialog.show();
 
 		}catch (Exception e){
@@ -1549,28 +1904,17 @@ public class Cobro extends PBase {
 		try{
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
 			dialog.setTitle(R.string.app_name);
 			dialog.setMessage("¿" + msg + "?");
-
 			dialog.setIcon(R.drawable.ic_quest);
-
 			dialog.setCancelable(false);
-
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					createDoc();
-					check();
-					//validaCredito();
-				}
+			dialog.setPositiveButton("Si", (dialog1, which) -> {
+				createDoc();
+				check();
+				//validaCredito();
 			});
 
-			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					closekeyb();
-				}
-			});
-
+			dialog.setNegativeButton("No", (dialog12, which) -> closekeyb());
 			dialog.show();
 
 		}catch (Exception e){
@@ -1587,22 +1931,10 @@ public class Cobro extends PBase {
 
 			dialog.setTitle(R.string.app_name);
 			dialog.setMessage("¿" + msg + "?");
-
 			dialog.setCancelable(false);
 			dialog.setIcon(R.drawable.ic_quest);
-
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					finish();
-				}
-			});
-
-			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					closekeyb();
-				}
-			});
-
+			dialog.setPositiveButton("Si", (dialog1, which) -> finish());
+			dialog.setNegativeButton("No", (dialog12, which) -> closekeyb());
 			dialog.show();
 
 		}catch (Exception e){

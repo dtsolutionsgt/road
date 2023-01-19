@@ -1525,6 +1525,7 @@ public class FacturaRes extends PBase {
 			int CorrelativoFac = 1;
 
 			dt.moveToFirst();
+
 			while (!dt.isAfterLast()) {
 
 				Detalle detalle = new Detalle();
@@ -1551,17 +1552,7 @@ public class FacturaRes extends PBase {
 				ins.add("VAL1",dt.getDouble(9));
 				ins.add("VAL2",dt.getDouble(9));
 				ins.add("UMVENTA",dt.getString(11));
-
-				/*
-				if (dt.getString(11).equalsIgnoreCase("KG")) {
-					ins.add("FACTOR",1);
-				} else {
-					if (dt.getDouble(12)!=0) ins.add("FACTOR",1/dt.getDouble(12));else ins.add("FACTOR",1);
-				}
-				*/
-
 				ins.add("FACTOR",dt.getDouble(12));
-
 				ins.add("UMSTOCK",dt.getString(13));ss=dt.getString(13);
 				ins.add("UMPESO",gl.umpeso); //#HS_20181120_1625 Se agrego el valor gl.umpeso anteriormente estaba ""
 
@@ -1579,8 +1570,8 @@ public class FacturaRes extends PBase {
 				}
 
 				if (!app.prodBarra(vprod)) {
-					ins.init("D_FACTURAD_LOTES");
 
+					ins.init("D_FACTURAD_LOTES");
 					ins.add("COREL", corel);
 					ins.add("PRODUCTO", vprod);
 					ins.add("LOTE", lotelote);
@@ -1589,7 +1580,6 @@ public class FacturaRes extends PBase {
 					ins.add("UMSTOCK", vumstock);
 					ins.add("UMPESO", gl.umpeso);
 					ins.add("UMVENTA", vumventa);
-
 					db.execSQL(ins.sql());
 
 				}
@@ -1685,9 +1675,7 @@ public class FacturaRes extends PBase {
 				ins.add("PEDCOREL",dt.getString(10));
 				ins.add("STATCOM",dt.getString(11));
 				ins.add("DESPCOREL",dt.getString(12));
-
 				db.execSQL(ins.sql());
-
 				dt.moveToNext();
 			}
 
@@ -1695,6 +1683,7 @@ public class FacturaRes extends PBase {
 
 			//region D_FACTURAP
 			int CodPago = 0;
+
 			if(!gl.cobroPendiente) {
 
 				sql = "SELECT ITEM,CODPAGO,TIPO,VALOR,DESC1,DESC2,DESC3 FROM T_PAGO";
@@ -1703,6 +1692,7 @@ public class FacturaRes extends PBase {
 				CodPago = Integer.valueOf(dt.getInt(1));
 
 				dt.moveToFirst();
+
 				while (!dt.isAfterLast()) {
 
 					ins.init("D_FACTURAP");
@@ -1717,9 +1707,7 @@ public class FacturaRes extends PBase {
 					ins.add("DESC2", dt.getString(5));
 					ins.add("DESC3", dt.getString(6));
 					ins.add("DEPOS", "N");
-
 					db.execSQL(ins.sql());
-
 					dt.moveToNext();
 				}
 
@@ -1739,6 +1727,7 @@ public class FacturaRes extends PBase {
 				Factura.gTot.dVTotItems = Total;
 
 				if (CodPago == 4) {
+
 					Pagos.iFormaPago = "01";
 					Factura.gTot.iPzPag = "2";
 
@@ -1749,6 +1738,7 @@ public class FacturaRes extends PBase {
 					PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
 					PagoPlazo.dValItPlazo = Total;
 					Factura.gTot.gPagPlazo.add(PagoPlazo);
+
 				} else {
 					Pagos.iFormaPago = "02";
 					Factura.gTot.iPzPag = "1";
@@ -1760,8 +1750,8 @@ public class FacturaRes extends PBase {
 			} else {
 
 				try {
-					ins.init("P_COBRO");
 
+					ins.init("P_COBRO");
 					ins.add("DOCUMENTO", corel);
 					ins.add("EMPRESA", gl.emp);
 					ins.add("RUTA", gl.ruta);
@@ -1776,10 +1766,9 @@ public class FacturaRes extends PBase {
 					ins.add("ID_TRANSACCION", 0);
 					ins.add("REFERENCIA", 0);
 					ins.add("ASIGNACION", 0);
-
 					db.execSQL(ins.sql());
 
-					Toast.makeText(this, "Se guardo la factura pendiente de pago",Toast.LENGTH_LONG).show();
+					Toast.makeText(this, "Se guardó la factura pendiente de pago",Toast.LENGTH_LONG).show();
 
 				}catch (Exception e){
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
@@ -1793,12 +1782,10 @@ public class FacturaRes extends PBase {
 			//region D_FACTURAF
 
 			ins.init("D_FACTURAF");
-
 			ins.add("COREL",corel);
 			ins.add("NOMBRE",gl.fnombre);
 			ins.add("NIT",gl.fnit);
 			ins.add("DIRECCION",gl.fdir);
-
 			db.execSQL(ins.sql());
 
 			//endregion

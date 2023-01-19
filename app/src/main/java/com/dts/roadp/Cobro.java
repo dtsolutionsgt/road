@@ -81,11 +81,12 @@ public class Cobro extends PBase {
 	private rFE NotaCredito = new rFE();
 	private Detalle detalle = new Detalle();
 	private CatalogoFactura Catalogo;
-	private String urltoken = "https://labpa.guru-soft.com/EdocPanama/4.0/Autenticacion/Api/ServicioEDOC?Id=1";
-	private String usuario = "edocTOLEDANO_8945";
-	private String clave = "wsTOLEDANO_8945";
-	private String urlDoc = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/FacturaEnte";
-	private String urlDocNT = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/NotaCreditoEnte";
+
+	private String urltoken = "";
+	private String usuario = "";
+	private String clave = "";
+	private String urlDoc = "";
+	private String urlDocNT = "";
 	private String QR = "";
 
 	private ProgressBar prgCobro;
@@ -111,6 +112,14 @@ public class Cobro extends PBase {
 		prgCobro.setVisibility(View.GONE);
 
 		cliid=gl.cliente;
+
+		//#CKFK20230118 Agregamos esta información quemada como variables
+		urltoken = gl.url_token;
+		usuario = gl.usuario_api;
+		clave = gl.clave_api;
+		urlDoc = gl.url_emision_factura_b2c;
+		QR = gl.qr_api;
+		urlDocNT = gl.url_emision_nc_b2c;
 
 		app = new AppMethods(this, gl, Con, db);
 
@@ -1253,13 +1262,13 @@ public class Cobro extends PBase {
 			RespuestaEdoc RespuestaEdocFac, RespuestaEdocNT = null;
 
 			if (ConexionValida()) {
-				RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, "2");
+				RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
 			} else {
-				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 
 			if	(RespuestaEdocFac.Cufe == null) {
-				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 
 			if (!RespuestaEdocFac.Estado.isEmpty() || RespuestaEdocFac.Estado != null) {

@@ -1374,6 +1374,7 @@ public class BaseDatosScript {
 					"[GEOREFERENCIA_AUTOVENTA] INTEGER DEFAULT 0 NOT NULL,"+
 					"[TIPORECEPTOR] TEXT,"+
 					"[CIUDAD] TEXT,"+
+					"[DESCRIPCION_PAGO] TEXT,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);
@@ -1635,6 +1636,15 @@ public class BaseDatosScript {
 			        "[CLAVE_API] TEXT,"+
 			        "[URL_ANULACION] TEXT,"+
 					"[URL_CONSULTA_DOCUMENTOS_POR_CRITERIO] TEXT,"+
+					"[URL_EMISION_FACTURA_B2C] TEXT,"+
+					"[URL_EMISION_NC_B2C] TEXT,"+
+					"[URL_EMISION_ND_B2C] TEXT,"+
+					"[URL_BASE] TEXT,"+
+					"[URL_TOKEN] TEXT,"+
+					"[QR_API] TEXT,"+
+					"[ARCHIVO_P12] TEXT,"+
+					"[QR_CLAVE] TEXT,"+
+					"[URL_B2C_HH] TEXT,"+
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
 			database.execSQL(vSQL);

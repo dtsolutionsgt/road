@@ -147,12 +147,11 @@ public class clsDocDevolucion extends clsDocument {
             }
 
             if (cantimpres>0){
-                nombre = "COPIA DE NOTA DE CREDITO";
+                nombre = nombre;//"COPIA DE NOTA DE CREDITO";
             }else if (cantimpres==-1){
-                nombre = "NOTA DE CREDITO ANULADA";
+                nombre = nombre + " ANULADA";//"NOTA DE CREDITO ANULADA";
             }else if (cantimpres==0){
-                nombre="COMPROBANTE AUXILIAR DE FACTURA ELECTRONICA " + (conreferencia?"NOTA DE CRÉDITO REFERENTE A UNA O VARIAS FE":
-                        "NOTA DE CRÉDITO GENERICA");
+                nombre=nombre;
             }
 
         } catch (Exception e) {

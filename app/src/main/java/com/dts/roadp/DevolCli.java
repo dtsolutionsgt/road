@@ -61,11 +61,12 @@ public class DevolCli extends PBase {
 	private clsClasses.clsSucursal Sucursal = clsCls.new clsSucursal();
 	private clsClasses.clsCliente Cliente = clsCls.new clsCliente();
 	private clsClasses.clsProducto Producto = clsCls.new clsProducto();
-	private String urltoken = "https://labpa.guru-soft.com/EdocPanama/4.0/Autenticacion/Api/ServicioEDOC?Id=1";
-	private String usuario = "edocTOLEDANO_8945";
-	private String clave = "wsTOLEDANO_8945";
-	private String urlDoc = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/NotaCreditoEnte";
-	private String QR = "5B4D134FFAE367FD0BE91E37F958883E2C01A36A02FED9E1F41C1E53F1D59ED2D8DD481C0ED9024F348D14CCF55A9A6D5CAC14E42BCCB7F41D64E90A33B5624C";
+	private String urltoken = "";
+	private String usuario = "";
+	private String clave =  "";
+	private String urlDoc =  "";
+	private String QR =  "";
+	private String urlcontingencia="";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +85,14 @@ public class DevolCli extends PBase {
 		emp=gl.emp;
 		estado=gl.devtipo;
 		cliid=gl.cliente;
+
+		//#CKFK20230118 Agregamos esta información quemada como variables
+		urltoken = gl.url_token;
+		usuario = gl.usuario_api;
+		clave =  gl.clave_api;
+		urlDoc =  gl.url_emision_nc_b2c;
+		QR =  gl.qr_api;
+		urlcontingencia= gl.url_b2c_hh;
 
 		app = new AppMethods(this, gl, Con, db);
 
@@ -876,13 +885,13 @@ public class DevolCli extends PBase {
 				clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
 
 				if (ConexionValida()) {
-					RespuestaEdoc = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDoc, "2");
+					RespuestaEdoc = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDoc, gl.ambiente);
 				} else {
-					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+ gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 				}
 
 				if	(RespuestaEdoc.Cufe == null) {
-					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?", "/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,gl.url_b2c_hh, "/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 				}
 
 				if (RespuestaEdoc != null) {

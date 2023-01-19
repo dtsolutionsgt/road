@@ -101,12 +101,12 @@ public class FacturaRes extends PBase {
 	private rFE NotaCredito = new rFE();
 	private Detalle detalle = new Detalle();
 	private CatalogoFactura Catalogo;
-	private String urltoken = "https://labpa.guru-soft.com/EdocPanama/4.0/Autenticacion/Api/ServicioEDOC?Id=1";
-	private String usuario = "edocTOLEDANO_8945";
-	private String clave = "wsTOLEDANO_8945";
-	private String urlDoc = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/FacturaEnte";
-	private String urlDocNT = "https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/NotaCreditoEnte";
-	private String QR = "5B4D134FFAE367FD0BE91E37F958883E2C01A36A02FED9E1F41C1E53F1D59ED2D8DD481C0ED9024F348D14CCF55A9A6D5CAC14E42BCCB7F41D64E90A33B5624C";
+	private String urltoken =  "";
+	private String usuario = "";
+	private String clave = "";
+	private String urlDoc = "";
+	private String urlDocNT = "";
+	private String QR = "";
 
 	@SuppressLint("MissingPermission")
 	@Override
@@ -150,6 +150,14 @@ public class FacturaRes extends PBase {
 		dispventa = gl.dvdispventa;dispventa=mu.round(dispventa,2);
 		notaC = gl.tiponcredito;
 		gl.corelFac=gl.ruta+"_"+mu.getCorelBase();
+
+		//#CKFK20230118 Agregamos esta información quemada como variables
+		urltoken = gl.url_token;
+		usuario = gl.usuario_api;
+		clave = gl.clave_api;
+		urlDoc = gl.url_emision_factura_b2c;
+		QR = gl.qr_api;
+		urlDocNT = gl.url_emision_nc_b2c;
 
 		app = new AppMethods(this, gl, Con, db);
 
@@ -2037,13 +2045,13 @@ public class FacturaRes extends PBase {
 				RespuestaEdoc RespuestaEdocFac, RespuestaEdocNT = null;
 
 				if (ConexionValida()) {
-					RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, "2");
+					RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
 				} else {
-					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 				}
 
 			     if	(RespuestaEdocFac.Cufe == null) {
-					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 				}
 
 				if (!RespuestaEdocFac.Estado.isEmpty() || RespuestaEdocFac.Estado != null) {
@@ -2087,61 +2095,6 @@ public class FacturaRes extends PBase {
 
 							GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
 
-							/*gDFRefNum gDFRefNum= new gDFRefNum();
-							gDFRefNum.gDFRefFE = new gDFRefFE();
-							gDFRefNum.gDFRefFE.dCUFERef = ControlFEL.Cufe;
-
-							Referencia referencia= new Referencia();
-							referencia.dFechaDFRef = ControlFEL.FechaEnvio+"-05:00";
-							referencia.dNombEmRef = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
-							referencia.gRucEmDFRef = new gRucEmDFRef();
-							referencia.gRucEmDFRef.dRuc =  Sucursal.nit;
-							referencia.gRucEmDFRef.dTipoRuc = Sucursal.tipoRuc;
-							referencia.gRucEmDFRef.dDV = Sucursal.texto;
-							referencia.gDFRefNum = gDFRefNum;
-
-							NotaCredito.gDGen.Referencia.add(referencia);
-
-							RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, "2");
-							//RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
-
-							if (RespuestaEdocNT != null) {
-								ControlNotaCredito.Cufe = RespuestaEdocNT.Cufe;
-								ControlNotaCredito.TipoDoc = NotaCredito.gDGen.iDoc;
-								ControlNotaCredito.NumDoc = NotaCredito.gDGen.dNroDF;
-								ControlNotaCredito.Sucursal = gl.sucur;
-								ControlNotaCredito.Caja = NotaCredito.gDGen.dPtoFacDF;
-
-								if (RespuestaEdocNT.Estado.equals("21")) {
-									ControlNotaCredito.Estado = "01";
-								} else {
-									ControlNotaCredito.Estado = RespuestaEdocNT.Estado;
-								}
-
-								ControlNotaCredito.Mensaje = RespuestaEdocNT.MensajeRespuesta;
-								ControlNotaCredito.ValorXml = RespuestaEdocNT.XML != null ? Catalogo.ReplaceXML(RespuestaEdocNT.XML) : "";
-
-								String[] FechaEnv = NotaCredito.gDGen.dFechaEm.split("-05:00", 0);
-								ControlNotaCredito.FechaEnvio = FechaEnv[0];
-								ControlNotaCredito.TipFac = NotaCredito.gDGen.iDoc;
-								ControlNotaCredito.FechaAgr = String.valueOf(du.getFechaCompleta());
-								ControlNotaCredito.QR = RespuestaEdocNT.UrlCodeQR;
-								ControlNotaCredito.Corel = gl.devcornc;
-								ControlNotaCredito.Ruta = gl.ruta;
-								ControlNotaCredito.Vendedor = gl.vend;
-								ControlNotaCredito.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
-
-								if (RespuestaEdocNT.Estado.equals("2")) {
-									EstadoNT = 1;
-									toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
-
-								} else {
-									toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
-								}
-
-								Catalogo.UpdateEstadoNotaCredito(ControlNotaCredito.Cufe, ControlFEL.Cufe, EstadoNT);
-								Catalogo.InsertarFELControl(ControlNotaCredito);
-							}*/
 						}
 
 					} else if(!ConexionValida() && ControlFEL.Estado.equals("1")) {
@@ -2224,13 +2177,13 @@ public class FacturaRes extends PBase {
 			NotaCredito.gDGen.Referencia.add(referencia);
 
 			if (ConexionValida()) {
-				RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, "2");
+				RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, gl.ambiente);
 			} else {
-				RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+				RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 
 			if (RespuestaEdocNT.Cufe == null) {
-				RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?","/data/data/com.dts.roadp/F-8-740-190-OrielAntonioBarriaCaraballo.p12","yb90o#0F",QR,"2");
+				RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 
 			if (RespuestaEdocNT != null) {

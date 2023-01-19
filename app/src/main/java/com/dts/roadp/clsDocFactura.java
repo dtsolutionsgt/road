@@ -94,13 +94,13 @@ public class clsDocFactura extends clsDocument {
 				}
 
 				if (cantimpres>0){
-					nombre = "COPIA DE FACTURA";
+					nombre = nombre;//"COPIA DE FACTURA";
 				}else if (cantimpres==-1){
-					nombre = "FACTURA ANULADA";
+					nombre = nombre + " ANULADA";//"FACTURA ANULADA";
 				}else if (cantimpres==-2){
 					nombre = "FACTURA PENDIENTE DE PAGO";
 				}else if (cantimpres==0){
-					nombre = "COMPROBANTE AUXILIAR DE FACTURA ELECTRONICA FACTURA DE OPERACIÓN INTERNA";
+					nombre = nombre;
 				}
 
 			}

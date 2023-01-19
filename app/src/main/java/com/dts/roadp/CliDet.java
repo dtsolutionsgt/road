@@ -2,7 +2,6 @@ package com.dts.roadp;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
@@ -43,7 +43,7 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 public class CliDet extends PBase {
 
-	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS;
+	private TextView lblNom,lblRep,lblDir,lblAten,lblTel,lblGPS,lblDescripcionPago;
 	private TextView lblCLim,lblCUsed,lblCDisp,lblCobro,lblDevol,lblCantDias,lblClientePago;
 	private TextView lblRuta,lblRuta2, lblDespacho, lblCanal, lblCanalsub,lblPrior,lblProv,lblDist;
 	private RelativeLayout relV,relP,relD,relCamara,relCanasta;
@@ -92,6 +92,7 @@ public class CliDet extends PBase {
         lblPrior = findViewById(R.id.textView100);
         lblProv = findViewById(R.id.textView98);
         lblDist= findViewById(R.id.textView99);
+		lblDescripcionPago=(TextView)findViewById(R.id.lblDescripcionPago);
 
 		txtRuta = (EditText) findViewById(R.id.txtRuta);
 		txtRuta.setVisibility(View.INVISIBLE);
@@ -99,7 +100,6 @@ public class CliDet extends PBase {
 
 		chknc = new RadioButton(this,null);
 		chkncv = new RadioButton(this,null);
-
 
 		lblDespacho = (TextView) findViewById(R.id.lblDespacho);
 
@@ -541,7 +541,8 @@ public class CliDet extends PBase {
 
 			sql="SELECT NOMBRE,NOMBRE_PROPIETARIO,DIRECCION,ULTVISITA,TELEFONO,LIMITECREDITO,NIVELPRECIO,PERCEPCION,TIPO_CONTRIBUYENTE, " +
 					"COORX,COORY,MEDIAPAGO,NIT,VALIDACREDITO,BODEGA,CHEQUEPOST,TIPO,DIACREDITO,INGRESA_CANASTAS, " +
-                    "CANAL,SUBCANAL,PRIORIZACION,MUNICIPIO, GEOREFERENCIA_CANASTA, GEOREFERENCIA_PREVENTA, GEOREFERENCIA_PREFACTURA, GEOREFERENCIA_AUTOVENTA "+
+                    "CANAL,SUBCANAL,PRIORIZACION,MUNICIPIO, GEOREFERENCIA_CANASTA, GEOREFERENCIA_PREVENTA, GEOREFERENCIA_PREFACTURA, " +
+					"GEOREFERENCIA_AUTOVENTA, DESCRIPCION_PAGO "+
 					"FROM P_CLIENTE WHERE CODIGO='"+cod+"'";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
@@ -550,6 +551,9 @@ public class CliDet extends PBase {
 			lblRep.setText(DT.getString(12));
 			lblDir.setText(DT.getString(2));
 			lblCantDias.setText(DT.getString(17));
+			lblDescripcionPago.setText(DT.getString(27)==null?"":DT.getString(27));
+
+			if(lblDescripcionPago.getText().toString().contains("ACH")) lblDescripcionPago.setTextColor(Color.RED);
 
 			georefCanasta    = (DT.getInt(23) == 1 ? true : false);
 			georefPreventa   = (DT.getInt(24) == 1 ? true : false);

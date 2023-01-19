@@ -102,12 +102,16 @@ public class clsDocument {
 			if (flag==0) {
 				if (!rep.save()) return false;
 			} else if (flag==1){
-				if  (docpedido){
-					if (global != null){
+				if  (docpedido) {
+					if (global != null) {
 						if (!rep.save(global.pCantImpresion)) return false;
-					}else{
+					} else {
 						if (!rep.save(2)) return false;
 					}
+				}else if  (docfactura || docdevolucion) {
+					//#CKFK20230118 Las facturas y NC ya solo van a tener una copia
+					//if (!rep.save(2)) return false;
+					if (!rep.save(1)) return false;
 				}else{
 					if (!rep.save(2)) return false;
 				}

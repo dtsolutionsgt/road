@@ -245,6 +245,7 @@ public class clsDocument {
     protected void saveHeadLines(int reimpres) {
         String s;
 		String mPago,dPago;
+		boolean vAnulada = false;
 
         rep.empty();rep.empty();
 
@@ -271,7 +272,23 @@ public class clsDocument {
             /*    residx=0;
             }*/
 
-			if (!s.equalsIgnoreCase("@@")) rep.add(s);
+			if(docfactura && s.contains("ANULADA")){
+				s = s.replace("ANULADA","");
+				vAnulada = true;
+			}
+
+			if (!s.equalsIgnoreCase("@@")) {
+				rep.add(s);
+			}
+
+			if(docrecibo && s.contains("RECIBO")){
+				rep.add("DOCUMENTO NO FISCAL");
+			}
+
+			if ((docfactura || docdevolucion) && vAnulada){
+				rep.add("ANULADA");
+				vAnulada = false;
+			}
 
 			if(i==7){
 

@@ -265,8 +265,10 @@ public class CatalogoFactura extends PBase {
     }
 
     public clsClasses.clsProducto getProducto(String Codigo) {
+
         clsClasses.clsProducto Producto = clsCls.new clsProducto();
         Cursor dt;
+
         try {
 
             sql="SELECT DESCLARGA, UNIDBAS, SUBBODEGA  FROM P_PRODUCTO " +

@@ -118,6 +118,7 @@ public class CliDet extends PBase {
 		app = new AppMethods(this, gl, Con, db);
 
 		cod=gl.cliente;
+
 		showData();
 
 		gl.iddespacho = null;

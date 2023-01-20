@@ -2527,6 +2527,8 @@ public class FacturaRes extends PBase {
 				sql="SELECT BARRA FROM D_STOCKB_DEV WHERE (BARRA='" + barra + "') ";
 				dtl=Con.OpenDT(sql);
 
+				barra2 = dtl.getString(0);
+
 				if (barra.equals(barra2)) throw new Exception("Barra duplicada " + barra);
 
 				dt.moveToNext();

@@ -64,4 +64,67 @@
         android:padding="3dp"
         android:src="@drawable/standby" />
 
+    <TextView
+        android:id="@+id/lblCufe"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lblPNum"
+        android:layout_marginTop="6dp"
+        android:text="CUFE: "
+        android:textColor="#000000"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textCufe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lblPNum"
+        android:layout_alignTop="@id/lblCufe"
+        android:layout_marginLeft="5dp"
+        android:layout_toEndOf="@+id/lblCufe"
+        android:text="TextView"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/lblCertificada"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textCufe"
+        android:layout_marginTop="6dp"
+        android:text="Certificada: "
+        android:textColor="#000000"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textCertificada"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textCufe"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="6dp"
+        android:layout_toEndOf="@id/lblCertificada"
+        android:text="TextView"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/lblEstadoDGI"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textCertificada"
+        android:layout_marginTop="6dp"
+        android:text="Estado: "
+        android:textColor="#000000"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtEstado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textCertificada"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="6dp"
+        android:layout_toEndOf="@id/lblEstadoDGI"
+        android:text="TextView"
+        tools:visibility="visible" />
+
 </RelativeLayout>

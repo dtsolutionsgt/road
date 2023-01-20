@@ -123,7 +123,11 @@ public class Anulacion extends PBase {
 
 		app = new AppMethods(this, gl, Con, db);
 		gl.validimp=app.validaImpresora();
-		if (!gl.validimp) msgbox("¡La impresora no está autorizada!");
+
+		if (!gl.validimp) {
+			msgbox("¡La impresora no está autorizada!");
+		}
+
         toledano=gl.peModal.equalsIgnoreCase("TOL");
 
 		//#CKFK20230118 Agregamos esta información quemada como variables
@@ -309,10 +313,13 @@ public class Anulacion extends PBase {
 			}
 			
 			if (tipo==3) {
-				sql="SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO, D_FACTURA.CUFE "+
-					 "FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO "+
-					 "WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') " +
-					 "ORDER BY D_FACTURA.COREL DESC ";
+				sql=" SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO, " +
+					" D_FACTURA.CUFE, D_FACTURA_CONTROL_CONTINGENCIA.NUMERO_AUTORIZACION, D_FACTURA.CERTIFICADA_DGI, " +
+					" D_FACTURA_CONTROL_CONTINGENCIA.Estado "+
+					" FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO "+
+					"  INNER JOIN D_FACTURA_CONTROL_CONTINGENCIA ON D_FACTURA.COREL=D_FACTURA_CONTROL_CONTINGENCIA.COREL "+
+					" WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') " +
+					" ORDER BY D_FACTURA.COREL DESC ";
 			}
 			
 			if (tipo==4) {
@@ -349,7 +356,11 @@ public class Anulacion extends PBase {
 					if (tipo==3) {
 						vItem.flag = DT.getInt(4);
 						vItem.Cufe = DT.getString(5);
-						sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);;
+						sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);
+                        vItem.Numero_Autorizacion=DT.getString(6);
+						vItem.Certificada_DGI = (DT.getInt(7)==1?"Si":"No");
+						vItem.Estado = DT.getString(8);
+
 					}else if(tipo==1||tipo==6){
 						sf=DT.getString(0);
 					}else{

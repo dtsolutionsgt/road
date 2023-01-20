@@ -302,9 +302,12 @@ public class Reimpresion extends PBase {
 
 			if (tipo == 3) {
 				if (gl.peModal.equalsIgnoreCase("TOL")) {
-					sql = "SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO,D_FACTURA.IMPRES " +
-							"FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO " +
-							"WHERE (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC";
+					sql = " SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO," +
+						  " D_FACTURA.IMPRES,D_FACTURA.CUFE, D_FACTURA_CONTROL_CONTINGENCIA.NUMERO_AUTORIZACION, " +
+					      " D_FACTURA.CERTIFICADA_DGI, D_FACTURA_CONTROL_CONTINGENCIA.Estado "+
+						  " FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO " +
+						  "  INNER JOIN D_FACTURA_CONTROL_CONTINGENCIA ON D_FACTURA.COREL=D_FACTURA_CONTROL_CONTINGENCIA.COREL "+
+						  " WHERE (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC";
 				} else {
 					sql = "SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO,D_FACTURA.IMPRES " +
 							"FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO " +
@@ -342,7 +345,11 @@ public class Reimpresion extends PBase {
 						if (tipo==2) vItem.Desc+=" - "+DT.getString(4);	
 
 						if (tipo==3) {
-							sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);;
+							sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);
+							vItem.Cufe =DT.getString(6);
+							vItem.Numero_Autorizacion=DT.getString(7);
+							vItem.Certificada_DGI = (DT.getInt(8)==1?"Si":"No");
+							vItem.Estado  = DT.getString(9);
 						} else if (tipo==1||tipo==6){
 							sf=DT.getString(0);
 						}else {

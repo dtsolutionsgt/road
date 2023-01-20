@@ -59,6 +59,9 @@ public class ListAdaptCFDVB extends BaseAdapter {
 			holder.lblDesc = (TextView) convertView.findViewById(R.id.lblPNum);
 			holder.lblValor = (TextView) convertView.findViewById(R.id.lblPValor);
             holder.img1 =  convertView.findViewById(R.id.imageView27);
+			holder.lblCufe = (TextView) convertView.findViewById(R.id.textCufe);
+			holder.lblCertificada = (TextView) convertView.findViewById(R.id.textCertificada);
+			holder.lblEstado = (TextView) convertView.findViewById(R.id.txtEstado);
 
 			convertView.setTag(holder);
 		} else {
@@ -68,6 +71,9 @@ public class ListAdaptCFDVB extends BaseAdapter {
 		holder.lblFecha.setText(itemDetailsrrayList.get(position).Fecha);
 		holder.lblDesc.setText(itemDetailsrrayList.get(position).Desc);
 		holder.lblValor.setText(itemDetailsrrayList.get(position).Valor);
+		holder.lblCufe.setText(itemDetailsrrayList.get(position).Cufe);
+		holder.lblCertificada.setText(itemDetailsrrayList.get(position).Certificada_DGI);
+		holder.lblEstado.setText(itemDetailsrrayList.get(position).Estado);
 
 		if (itemDetailsrrayList.get(position).bandera==1) {
             holder.img1.setVisibility(View.VISIBLE);
@@ -86,7 +92,7 @@ public class ListAdaptCFDVB extends BaseAdapter {
 
 
 	static class ViewHolder {
-		TextView  lblFecha,lblDesc,lblValor;
+		TextView  lblFecha,lblDesc,lblValor, lblCufe, lblEstado, lblCertificada;
 		ImageView img1;
 	}
 

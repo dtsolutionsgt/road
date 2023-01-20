@@ -19,7 +19,7 @@ public class clsClasses {
     //JP20210614
 	public class clsCFDV {
 		public int id,flag,bandera;
-		public String Cod,Desc,Fecha,Valor,Sid, Cufe;
+		public String Cod,Desc,Fecha,Valor,Sid, Cufe, Numero_Autorizacion, Certificada_DGI, Estado;
 		public double val;
 	}
 	

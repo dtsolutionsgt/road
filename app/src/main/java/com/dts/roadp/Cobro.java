@@ -122,6 +122,7 @@ public class Cobro extends PBase {
 		urlDocNT = gl.url_emision_nc_b2c;
 
 		app = new AppMethods(this, gl, Con, db);
+		Catalogo = new CatalogoFactura(this, Con, db);
 
 		setHandlers();
 
@@ -169,7 +170,6 @@ public class Cobro extends PBase {
 
 		fdocf = new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp, "",app.esClienteNuevo(cliid),gl.codCliNuevo,gl.peModal);
 		fdocf.deviceid=gl.numSerie;
-		Catalogo = new CatalogoFactura(this, Con, db);
 	}
 
 	// Events
@@ -657,35 +657,68 @@ public class Cobro extends PBase {
 			} else {
 
 				if (saveCobroPendiente()) {
-
 					try {
 
-						prgCobro.setVisibility(View.VISIBLE);
+						//#AT20230123 Mostrar progress en certificación de facturas pendientes de pago
+						ProgressDialog("Certificando factura...");
 
 						Handler mtimer = new Handler();
 						Runnable mrunner= () -> {
 							CertificarFacturaDGI();
+							ImprimirDocumento();
 						};
-						mtimer.postDelayed(mrunner,1000);
-
-//						Handler mtimer = new Handler();
-//						Runnable mrunner= () -> {
-//							CertificarFactura certificar = new CertificarFactura();
-//							certificar.execute();
-//						};
-//						mtimer.postDelayed(mrunner,500);
+						mtimer.postDelayed(mrunner,3000);
 
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}
 				}
 			}
-
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("createDoc: " + e.getMessage());
 		}
 
+	}
+
+	private void ImprimirDocumento() {
+		try {
+			listItems();
+			if (dtipo.equalsIgnoreCase("R")) {
+				if (prn.isEnabled()) {
+					fdocf.buildPrint(crrf, 0, gl.peModal);
+					prn.printask(printcallback);
+				} else if (!prn.isEnabled()) {
+					fdocf.buildPrint(crrf, 0, gl.peModal);
+
+					if (gl.validarCred == 1) {
+						validaCredito();
+					} else if (gl.validarCred == 2) {
+						Cobro.super.finish();
+					}
+
+					gl.validarCred = 0;
+				}
+			} else {
+
+				if (prn.isEnabled()) {
+					fdoc.buildPrint(corel, 0, gl.peModal);
+					browse = 4;
+					prn.printask(printcallback);
+				} else if (!prn.isEnabled()) {
+					fdoc.buildPrint(corel, 0, gl.peModal);
+
+					if (gl.validarCred == 1) {
+						validaCredito();
+					} else if (gl.validarCred == 2) {
+						Cobro.super.finish();
+					}
+					gl.validarCred = 0;
+				}
+			}
+		} catch (Exception e) {
+			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
 	}
 
 	public String sfecha(long f) {
@@ -949,12 +982,12 @@ public class Cobro extends PBase {
 				sql = "DELETE FROM P_COBRO WHERE DOCUMENTO='" + doc + "'";
 				db.execSQL(sql);
 
-				db.setTransactionSuccessful();
-				db.endTransaction();
-
 			}
 
 			if (DT != null) DT.close();
+
+			db.setTransactionSuccessful();
+			db.endTransaction();
 
 			LlenaDatosFactura(doc);
 
@@ -1124,7 +1157,6 @@ public class Cobro extends PBase {
 
 					sql = "SELECT PRODUCTO, FACTOR, CANT, TOTAL, PESO, PRECIODOC FROM D_FACTURAD WHERE COREL = '" + doc + "'";
 					DT2 =Con.OpenDT(sql);
-
 					DT2.moveToFirst();
 
 					while (!DT2.isAfterLast()) {
@@ -1197,7 +1229,7 @@ public class Cobro extends PBase {
 						DT2.moveToNext();
 					}
 
-					if (DT2 != null) DT2.close();
+					if (DT != null) DT.close();
 
 					gFormaPago Pagos = new gFormaPago();
 
@@ -1249,6 +1281,7 @@ public class Cobro extends PBase {
 			progress.setMessage(mensaje);
 			progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			progress.setIndeterminate(true);
+			progress.setCancelable(false);
 			progress.setProgress(0);
 			progress.show();
 		} catch (Exception e) {
@@ -1259,9 +1292,6 @@ public class Cobro extends PBase {
 	private void CertificarFacturaDGI() {
 
 		try	{
-
-			ProgressDialog("Certificando factura...");
-
 			Log.d("Ruta",this.getApplicationContext().getFilesDir().toString());
 
 			Fimador Firmador = new Fimador(this);
@@ -1312,18 +1342,22 @@ public class Cobro extends PBase {
 
 				if (RespuestaEdocFac.Estado.equals("2")) {
 					EstadoFac = 1;
-					//toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+					toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 					certifico_factura_pendiente_pago =true;
 				} else {
-					//toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+					toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 					certifico_factura_pendiente_pago = false;
 				}
 
-				Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
-				Catalogo.InsertarFELControl(ControlFEL);
+				try {
+					Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
+					Catalogo.InsertarFELControl(ControlFEL);
+				} catch (Exception e) {
+					msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+				}
 
 			}
-
+			progress.cancel();
 		} catch (Exception e) {
 			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
 		} catch (Throwable e) {
@@ -2001,6 +2035,8 @@ addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"
 		try{
 
 			super.onResume();
+
+			Catalogo.Reconectar(Con, db);
 
 			if (browse==1) {
 				browse=0;

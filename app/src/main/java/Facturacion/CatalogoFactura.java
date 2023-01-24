@@ -36,6 +36,11 @@ public class CatalogoFactura extends PBase {
 
     }
 
+    public void Reconectar(BaseDatos dbconnection, SQLiteDatabase dbase) {
+        Con=dbconnection;
+        ins=Con.Ins;upd=Con.Upd;
+        db = dbase;
+    }
 
     public void InsertarFELControl(clsClasses.clsControlFEL ItemFEL) {
         Cursor dt;

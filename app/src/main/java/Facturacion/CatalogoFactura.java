@@ -490,6 +490,15 @@ public class CatalogoFactura extends PBase {
                 }else{
                     gl.dvactualnd = String.valueOf(DT.getInt(1));
                 }
+            }else{
+                if (!gl.peModal.equalsIgnoreCase("TOL")){
+                    correl=gl.ruta+"_"+mu.getCorelBase();
+                    if (tipo.equals("D")){
+                        gl.dvactuald = String.valueOf(1);
+                    }else{
+                        gl.dvactualnd = String.valueOf(1);
+                    }
+                }
             }
 
             if (DT != null) DT.close();

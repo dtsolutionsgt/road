@@ -318,7 +318,8 @@ public class Anulacion extends PBase {
 					" D_FACTURA_CONTROL_CONTINGENCIA.Estado, P_CLIENTE.CODIGO"+
 					" FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO "+
 					"  INNER JOIN D_FACTURA_CONTROL_CONTINGENCIA ON D_FACTURA.COREL=D_FACTURA_CONTROL_CONTINGENCIA.COREL "+
-					" WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') " +
+					" WHERE (D_FACTURA.ANULADO='N') AND (D_FACTURA.STATCOM='N') AND " +
+					"       (D_FACTURA_CONTROL_CONTINGENCIA.TIPODOCUMENTO = '01')" +
 					" ORDER BY D_FACTURA.COREL DESC ";
 			}
 			
@@ -333,9 +334,13 @@ public class Anulacion extends PBase {
 			}
 
 			if (tipo==6) {
-				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.CODIGO || ' - ' || P_CLIENTE.NOMBRE AS DESC,FECHA,D_NOTACRED.TOTAL "+
-					"FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
-					"WHERE (D_NOTACRED.ANULADO='N') AND (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC ";
+				sql=" SELECT D_NOTACRED.COREL,P_CLIENTE.CODIGO || ' - ' || P_CLIENTE.NOMBRE AS DESC,FECHA,D_NOTACRED.TOTAL, "+
+					"        D_NOTACRED.CUFE, D_FACTURA_CONTROL_CONTINGENCIA.NUMERO_AUTORIZACION, D_NOTACRED.CERTIFICADA_DGI, " +
+					"        D_FACTURA_CONTROL_CONTINGENCIA.Estado "+
+					" FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
+					"      INNER JOIN D_FACTURA_CONTROL_CONTINGENCIA ON D_NOTACRED.COREL=D_FACTURA_CONTROL_CONTINGENCIA.COREL "+
+					" WHERE (D_NOTACRED.ANULADO='N') AND (D_NOTACRED.STATCOM='N') AND (D_FACTURA_CONTROL_CONTINGENCIA.TIPODOCUMENTO <> '01')" +
+					" ORDER BY D_NOTACRED.COREL DESC ";
 			}
 			    		
 			DT=Con.OpenDT(sql);
@@ -352,6 +357,8 @@ public class Anulacion extends PBase {
 					vItem.Cod=DT.getString(0);
 					vItem.Desc=DT.getString(1);
 					if (tipo==2) vItem.Desc+=" - "+DT.getString(4);
+
+					vItem.tipodoc = tipo;
 					
 					if (tipo==3) {
 						vItem.Desc = DT.getString(9) + " - " + DT.getString(1);
@@ -361,13 +368,18 @@ public class Anulacion extends PBase {
                         vItem.Numero_Autorizacion=DT.getString(6);
 						vItem.Certificada_DGI = (DT.getInt(7)==1?"Si":"No");
 						vItem.Estado = DT.getString(8);
-
 					}else if(tipo==1||tipo==6){
 						sf=DT.getString(0);
 					}else{
 						f=DT.getLong(2);sf=du.sfecha(f)+" "+du.shora(f);
 					}
-					
+
+					if (tipo==6){
+						vItem.Cufe = DT.getString(4);
+						vItem.Certificada_DGI = (DT.getInt(6)==1?"Si":"No");
+						vItem.Estado = DT.getString(7);
+					}
+
 					vItem.Fecha=sf;
 					val=DT.getDouble(3);
 					try {
@@ -441,7 +453,7 @@ public class Anulacion extends PBase {
 				if (CrearNotaDebito()) {
 					anulNotaCredito(itemid);
 				} else {
-					msgbox("Error en el processo de anulación");
+					//msgbox("Error en el processo de anulación");
 					return;
 				}
 			}
@@ -619,6 +631,11 @@ public class Anulacion extends PBase {
 			//AT20221014 Se Obtiene corel para guardar la nota de debito
 			gl.dvcorreld = Catalogo.obtienecorrel("D");
 			gl.dvcorelnd = Catalogo.obtienecorrel("ND");
+
+			if (gl.dvcorelnd.equals("")){
+				throw new Exception("No está definido correlativo para notas de débito," +
+						" no se puede continuar con la anulación de la nota de crédito.");
+			}
 
 			int vNroDF = Integer.valueOf(gl.dvcorelnd.substring(3,9));
 			String vSerie = StringUtils.right("000" + gl.dvcorelnd.substring(0,3), 3);

@@ -59,9 +59,12 @@ public class ListAdaptCFDVB extends BaseAdapter {
 			holder.lblDesc = (TextView) convertView.findViewById(R.id.lblPNum);
 			holder.lblValor = (TextView) convertView.findViewById(R.id.lblPValor);
             holder.img1 =  convertView.findViewById(R.id.imageView27);
-			holder.lblCufe = (TextView) convertView.findViewById(R.id.textCufe);
-			holder.lblCertificada = (TextView) convertView.findViewById(R.id.textCertificada);
-			holder.lblEstado = (TextView) convertView.findViewById(R.id.txtEstado);
+			holder.txtCufe = (TextView) convertView.findViewById(R.id.textCufe);
+			holder.txtCertificada = (TextView) convertView.findViewById(R.id.textCertificada);
+			holder.txtEstadoDGI = (TextView) convertView.findViewById(R.id.txtEstado);
+			holder.lblCufe = (TextView) convertView.findViewById(R.id.lblCufe);
+			holder.lblCertificada = (TextView) convertView.findViewById(R.id.lblCertificada);
+			holder.lblEstadoDGI = (TextView) convertView.findViewById(R.id.lblEstadoDGI);
 
 			convertView.setTag(holder);
 		} else {
@@ -71,9 +74,34 @@ public class ListAdaptCFDVB extends BaseAdapter {
 		holder.lblFecha.setText(itemDetailsrrayList.get(position).Fecha);
 		holder.lblDesc.setText(itemDetailsrrayList.get(position).Desc);
 		holder.lblValor.setText(itemDetailsrrayList.get(position).Valor);
-		holder.lblCufe.setText(itemDetailsrrayList.get(position).Cufe);
-		holder.lblCertificada.setText(itemDetailsrrayList.get(position).Certificada_DGI);
-		holder.lblEstado.setText(itemDetailsrrayList.get(position).Estado);
+
+		if (itemDetailsrrayList.get(position).tipodoc==3
+			|| itemDetailsrrayList.get(position).tipodoc==6) {
+
+			holder.txtCufe.setText(itemDetailsrrayList.get(position).Cufe);
+			holder.txtCertificada.setText(itemDetailsrrayList.get(position).Certificada_DGI);
+			holder.txtEstadoDGI.setText(itemDetailsrrayList.get(position).Estado);
+
+			holder.txtCufe.setVisibility(View.VISIBLE);
+			holder.txtCertificada.setVisibility(View.VISIBLE);
+			holder.txtEstadoDGI.setVisibility(View.VISIBLE);
+			holder.lblCufe.setVisibility(View.VISIBLE);
+			holder.lblCertificada.setVisibility(View.VISIBLE);
+			holder.lblEstadoDGI.setVisibility(View.VISIBLE);
+
+		}else{
+			holder.txtCufe.setText("");
+			holder.txtCertificada.setText("");
+			holder.txtEstadoDGI.setText("");
+
+			holder.txtCufe.setVisibility(View.GONE);
+			holder.txtCertificada.setVisibility(View.GONE);
+			holder.txtEstadoDGI.setVisibility(View.GONE);
+			holder.lblCufe.setVisibility(View.GONE);
+			holder.lblCertificada.setVisibility(View.GONE);
+			holder.lblEstadoDGI.setVisibility(View.GONE);
+		}
+
 
 		if (itemDetailsrrayList.get(position).bandera==1) {
             holder.img1.setVisibility(View.VISIBLE);
@@ -92,7 +120,7 @@ public class ListAdaptCFDVB extends BaseAdapter {
 
 
 	static class ViewHolder {
-		TextView  lblFecha,lblDesc,lblValor, lblCufe, lblEstado, lblCertificada;
+		TextView  lblFecha,lblDesc,lblValor, txtCufe, txtEstadoDGI, txtCertificada, lblCufe, lblEstadoDGI,lblCertificada;
 		ImageView img1;
 	}
 

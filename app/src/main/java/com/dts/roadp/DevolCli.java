@@ -954,7 +954,6 @@ public class DevolCli extends PBase {
 				gl.closeCliDet = true;
     			gl.closeVenta = true;
 
-
     			//#CKFK 20210922 Puse esto en comentario porque no aplica realizar
 				// esta asignación cuando no tiene una factura asociada
                 //gl.devtotal = cntotl;
@@ -1077,14 +1076,17 @@ public class DevolCli extends PBase {
 				}else{
 					gl.dvactualnc = String.valueOf(DT.getInt(1));
 				}
-
 			} else {
-				correl=gl.ruta+"_"+mu.getCorelBase();
-                if (tipo.equals("D")){
-                    gl.dvactuald = String.valueOf(1);
-                }else{
-                    gl.dvactualnc = String.valueOf(1);
-                }
+				if (gl.peModal.equalsIgnoreCase("TOL")){
+					mu.msgbox("No está definido correlativo, no se puede continuar con la devolución.\n");
+				}else{
+					correl=gl.ruta+"_"+mu.getCorelBase();
+					if (tipo.equals("D")){
+						gl.dvactuald = String.valueOf(1);
+					}else{
+						gl.dvactualnc = String.valueOf(1);
+					}
+				}
 			}
 
 		}catch (Exception e){

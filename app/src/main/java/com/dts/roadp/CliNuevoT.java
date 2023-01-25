@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -369,6 +370,12 @@ public class CliNuevoT extends PBase {
                 return false;
             }
 
+            if (!emailValidator(txtCliEmail)){
+                mu.msgbox("El formato del correo electrónico no es válido");
+                txtCliEmail.requestFocus();
+                return false;
+            }
+
             s=txtCliContacto.getText().toString();
             if (mu.emptystr(s)) {
                 mu.msgbox("Falta contacto del cliente");
@@ -585,6 +592,26 @@ public class CliNuevoT extends PBase {
         }
         return true;
     }
+
+    public boolean emailValidator(EditText etMail) {
+
+        try{
+            String emailToText = etMail.getText().toString();
+            String emailPattern = "[a-zA-Z0-9._-]+\\@[a-z]+\\.+[a-z]+";
+            String emailPattern1 = "[a-zA-Z0-9._-]+\\@[a-z]+\\.+[a-z]+\\.+[a-z]+";
+
+            if (emailToText.trim().matches(emailPattern) || emailToText.trim().matches(emailPattern1)) {
+                return true;
+            } else {
+                return false;
+            }
+        }catch (Exception e){
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(e.getMessage());
+            return  false;
+        }
+ }
 
     //Set datos en Spinner
     private void setDataSpinnerPrecio() {

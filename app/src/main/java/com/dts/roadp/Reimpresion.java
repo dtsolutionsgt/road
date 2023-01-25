@@ -307,7 +307,9 @@ public class Reimpresion extends PBase {
 					      " D_FACTURA.CERTIFICADA_DGI, D_FACTURA_CONTROL_CONTINGENCIA.Estado "+
 						  " FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO " +
 						  "  INNER JOIN D_FACTURA_CONTROL_CONTINGENCIA ON D_FACTURA.COREL=D_FACTURA_CONTROL_CONTINGENCIA.COREL "+
-						  " WHERE (D_FACTURA.STATCOM='N') ORDER BY D_FACTURA.COREL DESC";
+						  " WHERE (D_FACTURA.STATCOM='N') AND " +
+						  " (D_FACTURA_CONTROL_CONTINGENCIA.TIPODOCUMENTO = '01') " +
+						  " ORDER BY D_FACTURA.COREL DESC";
 				} else {
 					sql = "SELECT D_FACTURA.COREL,P_CLIENTE.NOMBRE,D_FACTURA.SERIE,D_FACTURA.TOTAL,D_FACTURA.CORELATIVO,D_FACTURA.IMPRES " +
 							"FROM D_FACTURA INNER JOIN P_CLIENTE ON D_FACTURA.CLIENTE=P_CLIENTE.CODIGO " +
@@ -322,9 +324,13 @@ public class Reimpresion extends PBase {
 			}
 			
 			if (tipo==6) {
-				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.NOMBRE,D_NOTACRED.SERIE,D_NOTACRED.TOTAL,D_NOTACRED.CORELATIVO,D_NOTACRED.IMPRES "+
-					 "FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
-					 "WHERE (D_NOTACRED.STATCOM='N') ORDER BY D_NOTACRED.COREL DESC";
+				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.CODIGO || ' - ' || P_CLIENTE.NOMBRE,D_NOTACRED.SERIE,D_NOTACRED.TOTAL," +
+					"       D_NOTACRED.CORELATIVO,D_NOTACRED.IMPRES,D_NOTACRED.CUFE, D_FACTURA_CONTROL_CONTINGENCIA.NUMERO_AUTORIZACION," +
+					"       D_NOTACRED.CERTIFICADA_DGI, D_FACTURA_CONTROL_CONTINGENCIA.Estado "+
+					"FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
+					"      INNER JOIN D_FACTURA_CONTROL_CONTINGENCIA ON D_NOTACRED.COREL=D_FACTURA_CONTROL_CONTINGENCIA.COREL "+
+					 "WHERE (D_NOTACRED.STATCOM='N') AND (D_FACTURA_CONTROL_CONTINGENCIA.TIPODOCUMENTO <> '01')" +
+						" ORDER BY D_NOTACRED.COREL DESC ";
 			}
 			
 			if (tipo<99) {
@@ -342,7 +348,9 @@ public class Reimpresion extends PBase {
 
 						vItem.Cod=DT.getString(0);
 						vItem.Desc=DT.getString(1);
-						if (tipo==2) vItem.Desc+=" - "+DT.getString(4);	
+						if (tipo==2) vItem.Desc+=" - "+DT.getString(4);
+
+						vItem.tipodoc = tipo;
 
 						if (tipo==3) {
 							sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);
@@ -357,6 +365,12 @@ public class Reimpresion extends PBase {
 						}
 
 						vItem.Fecha=sf;
+
+						if (tipo==6){
+							vItem.Cufe = DT.getString(6);
+							vItem.Certificada_DGI = (DT.getInt(8)==1?"Si":"No");
+							vItem.Estado = DT.getString(9);
+						}
 
 						val=DT.getDouble(3);sval=""+val;
 						vItem.Valor=sval;	  

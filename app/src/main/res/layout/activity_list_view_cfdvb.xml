@@ -72,7 +72,8 @@
         android:layout_marginTop="6dp"
         android:text="CUFE: "
         android:textColor="#000000"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:visibility="gone" />
 
     <TextView
         android:id="@+id/textCufe"
@@ -83,7 +84,7 @@
         android:layout_marginLeft="5dp"
         android:layout_toEndOf="@+id/lblCufe"
         android:text="TextView"
-        tools:visibility="visible" />
+        tools:visibility="gone" />
 
     <TextView
         android:id="@+id/lblCertificada"
@@ -93,7 +94,8 @@
         android:layout_marginTop="6dp"
         android:text="Certificada: "
         android:textColor="#000000"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:visibility="gone" />
 
     <TextView
         android:id="@+id/textCertificada"
@@ -104,7 +106,7 @@
         android:layout_marginTop="6dp"
         android:layout_toEndOf="@id/lblCertificada"
         android:text="TextView"
-        tools:visibility="visible" />
+        tools:visibility="gone" />
 
     <TextView
         android:id="@+id/lblEstadoDGI"
@@ -114,7 +116,8 @@
         android:layout_marginTop="6dp"
         android:text="Estado: "
         android:textColor="#000000"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:visibility="gone" />
 
     <TextView
         android:id="@+id/txtEstado"
@@ -125,6 +128,6 @@
         android:layout_marginTop="6dp"
         android:layout_toEndOf="@id/lblEstadoDGI"
         android:text="TextView"
-        tools:visibility="visible" />
+        tools:visibility="gone" />
 
 </RelativeLayout>

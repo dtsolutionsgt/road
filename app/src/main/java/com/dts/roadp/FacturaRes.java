@@ -2001,7 +2001,7 @@ public class FacturaRes extends PBase {
 		try {
 
 			if (!gl.cobroPendiente && saved) {
-
+				//#AT20230126 Aca debo crear un hilo
 				ProgressDialog("Certificando la factura");
 
 				Fimador Firmador = new Fimador(this);

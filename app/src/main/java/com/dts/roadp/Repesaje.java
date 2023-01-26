@@ -480,7 +480,9 @@ public class Repesaje extends PBase {
                 }else{
                     ttotal = tprecio*tcantidad;
                 }
-                if (prodPorPeso(prodid)) ttotal=mu.round2(tprecio*ppr);
+                //#AT20230125 Se quito el reondeo en total de t_barra, por error en el total de la factura
+                //if (prodPorPeso(prodid)) ttotal=mu.round2(tprecio*ppr);
+                if (prodPorPeso(prodid)) ttotal=tprecio*ppr;
                 //else ttotal=tprecio*tcantidad;
 
                 sql="UPDATE T_BARRA SET PESO="+ppr+", PRECIO="+ttotal+" WHERE CODIGO='"+prodid+"' AND BARRA='"+bar+"'";
@@ -510,7 +512,9 @@ public class Repesaje extends PBase {
                 ttotal = tprecio*tcantidad;
             }
 
-            if (prodPorPeso(prodid)) ttotal=mu.round2(tprecio*(pp+dtp));
+            //#AT20230125 Se quito el reondeo en total de t_barra, por error en el total de la factura
+            //if (prodPorPeso(prodid)) ttotal=mu.round2(tprecio*(pp+dtp));
+            if (prodPorPeso(prodid)) ttotal=tprecio*(pp+dtp);
             //else ttotal=tprecio*tcantidad;
 
             // agregar la diferencia a la primera barra

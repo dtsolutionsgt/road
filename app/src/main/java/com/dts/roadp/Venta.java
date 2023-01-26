@@ -1871,7 +1871,8 @@ public class Venta extends PBase {
             }
 			if (prodPorPeso(prodid)) prodtot = prec * ppeso;
 
-            prodtot = mu.round2(prodtot);
+			//#AT20230125 Se quito el reondeo en total, por error en el total de la factura
+            //prodtot = mu.round2(prodtot);
 
 			//region T_BARRA
 
@@ -2272,8 +2273,10 @@ public class Venta extends PBase {
             }else{
                 prodtot = prec;
             }
-			if (prodPorPeso(prodid)) prodtot=mu.round2(prec*ppeso);
 
+			//#AT20230125 Se quito el reondeo en total de t_barra, por error en el total de la factura
+			//if (prodPorPeso(prodid)) prodtot=mu.round2(prec*ppeso);
+			if (prodPorPeso(prodid)) prodtot=prec*ppeso;
 			//region T_BARRA
 
 			try {

@@ -750,6 +750,7 @@ public class FacturaRes extends PBase {
 	}
 
  	private void finishOrder(){
+		ProgressDialog("Certificando factura...");
 
 		if (!saved) {
 			if (!saveOrder()) return;
@@ -759,6 +760,13 @@ public class FacturaRes extends PBase {
 			impressOrder();
 		}
 
+	}
+
+	private boolean TestProgress()
+	{
+
+
+		return false;
 	}
 
 	private void impressOrder(){
@@ -2004,13 +2012,10 @@ public class FacturaRes extends PBase {
 		try {
 
 			if (!gl.cobroPendiente && saved) {
-				//#AT20230126 Aca debo crear un hilo
-				ProgressDialog("Certificando la factura");
-				//progress.setMessage("Certificando factura...");
-
 				Handler mtimer = new Handler();
 				Runnable mrunner= () -> {
 					CertificarFactura();
+					progress.cancel();
 					impressOrder();
 				};
 				mtimer.postDelayed(mrunner,3000);
@@ -2022,8 +2027,6 @@ public class FacturaRes extends PBase {
 		} catch (Throwable e) {
 			if (progress!=null) progress.cancel();
 			e.printStackTrace();
-		}finally {
-			if (progress!=null) progress.cancel();
 		}
 
 		if(gl.dvbrowse!=0){
@@ -3105,7 +3108,7 @@ Log.d("IniApplyCAsh","todobene");
 		Cursor DT;
 		double tpago;
 
-		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+		//getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
 		if (pagocompleto) return;
 

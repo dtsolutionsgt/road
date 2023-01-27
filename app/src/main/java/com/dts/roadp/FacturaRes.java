@@ -3350,6 +3350,7 @@ Log.d("IniApplyCAsh","todobene");
 			progress.setMessage(mensaje);
 			progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			progress.setIndeterminate(true);
+			progress.setCancelable(false);
 			progress.setProgress(0);
 			progress.show();
 		} catch (Exception e) {

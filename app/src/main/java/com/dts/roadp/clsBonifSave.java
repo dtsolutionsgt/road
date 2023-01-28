@@ -4,18 +4,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-public class clsBonifSave {
+public class clsBonifSave extends FacturaRes{
 
 	public String ruta,cliente,emp;
 	public long fecha;
-	
 	private int active;
-	private SQLiteDatabase db;
-	private BaseDatos Con;
-	private BaseDatos.Insert ins;
-	private BaseDatos.Update upd;
-	private String sql;
-	
 	private MiscUtils mu;
 	private clsClasses clsCls = new clsClasses();
 	
@@ -28,13 +21,7 @@ public class clsBonifSave {
 		cont=context;
 		corel=corelativo;
 		venped=ventaped;
-
-
 		active=0;
-		Con = new BaseDatos(context);
-		opendb();
-	    ins=Con.Ins;upd=Con.Upd;
-	    
 	    mu=new MiscUtils(context);	
 	}
 
@@ -292,16 +279,4 @@ public class clsBonifSave {
 		if(DT!=null) DT.close();
 
 	}
-	
-  	private void opendb() {
-		try {
-			db = Con.getWritableDatabase();
-		 	Con.vDatabase =db;
-			active=1;	
-	    } catch (Exception e) {
-	    	active= 0;
-	    }
-	}		
-	
-	
 }

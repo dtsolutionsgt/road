@@ -10,6 +10,7 @@ import android.database.SQLException;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -749,13 +750,23 @@ public class FacturaRes extends PBase {
 	}
 
  	private void finishOrder(){
+		ProgressDialog("Certificando factura...");
 
 		if (!saved) {
 			if (!saveOrder()) return;
 		}
 
-		impressOrder();
+		if (gl.cobroPendiente) {
+			impressOrder();
+		}
 
+	}
+
+	private boolean TestProgress()
+	{
+
+
+		return false;
 	}
 
 	private void impressOrder(){
@@ -2001,81 +2012,13 @@ public class FacturaRes extends PBase {
 		try {
 
 			if (!gl.cobroPendiente && saved) {
-
-				ProgressDialog("Certificando la factura");
-
-				Fimador Firmador = new Fimador(this);
-				RespuestaEdoc RespuestaEdocFac;
-
-				if (ConexionValida()) {
-					RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
-				} else {
-					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
-				}
-
-			     if	(RespuestaEdocFac.Cufe == null) {
-					RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
-				}
-
-				if (!RespuestaEdocFac.Estado.isEmpty() || RespuestaEdocFac.Estado != null) {
-
-					clsClasses.clsControlFEL ControlFEL = clsCls.new clsControlFEL();
-					int EstadoFac = 0;
-
-					ControlFEL.Cufe = RespuestaEdocFac.Cufe;
-					ControlFEL.TipoDoc = Factura.gDGen.iDoc;
-					ControlFEL.NumDoc = Factura.gDGen.dNroDF;
-					ControlFEL.Sucursal = gl.sucur;
-					ControlFEL.Caja = fserie;
-
-					if (RespuestaEdocFac.Estado.equals("21") || RespuestaEdocFac.Estado.equals("20")) {
-						ControlFEL.Estado = "1";
-					} else {
-						ControlFEL.Estado = RespuestaEdocFac.Estado;
-					}
-
-					ControlFEL.Mensaje = RespuestaEdocFac.MensajeRespuesta;
-					ControlFEL.ValorXml = RespuestaEdocFac.XML != null ? Catalogo.ReplaceXML(RespuestaEdocFac.XML) : "";
-
-					String[] fechaEnvio = Factura.gDGen.dFechaEm.split("-05:00", 0);
-					ControlFEL.FechaEnvio = fechaEnvio[0];
-                    ControlFEL.TipFac = Factura.gDGen.iDoc;
-					ControlFEL.FechaAgr = String.valueOf(du.getFechaCompleta());
-					ControlFEL.QR = RespuestaEdocFac.UrlCodeQR;
-					ControlFEL.Corel = corel;
-					ControlFEL.Ruta = gl.ruta;
-					ControlFEL.Vendedor = gl.vend;
-					ControlFEL.Correlativo = String.valueOf(fcorel);
-					ControlFEL.Fecha_Autorizacion = RespuestaEdocFac.FechaAutorizacion;
-					ControlFEL.Numero_Autorizacion = RespuestaEdocFac.NumAutorizacion;
-
-					if (RespuestaEdocFac.Estado.equals("2")) {
-						EstadoFac = 1;
-						toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
-
-						if (gl.dvbrowse!=0) {
-
-							GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
-
-						}
-
-					} else if(!ConexionValida() && ControlFEL.Estado.equals("1")) {
-						if (gl.dvbrowse!=0) {
-							GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
-						}
-					} else if(ConexionValida() && !ControlFEL.Estado.equals("15")) {
-						if (gl.dvbrowse!=0) {
-							GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
-						}
-					} else {
-						toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
-					}
-
-					Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
-					Catalogo.InsertarFELControl(ControlFEL);
-
+				Handler mtimer = new Handler();
+				Runnable mrunner= () -> {
+					CertificarFactura();
 					progress.cancel();
-				}
+					impressOrder();
+				};
+				mtimer.postDelayed(mrunner,3000);
 			}
 
 		} catch (Exception e){
@@ -2084,8 +2027,6 @@ public class FacturaRes extends PBase {
 		} catch (Throwable e) {
 			if (progress!=null) progress.cancel();
 			e.printStackTrace();
-		}finally {
-			if (progress!=null) progress.cancel();
 		}
 
 		if(gl.dvbrowse!=0){
@@ -2096,6 +2037,85 @@ public class FacturaRes extends PBase {
 		saveAtten(tot);
 
 		return true;
+	}
+
+	private void CertificarFactura() {
+		try {
+			Fimador Firmador = new Fimador(this);
+			RespuestaEdoc RespuestaEdocFac;
+
+			if (ConexionValida()) {
+				RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
+			} else {
+				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
+			}
+
+			if	(RespuestaEdocFac.Cufe == null) {
+				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
+			}
+
+			if (!RespuestaEdocFac.Estado.isEmpty() || RespuestaEdocFac.Estado != null) {
+
+				clsClasses.clsControlFEL ControlFEL = clsCls.new clsControlFEL();
+				int EstadoFac = 0;
+
+				ControlFEL.Cufe = RespuestaEdocFac.Cufe;
+				ControlFEL.TipoDoc = Factura.gDGen.iDoc;
+				ControlFEL.NumDoc = Factura.gDGen.dNroDF;
+				ControlFEL.Sucursal = gl.sucur;
+				ControlFEL.Caja = fserie;
+
+				if (RespuestaEdocFac.Estado.equals("21") || RespuestaEdocFac.Estado.equals("20")) {
+					ControlFEL.Estado = "1";
+				} else {
+					ControlFEL.Estado = RespuestaEdocFac.Estado;
+				}
+
+				ControlFEL.Mensaje = RespuestaEdocFac.MensajeRespuesta;
+				ControlFEL.ValorXml = RespuestaEdocFac.XML != null ? Catalogo.ReplaceXML(RespuestaEdocFac.XML) : "";
+
+				String[] fechaEnvio = Factura.gDGen.dFechaEm.split("-05:00", 0);
+				ControlFEL.FechaEnvio = fechaEnvio[0];
+				ControlFEL.TipFac = Factura.gDGen.iDoc;
+				ControlFEL.FechaAgr = String.valueOf(du.getFechaCompleta());
+				ControlFEL.QR = RespuestaEdocFac.UrlCodeQR;
+				ControlFEL.Corel = corel;
+				ControlFEL.Ruta = gl.ruta;
+				ControlFEL.Vendedor = gl.vend;
+				ControlFEL.Correlativo = String.valueOf(fcorel);
+				ControlFEL.Fecha_Autorizacion = RespuestaEdocFac.FechaAutorizacion;
+				ControlFEL.Numero_Autorizacion = RespuestaEdocFac.NumAutorizacion;
+
+				if (RespuestaEdocFac.Estado.equals("2")) {
+					EstadoFac = 1;
+					toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+
+					if (gl.dvbrowse!=0) {
+
+						GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
+
+					}
+
+				} else if(!ConexionValida() && ControlFEL.Estado.equals("1")) {
+					if (gl.dvbrowse!=0) {
+						GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
+					}
+				} else if(ConexionValida() && !ControlFEL.Estado.equals("15")) {
+					if (gl.dvbrowse!=0) {
+						GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
+					}
+				} else {
+					toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+				}
+
+				Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
+				Catalogo.InsertarFELControl(ControlFEL);
+			}
+		} catch (Exception e) {
+			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public boolean ConexionValida() {
@@ -3088,7 +3108,7 @@ Log.d("IniApplyCAsh","todobene");
 		Cursor DT;
 		double tpago;
 
-		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+		//getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
 		if (pagocompleto) return;
 
@@ -3255,8 +3275,8 @@ Log.d("IniApplyCAsh","todobene");
 			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),"");
 		}
 
-	}	
-	
+	}
+
 	private void clearGlobals() {
 
 		try {
@@ -3273,12 +3293,12 @@ Log.d("IniApplyCAsh","todobene");
 			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
 		}
 	}
-	
+
 	private void checkPromo() {
 		Cursor DT;
-		
+
 		imgBon.setVisibility(View.INVISIBLE);
-		
+
 		try {
 			sql="SELECT ITEM FROM T_BONITEM";
            	DT=Con.OpenDT(sql);
@@ -3290,12 +3310,12 @@ Log.d("IniApplyCAsh","todobene");
 			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
 	    }
 	}
-	
+
 	private void cliPorDia() {
 		Cursor DT;
-		
+
 		int dweek=mu.dayofweek();
-		
+
 		try {
 			sql="SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE (P_CLIRUTA.DIA ="+dweek+") ";
 			DT=Con.OpenDT(sql);
@@ -3313,7 +3333,7 @@ Log.d("IniApplyCAsh","todobene");
 			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
             mu.msgbox("cliPorDia: " + e.getMessage() );
 		}
-			
+
 	}
 
 	private boolean prodPorPeso(String prodid) {
@@ -3330,6 +3350,7 @@ Log.d("IniApplyCAsh","todobene");
 			progress.setMessage(mensaje);
 			progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			progress.setIndeterminate(true);
+			progress.setCancelable(false);
 			progress.setProgress(0);
 			progress.show();
 		} catch (Exception e) {
@@ -3338,7 +3359,7 @@ Log.d("IniApplyCAsh","todobene");
 	}
 
 	//endregion
-	
+
 	//region Activity Events
 
 	@Override
@@ -3367,7 +3388,7 @@ Log.d("IniApplyCAsh","todobene");
 			addlog(Objects.requireNonNull(new Object() {
 			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),"");
 		}
-	}	
+	}
 
 	@Override
 	public void onBackPressed() {
@@ -3380,7 +3401,7 @@ Log.d("IniApplyCAsh","todobene");
 		}
 
 	}
-	
+
 	//endregion
 
 }

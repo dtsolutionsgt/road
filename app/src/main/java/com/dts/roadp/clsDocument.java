@@ -110,8 +110,8 @@ public class clsDocument {
 					}
 				}else if  (docfactura || docdevolucion) {
 					//#CKFK20230118 Las facturas y NC ya solo van a tener una copia
-					//if (!rep.save(2)) return false;
-					if (!rep.save(1)) return false;
+					if (!rep.save(2)) return false;
+					//if (!rep.save(1)) return false;
 				}else{
 					if (!rep.save(2)) return false;
 				}

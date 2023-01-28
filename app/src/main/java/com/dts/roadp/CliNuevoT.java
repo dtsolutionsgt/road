@@ -363,6 +363,12 @@ public class CliNuevoT extends PBase {
                 return false;
             }
 
+            if (!telefonoValidator(txtCliTelefono)){
+                mu.msgbox("El formato del teléfono no es válido");
+                txtCliTelefono.requestFocus();
+                return false;
+            }
+
             s=txtCliEmail.getText().toString();
             if (mu.emptystr(s)) {
                 mu.msgbox("Falta correo del cliente");
@@ -612,6 +618,34 @@ public class CliNuevoT extends PBase {
             return  false;
         }
  }
+
+    public boolean telefonoValidator(EditText etTelefono) {
+
+        try{
+            String telefonoToText = etTelefono.getText().toString();
+            String telefonoPattern = "[0-9]+\\-[0-9]+";
+
+            if (telefonoToText.trim().matches(telefonoPattern) && (telefonoToText.length()==9 || telefonoToText.length()==8)) {
+
+                String[] sp= telefonoToText.split("-");
+                String sp1,sp2;
+                sp1=sp[0];sp2=sp[1];
+
+                if ((sp1.length() == 3 && sp2.length()==4) || (sp1.length() == 4 && sp2.length()==4)){
+                    return true;
+                }else{
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }catch (Exception e){
+            addlog(new Object() {
+            }.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+            msgbox(e.getMessage());
+            return  false;
+        }
+    }
 
     //Set datos en Spinner
     private void setDataSpinnerPrecio() {

@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.zxing.qrcode.encoder.QRCode;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,6 +33,8 @@ public class printDMax extends printBase {
 
 	private ArrayList<String> lines = new ArrayList<String>();
 	private ArrayList<Document> documentlist = new  ArrayList<Document>();
+
+	private String qrCode="";
 	
 	public printDMax(Context context,String printerMAC,boolean validprinter) {
 		super(context,printerMAC);
@@ -158,12 +162,17 @@ public class printDMax extends printBase {
 			docLP.clear();
 			
 			while ((ss = dfile.readLine()) != null) {
+				//#CKFK20230127 Agregué esto para imprimir el QR en las datamax
+				if (ss.contains("QRCode:")){
+					qrCode = ss.substring(7,ss.length());
+				}else{
 					docLP.writeText(ss);
+				}
 			}
-			
+
 			docLP.writeText("");
 			docLP.writeText("");
-			
+
 			dfile.close();	
 				       
 	        printData = docLP.getDocumentData();
@@ -204,8 +213,34 @@ public class printDMax extends printBase {
 				paramEZ.setVerticalMultiplier(14);
 				docEZ.writeText(txt, 120, 30);
 				docEZ.writeBarCode("BC128",ss,40,20,paramEZ);
-                documentlist.add(docEZ);
+				documentlist.add(docEZ);
 
+			}
+
+			return true;
+
+		} catch (Exception e) {
+			try {
+
+			} catch (Exception e1) {}
+
+			showmsg("Error: " + e.getMessage());
+
+			return false;
+		}
+	}
+
+	private boolean loadFileQRCode() {
+
+		try {
+
+			showmsg("Lines : "+lines.size());
+
+			if (qrCode.length()>0){
+				docEZ = new DocumentEZ("MF204");
+
+				docEZ.writeBarCodeQRCode(qrCode,1,0,0,0,0);
+				documentlist.add(docEZ);
 			}
 
 			return true;
@@ -249,6 +284,11 @@ public class printDMax extends printBase {
 	    protected Void doInBackground(String... params) {
 			try {
 				processPrint();
+				if (qrCode.length()>0){
+					if (loadFileQRCode()){
+						doStartPrintBarra();
+					}
+				}
 			} catch (Exception e) {
 				ss=ss + e.getMessage();
 				Log.d("Err_Impr",e.getMessage());

@@ -76,7 +76,8 @@ public class ListAdaptCFDVB extends BaseAdapter {
 		holder.lblValor.setText(itemDetailsrrayList.get(position).Valor);
 
 		if (itemDetailsrrayList.get(position).tipodoc==3
-			|| itemDetailsrrayList.get(position).tipodoc==6) {
+			|| itemDetailsrrayList.get(position).tipodoc==6
+			|| itemDetailsrrayList.get(position).tipodoc==7) {
 
 			holder.txtCufe.setText(itemDetailsrrayList.get(position).Cufe);
 			holder.txtCertificada.setText(itemDetailsrrayList.get(position).Certificada_DGI);

@@ -179,7 +179,11 @@ public class Reimpresion extends PBase {
 			fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
 			fdev.deviceid =gl.numSerie;
 			lblTipo.setText("Nota Crédito");break;
-			
+
+		case 7:
+			fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+			fdev.deviceid =gl.numSerie;
+			lblTipo.setText("Nota Débito");break;
 		case 99:  
 			lblTipo.setText("Cierre de día");break;
 		}		
@@ -329,7 +333,17 @@ public class Reimpresion extends PBase {
 					"       D_NOTACRED.CERTIFICADA_DGI, D_FACTURA_CONTROL_CONTINGENCIA.Estado "+
 					"FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
 					"      INNER JOIN D_FACTURA_CONTROL_CONTINGENCIA ON D_NOTACRED.COREL=D_FACTURA_CONTROL_CONTINGENCIA.COREL "+
-					 "WHERE (D_NOTACRED.STATCOM='N') AND (D_FACTURA_CONTROL_CONTINGENCIA.TIPODOCUMENTO <> '01')" +
+					 "WHERE (D_NOTACRED.STATCOM='N') AND (D_FACTURA_CONTROL_CONTINGENCIA.TIPODOCUMENTO <> '01') AND (ANULADO = 'N') " +
+						" ORDER BY D_NOTACRED.COREL DESC ";
+			}
+
+			if (tipo==7) {
+				sql="SELECT D_NOTACRED.COREL,P_CLIENTE.CODIGO || ' - ' || P_CLIENTE.NOMBRE,D_NOTACRED.SERIE,D_NOTACRED.TOTAL," +
+						"       D_NOTACRED.CORELATIVO,D_NOTACRED.IMPRES,D_NOTACRED.CUFE, D_FACTURA_CONTROL_CONTINGENCIA.NUMERO_AUTORIZACION," +
+						"       D_NOTACRED.CERTIFICADA_DGI, D_FACTURA_CONTROL_CONTINGENCIA.Estado "+
+						"FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
+						"      INNER JOIN D_FACTURA_CONTROL_CONTINGENCIA ON D_NOTACRED.COREL=D_FACTURA_CONTROL_CONTINGENCIA.COREL "+
+						"WHERE (D_NOTACRED.STATCOM='N') AND (D_FACTURA_CONTROL_CONTINGENCIA.TIPODOCUMENTO <> '01') AND (D_NOTACRED.TIPO_DOCUMENTO = 'ND')" +
 						" ORDER BY D_NOTACRED.COREL DESC ";
 			}
 			
@@ -358,7 +372,7 @@ public class Reimpresion extends PBase {
 							vItem.Numero_Autorizacion=DT.getString(7);
 							vItem.Certificada_DGI = (DT.getInt(8)==1?"Si":"No");
 							vItem.Estado  = DT.getString(9);
-						} else if (tipo==1||tipo==6){
+						} else if (tipo==1||tipo==6 || tipo==7){
 							sf=DT.getString(0);
 						}else {
 							f=DT.getLong(2);sf=du.sfecha(f)+" "+du.shora(f);
@@ -366,7 +380,7 @@ public class Reimpresion extends PBase {
 
 						vItem.Fecha=sf;
 
-						if (tipo==6){
+						if (tipo==6 || tipo == 7){
 							vItem.Cufe = DT.getString(6);
 							vItem.Certificada_DGI = (DT.getInt(8)==1?"Si":"No");
 							vItem.Estado = DT.getString(9);
@@ -457,6 +471,8 @@ public class Reimpresion extends PBase {
 					imprDevol();break;
 				case 6:
 					imprUltNotaCredito();break;
+				case 7:
+					imprUltNotaDebito();break;
 				case 99:
 					imprFindia();break;
 			}
@@ -838,6 +854,66 @@ public class Reimpresion extends PBase {
 		}
 
 	}
+
+	private void imprUltNotaDebito() {
+		Cursor dt;
+		String id,serie;
+		int corel;
+		String corelFactura=getCorelFact(itemid);
+
+		try {
+
+			if(prn.isEnabled()){
+
+				if(ncFact==1){
+					if(tipo==6){
+						fdev.buildPrint(itemid, 3, "TOL");
+						prn_nc.printask(printcallback, "printnc.txt");
+
+						toast("Reimpresión de nota de debito y factura generada");
+					}else {
+						fdev.buildPrint(itemid, 1, "TOL");
+						prn_nc.printask(printcallback, "printnc.txt");
+						toast("Reimpresión de nota de debito y factura generada");
+					}
+
+				}else if(ncFact==2){
+					if(tipo==6){
+						fdev.buildPrint(itemid, 3, "TOL");
+						prn_nc.printask(printcallback, "printnc.txt");
+
+						toast("Reimpresion de nota de debito generada");
+					}else{
+						fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printcallback, "printnc.txt");
+
+						toast("Reimpresion de nota de debito generada");
+					}
+				}
+
+			} else if(!prn.isEnabled()){
+
+				if(ncFact==1){
+					fdev.buildPrint(itemid, 1, "TOL");
+					fdoc.buildPrint(corelFactura, 1, "TOL");
+
+					toast("Reimpresion de nota de debito y factura generada");
+
+				}else if(ncFact==2){
+					fdev.buildPrint(itemid, 1, "TOL");
+
+					toast("Reimpresion de nota de debito generada");
+				}
+
+			}
+
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+			msgbox("imprUltNotaCredito: "+new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
+		}
+
+	}
+
 
 	private String getCorelFact(String vCorel){
 

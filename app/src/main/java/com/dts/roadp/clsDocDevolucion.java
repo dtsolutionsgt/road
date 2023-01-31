@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.os.IResultReceiver;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.apache.commons.lang.StringUtils;
@@ -15,6 +16,7 @@ public class clsDocDevolucion extends clsDocument {
 
     private double tot,desc,imp,stot,percep;
     private boolean sinimp;
+    private boolean esnotadebito = false;
     private String 	contrib,recfact,estadoDev,corelNC,corelF,asignacion;
 
     public clsDocDevolucion(Context context, int printwidth, String cursym, int decimpres, String archivo) {
@@ -77,7 +79,7 @@ public class clsDocDevolucion extends clsDocument {
     protected boolean buildFooter() {
 
         rep.add("");
-        rep.addtot("TOTAL NOTA CREDITO ", tot);
+        rep.addtot(!esnotadebito ? "TOTAL NOTA CREDITO ": "TOTAL NOTA DEBITO ", tot);
         rep.add("");
         rep.add("");
         rep.add("");
@@ -115,9 +117,16 @@ public class clsDocDevolucion extends clsDocument {
         super.loadHeadData(corel);
 
         conreferencia = conReferenciaFactura(corel);
+        esnotadebito = EsNotaDebito(corel);
 
-        nombre="COMPROBANTE AUXILIAR DE FACTURA ELECTRONICA " + (conreferencia?"NOTA DE CRÉDITO REFERENTE A UNA O VARIAS FE":
-                                                                 "NOTA DE CRÉDITO GENERICA");
+        if (!esnotadebito) {
+            nombre = "COMPROBANTE AUXILIAR DE FACTURA ELECTRONICA " + (conreferencia ? "NOTA DE CRÉDITO REFERENTE A UNA O VARIAS FE" :
+                    "NOTA DE CRÉDITO GENERICA");
+        } else {
+            nombre = "COMPROBANTE AUXILIAR DE FACTURA ELECTRONICA " + (conreferencia ? "NOTA DE DEBITO REFERENTE A UNA O VARIAS FE" :
+                    "NOTA DE DEBITO GENERICA");
+
+        }
 
         try {
             sql="SELECT N.RUTA,N.VENDEDOR,N.CLIENTE,N.TOTAL,N.FECHA,N.COREL, N.ANULADO, N.IMPRES "+
@@ -315,6 +324,21 @@ public class clsDocDevolucion extends clsDocument {
         return true;
     }
 
+    protected  boolean EsNotaDebito(String corel) {
+        Cursor DT;
+        boolean existe=false;
+        try {
+            sql="SELECT * FROM D_NOTACRED WHERE COREL = '"+corel+"'" + " AND TIPO_DOCUMENTO = 'ND'";
+            DT=Con.OpenDT(sql);
+
+            if(DT.getCount() != 0){
+                existe = true;
+            }
+        } catch (Exception e) {
+            Log.e("EsNotaDebito", e.getMessage());
+        }
+        return existe;
+    }
     protected boolean conReferenciaFactura(String corel){
         Cursor DT;
         boolean resultado=false;

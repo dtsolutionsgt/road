@@ -567,7 +567,7 @@ public class Menu extends PBase {
 
 		try{
 			final AlertDialog Dialog;
-			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia", "Nota de crédito"};
+			final String[] selitems = {"Factura","Recibo","Deposito","Recarga","Devolución a bodega","Cierre de dia", "Nota de crédito", "Nota débito"};
 
 			menudlg = new AlertDialog.Builder(this);
 			menudlg.setIcon(R.drawable.reimpresion48);
@@ -591,6 +591,8 @@ public class Menu extends PBase {
 							menuImprDoc(99);break;
 						case 6:
 							menuImprDoc(6);break;
+						case 7:
+							menuImprDoc(7);break;
 					}
 
 					dialog.cancel();

@@ -1061,11 +1061,11 @@ public class BaseDatosScript {
 					"[IMPRES] INTEGER NOT NULL,"+
 					"[CERTIFICADA_DGI] INTEGER NOT NULL,"+
 					"[CUFE] TEXT,"+
-					"[TIPO_DOCUMENTO] [nvarchar](10),"+
-					"[COREL_REFERENCIA] [nvarchar](20),"+
-					"[ES_ANULACION] [bit],"+
-					"[CUFE_FACTURA] [nvarchar](20),"+
-					"PRIMARY KEY ([COREL])"+
+					"[TIPO_DOCUMENTO] TEXT NOT NULL,"+
+					"[COREL_REFERENCIA] TEXT,"+
+					"[ES_ANULACION] INTEGER,"+
+					"[CUFE_FACTURA] TEXT,"+
+					"PRIMARY KEY ([COREL], [TIPO_DOCUMENTO])"+
 					");";
 			database.execSQL(vSQL);
 
@@ -1081,7 +1081,8 @@ public class BaseDatosScript {
 					"[UMSTOCK] TEXT NOT NULL,"+
 					"[UMPESO] TEXT NOT NULL,"+
 					"[FACTOR] REAL NOT NULL,"+
-					"PRIMARY KEY ([COREL],[PRODUCTO])"+
+					"[TIPO_DOCUMENTO] TEXT NOT NULL,"+
+					"PRIMARY KEY ([COREL],[PRODUCTO], [TIPO_DOCUMENTO])"+
 					");";
 			database.execSQL(vSQL);
 

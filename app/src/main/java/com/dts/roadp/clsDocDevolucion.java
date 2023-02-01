@@ -120,8 +120,8 @@ public class clsDocDevolucion extends clsDocument {
         esnotadebito = EsNotaDebito(corel);
 
         if (!esnotadebito) {
-            nombre = "COMPROBANTE AUXILIAR DE FACTURA ELECTRONICA " + (conreferencia ? "NOTA DE CRÉDITO REFERENTE A UNA O VARIAS FE" :
-                    "NOTA DE CRÉDITO GENERICA");
+            nombre = "COMPROBANTE AUXILIAR DE FACTURA ELECTRONICA " + (conreferencia ? "NOTA DE CREDITO REFERENTE A UNA O VARIAS FE" :
+                    "NOTA DE CREDITO GENERICA");
         } else {
             nombre = "COMPROBANTE AUXILIAR DE FACTURA ELECTRONICA " + (conreferencia ? "NOTA DE DEBITO REFERENTE A UNA O VARIAS FE" :
                     "NOTA DE DEBITO GENERICA");

@@ -336,10 +336,11 @@ public class Anulacion extends PBase {
 			if (tipo==6) {
 				sql=" SELECT D_NOTACRED.COREL,P_CLIENTE.CODIGO || ' - ' || P_CLIENTE.NOMBRE AS DESC,FECHA,D_NOTACRED.TOTAL, "+
 					"        D_NOTACRED.CUFE, D_FACTURA_CONTROL_CONTINGENCIA.NUMERO_AUTORIZACION, D_NOTACRED.CERTIFICADA_DGI, " +
-					"        D_FACTURA_CONTROL_CONTINGENCIA.Estado "+
+					"        D_FACTURA_CONTROL_CONTINGENCIA.Estado, D_NOTACRED.CUFE_FACTURA "+
 					" FROM D_NOTACRED INNER JOIN P_CLIENTE ON D_NOTACRED.CLIENTE=P_CLIENTE.CODIGO "+
 					"      INNER JOIN D_FACTURA_CONTROL_CONTINGENCIA ON D_NOTACRED.COREL=D_FACTURA_CONTROL_CONTINGENCIA.COREL "+
-					" WHERE (D_NOTACRED.ANULADO='N') AND (D_NOTACRED.STATCOM='N') AND (D_FACTURA_CONTROL_CONTINGENCIA.TIPODOCUMENTO <> '01')" +
+					" WHERE (D_NOTACRED.ANULADO='N') AND (D_NOTACRED.STATCOM='N') AND (D_FACTURA_CONTROL_CONTINGENCIA.TIPODOCUMENTO IN ('04','06')) " +
+					" AND (D_NOTACRED.TIPO_DOCUMENTO = 'NC') " +
 					" ORDER BY D_NOTACRED.COREL DESC ";
 			}
 			    		
@@ -378,6 +379,7 @@ public class Anulacion extends PBase {
 						vItem.Cufe = DT.getString(4);
 						vItem.Certificada_DGI = (DT.getInt(6)==1?"Si":"No");
 						vItem.Estado = DT.getString(7);
+						vItem.CufeFactura = (DT.getString(8) == null ? "": DT.getString(8));
 					}
 
 					vItem.Fecha=sf;
@@ -559,6 +561,49 @@ public class Anulacion extends PBase {
 			mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" - "+ e.getMessage());
 		}
 	}
+
+	private void AnularFactHHConNC() {
+		try {
+
+			db.beginTransaction();
+
+			if (anulNotaCredito(itemid)){
+
+				db.setTransactionSuccessful();
+				db.endTransaction();
+
+				clsDocDevolucion fdev;
+
+				fdev=new clsDocDevolucion(this,prn_nc.prw,gl.peMon,gl.peDecImp, "printnc.txt");
+				fdev.deviceid =gl.numSerie;
+
+				fdev.buildPrint(itemid, 3, "TOL");
+
+				String corelFactura=tieneFacturaNC(itemid);
+
+				if (!corelFactura.isEmpty()){
+					prn_nc.printask(printotrodoc, "printnc.txt");
+				}else {
+					prn_nc.printask(printclose, "printnc.txt");
+				}
+
+				progress.cancel();
+				mu.msgbox("El documento ha sido anulado.");
+
+			}else{
+
+				db.setTransactionSuccessful();
+				db.endTransaction();
+
+			}
+
+			listItems();
+
+		} catch (Exception e) {
+			mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" - "+ e.getMessage());
+		}
+	}
+
 	private void getToken() {
 		try {
 			String base = Empresa.usuarioApi + ":" + Empresa.claveApi;
@@ -590,7 +635,13 @@ public class Anulacion extends PBase {
 
 			AnularDocs client = retrofit.CrearServicio(AnularDocs.class);
 			AnularFactura data = new AnularFactura();
-			data.setCufe(sitem.Cufe);
+
+			if (!sitem.CufeFactura.isEmpty() && sitem.CufeFactura != null) {
+				data.setCufe(sitem.CufeFactura);
+			} else {
+				data.setCufe(sitem.Cufe);
+			}
+
 			data.setMotivoAnulacion("ANULACION_POR_ERROR");
 
 			Call<ResultadoAnulacion> call = client.AnularFactura(data, AuthToken);
@@ -1399,6 +1450,7 @@ public class Anulacion extends PBase {
 				ins.add("UMSTOCK", detalle.get(i).umStock);
 				ins.add("UMPESO", detalle.get(i).umpeso);
 				ins.add("FACTOR", detalle.get(i).factor);
+				ins.add("TIPO_DOCUMENTO", "ND");
 
 				db.execSQL(ins.sql());
 			}
@@ -2907,10 +2959,8 @@ public class Anulacion extends PBase {
 						ProgressDialog("Anulando factura...");
 
 						if (!CorelNC.isEmpty()) {
-							//CrearNotaDebito();
 							if (AnularNotaCreditoConFactura(CorelNC, itemid)) {
 
-								//anulNotaCredito(CorelNC);
 								AsyncAnularDocumento anular = new AsyncAnularDocumento();
 								anular.execute();
 							}
@@ -2919,10 +2969,27 @@ public class Anulacion extends PBase {
 							AsyncAnularDocumento anular = new AsyncAnularDocumento();
 							anular.execute();
 						}
-					} else {
-						anulDocument();
-					}
+					} else if ( tipo == 6 ) {
+						Cursor DT;
+						String vCorelFactura = "";
 
+						sql = "SELECT FACTURA FROM D_NOTACRED WHERE COREL = '" + itemid + "' AND TIPO_DOCUMENTO = 'NC' ";
+						DT=Con.OpenDT(sql);
+
+						if (DT.getCount()>0){
+							DT.moveToFirst();
+							vCorelFactura = DT.getString(0);
+						}
+
+						if (ExisteFactura(vCorelFactura)) {
+							if (AnularNotaCreditoConFactura(itemid, vCorelFactura)) {
+								AsyncAnularDocumento anular = new AsyncAnularDocumento();
+								anular.execute();
+							}
+						}else {
+							anulDocument();
+						}
+					}
 				}
 			});
 			dialog.setNegativeButton("No", null);
@@ -3079,7 +3146,11 @@ public class Anulacion extends PBase {
 		@Override
 		protected void onPostExecute(String vdata){
 			if (exito) {
-				AnularFactHH_DGI();
+				if (tipo == 6) {
+					AnularFactHHConNC();
+				} else {
+					AnularFactHH_DGI();
+				}
 			} else {
 				progress.cancel();
 				toast(resultado.getMensajeRespuesta());

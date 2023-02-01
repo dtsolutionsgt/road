@@ -323,7 +323,7 @@ public class CatalogoFactura extends PBase {
         clsClasses.clsNotaCreditoEnc NotaCreditoEnc = clsCls.new clsNotaCreditoEnc();
 
         try {
-            sql = "SELECT * FROM D_NOTACRED WHERE COREL = '"+Corel+"'";
+            sql = "SELECT * FROM D_NOTACRED WHERE COREL = '"+Corel+"' AND TIPO_DOCUMENTO = 'NC' ";
             dt=Con.OpenDT(sql);
 
             if (dt.getCount()>0) {
@@ -373,7 +373,7 @@ public class CatalogoFactura extends PBase {
             sql = "SELECT A.*, B.DESCCORTA " +
                   " FROM D_NOTACREDD A " +
                   " INNER JOIN P_PRODUCTO B ON B.CODIGO = A.PRODUCTO " +
-                  " WHERE A.COREL = '"+Corel+"'";
+                  " WHERE A.COREL = '"+Corel+"' AND A.TIPO_DOCUMENTO = 'NC'";
             dt=Con.OpenDT(sql);
 
             if (dt.getCount()>0) {

@@ -488,6 +488,7 @@ public class DevolCli extends PBase {
 				ins.add("CORELFACT",0);
 				ins.add("IMPRES",0);
 				ins.add("CERTIFICADA_DGI", 0);
+				ins.add("TIPO_DOCUMENTO", "NC");
 
 				db.execSQL(ins.sql());
 
@@ -758,6 +759,7 @@ public class DevolCli extends PBase {
 					ins.add("UMSTOCK",DT.getString(11));
 					ins.add("UMPESO",DT.getString(12));
 					ins.add("FACTOR",DT.getDouble(13));
+					ins.add("TIPO_DOCUMENTO", "NC");
 					db.execSQL(ins.sql());
 
 					Producto = clsCls.new clsProducto();

@@ -1212,6 +1212,7 @@ public class FacturaRes extends PBase {
 				ins.add("CORELFACT",0);
 				ins.add("IMPRES",0);
 				ins.add("CERTIFICADA_DGI", 0);
+				ins.add("TIPO_DOCUMENTO", "NC");
 
 				db.execSQL(ins.sql());
 
@@ -1401,6 +1402,7 @@ public class FacturaRes extends PBase {
 					ins.add("UMSTOCK",DT.getString(11));
 					ins.add("UMPESO",DT.getString(12));
 					ins.add("FACTOR",DT.getDouble(13));
+					ins.add("TIPO_DOCUMENTO", "NC");
 					db.execSQL(ins.sql());
 
 					double ntPeso = DT.getDouble(8);
@@ -2009,32 +2011,40 @@ public class FacturaRes extends PBase {
             mu.msgbox("Error (factura) " + e.getMessage());return false;
         }
 
-		try {
+		if (!gl.cobroPendiente && saved) {
+			try {
 
-			if (!gl.cobroPendiente && saved) {
 				Handler mtimer = new Handler();
-				Runnable mrunner= () -> {
+				Runnable mrunner = () -> {
 					CertificarFactura();
+
+					if (gl.dvbrowse != 0) {
+						gl.dvbrowse = 0;
+						gl.tiponcredito = 0;
+					}
+					saveAtten(tot);
+
 					progress.cancel();
 					impressOrder();
 				};
-				mtimer.postDelayed(mrunner,3000);
+				mtimer.postDelayed(mrunner, 3000);
+
+			} catch (Exception e) {
+				if (progress != null) progress.cancel();
+				Log.e("respuestageneradaBTB", e.getMessage());
+			} catch (Throwable e) {
+				if (progress != null) progress.cancel();
+				e.printStackTrace();
 			}
-
-		} catch (Exception e){
-			if (progress!=null) progress.cancel();
-			Log.e("respuestageneradaBTB", e.getMessage());
-		} catch (Throwable e) {
-			if (progress!=null) progress.cancel();
-			e.printStackTrace();
+		} else {
+			if (saved) {
+				if (gl.dvbrowse != 0) {
+					gl.dvbrowse = 0;
+					gl.tiponcredito = 0;
+				}
+				saveAtten(tot);
+			}
 		}
-
-		if(gl.dvbrowse!=0){
-			gl.dvbrowse =0;
-			gl.tiponcredito=0;
-		}
-
-		saveAtten(tot);
 
 		return true;
 	}
@@ -2091,9 +2101,7 @@ public class FacturaRes extends PBase {
 					toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 
 					if (gl.dvbrowse!=0) {
-
 						GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
-
 					}
 
 				} else if(!ConexionValida() && ControlFEL.Estado.equals("1")) {

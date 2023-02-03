@@ -1065,9 +1065,9 @@ public class FacturaRes extends PBase {
 
 				if (ciudad !=null) {
 
-					Factura.gDGen.Emisor.gUbiEm.dCorreg = ciudad.corregimiento.toUpperCase().trim().trim();
-					Factura.gDGen.Emisor.gUbiEm.dDistr = ciudad.distrito.toUpperCase().trim();
-					Factura.gDGen.Emisor.gUbiEm.dProv = ciudad.provincia.toUpperCase().trim();
+					Factura.gDGen.Emisor.gUbiEm.dCorreg = (ciudad.corregimiento==null?"":ciudad.corregimiento.toUpperCase().trim());
+					Factura.gDGen.Emisor.gUbiEm.dDistr = (ciudad.distrito==null?"":ciudad.distrito.toUpperCase().trim());
+					Factura.gDGen.Emisor.gUbiEm.dProv = (ciudad.provincia==null?"":ciudad.provincia.toUpperCase().trim());
 
 					if (ciudad.provincia.isEmpty()) {
 						Factura.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
@@ -1100,9 +1100,9 @@ public class FacturaRes extends PBase {
 
 					if (ciudad !=null) {
 
-						Factura.gDGen.Receptor.gUbiRec.dCorreg = ciudad.corregimiento.toUpperCase().trim();
-						Factura.gDGen.Receptor.gUbiRec.dDistr = ciudad.distrito.toUpperCase().trim();
-						Factura.gDGen.Receptor.gUbiRec.dProv = ciudad.provincia.toUpperCase().trim();
+						Factura.gDGen.Receptor.gUbiRec.dCorreg = (ciudad.corregimiento==null?"":ciudad.corregimiento.toUpperCase().trim());
+						Factura.gDGen.Receptor.gUbiRec.dDistr =(ciudad.distrito==null?"":ciudad.distrito.toUpperCase().trim());
+						Factura.gDGen.Receptor.gUbiRec.dProv = (ciudad.distrito==null?"":ciudad.provincia.toUpperCase().trim());
 
 						if (ciudad.provincia.isEmpty()) {
 							Factura.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
@@ -1257,9 +1257,9 @@ public class FacturaRes extends PBase {
 
 					if (ciudad !=null) {
 
-						NotaCredito.gDGen.Emisor.gUbiEm.dCorreg = ciudad.corregimiento.toUpperCase().trim();
-						NotaCredito.gDGen.Emisor.gUbiEm.dDistr = ciudad.distrito.toUpperCase().trim();
-						NotaCredito.gDGen.Emisor.gUbiEm.dProv = ciudad.provincia.toUpperCase().trim();
+						NotaCredito.gDGen.Emisor.gUbiEm.dCorreg = (ciudad.corregimiento==null?"":ciudad.corregimiento.toUpperCase().trim());
+						NotaCredito.gDGen.Emisor.gUbiEm.dDistr = (ciudad.distrito==null?"":ciudad.distrito.toUpperCase().trim());
+						NotaCredito.gDGen.Emisor.gUbiEm.dProv = (ciudad.distrito==null?"":ciudad.provincia.toUpperCase().trim());
 
 						if (ciudad.provincia.isEmpty()) {
 							NotaCredito.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
@@ -1291,9 +1291,9 @@ public class FacturaRes extends PBase {
 
 						if (ciudad !=null) {
 
-							NotaCredito.gDGen.Receptor.gUbiRec.dCorreg = ciudad.corregimiento.toUpperCase().trim();
-							NotaCredito.gDGen.Receptor.gUbiRec.dDistr = ciudad.distrito.toUpperCase().trim();
-							NotaCredito.gDGen.Receptor.gUbiRec.dProv = ciudad.provincia.toUpperCase().trim();
+							NotaCredito.gDGen.Receptor.gUbiRec.dCorreg = (ciudad.corregimiento==null?"":ciudad.corregimiento.toUpperCase().trim());
+							NotaCredito.gDGen.Receptor.gUbiRec.dDistr = (ciudad.distrito==null?"":ciudad.distrito.toUpperCase().trim());
+							NotaCredito.gDGen.Receptor.gUbiRec.dProv = (ciudad.distrito==null?"":ciudad.provincia.toUpperCase().trim());
 
 							if (ciudad.provincia.isEmpty()) {
 								NotaCredito.gDGen.Receptor.gUbiRec.dProv = "PANAMA";

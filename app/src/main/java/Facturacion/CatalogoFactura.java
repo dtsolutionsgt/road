@@ -76,7 +76,7 @@ public class CatalogoFactura extends PBase {
             ins.add("CORELATIVO", ItemFEL.Correlativo);
             ins.add("QRIMAGE", ItemFEL.QRImg);
 
-            if (ItemFEL.Fecha_Autorizacion!=null){
+            if (ItemFEL.Fecha_Autorizacion!=null && ItemFEL.Fecha_Autorizacion.length() > 0){
                 vFechaAutorizacion = ItemFEL.Fecha_Autorizacion.equals("0001-01-01T00:00:00")?
                         "1900-01-01T00:00:00":
                         ItemFEL.Fecha_Autorizacion.toString().substring(0,ItemFEL.Fecha_Autorizacion.length()-6);
@@ -91,6 +91,40 @@ public class CatalogoFactura extends PBase {
 
         } catch (Exception e) {
             msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+        }
+    }
+
+    public void ActualizaFELControl(clsClasses.clsControlFEL ItemFEL, String Corel) {
+        String vFechaAutorizacion = "";
+        try {
+
+            upd.init("D_FACTURA_CONTROL_CONTINGENCIA");
+
+            upd.add("Cufe", ItemFEL.Cufe);
+            upd.add("Estado", ItemFEL.Estado);
+            upd.add("Mensaje", ItemFEL.Mensaje);
+            upd.add("Valor_XML", ItemFEL.ValorXml);
+            upd.add("QR", ItemFEL.QR);
+            upd.add("HOST", ItemFEL.Host);
+            upd.add("CODIGOLIQUIDACION", ItemFEL.CodLiquidacion);
+            upd.add("CORELATIVO", ItemFEL.Correlativo);
+            upd.add("QRIMAGE", ItemFEL.QRImg);
+
+            if (ItemFEL.Fecha_Autorizacion!=null || ItemFEL.Fecha_Autorizacion.length() > 0){
+                vFechaAutorizacion = ItemFEL.Fecha_Autorizacion.equals("0001-01-01T00:00:00")?
+                        "1900-01-01T00:00:00":
+                        ItemFEL.Fecha_Autorizacion.toString().substring(0,ItemFEL.Fecha_Autorizacion.length()-6);
+            }else{
+                vFechaAutorizacion = "1900-01-01T00:00:00";
+            }
+
+            upd.add("FECHA_AUTORIZACION",vFechaAutorizacion);
+            upd.add("NUMERO_AUTORIZACION", ItemFEL.Numero_Autorizacion);
+            upd.Where("COREL ='"+ Corel +"' ");
+
+            db.execSQL(upd.SQL());
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
         }
     }
 
@@ -509,6 +543,27 @@ public class CatalogoFactura extends PBase {
 
         return  correl;
 
+    }
+
+    public String ExisteFacturaDControl (String pCorel) {
+        String corel = "";
+        Cursor dt;
+        try {
+            sql = "SELECT COREL FROM D_FACTURA_CONTROL_CONTINGENCIA WHERE COREL = '"+pCorel+"'";
+            dt=Con.OpenDT(sql);
+            dt.moveToFirst();
+
+            if (dt.getCount() > 0) {
+                corel = dt.getString(0);
+            }
+
+            if (dt != null) dt.close();
+
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+        }
+
+        return corel;
     }
 
     public void opendb() {

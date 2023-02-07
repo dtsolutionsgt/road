@@ -2001,6 +2001,9 @@ public class FacturaRes extends PBase {
 
 			dt.close();
 
+			//#AT20230203 Inserta en D_FACTURA_CONTROL_CONTIGENCIA de forma temporal
+			InsertaFacturaTmp();
+
 			db.setTransactionSuccessful();
 			db.endTransaction();
 
@@ -2116,8 +2119,10 @@ public class FacturaRes extends PBase {
 					toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 				}
 
+				//#AT20230203 Actualiza los campos faltantes en D_FACTURA_CONTROL_CONTIGENCIA
+				ActualizaFacturaTmp(corel, ControlFEL);
 				Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
-				Catalogo.InsertarFELControl(ControlFEL);
+				//Catalogo.InsertarFELControl(ControlFEL);
 			}
 		} catch (Exception e) {
 			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
@@ -2126,6 +2131,57 @@ public class FacturaRes extends PBase {
 		}
 	}
 
+	private void InsertaFacturaTmp() {
+		clsClasses.clsControlFEL TmpControlFEL;
+		try {
+			TmpControlFEL = clsCls.new clsControlFEL();
+
+			TmpControlFEL.TipoDoc = Factura.gDGen.iDoc;
+			TmpControlFEL.NumDoc = Factura.gDGen.dNroDF;
+			TmpControlFEL.Sucursal = gl.sucur;
+			TmpControlFEL.Caja = fserie;
+			String[] fechaEnvio = Factura.gDGen.dFechaEm.split("-05:00", 0);
+			TmpControlFEL.FechaEnvio = fechaEnvio[0];
+			TmpControlFEL.TipFac = Factura.gDGen.iDoc;
+			TmpControlFEL.FechaAgr = String.valueOf(du.getFechaCompleta());
+			TmpControlFEL.Corel = corel;
+			TmpControlFEL.Ruta = gl.ruta;
+			TmpControlFEL.Vendedor = gl.vend;
+			TmpControlFEL.Correlativo = String.valueOf(fcorel);
+
+			try {
+				Catalogo.InsertarFELControl(TmpControlFEL);
+
+				if (gl.dvbrowse!=0) {
+					TmpControlFEL.TipoDoc = NotaCredito.gDGen.iDoc;
+					TmpControlFEL.NumDoc = NotaCredito.gDGen.dNroDF;
+					TmpControlFEL.TipFac = NotaCredito.gDGen.iDoc;
+					TmpControlFEL.Corel = gl.devcornc;
+					TmpControlFEL.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
+
+					Catalogo.InsertarFELControl(TmpControlFEL);
+				}
+
+			} catch (Exception e) {
+				msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+			}
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
+	}
+	
+	private void ActualizaFacturaTmp(String Corel, clsClasses.clsControlFEL ControlFEL) {
+		try {
+			if (!Catalogo.ExisteFacturaDControl(Corel).isEmpty()) {
+				Catalogo.ActualizaFELControl(ControlFEL, Corel);
+			} else {
+				Catalogo.InsertarFELControl(ControlFEL);
+			}
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+		}
+	}
+	
 	public boolean ConexionValida() {
 		boolean valida = false;
 		try {
@@ -2214,8 +2270,10 @@ public class FacturaRes extends PBase {
 						toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
 					}
 
+					ActualizaFacturaTmp(gl.devcornc, ControlNotaCredito);
 					Catalogo.UpdateEstadoNotaCredito(ControlNotaCredito.Cufe, CufeFact, EstadoNT);
-					Catalogo.InsertarFELControl(ControlNotaCredito);
+					//Catalogo.InsertarFELControl(ControlNotaCredito);
+
 				} else {
 					msgbox("Campos con valores nulos.");
 				}

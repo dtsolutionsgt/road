@@ -1102,7 +1102,7 @@ public class FacturaRes extends PBase {
 
 						Factura.gDGen.Receptor.gUbiRec.dCorreg = (ciudad.corregimiento==null?"":ciudad.corregimiento.toUpperCase().trim());
 						Factura.gDGen.Receptor.gUbiRec.dDistr =(ciudad.distrito==null?"":ciudad.distrito.toUpperCase().trim());
-						Factura.gDGen.Receptor.gUbiRec.dProv = (ciudad.distrito==null?"":ciudad.provincia.toUpperCase().trim());
+						Factura.gDGen.Receptor.gUbiRec.dProv = (ciudad.provincia==null?"":ciudad.provincia.toUpperCase().trim());
 
 						if (ciudad.provincia.isEmpty()) {
 							Factura.gDGen.Receptor.gUbiRec.dProv = "PANAMA";

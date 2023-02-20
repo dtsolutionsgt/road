@@ -191,7 +191,7 @@ public class CatalogoFactura extends PBase {
     }
 
     public clsClasses.clsCiudad getCiudad(String CodCiudad) {
-        clsClasses.clsCiudad Ciudad = clsCls.new clsCiudad();
+        clsClasses.clsCiudad Ciudad = null;
         Cursor dt;
         try {
             sql= "SELECT * FROM P_CIUDAD WHERE CODIGO = '"+CodCiudad+"'";
@@ -199,6 +199,7 @@ public class CatalogoFactura extends PBase {
             dt.moveToFirst();
 
             if (dt.getCount() > 0) {
+                Ciudad = clsCls.new clsCiudad();
                 Ciudad.codigo = dt.getString(0);
                 Ciudad.distrito = dt.getString(1);
                 Ciudad.corregimiento = dt.getString(2);

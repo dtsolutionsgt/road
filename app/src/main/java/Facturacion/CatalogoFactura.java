@@ -239,13 +239,14 @@ public class CatalogoFactura extends PBase {
         clsClasses.clsCliente Cliente = clsCls.new clsCliente();
         Cursor dt;
         try {
-            sql= "SELECT NOMBRE, TIPO_CONTRIBUYENTE, TIPORECEPTOR, EMAIL, TELEFONO, COD_PAIS, DIRECCION, CIUDAD, NIT, MUNICIPIO, MEDIAPAGO, DIACREDITO " +
+            sql= "SELECT NOMBRE, TIPO_CONTRIBUYENTE, TIPORECEPTOR, EMAIL, TELEFONO, COD_PAIS, DIRECCION, CIUDAD, NIT, MUNICIPIO, MEDIAPAGO, DIACREDITO, CODIGO " +
                     " FROM P_CLIENTE WHERE CODIGO = '"+CodCliente+"'";
             dt=Con.OpenDT(sql);
             dt.moveToFirst();
 
             if (dt.getCount() > 0) {
                 Cliente.nombre = dt.getString(0);
+                Cliente.codigo = dt.getString(12);
                 Cliente.tipoContribuyente = dt.getString(1);
                 Cliente.tipoRec = dt.getString(2);
                 Cliente.email = dt.getString(3);

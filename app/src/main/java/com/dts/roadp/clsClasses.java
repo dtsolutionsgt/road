@@ -238,7 +238,7 @@ public class clsClasses {
 	}
 
 	public class clsCliente {
-		public String  tipoContribuyente, tipoRec, email, telefono, codPais, nombre, direccion, ciudad, muni = "", nit;
+		public String  codigo, tipoContribuyente, tipoRec, email, telefono, codPais, nombre, direccion, ciudad, muni = "", nit;
 		public int diascredito, mediapago;
 	}
 

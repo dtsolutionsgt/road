@@ -1088,7 +1088,7 @@ public class FacturaRes extends PBase {
 			Factura.gDGen.Receptor.dCorElectRec = cliente.email;
 			Factura.gDGen.Receptor.dTfnRec = cliente.telefono;
 			Factura.gDGen.Receptor.cPaisRec = cliente.codPais;
-			Factura.gDGen.Receptor.dNombRec = cliente.nombre;
+			Factura.gDGen.Receptor.dNombRec = cliente.codigo + "-" + cliente.nombre;
 			Factura.gDGen.Receptor.dDirecRec = (cliente.direccion==null?"": cliente.direccion.substring(0,(cliente.direccion.length()>=100?100: cliente.direccion.length())));
 			Factura.gDGen.Receptor.gUbiRec.dCodUbi = (cliente.ciudad==null?"": cliente.ciudad);
 
@@ -1279,7 +1279,7 @@ public class FacturaRes extends PBase {
 				NotaCredito.gDGen.Receptor.dCorElectRec = cliente.email;
 				NotaCredito.gDGen.Receptor.dTfnRec = cliente.telefono;
 				NotaCredito.gDGen.Receptor.cPaisRec = cliente.codPais;
-				NotaCredito.gDGen.Receptor.dNombRec = cliente.nombre;
+				NotaCredito.gDGen.Receptor.dNombRec = cliente.codigo + "-" + cliente.nombre;
 				NotaCredito.gDGen.Receptor.dDirecRec = (cliente.direccion==null?"": cliente.direccion.substring(0,(cliente.direccion.length()>=100?100: cliente.direccion.length())));
 				NotaCredito.gDGen.Receptor.gUbiRec.dCodUbi = (cliente.ciudad==null?"": cliente.ciudad);
 
@@ -1731,6 +1731,8 @@ public class FacturaRes extends PBase {
 
 					PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(cliente.diascredito);
 					PagoPlazo.dValItPlazo = Total;
+					PagoPlazo.dInfPagPlazo = String.valueOf(cliente.diascredito);
+
 					Factura.gTot.gPagPlazo.add(PagoPlazo);
 
 				} else {

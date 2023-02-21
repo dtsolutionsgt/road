@@ -585,36 +585,9 @@ public class DevolCli extends PBase {
 				NotaCredito.gDGen.Receptor.dCorElectRec = Cliente.email;
 				NotaCredito.gDGen.Receptor.dTfnRec = Cliente.telefono;
 				NotaCredito.gDGen.Receptor.cPaisRec = Cliente.codPais;
-				NotaCredito.gDGen.Receptor.dNombRec = Cliente.nombre;
+				NotaCredito.gDGen.Receptor.dNombRec = Cliente.codigo + "-" + Cliente.nombre;
 				NotaCredito.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
 				NotaCredito.gDGen.Receptor.gUbiRec.dCodUbi = (Cliente.ciudad==null?"":Cliente.ciudad);
-
-				//#CKFK20221227 Antes se obtenia el distrito, provincia y correegimiento de esta forma
-                /*if (!Cliente.muni.isEmpty() || Cliente.muni != null) {
-					Municipio = clsCls.new clsMunicipio();
-					Departamento = clsCls.new clsDepartamento();
-
-					Municipio = Catalogo.getMunicipio(Cliente.muni);
-					Departamento = Catalogo.getDepartamento(Municipio.depar);
-
-					if (Municipio.nombre.contains("/")) {
-
-						String[] DireccionCompleta = Municipio.nombre.split("/");
-
-						NotaCredito.gDGen.Receptor.gUbiRec.dCorreg = DireccionCompleta[1].trim().toUpperCase();
-						NotaCredito.gDGen.Receptor.gUbiRec.dDistr = DireccionCompleta[0].trim().toUpperCase();
-
-						if (!Departamento.nombre.isEmpty()) {
-							NotaCredito.gDGen.Receptor.gUbiRec.dProv = Departamento.nombre.toUpperCase();
-						} else {
-							NotaCredito.gDGen.Receptor.gUbiRec.dProv = "PANAMA";
-						}
-
-					} else {
-						msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
-						return;
-					}
-				}*/
 
 				if (Cliente.ciudad != null) {
 
@@ -652,29 +625,6 @@ public class DevolCli extends PBase {
 						return;
 					}
 				}
-
-				//#CKFK20221206 Antes asi se calculaba el RUC
-				/*if (!Cliente.nit.contains("D")) {
-					msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de RUC lo requiere.");
-					return;
-				} else {
-					String[] DVRuc = Cliente.nit.split("DV");
-
-					if (NotaCredito.gDGen.Receptor.gRucRec.dTipoRuc.equals("01") || NotaCredito.gDGen.Receptor.gRucRec.dTipoRuc.equals("03")) {
-						if (DVRuc.length > 1) {
-							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-							NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
-						}
-					} else {
-						if (DVRuc.length > 1) {
-							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-							NotaCredito.gDGen.Receptor.gRucRec.dDV = DVRuc[1].replace("V ", "").trim();
-						} else {
-							NotaCredito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
-							NotaCredito.gDGen.Receptor.gRucRec.dDV = "";
-						}
-					}
-				}*/
 
 				// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
 				if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {

@@ -783,7 +783,7 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.Receptor.dCorElectRec = Cliente.email;
 			NotaDebito.gDGen.Receptor.dTfnRec = Cliente.telefono;
 			NotaDebito.gDGen.Receptor.cPaisRec = Cliente.codPais;
-			NotaDebito.gDGen.Receptor.dNombRec = Cliente.nombre;
+			NotaDebito.gDGen.Receptor.dNombRec = Cliente.codigo + "-" + Cliente.nombre;
 			NotaDebito.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
 			NotaDebito.gDGen.Receptor.gUbiRec.dCodUbi = (Cliente.ciudad==null?"":Cliente.ciudad);
 
@@ -944,6 +944,8 @@ public class Anulacion extends PBase {
 				PagoPlazo.dSecItem = "1";
 				PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
 				PagoPlazo.dValItPlazo = TotalNT;
+				PagoPlazo.dInfPagPlazo = String.valueOf(Cliente.diascredito);
+
 				NotaDebito.gTot.gPagPlazo.add(PagoPlazo);
 			} else {
 				PagosNt.iFormaPago = "02";
@@ -1132,7 +1134,7 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.Receptor.dCorElectRec = Cliente.email;
 			NotaDebito.gDGen.Receptor.dTfnRec = Cliente.telefono;
 			NotaDebito.gDGen.Receptor.cPaisRec = Cliente.codPais;
-			NotaDebito.gDGen.Receptor.dNombRec = Cliente.nombre;
+			NotaDebito.gDGen.Receptor.dNombRec = Cliente.codigo + "-" + Cliente.nombre;
 			NotaDebito.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
 			NotaDebito.gDGen.Receptor.gUbiRec.dCodUbi = (Cliente.ciudad==null?"":Cliente.ciudad);
 
@@ -1293,6 +1295,8 @@ public class Anulacion extends PBase {
 				PagoPlazo.dSecItem = "1";
 				PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
 				PagoPlazo.dValItPlazo = TotalNT;
+				PagoPlazo.dInfPagPlazo = String.valueOf(Cliente.diascredito);
+
 				NotaDebito.gTot.gPagPlazo.add(PagoPlazo);
 			} else {
 				PagosNt.iFormaPago = "02";

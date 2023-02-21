@@ -118,6 +118,7 @@ public class FinDia extends PBase {
 	public void startFDD()  {
 
 		boolean rslt;
+        boolean existeArchivo=false;
 
 		File fd=new File(Environment.getExternalStorageDirectory()+"/SyncFold/findia.txt");
 		FileUtils.deleteQuietly(fd);
@@ -145,7 +146,10 @@ public class FinDia extends PBase {
             try {
                 File f1 = new File(Environment.getExternalStorageDirectory() + "/SyncFold/findia.txt");
                 File f2 = new File(Environment.getExternalStorageDirectory() + "/print.txt");
-                FileUtils.copyFile(f1, f2);
+                if (f1.exists()){
+                    existeArchivo = true;
+                    FileUtils.copyFile(f1, f2);
+                }
             } catch (Exception e) {
                 addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
                 msgExit("No se pudo crear archivo de impresión.");
@@ -173,17 +177,18 @@ public class FinDia extends PBase {
             startActivity(new Intent(this, ComWS.class));
 
             try  {
-
-                if (prn.isEnabled())  {
-                    final Handler shandler = new Handler();
-                    shandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run()  {
-                            gl.prdlgmode=1;
-                            Intent intent = new Intent(FinDia.this, PrintDialog.class);
-                            startActivity(intent);
-                        }
-                    }, 2000);
+                if (existeArchivo){
+                    if (prn.isEnabled())  {
+                        final Handler shandler = new Handler();
+                        shandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run()  {
+                                gl.prdlgmode=1;
+                                Intent intent = new Intent(FinDia.this, PrintDialog.class);
+                                startActivity(intent);
+                            }
+                        }, 2000);
+                    }
                 }
             } catch (Exception e) {
                 addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

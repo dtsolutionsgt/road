@@ -110,12 +110,14 @@ public class CatalogoFactura extends PBase {
             upd.add("CORELATIVO", ItemFEL.Correlativo);
             upd.add("QRIMAGE", ItemFEL.QRImg);
 
-            if (ItemFEL.Fecha_Autorizacion!=null || ItemFEL.Fecha_Autorizacion.length() > 0){
-                vFechaAutorizacion = ItemFEL.Fecha_Autorizacion.equals("0001-01-01T00:00:00")?
-                        "1900-01-01T00:00:00":
-                        ItemFEL.Fecha_Autorizacion.toString().substring(0,ItemFEL.Fecha_Autorizacion.length()-6);
-            }else{
-                vFechaAutorizacion = "1900-01-01T00:00:00";
+            vFechaAutorizacion = "1900-01-01T00:00:00";
+
+            if (ItemFEL.Fecha_Autorizacion!=null ){
+                if (ItemFEL.Fecha_Autorizacion.length() > 0) {
+                    vFechaAutorizacion = ItemFEL.Fecha_Autorizacion.equals("0001-01-01T00:00:00") ?
+                            "1900-01-01T00:00:00" :
+                            ItemFEL.Fecha_Autorizacion.toString().substring(0, ItemFEL.Fecha_Autorizacion.length() - 6);
+                }
             }
 
             upd.add("FECHA_AUTORIZACION",vFechaAutorizacion);

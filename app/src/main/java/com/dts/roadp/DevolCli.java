@@ -812,6 +812,8 @@ public class DevolCli extends PBase {
 					PagoPlazo.dSecItem = "1";
 					PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
 					PagoPlazo.dValItPlazo = TotalNT;
+					PagoPlazo.dInfPagPlazo = null;
+
 					NotaCredito.gTot.gPagPlazo.add(PagoPlazo);
 				} else {
 					PagosNt.iFormaPago = "02";

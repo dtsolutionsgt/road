@@ -944,7 +944,7 @@ public class Anulacion extends PBase {
 				PagoPlazo.dSecItem = "1";
 				PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
 				PagoPlazo.dValItPlazo = TotalNT;
-				PagoPlazo.dInfPagPlazo = String.valueOf(Cliente.diascredito);
+				PagoPlazo.dInfPagPlazo = null;
 
 				NotaDebito.gTot.gPagPlazo.add(PagoPlazo);
 			} else {
@@ -1295,7 +1295,7 @@ public class Anulacion extends PBase {
 				PagoPlazo.dSecItem = "1";
 				PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
 				PagoPlazo.dValItPlazo = TotalNT;
-				PagoPlazo.dInfPagPlazo = String.valueOf(Cliente.diascredito);
+				PagoPlazo.dInfPagPlazo = null;
 
 				NotaDebito.gTot.gPagPlazo.add(PagoPlazo);
 			} else {

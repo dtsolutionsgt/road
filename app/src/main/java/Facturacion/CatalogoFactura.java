@@ -58,7 +58,7 @@ public class CatalogoFactura extends PBase {
             ins.add("IdTablaControl", ItemFEL.Id);
             ins.add("Cufe", ItemFEL.Cufe);
             ins.add("TipoDocumento", ItemFEL.TipoDoc);
-            ins.add("NumeroDocumento", ItemFEL.NumDoc);
+            ins.add("NumeroDocumento", StringUtils.right("0000000000" + ItemFEL.NumDoc,10));//FacturaFEL.gDGen.dNroDF
             ins.add("Sucursal", ItemFEL.Sucursal);
             ins.add("Caja", ItemFEL.Caja);
             ins.add("Estado", ItemFEL.Estado);

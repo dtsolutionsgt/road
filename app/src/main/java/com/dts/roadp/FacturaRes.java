@@ -750,7 +750,12 @@ public class FacturaRes extends PBase {
 	}
 
  	private void finishOrder(){
-		ProgressDialog("Certificando factura...");
+
+		if (!gl.cobroPendiente) {
+			ProgressDialog("Certificando factura...");
+		} else {
+			ProgressDialog("Procesando factura...");
+		}
 
 		if (!saved) {
 			if (!saveOrder()) return;
@@ -760,13 +765,6 @@ public class FacturaRes extends PBase {
 			impressOrder();
 		}
 
-	}
-
-	private boolean TestProgress()
-	{
-
-
-		return false;
 	}
 
 	private void impressOrder(){

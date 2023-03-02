@@ -88,6 +88,7 @@ public class Cobro extends PBase {
 	private String urlDoc = "";
 	private String urlDocNT = "";
 	private String QR = "";
+	private String corelFactura = "";
 
 	private ProgressBar prgCobro;
 	@Override
@@ -1014,6 +1015,7 @@ public class Cobro extends PBase {
 
 				if (DT.getCount() > 0) {
 
+					corelFactura = DT.getString(0);
 					Sucursal = Catalogo.getSucursal();
 					Cliente = Catalogo.getCliente(DT.getString(1));
 
@@ -1320,7 +1322,7 @@ public class Cobro extends PBase {
 				ControlFEL.TipoDoc = Factura.gDGen.iDoc;
 				ControlFEL.NumDoc = Factura.gDGen.dNroDF;
 				ControlFEL.Sucursal = gl.sucur;
-				ControlFEL.Caja = fserie;
+				ControlFEL.Caja = Factura.gDGen.dPtoFacDF;
 
 				if (RespuestaEdocFac.Estado.equals("21") || RespuestaEdocFac.Estado.equals("20")) {
 					ControlFEL.Estado = "1";
@@ -1336,10 +1338,10 @@ public class Cobro extends PBase {
 				ControlFEL.TipFac = Factura.gDGen.iDoc;
 				ControlFEL.FechaAgr = String.valueOf(du.getFechaCompleta());
 				ControlFEL.QR = RespuestaEdocFac.UrlCodeQR;
-				ControlFEL.Corel = corel;
+				ControlFEL.Corel = corelFactura;
 				ControlFEL.Ruta = gl.ruta;
 				ControlFEL.Vendedor = gl.vend;
-				ControlFEL.Correlativo = String.valueOf(fcorel);
+				ControlFEL.Correlativo = Factura.gDGen.dNroDF;
 				ControlFEL.Fecha_Autorizacion = RespuestaEdocFac.FechaAutorizacion;
 				ControlFEL.Numero_Autorizacion = RespuestaEdocFac.NumAutorizacion;
 
@@ -1353,8 +1355,9 @@ public class Cobro extends PBase {
 				}
 
 				try {
+					ActualizaFacturaTmp(corelFactura, ControlFEL);
 					Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
-					Catalogo.InsertarFELControl(ControlFEL);
+					//Catalogo.InsertarFELControl(ControlFEL);
 				} catch (Exception e) {
 					msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
 				}
@@ -1367,6 +1370,18 @@ public class Cobro extends PBase {
 			throw new RuntimeException(e);
 		}finally {
 			progress.cancel();
+		}
+	}
+
+	private void ActualizaFacturaTmp(String Corel, clsClasses.clsControlFEL ControlFEL) {
+		try {
+			if (!Catalogo.ExisteFacturaDControl(Corel).isEmpty()) {
+				Catalogo.ActualizaFELControl(ControlFEL, Corel);
+			} else {
+				Catalogo.InsertarFELControl(ControlFEL);
+			}
+		} catch (Exception e) {
+			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
 		}
 	}
 

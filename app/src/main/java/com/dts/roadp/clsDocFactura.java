@@ -98,7 +98,8 @@ public class clsDocFactura extends clsDocument {
 				}else if (cantimpres==-1){
 					nombre = nombre + " ANULADA";//"FACTURA ANULADA";
 				}else if (cantimpres==-2){
-					nombre = "FACTURA PENDIENTE DE PAGO";
+					//nombre = "FACTURA PENDIENTE DE PAGO";
+					nombre = "DOC. NO FISCAL PENDIENTE DE PAGO";
 				}else if (cantimpres==0){
 					nombre = nombre;
 				}

@@ -734,6 +734,7 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.iProGen = 2;
 			NotaDebito.gDGen.iTipoTranVenta = 1;
 			NotaDebito.gDGen.iTipoSuc = 2;
+			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo;
 
 			Sucursal = Catalogo.getSucursal();
 
@@ -783,7 +784,7 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.Receptor.dCorElectRec = Cliente.email;
 			NotaDebito.gDGen.Receptor.dTfnRec = Cliente.telefono;
 			NotaDebito.gDGen.Receptor.cPaisRec = Cliente.codPais;
-			NotaDebito.gDGen.Receptor.dNombRec = Cliente.codigo + "-" + Cliente.nombre;
+			NotaDebito.gDGen.Receptor.dNombRec = Cliente.nombre;
 			NotaDebito.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
 			NotaDebito.gDGen.Receptor.gUbiRec.dCodUbi = (Cliente.ciudad==null?"":Cliente.ciudad);
 
@@ -1085,6 +1086,7 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.iProGen = 2;
 			NotaDebito.gDGen.iTipoTranVenta = 1;
 			NotaDebito.gDGen.iTipoSuc = 2;
+			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo;
 
 			Sucursal = Catalogo.getSucursal();
 
@@ -1134,7 +1136,7 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.Receptor.dCorElectRec = Cliente.email;
 			NotaDebito.gDGen.Receptor.dTfnRec = Cliente.telefono;
 			NotaDebito.gDGen.Receptor.cPaisRec = Cliente.codPais;
-			NotaDebito.gDGen.Receptor.dNombRec = Cliente.codigo + "-" + Cliente.nombre;
+			NotaDebito.gDGen.Receptor.dNombRec = Cliente.nombre;
 			NotaDebito.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
 			NotaDebito.gDGen.Receptor.gUbiRec.dCodUbi = (Cliente.ciudad==null?"":Cliente.ciudad);
 

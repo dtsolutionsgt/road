@@ -516,6 +516,7 @@ public class DevolCli extends PBase {
 				NotaCredito.gDGen.iProGen = 2;
 				NotaCredito.gDGen.iTipoTranVenta = 1;
 				NotaCredito.gDGen.iTipoSuc = 2;
+				NotaCredito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo;
 
 				NotaCredito.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
 				NotaCredito.gDGen.Emisor.dTfnEm = Sucursal.telefono;
@@ -585,7 +586,7 @@ public class DevolCli extends PBase {
 				NotaCredito.gDGen.Receptor.dCorElectRec = Cliente.email;
 				NotaCredito.gDGen.Receptor.dTfnRec = Cliente.telefono;
 				NotaCredito.gDGen.Receptor.cPaisRec = Cliente.codPais;
-				NotaCredito.gDGen.Receptor.dNombRec = Cliente.codigo + "-" + Cliente.nombre;
+				NotaCredito.gDGen.Receptor.dNombRec = Cliente.nombre;
 				NotaCredito.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
 				NotaCredito.gDGen.Receptor.gUbiRec.dCodUbi = (Cliente.ciudad==null?"":Cliente.ciudad);
 

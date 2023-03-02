@@ -1045,6 +1045,7 @@ public class FacturaRes extends PBase {
 			Factura.gDGen.iProGen = 2; //'Fijo 2
 			Factura.gDGen.iTipoTranVenta = 1; // Fijo 1
 			Factura.gDGen.iTipoSuc = 2; //'Fijo 2
+			Factura.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + cliente.codigo;
 
 			Factura.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";  //'BeSucursal.NOMBRE
 			Factura.gDGen.Emisor.dTfnEm = Sucursal.telefono;
@@ -1088,7 +1089,7 @@ public class FacturaRes extends PBase {
 			Factura.gDGen.Receptor.dCorElectRec = cliente.email;
 			Factura.gDGen.Receptor.dTfnRec = cliente.telefono;
 			Factura.gDGen.Receptor.cPaisRec = cliente.codPais;
-			Factura.gDGen.Receptor.dNombRec = cliente.codigo + "-" + cliente.nombre;
+			Factura.gDGen.Receptor.dNombRec = cliente.nombre;
 			Factura.gDGen.Receptor.dDirecRec = (cliente.direccion==null?"": cliente.direccion.substring(0,(cliente.direccion.length()>=100?100: cliente.direccion.length())));
 			Factura.gDGen.Receptor.gUbiRec.dCodUbi = (cliente.ciudad==null?"": cliente.ciudad);
 
@@ -1238,6 +1239,7 @@ public class FacturaRes extends PBase {
 				NotaCredito.gDGen.iProGen = 2;
 				NotaCredito.gDGen.iTipoTranVenta = 1;
 				NotaCredito.gDGen.iTipoSuc = 2;
+				NotaCredito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + cliente.codigo;
 
 				//Datos Emisor
 				NotaCredito.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
@@ -1279,7 +1281,7 @@ public class FacturaRes extends PBase {
 				NotaCredito.gDGen.Receptor.dCorElectRec = cliente.email;
 				NotaCredito.gDGen.Receptor.dTfnRec = cliente.telefono;
 				NotaCredito.gDGen.Receptor.cPaisRec = cliente.codPais;
-				NotaCredito.gDGen.Receptor.dNombRec = cliente.codigo + "-" + cliente.nombre;
+				NotaCredito.gDGen.Receptor.dNombRec = cliente.nombre;
 				NotaCredito.gDGen.Receptor.dDirecRec = (cliente.direccion==null?"": cliente.direccion.substring(0,(cliente.direccion.length()>=100?100: cliente.direccion.length())));
 				NotaCredito.gDGen.Receptor.gUbiRec.dCodUbi = (cliente.ciudad==null?"": cliente.ciudad);
 
@@ -1731,7 +1733,7 @@ public class FacturaRes extends PBase {
 
 					PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(cliente.diascredito);
 					PagoPlazo.dValItPlazo = Total;
-					PagoPlazo.dInfPagPlazo = String.valueOf(cliente.diascredito);
+					PagoPlazo.dInfPagPlazo =  StringUtils.right("000000000000000" +  String.valueOf(cliente.diascredito),15);
 
 					Factura.gTot.gPagPlazo.add(PagoPlazo);
 

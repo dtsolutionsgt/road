@@ -1031,6 +1031,7 @@ public class Cobro extends PBase {
 					Factura.gDGen.iProGen = 2; //'Fijo 2
 					Factura.gDGen.iTipoTranVenta = 1; // Fijo 1
 					Factura.gDGen.iTipoSuc = 2; //'Fijo 2
+					Factura.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo;
 
 					Factura.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";  //'BeSucursal.NOMBRE
 					Factura.gDGen.Emisor.dTfnEm = Sucursal.telefono;
@@ -1073,7 +1074,7 @@ public class Cobro extends PBase {
 					Factura.gDGen.Receptor.dCorElectRec = Cliente.email;
 					Factura.gDGen.Receptor.dTfnRec = Cliente.telefono;
 					Factura.gDGen.Receptor.cPaisRec = Cliente.codPais;
-					Factura.gDGen.Receptor.dNombRec = Cliente.codigo + "-" + Cliente.nombre;
+					Factura.gDGen.Receptor.dNombRec = Cliente.nombre;
 					Factura.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
 					Factura.gDGen.Receptor.gUbiRec.dCodUbi = (Cliente.ciudad==null?"":Cliente.ciudad);
 
@@ -1254,7 +1255,7 @@ public class Cobro extends PBase {
 
 						PagoPlazo.dFecItPlazo = Catalogo.FechaCredito(Cliente.diascredito);
 						PagoPlazo.dValItPlazo = Total;
-						PagoPlazo.dInfPagPlazo = String.valueOf(Cliente.diascredito);
+						PagoPlazo.dInfPagPlazo = StringUtils.right("000000000000000" +  String.valueOf(Cliente.diascredito),15);
 
 						Factura.gTot.gPagPlazo.add(PagoPlazo);
 					} else {

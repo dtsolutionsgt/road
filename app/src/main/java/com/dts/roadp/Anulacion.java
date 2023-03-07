@@ -2992,9 +2992,11 @@ public class Anulacion extends PBase {
 								AsyncAnularDocumento anular = new AsyncAnularDocumento();
 								anular.execute();
 							}
-						}else {
+						} else {
 							anulDocument();
 						}
+					} else {
+						anulDocument();
 					}
 				}
 			});

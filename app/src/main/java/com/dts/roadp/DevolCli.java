@@ -516,9 +516,9 @@ public class DevolCli extends PBase {
 				NotaCredito.gDGen.iProGen = 2;
 				NotaCredito.gDGen.iTipoTranVenta = 1;
 				NotaCredito.gDGen.iTipoSuc = 2;
-				NotaCredito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo;
+				NotaCredito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web;
 
-				NotaCredito.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
+				NotaCredito.gDGen.Emisor.dNombEm = Sucursal.nombre;
 				NotaCredito.gDGen.Emisor.dTfnEm = Sucursal.telefono;
 				NotaCredito.gDGen.Emisor.dSucEm = Sucursal.codigo;
 				NotaCredito.gDGen.Emisor.dCorElectEmi = Sucursal.correo;

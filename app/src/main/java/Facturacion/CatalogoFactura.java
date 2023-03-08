@@ -295,6 +295,7 @@ public class CatalogoFactura extends PBase {
                 Sucursal.codubi = dt.getString(12);
                 Sucursal.tipoRuc = dt.getString(13);
                 Sucursal.codMuni = dt.getString(14);
+                Sucursal.sitio_web = dt.getString(15);
 
             }
 

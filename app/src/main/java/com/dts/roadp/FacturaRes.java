@@ -1043,7 +1043,7 @@ public class FacturaRes extends PBase {
 			Factura.gDGen.iProGen = 2; //'Fijo 2
 			Factura.gDGen.iTipoTranVenta = 1; // Fijo 1
 			Factura.gDGen.iTipoSuc = 2; //'Fijo 2
-			Factura.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + cliente.codigo;
+			Factura.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + cliente.codigo + ";" + Sucursal.sitio_web;;
 
 			Factura.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";  //'BeSucursal.NOMBRE
 			Factura.gDGen.Emisor.dTfnEm = Sucursal.telefono;
@@ -1237,7 +1237,7 @@ public class FacturaRes extends PBase {
 				NotaCredito.gDGen.iProGen = 2;
 				NotaCredito.gDGen.iTipoTranVenta = 1;
 				NotaCredito.gDGen.iTipoSuc = 2;
-				NotaCredito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + cliente.codigo;
+				NotaCredito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + cliente.codigo + ";" + Sucursal.sitio_web;
 
 				//Datos Emisor
 				NotaCredito.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";

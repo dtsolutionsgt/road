@@ -26,6 +26,7 @@ import com.example.edocsdk.Fimador;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import Entidades.Detalle;
 import Entidades.Receptor;
@@ -980,7 +981,27 @@ public class Anulacion extends PBase {
 			int EstadoND = 0;
 
 			if (ConexionValida()) {
-				RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+				//#AT20230309 Intenta certificar 3 veces
+				try {
+					RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+
+					if (RespuestaEdocND.Cufe == null) {
+						for (int i = 0; i < 2; i++) {
+							if (RespuestaEdocND.Cufe == null && !RespuestaEdocND.Estado.equals("15")) {
+								RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+
+								if (RespuestaEdocND.Cufe != null) {
+									break;
+								}
+							} else {
+								break;
+							}
+
+						}
+					}
+				} catch (Exception e) {
+					addlog(Objects.requireNonNull(new Object() { }.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
+				}
 			} else {
 				RespuestaEdocND = Firmador.EmisionDocumentoBTC(NotaDebito,urlanulacion, "/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
@@ -2953,47 +2974,60 @@ public class Anulacion extends PBase {
 					Token.execute();
 
 					if (tipo == 3) {
+						//#AT20230309 Solo mandar anular facturas si el estado es 2,15 0 20
+						if (sitem.Estado.equals(2) || sitem.Estado.equals(15)  || sitem.Estado.equals(20) ) {
+							if (!ConexionValida()) {
+								toast("No hay conexión a internet.");
+								return;
+							}
 
-						if (!ConexionValida()) {
-							toast("No hay conexión a internet.");
-							return;
-						}
+							String CorelNC = "";
+							CorelNC = TieneNotaCredito();
 
-						String CorelNC = "";
-						CorelNC = TieneNotaCredito();
+							ProgressDialog("Anulando factura...");
 
-						ProgressDialog("Anulando factura...");
+							if (!CorelNC.isEmpty()) {
+								if (AnularNotaCreditoConFactura(CorelNC, itemid)) {
 
-						if (!CorelNC.isEmpty()) {
-							if (AnularNotaCreditoConFactura(CorelNC, itemid)) {
-
+									AsyncAnularDocumento anular = new AsyncAnularDocumento();
+									anular.execute();
+								}
+							} else {
 								AsyncAnularDocumento anular = new AsyncAnularDocumento();
 								anular.execute();
 							}
 						} else {
-							//ProgressDialog("Anulando factura...");
-							AsyncAnularDocumento anular = new AsyncAnularDocumento();
-							anular.execute();
+							AnularFactHH_DGI();
 						}
-					} else if ( tipo == 6 ) {
-						Cursor DT;
-						String vCorelFactura = "";
+					} else if (tipo == 6) {
+						//#AT20230309 Solo mandar anular facturas si el estado es 2,15 0 20
+						if (sitem.Estado.equals(2) || sitem.Estado.equals(15)  || sitem.Estado.equals(20)) {
+							if (!ConexionValida()) {
+								toast("No hay conexión a internet.");
+								return;
+							}
 
-						sql = "SELECT FACTURA FROM D_NOTACRED WHERE COREL = '" + itemid + "' AND TIPO_DOCUMENTO = 'NC' ";
-						DT=Con.OpenDT(sql);
+							Cursor DT;
+							String vCorelFactura = "";
 
-						if (DT.getCount()>0){
-							DT.moveToFirst();
-							vCorelFactura = DT.getString(0);
-						}
+							sql = "SELECT FACTURA FROM D_NOTACRED WHERE COREL = '" + itemid + "' AND TIPO_DOCUMENTO = 'NC' ";
+							DT=Con.OpenDT(sql);
 
-						if (ExisteFactura(vCorelFactura)) {
-							if (AnularNotaCreditoConFactura(itemid, vCorelFactura)) {
-								AsyncAnularDocumento anular = new AsyncAnularDocumento();
-								anular.execute();
+							if (DT.getCount()>0){
+								DT.moveToFirst();
+								vCorelFactura = DT.getString(0);
+							}
+
+							if (ExisteFactura(vCorelFactura)) {
+								if (AnularNotaCreditoConFactura(itemid, vCorelFactura)) {
+									AsyncAnularDocumento anular = new AsyncAnularDocumento();
+									anular.execute();
+								}
+							} else {
+								anulDocument();
 							}
 						} else {
-							anulDocument();
+							anulNotaCredito(itemid);
 						}
 					} else {
 						anulDocument();

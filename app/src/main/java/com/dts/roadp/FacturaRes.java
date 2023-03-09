@@ -2057,15 +2057,31 @@ public class FacturaRes extends PBase {
 	private void CertificarFactura() {
 		try {
 			Fimador Firmador = new Fimador(this);
-			RespuestaEdoc RespuestaEdocFac;
+			RespuestaEdoc RespuestaEdocFac = new RespuestaEdoc();;
 
 			if (ConexionValida()) {
-				RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
-			} else {
-				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
-			}
+				//#AT20230309 Intenta certificar 3 veces
+				try {
+					RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
-			if	(RespuestaEdocFac.Cufe == null) {
+					if (RespuestaEdocFac.Cufe == null) {
+						for (int i = 0; i < 2; i++) {
+							if (RespuestaEdocFac.Cufe == null && !RespuestaEdocFac.Estado.equals("15")) {
+								RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
+
+								if (RespuestaEdocFac.Cufe != null) {
+									break;
+								}
+							} else {
+								break;
+							}
+						}
+					}
+				} catch (Exception e) {
+					msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+				}
+
+			} else {
 				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 
@@ -2079,13 +2095,7 @@ public class FacturaRes extends PBase {
 				ControlFEL.NumDoc = Factura.gDGen.dNroDF;
 				ControlFEL.Sucursal = gl.sucur;
 				ControlFEL.Caja = fserie;
-
-				if (RespuestaEdocFac.Estado.equals("21") || RespuestaEdocFac.Estado.equals("20")) {
-					ControlFEL.Estado = "1";
-				} else {
-					ControlFEL.Estado = RespuestaEdocFac.Estado;
-				}
-
+				ControlFEL.Estado = RespuestaEdocFac.Estado;
 				ControlFEL.Mensaje = RespuestaEdocFac.MensajeRespuesta;
 				ControlFEL.ValorXml = RespuestaEdocFac.XML != null ? Catalogo.ReplaceXML(RespuestaEdocFac.XML) : "";
 
@@ -2204,10 +2214,9 @@ public class FacturaRes extends PBase {
 
 	private void GeneraNotaCredito(String CufeFact, String FechaFact) {
 		try {
-
-			RespuestaEdoc RespuestaEdocNT;
-			Fimador Firmador = new Fimador(this);
 			clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
+			RespuestaEdoc RespuestaEdocNT = new RespuestaEdoc();
+			Fimador Firmador = new Fimador(this);
 			int EstadoNT = 0;
 
 			gDFRefNum gDFRefNum= new gDFRefNum();
@@ -2226,12 +2235,28 @@ public class FacturaRes extends PBase {
 			NotaCredito.gDGen.Referencia.add(referencia);
 
 			if (ConexionValida()) {
-				RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, gl.ambiente);
-			} else {
-				RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
-			}
+				//#AT20230309 Intenta certificar 3 veces
+				try {
+					RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, gl.ambiente);
 
-			if (RespuestaEdocNT.Cufe == null) {
+					if (RespuestaEdocNT.Cufe == null) {
+						for (int i = 0; i < 2; i++) {
+							if (RespuestaEdocNT.Cufe == null && !RespuestaEdocNT.Estado.equals("15")) {
+								RespuestaEdocNT = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, gl.ambiente);
+
+								if (RespuestaEdocNT.Cufe != null) {
+									break;
+								}
+							} else {
+								break;
+							}
+						}
+					}
+				} catch (Exception e) {
+					addlog(Objects.requireNonNull(new Object() { }.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
+				}
+
+			} else {
 				RespuestaEdocNT = Firmador.EmisionDocumentoBTC(NotaCredito,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 

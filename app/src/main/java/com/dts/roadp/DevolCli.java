@@ -21,6 +21,7 @@ import com.example.edocsdk.Fimador;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import Entidades.Detalle;
 import Entidades.Receptor;
@@ -834,19 +835,34 @@ public class DevolCli extends PBase {
 
 				db.endTransaction();
 
-				Fimador Firmador = new Fimador(this);
-				RespuestaEdoc RespuestaEdoc =  null;
-
 				clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
+				RespuestaEdoc RespuestaEdoc =  new RespuestaEdoc();
+				Fimador Firmador = new Fimador(this);
 
 				if (ConexionValida()) {
-					RespuestaEdoc = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+					//#AT20230309 Intenta certificar 3 veces
+					try {
+						RespuestaEdoc = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+
+						if (RespuestaEdoc.Cufe == null) {
+							for (int i = 0; i < 2; i++) {
+								if (RespuestaEdoc.Cufe == null && !RespuestaEdoc.Estado.equals("15")) {
+									RespuestaEdoc = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+
+									if (RespuestaEdoc.Cufe != null) {
+										break;
+									}
+								} else {
+									break;
+								}
+
+							}
+						}
+					} catch (Exception e) {
+						addlog(Objects.requireNonNull(new Object() { }.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
+					}
 				} else {
 					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+ gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
-				}
-
-				if	(RespuestaEdoc.Cufe == null) {
-					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,gl.url_b2c_hh, "/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 				}
 
 				if (RespuestaEdoc != null) {

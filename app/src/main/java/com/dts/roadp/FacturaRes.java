@@ -1073,7 +1073,7 @@ public class FacturaRes extends PBase {
 					}
 
 				} else {
-					msgbox("No se encontraron los datos de la ubicación para este código:" + cliente.ciudad);
+					msgbox("No se encontraron los datos de la ubicación para este código: " + cliente.ciudad);
 					return false;
 				}
 			}

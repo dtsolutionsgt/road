@@ -1666,6 +1666,7 @@ public class BaseDatosScript {
 			        "[CODUBI] TEXT NOT NULL,"+
 			        "[TIPORUC] TEXT,"+
 					"[CODMUNI] TEXT,"+
+					"[SITIO_WEB] TEXT,"+
 					"PRIMARY KEY ([CODIGO])"+
 					");";
 			database.execSQL(vSQL);

@@ -611,19 +611,19 @@ public class DevolCli extends PBase {
 
 						} else {
 							if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
-								msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+								msgbox("La ubicación del cliente está vacía Cliente: " + Cliente.nombre);
 								return;
 							}
 						}
 					}else {
 						if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
-							msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+							msgbox("La ubicación del cliente está vacía Cliente: " + Cliente.nombre);
 							return;
 						}
 					}
 				}else {
 					if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
-						msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
+						msgbox("La ubicación del cliente está vacía Cliente: " + Cliente.nombre);
 						return;
 					}
 				}

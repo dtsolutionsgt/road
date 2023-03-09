@@ -34,8 +34,10 @@ public class printZebraZPL extends printBase {
     private ArrayList<String> lines = new ArrayList<String>();
     private String qrCode="";
 
+    private int cantQR = 0, marca = 0;
+
     private String ss,statstr,dbg;
-    private boolean status,validprint;;
+    private boolean status,validprint;
 
     // ZQ320 AC:3F:A4:C8:5F:D9
 
@@ -127,6 +129,9 @@ public class printZebraZPL extends printBase {
         File ffile;
         BufferedReader dfile;
         String ss;
+        int linea = 0;
+
+        cantQR = 0;
 
         try {
 
@@ -144,11 +149,18 @@ public class printZebraZPL extends printBase {
         try {
 
             lines.clear();
+            linea = 0;
 
             while ((ss = dfile.readLine()) != null) {
 
+                linea += 1;
+
                 if (ss.contains("QRCode:")){
                     qrCode = ss.substring(7,ss.length());
+                    cantQR +=1;
+                    if (cantQR==1){
+                        marca = linea;
+                    }
                 }else{
                     lines.add(ss);
                 }
@@ -205,14 +217,19 @@ public class printZebraZPL extends printBase {
         byte[] prdata = null;
         int ccnt,dlen;
         String ps,ss;
-        int altolinea,anchopapel,psx,altoQR=0;
+        int altolinea,anchopapel,psx,altoQRPapel=0,altoQR=0;
 
         try {
 
             altolinea=20;
 
             if (qrCode.length()>0){
-                altoQR = 350;
+                altoQR = 280;
+                if (cantQR>1){
+                    altoQRPapel = 280 * cantQR;
+                }else{
+                    altoQRPapel = altoQR;
+                }
             }
 
             psx = 0;
@@ -222,7 +239,7 @@ public class printZebraZPL extends printBase {
             if (prwidth>60) anchopapel=400;
 
             ccnt=lines.size();
-            dlen=(ccnt*altolinea) + altoQR +60;
+            dlen=(ccnt*altolinea) + altoQRPapel +60;
 
             ps="";
             anchopapel=430;
@@ -232,16 +249,44 @@ public class printZebraZPL extends printBase {
 
             //Prueba imprimir así, haber como sale..
             for (int i = 0; i <ccnt; i++) {
-                ps+="^FO,"+psx+",0 ^A 0, 40 ";
-                ps+="^ADN,5,1";
-                //ps+="^A@N,20,20,TT0003M_^FH\\^CI28";
-                //ps+="^A0N,20,20^FH\\^CI28^";
-                ps+="^FD";
-                ss=lines.get(i);
-                ps+=ss;
-                //ps+="^FS^CI27";
-                ps+="^FS";
-                psx =psx + altolinea;
+
+                if (marca!=0 && marca == i && altoQR!=0){
+                    if (qrCode.length()>0){
+                        ps+="^FO,"+psx+",1";
+                        ps+="^BQN,2,3^";
+                        ps+="^FD"+"   "+qrCode;
+                        ps+="^FS";
+
+                        ps+="^FO,"+psx+",0 ^A 0, 40 ";
+                        ps+="^ADN,5,1";
+                        //ps+="^A@N,20,20,TT0003M_^FH\\^CI28";
+                        //ps+="^A0N,20,20^FH\\^CI28^";
+                        ps+="^FD";
+                        ss=lines.get(i);
+                        ps+=ss;
+                        //ps+="^FS^CI27";
+                        ps+="^FS";
+
+                    }
+                }else{
+
+                    ps+="^FO,"+psx+",0 ^A 0, 40 ";
+                    ps+="^ADN,5,1";
+                    //ps+="^A@N,20,20,TT0003M_^FH\\^CI28";
+                    //ps+="^A0N,20,20^FH\\^CI28^";
+                    ps+="^FD";
+                    ss=lines.get(i);
+                    ps+=ss;
+                    //ps+="^FS^CI27";
+                    ps+="^FS";
+
+                }
+
+                if (marca!=0 && i==marca && cantQR>1){
+                    psx =psx + altoQR;
+                }else{
+                    psx =psx + altolinea;
+                }
             }
 
             if (qrCode.length()>0){

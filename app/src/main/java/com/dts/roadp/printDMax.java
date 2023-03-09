@@ -236,6 +236,8 @@ public class printDMax extends printBase {
 
 			showmsg("Lines : "+lines.size());
 
+			documentlist.clear();
+
 			if (qrCode.length()>0){
 				docEZ = new DocumentEZ("MF204");
 

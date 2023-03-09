@@ -234,7 +234,8 @@ public class clsClasses {
 	}
 
 	public class clsSucursal {
-		public String codigo, empresa, descripcion, nombre, telefono, nit, direccion, texto, correo, corx, cory, codubi, tipoRuc, codMuni = "", tipoSucursal;
+		public String codigo, empresa, descripcion, nombre, telefono, nit, direccion, texto, correo, corx, cory,
+				codubi, tipoRuc, codMuni = "", tipoSucursal, sitio_web;
 	}
 
 	public class clsCliente {

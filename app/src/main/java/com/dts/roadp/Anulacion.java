@@ -735,11 +735,11 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.iProGen = 2;
 			NotaDebito.gDGen.iTipoTranVenta = 1;
 			NotaDebito.gDGen.iTipoSuc = 2;
-			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo;
+			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web;;
 
 			Sucursal = Catalogo.getSucursal();
 
-			NotaDebito.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
+			NotaDebito.gDGen.Emisor.dNombEm = Sucursal.nombre;
 			NotaDebito.gDGen.Emisor.dTfnEm = Sucursal.telefono;
 			NotaDebito.gDGen.Emisor.dSucEm = Sucursal.codigo;
 			NotaDebito.gDGen.Emisor.dCorElectEmi = Sucursal.correo;
@@ -965,7 +965,7 @@ public class Anulacion extends PBase {
 
 				Referencia referencia= new Referencia();
 				referencia.dFechaDFRef = NotaDebito.gDGen.dFechaEm;
-				referencia.dNombEmRef = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
+				referencia.dNombEmRef = Sucursal.nombre;
 				referencia.gRucEmDFRef = new gRucEmDFRef();
 				referencia.gRucEmDFRef.dRuc =  Sucursal.nit;
 				referencia.gRucEmDFRef.dTipoRuc = Sucursal.tipoRuc;
@@ -1107,11 +1107,11 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.iProGen = 2;
 			NotaDebito.gDGen.iTipoTranVenta = 1;
 			NotaDebito.gDGen.iTipoSuc = 2;
-			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo;
+			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web;;
 
 			Sucursal = Catalogo.getSucursal();
 
-			NotaDebito.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
+			NotaDebito.gDGen.Emisor.dNombEm = Sucursal.nombre;
 			NotaDebito.gDGen.Emisor.dTfnEm = Sucursal.telefono;
 			NotaDebito.gDGen.Emisor.dSucEm = Sucursal.codigo;
 			NotaDebito.gDGen.Emisor.dCorElectEmi = Sucursal.correo;
@@ -3195,7 +3195,7 @@ public class Anulacion extends PBase {
 				}
 			} else {
 				progress.cancel();
-				toast(resultado.getMensajeRespuesta());
+				toast("No se pudo anular la factura " + resultado.getMensajeRespuesta());
 			}
 		}
 	}

@@ -1092,6 +1092,8 @@ public class Anulacion extends PBase {
 				throw new Exception("Error al guardar detalle CxCD");
 			}
 
+			Sucursal = Catalogo.getSucursal();
+
 			NotaDebito = new rFE();
 			NotaDebito.gDGen.iTpEmis = "01";
 			NotaDebito.gDGen.iDoc = "05"; //Tipo de documento //(05:Nota de debito  referente a facturas, 07:Nota de debito genérica )
@@ -1107,9 +1109,7 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.iProGen = 2;
 			NotaDebito.gDGen.iTipoTranVenta = 1;
 			NotaDebito.gDGen.iTipoSuc = 2;
-			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web;;
-
-			Sucursal = Catalogo.getSucursal();
+			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web;
 
 			NotaDebito.gDGen.Emisor.dNombEm = Sucursal.nombre;
 			NotaDebito.gDGen.Emisor.dTfnEm = Sucursal.telefono;
@@ -1353,7 +1353,27 @@ public class Anulacion extends PBase {
 			int EstadoND = 0;
 
 			if (ConexionValida()) {
-				RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+				//#AT20230309 Intenta certificar 3 veces
+				try {
+					RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+
+					if (RespuestaEdocND.Cufe == null) {
+						for (int i = 0; i < 2; i++) {
+							if (RespuestaEdocND.Cufe == null && !RespuestaEdocND.Estado.equals("15")) {
+								RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+
+								if (RespuestaEdocND.Cufe != null) {
+									break;
+								}
+							} else {
+								break;
+							}
+						}
+					}
+				} catch (Exception e) {
+					addlog(Objects.requireNonNull(new Object() { }.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
+				}
+
 			} else {
 				RespuestaEdocND = Firmador.EmisionDocumentoBTC(NotaDebito,urlanulacion, "/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
@@ -2975,7 +2995,7 @@ public class Anulacion extends PBase {
 
 					if (tipo == 3) {
 						//#AT20230309 Solo mandar anular facturas si el estado es 2,15 0 20
-						if (sitem.Estado.equals(2) || sitem.Estado.equals(15)  || sitem.Estado.equals(20) ) {
+						if (sitem.Estado.equals("2") || sitem.Estado.equals("15")  || sitem.Estado.equals("20")) {
 							if (!ConexionValida()) {
 								toast("No hay conexión a internet.");
 								return;
@@ -3001,7 +3021,7 @@ public class Anulacion extends PBase {
 						}
 					} else if (tipo == 6) {
 						//#AT20230309 Solo mandar anular facturas si el estado es 2,15 0 20
-						if (sitem.Estado.equals(2) || sitem.Estado.equals(15)  || sitem.Estado.equals(20)) {
+						if (sitem.Estado.equals("2") || sitem.Estado.equals("15")  || sitem.Estado.equals("20")) {
 							if (!ConexionValida()) {
 								toast("No hay conexión a internet.");
 								return;

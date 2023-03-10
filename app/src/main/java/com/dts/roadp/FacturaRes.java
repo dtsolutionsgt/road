@@ -1073,6 +1073,7 @@ public class FacturaRes extends PBase {
 					}
 
 				} else {
+					progress.cancel();
 					msgbox("No se encontraron los datos de la ubicación para este código: " + cliente.ciudad);
 					return false;
 				}
@@ -1109,18 +1110,21 @@ public class FacturaRes extends PBase {
 
 					} else {
 						if (cliente.tipoRec.equals("01")|| cliente.tipoRec.equals("03")){
+							progress.cancel();
 							msgbox("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
 							return false;
 						}
 					}
 				}else {
 					if (cliente.tipoRec.equals("01")|| cliente.tipoRec.equals("03")){
+						progress.cancel();
 						msgbox("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
 						return false;
 					}
 				}
 			}else {
 				if (cliente.tipoRec.equals("01")|| cliente.tipoRec.equals("03")){
+					progress.cancel();
 					msgbox("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
 					return false;
 				}
@@ -1139,10 +1143,12 @@ public class FacturaRes extends PBase {
 							Factura.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
 						}
 					}else{
+						progress.cancel();
 						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
 						return false;
 					}
 				}else {
+					progress.cancel();
 					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 					return false;
 				}

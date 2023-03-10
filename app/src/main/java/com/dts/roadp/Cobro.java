@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 import Entidades.Detalle;
 import Entidades.Receptor;
@@ -1099,18 +1100,21 @@ public class Cobro extends PBase {
 
 							} else {
 								if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+									progress.cancel();
 									msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
 									return false;
 								}
 							}
 						} else {
 							if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+								progress.cancel();
 								msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
 								return false;
 							}
 						}
 					} else {
 						if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
+							progress.cancel();
 							msgbox("La ubicación del cliente está vacía Cliente:" + Cliente.nombre);
 							return false;
 						}
@@ -1129,10 +1133,12 @@ public class Cobro extends PBase {
 									Factura.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
 								}
 							} else {
+								progress.cancel();
 								msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
 								return false;
 							}
 						} else {
+							progress.cancel();
 							msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 							return false;
 						}
@@ -1300,15 +1306,31 @@ public class Cobro extends PBase {
 			Log.d("Ruta",this.getApplicationContext().getFilesDir().toString());
 
 			Fimador Firmador = new Fimador(this);
-			RespuestaEdoc RespuestaEdocFac, RespuestaEdocNT = null;
+			RespuestaEdoc RespuestaEdocFac = new RespuestaEdoc();
 
 			if (ConexionValida()) {
-				RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
-			} else {
-				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
-			}
+				//#AT20230309 Intenta certificar 3 veces
+				try {
+					RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
-			if	(RespuestaEdocFac.Cufe == null) {
+					if (RespuestaEdocFac.Cufe == null) {
+						for (int i = 0; i < 2; i++) {
+							if (RespuestaEdocFac.Cufe == null && !RespuestaEdocFac.Estado.equals("15")) {
+								RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
+
+								if (RespuestaEdocFac.Cufe != null) {
+									break;
+								}
+							} else {
+								break;
+							}
+						}
+					}
+				} catch (Exception e) {
+					addlog(Objects.requireNonNull(new Object() { }.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
+				}
+
+			} else {
 				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 

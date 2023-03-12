@@ -671,7 +671,7 @@ public class DevolCli extends PBase {
 				if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
 
 					if(!BeRUC.sRUC.trim().equals("")){
-						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+						NotaCredito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 					}else{
 						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 						return;
@@ -687,7 +687,7 @@ public class DevolCli extends PBase {
 				}else{
 
 					if(!BeRUC.sRUC.trim().equals("")){
-						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+						NotaCredito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 					}else{
 						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 						return;

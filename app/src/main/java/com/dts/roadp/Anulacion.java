@@ -1241,7 +1241,7 @@ public class Anulacion extends PBase {
 			if (NotaDebito.gDGen.Receptor.iTipoRec.equals("01") || NotaDebito.gDGen.Receptor.iTipoRec.equals("03")) {
 
 				if(!BeRUC.sRUC.trim().equals("")){
-					NotaDebito.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+					NotaDebito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 				}else{
 					progress.cancel();
 					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
@@ -1259,7 +1259,7 @@ public class Anulacion extends PBase {
 			}else{
 
 				if(!BeRUC.sRUC.trim().equals("")){
-					NotaDebito.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+					NotaDebito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 				}else{
 					progress.cancel();
 					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");

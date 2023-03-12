@@ -157,7 +157,7 @@ public class FacturaRes extends PBase {
 		urltoken = gl.url_token;
 		usuario = gl.usuario_api;
 		clave = gl.clave_api;
-		urlDoc = gl.url_emision_factura_b2c;
+		urlDoc = gl.url_doc;
 		QR = gl.qr_api;
 		urlDocNT = gl.url_emision_nc_b2c;
 
@@ -1070,6 +1070,13 @@ public class FacturaRes extends PBase {
 
 			//region Factura Electrónica
 			Sucursal = Catalogo.getSucursal();
+
+			if (Sucursal == null) {
+				progress.cancel();
+				msgbox("Sucursal sin datos");
+				return false;
+			}
+
 			clsClasses.clsCliente cliente = Catalogo.getCliente(gl.cliente);
 
 			Factura.gDGen.iTpEmis = "01"; // 'Fijo salvo que sea autorización en contingencia cambiar a valor 04
@@ -1179,7 +1186,7 @@ public class FacturaRes extends PBase {
 			if (Factura.gDGen.Receptor.iTipoRec.equals("01") || Factura.gDGen.Receptor.iTipoRec.equals("03")) {
 
 					if(!BeRUC.sRUC.trim().equals("")){
-						Factura.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+						Factura.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 					}else{
 						progress.cancel();
 						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
@@ -1197,7 +1204,7 @@ public class FacturaRes extends PBase {
 			}else{
 
 				if(!BeRUC.sRUC.trim().equals("")){
-					Factura.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+					Factura.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 				}else{
 					progress.cancel();
 					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
@@ -1373,7 +1380,7 @@ public class FacturaRes extends PBase {
 				if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
 
 					if(!BeRUC.sRUC.trim().equals("")){
-						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+						NotaCredito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 					}else{
 						progress.cancel();
 						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
@@ -1391,7 +1398,7 @@ public class FacturaRes extends PBase {
 				}else{
 
 					if(!BeRUC.sRUC.trim().equals("")){
-						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+						NotaCredito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 					}else{
 						progress.cancel();
 						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");

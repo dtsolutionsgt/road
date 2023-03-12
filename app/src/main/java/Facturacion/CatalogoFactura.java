@@ -297,6 +297,8 @@ public class CatalogoFactura extends PBase {
                 Sucursal.codMuni = dt.getString(14);
                 Sucursal.sitio_web = dt.getString(15);
 
+            } else {
+                Sucursal = null;
             }
 
             if (dt != null) dt.close();

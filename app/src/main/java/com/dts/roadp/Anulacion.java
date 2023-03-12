@@ -84,7 +84,7 @@ public class Anulacion extends PBase {
 	//#Anular Factura
 	private ProgressDialog progress;
 	private clsClasses.clsEmpresa Empresa = clsCls.new clsEmpresa();
-	private ConfigRetrofit retrofit = new ConfigRetrofit();
+	private ConfigRetrofit retrofit;
 	private Token token = new Token();
 	private ResultadoAnulacion resultado = new ResultadoAnulacion();
 	boolean exito = false;
@@ -176,6 +176,7 @@ public class Anulacion extends PBase {
 		fdoc=new clsDocFactura(this,prn.prw,gl.peMon,gl.peDecImp,"",app.esClienteNuevo(pclicod),gl.codCliNuevo,gl.peModal);
 		fdoc.medidapeso=gl.umpeso;
 		Catalogo = new CatalogoFactura(this, Con, db);
+		retrofit = new ConfigRetrofit(this);
 		getDatosEmpresa();
 	}
 

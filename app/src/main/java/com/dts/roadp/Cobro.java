@@ -1036,7 +1036,7 @@ public class Cobro extends PBase {
 					Factura.gDGen.iTipoSuc = 2; //'Fijo 2
 					Factura.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web + ";";
 
-					Factura.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";  //'BeSucursal.NOMBRE
+					Factura.gDGen.Emisor.dNombEm =Sucursal.nombre;
 					Factura.gDGen.Emisor.dTfnEm = Sucursal.telefono;
 					Factura.gDGen.Emisor.dSucEm = Sucursal.codigo;
 					Factura.gDGen.Emisor.dCorElectEmi = Sucursal.correo;
@@ -1410,18 +1410,20 @@ public class Cobro extends PBase {
 					toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 					certifico_factura_pendiente_pago =true;
 				} else {
-					toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+					toastlong("ERR_233121237A: NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 					certifico_factura_pendiente_pago = false;
 				}
 
 				try {
 					ActualizaFacturaTmp(corelFactura, ControlFEL);
-					Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
+					Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, RespuestaEdocFac.Estado, corel);
 					//Catalogo.InsertarFELControl(ControlFEL);
 				} catch (Exception e) {
 					msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
 				}
 
+			} else {
+				toastlong("ERR_233121237: NO SE LOGRÓ CERTIFICAR LA FACTURA");
 			}
 			progress.cancel();
 		} catch (Exception e) {

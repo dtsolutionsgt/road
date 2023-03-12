@@ -1411,7 +1411,7 @@ public class Anulacion extends PBase {
 
 				Referencia referencia= new Referencia();
 				referencia.dFechaDFRef = NotaDebito.gDGen.dFechaEm;
-				referencia.dNombEmRef = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
+				referencia.dNombEmRef = Sucursal.nombre;
 				referencia.gRucEmDFRef = new gRucEmDFRef();
 				referencia.gRucEmDFRef.dRuc =  Sucursal.nit;
 				referencia.gRucEmDFRef.dTipoRuc = Sucursal.tipoRuc;

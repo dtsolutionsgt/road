@@ -922,14 +922,16 @@ public class FacturaRes extends PBase {
 				addlog(Objects.requireNonNull(new Object() {
 				}.getClass().getEnclosingMethod()).getName(),"Inconsistencia de lotes , producto : "+consprod+" / "+corel,"");
 				db.endTransaction();
-				mu.msgbox("Inconsistencia de lotes , producto : "+consprod+" / "+corel);return false;
+				mu.msgbox("Inconsistencia de lotes , producto : "+consprod+" / "+corel);
+				return false;
 			}
 
 			if (!consistenciaBarras()) {
 				addlog(Objects.requireNonNull(new Object() {
 				}.getClass().getEnclosingMethod()).getName(),"Inconsistencia de barras "+corel,"");
 				db.endTransaction();
-				mu.msgbox("Inconsistencia de barras , producto : "+consprod+" / "+corel);return false;
+				mu.msgbox("Inconsistencia de barras , producto : "+consprod+" / "+corel);
+				return false;
 			}
 
 			//region D_FACTURA
@@ -1054,9 +1056,7 @@ public class FacturaRes extends PBase {
 						vumentr=dt.getString(2);
 						vpeso= dt.getDouble(3);
 						vfactor = vpeso/(vcant==0?1:vcant);
-
 						rebajaStockCanastas(vprod, vcant, vumentr, vfactor);
-
 						dt.moveToNext();
 					}
 				}
@@ -1095,7 +1095,7 @@ public class FacturaRes extends PBase {
 			Factura.gDGen.iTipoSuc = 2; //'Fijo 2
 			Factura.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + cliente.codigo + ";" + Sucursal.sitio_web + ";";
 
-			Factura.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";  //'BeSucursal.NOMBRE
+			Factura.gDGen.Emisor.dNombEm = Sucursal.nombre;
 			Factura.gDGen.Emisor.dTfnEm = Sucursal.telefono;
 			Factura.gDGen.Emisor.dSucEm = Sucursal.codigo;
 			Factura.gDGen.Emisor.dCorElectEmi = Sucursal.correo;
@@ -1296,7 +1296,7 @@ public class FacturaRes extends PBase {
 				NotaCredito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + cliente.codigo + ";" + Sucursal.sitio_web + ";";
 
 				//Datos Emisor
-				NotaCredito.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
+				NotaCredito.gDGen.Emisor.dNombEm = Sucursal.nombre;
 				NotaCredito.gDGen.Emisor.dTfnEm = Sucursal.telefono;
 				NotaCredito.gDGen.Emisor.dSucEm = Sucursal.codigo;
 				NotaCredito.gDGen.Emisor.dCorElectEmi = Sucursal.correo;
@@ -1413,42 +1413,6 @@ public class FacturaRes extends PBase {
 					}
 
 				}
-
-				/*if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
-
-					if (cliente.nit.length()>0) {
-						String[] DVRuc = cliente.nit.split(" ");
-						if (DVRuc.length > 1) {
-							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-							if (DVRuc[1].trim().equals("")){
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
-							}else{
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
-							}
-						}else{
-							msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
-							return false;
-						}
-					}else {
-						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-						return false;
-					}
-				}else{
-					if (cliente.nit.length()>0) {
-						String[] DVRuc = cliente.nit.split(" ");
-						if (DVRuc.length > 1) {
-							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-							if (DVRuc[1].trim().equals("")){
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
-							}else{
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
-							}
-						}else{
-							NotaCredito.gDGen.Receptor.gRucRec.dRuc = cliente.nit;
-							NotaCredito.gDGen.Receptor.gRucRec.dDV = "";
-						}
-					}
-				}*/
 
 				sql="SELECT Item,CODIGO,CANT,CODDEV,TOTAL,PRECIO,PRECLISTA,REF,PESO,LOTE,UMVENTA,UMSTOCK,UMPESO,FACTOR,POR_PESO FROM T_CxCD WHERE CANT>0";
 				DT=Con.OpenDT(sql);
@@ -2107,22 +2071,25 @@ public class FacturaRes extends PBase {
 			db.endTransaction();
             addlog(Objects.requireNonNull(new Object() {
 			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
-            mu.msgbox("Error (factura) " + e.getMessage());return false;
+            mu.msgbox("Error (factura) " + e.getMessage());
+			return false;
         }
 
 		if (!gl.cobroPendiente && saved) {
+
 			try {
 
 				Handler mtimer = new Handler();
 				Runnable mrunner = () -> {
+
 					CertificarFactura();
 
 					if (gl.dvbrowse != 0) {
 						gl.dvbrowse = 0;
 						gl.tiponcredito = 0;
 					}
-					saveAtten(tot);
 
+					saveAtten(tot);
 					progress.cancel();
 					impressOrder();
 				};
@@ -2149,7 +2116,9 @@ public class FacturaRes extends PBase {
 	}
 
 	private void CertificarFactura() {
+
 		try {
+
 			Fimador Firmador = new Fimador(this);
 			RespuestaEdoc RespuestaEdocFac = new RespuestaEdoc();;
 
@@ -2206,8 +2175,14 @@ public class FacturaRes extends PBase {
 				ControlFEL.Fecha_Autorizacion = RespuestaEdocFac.FechaAutorizacion;
 				ControlFEL.Numero_Autorizacion = RespuestaEdocFac.NumAutorizacion;
 
+				//#AT20230203 Actualiza los campos faltantes en D_FACTURA_CONTROL_CONTIGENCIA
+				ActualizaFacturaTmp(corel, ControlFEL);
+				Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, RespuestaEdocFac.Estado, corel);
+
 				if (RespuestaEdocFac.Estado.equals("2")) {
+
 					EstadoFac = 1;
+
 					toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 
 					if (gl.dvbrowse!=0) {
@@ -2223,14 +2198,13 @@ public class FacturaRes extends PBase {
 						GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
 					}
 				} else {
-					toastlong("NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+					toastlong("ERR_233121237B: NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 				}
 
-				//#AT20230203 Actualiza los campos faltantes en D_FACTURA_CONTROL_CONTIGENCIA
-				ActualizaFacturaTmp(corel, ControlFEL);
-				Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, EstadoFac, corel);
-				//Catalogo.InsertarFELControl(ControlFEL);
+			}else {
+				toastlong("ERR_233121237C: NO SE LOGRÓ CERTIFICAR LA FACTURA");
 			}
+
 		} catch (Exception e) {
 			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
 		} catch (Throwable e) {
@@ -2239,10 +2213,12 @@ public class FacturaRes extends PBase {
 	}
 
 	private void InsertaFacturaTmp() {
-		clsClasses.clsControlFEL TmpControlFEL;
-		try {
-			TmpControlFEL = clsCls.new clsControlFEL();
 
+		clsClasses.clsControlFEL TmpControlFEL;
+
+		try {
+
+			TmpControlFEL = clsCls.new clsControlFEL();
 			TmpControlFEL.TipoDoc = Factura.gDGen.iDoc;
 			TmpControlFEL.NumDoc = Factura.gDGen.dNroDF;
 			TmpControlFEL.Sucursal = gl.sucur;
@@ -2257,15 +2233,16 @@ public class FacturaRes extends PBase {
 			TmpControlFEL.Correlativo = String.valueOf(fcorel);
 
 			try {
+
 				Catalogo.InsertarFELControl(TmpControlFEL);
 
 				if (gl.dvbrowse!=0) {
+
 					TmpControlFEL.TipoDoc = NotaCredito.gDGen.iDoc;
 					TmpControlFEL.NumDoc = NotaCredito.gDGen.dNroDF;
 					TmpControlFEL.TipFac = NotaCredito.gDGen.iDoc;
 					TmpControlFEL.Corel = gl.devcornc;
 					TmpControlFEL.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
-
 					Catalogo.InsertarFELControl(TmpControlFEL);
 				}
 
@@ -2308,7 +2285,9 @@ public class FacturaRes extends PBase {
 	}
 
 	private void GeneraNotaCredito(String CufeFact, String FechaFact) {
+
 		try {
+
 			clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
 			RespuestaEdoc RespuestaEdocNT = new RespuestaEdoc();
 			Fimador Firmador = new Fimador(this);
@@ -2320,7 +2299,7 @@ public class FacturaRes extends PBase {
 
 			Referencia referencia= new Referencia();
 			referencia.dFechaDFRef = FechaFact+"-05:00";
-			referencia.dNombEmRef = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
+			referencia.dNombEmRef = Sucursal.nombre;
 			referencia.gRucEmDFRef = new gRucEmDFRef();
 			referencia.gRucEmDFRef.dRuc =  Sucursal.nit;
 			referencia.gRucEmDFRef.dTipoRuc = Sucursal.tipoRuc;

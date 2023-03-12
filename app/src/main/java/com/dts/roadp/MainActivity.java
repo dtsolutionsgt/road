@@ -456,7 +456,7 @@ public class MainActivity extends PBase {
             //#HS_20181120_1616 Se agrego el campo UNIDAD_MEDIDA_PESO.//campo INCIDENCIA_NO_LECTURA
             sql = " SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO," +
                   " INCIDENCIA_NO_LECTURA, LOTE_POR_DEFECTO, URL_TOKEN, USUARIO_API, CLAVE_API, URL_EMISION_NC_B2C," +
-                  " URL_EMISION_ND_B2C,URL_EMISION_FACTURA_B2C,QR_API,URL_BASE, ARCHIVO_P12,URL_B2C_HH,QR_CLAVE, URL_DOC " +
+                  " URL_EMISION_ND_B2C,URL_EMISION_FACTURA_B2C,QR_API,URL_BASE, ARCHIVO_P12,URL_B2C_HH,QR_CLAVE, URL_DOC, URL_EMISION_NC_B2B_HH, URL_EMISION_ND_B2B_HH " +
                   " FROM P_EMPRESA ";
             DT = Con.OpenDT(sql);
 
@@ -488,6 +488,8 @@ public class MainActivity extends PBase {
                 gl.url_b2c_hh = DT.getString(18);
                 gl.qr_clave = DT.getString(19);
                 gl.url_doc = DT.getString(20);
+                gl.url_emision_nc_b2b_hh = DT.getString(21);
+                gl.url_emision_nd_b2b_hh =DT.getString(22);
             } else {
                 gl.emp = "";lblRuta.setText("");
                 gl.devol = false;

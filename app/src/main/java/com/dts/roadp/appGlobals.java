@@ -121,5 +121,7 @@ public class appGlobals extends Application {
 	public String archivo_p12 = ""; //F-8-740-190-OrielAntonioBarriaCaraballo.p12
 	public String url_b2c_hh = ""; //"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?"
 	public String qr_clave= ""; //"yb90o#0F"
+	public String url_emision_nc_b2b_hh = "";
+	public String url_emision_nd_b2b_hh = "";
 	public String ambiente= "1"; //"2"
 }

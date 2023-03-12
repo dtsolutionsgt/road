@@ -1647,6 +1647,8 @@ public class BaseDatosScript {
 					"[QR_CLAVE] TEXT,"+
 					"[URL_B2C_HH] TEXT,"+
 					"[URL_DOC] TEXT,"+
+					"[URL_EMISION_NC_B2B_HH] TEXT,"+
+					"[URL_EMISION_ND_B2B_HH] TEXT,"+
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
 			database.execSQL(vSQL);

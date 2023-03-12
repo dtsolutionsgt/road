@@ -159,7 +159,7 @@ public class FacturaRes extends PBase {
 		clave = gl.clave_api;
 		urlDoc = gl.url_doc;
 		QR = gl.qr_api;
-		urlDocNT = gl.url_emision_nc_b2c;
+		urlDocNT = gl.url_emision_nc_b2b_hh;
 
 		app = new AppMethods(this, gl, Con, db);
 

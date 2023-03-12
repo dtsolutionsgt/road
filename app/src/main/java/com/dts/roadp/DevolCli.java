@@ -91,7 +91,7 @@ public class DevolCli extends PBase {
 		urltoken = gl.url_token;
 		usuario = gl.usuario_api;
 		clave =  gl.clave_api;
-		urlDoc =  gl.url_doc;
+		urlDoc =  gl.url_emision_nc_b2b_hh;
 		QR =  gl.qr_api;
 		urlcontingencia= gl.url_b2c_hh;
 

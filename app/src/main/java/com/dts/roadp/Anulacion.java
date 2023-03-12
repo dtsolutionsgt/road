@@ -135,7 +135,7 @@ public class Anulacion extends PBase {
 		urltoken = gl.url_token;
 		usuario = gl.usuario_api;
 		clave = gl.clave_api;
-		urlDoc = gl.url_emision_nd_b2c;
+		urlDoc = gl.url_emision_nd_b2b_hh;
 		QR = gl.qr_api;
 		urlanulacion=gl.url_b2c_hh;
 

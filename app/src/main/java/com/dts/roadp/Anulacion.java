@@ -366,7 +366,7 @@ public class Anulacion extends PBase {
 					if (tipo==3) {
 						vItem.Desc = DT.getString(9) + " - " + DT.getString(1);
 						vItem.flag = DT.getInt(4);
-						vItem.Cufe = DT.getString(5);
+						vItem.Cufe = (DT.getString(5).equals("null") ? "":DT.getString(5));
 						sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);
                         vItem.Numero_Autorizacion=DT.getString(6);
 						vItem.Certificada_DGI = (DT.getInt(7)==1?"Si":"No");
@@ -378,7 +378,7 @@ public class Anulacion extends PBase {
 					}
 
 					if (tipo==6){
-						vItem.Cufe = DT.getString(4);
+						vItem.Cufe = (DT.getString(4).equals("null") ? "":DT.getString(4));
 						vItem.Certificada_DGI = (DT.getInt(6)==1?"Si":"No");
 						vItem.Estado = DT.getString(7);
 						vItem.CufeFactura = (DT.getString(8) == null ? "": DT.getString(8));

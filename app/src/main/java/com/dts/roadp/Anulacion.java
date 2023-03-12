@@ -658,10 +658,11 @@ public class Anulacion extends PBase {
 					//En espera para definir el estado correcto 11 ó 2
 					if (resultado.getEstado().equals("2")) {
 						exito = true;
-					} else if (resultado.getEstado().equals("4")) {
+					} /*else if (resultado.getEstado().equals("4")) {
 						//#CKFK20230118 Si la factura no está autorizada se debe de poder anular
 						exito = true;
-					} else{
+					}*/
+					else{
 						toastlong(resultado.getMensajeRespuesta());
 					}
 				}
@@ -724,6 +725,8 @@ public class Anulacion extends PBase {
 				NotaDebito.gDGen.iDoc = "05";
 			}
 
+			Sucursal = Catalogo.getSucursal();
+
 			NotaDebito.gDGen.dNroDF = String.valueOf(vNroDF); //Acá va un número entero 19
 			NotaDebito.gDGen.dPtoFacDF = vSerie; //000 003
 			NotaDebito.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";
@@ -737,8 +740,6 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.iTipoTranVenta = 1;
 			NotaDebito.gDGen.iTipoSuc = 2;
 			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web + ";";
-
-			Sucursal = Catalogo.getSucursal();
 
 			NotaDebito.gDGen.Emisor.dNombEm = Sucursal.nombre;
 			NotaDebito.gDGen.Emisor.dTfnEm = Sucursal.telefono;

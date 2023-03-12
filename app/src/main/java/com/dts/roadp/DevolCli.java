@@ -91,7 +91,7 @@ public class DevolCli extends PBase {
 		urltoken = gl.url_token;
 		usuario = gl.usuario_api;
 		clave =  gl.clave_api;
-		urlDoc =  gl.url_emision_nc_b2c;
+		urlDoc =  gl.url_doc;
 		QR =  gl.qr_api;
 		urlcontingencia= gl.url_b2c_hh;
 
@@ -629,7 +629,7 @@ public class DevolCli extends PBase {
 				}
 
 				// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
-				if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
+				/*if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
 
 					if (Cliente.nit.length()>0) {
 						String[] DVRuc = Cliente.nit.split(" ");
@@ -663,6 +663,43 @@ public class DevolCli extends PBase {
 							NotaCredito.gDGen.Receptor.gRucRec.dDV = "";
 						}
 					}
+				}*/
+
+				clsClasses.clsRUC BeRUC= Catalogo.getRUC(Cliente.nit);
+
+				BeRUC= Catalogo.getRUC(Cliente.nit);
+				if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
+
+					if(!BeRUC.sRUC.trim().equals("")){
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+					}else{
+						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+						return;
+					}
+
+					if (!BeRUC.sDV.trim().equals("")) {
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
+					} else {
+						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
+						return;
+					}
+
+				}else{
+
+					if(!BeRUC.sRUC.trim().equals("")){
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+					}else{
+						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+						return;
+					}
+
+					if (!BeRUC.sDV.trim().equals("")) {
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
+					} else {
+						NotaCredito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC;
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = "";
+					}
+
 				}
 
 				sql="SELECT Item,CODIGO,CANT,CODDEV,TOTAL,PRECIO,PRECLISTA,REF,PESO,LOTE,UMVENTA,UMSTOCK,UMPESO,FACTOR,POR_PESO FROM T_CxCD WHERE CANT>0";

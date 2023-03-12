@@ -1646,6 +1646,7 @@ public class BaseDatosScript {
 					"[ARCHIVO_P12] TEXT,"+
 					"[QR_CLAVE] TEXT,"+
 					"[URL_B2C_HH] TEXT,"+
+					"[URL_DOC] TEXT,"+
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
 			database.execSQL(vSQL);
@@ -1674,7 +1675,7 @@ public class BaseDatosScript {
 			vSQL="CREATE TABLE [P_MEDIDA](" +
 					"[CODIGO] TEXT NOT NULL," +
 					"[DESCRIPCION] TEXT," +
-					"[CODIGO_DGI] TEXT," +
+					"[CODIGO_CGI] TEXT," +
 					" PRIMARY KEY([CODIGO])" +
 					" );";
 			database.execSQL(vSQL);

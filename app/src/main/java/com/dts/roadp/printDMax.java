@@ -168,7 +168,7 @@ public class printDMax extends printBase {
 				if (ss.contains("QRCode:")){
 					cantQR  += 1;
 					qrCode = ss.substring(7,ss.length());
-/*
+
 					if (cantQR==1){
 
 						docLP.writeText("");
@@ -185,7 +185,7 @@ public class printDMax extends printBase {
 
 						printData2 = docLP.getDocumentData();
 
-					}*/
+					}
 
 				}else{
 					docLP.writeText(ss);
@@ -197,7 +197,11 @@ public class printDMax extends printBase {
 			docLP.writeText("");
 			docLP.writeText("");
 
-			printData = docLP.getDocumentData();
+			if (cantQR==0){
+
+				printData = docLP.getDocumentData();
+
+			}
 			return true;
 
 		} catch (Exception e) {
@@ -484,15 +488,47 @@ public class printDMax extends printBase {
 
 				prthread.sleep(500);
 
+				if (qrCode.length()>0){
+					documentlist.clear();
+
+					docEZ = new DocumentEZ("MF204");
+
+					docEZ.writeBarCodeQRCode(qrCode,1,0,0,0,0);
+					documentlist.add(docEZ);
+					for (Document doc: documentlist){
+						printData = doc.getDocumentData();
+					}
+					prconn.write(printData,0,printData.length);
+				}
+
+				prthread.sleep(500);
+
+				if (cantQR==2){
+
+					printData = printData2;
+
+					prconn.write(printData);
+
+					prthread.sleep(500);
+
+					if (qrCode.length()>0){
+						documentlist.clear();
+
+						docEZ = new DocumentEZ("MF204");
+
+						docEZ.writeBarCodeQRCode(qrCode,1,0,0,0,0);
+						documentlist.add(docEZ);
+						for (Document doc: documentlist){
+							printData = doc.getDocumentData();
+						}
+						prconn.write(printData,0,printData.length);
+					}
+					prthread.sleep(500);
+				}
+
 				prconn.clearWriteBuffer();
 				//printclose.run();
 				prconn.close();
-
-				if (qrCode.length()>0){
-					if (loadFileQRCode()){
-						doStartPrintBarra();
-					}
-				}
 
 			}
 

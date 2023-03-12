@@ -1174,44 +1174,44 @@ public class FacturaRes extends PBase {
 			}
 
 			// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
+			//endregion Factura electrónica
+			clsClasses.clsRUC BeRUC= Catalogo.getRUC(cliente.nit);
 			if (Factura.gDGen.Receptor.iTipoRec.equals("01") || Factura.gDGen.Receptor.iTipoRec.equals("03")) {
 
-				if (cliente.nit.length()>0) {
-					String[] DVRuc = cliente.nit.split(" ");
-					if (DVRuc.length > 1) {
-						Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-						if (DVRuc[1].trim().equals("")){
-							Factura.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
-						}else{
-							Factura.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
-						}
+					if(!BeRUC.sRUC.trim().equals("")){
+						Factura.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
 					}else{
 						progress.cancel();
-						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
+						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 						return false;
 					}
-				}else {
+
+					if (!BeRUC.sDV.trim().equals("")) {
+					Factura.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
+				} else {
+					progress.cancel();
+					msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
+					return false;
+				}
+
+			}else{
+
+				if(!BeRUC.sRUC.trim().equals("")){
+					Factura.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+				}else{
 					progress.cancel();
 					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 					return false;
 				}
-			}else{
-				if (cliente.nit.length()>0) {
-					String[] DVRuc = cliente.nit.split(" ");
-					if (DVRuc.length > 1) {
-						Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-						if (DVRuc[1].trim().equals("")){
-							Factura.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[3].trim(),2);
-						}else{
-							Factura.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[2].trim(),2);
-						}
-					}else{
-						Factura.gDGen.Receptor.gRucRec.dRuc = cliente.nit;
-						Factura.gDGen.Receptor.gRucRec.dDV = "";
-					}
+
+				if (!BeRUC.sDV.trim().equals("")) {
+					Factura.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
+				} else {
+					Factura.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC;
+					Factura.gDGen.Receptor.gRucRec.dDV = "";
 				}
+
 			}
-			//endregion Factura electrónica
 
 			//region Devolución de  producto.
 			clsClasses.clsProducto producto;
@@ -1369,7 +1369,45 @@ public class FacturaRes extends PBase {
 
 				//#CKFK20221206 Si el dTipoRuc Tipo de Contribuyente (1:Natural, 2:Jurídico)
 				// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
+				BeRUC= Catalogo.getRUC(cliente.nit);
 				if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
+
+					if(!BeRUC.sRUC.trim().equals("")){
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+					}else{
+						progress.cancel();
+						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+						return false;
+					}
+
+					if (!BeRUC.sDV.trim().equals("")) {
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
+					} else {
+						progress.cancel();
+						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
+						return false;
+					}
+
+				}else{
+
+					if(!BeRUC.sRUC.trim().equals("")){
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+					}else{
+						progress.cancel();
+						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+						return false;
+					}
+
+					if (!BeRUC.sDV.trim().equals("")) {
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
+					} else {
+						NotaCredito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC;
+						NotaCredito.gDGen.Receptor.gRucRec.dDV = "";
+					}
+
+				}
+
+				/*if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
 
 					if (cliente.nit.length()>0) {
 						String[] DVRuc = cliente.nit.split(" ");
@@ -1403,7 +1441,7 @@ public class FacturaRes extends PBase {
 							NotaCredito.gDGen.Receptor.gRucRec.dDV = "";
 						}
 					}
-				}
+				}*/
 
 				sql="SELECT Item,CODIGO,CANT,CODDEV,TOTAL,PRECIO,PRECLISTA,REF,PESO,LOTE,UMVENTA,UMSTOCK,UMPESO,FACTOR,POR_PESO FROM T_CxCD WHERE CANT>0";
 				DT=Con.OpenDT(sql);
@@ -2111,6 +2149,7 @@ public class FacturaRes extends PBase {
 			if (ConexionValida()) {
 				//#AT20230309 Intenta certificar 3 veces
 				try {
+					//urlDoc = "https://pa.edocnube.com/4.0/Emision/Api/FacturaEnte";
 					RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 					if (RespuestaEdocFac.Cufe == null) {

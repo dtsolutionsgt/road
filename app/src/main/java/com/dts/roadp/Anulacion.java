@@ -1201,7 +1201,7 @@ public class Anulacion extends PBase {
 			}
 
 			// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
-			if (NotaDebito.gDGen.Receptor.iTipoRec.equals("01") || NotaDebito.gDGen.Receptor.iTipoRec.equals("03")) {
+			/*if (NotaDebito.gDGen.Receptor.iTipoRec.equals("01") || NotaDebito.gDGen.Receptor.iTipoRec.equals("03")) {
 
 				if (Cliente.nit.length()>0) {
 					String[] DVRuc = Cliente.nit.split(" ");
@@ -1235,6 +1235,44 @@ public class Anulacion extends PBase {
 						NotaDebito.gDGen.Receptor.gRucRec.dDV = "";
 					}
 				}
+			}*/
+
+			clsClasses.clsRUC BeRUC= Catalogo.getRUC(Cliente.nit);
+			if (NotaDebito.gDGen.Receptor.iTipoRec.equals("01") || NotaDebito.gDGen.Receptor.iTipoRec.equals("03")) {
+
+				if(!BeRUC.sRUC.trim().equals("")){
+					NotaDebito.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+				}else{
+					progress.cancel();
+					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+					return false;
+				}
+
+				if (!BeRUC.sDV.trim().equals("")) {
+					NotaDebito.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
+				} else {
+					progress.cancel();
+					msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
+					return false;
+				}
+
+			}else{
+
+				if(!BeRUC.sRUC.trim().equals("")){
+					NotaDebito.gDGen.Receptor.gRucRec.dDV = BeRUC.sRUC.trim();
+				}else{
+					progress.cancel();
+					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+					return false;
+				}
+
+				if (!BeRUC.sDV.trim().equals("")) {
+					NotaDebito.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
+				} else {
+					NotaDebito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC;
+					NotaDebito.gDGen.Receptor.gRucRec.dDV = "";
+				}
+
 			}
 
 			int Correlativo = 1;

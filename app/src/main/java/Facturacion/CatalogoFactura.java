@@ -340,7 +340,7 @@ public class CatalogoFactura extends PBase {
         Cursor dt;
         String Codigo="";
         try {
-            sql="SELECT CODIGO_DGI  FROM P_MEDIDA " +
+            sql="SELECT CODIGO_CGI  FROM P_MEDIDA " +
                     " WHERE CODIGO = '"+CodigoUM+"'";
             dt=Con.OpenDT(sql);
             dt.moveToFirst();
@@ -579,4 +579,45 @@ public class CatalogoFactura extends PBase {
             msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
         }
     }
+
+    public clsClasses.clsRUC getRUC(String pNit){
+        clsClasses.clsRUC pRUC=clsCls.new clsRUC();
+
+        try{
+            if (pNit.length()>0) {
+                String[] DVRuc = pNit.split(" ");
+                if (DVRuc.length > 1) {
+                    pRUC.sRUC = DVRuc[0].trim();
+                    if(DVRuc.length >= 2 ){
+                        if (DVRuc[1].trim().equals("")) {
+                            if (DVRuc.length >= 4) {
+                                pRUC.sDV = StringUtils.right("00" + DVRuc[3].trim(), 2);
+                            } else {
+                                pRUC.sDV = "";
+                                //progress.cancel();
+                                //msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
+                            }
+                        }else{
+                            if(DVRuc.length >= 3 ){
+                                pRUC.sDV = StringUtils.right("00" + DVRuc[2].trim(),2);
+                            }else{
+                                pRUC.sDV = "";
+                                //progress.cancel();
+                                //msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
+                            }
+                        }
+                    }
+
+                }else{
+                    pRUC.sDV = "";
+                }
+            }else {
+                pRUC.sRUC = "";
+            }
+        }catch (Exception e){
+            msgbox("Error al validar el RUC " + pNit);
+        }
+        return  pRUC;
+    }
+
 }

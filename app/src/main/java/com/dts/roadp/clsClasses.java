@@ -238,6 +238,10 @@ public class clsClasses {
 				codubi, tipoRuc, codMuni = "", tipoSucursal, sitio_web;
 	}
 
+	public class clsRUC{
+		public String sRUC, sDV,sTipoReceptor;
+	}
+
 	public class clsCliente {
 		public String  codigo, tipoContribuyente, tipoRec, email, telefono, codPais, nombre, direccion, ciudad, muni = "", nit;
 		public int diascredito, mediapago;

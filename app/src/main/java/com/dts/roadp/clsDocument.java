@@ -311,7 +311,11 @@ public class clsDocument {
 				if (DVRuc.length > 1) {
 					ruc = DVRuc[0].trim();
 					if (DVRuc[1].trim().equals("")){
-						dDV =  StringUtils.right("00" + DVRuc[3].trim(),2);
+						try{
+							dDV =  StringUtils.right("00" + DVRuc[3].trim(),2);
+						}catch (Exception ex){
+							dDV = "";
+						}
 						receptor = DVRuc[2].trim();
 					}else{
 						dDV =  StringUtils.right("00" + DVRuc[2].trim(),2);

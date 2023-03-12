@@ -113,10 +113,13 @@ public class appGlobals extends Application {
 	public String url_emision_nc_b2c;//"https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/NotaCreditoEnte";
 	public String url_emision_nd_b2c;//"https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/NotaDebitoEnte";
 	public String url_emision_factura_b2c;//"https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/FacturaEnte";
+
+	public String url_doc;//"https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/FacturaEnte";
+
 	public String qr_api = "";//"5B4D134FFAE367FD0BE91E37F958883E2C01A36A02FED9E1F41C1E53F1D59ED2D8DD481C0ED9024F348D14CCF55A9A6D5CAC14E42BCCB7F41D64E90A33B5624C";
 	public String url_base = ""; //"https://labpa.guru-soft.com/eDocPanama/4.0/"
 	public String archivo_p12 = ""; //F-8-740-190-OrielAntonioBarriaCaraballo.p12
 	public String url_b2c_hh = ""; //"https://dgi-fep-test.mef.gob.pa:40001/Consultas/FacturasPorQR?"
 	public String qr_clave= ""; //"yb90o#0F"
-	public String ambiente= "2"; //"2"
+	public String ambiente= "1"; //"2"
 }

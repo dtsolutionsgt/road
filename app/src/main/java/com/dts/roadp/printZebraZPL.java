@@ -266,7 +266,6 @@ public class printZebraZPL extends printBase {
                         ps+=ss;
                         //ps+="^FS^CI27";
                         ps+="^FS";
-
                     }
                 }else{
 

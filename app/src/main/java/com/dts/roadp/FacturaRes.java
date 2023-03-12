@@ -99,6 +99,7 @@ public class FacturaRes extends PBase {
 	private boolean saved;
 	private boolean porpeso;
 	private boolean pagocompleto=false;
+	private boolean pagando = false;
 
 	private clsClasses.clsSucursal Sucursal = clsCls.new clsSucursal();
 	private final rFE Factura = new rFE();
@@ -334,13 +335,21 @@ public class FacturaRes extends PBase {
 
 		try{
 
+			if (pagando) return;
+
+			pagando = true;
+
+			rl_facturares.setEnabled(false);
+			imgMPago.setEnabled(false);
+
+			rl_facturares.setVisibility(View.INVISIBLE);
+			imgMPago.setVisibility(View.INVISIBLE);
+
 			if (tieneCanastas()) return;
 
 			if (fcorel==0) {
 				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
 			}
-
-			rl_facturares.setVisibility(View.INVISIBLE);
 
 			gl.pagoval=tot;
 			gl.pagolim=tot;
@@ -355,8 +364,89 @@ public class FacturaRes extends PBase {
 			}.getClass().getEnclosingMethod()).getName(), e.getMessage(), "");
 			mu.msgbox("paySelect: " + e.getMessage());
 		}finally {
+
+			rl_facturares.setEnabled(true);
+			imgMPago.setEnabled(true);
+
 			rl_facturares.setVisibility(View.VISIBLE);
+			imgMPago.setVisibility(View.VISIBLE);
+
 		}
+	}
+
+	public void payCash(View view) {
+
+		try{
+
+			if (pagando) return;
+
+			pagando = true;
+
+			rl_facturares.setEnabled(false);
+			imgCash.setEnabled(false);
+
+			rl_facturares.setVisibility(View.INVISIBLE);
+			imgCash.setVisibility(View.INVISIBLE);
+
+			if (tieneCanastas()) return;
+
+			if (fcorel==0) {
+				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
+			}
+
+			//inputEfectivo();
+			inputVuelto();
+
+		}catch (Exception e){
+			addlog(Objects.requireNonNull(new Object() {
+			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),"");
+			mu.msgbox("payCash: " + e.getMessage());
+		}finally {
+
+			rl_facturares.setEnabled(true);
+			imgCash.setEnabled(true);
+
+			rl_facturares.setVisibility(View.VISIBLE);
+			imgCash.setVisibility(View.VISIBLE);
+
+		}
+	}
+
+	public void payCred(View view) {
+
+		try{
+
+			if (pagando) return;
+
+			pagando = true;
+
+			rl_facturares.setEnabled(false);
+			imgCred.setEnabled(false);
+
+			rl_facturares.setVisibility(View.INVISIBLE);
+			imgCred.setVisibility(View.INVISIBLE);
+
+			if (tieneCanastas()) return;
+
+			if (fcorel==0) {
+				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
+			}
+
+			inputCredito();
+
+		}catch (Exception e){
+			addlog(Objects.requireNonNull(new Object() {
+			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),"");
+			mu.msgbox("payCred: " + e.getMessage());
+		}finally {
+
+			rl_facturares.setEnabled(true);
+			imgCred.setEnabled(true);
+
+			rl_facturares.setVisibility(View.VISIBLE);
+			imgCred.setVisibility(View.VISIBLE);
+		}
+
 	}
 
 	public void checkedBox(View view){
@@ -416,53 +506,6 @@ public class FacturaRes extends PBase {
 		}
 
 		return false;
-	}
-
-	public void payCash(View view) {
-
-		try{
-
-			if (tieneCanastas()) return;
-
-			if (fcorel==0) {
-				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
-			}
-
-			rl_facturares.setVisibility(View.INVISIBLE);
-
-			//inputEfectivo();
-			inputVuelto();
-
-		}catch (Exception e){
-			addlog(Objects.requireNonNull(new Object() {
-			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),"");
-			mu.msgbox("payCash: " + e.getMessage());
-		}finally {
-			rl_facturares.setVisibility(View.VISIBLE);
-		}
-	}
-
-	public void payCred(View view) {
-
-		try{
-			if (tieneCanastas()) return;
-
-			if (fcorel==0) {
-				msgbox("No existe un correlativo disponible, no se puede emitir factura");return;
-			}
-
-			rl_facturares.setVisibility(View.VISIBLE);
-
-			inputCredito();
-
-		}catch (Exception e){
-			addlog(Objects.requireNonNull(new Object() {
-			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),"");
-			mu.msgbox("payCred: " + e.getMessage());
-		}finally {
-			rl_facturares.setVisibility(View.VISIBLE);
-		}
-
 	}
 
 	public void showBon(View view) {
@@ -1043,7 +1086,7 @@ public class FacturaRes extends PBase {
 			Factura.gDGen.iProGen = 2; //'Fijo 2
 			Factura.gDGen.iTipoTranVenta = 1; // Fijo 1
 			Factura.gDGen.iTipoSuc = 2; //'Fijo 2
-			Factura.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + cliente.codigo + ";" + Sucursal.sitio_web;;
+			Factura.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + cliente.codigo + ";" + Sucursal.sitio_web + ";";
 
 			Factura.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";  //'BeSucursal.NOMBRE
 			Factura.gDGen.Emisor.dTfnEm = Sucursal.telefono;
@@ -1243,7 +1286,7 @@ public class FacturaRes extends PBase {
 				NotaCredito.gDGen.iProGen = 2;
 				NotaCredito.gDGen.iTipoTranVenta = 1;
 				NotaCredito.gDGen.iTipoSuc = 2;
-				NotaCredito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + cliente.codigo + ";" + Sucursal.sitio_web;
+				NotaCredito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + cliente.codigo + ";" + Sucursal.sitio_web + ";";
 
 				//Datos Emisor
 				NotaCredito.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";
@@ -2871,6 +2914,7 @@ public class FacturaRes extends PBase {
 				closekeyb();
 				applyCash();
 				checkPago();
+				//pagando = false;
 			});
 
 			alert.setNegativeButton("Cancelar", (dialog, whichButton) -> closekeyb());
@@ -2915,7 +2959,11 @@ public class FacturaRes extends PBase {
 			}
 
 			layout.addView(txtVuelto);
-			layout.addView(lblVuelto);lblVuelto.setTextSize(20);lblVuelto.setTextColor(Color.rgb(54,184,238));lblVuelto.setGravity(Gravity.LEFT);
+			layout.addView(lblVuelto);
+
+			lblVuelto.setTextSize(20);
+			lblVuelto.setTextColor(Color.rgb(54,184,238));
+			lblVuelto.setGravity(Gravity.LEFT);
 
 			alert.setView(layout);
 
@@ -2927,31 +2975,32 @@ public class FacturaRes extends PBase {
 				svuelt= txtVuelto.getText().toString();
 				gl.brw=1;
 
-		if (!svuelt.equalsIgnoreCase("")){
-		if (Double.parseDouble(svuelt)<0.0){
-		toast("Monto ingresado no genera vuelto");
-}
-}
+				if (!svuelt.equalsIgnoreCase("")){
+					if (Double.parseDouble(svuelt)<0.0){
+					toast("Monto ingresado no genera vuelto");
+					}
+				}
 
-svuelt=""+tot;
-sefect=""+tot;
+					svuelt=""+tot;
+					sefect=""+tot;
 
-Log.d("IniApplyCAsh","todobene");
+					Log.d("IniApplyCAsh","todobene");
 
-				applyCash();
-				Log.d("FinApplyCAsh","todobene");
-				checkPago();
-				Log.d("FinCheckpago","todobene?");
-			});
+					applyCash();
+					Log.d("FinApplyCAsh","todobene");
+					checkPago();
+				    pagando = false;
+					Log.d("FinCheckpago","todobene?");
+				});
 
-			alert.setNegativeButton("Cancelar", (dialog, whichButton) -> {
-				lblVuelto.setText("");
-				txtVuelto.setText("");
-				layout.removeAllViews();
+				alert.setNegativeButton("Cancelar", (dialog, whichButton) -> {
+					lblVuelto.setText("");
+					txtVuelto.setText("");
+					layout.removeAllViews();
+					pagando = false;
+				});
 
-			});
-
-			alert.show();
+				alert.show();
 
 		}catch (Exception e){
 			addlog(Objects.requireNonNull(new Object() {
@@ -3074,6 +3123,7 @@ Log.d("IniApplyCAsh","todobene");
 				closekeyb();
 				applyCredit();
 				checkPago();
+				pagando = false;
 			});
 
 			alert.setNegativeButton("Cancelar", (dialog, whichButton) -> closekeyb());
@@ -3473,6 +3523,7 @@ Log.d("IniApplyCAsh","todobene");
 
 				checkPromo();
 				checkPago();
+                pagando = false;
 
 				if (gl.promapl) updDesc();
 

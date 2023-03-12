@@ -1034,7 +1034,7 @@ public class Cobro extends PBase {
 					Factura.gDGen.iProGen = 2; //'Fijo 2
 					Factura.gDGen.iTipoTranVenta = 1; // Fijo 1
 					Factura.gDGen.iTipoSuc = 2; //'Fijo 2
-					Factura.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web;;
+					Factura.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web + ";";
 
 					Factura.gDGen.Emisor.dNombEm = "FE generada en ambiente de pruebas - sin valor comercial ni fiscal";  //'BeSucursal.NOMBRE
 					Factura.gDGen.Emisor.dTfnEm = Sucursal.telefono;

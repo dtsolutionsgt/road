@@ -101,7 +101,7 @@ public class UtilPrint extends PBase {
 			prpar=txtPar.getText().toString().trim();
 
 			if (mu.emptystr(prpar)) {
-				mu.msgbox("Parametro de impresion incorrecto");return;
+				mu.msgbox("Parámetro de impresión incorrecto");return;
 			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

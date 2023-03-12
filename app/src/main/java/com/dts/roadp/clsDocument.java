@@ -302,8 +302,30 @@ public class clsDocument {
 			}
         }
 
+		try{
+			if (nit.length()>0) {
+				String[] DVRuc = nit.split(" ");
+				String dDV="";
+				String ruc="";
+				String receptor = "";
+				if (DVRuc.length > 1) {
+					ruc = DVRuc[0].trim();
+					if (DVRuc[1].trim().equals("")){
+						dDV =  StringUtils.right("00" + DVRuc[3].trim(),2);
+						receptor = DVRuc[2].trim();
+					}else{
+						dDV =  StringUtils.right("00" + DVRuc[2].trim(),2);
+						receptor = DVRuc[1].trim();
+					}
+					nit = ruc + " DV:" + dDV + " Rec." + receptor;
+				}
+			}
+		}catch (Exception ex){
+			toast("Error " + ex.getMessage());
+		}
+
         if (!emptystr(nit)) {
-        	rep.add("RUC : "+nit);
+        	rep.add("RUC: "+nit);
 		}
 
 		if (!emptystr(rutapv)) {

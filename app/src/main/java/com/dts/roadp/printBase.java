@@ -30,7 +30,8 @@ public class printBase {
 	protected Handler handler = new Handler(); 
 	protected Runnable callback;
 	
-	protected byte[] printData = {0};	
+	protected byte[] printData = {0};
+	protected byte[] printData2 = {0};
 	
 	protected boolean hasCallback;
 	

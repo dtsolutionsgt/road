@@ -35,6 +35,7 @@ public class printDMax extends printBase {
 	private ArrayList<Document> documentlist = new  ArrayList<Document>();
 
 	private String qrCode="";
+	private int cantQR=0;
 	
 	public printDMax(Context context,String printerMAC,boolean validprinter) {
 		super(context,printerMAC);
@@ -160,23 +161,43 @@ public class printDMax extends printBase {
 		
 		try {
 			docLP.clear();
-			
+			cantQR = 0;
+
 			while ((ss = dfile.readLine()) != null) {
 				//#CKFK20230127 Agregué esto para imprimir el QR en las datamax
 				if (ss.contains("QRCode:")){
+					cantQR  += 1;
 					qrCode = ss.substring(7,ss.length());
+/*
+					if (cantQR==1){
+
+						docLP.writeText("");
+						docLP.writeText("");
+
+						printData = docLP.getDocumentData();
+
+						docLP.clear();
+
+					}else if(cantQR==2){
+
+						docLP.writeText("");
+						docLP.writeText("");
+
+						printData2 = docLP.getDocumentData();
+
+					}*/
+
 				}else{
 					docLP.writeText(ss);
 				}
 			}
 
+			dfile.close();
+
 			docLP.writeText("");
 			docLP.writeText("");
 
-			dfile.close();	
-				       
-	        printData = docLP.getDocumentData();
-
+			printData = docLP.getDocumentData();
 			return true;
 
 		} catch (Exception e) {
@@ -286,11 +307,6 @@ public class printDMax extends printBase {
 	    protected Void doInBackground(String... params) {
 			try {
 				processPrint();
-				if (qrCode.length()>0){
-					if (loadFileQRCode()){
-						doStartPrintBarra();
-					}
-				}
 			} catch (Exception e) {
 				ss=ss + e.getMessage();
 				Log.d("Err_Impr",e.getMessage());
@@ -471,6 +487,12 @@ public class printDMax extends printBase {
 				prconn.clearWriteBuffer();
 				//printclose.run();
 				prconn.close();
+
+				if (qrCode.length()>0){
+					if (loadFileQRCode()){
+						doStartPrintBarra();
+					}
+				}
 
 			}
 

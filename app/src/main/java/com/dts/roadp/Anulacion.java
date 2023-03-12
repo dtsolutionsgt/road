@@ -735,7 +735,7 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.iProGen = 2;
 			NotaDebito.gDGen.iTipoTranVenta = 1;
 			NotaDebito.gDGen.iTipoSuc = 2;
-			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web;;
+			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web + ";";
 
 			Sucursal = Catalogo.getSucursal();
 
@@ -1109,7 +1109,9 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.iProGen = 2;
 			NotaDebito.gDGen.iTipoTranVenta = 1;
 			NotaDebito.gDGen.iTipoSuc = 2;
-			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web;
+			NotaDebito.gDGen.dInfEmFE = gl.ruta + ";" + "0;" + Cliente.codigo + ";" + Sucursal.sitio_web + ";";
+
+			Sucursal = Catalogo.getSucursal();
 
 			NotaDebito.gDGen.Emisor.dNombEm = Sucursal.nombre;
 			NotaDebito.gDGen.Emisor.dTfnEm = Sucursal.telefono;

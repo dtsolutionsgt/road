@@ -752,31 +752,26 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.Emisor.gRucEmi.dDV = Sucursal.texto;
 			NotaDebito.gDGen.Emisor.gRucEmi.dTipoRuc = Sucursal.tipoRuc;
 
-			if (!Sucursal.codMuni.isEmpty() || Sucursal.codMuni != null) {
-				Municipio = clsCls.new clsMunicipio();
-				Departamento = clsCls.new clsDepartamento();
+			clsClasses.clsCiudad ciudad = clsCls.new clsCiudad();
+			if (Sucursal.codubi != null) {
 
-				Municipio = Catalogo.getMunicipio(Sucursal.codMuni);
-				Departamento = Catalogo.getDepartamento(Municipio.depar);
+				if (!Sucursal.codubi.isEmpty() ){
 
-				if (Municipio.nombre.contains("/")) {
 
-					String[] DireccionCompleta = Municipio.nombre.split("/");
+					ciudad = Catalogo.getCiudad(Sucursal.codubi);
 
-					NotaDebito.gDGen.Emisor.gUbiEm.dCorreg = DireccionCompleta[1].trim().toUpperCase();
-					NotaDebito.gDGen.Emisor.gUbiEm.dDistr = DireccionCompleta[0].trim().toUpperCase();
+					if (ciudad !=null) {
 
-					if (!Departamento.nombre.isEmpty()) {
-						NotaDebito.gDGen.Emisor.gUbiEm.dProv = Departamento.nombre.toUpperCase();
-					} else {
-						NotaDebito.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
+						NotaDebito.gDGen.Emisor.gUbiEm.dCorreg = (ciudad.corregimiento==null?"":ciudad.corregimiento.toUpperCase().trim());
+						NotaDebito.gDGen.Emisor.gUbiEm.dDistr =(ciudad.distrito==null?"":ciudad.distrito.toUpperCase().trim());
+						NotaDebito.gDGen.Emisor.gUbiEm.dProv = (ciudad.provincia==null?"":ciudad.provincia.toUpperCase().trim());
+
+						if (ciudad.provincia.isEmpty()) {
+							NotaDebito.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
+						}
+
 					}
-
-				} else {
-					msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
-					return false;
 				}
-
 			}
 
 			NotaDebito.gDGen.Receptor = new Receptor();
@@ -849,7 +844,44 @@ public class Anulacion extends PBase {
 					return false;
 				}
 			}else{
-				if (Cliente.nit.length()>0) {
+				clsClasses.clsRUC BeRUC= Catalogo.getRUC(Cliente.nit);
+				if (NotaDebito.gDGen.Receptor.iTipoRec.equals("01") || NotaDebito.gDGen.Receptor.iTipoRec.equals("03")) {
+
+					if(!BeRUC.sRUC.trim().equals("")){
+						NotaDebito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
+					}else{
+						progress.cancel();
+						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+						return false;
+					}
+
+					if (!BeRUC.sDV.trim().equals("")) {
+						NotaDebito.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
+					} else {
+						progress.cancel();
+						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
+						return false;
+					}
+
+				}else{
+
+					if(!BeRUC.sRUC.trim().equals("")){
+						NotaDebito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
+					}else{
+						progress.cancel();
+						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+						return false;
+					}
+
+					if (!BeRUC.sDV.trim().equals("")) {
+						NotaDebito.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
+					} else {
+						NotaDebito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC;
+						NotaDebito.gDGen.Receptor.gRucRec.dDV = "";
+					}
+
+				}
+				/*if (Cliente.nit.length()>0) {
 					String[] DVRuc = Cliente.nit.split(" ");
 					if (DVRuc.length > 1) {
 						NotaDebito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
@@ -862,7 +894,7 @@ public class Anulacion extends PBase {
 						NotaDebito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
 						NotaDebito.gDGen.Receptor.gRucRec.dDV = "";
 					}
-				}
+				}*/
 			}
 
 			int Correlativo = 1;
@@ -1849,7 +1881,7 @@ public class Anulacion extends PBase {
 			sql="DELETE FROM D_STOCKB_DEV WHERE Corel='"+itemid+"'";
 			db.execSQL(sql);
 
-            sql = "UPDATE D_NOTACRED SET ANULADO ='S' WHERE FACTURA ='" + itemid + "'";
+            sql = "UPDATE D_NOTACRED SET ANULADO ='S' WHERE FACTURA ='" + itemid + "' AND TIPODOCUMENTO = 'NC'";
             db.execSQL(sql);
 
             sql = "UPDATE D_CXC SET ANULADO ='S' WHERE REFERENCIA ='" + itemid + "'";
@@ -2381,7 +2413,7 @@ public class Anulacion extends PBase {
 				sql = "UPDATE D_CXC SET ANULADO='S' WHERE COREL='" + vCorelDevol + "' ";
 				db.execSQL(sql);
 
-				sql = "UPDATE D_NOTACRED SET ANULADO='S' WHERE COREL='" + vCorelNotaC + "'";
+				sql = "UPDATE D_NOTACRED SET ANULADO='S' WHERE COREL='" + vCorelNotaC + "'  AND TIPO_DOCUMENTO = 'NC'";
 				db.execSQL(sql);
 
 				vAnulNotaCredito=true;

@@ -459,10 +459,15 @@ public class CatalogoFactura extends PBase {
         }
     }
 
-    public void UpdateEstadoFactura(String Cufe, int EstadoFac, String corel) {
+    public void UpdateEstadoFactura(String Cufe, String EstadoFac, String corel) {
+
         try {
-            sql="UPDATE D_FACTURA SET CUFE ='"+Cufe+"', CERTIFICADA_DGI="+EstadoFac+"  WHERE COREL='"+corel+"'";
+
+            int CertificadaDGI = EstadoFac == "2"  ? 1:0;
+
+            sql="UPDATE D_FACTURA SET CUFE ='"+Cufe+"', CERTIFICADA_DGI="+CertificadaDGI+"  WHERE COREL='"+corel+"'";
             db.execSQL(sql);
+
         } catch (Exception e) {
             msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" - "+ e.getMessage());
         }

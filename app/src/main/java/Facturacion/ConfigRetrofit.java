@@ -8,7 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ConfigRetrofit {
     public int callback=-1;
-    public static final String BASE_URL = "https://labpa.guru-soft.com/eDocPanama/4.0/";
+    //public static final String BASE_URL = "https://labpa.guru-soft.com/eDocPanama/4.0/";
+    public static final String BASE_URL = "https://pa.edocnube.com/4.0/";
     private static Retrofit retrofit = null;
 
     public  <S> S CrearServicio(Class<S> claseServicio) {

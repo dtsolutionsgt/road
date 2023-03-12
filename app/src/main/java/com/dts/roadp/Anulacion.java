@@ -519,6 +519,7 @@ public class Anulacion extends PBase {
 	}
 
 	private void AnularFactHH_DGI() {
+
 		try {
 
 			db.beginTransaction();
@@ -544,7 +545,6 @@ public class Anulacion extends PBase {
 					} else {
 						prn.printask(printclose);
 					}
-
 				}
 
 				progress.cancel();
@@ -565,6 +565,7 @@ public class Anulacion extends PBase {
 	}
 
 	private void AnularFactHHConNC() {
+
 		try {
 
 			db.beginTransaction();
@@ -607,7 +608,9 @@ public class Anulacion extends PBase {
 	}
 
 	private void getToken() {
+
 		try {
+
 			String base = Empresa.usuarioApi + ":" + Empresa.claveApi;
 			String Credenciales = "Basic "+ encodeToString(base.getBytes(), NO_WRAP);
 
@@ -615,6 +618,7 @@ public class Anulacion extends PBase {
 			Call<Token> call = client.getToken(Credenciales);
 
 			try {
+
 				Response<Token> response = call.execute();
 
 				if (response.isSuccessful()) {
@@ -622,6 +626,7 @@ public class Anulacion extends PBase {
 				} else {
 					toastlong("Error en respuesta: " + getClass());
 				}
+
 			} catch (Exception ex) {
 				mu.msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" Error en respuesta "+ ex.getMessage());
 			}
@@ -632,7 +637,9 @@ public class Anulacion extends PBase {
 	}
 
 	private boolean AnularFacturaDGI() {
+
 		try {
+
 			String AuthToken = "Bearer "+ token.getToken();
 
 			AnularDocs client = retrofit.CrearServicio(AnularDocs.class);
@@ -653,15 +660,13 @@ public class Anulacion extends PBase {
 				Response<ResultadoAnulacion> response = call.execute();
 
 				if (response.isSuccessful()) {
+
 					resultado = response.body();
 
 					//En espera para definir el estado correcto 11 ó 2
 					if (resultado.getEstado().equals("2")) {
 						exito = true;
-					} /*else if (resultado.getEstado().equals("4")) {
-						//#CKFK20230118 Si la factura no está autorizada se debe de poder anular
-						exito = true;
-					}*/
+					}
 					else{
 						toastlong(resultado.getMensajeRespuesta());
 					}
@@ -678,8 +683,10 @@ public class Anulacion extends PBase {
 	}
 
 	private boolean CrearNotaDebito() {
+
 		String corelFactura = "";
 		boolean exito = false;
+
 		try {
 
 			//AT20221014 Se Obtiene corel para guardar la nota de debito
@@ -881,25 +888,13 @@ public class Anulacion extends PBase {
 					}
 
 				}
-				/*if (Cliente.nit.length()>0) {
-					String[] DVRuc = Cliente.nit.split(" ");
-					if (DVRuc.length > 1) {
-						NotaDebito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-						if (DVRuc[1].trim().equals("")){
-							NotaDebito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
-						}else{
-							NotaDebito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
-						}
-					}else{
-						NotaDebito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
-						NotaDebito.gDGen.Receptor.gRucRec.dDV = "";
-					}
-				}*/
 			}
 
 			int Correlativo = 1;
 			double TotalAcumulado = 0;
+
 			for (int i=0; i < DetalleNT.size(); i++) {
+
 				Detalle detalle = new Detalle();
 
 				Producto = clsCls.new clsProducto();
@@ -910,6 +905,7 @@ public class Anulacion extends PBase {
 				detalle.dCodProd = Producto.codigo;
 
 				if (!Producto.um.isEmpty()) {
+
 					String CodDGI;
 
 					if (DetalleNT.get(i).porpeso.equals("S")) {
@@ -936,13 +932,10 @@ public class Anulacion extends PBase {
 				}
 
 				String TotalItem = String.valueOf(mu.round2(Double.valueOf(detalle.dCantCodInt) * Double.valueOf(DetalleNT.get(i).precio)));
-				//String TotalItem = "11.57";
 
 				if (Producto.subBodega.length() > 1) {
 					detalle.dCodCPBSabr = Producto.subBodega.substring(0, 2);
 					detalle.dCodCPBScmp = Producto.subBodega;
-				} else {
-					//throw new Exception("No tiene definido la familia del producto por la DGI");
 				}
 
 				detalle.gPrecios.dPrUnit = String.valueOf(DetalleNT.get(i).precio);
@@ -983,6 +976,7 @@ public class Anulacion extends PBase {
 				PagoPlazo.dInfPagPlazo = null;
 
 				NotaDebito.gTot.gPagPlazo.add(PagoPlazo);
+
 			} else {
 				PagosNt.iFormaPago = "02";
 				NotaDebito.gTot.iPzPag = "1";

@@ -2,18 +2,13 @@ package Facturacion;
 
 import android.app.Activity;
 import android.content.Context;
-
 import com.dts.roadp.appGlobals;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
 public class ConfigRetrofit {
-    public int callback=-1;
-    //public static final String BASE_URL = "https://labpa.guru-soft.com/eDocPanama/4.0/";
-    //public static final String BASE_URL = "https://pa.edocnube.com/4.0/";
     private appGlobals gl;
     private static Retrofit retrofit = null;
 

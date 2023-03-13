@@ -5894,12 +5894,12 @@ public class ComWS extends PBase {
 
 	public void envioNotasCredito() {
 		Cursor DT;
-		String cor, fruta = "";
+		String cor, fruta = "", tipodocumento, tipoDGIR = "", tipoDGISR = "", query = "";
 		int i, pc = 0, pcc = 0, ccorel;
 
 		try {
 
-			sql = "SELECT COREL,RUTA,CORELATIVO FROM D_NOTACRED WHERE STATCOM='N' ORDER BY CORELATIVO";
+			sql = "SELECT COREL,RUTA,CORELATIVO, TIPO_DOCUMENTO FROM D_NOTACRED WHERE STATCOM='N' ORDER BY CORELATIVO";
 			DT = Con.OpenDT(sql);
 			if (DT.getCount() == 0) {
 				senv += "Notas crédito : " + pc + "\n";
@@ -5916,6 +5916,17 @@ public class ComWS extends PBase {
 				cor = DT.getString(0);
 				fruta = DT.getString(1);
 				ccorel = DT.getInt(2);
+				tipodocumento = DT.getString(3);
+
+				//Tipo de documento (04:Nota de Crédito  referente a facturas, 06:Nota de crédito genérica)
+				//(05:Nota de debito  referente a facturas, 07:Nota de debito genérica )
+				if	(tipodocumento.equals("ND")) {
+					tipoDGISR = "05";
+					tipoDGIR ="07";
+				} else if (tipodocumento.equals("NC")) {
+					tipoDGISR = "06";
+					tipoDGIR = "04";
+				}
 
 				try {
 
@@ -5927,9 +5938,11 @@ public class ComWS extends PBase {
 
 					if (envioparcial) dbld.clear();
 
-					dbld.insert("D_NOTACRED", "WHERE COREL='" + cor + "'");
-					dbld.insert("D_NOTACREDD", "WHERE COREL='" + cor + "'");
-					dbld.insert("D_FACTURA_CONTROL_CONTINGENCIA", "WHERE COREL = '"+ cor +"'");
+					dbld.insert("D_NOTACRED", "WHERE COREL='" + cor + "' AND TIPO_DOCUMENTO = '"+tipodocumento+"'");
+					dbld.insert("D_NOTACREDD", "WHERE COREL='" + cor + "' AND TIPO_DOCUMENTO = '"+tipodocumento+"'");
+
+					query = "(tipodocumento = '" + tipoDGISR + "' OR tipodocumento = '" + tipoDGIR + "')";
+					dbld.insert("D_FACTURA_CONTROL_CONTINGENCIA", "WHERE COREL = '"+ cor +"' AND "+query+"");
 
 					//dbld.add("UPDATE P_CORELNC SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");
 					dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'NC' " +

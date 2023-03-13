@@ -1507,6 +1507,7 @@ public class Anulacion extends PBase {
 
 	public void InsertarFELControl(clsClasses.clsControlFEL ItemFEL) {
 		Cursor dt;
+		String vFechaAutorizacion = "";
 		try {
 
 			sql = "SELECT MAX(IdTablaControl) FROM D_FACTURA_CONTROL_CONTINGENCIA";
@@ -1537,7 +1538,16 @@ public class Anulacion extends PBase {
 			ins.add("CODIGOLIQUIDACION", ItemFEL.CodLiquidacion);
 			ins.add("CORELATIVO", ItemFEL.Correlativo);
 			ins.add("QRIMAGE", ItemFEL.QRImg);
-			ins.add("FECHA_AUTORIZACION", ItemFEL.Fecha_Autorizacion);
+
+			if (ItemFEL.Fecha_Autorizacion!=null && ItemFEL.Fecha_Autorizacion.length() > 0){
+				vFechaAutorizacion = ItemFEL.Fecha_Autorizacion.equals("0001-01-01T00:00:00")?
+						"1900-01-01T00:00:00":
+						ItemFEL.Fecha_Autorizacion.toString().substring(0,ItemFEL.Fecha_Autorizacion.length()-6);
+			} else {
+				vFechaAutorizacion = "1900-01-01T00:00:00";
+			}
+
+			ins.add("FECHA_AUTORIZACION", vFechaAutorizacion);
 			ins.add("NUMERO_AUTORIZACION", ItemFEL.Numero_Autorizacion);
 
 			db.execSQL(ins.sql());

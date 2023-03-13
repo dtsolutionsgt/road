@@ -111,6 +111,7 @@ public class FacturaRes extends PBase {
 	private String urlDoc = "";
 	private String urlDocNT = "";
 	private String QR = "";
+	private boolean exito = true;
 
 	@SuppressLint("MissingPermission")
 	@Override
@@ -2061,13 +2062,19 @@ public class FacturaRes extends PBase {
 
 			dt.close();
 
-			//#AT20230203 Inserta en D_FACTURA_CONTROL_CONTIGENCIA de forma temporal
-			InsertaFacturaTmp();
-
 			db.setTransactionSuccessful();
 			db.endTransaction();
 
-        } catch (Exception e) {
+			db.beginTransaction();
+			//#AT20230203 Inserta en D_FACTURA_CONTROL_CONTIGENCIA de forma temporal
+			if(!InsertaFacturaTmp()) {
+				toast("ERROR20230313_A No se logró insertar datos temporales en D_FACTURA_CONTROL_CONTIGENCIA");
+				exito = false;
+			}
+			db.setTransactionSuccessful();
+			db.endTransaction();
+
+	} catch (Exception e) {
 			db.endTransaction();
             addlog(Objects.requireNonNull(new Object() {
 			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
@@ -2120,17 +2127,22 @@ public class FacturaRes extends PBase {
 		try {
 
 			Fimador Firmador = new Fimador(this);
-			RespuestaEdoc RespuestaEdocFac = new RespuestaEdoc();;
+			RespuestaEdoc RespuestaEdocFac = new RespuestaEdoc();
+
+			if(!exito) {
+				if (!InsertaFacturaTmp()) {
+					toast("ERROR20230313_B No se logró insertar datos temporales en D_FACTURA_CONTROL_CONTIGENCIA");
+				}
+			}
 
 			if (ConexionValida()) {
 				//#AT20230309 Intenta certificar 3 veces
 				try {
-					//urlDoc = "https://pa.edocnube.com/4.0/Emision/Api/FacturaEnte";
 					RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 					if (RespuestaEdocFac.Cufe == null) {
 						for (int i = 0; i < 2; i++) {
-							if (RespuestaEdocFac.Cufe == null && !RespuestaEdocFac.Estado.equals("15")) {
+							if (RespuestaEdocFac.Cufe == null && (RespuestaEdocFac.Estado == null || !RespuestaEdocFac.Estado.equals("15"))) {
 								RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 								if (RespuestaEdocFac.Cufe != null) {
@@ -2149,10 +2161,9 @@ public class FacturaRes extends PBase {
 				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 
-			if (!RespuestaEdocFac.Estado.isEmpty() || RespuestaEdocFac.Estado != null) {
+			if (!RespuestaEdocFac.Estado.isEmpty() && RespuestaEdocFac.Estado != null) {
 
 				clsClasses.clsControlFEL ControlFEL = clsCls.new clsControlFEL();
-				int EstadoFac = 0;
 
 				ControlFEL.Cufe = RespuestaEdocFac.Cufe;
 				ControlFEL.TipoDoc = Factura.gDGen.iDoc;
@@ -2181,8 +2192,6 @@ public class FacturaRes extends PBase {
 
 				if (RespuestaEdocFac.Estado.equals("2")) {
 
-					EstadoFac = 1;
-
 					toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 
 					if (gl.dvbrowse!=0) {
@@ -2201,7 +2210,12 @@ public class FacturaRes extends PBase {
 					toastlong("ERR_233121237B: NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 				}
 
-			}else {
+				//#AT20230313 Si no existe la factura en d control la intenta insertar de nuevo
+				if (Catalogo.ExisteFacturaDControl(ControlFEL.Corel).isEmpty()) {
+					Catalogo.InsertarFELControl(ControlFEL);
+				}
+				
+			} else {
 				toastlong("ERR_233121237C: NO SE LOGRÓ CERTIFICAR LA FACTURA");
 			}
 
@@ -2212,7 +2226,7 @@ public class FacturaRes extends PBase {
 		}
 	}
 
-	private void InsertaFacturaTmp() {
+	private boolean InsertaFacturaTmp() {
 
 		clsClasses.clsControlFEL TmpControlFEL;
 
@@ -2243,15 +2257,20 @@ public class FacturaRes extends PBase {
 					TmpControlFEL.TipFac = NotaCredito.gDGen.iDoc;
 					TmpControlFEL.Corel = gl.devcornc;
 					TmpControlFEL.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
+
 					Catalogo.InsertarFELControl(TmpControlFEL);
 				}
 
 			} catch (Exception e) {
 				msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+				return false;
 			}
 		} catch (Exception e) {
 			msgbox(new Object() {}.getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+			return false;
 		}
+
+		return true;
 	}
 	
 	private void ActualizaFacturaTmp(String Corel, clsClasses.clsControlFEL ControlFEL) {

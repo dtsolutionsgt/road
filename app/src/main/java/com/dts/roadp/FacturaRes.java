@@ -2938,7 +2938,9 @@ public class FacturaRes extends PBase {
 	//region Pago
 
 	private void inputEfectivo() {
+
 		try{
+
 			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 			alert.setTitle("Pago Efectivo");
@@ -2958,12 +2960,11 @@ public class FacturaRes extends PBase {
 				closekeyb();
 				applyCash();
 				checkPago();
-				//pagando = false;
 			});
 
 			alert.setNegativeButton("Cancelar", (dialog, whichButton) -> closekeyb());
-
 			alert.show();
+
 		}catch (Exception e){
 			addlog(Objects.requireNonNull(new Object() {
 			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),"");
@@ -3107,16 +3108,16 @@ public class FacturaRes extends PBase {
 		double epago;
 
 		try {
-			epago=Double.parseDouble(sefect);
-			if (epago==0) return;
 
-			if (epago<0) throw new Exception();
+			epago=Double.parseDouble(sefect);
+			//if (epago==0) return;
+
+			if (epago<0) throw new Exception("Err_2303131034: El valor del pago es 0 en sefect.");
 
 			sql="DELETE FROM T_PAGO";
 			db.execSQL(sql);
 
 			ins.init("T_PAGO");
-
 			ins.add("ITEM",1);
 			ins.add("CODPAGO",1);
 			ins.add("TIPO","E");
@@ -3131,14 +3132,12 @@ public class FacturaRes extends PBase {
 			ins.add("DESC1","");
 			ins.add("DESC2","");
 			ins.add("DESC3","");
-
 		    db.execSQL(ins.sql());
 
 		} catch (Exception e) {
 			addlog(Objects.requireNonNull(new Object() {
 			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
-			inputEfectivo();
-			mu.msgbox("Pago incorrecto"+e.getMessage());
+			mu.msgbox("Err_233131019_applyCash: "+e.getMessage());
 	    }
 
 	}
@@ -3148,7 +3147,6 @@ public class FacturaRes extends PBase {
 		try{
 
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
 			alert.setTitle("Pago Crédito");
 			alert.setMessage("Valor a pagar");
 
@@ -3171,7 +3169,6 @@ public class FacturaRes extends PBase {
 			});
 
 			alert.setNegativeButton("Cancelar", (dialog, whichButton) -> closekeyb());
-
 			alert.show();
 
 		}catch (Exception e){
@@ -3211,7 +3208,7 @@ public class FacturaRes extends PBase {
 			addlog(Objects.requireNonNull(new Object() {
 			}.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
 			inputEfectivo();
-			mu.msgbox("Pago incorrecto"+e.getMessage());
+			mu.msgbox("Err_233131020_applyCredit: "+e.getMessage());
 	    }
 
 	}
@@ -3300,8 +3297,6 @@ public class FacturaRes extends PBase {
 
 		Cursor DT;
 		double tpago;
-
-		//getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
 		if (pagocompleto) return;
 

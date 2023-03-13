@@ -265,6 +265,7 @@ public class Cobro extends PBase {
 
 				calcSelected();
 				showTotals();
+
 			}else{
 				for (int i = 0; i <items.size(); i++) {
 					items.get(i).flag=2;
@@ -275,15 +276,6 @@ public class Cobro extends PBase {
 				calcSelected();
 				showTotals();
 			}
-
-			/*for (int i = 0; i <items.size(); i++) {
-				items.get(i).flag=0;
-			}
-
-			adapter.refreshItems();
-
-			calcSelected();
-			showTotals();*/
 
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
@@ -1120,45 +1112,6 @@ public class Cobro extends PBase {
 						}
 					}
 
-					// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
-					/*if (Factura.gDGen.Receptor.iTipoRec.equals("01") || Factura.gDGen.Receptor.iTipoRec.equals("03")) {
-
-						if (Cliente.nit.length()>0) {
-							String[] DVRuc = Cliente.nit.split(" ");
-							if (DVRuc.length > 1) {
-								Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-								if (DVRuc[1].trim().equals("")){
-									Factura.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
-								} else{
-									Factura.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
-								}
-							} else {
-								progress.cancel();
-								msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
-								return false;
-							}
-						} else {
-							progress.cancel();
-							msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-							return false;
-						}
-					} else {
-						if (Cliente.nit.length()>0) {
-							String[] DVRuc = Cliente.nit.split(" ");
-							if (DVRuc.length > 1) {
-								Factura.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-								if (DVRuc[1].trim().equals("")){
-									Factura.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[3].trim(),2);
-								} else {
-									Factura.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[2].trim(),2);
-								}
-							} else {
-								Factura.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
-								Factura.gDGen.Receptor.gRucRec.dDV = "";
-							}
-						}
-					}
-*/
 					clsClasses.clsRUC BeRUC= Catalogo.getRUC(Cliente.nit);
 					if (Factura.gDGen.Receptor.iTipoRec.equals("01") || Factura.gDGen.Receptor.iTipoRec.equals("03")) {
 
@@ -1276,8 +1229,6 @@ public class Cobro extends PBase {
 						DT2.moveToNext();
 					}
 
-					if (DT != null) DT.close();
-
 					gFormaPago Pagos = new gFormaPago();
 
 					String Total = String.valueOf(TotalFact);
@@ -1318,7 +1269,7 @@ public class Cobro extends PBase {
 			if (DT != null) DT.close();
 
 		} catch (Exception e) {
-			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage() + " " + sql);
+			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage() + " Err_2303131027" );
 		}
 
 		return true;
@@ -1663,10 +1614,8 @@ public class Cobro extends PBase {
 		try{
 
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
 			alert.setTitle("Pago Efectivo");
 			alert.setMessage("Valor a pagar");
-
 			final EditText input = new EditText(this);
 			alert.setView(input);
 
@@ -1678,20 +1627,16 @@ public class Cobro extends PBase {
 			showkeyb();
 
 			checkCheck =  1;
-			alert.setPositiveButton("Aplicar", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					peexit=false;
-					sefect=input.getText().toString();
-					//closekeyb();
-					checkCash();
-				}
+
+			alert.setPositiveButton("Aplicar", (dialog, whichButton) -> {
+				peexit=false;
+				sefect=input.getText().toString();
+				checkCash();
 			});
 
-			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					peexit=true;
-					closekeyb();
-				}
+			alert.setNegativeButton("Cancelar", (dialog, whichButton) -> {
+				peexit=true;
+				closekeyb();
 			});
 
 			alert.show();
@@ -1703,6 +1648,7 @@ public class Cobro extends PBase {
 	}
 
 	private void checkCash() {
+
 		double epago;
 
 		try {
@@ -1712,7 +1658,7 @@ public class Cobro extends PBase {
 
 			if (epago==0) return;
 
-			if (epago<0) throw new Exception();
+			if (epago<0) throw new Exception("Err_233131022: Monto pago es 0 en sefect.");
 
 			if (epago>tsel) {
 				mu.msgbox("Total a pagar mayor que total de monto seleccionado");return;
@@ -1725,12 +1671,10 @@ public class Cobro extends PBase {
 				}
 			}
 
-
 			sql="DELETE FROM T_PAGO";
 			db.execSQL(sql);
 
 			ins.init("T_PAGO");
-
 			ins.add("ITEM",1);
 			ins.add("CODPAGO",1);
 			ins.add("TIPO","E");
@@ -1738,15 +1682,14 @@ public class Cobro extends PBase {
 			ins.add("DESC1","");
 			ins.add("DESC2","");
 			ins.add("DESC3","");
-
 			db.execSQL(ins.sql());
 
-			msgAskSave("Aplicar pago?");
+			msgAskSave("¿Aplicar pago?");
 
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			inputEfectivo();
-			mu.msgbox("Pago incorrecto"+e.getMessage());
+			mu.msgbox("Err_233131019_checkCash: "+e.getMessage());
 		}
 
 	}
@@ -1772,9 +1715,6 @@ public class Cobro extends PBase {
 
 			lblSel.setText(mu.frmcur(total));
 			lblPag.setText(mu.frmcur(tpagos));
-
-			/*tpend=total-tpagos;
-			plim=total-tpagos;*/
 
 			if (tsel>=0.01) {
 				lblPend.setText(mu.frmcur(tsel));
@@ -2068,15 +2008,13 @@ addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"
 
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 			dialog.setTitle(R.string.app_name);
-			dialog.setMessage("¿" + msg + "?");
+			dialog.setMessage(msg);
 			dialog.setIcon(R.drawable.ic_quest);
 			dialog.setCancelable(false);
 			dialog.setPositiveButton("Si", (dialog1, which) -> {
 				createDoc();
 				check();
-				//validaCredito();
 			});
-
 			dialog.setNegativeButton("No", (dialog12, which) -> closekeyb());
 			dialog.show();
 

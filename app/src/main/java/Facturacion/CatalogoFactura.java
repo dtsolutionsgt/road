@@ -463,7 +463,7 @@ public class CatalogoFactura extends PBase {
 
         try {
 
-            int CertificadaDGI = EstadoFac == "2"  ? 1:0;
+            int CertificadaDGI = EstadoFac.equals("2") ? 1:0;
 
             sql="UPDATE D_FACTURA SET CUFE ='"+Cufe+"', CERTIFICADA_DGI="+CertificadaDGI+"  WHERE COREL='"+corel+"'";
             db.execSQL(sql);

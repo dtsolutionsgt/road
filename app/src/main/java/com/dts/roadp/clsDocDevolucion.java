@@ -103,6 +103,8 @@ public class clsDocDevolucion extends clsDocument {
 
         rep.add(CUFE);
         rep.add("");
+        rep.add("Documento validado por GURUSOFT, S.A. con RUC 155668001-2-2018, es Proveedor Autorizado Calificado, Resolucion No. 201-0528 de 21/03/2022");
+        rep.add("");
         rep.add(qrCode);
 
         return super.buildFooter();

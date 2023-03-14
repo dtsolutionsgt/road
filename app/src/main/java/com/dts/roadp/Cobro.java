@@ -1620,7 +1620,7 @@ public class Cobro extends PBase {
 			alert.setView(input);
 
 			input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-			input.setText(""+tsel);
+			input.setText(""+ mu.round(tsel,2));
 			input.requestFocus();
 
 			alert.setCancelable(false);

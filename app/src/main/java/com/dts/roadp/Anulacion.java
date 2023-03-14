@@ -548,7 +548,7 @@ public class Anulacion extends PBase {
 				}
 
 				progress.cancel();
-				mu.msgbox("El documento ha sido anulado.");
+				mu.msgbox("Documento anulado.");
 
 			}else{
 
@@ -1840,6 +1840,7 @@ public class Anulacion extends PBase {
     }
 	
 	private boolean anulFactura(String itemid) {
+
 		Cursor dt;
 		String prod,um,ncred;
 
@@ -1896,7 +1897,7 @@ public class Anulacion extends PBase {
 			sql="DELETE FROM D_STOCKB_DEV WHERE Corel='"+itemid+"'";
 			db.execSQL(sql);
 
-            sql = "UPDATE D_NOTACRED SET ANULADO ='S' WHERE FACTURA ='" + itemid + "' AND TIPODOCUMENTO = 'NC'";
+            sql = "UPDATE D_NOTACRED SET ANULADO ='S' WHERE FACTURA ='" + itemid + "' AND TIPO_DOCUMENTO = 'NC'";
             db.execSQL(sql);
 
             sql = "UPDATE D_CXC SET ANULADO ='S' WHERE REFERENCIA ='" + itemid + "'";
@@ -3070,81 +3071,80 @@ public class Anulacion extends PBase {
 	private void msgAsk(String msg) {
 
 		try{
-			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 			dialog.setTitle("ROAD");
 			dialog.setMessage("¿" + msg  + "?");
-
 			dialog.setIcon(R.drawable.ic_quest);
+			dialog.setPositiveButton("Si", (dialog1, which) -> {
+				AsyncGetToken Token = new AsyncGetToken();
+				Token.execute();
 
-			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					AsyncGetToken Token = new AsyncGetToken();
-					Token.execute();
+				if (tipo == 3) {
+					//#AT20230309 Solo mandar anular facturas si el estado es 2,15 0 20
+					if (sitem.Estado.equals("2") || sitem.Estado.equals("15")  || sitem.Estado.equals("20")) {
+						if (!ConexionValida()) {
+							toast("No hay conexión a internet.");
+							return;
+						}
 
-					if (tipo == 3) {
-						//#AT20230309 Solo mandar anular facturas si el estado es 2,15 0 20
-						if (sitem.Estado.equals("2") || sitem.Estado.equals("15")  || sitem.Estado.equals("20")) {
-							if (!ConexionValida()) {
-								toast("No hay conexión a internet.");
-								return;
+						String CorelNC = "";
+						CorelNC = TieneNotaCredito();
+
+						ProgressDialog("Anulando factura...");
+
+						if (!CorelNC.isEmpty()) {
+
+							if (AnularNotaCreditoConFactura(CorelNC, itemid)) {
+								AsyncAnularDocumento anular = new AsyncAnularDocumento();
+								anular.execute();
 							}
 
-							String CorelNC = "";
-							CorelNC = TieneNotaCredito();
+						} else {
+							AsyncAnularDocumento anular = new AsyncAnularDocumento();
+							anular.execute();
+						}
 
-							ProgressDialog("Anulando factura...");
+					} else {
+						AnularFactHH_DGI();
+					}
+				} else if (tipo == 6) {
+					//#AT20230309 Solo mandar anular facturas si el estado es 2,15 0 20
+					if (sitem.Estado.equals("2") || sitem.Estado.equals("15")  || sitem.Estado.equals("20")) {
+						if (!ConexionValida()) {
+							toast("No hay conexión a internet.");
+							return;
+						}
 
-							if (!CorelNC.isEmpty()) {
-								if (AnularNotaCreditoConFactura(CorelNC, itemid)) {
+						Cursor DT;
+						String vCorelFactura = "";
 
-									AsyncAnularDocumento anular = new AsyncAnularDocumento();
-									anular.execute();
-								}
-							} else {
+						sql = "SELECT FACTURA FROM D_NOTACRED WHERE COREL = '" + itemid + "' AND TIPO_DOCUMENTO = 'NC' ";
+						DT=Con.OpenDT(sql);
+
+						if (DT.getCount()>0){
+							DT.moveToFirst();
+							vCorelFactura = DT.getString(0);
+						}
+
+						if (ExisteFactura(vCorelFactura)) {
+							if (AnularNotaCreditoConFactura(itemid, vCorelFactura)) {
 								AsyncAnularDocumento anular = new AsyncAnularDocumento();
 								anular.execute();
 							}
 						} else {
-							AnularFactHH_DGI();
-						}
-					} else if (tipo == 6) {
-						//#AT20230309 Solo mandar anular facturas si el estado es 2,15 0 20
-						if (sitem.Estado.equals("2") || sitem.Estado.equals("15")  || sitem.Estado.equals("20")) {
-							if (!ConexionValida()) {
-								toast("No hay conexión a internet.");
-								return;
-							}
-
-							Cursor DT;
-							String vCorelFactura = "";
-
-							sql = "SELECT FACTURA FROM D_NOTACRED WHERE COREL = '" + itemid + "' AND TIPO_DOCUMENTO = 'NC' ";
-							DT=Con.OpenDT(sql);
-
-							if (DT.getCount()>0){
-								DT.moveToFirst();
-								vCorelFactura = DT.getString(0);
-							}
-
-							if (ExisteFactura(vCorelFactura)) {
-								if (AnularNotaCreditoConFactura(itemid, vCorelFactura)) {
-									AsyncAnularDocumento anular = new AsyncAnularDocumento();
-									anular.execute();
-								}
-							} else {
-								anulDocument();
-							}
-						} else {
-							anulNotaCredito(itemid);
+							anulDocument();
 						}
 					} else {
-						anulDocument();
+						anulNotaCredito(itemid);
 					}
+				} else {
+					anulDocument();
 				}
 			});
 			dialog.setNegativeButton("No", null);
 			dialog.show();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}

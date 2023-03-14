@@ -249,6 +249,10 @@ public class clsDocument {
 
         rep.empty();rep.empty();
 
+		if (docfactura || docdevolucion){
+			rep.addc("             DGI");
+		}
+
         for (int i = 0; i <lines.size(); i++) 		{
 
             s=lines.get(i);

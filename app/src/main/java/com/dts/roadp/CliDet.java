@@ -118,6 +118,8 @@ public class CliDet extends PBase {
 		app = new AppMethods(this, gl, Con, db);
 
 		cod=gl.cliente;
+		gl.cobroPendiente = false;
+		gl.pagocobro = false;
 
 		showData();
 

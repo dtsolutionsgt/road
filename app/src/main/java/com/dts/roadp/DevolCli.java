@@ -793,7 +793,7 @@ public class DevolCli extends PBase {
 						if (!CodDGI.isEmpty()) {
 							detalle.cUnidad = CodDGI.toLowerCase();
 						} else {
-							detalle.cUnidad = Producto.um.toLowerCase();
+							detalle.cUnidad = "und";
 						}
 					}
 
@@ -944,9 +944,9 @@ public class DevolCli extends PBase {
 
 							if (RespuestaEdoc.Estado.equals("2")) {
 								EstadoNT = 1;
-								toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + RespuestaEdoc.MensajeRespuesta);
+								toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + (RespuestaEdoc.MensajeRespuesta == null ? "":RespuestaEdoc.MensajeRespuesta));
 							} else {
-								toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + RespuestaEdoc.MensajeRespuesta);
+								toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + (RespuestaEdoc.MensajeRespuesta == null ? "":RespuestaEdoc.MensajeRespuesta));
 							}
 						}
 

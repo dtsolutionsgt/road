@@ -500,6 +500,7 @@ public class CatalogoFactura extends PBase {
 
     public String ReplaceXML(String texto) {
         String Vocales = "ÁáÉéÍíÓóÚúÑñÜü", VocalesSinAcento = "AaEeIiOoUuNnUu";
+
         char[] array = texto.toCharArray();
         try {
 

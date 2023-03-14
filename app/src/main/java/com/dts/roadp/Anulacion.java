@@ -20,6 +20,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.edocsdk.Fimador;
 
@@ -366,7 +367,14 @@ public class Anulacion extends PBase {
 					if (tipo==3) {
 						vItem.Desc = DT.getString(9) + " - " + DT.getString(1);
 						vItem.flag = DT.getInt(4);
-						vItem.Cufe = (DT.getString(5).equals("null") ? "":DT.getString(5));
+
+						if (DT.getString(5) == null) {
+							vItem.Cufe = "";
+						} else if (DT.getString(5).equals("null")) {
+							vItem.Cufe = "";
+						} else {
+							vItem.Cufe = DT.getString(5);
+						}
 						sf=DT.getString(2)+ StringUtils.right("000000" + Integer.toString(DT.getInt(4)), 6);
                         vItem.Numero_Autorizacion=DT.getString(6);
 						vItem.Certificada_DGI = (DT.getInt(7)==1?"Si":"No");
@@ -917,7 +925,7 @@ public class Anulacion extends PBase {
 					if (!CodDGI.isEmpty()) {
 						detalle.cUnidad = CodDGI.toLowerCase();
 					} else {
-						detalle.cUnidad = Producto.um.toLowerCase();
+						detalle.cUnidad = "und";
 					}
 				}
 
@@ -1067,9 +1075,9 @@ public class Anulacion extends PBase {
 
 					if (RespuestaEdocND.Estado.equals("2")) {
 						EstadoND = 1;
-						toastlong("NOTA DE DEBITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
+						toastlong("NOTA DE DEBITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + (RespuestaEdocND.MensajeRespuesta == null ? "": RespuestaEdocND.MensajeRespuesta));
 					} else {
-						toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE DEBITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
+						toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE DEBITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + (RespuestaEdocND.MensajeRespuesta == null ? "": RespuestaEdocND.MensajeRespuesta));
 					}
 
 					sql="UPDATE D_NOTACRED SET CUFE ='"+RespuestaEdocND.Cufe+"', CERTIFICADA_DGI="+EstadoND+"  WHERE COREL='"+gl.dvcorelnd+"'" +" AND TIPO_DOCUMENTO = 'ND'";
@@ -1338,7 +1346,7 @@ public class Anulacion extends PBase {
 					if (!CodDGI.isEmpty()) {
 						detalle.cUnidad = CodDGI.toLowerCase();
 					} else {
-						detalle.cUnidad = Producto.um.toLowerCase();
+						detalle.cUnidad = "und";
 					}
 				}
 
@@ -3136,7 +3144,7 @@ public class Anulacion extends PBase {
 							anulDocument();
 						}
 					} else {
-						anulNotaCredito(itemid);
+						msgbox("No se anulará nota de crédito porque no esta certificada, se anulará en BOF.");
 					}
 				} else {
 					anulDocument();

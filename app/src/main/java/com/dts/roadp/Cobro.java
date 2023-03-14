@@ -1185,7 +1185,7 @@ public class Cobro extends PBase {
 							if (!CodDGI.isEmpty()) {
 								detalle.cUnidad = CodDGI.toLowerCase();
 							} else {
-								detalle.cUnidad = Producto.um.toLowerCase(); //Utiliza codigo de la cgi hy que sacarlo con una consulta
+								detalle.cUnidad = "und"; //Utiliza codigo de la cgi hy que sacarlo con una consulta
 							}
 						}
 
@@ -1326,21 +1326,13 @@ public class Cobro extends PBase {
 			if (!RespuestaEdocFac.Estado.isEmpty() || RespuestaEdocFac.Estado != null) {
 
 				clsClasses.clsControlFEL ControlFEL = clsCls.new clsControlFEL();
-				clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
-				int EstadoFac = 0, EstadoNT = 0;
 
 				ControlFEL.Cufe = RespuestaEdocFac.Cufe;
 				ControlFEL.TipoDoc = Factura.gDGen.iDoc;
 				ControlFEL.NumDoc = Factura.gDGen.dNroDF;
 				ControlFEL.Sucursal = gl.sucur;
 				ControlFEL.Caja = Factura.gDGen.dPtoFacDF;
-
-				if (RespuestaEdocFac.Estado.equals("21") || RespuestaEdocFac.Estado.equals("20")) {
-					ControlFEL.Estado = "1";
-				} else {
-					ControlFEL.Estado = RespuestaEdocFac.Estado;
-				}
-
+				ControlFEL.Estado = RespuestaEdocFac.Estado;
 				ControlFEL.Mensaje = RespuestaEdocFac.MensajeRespuesta;
 				ControlFEL.ValorXml = RespuestaEdocFac.XML != null ? Catalogo.ReplaceXML(RespuestaEdocFac.XML) : "";
 
@@ -1357,7 +1349,6 @@ public class Cobro extends PBase {
 				ControlFEL.Numero_Autorizacion = RespuestaEdocFac.NumAutorizacion;
 
 				if (RespuestaEdocFac.Estado.equals("2")) {
-					EstadoFac = 1;
 					toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 					certifico_factura_pendiente_pago =true;
 				} else {
@@ -1367,8 +1358,7 @@ public class Cobro extends PBase {
 
 				try {
 					ActualizaFacturaTmp(corelFactura, ControlFEL);
-					Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, RespuestaEdocFac.Estado, corel);
-					//Catalogo.InsertarFELControl(ControlFEL);
+					Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, RespuestaEdocFac.Estado, corelFactura);
 				} catch (Exception e) {
 					msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
 				}

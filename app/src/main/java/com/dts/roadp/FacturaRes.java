@@ -38,6 +38,7 @@ import com.example.edocsdk.Fimador;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 
 import Entidades.Detalle;
@@ -1504,7 +1505,7 @@ public class FacturaRes extends PBase {
 						if (!CodDGI.isEmpty()) {
 							detalle.cUnidad = CodDGI.toLowerCase();
 						} else {
-							detalle.cUnidad = producto.um.toLowerCase();
+							detalle.cUnidad = "und";
 						}
 					}
 
@@ -1657,7 +1658,7 @@ public class FacturaRes extends PBase {
 					if (!CodDGI.isEmpty()) {
 						detalle.cUnidad = CodDGI.toLowerCase();
 					} else {
-						detalle.cUnidad = producto.um.toLowerCase(); //Utiliza codigo de la cgi hy que sacarlo con una consulta
+						detalle.cUnidad = "und"; //Utiliza codigo de la cgi hy que sacarlo con una consulta
 					}
 				}
 

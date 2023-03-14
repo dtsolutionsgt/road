@@ -217,6 +217,8 @@ public class Cobro extends PBase {
 				mu.msgbox("Total a pagar = 0, debe seleccionar un documento");return;
 			}
 
+			if (dtipo.equalsIgnoreCase("R")) gl.pagocobro=false; else gl.pagocobro=true;
+
 			inputEfectivo();
 
 		}catch (Exception e){

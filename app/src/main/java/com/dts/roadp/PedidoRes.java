@@ -563,6 +563,7 @@ public class PedidoRes extends PBase {
                     ins.add("AYUDANTE",gl.ayudanteID);
                     ins.add("CODIGOLIQUIDACION",0);
                     ins.add("ESTADO","S");
+					ins.add("TIPO_DOCUMENTO", "NC");
 
                     db.execSQL(ins.sql());
 

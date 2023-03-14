@@ -123,5 +123,7 @@ public class appGlobals extends Application {
 	public String qr_clave= ""; //"yb90o#0F"
 	public String url_emision_nc_b2b_hh = "";
 	public String url_emision_nd_b2b_hh = "";
-	public String ambiente= "1"; //"2"
+	public String ambiente= "2"; //"1"
+
+	public String unidad_medida_defecto= "";
 }

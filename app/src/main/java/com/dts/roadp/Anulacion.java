@@ -915,9 +915,9 @@ public class Anulacion extends PBase {
 					}
 
 					if (!CodDGI.isEmpty()) {
-						detalle.cUnidad = CodDGI.toLowerCase();
+						detalle.cUnidad = CodDGI;
 					} else {
-						detalle.cUnidad = Producto.um.toLowerCase();
+						detalle.cUnidad = gl.unidad_medida_defecto;
 					}
 				}
 
@@ -1336,9 +1336,9 @@ public class Anulacion extends PBase {
 					}
 
 					if (!CodDGI.isEmpty()) {
-						detalle.cUnidad = CodDGI.toLowerCase();
+						detalle.cUnidad = CodDGI;
 					} else {
-						detalle.cUnidad = Producto.um.toLowerCase();
+						detalle.cUnidad = gl.unidad_medida_defecto;
 					}
 				}
 
@@ -1628,6 +1628,7 @@ public class Anulacion extends PBase {
 				ins.add("AYUDANTE", DT.getString(13));
 				ins.add("CODIGOLIQUIDACION", 0);
 				ins.add("ESTADO", DT.getString(15));
+				ins.add("TIPO_DOCUMENTO","ND");
 
 				db.execSQL(ins.sql());
 			}

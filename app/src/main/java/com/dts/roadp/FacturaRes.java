@@ -1247,6 +1247,7 @@ public class FacturaRes extends PBase {
 				ins.add("AYUDANTE",gl.ayudanteID);
 				ins.add("CODIGOLIQUIDACION",0);
 				ins.add("ESTADO","S");
+				ins.add("TIPO_DOCUMENTO", "NC");
 
 				db.execSQL(ins.sql());
 
@@ -1502,9 +1503,9 @@ public class FacturaRes extends PBase {
 						}
 
 						if (!CodDGI.isEmpty()) {
-							detalle.cUnidad = CodDGI.toLowerCase();
+							detalle.cUnidad = CodDGI;
 						} else {
-							detalle.cUnidad = producto.um.toLowerCase();
+							detalle.cUnidad = gl.unidad_medida_defecto;
 						}
 					}
 
@@ -1655,9 +1656,9 @@ public class FacturaRes extends PBase {
 					}
 
 					if (!CodDGI.isEmpty()) {
-						detalle.cUnidad = CodDGI.toLowerCase();
+						detalle.cUnidad = CodDGI;
 					} else {
-						detalle.cUnidad = producto.um.toLowerCase(); //Utiliza codigo de la cgi hy que sacarlo con una consulta
+						detalle.cUnidad = gl.unidad_medida_defecto; //Utiliza codigo de la cgi hy que sacarlo con una consulta
 					}
 				}
 

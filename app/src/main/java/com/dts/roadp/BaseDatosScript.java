@@ -175,6 +175,7 @@ public class BaseDatosScript {
 					"[AYUDANTE] TEXT NOT NULL,"+
 					"[CODIGOLIQUIDACION] INTEGER NOT NULL,"+
 					"[ESTADO] TEXT NOT NULL,"+
+					"[TIPO_DOCUMENTO] TEXT NOT NULL,"+
 					"PRIMARY KEY ([COREL])"+
 					");";
 			database.execSQL(vSQL);
@@ -1649,6 +1650,7 @@ public class BaseDatosScript {
 					"[URL_DOC] TEXT,"+
 					"[URL_EMISION_NC_B2B_HH] TEXT,"+
 					"[URL_EMISION_ND_B2B_HH] TEXT,"+
+					"[UNIDAD_MEDIDA_DEFECTO] TEXT,"+
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
 			database.execSQL(vSQL);

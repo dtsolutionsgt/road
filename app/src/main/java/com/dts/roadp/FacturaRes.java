@@ -2186,6 +2186,12 @@ public class FacturaRes extends PBase {
 				ControlFEL.Fecha_Autorizacion = RespuestaEdocFac.FechaAutorizacion;
 				ControlFEL.Numero_Autorizacion = RespuestaEdocFac.NumAutorizacion;
 
+				try{
+					Catalogo.Reconectar(Con, db);
+				}catch (Exception e){
+					Catalogo = new CatalogoFactura(this, Con, db);
+				}
+
 				//#AT20230203 Actualiza los campos faltantes en D_FACTURA_CONTROL_CONTIGENCIA
 				ActualizaFacturaTmp(corel, ControlFEL);
 				Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, RespuestaEdocFac.Estado, corel);
@@ -2390,9 +2396,19 @@ public class FacturaRes extends PBase {
 						toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
 					}
 
+					try{
+						Catalogo.Reconectar(Con, db);
+					}catch (Exception e){
+						Catalogo = new CatalogoFactura(this, Con, db);
+					}
+
 					ActualizaFacturaTmp(gl.devcornc, ControlNotaCredito);
 					Catalogo.UpdateEstadoNotaCredito(ControlNotaCredito.Cufe, CufeFact, EstadoNT);
-					//Catalogo.InsertarFELControl(ControlNotaCredito);
+
+					//#AT20230313 Si no existe la NC en d control la intenta insertar de nuevo
+					if (Catalogo.ExisteFacturaDControl(ControlNotaCredito.Corel).isEmpty()) {
+						Catalogo.InsertarFELControl(ControlNotaCredito);
+					}
 
 				} else {
 					msgbox("Campos con valores nulos.");

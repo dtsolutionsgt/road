@@ -869,7 +869,6 @@ public class DevolCli extends PBase {
 				db.execSQL(sql);
 
 				db.setTransactionSuccessful();
-
 				db.endTransaction();
 
 				clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
@@ -935,6 +934,14 @@ public class DevolCli extends PBase {
 							ControlNotaCredito.Fecha_Autorizacion = RespuestaEdoc.FechaAutorizacion;
 							ControlNotaCredito.Numero_Autorizacion = RespuestaEdoc.NumAutorizacion;
 
+							try{
+								Catalogo.opendb();
+							}catch (Exception e){
+								Catalogo = new CatalogoFactura(this, Con, db);
+							}
+
+							Catalogo.InsertarFELControl(ControlNotaCredito);
+
 							if (RespuestaEdoc.Estado.equals("2")) {
 								EstadoNT = 1;
 								toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + RespuestaEdoc.MensajeRespuesta);
@@ -943,14 +950,18 @@ public class DevolCli extends PBase {
 							}
 						}
 
-						try{
+						/*try{
 							Catalogo.opendb();
 						}catch (Exception e){
 							Catalogo = new CatalogoFactura(this, Con, db);
-						}
+						}*/
 
 						Catalogo.UpdateEstadoNotaCredito(RespuestaEdoc.Cufe,"", EstadoNT);
-						Catalogo.InsertarFELControl(ControlNotaCredito);
+
+						//#AT20230313 Si no existe la NotaCredito en d control la intenta insertar de nuevo
+						if (Catalogo.ExisteFacturaDControl(ControlNotaCredito.Corel).isEmpty()) {
+							Catalogo.InsertarFELControl(ControlNotaCredito);
+						}
 					}
 				}
 

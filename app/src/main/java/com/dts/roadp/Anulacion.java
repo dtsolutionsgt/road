@@ -1063,6 +1063,8 @@ public class Anulacion extends PBase {
 					ControlNotaDebito.Fecha_Autorizacion = RespuestaEdocND.FechaAutorizacion;
 					ControlNotaDebito.Numero_Autorizacion = RespuestaEdocND.NumAutorizacion;
 
+					InsertarFELControl(ControlNotaDebito);
+
 					if (RespuestaEdocND.Estado.equals("2")) {
 						EstadoND = 1;
 						toastlong("NOTA DE DEBITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
@@ -1073,7 +1075,16 @@ public class Anulacion extends PBase {
 					sql="UPDATE D_NOTACRED SET CUFE ='"+RespuestaEdocND.Cufe+"', CERTIFICADA_DGI="+EstadoND+"  WHERE COREL='"+gl.dvcorelnd+"'" +" AND TIPO_DOCUMENTO = 'ND'";
 					db.execSQL(sql);
 
-					InsertarFELControl(ControlNotaDebito);
+					try{
+						Catalogo.Reconectar(Con, db);
+					}catch (Exception e){
+						Catalogo = new CatalogoFactura(this, Con, db);
+					}
+
+					//#AT20230313 Si no existe la NotaDebito en d control la intenta insertar de nuevo
+					if (Catalogo.ExisteFacturaDControl(ControlNotaDebito.Corel).isEmpty()) {
+						InsertarFELControl(ControlNotaDebito);
+					}
 
 				} else {
 					toastlong("Estamos esperando una respuesta de GuruSoft");

@@ -199,7 +199,16 @@ public class clsDataBuilder {
                         valnum=DT.getDouble(i);
                         ins.add(nombre,valnum);
                     } else if (ct==4) {
-						s= "CONVERT(XML, '" + DT.getString(i) + "')";
+						String xmlEnc= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+						String xmlContigencia = DT.getString(i);
+
+						if (xmlContigencia.length() > 0) {
+							if (xmlContigencia.contains(xmlEnc)) {
+								xmlContigencia = xmlContigencia.substring(xmlEnc.length(), xmlContigencia.length());
+							}
+						}
+
+						s = "CONVERT(XML, '" + xmlContigencia + "')";
 						ins.addXML(nombre,s);
 					} else {
                         if (ct==1) s="'"+DT.getString(i)+"'";

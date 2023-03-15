@@ -1162,23 +1162,17 @@ public class FacturaRes extends PBase {
 
 					} else {
 						if (cliente.tipoRec.equals("01")|| cliente.tipoRec.equals("03")){
-							progress.cancel();
-							msgbox("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
-							return false;
+							toastlongd("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
 						}
 					}
 				}else {
 					if (cliente.tipoRec.equals("01")|| cliente.tipoRec.equals("03")){
-						progress.cancel();
-						msgbox("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
-						return false;
+						toastlongd("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
 					}
 				}
 			}else {
 				if (cliente.tipoRec.equals("01")|| cliente.tipoRec.equals("03")){
-					progress.cancel();
-					msgbox("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
-					return false;
+					toastlongd("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
 				}
 			}
 
@@ -1359,20 +1353,17 @@ public class FacturaRes extends PBase {
 
 						} else {
 							if (cliente.tipoRec.equals("01")|| cliente.tipoRec.equals("03")){
-								msgbox("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
-								return false;
+								toastlongd("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
 							}
 						}
 					}else {
 						if (cliente.tipoRec.equals("01")|| cliente.tipoRec.equals("03")){
-							msgbox("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
-							return false;
+							toastlongd("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
 						}
 					}
 				}else {
 					if (cliente.tipoRec.equals("01")|| cliente.tipoRec.equals("03")){
-						msgbox("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
-						return false;
+						toastlongd("La ubicación del cliente está vacía Cliente:" + cliente.nombre);
 					}
 				}
 

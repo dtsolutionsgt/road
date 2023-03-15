@@ -108,6 +108,11 @@ public class PBase extends Activity {
 		toast.show();
 	}
 
+	protected void toastlongd(String msg) {
+		Toast toast= Toast.makeText(getApplicationContext(),msg, Toast.LENGTH_LONG);
+		toast.show();
+	}
+
 	protected void toastcent(String msg) {
 
 		if (mu.emptystr(msg)) return;

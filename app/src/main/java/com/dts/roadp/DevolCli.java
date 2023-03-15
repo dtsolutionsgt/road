@@ -551,34 +551,6 @@ public class DevolCli extends PBase {
 					}
 				}
 
-				//#CKFK20221227 Antes se obtenia el distrito, provincia y correegimiento de esta forma
-				/*if (!Sucursal.codMuni.isEmpty() || Sucursal.codMuni != null) {
-					Municipio = clsCls.new clsMunicipio();
-					Departamento = clsCls.new clsDepartamento();
-
-					Municipio = Catalogo.getMunicipio(Sucursal.codMuni);
-					Departamento = Catalogo.getDepartamento(Municipio.depar);
-
-					if (Municipio.nombre.contains("/")) {
-
-						String[] DireccionCompleta = Municipio.nombre.split("/");
-
-						NotaCredito.gDGen.Emisor.gUbiEm.dCorreg = DireccionCompleta[1].trim().toUpperCase();
-						NotaCredito.gDGen.Emisor.gUbiEm.dDistr = DireccionCompleta[0].trim().toUpperCase();
-
-						if (!Departamento.nombre.isEmpty()) {
-							NotaCredito.gDGen.Emisor.gUbiEm.dProv = Departamento.nombre.toUpperCase();
-						} else {
-							NotaCredito.gDGen.Emisor.gUbiEm.dProv = "PANAMA";
-						}
-
-					} else {
-						msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
-						return;
-					}
-
-				}*/
-
 				NotaCredito.gDGen.Receptor = new Receptor();
 				NotaCredito.gDGen.Receptor.gRucRec = new gRucRec();
 				NotaCredito.gDGen.Receptor.gUbiRec = new gUbiRec();
@@ -611,62 +583,22 @@ public class DevolCli extends PBase {
 
 						} else {
 							if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
-								msgbox("La ubicación del cliente está vacía Cliente: " + Cliente.nombre);
-								return;
+								toastlongd("La ubicación del cliente está vacía Cliente: " + Cliente.nombre);
 							}
 						}
 					}else {
 						if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
-							msgbox("La ubicación del cliente está vacía Cliente: " + Cliente.nombre);
-							return;
+							toastlongd("La ubicación del cliente está vacía Cliente: " + Cliente.nombre);
 						}
 					}
 				}else {
 					if (Cliente.tipoRec.equals("01")||Cliente.tipoRec.equals("03")){
-						msgbox("La ubicación del cliente está vacía Cliente: " + Cliente.nombre);
-						return;
+						toastlongd("La ubicación del cliente está vacía Cliente: " + Cliente.nombre);
 					}
 				}
 
-				// #CKFK20221206 Si el iTipoRec 01:Contribuyente, 02:Consumidor final, 03:Gobierno, 04:Extranjero
-				/*if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
-
-					if (Cliente.nit.length()>0) {
-						String[] DVRuc = Cliente.nit.split(" ");
-						if (DVRuc.length > 1) {
-							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-							if (DVRuc[1].trim().equals("")){
-								NotaCredito.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[3].trim(),2);
-							}else{
-								NotaCredito.gDGen.Receptor.gRucRec.dDV =  StringUtils.right("00" + DVRuc[2].trim(),2);
-							}
-						}else{
-							msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
-							return;
-						}
-					}else {
-						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-						return;
-					}
-				}else{
-					if (Cliente.nit.length()>0) {
-						String[] DVRuc = Cliente.nit.split(" ");
-						if (DVRuc.length > 1) {
-							NotaCredito.gDGen.Receptor.gRucRec.dRuc = DVRuc[0].trim();
-							if (DVRuc[1].trim().equals("")){
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[3].trim(),2);
-							}else{
-								NotaCredito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
-							}
-						}else{
-							NotaCredito.gDGen.Receptor.gRucRec.dRuc = Cliente.nit;
-							NotaCredito.gDGen.Receptor.gRucRec.dDV = "";
-						}
-					}
-				}*/
 
 				clsClasses.clsRUC BeRUC= Catalogo.getRUC(Cliente.nit);
-
 				BeRUC= Catalogo.getRUC(Cliente.nit);
 				if (NotaCredito.gDGen.Receptor.iTipoRec.equals("01") || NotaCredito.gDGen.Receptor.iTipoRec.equals("03")) {
 

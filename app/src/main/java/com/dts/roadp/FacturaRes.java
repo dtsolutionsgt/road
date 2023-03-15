@@ -1503,7 +1503,7 @@ public class FacturaRes extends PBase {
 						}
 
 						if (!CodDGI.isEmpty()) {
-							detalle.cUnidad = CodDGI.toLowerCase();
+							detalle.cUnidad = CodDGI;
 						} else {
 							detalle.cUnidad = "und";
 						}
@@ -1656,7 +1656,7 @@ public class FacturaRes extends PBase {
 					}
 
 					if (!CodDGI.isEmpty()) {
-						detalle.cUnidad = CodDGI.toLowerCase();
+						detalle.cUnidad = CodDGI;
 					} else {
 						detalle.cUnidad = "und"; //Utiliza codigo de la cgi hy que sacarlo con una consulta
 					}

@@ -923,7 +923,7 @@ public class Anulacion extends PBase {
 					}
 
 					if (!CodDGI.isEmpty()) {
-						detalle.cUnidad = CodDGI.toLowerCase();
+						detalle.cUnidad = CodDGI;
 					} else {
 						detalle.cUnidad = "und";
 					}
@@ -1344,7 +1344,7 @@ public class Anulacion extends PBase {
 					}
 
 					if (!CodDGI.isEmpty()) {
-						detalle.cUnidad = CodDGI.toLowerCase();
+						detalle.cUnidad = CodDGI;
 					} else {
 						detalle.cUnidad = "und";
 					}

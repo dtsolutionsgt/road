@@ -1083,7 +1083,7 @@ public class FacturaRes extends PBase {
 
 			Factura.gDGen.iTpEmis = "01"; // 'Fijo salvo que sea autorización en contingencia cambiar a valor 04
 			Factura.gDGen.iDoc = "01"; //'Para Factura fijo.
-			Factura.gDGen.dNroDF = String.valueOf(fcorel); //P_COREL.Correlativo
+			Factura.gDGen.dNroDF = StringUtils.right("0000000000" + (fcorel), 10);//P_COREL.Correlativo
 			Factura.gDGen.dPtoFacDF = fserie; // BeSucursal.CODIGO '"002" 'Punto de Facturación del documento fiscal. (Ruta, Serie del disp.)
 			Factura.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";// 'Fecha de la FM.
 			Factura.gDGen.iNatOp = "01"; //'Venta fijo.
@@ -1277,7 +1277,7 @@ public class FacturaRes extends PBase {
 
 				NotaCredito.gDGen.iTpEmis = "01";
 				NotaCredito.gDGen.iDoc = "04"; //Tipo de documento (04:Nota de Crédito  referente a facturas, 06:Nota de crédito genérica )
-				NotaCredito.gDGen.dNroDF = String.valueOf(vNroDF);
+				NotaCredito.gDGen.dNroDF = StringUtils.right("0000000000" + (vNroDF), 10);//String.valueOf(vNroDF);
 				NotaCredito.gDGen.dPtoFacDF = vSerie; //000
 				NotaCredito.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";
 				NotaCredito.gDGen.iNatOp = "01";
@@ -2205,7 +2205,7 @@ public class FacturaRes extends PBase {
 						GeneraNotaCredito(ControlFEL.Cufe, ControlFEL.FechaEnvio);
 					}
 				} else {
-					toastlong("ERR_233121237B: NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+					toastlong("ERR_233121237B: NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + (RespuestaEdocFac.MensajeRespuesta == null ? "":RespuestaEdocFac.MensajeRespuesta));
 				}
 
 				//#AT20230313 Si no existe la factura en d control la intenta insertar de nuevo
@@ -2385,7 +2385,7 @@ public class FacturaRes extends PBase {
 						toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
 
 					} else {
-						toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + RespuestaEdocNT.MensajeRespuesta);
+						toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdocNT.Estado + " - " + (RespuestaEdocNT.MensajeRespuesta == null ? "":RespuestaEdocNT.MensajeRespuesta));
 					}
 
 					try{

@@ -505,7 +505,7 @@ public class DevolCli extends PBase {
 				NotaCredito.gDGen.iTpEmis = "01";
 				NotaCredito.gDGen.iDoc = "06"; //Tipo de documento (04:Nota de Crédito  referente a facturas, 06:Nota de crédito genérica )
 				//(05:Nota de debito  referente a facturas, 07:Nota de debito genérica )
-				NotaCredito.gDGen.dNroDF = String.valueOf(vNroDF);
+				NotaCredito.gDGen.dNroDF = StringUtils.right("0000000000" + (vNroDF), 10);//String.valueOf(vNroDF);
 				NotaCredito.gDGen.dPtoFacDF = vSerie; //000
 				NotaCredito.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";
 				NotaCredito.gDGen.iNatOp = "01";

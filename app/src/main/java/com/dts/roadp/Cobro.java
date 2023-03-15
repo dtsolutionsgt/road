@@ -1016,7 +1016,7 @@ public class Cobro extends PBase {
 
 					Factura.gDGen.iTpEmis = "01"; // 'Fijo salvo que sea autorización en contingencia cambiar a valor 04
 					Factura.gDGen.iDoc = "01"; //'Para Factura fijo.
-					Factura.gDGen.dNroDF = String.valueOf(DT.getInt(3)); //P_COREL.Correlativo
+					Factura.gDGen.dNroDF = StringUtils.right("0000000000" + (DT.getInt(3)), 10);//String.valueOf(); //P_COREL.Correlativo
 					Factura.gDGen.dPtoFacDF = DT.getString(2); // BeSucursal.CODIGO '"002" 'Punto de Facturación del documento fiscal. (Ruta, Serie del disp.)
 					Factura.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";// 'Fecha de la FM.
 					Factura.gDGen.iNatOp = "01"; //'Venta fijo.
@@ -1348,7 +1348,7 @@ public class Cobro extends PBase {
 					toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
 					certifico_factura_pendiente_pago =true;
 				} else {
-					toastlong("ERR_233121237A: NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+					toastlong("ERR_233121237A: NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + (RespuestaEdocFac.MensajeRespuesta == null ? "":RespuestaEdocFac.MensajeRespuesta));
 					certifico_factura_pendiente_pago = false;
 				}
 

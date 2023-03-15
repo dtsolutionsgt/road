@@ -742,7 +742,7 @@ public class Anulacion extends PBase {
 
 			Sucursal = Catalogo.getSucursal();
 
-			NotaDebito.gDGen.dNroDF = String.valueOf(vNroDF); //Acá va un número entero 19
+			NotaDebito.gDGen.dNroDF = StringUtils.right("0000000000" + (vNroDF), 10); //String.valueOf(vNroDF); //Acá va un número entero 19
 			NotaDebito.gDGen.dPtoFacDF = vSerie; //000 003
 			NotaDebito.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";
 			NotaDebito.gDGen.iNatOp = "01";
@@ -1141,7 +1141,7 @@ public class Anulacion extends PBase {
 			NotaDebito = new rFE();
 			NotaDebito.gDGen.iTpEmis = "01";
 			NotaDebito.gDGen.iDoc = "05"; //Tipo de documento //(05:Nota de debito  referente a facturas, 07:Nota de debito genérica )
-			NotaDebito.gDGen.dNroDF = String.valueOf(vNroDF); //Acá va un número entero 19
+			NotaDebito.gDGen.dNroDF = StringUtils.right("0000000000" + (vNroDF), 10); //String.valueOf(vNroDF); //Acá va un número entero 19
 			NotaDebito.gDGen.dPtoFacDF = vSerie; //000 003
 			NotaDebito.gDGen.dFechaEm = du.getFechaCompleta()+"-05:00";
 			NotaDebito.gDGen.iNatOp = "01";

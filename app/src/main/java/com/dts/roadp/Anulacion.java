@@ -1018,18 +1018,20 @@ public class Anulacion extends PBase {
 				try {
 					RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
-					if (RespuestaEdocND.Cufe == null) {
-						for (int i = 0; i < 2; i++) {
-							if (RespuestaEdocND.Cufe == null && !RespuestaEdocND.Estado.equals("15")) {
-								RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+					if (RespuestaEdocND != null) {
+						if (RespuestaEdocND.Cufe == null) {
+							for (int i = 0; i < 2; i++) {
+								if (RespuestaEdocND.Cufe == null && !RespuestaEdocND.Estado.equals("15")) {
+									RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
-								if (RespuestaEdocND.Cufe != null) {
+									if (RespuestaEdocND.Cufe != null) {
+										break;
+									}
+								} else {
 									break;
 								}
-							} else {
-								break;
-							}
 
+							}
 						}
 					}
 				} catch (Exception e) {
@@ -1048,7 +1050,7 @@ public class Anulacion extends PBase {
 				RespuestaEdocND = Firmador.EmisionDocumentoBTC(NotaDebito,urlanulacion, "/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 
-			if (RespuestaEdocND != null ) {
+			/*if (RespuestaEdocND != null ) {
 				if	(RespuestaEdocND.Cufe != null) {
 					ControlNotaDebito.Cufe = RespuestaEdocND.Cufe;
 					ControlNotaDebito.TipoDoc = NotaDebito.gDGen.iDoc;
@@ -1103,7 +1105,43 @@ public class Anulacion extends PBase {
 				} else {
 					toastlong("Estamos esperando una respuesta de GuruSoft");
 				}
+			}*/
+
+			if (RespuestaEdocND != null ) {
+				ControlNotaDebito.Cufe = (RespuestaEdocND.Cufe == null ? "": RespuestaEdocND.Cufe);
+				ControlNotaDebito.Estado = RespuestaEdocND.Estado;
+				ControlNotaDebito.Mensaje = RespuestaEdocND.MensajeRespuesta;
+				ControlNotaDebito.ValorXml = RespuestaEdocND.XML;
+				ControlNotaDebito.QR = RespuestaEdocND.UrlCodeQR;
+				ControlNotaDebito.Fecha_Autorizacion = RespuestaEdocND.FechaAutorizacion;
+				ControlNotaDebito.Numero_Autorizacion = RespuestaEdocND.NumAutorizacion;
 			}
+
+			ControlNotaDebito.TipoDoc = NotaDebito.gDGen.iDoc;
+			ControlNotaDebito.NumDoc = NotaDebito.gDGen.dNroDF;
+			ControlNotaDebito.Sucursal = gl.sucur;
+			ControlNotaDebito.Caja = NotaDebito.gDGen.dPtoFacDF;
+			String[] FechaEnv = NotaDebito.gDGen.dFechaEm.split("-05:00", 0);
+			ControlNotaDebito.FechaEnvio = FechaEnv[0];
+			ControlNotaDebito.TipFac = NotaDebito.gDGen.iDoc;
+			ControlNotaDebito.FechaAgr = String.valueOf(du.getFechaCompleta());
+			ControlNotaDebito.Corel = gl.dvcorelnd;
+			ControlNotaDebito.Ruta = gl.ruta;
+			ControlNotaDebito.Vendedor = gl.vend;
+			ControlNotaDebito.Correlativo = String.valueOf(NotaDebito.gDGen.dNroDF);
+
+			if (RespuestaEdocND.Estado.equals("2")) {
+				EstadoND = 1;
+				toastlong("NOTA DE DEBITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
+			} else {
+				toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE DEBITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
+			}
+
+
+			sql="UPDATE D_NOTACRED SET CUFE ='"+RespuestaEdocND.Cufe+"', CERTIFICADA_DGI="+EstadoND+"  WHERE COREL='"+gl.dvcorelnd+"'" +" AND TIPO_DOCUMENTO = 'ND'";
+			db.execSQL(sql);
+
+			InsertarFELControl(ControlNotaDebito);
 
 			exito = true;
 
@@ -1198,8 +1236,7 @@ public class Anulacion extends PBase {
 					}
 
 				} else {
-					msgbox("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
-					return false;
+					toastlongd("El nombre del corregimiento y distrito está mal formado para el código de municipio:" + Municipio.codigo);
 				}
 
 			}
@@ -1256,17 +1293,13 @@ public class Anulacion extends PBase {
 				if(!BeRUC.sRUC.trim().equals("")){
 					NotaDebito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 				}else{
-					progress.cancel();
-					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-					return false;
+					toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 				}
 
 				if (!BeRUC.sDV.trim().equals("")) {
 					NotaDebito.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
 				} else {
-					progress.cancel();
-					msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
-					return false;
+					toastlongd(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
 				}
 
 			}else{
@@ -1274,9 +1307,7 @@ public class Anulacion extends PBase {
 				if(!BeRUC.sRUC.trim().equals("")){
 					NotaDebito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 				}else{
-					progress.cancel();
-					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-					return false;
+					toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 				}
 
 				if (!BeRUC.sDV.trim().equals("")) {
@@ -1442,50 +1473,40 @@ public class Anulacion extends PBase {
 			}
 
 			if (RespuestaEdocND != null ) {
-				if	(RespuestaEdocND.Cufe != null) {
-					ControlNotaDebito.Cufe = RespuestaEdocND.Cufe;
-					ControlNotaDebito.TipoDoc = NotaDebito.gDGen.iDoc;
-					ControlNotaDebito.NumDoc = NotaDebito.gDGen.dNroDF;
-					ControlNotaDebito.Sucursal = gl.sucur;
-					ControlNotaDebito.Caja = NotaDebito.gDGen.dPtoFacDF;
-
-					if (RespuestaEdocND.Estado.equals("21")) {
-						ControlNotaDebito.Estado = "01";
-					} else {
-						ControlNotaDebito.Estado = RespuestaEdocND.Estado;
-					}
-
-					ControlNotaDebito.Mensaje = RespuestaEdocND.MensajeRespuesta;
-					ControlNotaDebito.ValorXml = RespuestaEdocND.XML;
-
-					String[] FechaEnv = NotaDebito.gDGen.dFechaEm.split("-05:00", 0);
-					ControlNotaDebito.FechaEnvio = FechaEnv[0];
-					ControlNotaDebito.TipFac = NotaDebito.gDGen.iDoc;
-					ControlNotaDebito.FechaAgr = String.valueOf(du.getFechaCompleta());
-					ControlNotaDebito.QR = RespuestaEdocND.UrlCodeQR;
-					ControlNotaDebito.Corel = gl.dvcorelnd;
-					ControlNotaDebito.Ruta = gl.ruta;
-					ControlNotaDebito.Vendedor = gl.vend;
-					ControlNotaDebito.Correlativo = String.valueOf(NotaDebito.gDGen.dNroDF);
-					ControlNotaDebito.Fecha_Autorizacion = RespuestaEdocND.FechaAutorizacion;
-					ControlNotaDebito.Numero_Autorizacion = RespuestaEdocND.NumAutorizacion;
-
-					if (RespuestaEdocND.Estado.equals("2")) {
-						EstadoND = 1;
-						toastlong("NOTA DE DEBITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
-					} else {
-						toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE DEBITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
-					}
-
-					sql="UPDATE D_NOTACRED SET CUFE ='"+RespuestaEdocND.Cufe+"', CERTIFICADA_DGI="+EstadoND+"  WHERE COREL='"+gl.dvcorelnd+"'" +" AND TIPO_DOCUMENTO = 'ND'";
-					db.execSQL(sql);
-
-					InsertarFELControl(ControlNotaDebito);
-
-				} else {
-					toastlong("Estamos esperando una respuesta de GuruSoft");
-				}
+				ControlNotaDebito.Cufe = (RespuestaEdocND.Cufe == null ? "": RespuestaEdocND.Cufe);
+				ControlNotaDebito.Estado = RespuestaEdocND.Estado;
+				ControlNotaDebito.Mensaje = RespuestaEdocND.MensajeRespuesta;
+				ControlNotaDebito.ValorXml = RespuestaEdocND.XML;
+				ControlNotaDebito.QR = RespuestaEdocND.UrlCodeQR;
+				ControlNotaDebito.Fecha_Autorizacion = RespuestaEdocND.FechaAutorizacion;
+				ControlNotaDebito.Numero_Autorizacion = RespuestaEdocND.NumAutorizacion;
 			}
+
+			ControlNotaDebito.TipoDoc = NotaDebito.gDGen.iDoc;
+			ControlNotaDebito.NumDoc = NotaDebito.gDGen.dNroDF;
+			ControlNotaDebito.Sucursal = gl.sucur;
+			ControlNotaDebito.Caja = NotaDebito.gDGen.dPtoFacDF;
+			String[] FechaEnv = NotaDebito.gDGen.dFechaEm.split("-05:00", 0);
+			ControlNotaDebito.FechaEnvio = FechaEnv[0];
+			ControlNotaDebito.TipFac = NotaDebito.gDGen.iDoc;
+			ControlNotaDebito.FechaAgr = String.valueOf(du.getFechaCompleta());
+			ControlNotaDebito.Corel = gl.dvcorelnd;
+			ControlNotaDebito.Ruta = gl.ruta;
+			ControlNotaDebito.Vendedor = gl.vend;
+			ControlNotaDebito.Correlativo = String.valueOf(NotaDebito.gDGen.dNroDF);
+
+			if (RespuestaEdocND.Estado.equals("2")) {
+				EstadoND = 1;
+				toastlong("NOTA DE DEBITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
+			} else {
+				toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE DEBITO -- " + " ESTADO: " + RespuestaEdocND.Estado + " - " + RespuestaEdocND.MensajeRespuesta);
+			}
+
+
+			sql="UPDATE D_NOTACRED SET CUFE ='"+RespuestaEdocND.Cufe+"', CERTIFICADA_DGI="+EstadoND+"  WHERE COREL='"+gl.dvcorelnd+"'" +" AND TIPO_DOCUMENTO = 'ND'";
+			db.execSQL(sql);
+
+			InsertarFELControl(ControlNotaDebito);
 
 			exito_anula_nc = true;
 

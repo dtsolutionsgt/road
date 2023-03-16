@@ -803,8 +803,8 @@ public class DevolCli extends PBase {
 				db.setTransactionSuccessful();
 				db.endTransaction();
 
-				clsClasses.clsControlFEL ControlNotaCredito = clsCls.new clsControlFEL();
-				RespuestaEdoc RespuestaEdoc =  new RespuestaEdoc();
+				clsClasses.clsControlFEL FacturaControl = clsCls.new clsControlFEL();
+				RespuestaEdoc RespuestaEdoc = null;
 				Fimador Firmador = new Fimador(this);
 
 				if (ConexionValida()) {
@@ -842,68 +842,49 @@ public class DevolCli extends PBase {
 					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+ gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 				}
 
+				//#AT20230316 Nueva forma para guardar en D_CONTROl
 				if (RespuestaEdoc != null) {
-					if	(RespuestaEdoc.Cufe != null) {
-						int EstadoNT = 0;
+					FacturaControl.Cufe = (RespuestaEdoc.Cufe == null ? "": RespuestaEdoc.Cufe);
+					FacturaControl.Estado = (RespuestaEdoc.Estado == null ? "": RespuestaEdoc.Estado);
+					FacturaControl.Mensaje = (RespuestaEdoc.MensajeRespuesta == null ? "": RespuestaEdoc.MensajeRespuesta);
+					FacturaControl.ValorXml = RespuestaEdoc.XML != null ? Catalogo.ReplaceXML(RespuestaEdoc.XML) : "";
+					FacturaControl.Fecha_Autorizacion = RespuestaEdoc.FechaAutorizacion;
+					FacturaControl.Numero_Autorizacion = (RespuestaEdoc.NumAutorizacion == null ? "": RespuestaEdoc.NumAutorizacion);
+				}
 
-						if (!RespuestaEdoc.Estado.isEmpty() || RespuestaEdoc.Estado != null) {
+				FacturaControl.TipoDoc = NotaCredito.gDGen.iDoc;
+				FacturaControl.NumDoc = NotaCredito.gDGen.dNroDF;
+				FacturaControl.Sucursal = gl.sucur;
+				FacturaControl.Caja = NotaCredito.gDGen.dPtoFacDF;
 
-							ControlNotaCredito.Cufe = RespuestaEdoc.Cufe;
-							ControlNotaCredito.TipoDoc = NotaCredito.gDGen.iDoc;
-							ControlNotaCredito.NumDoc = NotaCredito.gDGen.dNroDF;
-							ControlNotaCredito.Sucursal = gl.sucur;
-							ControlNotaCredito.Caja = NotaCredito.gDGen.dPtoFacDF;
+				String[] FechaEnv = NotaCredito.gDGen.dFechaEm.split("-05:00", 0);
+				FacturaControl.FechaEnvio = FechaEnv[0];
+				FacturaControl.TipFac = NotaCredito.gDGen.iDoc;
+				FacturaControl.FechaAgr = String.valueOf(du.getFechaCompleta());
+				FacturaControl.QR = RespuestaEdoc.UrlCodeQR;
+				FacturaControl.Corel = gl.devcornc;
+				FacturaControl.Ruta = gl.ruta;
+				FacturaControl.Vendedor = gl.vend;
+				FacturaControl.Correlativo = String.valueOf(vNroDF);
 
-							if (RespuestaEdoc.Estado.equals("21")) {
-								ControlNotaCredito.Estado = "01";
-							} else {
-								ControlNotaCredito.Estado = RespuestaEdoc.Estado;
-							}
+				if (RespuestaEdoc.Estado.equals("2")) {
+					toastlongd("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + (RespuestaEdoc.MensajeRespuesta == null ? "":RespuestaEdoc.MensajeRespuesta));
+				} else {
+					toastlongd("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + (RespuestaEdoc.MensajeRespuesta == null ? "":RespuestaEdoc.MensajeRespuesta));
+				}
 
-							ControlNotaCredito.Mensaje = RespuestaEdoc.MensajeRespuesta;
-							ControlNotaCredito.ValorXml = RespuestaEdoc.XML != null ? Catalogo.ReplaceXML(RespuestaEdoc.XML) : "";
+				try{
+					Catalogo.Reconectar(Con, db);
+				}catch (Exception e){
+					Catalogo = new CatalogoFactura(this, Con, db);
+				}
 
-							String[] FechaEnv = NotaCredito.gDGen.dFechaEm.split("-05:00", 0);
-							ControlNotaCredito.FechaEnvio = FechaEnv[0];
-							ControlNotaCredito.TipFac = NotaCredito.gDGen.iDoc;
-							ControlNotaCredito.FechaAgr = String.valueOf(du.getFechaCompleta());
-							ControlNotaCredito.QR = RespuestaEdoc.UrlCodeQR;
-							ControlNotaCredito.Corel = gl.devcornc;
-							ControlNotaCredito.Ruta = gl.ruta;
-							ControlNotaCredito.Vendedor = gl.vend;
-							ControlNotaCredito.Correlativo = String.valueOf(NotaCredito.gDGen.dNroDF);
-							ControlNotaCredito.Fecha_Autorizacion = RespuestaEdoc.FechaAutorizacion;
-							ControlNotaCredito.Numero_Autorizacion = RespuestaEdoc.NumAutorizacion;
+				Catalogo.InsertarFELControl(FacturaControl);
+				Catalogo.UpdateEstadoNotaCredito(RespuestaEdoc.Cufe,"", (FacturaControl.Estado == null? "": FacturaControl.Estado));
 
-							try{
-								Catalogo.opendb();
-							}catch (Exception e){
-								Catalogo = new CatalogoFactura(this, Con, db);
-							}
-
-							Catalogo.InsertarFELControl(ControlNotaCredito);
-
-							if (RespuestaEdoc.Estado.equals("2")) {
-								EstadoNT = 1;
-								toastlong("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + (RespuestaEdoc.MensajeRespuesta == null ? "":RespuestaEdoc.MensajeRespuesta));
-							} else {
-								toastlong("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + (RespuestaEdoc.MensajeRespuesta == null ? "":RespuestaEdoc.MensajeRespuesta));
-							}
-						}
-
-						/*try{
-							Catalogo.opendb();
-						}catch (Exception e){
-							Catalogo = new CatalogoFactura(this, Con, db);
-						}*/
-
-						Catalogo.UpdateEstadoNotaCredito(RespuestaEdoc.Cufe,"", EstadoNT);
-
-						//#AT20230313 Si no existe la NotaCredito en d control la intenta insertar de nuevo
-						if (Catalogo.ExisteFacturaDControl(ControlNotaCredito.Corel).isEmpty()) {
-							Catalogo.InsertarFELControl(ControlNotaCredito);
-						}
-					}
+				//#AT20230313 Si no existe la NotaCredito en d control la intenta insertar de nuevo
+				if (Catalogo.ExisteFacturaDControl(FacturaControl.Corel).isEmpty()) {
+					Catalogo.InsertarFELControl(FacturaControl);
 				}
 
 				Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();

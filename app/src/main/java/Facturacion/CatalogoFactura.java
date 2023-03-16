@@ -450,9 +450,12 @@ public class CatalogoFactura extends PBase {
         return lista;
     }
 
-    public void UpdateEstadoNotaCredito(String Cufe, String CufeFact, int NTCertificada) {
+    public void UpdateEstadoNotaCredito(String Cufe, String CufeFact, String EstadoNC) {
         try {
-            sql = "UPDATE D_NOTACRED SET CUFE ='" + Cufe + "', CUFE_FACTURA ='" + CufeFact +"', CERTIFICADA_DGI=" + NTCertificada + "  WHERE COREL='" + gl.devcornc + "'";
+
+            int CertificadaDGI = EstadoNC.equals("2") ? 1:0;
+
+            sql = "UPDATE D_NOTACRED SET CUFE ='" + Cufe + "', CUFE_FACTURA ='" + CufeFact +"', CERTIFICADA_DGI=" + CertificadaDGI + "  WHERE COREL='" + gl.devcornc + "'";
             db.execSQL(sql);
         } catch (Exception e) {
             msgbox(new Object() {}.getClass().getEnclosingMethod().getName() +" - "+ e.getMessage());

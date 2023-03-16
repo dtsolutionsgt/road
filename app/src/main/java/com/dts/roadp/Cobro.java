@@ -1328,49 +1328,44 @@ public class Cobro extends PBase {
 				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 
-			if (!RespuestaEdocFac.Estado.isEmpty() || RespuestaEdocFac.Estado != null) {
-
-				clsClasses.clsControlFEL ControlFEL = clsCls.new clsControlFEL();
-
-				ControlFEL.Cufe = RespuestaEdocFac.Cufe;
-				ControlFEL.TipoDoc = Factura.gDGen.iDoc;
-				ControlFEL.NumDoc = Factura.gDGen.dNroDF;
-				ControlFEL.Sucursal = gl.sucur;
-				ControlFEL.Caja = Factura.gDGen.dPtoFacDF;
-				ControlFEL.Estado = RespuestaEdocFac.Estado;
-				ControlFEL.Mensaje = RespuestaEdocFac.MensajeRespuesta;
+			//#AT20230316 Nueva forma de guardar en D_CONTROL
+			clsClasses.clsControlFEL ControlFEL = clsCls.new clsControlFEL();
+			if (RespuestaEdocFac != null) {
+				ControlFEL.Cufe = (RespuestaEdocFac.Cufe == null ? "" : RespuestaEdocFac.Cufe);
+				ControlFEL.Estado = (RespuestaEdocFac.Estado == null ? "" : RespuestaEdocFac.Estado);
+				ControlFEL.Mensaje = (RespuestaEdocFac.MensajeRespuesta == null ? "" : RespuestaEdocFac.MensajeRespuesta);
 				ControlFEL.ValorXml = RespuestaEdocFac.XML != null ? Catalogo.ReplaceXML(RespuestaEdocFac.XML) : "";
-
-				String[] fechaEnvio = Factura.gDGen.dFechaEm.split("-05:00", 0);
-				ControlFEL.FechaEnvio = fechaEnvio[0];
-				ControlFEL.TipFac = Factura.gDGen.iDoc;
-				ControlFEL.FechaAgr = String.valueOf(du.getFechaCompleta());
-				ControlFEL.QR = RespuestaEdocFac.UrlCodeQR;
-				ControlFEL.Corel = corelFactura;
-				ControlFEL.Ruta = gl.ruta;
-				ControlFEL.Vendedor = gl.vend;
-				ControlFEL.Correlativo = Factura.gDGen.dNroDF;
+				ControlFEL.QR = (RespuestaEdocFac.UrlCodeQR == null ? "" : RespuestaEdocFac.UrlCodeQR);
 				ControlFEL.Fecha_Autorizacion = RespuestaEdocFac.FechaAutorizacion;
-				ControlFEL.Numero_Autorizacion = RespuestaEdocFac.NumAutorizacion;
-
-				if (RespuestaEdocFac.Estado.equals("2")) {
-					toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
-					certifico_factura_pendiente_pago =true;
-				} else {
-					toastlong("ERR_233121237A: NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + (RespuestaEdocFac.MensajeRespuesta == null ? "":RespuestaEdocFac.MensajeRespuesta));
-					certifico_factura_pendiente_pago = false;
-				}
-
-				try {
-					ActualizaFacturaTmp(corelFactura, ControlFEL);
-					Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, RespuestaEdocFac.Estado, corelFactura);
-				} catch (Exception e) {
-					msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
-				}
-
-			} else {
-				toastlong("ERR_233121237: NO SE LOGRÓ CERTIFICAR LA FACTURA");
+				ControlFEL.Numero_Autorizacion = (RespuestaEdocFac.NumAutorizacion == null ? "" : RespuestaEdocFac.NumAutorizacion);
 			}
+
+			ControlFEL.TipoDoc = Factura.gDGen.iDoc;
+			ControlFEL.NumDoc = Factura.gDGen.dNroDF;
+			ControlFEL.Sucursal = gl.sucur;
+			ControlFEL.Caja = Factura.gDGen.dPtoFacDF;
+			String[] fechaEnvio = Factura.gDGen.dFechaEm.split("-05:00", 0);
+			ControlFEL.FechaEnvio = fechaEnvio[0];
+			ControlFEL.TipFac = Factura.gDGen.iDoc;
+			ControlFEL.FechaAgr = String.valueOf(du.getFechaCompleta());
+			ControlFEL.Corel = corelFactura;
+			ControlFEL.Ruta = gl.ruta;
+			ControlFEL.Vendedor = gl.vend;
+			ControlFEL.Correlativo = Factura.gDGen.dNroDF;
+
+			if (RespuestaEdocFac.Estado.equals("2")) {
+				toastlong("FACTURA CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + RespuestaEdocFac.MensajeRespuesta);
+			} else {
+				toastlong("ERR_233121237A: NO SE LOGRÓ CERTIFICAR LA FACTURA -- " + " ESTADO: " + RespuestaEdocFac.Estado + " - " + (RespuestaEdocFac.MensajeRespuesta == null ? "":RespuestaEdocFac.MensajeRespuesta));
+			}
+
+			try {
+				ActualizaFacturaTmp(corelFactura, ControlFEL);
+				Catalogo.UpdateEstadoFactura(RespuestaEdocFac.Cufe, RespuestaEdocFac.Estado, corelFactura);
+			} catch (Exception e) {
+				msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());
+			}
+
 			progress.cancel();
 		} catch (Exception e) {
 			msgbox(new Object() {} .getClass().getEnclosingMethod().getName() + " - " + e.getMessage());

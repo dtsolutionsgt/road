@@ -1511,7 +1511,7 @@ public class FacturaRes extends PBase {
 					}
 
 					//String TotalItem = String.valueOf(mu.round2(Double.valueOf(detalle.dCantCodInt) * DT.getDouble(5)));
-					String TotalItem = String.valueOf(DT.getDouble(4));
+					String TotalItem = String.valueOf(mu.round2(DT.getDouble(4)));
 
 					if (producto.subBodega.length() > 1) {
 						detalle.dCodCPBSabr = producto.subBodega.substring(0, 2);
@@ -1533,7 +1533,7 @@ public class FacturaRes extends PBase {
 
 				}
 
-				String TotalNT = String.valueOf(TotalAcumulado);
+				String TotalNT = String.valueOf(mu.round2(TotalAcumulado));
 
 				NotaCredito.gTot.dTotNeto = TotalNT;
 				NotaCredito.gTot.dTotITBMS = "0.00";
@@ -1689,7 +1689,7 @@ public class FacturaRes extends PBase {
 				Factura.Detalles.add(detalle);
 
 				CorrelativoFac++;
-				TotalFact += mu.round2(dt.getDouble(6));
+				TotalFact+= mu.round2(dt.getDouble(6));
 
 				dt.moveToNext();
 			}
@@ -1760,7 +1760,7 @@ public class FacturaRes extends PBase {
 
 				gFormaPago Pagos = new gFormaPago();
 
-				String Total = String.valueOf(TotalFact);
+				String Total = String.valueOf(mu.round2(TotalFact));
 
 				Factura.gTot.dTotNeto = Total;
 				Factura.gTot.dTotITBMS = "0.00";

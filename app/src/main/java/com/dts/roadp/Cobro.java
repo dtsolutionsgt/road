@@ -1227,7 +1227,7 @@ public class Cobro extends PBase {
 
 					gFormaPago Pagos = new gFormaPago();
 
-					String Total = String.valueOf(TotalFact);
+					String Total = String.valueOf(mu.round2(TotalFact));
 
 					Factura.gTot.dTotNeto = Total;
 					Factura.gTot.dTotITBMS = "0.00";

@@ -1316,6 +1316,15 @@ public class Cobro extends PBase {
 				}
 
 			} else {
+				//#AT20230315 LLamdo BTC, cambiar valores en campos del encabezado
+				//Tipo de emisión (01:Autorización Previa normal,
+				//02:Autorización Previa contingencia,
+				//03:Autorización Posterior normal, 04:Autorización Posterior contingencia)
+
+				Factura.gDGen.iTpEmis = "02";
+				Factura.gDGen.dMotCont = "Autorización Previa contingencia";
+				Factura.gDGen.dFechaCont = du.getFechaCompleta()+"-05:00";
+
 				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 

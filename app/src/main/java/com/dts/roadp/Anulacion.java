@@ -1036,6 +1036,15 @@ public class Anulacion extends PBase {
 					addlog(Objects.requireNonNull(new Object() { }.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
 				}
 			} else {
+				//#AT20230315 LLamdo BTC, cambiar valores en campos del encabezado
+				//Tipo de emisión (01:Autorización Previa normal,
+				//02:Autorización Previa contingencia,
+				//03:Autorización Posterior normal, 04:Autorización Posterior contingencia)
+
+				NotaDebito.gDGen.iTpEmis = "02";
+				NotaDebito.gDGen.dMotCont = "Autorización Previa contingencia";
+				NotaDebito.gDGen.dFechaCont = du.getFechaCompleta()+"-05:00";
+
 				RespuestaEdocND = Firmador.EmisionDocumentoBTC(NotaDebito,urlanulacion, "/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 
@@ -1419,6 +1428,16 @@ public class Anulacion extends PBase {
 				}
 
 			} else {
+
+				//#AT20230315 LLamdo BTC, cambiar valores en campos del encabezado
+				//Tipo de emisión (01:Autorización Previa normal,
+				//02:Autorización Previa contingencia,
+				//03:Autorización Posterior normal, 04:Autorización Posterior contingencia)
+
+				NotaDebito.gDGen.iTpEmis = "02";
+				NotaDebito.gDGen.dMotCont = "Autorización Previa contingencia";
+				NotaDebito.gDGen.dFechaCont = du.getFechaCompleta()+"-05:00";
+
 				RespuestaEdocND = Firmador.EmisionDocumentoBTC(NotaDebito,urlanulacion, "/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
 

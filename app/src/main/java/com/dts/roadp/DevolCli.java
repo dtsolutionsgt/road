@@ -830,6 +830,15 @@ public class DevolCli extends PBase {
 						addlog(Objects.requireNonNull(new Object() { }.getClass().getEnclosingMethod()).getName(),e.getMessage(),sql);
 					}
 				} else {
+					//#AT20230315 LLamdo BTC, cambiar valores en campos del encabezado
+					//Tipo de emisión (01:Autorización Previa normal,
+					//02:Autorización Previa contingencia,
+					//03:Autorización Posterior normal, 04:Autorización Posterior contingencia)
+
+					NotaCredito.gDGen.iTpEmis = "02";
+					NotaCredito.gDGen.dMotCont = "Autorización Previa contingencia";
+					NotaCredito.gDGen.dFechaCont = du.getFechaCompleta()+"-05:00";
+
 					RespuestaEdoc = Firmador.EmisionDocumentoBTC(NotaCredito,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+ gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 				}
 

@@ -116,7 +116,32 @@ public class MiscUtils {
 		
 		return (double) (rslt/100);
 	}
-	
+
+	public double round2dec(double val){
+		double dval;
+		long ival;
+
+		val=val+0.000001;
+		dval=val*100;
+		ival=Math.round(dval);
+		dval=(double) ival;
+		val=dval*0.01;
+
+		return val;
+	}
+
+	private String formatDosDecimales(float valor){
+		DecimalFormat format = new DecimalFormat();
+		format.setMaximumFractionDigits(2); //Define 2 decimales.
+		return format.format(valor);
+	}
+
+	private String formatTreDecimales(float valor){
+		DecimalFormat format = new DecimalFormat();
+		format.setMaximumFractionDigits(3); //Define 2 decimales.
+		return format.format(valor);
+	}
+
 	public boolean emptystr(String s){
 		if (s==null || s.isEmpty()) {
 			return true;

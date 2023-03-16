@@ -795,7 +795,7 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.Receptor.gRucRec.dTipoRuc = Cliente.tipoContribuyente;
 			NotaDebito.gDGen.Receptor.iTipoRec = Cliente.tipoRec;
 			NotaDebito.gDGen.Receptor.dCorElectRec = Cliente.email;
-			NotaDebito.gDGen.Receptor.dTfnRec = Cliente.telefono;
+			NotaDebito.gDGen.Receptor.dTfnRec = Catalogo.ValidaTelefono(Cliente.telefono);
 			NotaDebito.gDGen.Receptor.cPaisRec = Cliente.codPais;
 			NotaDebito.gDGen.Receptor.dNombRec = Cliente.nombre;
 			NotaDebito.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));
@@ -1210,7 +1210,7 @@ public class Anulacion extends PBase {
 			NotaDebito.gDGen.Receptor.gRucRec.dTipoRuc = Cliente.tipoContribuyente;
 			NotaDebito.gDGen.Receptor.iTipoRec = Cliente.tipoRec;
 			NotaDebito.gDGen.Receptor.dCorElectRec = Cliente.email;
-			NotaDebito.gDGen.Receptor.dTfnRec = Cliente.telefono;
+			NotaDebito.gDGen.Receptor.dTfnRec = Catalogo.ValidaTelefono(Cliente.telefono);
 			NotaDebito.gDGen.Receptor.cPaisRec = Cliente.codPais;
 			NotaDebito.gDGen.Receptor.dNombRec = Cliente.nombre;
 			NotaDebito.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));

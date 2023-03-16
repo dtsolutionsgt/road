@@ -1138,7 +1138,7 @@ public class FacturaRes extends PBase {
 			Factura.gDGen.Receptor.gRucRec.dTipoRuc = cliente.tipoContribuyente;
 			Factura.gDGen.Receptor.iTipoRec = cliente.tipoRec;
 			Factura.gDGen.Receptor.dCorElectRec = cliente.email;
-			Factura.gDGen.Receptor.dTfnRec = cliente.telefono;
+			Factura.gDGen.Receptor.dTfnRec = Catalogo.ValidaTelefono(cliente.telefono);
 			Factura.gDGen.Receptor.cPaisRec = cliente.codPais;
 			Factura.gDGen.Receptor.dNombRec = cliente.nombre;
 			Factura.gDGen.Receptor.dDirecRec = (cliente.direccion==null?"": cliente.direccion.substring(0,(cliente.direccion.length()>=100?100: cliente.direccion.length())));
@@ -1329,7 +1329,7 @@ public class FacturaRes extends PBase {
 				NotaCredito.gDGen.Receptor.gRucRec.dTipoRuc = cliente.tipoContribuyente;
 				NotaCredito.gDGen.Receptor.iTipoRec = cliente.tipoRec;
 				NotaCredito.gDGen.Receptor.dCorElectRec = cliente.email;
-				NotaCredito.gDGen.Receptor.dTfnRec = cliente.telefono;
+				NotaCredito.gDGen.Receptor.dTfnRec = Catalogo.ValidaTelefono(cliente.telefono);
 				NotaCredito.gDGen.Receptor.cPaisRec = cliente.codPais;
 				NotaCredito.gDGen.Receptor.dNombRec = cliente.nombre;
 				NotaCredito.gDGen.Receptor.dDirecRec = (cliente.direccion==null?"": cliente.direccion.substring(0,(cliente.direccion.length()>=100?100: cliente.direccion.length())));

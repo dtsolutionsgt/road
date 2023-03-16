@@ -557,7 +557,7 @@ public class DevolCli extends PBase {
 				NotaCredito.gDGen.Receptor.gRucRec.dTipoRuc = Cliente.tipoContribuyente;
 				NotaCredito.gDGen.Receptor.iTipoRec = Cliente.tipoRec;
 				NotaCredito.gDGen.Receptor.dCorElectRec = Cliente.email;
-				NotaCredito.gDGen.Receptor.dTfnRec = Cliente.telefono;
+				NotaCredito.gDGen.Receptor.dTfnRec = Catalogo.ValidaTelefono(Cliente.telefono);
 				NotaCredito.gDGen.Receptor.cPaisRec = Cliente.codPais;
 				NotaCredito.gDGen.Receptor.dNombRec = Cliente.nombre;
 				NotaCredito.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));

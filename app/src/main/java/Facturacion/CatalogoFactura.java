@@ -579,6 +579,23 @@ public class CatalogoFactura extends PBase {
         return corel;
     }
 
+    public String ValidaTelefono(String telefono) {
+        String regex = "^[0-9]{3,4}?\\-[0-9]{4}$";
+        String resultado = null;
+
+        try {
+            if (telefono != null) {
+                if (!telefono.isEmpty()) {
+                    resultado = telefono.trim().matches(regex) ? telefono : null;
+                }
+            }
+        } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+        }
+
+        return resultado;
+    }
+
     public void opendb() {
         try {
             db = Con.getWritableDatabase();

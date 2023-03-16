@@ -1069,7 +1069,7 @@ public class Cobro extends PBase {
 					Factura.gDGen.Receptor.gRucRec.dTipoRuc = Cliente.tipoContribuyente;
 					Factura.gDGen.Receptor.iTipoRec = Cliente.tipoRec;
 					Factura.gDGen.Receptor.dCorElectRec = Cliente.email;
-					Factura.gDGen.Receptor.dTfnRec = Cliente.telefono;
+					Factura.gDGen.Receptor.dTfnRec = Catalogo.ValidaTelefono(Cliente.telefono);
 					Factura.gDGen.Receptor.cPaisRec = Cliente.codPais;
 					Factura.gDGen.Receptor.dNombRec = Cliente.nombre;
 					Factura.gDGen.Receptor.dDirecRec = (Cliente.direccion==null?"":Cliente.direccion.substring(0,(Cliente.direccion.length()>=100?100:Cliente.direccion.length())));

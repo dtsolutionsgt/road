@@ -5945,8 +5945,13 @@ public class ComWS extends PBase {
 					dbld.insert("D_FACTURA_CONTROL_CONTINGENCIA", "WHERE COREL = '"+ cor +"' AND "+query+"");
 
 					//dbld.add("UPDATE P_CORELNC SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");
-					dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'NC' " +
-							"AND ACTUAL<" + ccorel);
+					if	(tipodocumento.equals("NC")) {
+						dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'NC' " +
+								"AND ACTUAL<" + ccorel);
+					} else if (tipodocumento.equals("ND")) {
+						dbld.add("UPDATE P_CORREL_OTROS SET ACTUAL=" + ccorel + "  WHERE RUTA='" + fruta + "' AND TIPO = 'ND' " +
+								"AND ACTUAL <" + ccorel);
+					}
 
 					if (envioparcial && !esEnvioManual) {
 						if (commitSQL() == 1) {

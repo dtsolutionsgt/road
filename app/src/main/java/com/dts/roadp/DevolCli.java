@@ -612,8 +612,7 @@ public class DevolCli extends PBase {
 					if (!BeRUC.sDV.trim().equals("")) {
 						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
 					} else {
-						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
-						return;
+						toastlongd(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
 					}
 
 				}else{
@@ -621,8 +620,7 @@ public class DevolCli extends PBase {
 					if(!BeRUC.sRUC.trim().equals("")){
 						NotaCredito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 					}else{
-						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-						return;
+						toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 					}
 
 					if (!BeRUC.sDV.trim().equals("")) {
@@ -730,24 +728,23 @@ public class DevolCli extends PBase {
 					}
 
 					if (porpeso) {
-						detalle.dCantCodInt = String.valueOf(ntPeso);
+						detalle.dCantCodInt = mu.formatTresDecimales(mu.round(ntPeso, 3));
 					} else {
 						if (app.esRosty(Producto.codigo)) {
-							detalle.dCantCodInt = String.valueOf(mu.round2(pcant * ntFactor));
+							detalle.dCantCodInt = mu.formatDosDecimales(mu.round2dec(pcant * ntFactor));
 						} else {
-							detalle.dCantCodInt = String.valueOf(pcant);
+							detalle.dCantCodInt = mu.formatDosDecimales(pcant);
 						}
 					}
 
-					//String TotalItem = String.valueOf(mu.round2(Double.valueOf(detalle.dCantCodInt) * DT.getDouble(5)));
-					String TotalItem = String.valueOf(DT.getDouble(4));
+					String TotalItem = mu.formatDosDecimales(mu.round2dec(DT.getDouble(4)));
 
 					if (Producto.subBodega.length() > 1) {
 						detalle.dCodCPBSabr = Producto.subBodega.substring(0, 2);
 						detalle.dCodCPBScmp = Producto.subBodega;
 					}
 
-					detalle.gPrecios.dPrUnit = String.valueOf(DT.getDouble(5));
+					detalle.gPrecios.dPrUnit = mu.formatDosDecimales(mu.round2dec(DT.getDouble(5)));
 					detalle.gPrecios.dPrUnitDesc = "0.000000";
 					detalle.gPrecios.dPrItem = TotalItem;
 					detalle.gPrecios.dValTotItem = TotalItem;
@@ -757,11 +754,11 @@ public class DevolCli extends PBase {
 					NotaCredito.Detalles.add(detalle);
 
 					Correlativo++;
-					TotalAcumulado += mu.round2(Double.valueOf(TotalItem));
+					TotalAcumulado += (Double.valueOf(TotalItem));
 					DT.moveToNext();
 				}
 
-				String TotalNT = String.valueOf(mu.round2(TotalAcumulado));
+				String TotalNT = mu.formatDosDecimales(mu.round2dec(TotalAcumulado));
 
 				NotaCredito.gTot.dTotNeto = TotalNT;
 				NotaCredito.gTot.dTotITBMS = "0.00";

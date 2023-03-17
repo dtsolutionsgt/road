@@ -848,12 +848,10 @@ public class Anulacion extends PBase {
 							NotaDebito.gDGen.Receptor.gRucRec.dDV = StringUtils.right("00" + DVRuc[2].trim(),2);
 						}
 					}else{
-						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
-						return false;
+						toastlongd(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
 					}
 				}else {
-					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-					return false;
+					toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 				}
 			}else{
 				clsClasses.clsRUC BeRUC= Catalogo.getRUC(Cliente.nit);
@@ -862,17 +860,13 @@ public class Anulacion extends PBase {
 					if(!BeRUC.sRUC.trim().equals("")){
 						NotaDebito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 					}else{
-						progress.cancel();
-						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-						return false;
+						toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 					}
 
 					if (!BeRUC.sDV.trim().equals("")) {
 						NotaDebito.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
 					} else {
-						progress.cancel();
-						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
-						return false;
+						toastlongd(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
 					}
 
 				}else{
@@ -880,9 +874,7 @@ public class Anulacion extends PBase {
 					if(!BeRUC.sRUC.trim().equals("")){
 						NotaDebito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 					}else{
-						progress.cancel();
-						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-						return false;
+						toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 					}
 
 					if (!BeRUC.sDV.trim().equals("")) {
@@ -927,23 +919,23 @@ public class Anulacion extends PBase {
 				}
 
 				if (DetalleNT.get(i).porpeso.equals("S")) {
-					detalle.dCantCodInt = String.valueOf(mu.round2(Double.valueOf(DetalleNT.get(i).peso)));
+					detalle.dCantCodInt = mu.formatTresDecimales(mu.round(Double.valueOf(DetalleNT.get(i).peso), 3));
 				} else {
 					if (app.esRosty(Producto.codigo)) {
-						detalle.dCantCodInt = String.valueOf(mu.round2(Double.valueOf(DetalleNT.get(i).cant) * Double.valueOf(DetalleNT.get(i).factor)));
+						detalle.dCantCodInt = mu.formatDosDecimales(mu.round2dec(Double.valueOf(DetalleNT.get(i).cant) * Double.valueOf(DetalleNT.get(i).factor)));
 					} else {
-						detalle.dCantCodInt = String.valueOf(DetalleNT.get(i).cant);
+						detalle.dCantCodInt = mu.formatDosDecimales(DetalleNT.get(i).cant);
 					}
 				}
 
-				String TotalItem = String.valueOf(mu.round2(Double.valueOf(detalle.dCantCodInt) * Double.valueOf(DetalleNT.get(i).precio)));
+				String TotalItem = mu.formatDosDecimales(mu.round2dec(Double.valueOf(detalle.dCantCodInt) * Double.valueOf(DetalleNT.get(i).precio)));
 
 				if (Producto.subBodega.length() > 1) {
 					detalle.dCodCPBSabr = Producto.subBodega.substring(0, 2);
 					detalle.dCodCPBScmp = Producto.subBodega;
 				}
 
-				detalle.gPrecios.dPrUnit = String.valueOf(DetalleNT.get(i).precio);
+				detalle.gPrecios.dPrUnit = mu.formatDosDecimales(mu.round2dec(DetalleNT.get(i).precio));
 				detalle.gPrecios.dPrUnitDesc = "0.000000";
 				detalle.gPrecios.dPrItem = TotalItem;
 				detalle.gPrecios.dValTotItem = TotalItem;
@@ -953,10 +945,10 @@ public class Anulacion extends PBase {
 				NotaDebito.Detalles.add(detalle);
 
 				Correlativo++;
-				TotalAcumulado += mu.round2(Double.valueOf(TotalItem));
+				TotalAcumulado += (Double.valueOf(TotalItem));
 			}
 
-			String TotalNT = String.valueOf(mu.round2(TotalAcumulado));
+			String TotalNT = mu.formatDosDecimales(mu.round2dec(TotalAcumulado));
 
 			NotaDebito.gTot.dTotNeto = TotalNT;
 			NotaDebito.gTot.dTotITBMS = "0.00";
@@ -1348,17 +1340,16 @@ public class Anulacion extends PBase {
 				}
 
 				if (DetalleNT.get(i).porpeso.equals("S")) {
-					detalle.dCantCodInt = String.valueOf(mu.round2(Double.valueOf(DetalleNT.get(i).peso)));
+					detalle.dCantCodInt = mu.formatTresDecimales(mu.round(Double.valueOf(DetalleNT.get(i).peso), 3));
 				} else {
 					if (app.esRosty(Producto.codigo)) {
-						detalle.dCantCodInt = String.valueOf(mu.round2(Double.valueOf(DetalleNT.get(i).cant) * Double.valueOf(DetalleNT.get(i).factor)));
+						detalle.dCantCodInt = mu.formatDosDecimales(mu.round2dec(Double.valueOf(DetalleNT.get(i).cant) * Double.valueOf(DetalleNT.get(i).factor)));
 					} else {
-						detalle.dCantCodInt = String.valueOf(DetalleNT.get(i).cant);
+						detalle.dCantCodInt = mu.formatDosDecimales(DetalleNT.get(i).cant);
 					}
 				}
 
-				String TotalItem = String.valueOf(mu.round2(Double.valueOf(detalle.dCantCodInt) * Double.valueOf(DetalleNT.get(i).precio)));
-				//String TotalItem = "11.57";
+				String TotalItem = mu.formatDosDecimales(mu.round2dec(Double.valueOf(detalle.dCantCodInt) * Double.valueOf(DetalleNT.get(i).precio)));
 
 				if (Producto.subBodega.length() > 1) {
 					detalle.dCodCPBSabr = Producto.subBodega.substring(0, 2);
@@ -1367,7 +1358,7 @@ public class Anulacion extends PBase {
 					//throw new Exception("No tiene definido la familia del producto por la DGI");
 				}
 
-				detalle.gPrecios.dPrUnit = String.valueOf(DetalleNT.get(i).precio);
+				detalle.gPrecios.dPrUnit = mu.formatDosDecimales(mu.round2dec(DetalleNT.get(i).precio));
 				detalle.gPrecios.dPrUnitDesc = "0.000000";
 				detalle.gPrecios.dPrItem = TotalItem;
 				detalle.gPrecios.dValTotItem = TotalItem;
@@ -1377,10 +1368,10 @@ public class Anulacion extends PBase {
 				NotaDebito.Detalles.add(detalle);
 
 				Correlativo++;
-				TotalAcumulado += mu.round2(Double.valueOf(TotalItem));
+				TotalAcumulado += Double.valueOf(TotalItem);
 			}
 
-			String TotalNT = String.valueOf(mu.round2(TotalAcumulado));
+			String TotalNT = mu.formatDosDecimales(mu.round2dec(TotalAcumulado));
 
 			NotaDebito.gTot.dTotNeto = TotalNT;
 			NotaDebito.gTot.dTotITBMS = "0.00";

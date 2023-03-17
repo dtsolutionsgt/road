@@ -526,6 +526,7 @@ public class clsFinDia extends PBase{
                     corel = DT.getString(0);
                     sql="DELETE FROM D_NOTACRED WHERE COREL='" + corel + "'";db.execSQL(sql);
                     sql="DELETE FROM D_NOTACREDD WHERE COREL='" + corel + "'";db.execSQL(sql);
+                    sql="DELETE FROM D_FACTURA_CONTROL_CONTINGENCIA WHERE COREL='" + corel + "'";db.execSQL(sql);
 
                     DT.moveToNext();
                 }

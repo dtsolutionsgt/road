@@ -1057,8 +1057,7 @@ public class Cobro extends PBase {
 							}
 
 						} else {
-							msgbox("No se encontraron los datos de la ubicación para este código:" + Cliente.ciudad);
-							return false;
+							toastlongd("No se encontraron los datos de la ubicación para este código:" + Cliente.ciudad);
 						}
 					}
 
@@ -1114,17 +1113,13 @@ public class Cobro extends PBase {
 						if(!BeRUC.sRUC.trim().equals("")){
 							Factura.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 						}else{
-							progress.cancel();
-							msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-							return false;
+							toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 						}
 
 						if (!BeRUC.sDV.trim().equals("")) {
 							Factura.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
 						} else {
-							progress.cancel();
-							msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
-							return false;
+							toastlongd(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
 						}
 
 					}else{
@@ -1132,9 +1127,7 @@ public class Cobro extends PBase {
 						if(!BeRUC.sRUC.trim().equals("")){
 							Factura.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 						}else{
-							progress.cancel();
-							msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-							return false;
+							toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 						}
 
 						if (!BeRUC.sDV.trim().equals("")) {
@@ -1187,16 +1180,16 @@ public class Cobro extends PBase {
 
 						//Definir que se va enviar en la cantidad.
 						if (porpeso) {
-							detalle.dCantCodInt = String.valueOf(DT2.getDouble(4));
+							detalle.dCantCodInt = mu.formatTresDecimales(mu.round(DT2.getDouble(4), 3));
 						} else {
 							if (app.esRosty(Producto.codigo)) {
-								detalle.dCantCodInt = String.valueOf(DT2.getDouble(2) * DT.getDouble(1));
+								detalle.dCantCodInt = mu.formatDosDecimales(mu.round2dec(DT2.getDouble(2) * DT.getDouble(1)));
 							} else {
-								detalle.dCantCodInt = String.valueOf(DT2.getDouble(2));
+								detalle.dCantCodInt = mu.formatDosDecimales(DT2.getDouble(2));
 							}
 						}
 
-						String TotalItem = String.valueOf(mu.round2(DT2.getDouble(3)));
+						String TotalItem = mu.formatDosDecimales(mu.round2dec(DT2.getDouble(3)));
 
 						//Validar esto preguntar #AT20221019
 						if (Producto.subBodega.length() > 1) {
@@ -1211,7 +1204,7 @@ public class Cobro extends PBase {
 							}
 						}
 
-						detalle.gPrecios.dPrUnit = String.valueOf(DT2.getDouble(5));
+						detalle.gPrecios.dPrUnit = mu.formatDosDecimales(mu.round2dec(DT2.getDouble(5)));
 						detalle.gPrecios.dPrUnitDesc = "0.000000";
 						detalle.gPrecios.dPrItem = TotalItem;
 						detalle.gPrecios.dValTotItem = TotalItem;
@@ -1220,14 +1213,14 @@ public class Cobro extends PBase {
 						Factura.Detalles.add(detalle);
 
 						CorrelativoFac++;
-						TotalFact += mu.round2(DT2.getDouble(3));
+						TotalFact += mu.round2dec(DT2.getDouble(3));
 
 						DT2.moveToNext();
 					}
 
 					gFormaPago Pagos = new gFormaPago();
 
-					String Total = String.valueOf(mu.round2(TotalFact));
+					String Total = mu.formatDosDecimales(TotalFact);
 
 					Factura.gTot.dTotNeto = Total;
 					Factura.gTot.dTotITBMS = "0.00";

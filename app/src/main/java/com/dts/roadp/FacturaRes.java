@@ -1125,9 +1125,7 @@ public class FacturaRes extends PBase {
 					}
 
 				} else {
-					progress.cancel();
-					msgbox("No se encontraron los datos de la ubicación para este código: " + cliente.ciudad);
-					return false;
+					toastlongd("No se encontraron los datos de la ubicación para este código: " + cliente.ciudad);
 				}
 			}
 
@@ -1184,17 +1182,13 @@ public class FacturaRes extends PBase {
 					if(!BeRUC.sRUC.trim().equals("")){
 						Factura.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 					}else{
-						progress.cancel();
-						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-						return false;
+						toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 					}
 
 					if (!BeRUC.sDV.trim().equals("")) {
 					Factura.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
 				} else {
-					progress.cancel();
-					msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
-					return false;
+					toastlongd(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
 				}
 
 			}else{
@@ -1202,9 +1196,7 @@ public class FacturaRes extends PBase {
 				if(!BeRUC.sRUC.trim().equals("")){
 					Factura.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 				}else{
-					progress.cancel();
-					msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-					return false;
+					toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 				}
 
 				if (!BeRUC.sDV.trim().equals("")) {
@@ -1375,17 +1367,13 @@ public class FacturaRes extends PBase {
 					if(!BeRUC.sRUC.trim().equals("")){
 						NotaCredito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 					}else{
-						progress.cancel();
-						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-						return false;
+						toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 					}
 
 					if (!BeRUC.sDV.trim().equals("")) {
 						NotaCredito.gDGen.Receptor.gRucRec.dDV = BeRUC.sDV.trim();
 					} else {
-						progress.cancel();
-						msgbox(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
-						return false;
+						toastlongd(" El RUC asociado al cliente, no tiene dígito verificador y el tipo de Receptor lo requiere.");
 					}
 
 				}else{
@@ -1393,9 +1381,7 @@ public class FacturaRes extends PBase {
 					if(!BeRUC.sRUC.trim().equals("")){
 						NotaCredito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 					}else{
-						progress.cancel();
-						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-						return false;
+						toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
 					}
 
 					if (!BeRUC.sDV.trim().equals("")) {
@@ -1501,24 +1487,23 @@ public class FacturaRes extends PBase {
 					}
 
 					if (prodPorPeso(producto.codigo)) {
-						detalle.dCantCodInt = String.valueOf(mu.round2(ntPeso));
+						detalle.dCantCodInt = mu.formatTresDecimales(mu.round(ntPeso, 3));
 					} else {
 						if (app.esRosty(producto.codigo)) {
-							detalle.dCantCodInt = String.valueOf(mu.round2(pcant * ntFactor));
+							detalle.dCantCodInt = mu.formatDosDecimales(mu.round2dec(pcant * ntFactor));
 						} else {
-							detalle.dCantCodInt = String.valueOf(pcant);
+							detalle.dCantCodInt = mu.formatDosDecimales(pcant);
 						}
 					}
 
-					//String TotalItem = String.valueOf(mu.round2(Double.valueOf(detalle.dCantCodInt) * DT.getDouble(5)));
-					String TotalItem = String.valueOf(mu.round2(DT.getDouble(4)));
+					String TotalItem = mu.formatDosDecimales(mu.round2dec(DT.getDouble(4)));
 
 					if (producto.subBodega.length() > 1) {
 						detalle.dCodCPBSabr = producto.subBodega.substring(0, 2);
 						detalle.dCodCPBScmp = producto.subBodega;
 					}
 
-					detalle.gPrecios.dPrUnit = String.valueOf(DT.getDouble(5));
+					detalle.gPrecios.dPrUnit = mu.formatDosDecimales(mu.round2dec(DT.getDouble(5)));
 					detalle.gPrecios.dPrUnitDesc = "0.000000";
 					detalle.gPrecios.dPrItem = TotalItem;
 					detalle.gPrecios.dValTotItem = TotalItem;
@@ -1528,12 +1513,12 @@ public class FacturaRes extends PBase {
 					NotaCredito.Detalles.add(detalle);
 
 					Correlativo++;
-					TotalAcumulado += mu.round2(Double.parseDouble(TotalItem));
+					TotalAcumulado += mu.round2dec((Double.parseDouble(TotalItem)));
 					DT.moveToNext();
 
 				}
 
-				String TotalNT = String.valueOf(mu.round2(TotalAcumulado));
+				String TotalNT = mu.formatDosDecimales(TotalAcumulado);
 
 				NotaCredito.gTot.dTotNeto = TotalNT;
 				NotaCredito.gTot.dTotITBMS = "0.00";
@@ -1655,16 +1640,16 @@ public class FacturaRes extends PBase {
 
 				//Definir que se va enviar en la cantidad.
 				if (porpeso) {
-					detalle.dCantCodInt = String.valueOf(vpeso);
+					detalle.dCantCodInt = mu.formatTresDecimales(mu.round(vpeso, 3));
 				} else {
 					if (app.esRosty(producto.codigo)) {
-						detalle.dCantCodInt = String.valueOf(vcant * factpres);
+						detalle.dCantCodInt = mu.formatDosDecimales(mu.round2dec(vcant * factpres));
 					} else {
-						detalle.dCantCodInt = String.valueOf(vcant);
+						detalle.dCantCodInt = mu.formatDosDecimales(vcant);
 					}
 				}
 
-				String TotalItem = String.valueOf(mu.round2(dt.getDouble(6)));
+				String TotalItem = mu.formatDosDecimales(mu.round2dec(dt.getDouble(6)));
 
 				//Validar esto preguntar #AT20221019
 				if (producto.subBodega.length() > 1) {
@@ -1689,7 +1674,7 @@ public class FacturaRes extends PBase {
 				Factura.Detalles.add(detalle);
 
 				CorrelativoFac++;
-				TotalFact+= mu.round2(dt.getDouble(6));
+				TotalFact+= mu.round2dec(dt.getDouble(6));
 
 				dt.moveToNext();
 			}
@@ -1759,8 +1744,7 @@ public class FacturaRes extends PBase {
 				//AT20220823 Formas de pago
 
 				gFormaPago Pagos = new gFormaPago();
-
-				String Total = String.valueOf(mu.round2(TotalFact));
+				String Total = mu.formatDosDecimales(TotalFact);
 
 				Factura.gTot.dTotNeto = Total;
 				Factura.gTot.dTotITBMS = "0.00";

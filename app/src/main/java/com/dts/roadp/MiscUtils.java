@@ -130,15 +130,15 @@ public class MiscUtils {
 		return val;
 	}
 
-	private String formatDosDecimales(float valor){
-		DecimalFormat format = new DecimalFormat();
+	public String formatDosDecimales(double valor){
+		DecimalFormat format = new DecimalFormat("0.00");
 		format.setMaximumFractionDigits(2); //Define 2 decimales.
 		return format.format(valor);
 	}
 
-	private String formatTreDecimales(float valor){
-		DecimalFormat format = new DecimalFormat();
-		format.setMaximumFractionDigits(3); //Define 2 decimales.
+	public String formatTresDecimales(double valor){
+		DecimalFormat format = new DecimalFormat("0.000");
+		format.setMaximumFractionDigits(3); //Define 3 decimales.
 		return format.format(valor);
 	}
 

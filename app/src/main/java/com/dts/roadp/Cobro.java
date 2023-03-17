@@ -1316,7 +1316,7 @@ public class Cobro extends PBase {
 
 				Factura.gDGen.iTpEmis = "02";
 				Factura.gDGen.dMotCont = "Autorización Previa contingencia";
-				Factura.gDGen.dFechaCont = du.getFechaCompleta()+"-05:00";
+				Factura.gDGen.dFechaCont = Factura.gDGen.dFechaEm;
 
 				RespuestaEdocFac = Firmador.EmisionDocumentoBTC(Factura,gl.url_b2c_hh,"/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}

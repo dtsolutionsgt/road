@@ -1037,7 +1037,7 @@ public class Anulacion extends PBase {
 
 				NotaDebito.gDGen.iTpEmis = "02";
 				NotaDebito.gDGen.dMotCont = "Autorización Previa contingencia";
-				NotaDebito.gDGen.dFechaCont = du.getFechaCompleta()+"-05:00";
+				NotaDebito.gDGen.dFechaCont = NotaDebito.gDGen.dFechaEm;
 
 				RespuestaEdocND = Firmador.EmisionDocumentoBTC(NotaDebito,urlanulacion, "/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}
@@ -1458,7 +1458,7 @@ public class Anulacion extends PBase {
 
 				NotaDebito.gDGen.iTpEmis = "02";
 				NotaDebito.gDGen.dMotCont = "Autorización Previa contingencia";
-				NotaDebito.gDGen.dFechaCont = du.getFechaCompleta()+"-05:00";
+				NotaDebito.gDGen.dFechaCont = NotaDebito.gDGen.dFechaEm;
 
 				RespuestaEdocND = Firmador.EmisionDocumentoBTC(NotaDebito,urlanulacion, "/data/data/com.dts.roadp/"+gl.archivo_p12,gl.qr_clave,QR,gl.ambiente);
 			}

@@ -772,7 +772,6 @@ public class Anulacion extends PBase {
 
 				if (!Sucursal.codubi.isEmpty() ){
 
-
 					ciudad = Catalogo.getCiudad(Sucursal.codubi);
 
 					if (ciudad !=null) {

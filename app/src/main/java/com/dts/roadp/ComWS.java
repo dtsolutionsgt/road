@@ -1708,9 +1708,23 @@ public class ComWS extends PBase {
 			sstr = "OK";
 
 			if (nombretabla.contains("P_IMPRESORA")) {
+
+				value=value.replace("&", "&amp;");
+				value=value.replace("\"", "&quot;");
+				value=value.replace("'", "&apos;");
+				value=value.replace("<", "&lt;");
+				value=value.replace(">", "&gt;");
+
 				callMethod("getInsImpresora");
 				xr = getXMLRegionSingle("getInsImpresoraResult");
 			}else if (nombretabla.contains("CARGA_SUPERVISOR")){
+
+				value=value.replace("&", "&amp;");
+				value=value.replace("\"", "&quot;");
+				value=value.replace("'", "&apos;");
+				value=value.replace("<", "&lt;");
+				value=value.replace(">", "&gt;");
+
 				callMethod("RutaSupervisor");
 				xr = getXMLRegionSingle("RutaSupervisorResult");
 				sRutaSupervisor = (String) getSingle(xr,"checkLicenceResult",String.class);
@@ -1723,11 +1737,23 @@ public class ComWS extends PBase {
 				cargasuper = iRutaSupervisor == 1;
 			}else if (nombretabla.contains("checkLicenceRuta")){
 
+				value=value.replace("&", "&amp;");
+				value=value.replace("\"", "&quot;");
+				value=value.replace("'", "&apos;");
+				value=value.replace("<", "&lt;");
+				value=value.replace(">", "&gt;");
+
 				callMethod("checkLicenceRuta", "Ruta",ruta);
 				xr=getXMLRegionSingle("checkLicenceRutaResult");
 				licResultRuta=(Integer) getSingle(xr,"checkLicenceRutaResult",Integer.class);
 
 			}else if (nombretabla.contains("checkLicence")){
+
+				value=value.replace("&", "&amp;");
+				value=value.replace("\"", "&quot;");
+				value=value.replace("'", "&apos;");
+				value=value.replace("<", "&lt;");
+				value=value.replace(">", "&gt;");
 
 				callMethod("checkLicence","Serial",licSerial,"Name", gl.devicename, "Ruta",ruta);
 
@@ -1736,11 +1762,23 @@ public class ComWS extends PBase {
 
 			}else if (nombretabla.contains("commitSQL")){
 
+				value=value.replace("&", "&amp;");
+				value=value.replace("\"", "&quot;");
+				value=value.replace("'", "&apos;");
+				value=value.replace("<", "&lt;");
+				value=value.replace(">", "&gt;");
+
 				callMethod("Commit", "SQL", value);
 				xr=getXMLRegionSingle("CommitResult");
 				xr=(String) getSingle(xr,"CommitResult",String.class);
 
 			} else if (nombretabla.contains("CommitEnvio")) {
+
+				value=value.replace("&", "&amp;");
+				value=value.replace("\"", "&quot;");
+				value=value.replace("'", "&apos;");
+				value=value.replace("<", "&lt;");
+				value=value.replace(">", "&gt;");
 
 				String fecha = du.getActDateStr();
 
@@ -4983,6 +5021,7 @@ public class ComWS extends PBase {
 		dbld.clearlog();
 		dbld.clear();
 		senv = "";
+		errflag=false;
 
 		try {
 			envioFacturas();
@@ -5941,7 +5980,7 @@ public class ComWS extends PBase {
 					dbld.insert("D_NOTACRED", "WHERE COREL='" + cor + "' AND TIPO_DOCUMENTO = '"+tipodocumento+"'");
 					dbld.insert("D_NOTACREDD", "WHERE COREL='" + cor + "' AND TIPO_DOCUMENTO = '"+tipodocumento+"'");
 
-					query = "(tipodocumento = '" + tipoDGISR + "' OR tipodocumento = '" + tipoDGIR + "')";
+					query = "(TIPODOCUMENTO = '" + tipoDGISR + "' OR TIPODOCUMENTO = '" + tipoDGIR + "')";
 					dbld.insert("D_FACTURA_CONTROL_CONTINGENCIA", "WHERE COREL = '"+ cor +"' AND "+query+"");
 
 					//dbld.add("UPDATE P_CORELNC SET CORELULT=" + ccorel + "  WHERE RUTA='" + fruta + "'");

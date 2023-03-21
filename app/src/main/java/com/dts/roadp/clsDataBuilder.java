@@ -202,10 +202,14 @@ public class clsDataBuilder {
 						String xmlEnc= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 						String xmlContigencia = DT.getString(i);
 
-						if (xmlContigencia.length() > 0) {
-							if (xmlContigencia.contains(xmlEnc)) {
-								xmlContigencia = xmlContigencia.substring(xmlEnc.length(), xmlContigencia.length());
+						if (xmlContigencia != null){
+							if (xmlContigencia.length() > 0) {
+								if (xmlContigencia.contains(xmlEnc)) {
+									xmlContigencia = xmlContigencia.substring(xmlEnc.length(), xmlContigencia.length());
+								}
 							}
+						}else{
+							xmlContigencia = "";
 						}
 
 						s = "CONVERT(XML, '" + xmlContigencia + "')";

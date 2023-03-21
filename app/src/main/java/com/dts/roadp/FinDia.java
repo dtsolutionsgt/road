@@ -1743,9 +1743,9 @@ public class FinDia extends PBase {
             rep.line();
 
             sql = " SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N, D_FACTURAP F " +
-                    " WHERE N.FACTURA = F.COREL AND N.STATCOM='N'  AND F.TIPO = 'K'  " +
+                    " WHERE N.FACTURA = F.COREL AND N.STATCOM='N'  AND F.TIPO = 'K' AND N.TIPO_DOCUMENTO = 'NC'  " +
                     " UNION SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N, D_CXC C " +
-                    " WHERE N.FACTURA = C.COREL AND N.STATCOM='N' ";
+                    " WHERE N.FACTURA = C.COREL AND N.STATCOM='N' AND N.TIPO_DOCUMENTO = 'NC' ";
 
             DT = Con.OpenDT(sql);
 
@@ -1777,7 +1777,8 @@ public class FinDia extends PBase {
             rep.line();
 
             sql = " SELECT DISTINCT N.COREL, N.TOTAL, N.ANULADO FROM D_NOTACRED N " +
-                    " WHERE N.STATCOM='N' AND N.FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO <> 'K')";
+                    " WHERE N.STATCOM='N' AND N.TIPO_DOCUMENTO = 'NC' AND " +
+                    " N.FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO <> 'K')";
 
             DT = Con.OpenDT(sql);
 
@@ -2137,7 +2138,7 @@ public class FinDia extends PBase {
 
             sql =  " SELECT IFNULL(COUNT(NC.COREL),0) AS TOTAL " +
                     " FROM D_NOTACRED NC " +
-                    " WHERE NC.RUTA='" + gl.ruta + "'";
+                    " WHERE NC.RUTA='" + gl.ruta + "' AND NC.TIPO_DOCUMENTO = 'NC' ";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -2162,7 +2163,7 @@ public class FinDia extends PBase {
 
             sql =  " SELECT IFNULL(COUNT(NC.COREL),0) AS TOTAL " +
                     " FROM D_NOTACRED NC " +
-                    " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='S'";
+                    " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='S'  AND NC.TIPO_DOCUMENTO = 'NC' ";
             DT = Con.OpenDT(sql);
 
             if (DT.getCount() > 0) {
@@ -2187,7 +2188,7 @@ public class FinDia extends PBase {
 
             sql =  " SELECT IFNULL(SUM(NC.TOTAL),0) AS TOTAL " +
                     " FROM D_NOTACRED NC " +
-                    " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='N' " +
+                    " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='N' AND NC.TIPO_DOCUMENTO = 'NC'  " +
                     " AND (FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO = 'K')" +
                     " OR   FACTURA IN (SELECT COREL FROM D_CXC))";
             DT = Con.OpenDT(sql);
@@ -2214,7 +2215,7 @@ public class FinDia extends PBase {
 
             sql =  " SELECT IFNULL(SUM(NC.TOTAL),0) AS TOTAL " +
                     " FROM D_NOTACRED NC " +
-                    " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='N' " +
+                    " WHERE NC.RUTA='" + gl.ruta + "' AND NC.ANULADO='N'  AND NC.TIPO_DOCUMENTO = 'NC'  " +
                     " AND NC.FACTURA IN (SELECT COREL FROM D_FACTURAP WHERE TIPO <> 'K')";
             DT = Con.OpenDT(sql);
 

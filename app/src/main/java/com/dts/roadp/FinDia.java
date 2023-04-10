@@ -514,7 +514,8 @@ public class FinDia extends PBase {
 
     private boolean validaFinDia() {
         Cursor DT;
-        int pend, fechaUltimoCierre;
+        int pend;
+        long fechaUltimoCierre;
 
         claseFinDia = new clsFinDia(this);
 

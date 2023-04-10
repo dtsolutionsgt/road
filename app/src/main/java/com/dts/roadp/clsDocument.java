@@ -19,7 +19,8 @@ public class clsDocument {
 	public String tf1="",tf2="",tf3="",tf4="",tf5="",add1="",add2="",deviceid;
 	public clsRepBuilder rep;
 	public boolean docfactura,docrecibo,docanul,docpedido,docdevolucion,doccanastabod,docdesglose;
-	public int ffecha,pendiente,diacred,condicionPago;
+	public int pendiente,diacred,condicionPago;
+	public long ffecha;
 	
 	protected android.database.sqlite.SQLiteDatabase db;
 	protected BaseDatos Con;
@@ -558,8 +559,8 @@ public class clsDocument {
 		}
 	}
 	
-	public String sfecha(int f) {
-		int vy,vm,vd;
+	public String sfecha(long f) {
+		long vy,vm,vd;
 		String s;
 		
 		vy=(int) f/100000000;f=f % 100000000;

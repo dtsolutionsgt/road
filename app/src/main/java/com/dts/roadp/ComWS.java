@@ -61,7 +61,8 @@ public class ComWS extends PBase {
     private TextView lblUser,lblPassword,txtVersion;
     private EditText txtUser, txtPassword;
 
-	private int isbusy, fecha, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
+	private int isbusy, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
+	private long fecha;
 	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs;
 	private String licSerial,licRuta,licSerialEnc,licRutaEnc,parImprID;
 	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag,esEnvioManual=false;
@@ -264,7 +265,7 @@ public class ComWS extends PBase {
 
 			if (gl.banderafindia) {
 
-				int fechaUltimoCierre;
+				long fechaUltimoCierre;
 
 				fechaUltimoCierre = claseFindia.ultimoCierreFecha();
 

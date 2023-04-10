@@ -612,7 +612,7 @@ public class clsFinDia extends PBase{
 
         Cursor DT;
         boolean vFinDia = false;
-        int fechaUltimoCierre = ultimoCierreFecha();
+        long fechaUltimoCierre = ultimoCierreFecha();
 
         try{
 

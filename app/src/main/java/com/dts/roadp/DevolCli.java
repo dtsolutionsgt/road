@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +39,8 @@ public class DevolCli extends PBase {
 	private ListView listView;
 	private TextView lblCantProds,lblCantUnd,lblCantKgs,lblCantTotal;
 
+	private ImageView imgNext, imgImg;
+
 	private ArrayList<clsClasses.clsCFDV> items= new ArrayList<clsClasses.clsCFDV>();
 	private ListAdaptDevCli adapter;
 	private clsClasses.clsCFDV selitem;
@@ -54,6 +57,8 @@ public class DevolCli extends PBase {
 	private double cant;
 	private String emp,estado;
 	private int itempos,impres;
+
+	private boolean aplicandoDevol=false;
 
 	private rFE NotaCredito = new rFE();
 	private clsClasses.clsMunicipio Municipio = clsCls.new clsMunicipio();
@@ -82,6 +87,8 @@ public class DevolCli extends PBase {
 		lblCantUnd = (TextView) findViewById(R.id.lblCantUnd);
 		lblCantKgs = (TextView) findViewById(R.id.lblCantKgs);
 		lblCantTotal = (TextView) findViewById(R.id.lblCantTotal);
+		imgNext = (ImageView)findViewById(R.id.imgNext);
+		imgImg = (ImageView)findViewById(R.id.imgImg);
 
 		emp=gl.emp;
 		estado=gl.devtipo;
@@ -110,6 +117,7 @@ public class DevolCli extends PBase {
 		printexit= () -> {
 			limpiavariables_devol();
 			DevolCli.super.finish();
+
 		};
 
 		printvoid= () -> {
@@ -118,6 +126,7 @@ public class DevolCli extends PBase {
 		printclose= () -> {
 			limpiavariables_devol();
 			DevolCli.super.finish();
+
 		};
 
 		prn=new printer(this,printexit,gl.validimp);
@@ -160,8 +169,28 @@ public class DevolCli extends PBase {
 
 	public void finishDevol(View view){
 		try{
+
+			if (aplicandoDevol) return;
+
+			aplicandoDevol = true;
+
+			imgNext.setVisibility(View.INVISIBLE);
+			imgNext.setEnabled(false);
+
+			imgImg.setVisibility(View.INVISIBLE);
+			imgImg.setEnabled(false);
+
 			if (!hasProducts()) {
-				mu.msgbox("¡No puede continuar, no ha agregado ninguno producto!");return;
+				mu.msgbox("¡No puede continuar, no ha agregado ninguno producto!");
+
+				aplicandoDevol = false;
+				imgNext.setVisibility(View.VISIBLE);
+				imgNext.setEnabled(true);
+
+				imgImg.setVisibility(View.VISIBLE);
+				imgImg.setEnabled(true);
+
+				return;
 			}
 
 			msgAskComplete("Aplicar la devolución");
@@ -432,6 +461,7 @@ public class DevolCli extends PBase {
 		Cursor DT;
 		String corel,pcod;
 		Double pcant;
+		int ncItem = 0;
 
 		gl.dvcorreld = obtienecorrel("D");gl.devcord=gl.dvcorreld;
 		gl.dvcorrelnc = obtienecorrel("NC");gl.devcornc=gl.dvcorrelnc;
@@ -444,6 +474,22 @@ public class DevolCli extends PBase {
 		try {
 
             gl.despdevflag=true;
+
+			sql="SELECT MAX(ITEM) FROM D_NOTACRED_LOG ";
+			DT=Con.OpenDT(sql);
+
+			if (DT!=null){
+				if(DT.getCount()>0){
+					DT.moveToFirst();
+					ncItem=DT.getInt(0);
+				}else{
+					ncItem=0;
+				}
+
+				DT.close();
+
+				ncItem++;
+			}
 
 			if (gl.tiponcredito==1  ){
 
@@ -546,8 +592,8 @@ public class DevolCli extends PBase {
 						}
 
 					} else {
-						msgbox("No se encontraron los datos de la ubicación para este código:" + Cliente.ciudad);
-						return;
+						toastlongd("No se encontraron los datos de la ubicación para este código:" + Cliente.ciudad);
+						//return;
 					}
 				}
 
@@ -605,8 +651,8 @@ public class DevolCli extends PBase {
 					if(!BeRUC.sRUC.trim().equals("")){
 						NotaCredito.gDGen.Receptor.gRucRec.dRuc = BeRUC.sRUC.trim();
 					}else{
-						msgbox("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
-						return;
+						toastlongd("El RUC asociado al cliente es vacío y el tipo de Receptor lo requiere.");
+						//return;
 					}
 
 					if (!BeRUC.sDV.trim().equals("")) {
@@ -723,7 +769,7 @@ public class DevolCli extends PBase {
 						if (!CodDGI.isEmpty()) {
 							detalle.cUnidad = CodDGI;
 						} else {
-							detalle.cUnidad = "und";
+							detalle.cUnidad = gl.unidad_medida_defecto;
 						}
 					}
 
@@ -794,8 +840,30 @@ public class DevolCli extends PBase {
 				sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactuald+" WHERE RUTA='"+gl.ruta+"' AND TIPO='D'";
 				db.execSQL(sql);
 
+				ins.init("D_NOTACRED_LOG");
+				ins.add("ITEM",ncItem);
+				ins.add("SERIE",gl.dvSeried);
+				ins.add("COREL",gl.dvactuald);
+				ins.add("FECHA",du.getActDateTime());
+				ins.add("RUTA",gl.ruta);
+				ins.add("TIPO","D");
+				db.execSQL(ins.sql());
+
+				ncItem +=1;
+
 				sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactualnc+" WHERE RUTA='"+gl.ruta+"' AND TIPO='NC'";
 				db.execSQL(sql);
+
+				ins.init("D_NOTACRED_LOG");
+				ins.add("ITEM",ncItem);
+				ins.add("SERIE",gl.dvSerienc);
+				ins.add("COREL",gl.dvactualnc);
+				ins.add("FECHA",du.getActDateTime());
+				ins.add("RUTA",gl.ruta);
+				ins.add("TIPO","D");
+				db.execSQL(ins.sql());
+
+				ncItem +=1;
 
 				db.setTransactionSuccessful();
 				db.endTransaction();
@@ -912,13 +980,28 @@ public class DevolCli extends PBase {
 					startActivity(i);
 					finish();
 				} catch (Exception e){
+					aplicandoDevol = false;
+					imgNext.setVisibility(View.VISIBLE);
+					imgNext.setEnabled(true);
+
+					imgImg.setVisibility(View.VISIBLE);
+					imgImg.setEnabled(true);
 					addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 				}
 			}
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			db.endTransaction();
             gl.dvcorreld="";
+
+			aplicandoDevol = false;
+			imgNext.setVisibility(View.VISIBLE);
+			imgNext.setEnabled(true);
+
+			imgImg.setVisibility(View.VISIBLE);
+			imgImg.setEnabled(true);
+
 			mu.msgbox(e.getMessage());
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -952,6 +1035,12 @@ public class DevolCli extends PBase {
 		} catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 			mu.msgbox("createDoc: " + e.getMessage());
+
+			aplicandoDevol = false;
+			imgNext.setVisibility(View.VISIBLE);
+			imgNext.setEnabled(true);
+			imgImg.setVisibility(View.VISIBLE);
+			imgImg.setEnabled(true);
 		}
 
 	}
@@ -998,33 +1087,66 @@ public class DevolCli extends PBase {
 	}
 
 	private String obtienecorrel(String tipo){
-		String correl="";
+		String correl="",fserie;
 		Cursor DT;
+		int cactual,cfinal,ca1,ca2,fcorel;
 
 		try{
-			sql="SELECT SERIE,ACTUAL+1,FINAL,INICIAL FROM P_CORREL_OTROS WHERE RUTA='"+gl.ruta+"' AND TIPO='"+tipo+"'";
-			DT=Con.OpenDT(sql);
+			sql = " SELECT SERIE, ACTUAL, FINAL, INICIAL, TIPO " +
+				  " FROM P_CORREL_OTROS " +
+				  " WHERE RUTA='" + gl.ruta + "' AND TIPO='" + tipo + "'";
+			DT = Con.OpenDT(sql);
 
-			if(DT.getCount()>0){
+			if (DT.getCount() > 0) {
 				DT.moveToFirst();
-				correl=DT.getString(0) + StringUtils.right("000000" + Integer.toString(DT.getInt(1)), 6);
-
-				if (tipo.equals("D")){
-					gl.dvactuald = String.valueOf(DT.getInt(1));
-				}else{
-					gl.dvactualnc = String.valueOf(DT.getInt(1));
-				}
+				fserie = DT.getString(0);
+				ca1 = DT.getInt(1);
+				cfinal = DT.getInt(3);
 			} else {
+				fserie = "";
+				fcorel = 0;
 				if (gl.peModal.equalsIgnoreCase("TOL")){
-					mu.msgbox("No está definido correlativo, no se puede continuar con la devolución.\n");
+					mu.msgbox("No está definido correlativo de NC. No se puede continuar con la Nota de Crédito por devolución.\n");
 				}else{
 					correl=gl.ruta+"_"+mu.getCorelBase();
 					if (tipo.equals("D")){
 						gl.dvactuald = String.valueOf(1);
+						gl.dvSeried = fserie;
 					}else{
 						gl.dvactualnc = String.valueOf(1);
+						gl.dvSerienc = fserie;
 					}
 				}
+				return "";
+			}
+
+			sql = " SELECT MAX(COREL) FROM D_NOTACRED_LOG " +
+				  " WHERE RUTA='" + gl.ruta + "' AND " +
+				  "       SERIE='" + fserie + "' AND" +
+				  "       TIPO='" + tipo + "'";
+			DT = Con.OpenDT(sql);
+
+			if (DT.getCount() > 0) {
+				DT.moveToFirst();
+				ca2 = DT.getInt(0);
+			} else {
+				ca2 = 0;
+			}
+
+			DT.close();
+
+			cactual = ca1;
+			if (ca2 > cactual) cactual = ca2;
+			fcorel = cactual + 1;
+
+			correl=fserie + StringUtils.right("000000" + Integer.toString(fcorel), 6);
+
+			if (tipo.equals("D")){
+				gl.dvactuald = String.valueOf(fcorel);
+				gl.dvSeried = fserie;
+			}else{
+				gl.dvactualnc = String.valueOf(fcorel);
+				gl.dvSerienc = fserie;
 			}
 
 		}catch (Exception e){
@@ -1092,7 +1214,14 @@ public class DevolCli extends PBase {
 
 			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					;
+
+					aplicandoDevol = false;
+					imgNext.setVisibility(View.VISIBLE);
+					imgNext.setEnabled(true);
+
+					imgImg.setVisibility(View.VISIBLE);
+					imgImg.setEnabled(true);
+
 				}
 			});
 
@@ -1209,6 +1338,7 @@ public class DevolCli extends PBase {
 			db.execSQL(sql);
 
 			DevolCli.super.finish();
+
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
@@ -1250,6 +1380,13 @@ public class DevolCli extends PBase {
 			if (gl.closeVenta==true){
 				limpiavariables_devol();
 				super.finish();
+
+				aplicandoDevol = false;
+				imgNext.setVisibility(View.VISIBLE);
+				imgNext.setEnabled(true);
+
+				imgImg.setVisibility(View.VISIBLE);
+				imgImg.setEnabled(true);
 			}
 
 			if (browse==1) {

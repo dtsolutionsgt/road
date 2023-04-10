@@ -67,6 +67,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:adjustViewBounds="true"
+            android:onClick="DesencriptaImpresora"
             android:padding="5dp"
             android:src="@drawable/comunicacion_blanco_gris" />
     </RelativeLayout>

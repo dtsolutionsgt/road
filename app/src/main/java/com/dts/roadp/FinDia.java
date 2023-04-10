@@ -718,6 +718,10 @@ public class FinDia extends PBase {
         Cursor dt;
 
         try {
+
+            db.execSQL("UPDATE DS_PEDIDO SET BANDERA= 'S' " +
+                       " WHERE CLIENTE NOT IN (SELECT CLIENTE FROM P_CLIRUTA)");
+
             sql = "SELECT COREL FROM DS_PEDIDO WHERE (ANULADO='N') AND BANDERA = 'N'";
             dt = Con.OpenDT(sql);
 

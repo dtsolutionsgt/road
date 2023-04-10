@@ -399,14 +399,30 @@ public class PedidoRes extends PBase {
 		double tot,desc,imp,peso,vcant,vpeso,vfactor,factpres,cantinv;
         String vprod,vumstock,vumventa,bandisp, vumstockaux = "";
         int dev_ins=1;
-
+        int ncItem=0;
 
         corel=gl.ruta+"_"+mu.getCorelBase();
 		fechae=du.ffecha00(fechae);
         prodstandby=false;
 
 		try {
-			
+
+			sql="SELECT MAX(ITEM) FROM D_NOTACRED_LOG ";
+			DT=Con.OpenDT(sql);
+
+			if (DT!=null){
+				if(DT.getCount()>0){
+					DT.moveToFirst();
+					ncItem=DT.getInt(0);
+				}else{
+					ncItem=0;
+				}
+
+				DT.close();
+
+				ncItem++;
+			}
+
 			sql="SELECT SUM(TOTAL),SUM(DESMON),SUM(IMP),SUM(PESO) FROM T_VENTA";
 			DT=Con.OpenDT(sql);
 			DT.moveToFirst();
@@ -536,7 +552,6 @@ public class PedidoRes extends PBase {
 
          	if (prodstandby)  db.execSQL("UPDATE D_PEDIDO SET BANDERA='S' WHERE (COREL='"+corel+"')");
 
-
             //region Devolución de  producto.
             if (gl.dvbrowse!=0) {
 
@@ -646,8 +661,30 @@ public class PedidoRes extends PBase {
                     sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactuald+" WHERE RUTA='"+gl.ruta+"' AND TIPO='D'";
                     db.execSQL(sql);
 
+					ins.init("D_NOTACRED_LOG");
+					ins.add("ITEM",ncItem);
+					ins.add("SERIE",gl.dvSeried);
+					ins.add("COREL",gl.dvactuald);
+					ins.add("FECHA",du.getActDateTime());
+					ins.add("RUTA",gl.ruta);
+					ins.add("TIPO","ND");
+					db.execSQL(ins.sql());
+
+					ncItem +=1;
+
                     sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactualnc+" WHERE RUTA='"+gl.ruta+"' AND TIPO='NC'";
                     db.execSQL(sql);
+
+					ins.init("D_NOTACRED_LOG");
+					ins.add("ITEM",ncItem);
+					ins.add("SERIE",gl.dvSeriend);
+					ins.add("COREL",gl.dvactualnc);
+					ins.add("FECHA",du.getActDateTime());
+					ins.add("RUTA",gl.ruta);
+					ins.add("TIPO","NC");
+					db.execSQL(ins.sql());
+
+					ncItem +=1;
 
                     Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();
 

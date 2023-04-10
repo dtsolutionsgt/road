@@ -3779,7 +3779,8 @@ public class ComWS extends PBase {
 				  " COBROS_SIN_REFERENCIA, PORCENTAJE_NC, PORC_MERMA, PRODUCTO_ERROR_SUMA, UNIDAD_MEDIDA_PESO, LOTE_POR_DEFECTO," +
 				  " INCIDENCIA_NO_LECTURA, IMPRIMIR_TOTALES_PEDIDO, URL_AUTENTICACION, USUARIO_API, CLAVE_API, URL_ANULACION, " +
 				  " URL_CONSULTA_DOCUMENTOS_POR_CRITERIO,URL_EMISION_FACTURA_B2C, URL_EMISION_NC_B2C,URL_EMISION_ND_B2C," +
-				  " URL_BASE,URL_TOKEN, QR_API,ARCHIVO_P12, QR_CLAVE, URL_B2C_HH, URL_DOC, URL_EMISION_NC_B2B_HH, URL_EMISION_ND_B2B_HH " +
+				  " URL_BASE,URL_TOKEN, QR_API,ARCHIVO_P12, QR_CLAVE, URL_B2C_HH, URL_DOC, URL_EMISION_NC_B2B_HH, URL_EMISION_ND_B2B_HH," +
+				  " UNIDAD_MEDIDA_DEFECTO, AMBIENTE, URL_CONSULTAR_DOCUMENTO_POR_RUTA " +
 				  " FROM P_EMPRESA WHERE EMPRESA = '" + gEmpresa + "'";
 			return SQL;
 		}
@@ -8732,6 +8733,180 @@ public class ComWS extends PBase {
 			e.printStackTrace();
 		}
 		return "";
+	}
+
+	public void DesencriptaImpresora(View view) {
+
+		try {
+			askDecodePrinter();
+		} catch (Exception e) {
+
+		}
+	}
+	public void askDecodePrinter() {
+
+		try {
+
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setTitle("Desencriptar");
+			dialog.setMessage("¿Va a realizar la desencripción de las impresoras, está seguro?");
+			dialog.setCancelable(false);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					DatosSupervisorPrinters();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+
+			dialog.show();
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+
+	}
+
+	private void DatosSupervisorPrinters() {
+
+		try {
+
+			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Desencriptar impresoras");
+
+			final LinearLayout layout = new LinearLayout(this);
+			layout.setOrientation(LinearLayout.VERTICAL);
+
+			if (lblUser.getParent() != null) {
+				((ViewGroup) lblUser.getParent()).removeView(lblUser);
+			}
+
+			if (lblPassword.getParent() != null) {
+				((ViewGroup) lblPassword.getParent()).removeView(lblPassword);
+			}
+
+			if (txtUser.getParent() != null) {
+				((ViewGroup) txtUser.getParent()).removeView(txtUser);
+			}
+
+			if (txtPassword.getParent() != null) {
+				((ViewGroup) txtPassword.getParent()).removeView(txtPassword);
+			}
+
+			lblUser.setText("Usuario: ");
+			lblPassword.setText("Contraseña: ");
+			txtPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+			txtUser.setText("");
+			txtPassword.setText("");
+
+			layout.addView(lblUser);
+			layout.addView(txtUser);
+			layout.addView(lblPassword);
+			layout.addView(txtPassword);
+
+			alert.setView(layout);
+
+			showkeyb();
+			alert.setCancelable(false);
+			alert.create();
+
+			alert.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+
+					String usr, pwd;
+					boolean dtCorrectos;
+
+					usr = txtUser.getText().toString().trim();
+					pwd = txtPassword.getText().toString().trim();
+
+					if (mu.emptystr(usr)) {
+						toast("Usuario incorrecto.");
+						lblEnvM.setVisibility(View.VISIBLE);
+						imgEnvM.setVisibility(View.VISIBLE);
+						return;
+					}
+
+					if (mu.emptystr(pwd)) {
+						toast("Contraseña incorrecta.");
+						lblEnvM.setVisibility(View.VISIBLE);
+						imgEnvM.setVisibility(View.VISIBLE);
+						return;
+					}
+
+					dtCorrectos = validaDatos(usr, pwd);
+
+					if (dtCorrectos) {
+						decodePrintersC();
+					} else {
+						layout.removeAllViews();
+
+						return;
+					}
+
+				}
+			});
+
+			alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					layout.removeAllViews();
+				}
+			});
+
+			alert.show();
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+		}
+
+	}
+
+	private void decodePrintersC() {
+		Cursor dt;
+		String prid, ser, mac, se, sm;
+
+		try {
+
+			/*sql = "UPDATE P_RUTA SET VENTA = 'V'";
+			db.execSQL(sql);*/
+
+			sql = "SELECT IDIMPRESORA,NUMSERIE,MACADDRESS FROM P_IMPRESORA";
+			dt = Con.OpenDT(sql);
+
+			if (dt.getCount() > 0) dt.moveToFirst();
+			while (!dt.isAfterLast()) {
+
+				prid = dt.getString(0);
+				ser = dt.getString(1);
+				mac = dt.getString(2);
+
+				se = cu.decrypt(ser);
+				sm = cu.decrypt(mac);
+
+				sql = "UPDATE P_IMPRESORA SET NUMSERIE='" + se + "',MACADDRESS='" + sm + "' WHERE IDIMPRESORA='" + prid + "'";
+				db.execSQL(sql);
+
+				dt.moveToNext();
+			}
+
+			if (dt != null) dt.close();
+
+			msgbox("Finalizó proceso de desencripción de las impresoras");
+
+		} catch (Exception e) {
+			msgbox(new Object() {
+			}.getClass().getEnclosingMethod().getName() + " . " + e.getMessage());
+
+		}
 	}
 
 	//region Activity Events

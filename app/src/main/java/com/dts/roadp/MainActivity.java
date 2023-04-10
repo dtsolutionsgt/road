@@ -45,8 +45,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.9.16 / ";
-    private String parFechaVer = "20-03-2023";
+    private String parNumVer = "9.9.22 / ";
+    private String parFechaVer = "08-04-2023";
     private String parTipoVer = "ROAD PRD";
 
     @Override
@@ -456,7 +456,8 @@ public class MainActivity extends PBase {
             //#HS_20181120_1616 Se agrego el campo UNIDAD_MEDIDA_PESO.//campo INCIDENCIA_NO_LECTURA
             sql = " SELECT EMPRESA,NOMBRE,DEVOLUCION_MERCANCIA,USARPESO,FIN_DIA,DEPOSITO_PARCIAL,UNIDAD_MEDIDA_PESO," +
                   " INCIDENCIA_NO_LECTURA, LOTE_POR_DEFECTO, URL_TOKEN, USUARIO_API, CLAVE_API, URL_EMISION_NC_B2C," +
-                  " URL_EMISION_ND_B2C,URL_EMISION_FACTURA_B2C,QR_API,URL_BASE, ARCHIVO_P12,URL_B2C_HH,QR_CLAVE, URL_DOC, URL_EMISION_NC_B2B_HH, URL_EMISION_ND_B2B_HH " +
+                  " URL_EMISION_ND_B2C,URL_EMISION_FACTURA_B2C,QR_API,URL_BASE, ARCHIVO_P12,URL_B2C_HH,QR_CLAVE, URL_DOC, " +
+                  " URL_EMISION_NC_B2B_HH, URL_EMISION_ND_B2B_HH, UNIDAD_MEDIDA_DEFECTO, AMBIENTE, URL_CONSULTAR_DOCUMENTO_POR_RUTA " +
                   " FROM P_EMPRESA ";
             DT = Con.OpenDT(sql);
 
@@ -490,6 +491,9 @@ public class MainActivity extends PBase {
                 gl.url_doc = DT.getString(20);
                 gl.url_emision_nc_b2b_hh = DT.getString(21);
                 gl.url_emision_nd_b2b_hh =DT.getString(22);
+                gl.unidad_medida_defecto =DT.getString(23);
+                gl.ambiente =DT.getString(24);
+                gl.url_consultar_documento_por_ruta =DT.getString(25);
             } else {
                 gl.emp = "";lblRuta.setText("");
                 gl.devol = false;

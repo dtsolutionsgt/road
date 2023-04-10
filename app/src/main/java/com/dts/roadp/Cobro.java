@@ -1174,7 +1174,7 @@ public class Cobro extends PBase {
 							if (!CodDGI.isEmpty()) {
 								detalle.cUnidad = CodDGI;
 							} else {
-								detalle.cUnidad = "und"; //Utiliza codigo de la cgi hy que sacarlo con una consulta
+								detalle.cUnidad = gl.unidad_medida_defecto; //Utiliza codigo de la cgi hy que sacarlo con una consulta
 							}
 						}
 

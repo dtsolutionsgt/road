@@ -86,6 +86,7 @@ public class Reimpresion extends PBase {
 		itemid="*";
 		
 		setHandlers();
+		insertaRegistrosFaltantes();
 		listItems();
 
 		prn=new printer(this,printclose,gl.validimp);
@@ -271,6 +272,50 @@ public class Reimpresion extends PBase {
 
 
 	// Main
+
+	public void insertaRegistrosFaltantes(){
+
+		try{
+			sql="INSERT INTO D_FACTURA_CONTROL_CONTINGENCIA " +
+					"SELECT (SELECT IFNULL(MAX(IDTABLACONTROL),0)+1 IDTABLACONTROL " +
+					"FROM D_FACTURA_CONTROL_CONTINGENCIA) IDTABLACONTROL,'' CUFE, '01' TIPODOCUMENTO, " +
+					"substr('0000000000'|| CORELATIVO, length('0000000000'||CORELATIVO)-9 ,10) NUMERORODOCUMENTO, " +
+					"(SELECT SUCURSAL FROM P_RUTA) SUCURSAL, SERIE CAJA, '' ESTADO, '' MENSAJE, " +
+					"'' VALOR_XML, '" + String.valueOf(du.getFechaCompleta()) + "' FECHAENVIO, '01' TIPOFACTURA, " +
+					"'" + String.valueOf(du.getFechaCompleta()) + "' FECHAAGR, " +
+					"'' QR, COREL, RUTA, VENDEDOR, '' HOST, '0' CODIGOLIQUIDACION, " +
+					"substr('0000000000'|| CORELATIVO, length('0000000000'||CORELATIVO)-9 ,10), '' QRIMAGE, " +
+					" '1900-01-01T00:00:00' FECHA_AUTORIZACION, '' NUMERO_AUTORIZACION " +
+					"FROM D_FACTURA " +
+					"WHERE COREL NOT IN (SELECT COREL FROM D_FACTURA_CONTROL_CONTINGENCIA WHERE TIPODOCUMENTO = '01' )";
+			db.execSQL(sql);
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+		try{
+			sql = " INSERT INTO D_FACTURA_CONTROL_CONTINGENCIA " +
+					" SELECT (SELECT IFNULL(MAX(IDTABLACONTROL),0)+1 IDTABLACONTROL " +
+					" FROM D_FACTURA_CONTROL_CONTINGENCIA) IDTABLACONTROL,'' CUFE, " +
+					" CASE WHEN TIPO_DOCUMENTO = 'ND' THEN '07' ELSE " +
+					" CASE WHEN TIPO_DOCUMENTO = 'NC' AND LENGTH(FACTURA)>9 THEN '04' ELSE '07' END END TIPODOCUMENTO, " +
+					" CORELATIVO NUMERORODOCUMENTO, " +
+					" (SELECT SUCURSAL FROM P_RUTA), SERIE CAJA, ''ESTADO, '' MENSAJE, " +
+					" '' VALOR_XML, '" + String.valueOf(du.getFechaCompleta()) + "' FECHAENVIO, " +
+					" CASE WHEN TIPO_DOCUMENTO = 'ND' THEN '07' ELSE " +
+					" CASE WHEN TIPO_DOCUMENTO = 'NC' AND LENGTH(FACTURA)>9 THEN '04' ELSE '07' " +
+					" END END TIPOFACTURA, '" + String.valueOf(du.getFechaCompleta()) + "' FECHAAGR, " +
+					" '' QR, COREL, RUTA, VENDEDOR, '' HOST, '0' CODIGOLIQUIDACION, CORELATIVO, " +
+					" '' QRIMAGE, '1900-01-01T00:00:00','' NUMERO_AUTORIZACION " +
+					" FROM D_NOTACRED " +
+					" WHERE D_NOTACRED.COREL NOT IN  " +
+					" (SELECT C.COREL FROM D_FACTURA_CONTROL_CONTINGENCIA C " +
+					"  WHERE C.TIPODOCUMENTO <> '01')";
+			db.execSQL(sql);
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		}
+	}
 
 	public void listItems() {
 		Cursor DT;
@@ -827,8 +872,8 @@ public class Reimpresion extends PBase {
 
 						toast("Reimpresion de nota de credito generada");
 					}else{
-						fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printcallback, "printnc.txt");
-
+						fdev.buildPrint(itemid, 1, "TOL");
+						prn_nc.printask(printcallback, "printnc.txt");
 						toast("Reimpresion de nota de credito generada");
 					}
 				}
@@ -872,11 +917,11 @@ public class Reimpresion extends PBase {
 						fdev.buildPrint(itemid, 3, "TOL");
 						prn_nc.printask(printcallback, "printnc.txt");
 
-						toast("Reimpresión de nota de debito y factura generada");
+						toast("Reimpresión de nota de débito y factura generada");
 					}else {
 						fdev.buildPrint(itemid, 1, "TOL");
 						prn_nc.printask(printcallback, "printnc.txt");
-						toast("Reimpresión de nota de debito y factura generada");
+						toast("Reimpresión de nota de débito y factura generada");
 					}
 
 				}else if(ncFact==2){
@@ -884,11 +929,12 @@ public class Reimpresion extends PBase {
 						fdev.buildPrint(itemid, 3, "TOL");
 						prn_nc.printask(printcallback, "printnc.txt");
 
-						toast("Reimpresion de nota de debito generada");
+						toast("Reimpresion de nota de débito generada");
 					}else{
-						fdev.buildPrint(itemid, 1, "TOL"); prn_nc.printask(printcallback, "printnc.txt");
+						fdev.buildPrint(itemid, 1, "TOL");
+						prn_nc.printask(printcallback, "printnc.txt");
 
-						toast("Reimpresion de nota de debito generada");
+						toast("Reimpresion de nota de débito generada");
 					}
 				}
 

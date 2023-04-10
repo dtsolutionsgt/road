@@ -521,7 +521,7 @@ public class CatalogoFactura extends PBase {
         return new String(array);
     }
 
-    public String obtienecorrel(String tipo){
+/*    public String obtienecorrel(String tipo){
         String correl="";
         Cursor DT;
 
@@ -554,6 +554,84 @@ public class CatalogoFactura extends PBase {
             if (DT != null) DT.close();
 
         } catch (Exception e) {
+            addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+        }
+
+        return  correl;
+
+    }
+*/
+
+    public String obtienecorrel(String tipo){
+        String correl="",fserie;
+        Cursor DT;
+        int cactual,cfinal,ca1,ca2,fcorel;
+
+        try{
+            sql = " SELECT SERIE, ACTUAL, FINAL, INICIAL, TIPO " +
+                    " FROM P_CORREL_OTROS " +
+                    " WHERE RUTA='" + gl.ruta + "' AND TIPO='" + tipo + "'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                fserie = DT.getString(0);
+                ca1 = DT.getInt(1);
+                cfinal = DT.getInt(3);
+            } else {
+                fserie = "";
+                fcorel = 0;
+                if (gl.peModal.equalsIgnoreCase("TOL")){
+                    mu.msgbox("No está definido correlativo de NC. No se puede continuar con la Nota de Crédito por devolución.\n");
+                }else{
+                    correl=gl.ruta+"_"+mu.getCorelBase();
+                    if (tipo.equals("D")){
+                        gl.dvactuald = String.valueOf(1);
+                        gl.dvSeried = fserie;
+                    }else if (tipo.equals("ND")){
+                        gl.dvactualnd = String.valueOf(1);
+                        gl.dvSeriend = fserie;
+                    }else if (tipo.equals("NC")){
+                        gl.dvactualnc = String.valueOf(1);
+                        gl.dvSerienc = fserie;
+                    }
+                }
+                return "";
+            }
+
+            sql = " SELECT MAX(COREL) FROM D_NOTACRED_LOG " +
+                    " WHERE RUTA='" + gl.ruta + "' AND " +
+                    "       SERIE='" + fserie + "' AND" +
+                    "       TIPO='" + tipo + "'";
+            DT = Con.OpenDT(sql);
+
+            if (DT.getCount() > 0) {
+                DT.moveToFirst();
+                ca2 = DT.getInt(0);
+            } else {
+                ca2 = 0;
+            }
+
+            DT.close();
+
+            cactual = ca1;
+            if (ca2 > cactual) cactual = ca2;
+            fcorel = cactual + 1;
+
+            correl=fserie + StringUtils.right("000000" + Integer.toString(fcorel), 6);
+
+            if (tipo.equals("D")){
+                gl.dvactuald = String.valueOf(fcorel);
+                gl.dvSeried = fserie;
+            }else if (tipo.equals("ND")){
+                gl.dvactualnd = String.valueOf(fcorel);
+                gl.dvSeriend = fserie;
+            }else if (tipo.equals("NC")){
+                gl.dvactualnc = String.valueOf(fcorel);
+                gl.dvSerienc = fserie;
+            }
+
+        }catch (Exception e){
             addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
         }
 

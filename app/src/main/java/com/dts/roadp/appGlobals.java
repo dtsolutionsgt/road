@@ -54,7 +54,7 @@ public class appGlobals extends Application {
 	public int dvbrowse=0,tienelote,facturaVen,brw=0;
     public boolean dvporpeso,devfindia,devprncierre,gpspass,despdevflag;
     public double dvdispventa,devtotal;
-    public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc,devcornc, dvcorelnd, dvactualnd;
+    public String dvcorreld,dvcorrelnc,dvestado,dvactuald,dvactualnc,devcornc, dvcorelnd, dvactualnd,dvSeriend,dvSerienc, dvSeried;
 
 	// Parametros Extra
 	public String peModal,peMon,peFormatoFactura,CodDev;
@@ -123,5 +123,8 @@ public class appGlobals extends Application {
 	public String qr_clave= ""; //"yb90o#0F"
 	public String url_emision_nc_b2b_hh = "";
 	public String url_emision_nd_b2b_hh = "";
-	public String ambiente= "1"; //"2"
+	public String unidad_medida_defecto ="";
+	public String ambiente= ""; //"2"
+	public String url_consultar_documento_por_ruta= ""; //"https://labpa.guru-soft.com/EdocPanama/4.0/Emision/Api/Consulta/ConsultarDocumentoRuta"
+
 }

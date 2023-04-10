@@ -252,6 +252,11 @@ public class FacturaRes extends PBase {
 			lblCred.setVisibility(View.INVISIBLE);
 			imgMPago.setVisibility(View.VISIBLE);
 			lblMPago.setVisibility(View.VISIBLE);
+		}else{
+			if(credito > 0){
+				lblPend.setVisibility(View.INVISIBLE);
+				imgPend.setVisibility(View.INVISIBLE);
+			}
 		}
 
 		fecha=du.getActDateTime();
@@ -899,9 +904,9 @@ public class FacturaRes extends PBase {
 		Cursor dt;
 		String vprod,vumstock,vumventa,vbarra,vumentr;
 		double vcant,vpeso,vfactor,peso,factpres,vtot,vprec;
-		int mitem,bitem;
-		corel=gl.corelFac;
+		int mitem,bitem,ncItem=0;
 
+		corel=gl.corelFac;
 
         sql="SELECT MAX(ITEM) FROM D_FACT_LOG";
         dt=Con.OpenDT(sql);
@@ -1217,6 +1222,22 @@ public class FacturaRes extends PBase {
 				String pcod;
 				Double pcant;
 
+				sql="SELECT MAX(ITEM) FROM D_NOTACRED_LOG ";
+				DT=Con.OpenDT(sql);
+
+				if (DT!=null){
+					if(DT.getCount()>0){
+						DT.moveToFirst();
+						ncItem=DT.getInt(0);
+					}else{
+						ncItem=0;
+					}
+
+					DT.close();
+
+					ncItem++;
+				}
+
 				ins.init("D_CxC");
 				ins.add("COREL",gl.dvcorreld);
 				ins.add("RUTA",gl.ruta);
@@ -1482,7 +1503,7 @@ public class FacturaRes extends PBase {
 						if (!CodDGI.isEmpty()) {
 							detalle.cUnidad = CodDGI;
 						} else {
-							detalle.cUnidad = "und";
+							detalle.cUnidad = gl.unidad_medida_defecto;
 						}
 					}
 
@@ -1538,8 +1559,30 @@ public class FacturaRes extends PBase {
 				sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactuald+" WHERE RUTA='"+gl.ruta+"' AND TIPO='D'";
 				db.execSQL(sql);
 
+				ins.init("D_NOTACRED_LOG");
+				ins.add("ITEM",ncItem);
+				ins.add("SERIE",fserie);
+				ins.add("COREL",gl.dvactuald);
+				ins.add("FECHA",du.getActDateTime());
+				ins.add("RUTA",gl.ruta);
+				ins.add("TIPO","D");
+				db.execSQL(ins.sql());
+
+				ncItem +=1;
+
 				sql="UPDATE P_CORREL_OTROS SET ACTUAL="+gl.dvactualnc+" WHERE RUTA='"+gl.ruta+"' AND TIPO='NC'";
 				db.execSQL(sql);
+
+				ins.init("D_NOTACRED_LOG");
+				ins.add("ITEM",ncItem);
+				ins.add("SERIE",fserie);
+				ins.add("COREL",gl.dvactualnc);
+				ins.add("FECHA",du.getActDateTime());
+				ins.add("RUTA",gl.ruta);
+				ins.add("TIPO","NC");
+				db.execSQL(ins.sql());
+
+				ncItem +=1;
 
 				Toast.makeText(this,"Devolución guardada", Toast.LENGTH_SHORT).show();
 
@@ -1634,7 +1677,7 @@ public class FacturaRes extends PBase {
 					if (!CodDGI.isEmpty()) {
 						detalle.cUnidad = CodDGI;
 					} else {
-						detalle.cUnidad = "und"; //Utiliza codigo de la cgi hy que sacarlo con una consulta
+						detalle.cUnidad = gl.unidad_medida_defecto; //Utiliza codigo de la cgi hy que sacarlo con una consulta
 					}
 				}
 
@@ -2011,14 +2054,13 @@ public class FacturaRes extends PBase {
 			ins.add("ITEM",mitem);
 			ins.add("SERIE",fserie);
 			ins.add("COREL",fcorel);
-			ins.add("FECHA",0);
+			ins.add("FECHA",du.getActDateTime());
 			ins.add("RUTA",gl.ruta);
 			db.execSQL(ins.sql());
 
 			//endregion
 
             //region actualizacion de Nota credito
-
             if (gl.devtotal>0) {
                 sql="UPDATE D_CxC SET REFERENCIA='"+corel+"' WHERE COREL='"+gl.devcord+"'";
                 db.execSQL(sql);
@@ -2431,7 +2473,10 @@ public class FacturaRes extends PBase {
 			if (dt.getCount()==0) return;
 
 			dt.moveToFirst();
+
 			while (!dt.isAfterLast()) {
+
+				lote="";
 
 				cant=dt.getDouble(0);
 				speso=dt.getDouble(2);
@@ -2461,6 +2506,7 @@ public class FacturaRes extends PBase {
 				db.execSQL(sql);
 
 				// Factura Stock
+				lotelote = "";
 
 				ins.init("D_FACTURA_STOCK");
 				ins.add("COREL",corel);
@@ -2520,7 +2566,10 @@ public class FacturaRes extends PBase {
 			if (dt.getCount()==0) return;
 
 			dt.moveToFirst();
+
 			while (!dt.isAfterLast()) {
+
+				lote = "";
 
 				cant=dt.getDouble(0);
 				speso=dt.getDouble(2);

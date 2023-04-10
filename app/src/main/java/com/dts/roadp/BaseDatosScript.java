@@ -570,6 +570,16 @@ public class BaseDatosScript {
 					");";
 			database.execSQL(vSQL);
 
+			vSQL="CREATE TABLE [D_NOTACRED_LOG] ("+
+					"[ITEM] INTEGER NOT NULL,"+
+					"[SERIE] TEXT NOT NULL,"+
+					"[COREL] INTEGER NOT NULL,"+
+					"[FECHA] INTEGER NOT NULL,"+
+					"[RUTA] TEXT NOT NULL,"+
+					"[TIPO] TEXT NOT NULL,"+
+					"PRIMARY KEY ([ITEM])"+
+					");";
+			database.execSQL(vSQL);
 
 			vSQL="CREATE TABLE [D_FACTURA] ("+
 					"[COREL] TEXT NOT NULL,"+
@@ -1649,6 +1659,9 @@ public class BaseDatosScript {
 					"[URL_DOC] TEXT,"+
 					"[URL_EMISION_NC_B2B_HH] TEXT,"+
 					"[URL_EMISION_ND_B2B_HH] TEXT,"+
+					"[UNIDAD_MEDIDA_DEFECTO] TEXT,"+
+					"[AMBIENTE] TEXT,"+
+					"[URL_CONSULTAR_DOCUMENTO_POR_RUTA] TEXT,"+
 					"PRIMARY KEY ([EMPRESA])"+
 					");";
 			database.execSQL(vSQL);

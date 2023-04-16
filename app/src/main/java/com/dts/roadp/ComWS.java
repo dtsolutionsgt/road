@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.DatabaseErrorHandler;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,6 +35,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,14 +45,47 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+
+import javax.xml.crypto.dsig.XMLObject;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 public class ComWS extends PBase {
 
@@ -61,11 +97,11 @@ public class ComWS extends PBase {
     private TextView lblUser,lblPassword,txtVersion;
     private EditText txtUser, txtPassword;
 
-	private int isbusy, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta;
+	private int isbusy, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta, iRutaSupervisor;
 	private long fecha;
-	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs;
+	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs,sRutaSupervisor;
 	private String licSerial,licRuta,licSerialEnc,licRutaEnc,parImprID;
-	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag,esEnvioManual=false;
+	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag,esEnvioManual=false,errorFlag;
 
 	private SQLiteDatabase dbT;
 	private BaseDatos ConT;
@@ -87,6 +123,12 @@ public class ComWS extends PBase {
 
 	protected PowerManager.WakeLock wakeLock;
 
+	private HttpTransportSE transport;
+	private XMLObject xobj;
+
+	private String nombretabla;
+	private int indicetabla,modo_recepcion;
+
 	// Web Service -
 
 	public AsyncCallRec wsRtask;
@@ -96,11 +138,11 @@ public class ComWS extends PBase {
 	private static String sstr, fstr, fprog, finf, ferr, fterr, idbg, dbg, ftmsg, esql, ffpos;
 	private int scon, running, pflag, stockflag, conflag;
 	private String ftext, slsync, senv, gEmpresa, ActRuta, mac,rootdir;
-	private String fsql, fsqli, fsqlf, strliqid;
-	private boolean rutapos, ftflag, esvacio, liqid;
+	private String fsql, fsqli, fsqlf, strliqid,argstr,xmlresult, hEnvio;
+	private boolean rutapos, ftflag, esvacio, liqid, resultado,cargasuper;
 
 	private final String NAMESPACE = "http://tempuri.org/";
-	private String METHOD_NAME, URL;
+	private String METHOD_NAME, URL, URL_Remota;
 
 	protected PowerManager.WakeLock wakelock;
 
@@ -1169,7 +1211,216 @@ public class ComWS extends PBase {
 		}
 	}
 
+	public void callMethod(String methodName, Object... args) throws Exception {
+		int mTimeOut=5000;
+		String mResult,line="";
+		URL mUrl = new URL(URL);
+		errorFlag=false;
+
+		try{
+			mResult = "";xmlresult="";
+
+			URLConnection conn = mUrl.openConnection();
+			conn.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
+			conn.addRequestProperty("SOAPAction", "http://tempuri.org/" + methodName);
+
+			//#EJC 20200601: Set Timeout
+			conn.setConnectTimeout(mTimeOut);
+			conn.setReadTimeout(mTimeOut);
+
+			conn.setDoOutput(true);
+
+			OutputStream ostream = conn.getOutputStream();
+
+			OutputStreamWriter wr = new OutputStreamWriter(ostream);
+
+			String body = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" +
+					"<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:" +
+					"xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:" +
+					"soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+					"<soap:Body>" +
+					"<" + methodName + " xmlns=\"http://tempuri.org/\">";
+
+			body += buildArgs(args);
+			body += "</" + methodName + ">" +
+					"</soap:Body>" +
+					"</soap:Envelope>";
+			wr.write(body);
+			wr.flush();
+
+			int responsecode = ((HttpURLConnection) conn).getResponseCode();
+			String responsemsg = ((HttpURLConnection) conn).getResponseMessage();
+
+			//#EJC20200702:Capturar excepcion de SQL (No se sabe el error pero sabemos que no se proceso)
+			if (responsecode==500) {
+				throw new Exception("Error 500: Esto es poco usual pero algún problema ocurrió del lado del motor de BD al ejecutar sentencia SQL: \n" +
+						"\n" + args[1].toString());
+			}else if (responsecode!=299 && responsecode!=404) {
+
+				BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				while ((line = rd.readLine()) != null) mResult += line;
+				rd.close();rd.close();
+
+				mResult=mResult.replace("ñ","n");
+				xmlresult=mResult;
+
+			} if (responsecode==299) {
+
+				BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				while ((line = rd.readLine()) != null) mResult += line;
+				rd.close();rd.close();
+
+				mResult=mResult.replace("ñ","n");
+				xmlresult=mResult;
+
+				throw new Exception("Error al procesar la solicitud :\n " );
+
+			} if (responsecode==404) {
+				throw new Exception("Error 404: No se obtuvo acceso a: \n" + mUrl.toURI() +
+						"\n" + "Verifique que el WS Existe y es accesible desde el explorador.");
+			}
+
+		} catch (Exception e) {
+			sstr= "Error al conectarse a " + mUrl.toURI() + " " + e.getMessage();
+			errorFlag=true;fterr=e.getMessage();
+			throw new Exception(sstr);
+		}
+	}
+
+	private String buildArgs(Object... args) throws IllegalArgumentException, IllegalAccessException    {
+		String result = "";
+		String argName = "";
+		String valor = "";
+
+		for (int i = 0; i < args.length; i++)   {
+			if (i % 2 == 0) {
+				argName = args[i].toString();
+			} else {
+				result += "<" + argName + ">";
+				argstr = result;
+
+				result += buildArgValue(args[i]);
+				argstr = result;
+				result += "</" + argName + ">";
+				argstr = result;
+			}
+		}
+		return result;
+	}
+
+	private String buildArgValue(Object obj) throws IllegalArgumentException, IllegalAccessException   {
+
+		Class<?> cl = null;
+
+		try  {
+			cl = obj.getClass();
+		} catch (Exception e) {
+			return "";
+		}
+
+		String result = "";
+
+		if (cl.isPrimitive()) return obj.toString();
+		if (cl.getName().contains("java.lang.")) return obj.toString();
+		if (cl.getName().equals("java.util.Date"))  {
+			DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+			return dfm.format((Date) obj);
+		}
+
+		if (cl.isArray())  {
+			String xmlName = cl.getName().substring(cl.getName().lastIndexOf(".") + 1);
+			xmlName = xmlName.replace(";", "");
+			Object[] arr = (Object[]) obj;
+
+			for (int i = 0; i < arr.length; i++) {
+				result += "<" + xmlName + ">";
+				result += buildArgValue(arr[i]);
+				result += "</" + xmlName + ">";
+			}
+
+			return result;
+		}
+
+		Field[] fields = cl.getDeclaredFields();
+
+		for (int i = 0; i < fields.length - 1; i++) {
+			result += "<" + fields[i].getName() + ">";
+			result += buildArgValue(fields[i].get(obj));
+			result += "</" + fields[i].getName() + ">";
+		}
+
+		return result;
+	}
+
+	// #AT 20220131 Valida si existe hash
+	public boolean validaHash() {
+		String xr;
+		METHOD_NAME = "Existe_Hash_Envio";
+		sstr = "OK";
+
+		try {
+
+			callMethod("Existe_Hash_Envio", "Hash", hEnvio);
+			xr = getXMLRegionSingle("Existe_Hash_EnvioResult");
+			resultado = (boolean) getSingle(xr, "Existe_Hash_EnvioResult", Boolean.class);
+
+			return resultado;
+
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			sstr = e.getMessage();
+		}
+
+		return false;
+	}
+
+
 	public int commitSQL() {
+		int rc;
+		String s, ss="";
+		//#CKFK 20190429 Creé esta variable para retornar si la comunicación fue correcta o no
+		//e hice modificaciones en la función para garantizar esta funcionalidad
+		int vCommit=0;
+
+		METHOD_NAME = "CommitEnvio";
+		sstr = "OK";
+
+		if (dbld.size() == 0) vCommit =1;//return 1
+
+		s = "";
+		for (int i = 0; i < dbld.size(); i++) {
+			ss = dbld.items.get(i);
+			s = s + ss + "\n";
+		}
+		if (showprogress) {
+			fprog = "Enviando ...";
+			wsStask.onProgressUpdate();
+		}
+
+		s=s.replace("&","&amp;");
+		s=s.replace("\"", "&quot;");
+		s=s.replace("'","&apos;");
+		s=s.replace("<", "&lt;");
+		s=s.replace(">", "&gt;");
+
+		nombretabla = "CommitEnvio";
+
+		hEnvio = md5(s);
+
+		//#AT 20220202 Si ya existe el Hash es porque ya se enviaron datos
+		//retorna vCommit 1; si no hace el proceso de envió
+		if (validaHash()) {
+			vCommit = 1;
+		} else {
+			vCommit=fillTable2(s,"CommitEnvio");
+		}
+
+		return vCommit;
+
+	}
+
+	public int commitSQLs() {
 		int rc;
 		String s, ss;
 		//#CKFK 20190429 Creé esta variable para retornar si la comunicación fue correcta o no
@@ -1488,6 +1739,311 @@ public class ComWS extends PBase {
 		return 0;
 	}
 
+    public int fillTable2(String value, String delcmd) {
+        int rc,retFillTable = 0;
+        String str, ss, tabla;
+        String[] sitems;
+
+        String xr;
+
+        try {
+            sstr = "OK";
+
+            if (nombretabla.contains("P_IMPRESORA")) {
+
+                value=value.replace("&", "&amp;");
+                value=value.replace("\"", "&quot;");
+                value=value.replace("'", "&apos;");
+                value=value.replace("<", "&lt;");
+                value=value.replace(">", "&gt;");
+
+                callMethod("getInsImpresora");
+                xr = getXMLRegionSingle("getInsImpresoraResult");
+            }else if (nombretabla.contains("CARGA_SUPERVISOR")){
+
+                value=value.replace("&", "&amp;");
+                value=value.replace("\"", "&quot;");
+                value=value.replace("'", "&apos;");
+                value=value.replace("<", "&lt;");
+                value=value.replace(">", "&gt;");
+
+                callMethod("RutaSupervisor");
+                xr = getXMLRegionSingle("RutaSupervisorResult");
+                sRutaSupervisor = (String) getSingle(xr,"checkLicenceResult",String.class);
+                iRutaSupervisor =  0;
+                if (sRutaSupervisor.equalsIgnoreCase("S")) {
+                    iRutaSupervisor = 1;
+                } else if (sRutaSupervisor.equalsIgnoreCase("N")) {
+                    iRutaSupervisor= 0;
+                }
+                cargasuper = iRutaSupervisor == 1;
+            }else if (nombretabla.contains("checkLicenceRuta")){
+
+                value=value.replace("&", "&amp;");
+                value=value.replace("\"", "&quot;");
+                value=value.replace("'", "&apos;");
+                value=value.replace("<", "&lt;");
+                value=value.replace(">", "&gt;");
+
+                callMethod("checkLicenceRuta", "Ruta",ruta);
+                xr=getXMLRegionSingle("checkLicenceRutaResult");
+                licResultRuta=(Integer) getSingle(xr,"checkLicenceRutaResult",Integer.class);
+
+            }else if (nombretabla.contains("checkLicence")){
+
+                value=value.replace("&", "&amp;");
+                value=value.replace("\"", "&quot;");
+                value=value.replace("'", "&apos;");
+                value=value.replace("<", "&lt;");
+                value=value.replace(">", "&gt;");
+
+                callMethod("checkLicence","Serial",licSerial,"Name", gl.devicename, "Ruta",ruta);
+
+                xr=getXMLRegionSingle("checkLicenceResult");
+                licResult=(Integer) getSingle(xr,"checkLicenceResult",Integer.class);
+
+            }else if (nombretabla.contains("commitSQL")){
+
+                value=value.replace("&", "&amp;");
+                value=value.replace("\"", "&quot;");
+                value=value.replace("'", "&apos;");
+                value=value.replace("<", "&lt;");
+                value=value.replace(">", "&gt;");
+
+                callMethod("Commit", "SQL", value);
+                xr=getXMLRegionSingle("CommitResult");
+                xr=(String) getSingle(xr,"CommitResult",String.class);
+
+            } else if (nombretabla.contains("CommitEnvio")) {
+
+                value=value.replace("&", "&amp;");
+                value=value.replace("\"", "&quot;");
+                value=value.replace("'", "&apos;");
+                value=value.replace("<", "&lt;");
+                value=value.replace(">", "&gt;");
+
+                String fecha = du.getActDateStr();
+
+                callMethod("CommitEnvio", "SQL", value, "pHash", hEnvio, "pFechaHH", fecha, "pRuta", gl.ruta, "pVendedor", gl.vend);
+                xr = getXMLRegionSingle("CommitEnvioResult");
+                xr = (String) getSingle(xr, "CommitEnvioResult", String.class);
+
+            } else{
+
+                value=value.replace("&", "&amp;");
+                value=value.replace("\"", "&quot;");
+                value=value.replace("'", "&apos;");
+                value=value.replace("<", "&lt;");
+                value=value.replace(">", "&gt;");
+
+                callMethod("getIns", "SQL", value);
+                xr=getXMLRegionSingle("getInsResult");
+            }
+
+            sitems=xr.split("\n");
+            rc=sitems.length;
+
+            s = "";
+
+            if (pedidos) {
+                if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK_PV")) {
+                    if (rc == 1) {
+                        stockflag = 0;
+                    } else {
+                        stockflag = 1;
+                    }
+                }
+            } else {
+                if (delcmd.equalsIgnoreCase("DELETE FROM P_STOCK") || delcmd.equalsIgnoreCase("DELETE FROM P_STOCKB")) {
+                    if (rc == 1) {
+                        stockflag = 0;
+                    } else {
+                        stockflag = 1;
+                    }
+                }
+            }
+
+            if (!delcmd.equals("commitSQL") && !delcmd.contains("CommitEnvio")){
+                tabla=delcmd.substring(12);
+                switch (tabla){
+
+                    case "P_RUTA":
+                        if (rc==1){
+                            borraDatos();
+                            throw new Exception("La ruta ingresada no es válida, ruta: " + ruta + ", no se puede continuar la carga de datos");
+                        }
+                        break;
+
+                    case "P_CLIENTE":
+                        if (!cargasuper) {
+                            if (rc == 1) {
+                                borraDatos();
+                                throw new Exception("No hay clientes definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+                            }
+                        }
+                        break;
+
+                    case "P_PRODUCTO":
+                        if (rc==1){
+                            borraDatos();
+                            throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
+                        }
+                        break;
+                    case "P_PRODPRECIO":
+                        if (rc==1){
+                            borraDatos();
+                            throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+                        }
+                        break;
+                    case "P_COREL":
+                        if (rc==1 && gl.rutatipo.equals("V")){
+                            borraDatos();
+                            if (!pedidos) throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+                        }
+                        break;
+                }
+
+                for (int i=1; i < rc-2; i++) {
+
+                    try {
+                        ss=sitems[i];
+                        ss=ss.replace("<string>","");
+                        str=ss.replace("</string>","");
+                        str=str.replace("&amp;", "&");
+                        str=str.replace("&quot;", "\"");
+                        str=str.replace("&apos;", "'");
+                        str=str.replace("&lt;", "<");
+                        str=str.replace("&gt;", ">");
+                    } catch (Exception e) {
+                        str="";
+                    }
+
+                    if (i == 1) {
+
+                        idbg = idbg + " ret " + str + "  ";
+
+                        if (str.equalsIgnoreCase("#")) {
+                            listItems.add(delcmd);
+                        } else {
+                            idbg = idbg + str;
+                            ftmsg = ftmsg + "\n" + str;
+                            ftflag = true;
+                            sstr = str;
+                            return 0;
+                        }
+                    } else {
+                        try {
+                            sql = str;
+                            listItems.add(sql);
+                            sstr = str;
+                        } catch (Exception e) {
+                            addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+                            sstr = e.getMessage();
+                            return 0;
+                        }
+                    }
+                }
+            } else if (delcmd.contains("commitSQL") || delcmd.contains("CommitEnvio") ){
+                //Corregir esto
+                str=xr;
+                if (str.equalsIgnoreCase("#")) {
+                    listItems.add(delcmd);
+                } else {
+                    idbg = idbg + str;
+                    ftmsg = ftmsg + "\n" + str;
+                    ftflag = true;
+                    sstr = str;
+                    return 0;
+                }
+            }
+
+            retFillTable= 1;
+
+        } catch (Exception e) {
+            sstr = e.getMessage();
+            idbg = idbg + " ERR " + e.getMessage();
+            retFillTable= 0;
+        }
+
+        return  retFillTable;
+    }
+
+    public String getXMLRegionSingle(String nodename) throws Exception {
+        String st,ss,sv,en,sxml;
+        Node xmlnode;
+
+        try {
+
+            InputStream istream = new ByteArrayInputStream( xmlresult.getBytes() );
+            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
+            Document doc = docBuilder.parse(istream);
+
+            Element root=doc.getDocumentElement();
+
+            NodeList children=root.getChildNodes();
+            Node bodyroot=children.item(0);
+            NodeList body=bodyroot.getChildNodes();
+            Node responseroot=body.item(0);
+            NodeList response=responseroot.getChildNodes();
+
+            ss="";
+            for(int i =0;i<response.getLength();i++) {
+                ss+=response.item(i).getNodeName()+",\n";
+
+                if (response.item(i).getNodeName().equalsIgnoreCase(nodename)) {
+                    xmlnode=response.item(i);
+                    sxml=nodeToString(xmlnode);
+                    return sxml;
+                }
+            }
+        } catch (Exception e) {
+            throw new Exception(" XMLObject getXMLRegion : "+ e.getMessage());
+        }
+        return "";
+    }
+
+    private String nodeToString(Node node)  throws Exception {
+        StringWriter sw = new StringWriter();
+        try {
+            Transformer t = TransformerFactory.newInstance().newTransformer();
+            t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            t.setOutputProperty(OutputKeys.INDENT, "yes");
+            t.transform(new DOMSource(node), new StreamResult(sw));
+        } catch (Exception te) {
+            throw new Exception("XMLObject nodeToString : "+te.getMessage());
+        }
+        return sw.toString();
+    }
+
+    public Object getSingle( String body, String name, Class<?> cl)  throws Exception {
+
+        int start = body.indexOf("<" + name + ">");
+        if (start>-1)  start += name.length() + 2;else start=0;//with <and > char
+        int end = body.indexOf("</" + name + ">");
+        if (end == -1) body = "";else body = body.substring(start, end);
+
+        String gname = cl.getName();
+
+        if (cl.getName().toLowerCase().contains("string")) {
+            return body;
+        }
+        if (cl.getName().toLowerCase().contains("double")) {
+            if (body.isEmpty()) return 0; else return
+                    Double.parseDouble(body);
+        }
+        if (cl.getName().toLowerCase().contains("int")) {
+            if (body.isEmpty()) return 0; else return
+                    Integer.parseInt(body);
+        }
+
+        if (cl.getName().toLowerCase().contains("boolean")) {
+            return Boolean.parseBoolean(body);
+        }
+
+        return null;
+    }
+
 	//endregion
 
 	//region WS Recepcion Methods
@@ -1803,6 +2359,39 @@ public class ComWS extends PBase {
 			}
 		}
 
+	}
+
+	private boolean borraDatos() {
+
+		try {
+
+			db.beginTransaction();
+
+			sql = "DELETE FROM P_RUTA";
+			db.execSQL(sql);
+			sql = "DELETE FROM P_PRODUCTO";
+			db.execSQL(sql);
+			sql = "DELETE FROM P_COREL";
+			db.execSQL(sql);
+			sql = "DELETE FROM P_PARAMEXT";
+			db.execSQL(sql);
+			sql = "DELETE FROM P_PRODPRECIO";
+			db.execSQL(sql);
+			sql = "DELETE FROM P_CLIENTE";
+			db.execSQL(sql);
+
+			db.setTransactionSuccessful();
+			db.endTransaction();
+
+		} catch (SQLException e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			db.endTransaction();
+			//mu.msgbox("Error : " + e.getMessage());
+			return false;
+		}
+
+		return true;
 	}
 
 	//#EJC20181120: Inserta los documentos que bajaron a la HH
@@ -5188,6 +5777,25 @@ public class ComWS extends PBase {
 
 
 	//endregion
+
+	public String md5(String s) {
+		MessageDigest digest;
+
+		try
+		{
+			digest = MessageDigest.getInstance("MD5");
+			digest.update(s.getBytes(Charset.forName("US-ASCII")),0,s.length());
+			byte[] magnitude = digest.digest();
+			BigInteger bi = new BigInteger(1, magnitude);
+			String hash = String.format("%0" + (magnitude.length << 1) + "x", bi);
+			return hash;
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			e.printStackTrace();
+		}
+		return "";
+	}
 
 	//region Activity Events
 	

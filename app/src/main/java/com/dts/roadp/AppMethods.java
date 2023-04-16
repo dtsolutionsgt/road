@@ -1348,21 +1348,27 @@ public class AppMethods {
 
 	public String getNombreProducto(String prodid){
 		Cursor DT=null;
+        String nombre="";
 
 		try {
 
 			sql = "SELECT DESCCORTA FROM P_PRODUCTO " +
 				  "WHERE CODIGO='" + prodid + "'";
 			DT = Con.OpenDT(sql);
-			DT.moveToFirst();
-			return DT.getString(0);
+
+			if (DT!=null){
+				if (DT.getCount()>0){
+					DT.moveToFirst();
+					nombre =  DT.getString(0);
+				}
+			}
 
 		} catch (Exception e) {
 			msgbox(new Object(){}.getClass().getEnclosingMethod().getName()+" . "+e.getMessage());
-			return "";
 		} finally {
 			if(DT!=null) DT.close();
 		}
+		return nombre;
 	}
 
 	public String impresTipo() {

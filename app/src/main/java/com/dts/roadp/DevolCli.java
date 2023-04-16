@@ -312,6 +312,11 @@ public class DevolCli extends PBase {
 			pid=gl.gstr;
 			if (mu.emptystr(pid)) {return;}
 
+			if (gl.dvError){
+				gl.dvError = false;
+				return;
+			}
+
 			prodid=pid;
 
 			setCant();
@@ -377,6 +382,11 @@ public class DevolCli extends PBase {
 
 			raz=gl.devrazon;
 			cant=cnt;
+
+			if (gl.dvError){
+				gl.dvError = false;
+				return;
+			}
 
 			addItem(raz);
 
@@ -1396,7 +1406,8 @@ public class DevolCli extends PBase {
 
 			if (browse==2) {
 				browse=0;
-				processCant();return;
+				processCant();
+				return;
 			}
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

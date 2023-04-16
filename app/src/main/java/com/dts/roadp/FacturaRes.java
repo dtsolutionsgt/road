@@ -327,9 +327,9 @@ public class FacturaRes extends PBase {
 	public void prevScreen(View view) {
 		try{
 			clearGlobals();
-			if(gl.dvbrowse!=0){
+			/*if(gl.dvbrowse!=0){
 				gl.dvbrowse =0;
-			}
+			}*/
 			super.finish();
 		}catch (Exception e){
 			addlog(Objects.requireNonNull(new Object() {

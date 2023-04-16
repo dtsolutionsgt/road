@@ -104,18 +104,23 @@ public class DevCliCant extends PBase {
 
 		try{
 
+			gl.dvError = false;
+
 			setCant();
 
 			if (umcambiar.equalsIgnoreCase("Seleccione UM....")){
+				gl.dvError = true;
 				mu.msgbox("Debe definir unidad de medida a devolver.");return;
 			}
 
 			if (cant<=0){
+				gl.dvError = true;
 				mu.msgbox("Cantidad incorrecta");return;
 			}
 
 			if (estado.equalsIgnoreCase("M")) {
 				if (razon.equalsIgnoreCase("0")){
+					gl.dvError = true;
 					mu.msgbox("Debe definir una razón de devolución.");return;
 				}
 			}
@@ -128,22 +133,28 @@ public class DevCliCant extends PBase {
 				if(txtkgs.getText().toString().isEmpty()){
 					gl.dvpeso = 0.0;
 				}else{
-
-					try{
-						gl.dvpeso = Double.parseDouble(txtkgs.getText().toString());
-						if (gl.dvpeso<=0) throw new Exception();
-					}catch (Exception e){
-						gl.dvpeso =0.0;
-						mu.msgbox("Peso incorrecto, debe ser mayor a 0");
-						return;
-					}
-
+					gl.dvpeso = Double.parseDouble(txtkgs.getText().toString());
 				}
+
+				try{
+					if (gl.dvpeso<=0){
+						gl.dvError = true;
+						throw new Exception();
+					}
+				}catch (Exception e){
+					gl.dvpeso =0.0;
+					gl.dvError = true;
+					mu.msgbox("Peso incorrecto, debe ser mayor a 0");
+					return;
+				}
+
 			}else{
 
 				try{
 					gl.dvpeso = Double.parseDouble(txtkgs.getText().toString());
-					if (gl.dvpeso<=0) throw new Exception();
+					if (gl.dvpeso<=0) {
+						throw new Exception();
+					}
 				}catch (Exception e){
 					gl.dvpeso=app.pesoProm(prodid)*cant;
 				}
@@ -154,6 +165,7 @@ public class DevCliCant extends PBase {
 			gl.dvumventa = umcambiar;
 
 			if(txtLote.getText().toString().trim().equalsIgnoreCase("")){
+				gl.dvError = true;
 				mu.msgbox("Lote no puede ser vacío, por favor ingrese un lote.");return;
 			}else {
 				gl.dvlote =txtLote.getText().toString();
@@ -181,7 +193,6 @@ public class DevCliCant extends PBase {
 				gl.tienelote = 1;
 			}
 
-
 			gl.dvprec = mu.round2(gl.dvprec);
 			gl.dvtotal= mu.round2(gl.dvtotal);
 			gl.dvpreclista = mu.round2(gl.dvpreclista);
@@ -189,6 +200,7 @@ public class DevCliCant extends PBase {
 			super.finish();
 
 		}catch (Exception e){
+			gl.dvError = true;
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 

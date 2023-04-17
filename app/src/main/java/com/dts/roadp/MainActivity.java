@@ -41,7 +41,7 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parVer = "9.4.3 / 24-Mayo-2019";
+    private String parVer = "9.4.4 / 17-Abril-2023";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -429,10 +429,11 @@ public class MainActivity extends PBase {
     private boolean checkUser() {
         Cursor DT;
         String usr, pwd, dpwd;
+        Long FechaMaxima= Long.valueOf("2505310000");
 
         try {
 
-            if (fecha > 1905310000) {
+            if (fecha > FechaMaxima) {
                 msgAskLic("¡Su licencia expiró!");
                 return false;
             }
@@ -753,6 +754,7 @@ public class MainActivity extends PBase {
         Integer msgLic = 0;
 
         try {
+            //return true;
 
             lickey = cu.encrypt(gl.deviceId);
             rutaencrypt = cu.encrypt(gl.ruta);
@@ -763,7 +765,6 @@ public class MainActivity extends PBase {
             lic = dt.getString(0);
             licruta = dt.getString(1);
 
-
             if (mu.emptystr(lic)) {
                 toastlong("El dispositivo no tiene licencia válida de handheld");
                 return false;
@@ -773,7 +774,6 @@ public class MainActivity extends PBase {
                 toastlong("El dispositivo no tiene licencia válida de ruta");
                 return false;
             }
-
 
             if (lic.equalsIgnoreCase(lickey) && licruta.equalsIgnoreCase(rutaencrypt)) {
                return true;

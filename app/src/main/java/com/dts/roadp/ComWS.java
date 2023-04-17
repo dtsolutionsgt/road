@@ -2344,9 +2344,9 @@ public class ComWS extends PBase {
 
 		try {
 
-			if (!pedidos) {
+             /* if (!pedidos) {
 				if (TieneInventarioSinVentas()) return false;
-			}
+			} */
 
 			String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
 			wfile = new FileWriter(fname, false);
@@ -2568,7 +2568,7 @@ public class ComWS extends PBase {
 			if (modo_recepcion==1){
 				Actualiza_FinDia();
 				encodeLicence();
-				//encodeLicenceRuta();
+				encodeLicenceRuta();
 
 				encodePrinters();
 
@@ -2625,11 +2625,10 @@ public class ComWS extends PBase {
 
 				// if (stockflag == 1) s = s + "\nSe actualizó inventario.";
 
-				if (pedidos) {
-					sql = "SELECT Codigo FROM P_STOCK_PV ";
-				} else {
+				if (!pedidos) {
 					sql = "SELECT Codigo FROM P_STOCK UNION SELECT Codigo FROM P_STOCKB ";
 				}
+
 				Cursor dt = Con.OpenDT(sql);
 				if (dt.getCount() > 0){
 					stockflag = 1;
@@ -2656,13 +2655,13 @@ public class ComWS extends PBase {
 
 			visibilidadBotones();
 
-			msgAskExit(s);
-
 			barInfo.setVisibility(View.INVISIBLE);
 			lblParam.setVisibility(View.INVISIBLE);
 
 			lblRec.setVisibility(View.VISIBLE);
 			imgRec.setVisibility(View.VISIBLE);
+
+			msgAskExit(s);
 
 			return true;
 
@@ -2955,7 +2954,7 @@ public class ComWS extends PBase {
 			wsRtask.onProgressUpdate();
 			SQL = getTableSQL(TN);
 
-			if (fillTable(SQL, "DELETE FROM " + TN) == 1) {
+			if (fillTable2(SQL, "DELETE FROM " + TN) == 1) {
 				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " ok ";
 				idbg = idbg + SQL + "#" + "PASS OK";
 				return true;
@@ -3647,7 +3646,7 @@ public class ComWS extends PBase {
 		String lic;
 
 		try {
-			if (licResult==1) lic=licSerialEnc; else lic="";
+			if (licResult==2) lic=licSerialEnc; else lic="";
 			sql = "UPDATE Params SET lic='" + lic + "'";
 			dbT.execSQL(sql);
 		} catch (Exception e) {
@@ -3751,7 +3750,7 @@ public class ComWS extends PBase {
 
 	}
 
-	public void wsFinished() {
+	public void wsFinished_Original() {
 
 		barInfo.setVisibility(View.INVISIBLE);
 		lblParam.setVisibility(View.INVISIBLE);
@@ -3798,6 +3797,46 @@ public class ComWS extends PBase {
 
 	}
 
+	public void wsFinished() {
+
+		running = 0;
+
+		try {
+			if (fstr.equalsIgnoreCase("Sync OK")) {
+
+				// JP20211018
+				if (modo_recepcion==1) {
+					cargaTodasTablas();
+				}
+
+			} else {
+				lblInfo.setText(fstr);
+				mu.msgbox("Ocurrió error : \n" + fstr + " " + idbg + " (Registro: " + reccnt + ") ");
+				//mu.msgbox("::" + esql);
+				isbusy = 0;
+				barInfo.setVisibility(View.INVISIBLE);
+				visibilidadBotones();
+				addlog("Recepcion", fstr, idbg);
+				return;
+			}
+			if (ftflag) msgbox(ftmsg);
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+		}
+	}
+
+	private void cargaTodasTablas() {
+		try {
+			listItems.clear();
+			indicetabla=-5;nombretabla="P_PARAMEXT";
+			executaTabla();
+		} catch (Exception e) {
+			String ss=e.getMessage();
+			visibilidadBotones();
+		}
+	}
+
 	private class AsyncCallRec extends AsyncTask<String, Void, Void> {
 
 		@Override
@@ -3825,7 +3864,6 @@ public class ComWS extends PBase {
 			}
 
 		}
-
 		@Override
 		protected void onPreExecute() {
 			try {
@@ -3847,6 +3885,7 @@ public class ComWS extends PBase {
 		}
 
 	}
+
 	public void wsCallback() {
 		boolean ejecutar=true;
 
@@ -6277,6 +6316,7 @@ public class ComWS extends PBase {
 			dialog.setTitle(R.string.app_name);
 			dialog.setMessage(msg);
 			dialog.setIcon(R.drawable.ic_quest);
+			dialog.setCancelable(false);
 
 			dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {

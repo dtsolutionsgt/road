@@ -302,7 +302,6 @@ public class Menu extends PBase {
 					startActivity(intent2);
 					break;
 
-
 				case 3:  // Reimpresion
 
 					//#HS_20181206 Verifica el usuario si es DTS.

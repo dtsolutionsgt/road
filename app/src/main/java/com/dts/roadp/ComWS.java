@@ -6315,8 +6315,8 @@ public class ComWS extends PBase {
 
 			dialog.setTitle(R.string.app_name);
 			dialog.setMessage(msg);
-			dialog.setIcon(R.drawable.ic_quest);
 			dialog.setCancelable(false);
+			dialog.setIcon(R.drawable.ic_quest);
 
 			dialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {

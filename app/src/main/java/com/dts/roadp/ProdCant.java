@@ -33,7 +33,7 @@ public class ProdCant extends PBase {
 	
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant;
-	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
+	private double cant,prec, precSinImp,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0;
 	private boolean pexist,esdecimal,porpeso,esbarra;
 	
 	@Override
@@ -290,6 +290,7 @@ public class ProdCant extends PBase {
 		}
 
 		prec=prc.precio(prodid,1,nivel,um,gl.umpeso,0,um);
+		precSinImp = prc.precsin;
 		if (prc.existePrecioEspecial(prodid,1,gl.cliente,gl.clitipo,um,gl.umpeso,0)) {
 			if (prc.precioespecial>0) prec=prc.precioespecial;
 		}
@@ -301,7 +302,7 @@ public class ProdCant extends PBase {
 			msgSinPrecio("El producto no tiene definido precio");return;
 		}
 		
-		if (gl.sinimp) prec=prc.precsin;
+		if (gl.sinimp) prec=precSinImp;
 		
 		try {
 			sql="SELECT CANT,PESO FROM T_VENTA WHERE PRODUCTO='"+prodid+"'";
@@ -332,11 +333,12 @@ public class ProdCant extends PBase {
 		idisp=mu.trunc(idisp);
 
 		if (porpeso) {
-			lblBU.setText(umstock);
-			upres = umstock;
+			lblBU.setText(gl.umpeso);
 
 			lblPrec.setText(mu.frmcur(prec)+" x "+gl.umpeso);
 		} else {
+			lblBU.setText(umstock);
+			upres = umstock;
 			lblPrec.setText(mu.frmcur(prec)+" x "+upres);
 		}
 

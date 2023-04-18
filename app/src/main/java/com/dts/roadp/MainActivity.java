@@ -41,7 +41,7 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parVer = "9.4.4 / 17-Abril-2023";
+    private String parVer = "9.4.4 / 17-04-2023";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -335,7 +335,7 @@ public class MainActivity extends PBase {
                 gl.rutanom = "";
                 gl.vend = "0";
                 gl.rutatipog = "V";
-                gl.wsURL = "http://192.168.1.1/wsAndr/wsAndr.asmx";
+                gl.wsURL = "http://190.140.109.34/wsAndr/wsAndr.asmx";
 
             }
 

@@ -200,14 +200,14 @@ public class ComWS extends PBase {
         txtUser = new EditText(this,null);
         txtPassword = new EditText(this,null);
 
-		txtVersion.setText("24-Mayo-2019");
+		txtVersion.setText("17-04-2019");
 
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
 			if (mu.emptystr(txtRuta.getText().toString())) {
-				txtRuta.setText("8001-1");
-				txtEmp.setText("03");
-				txtWS.setText("http://192.168.1./wsAndr/wsandr.asmx");
+				txtRuta.setText("1");
+				txtEmp.setText("009");
+				txtWS.setText("http://190.140.109.34/wsAndr/wsandr.asmx");
 			}
 		}
 
@@ -944,6 +944,53 @@ public class ComWS extends PBase {
 		runRecepion();
 	}
 
+	// AT 20211019
+	private void runPrecios() {
+		if(tieneCatalogo()) {
+			modo_recepcion = 3;
+			runRecepion();
+		} else {
+			msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
+		}
+	}
+
+	// AT 20211019
+	private boolean tieneCatalogo() {
+		Cursor DT;
+		boolean TieneRuta = false;
+		boolean TieneClientes = false;
+		boolean TieneProd = false;
+
+		try {
+			String ntablas[] = {"P_RUTA", "P_CLIENTE", "P_PRODUCTO"};
+
+			for (int i = 0; i < ntablas.length; i++) {
+				sql ="SELECT CODIGO FROM "+ntablas[i];
+				DT=Con.OpenDT(sql);
+
+				if (DT.getCount() > 0) {
+					if (ntablas[i].equals("P_RUTA")){
+						TieneRuta = true;
+					} else if (ntablas[i].equals("P_CLIENTE")) {
+						TieneClientes = true;
+					} else if (ntablas[i].equals("P_PRODUCTO")) {
+						TieneProd = true;
+					}
+				}
+			}
+
+			if (TieneRuta && TieneClientes && TieneProd) {
+				return true;
+			}
+
+		} catch (Exception e) {
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			return false;
+		}
+
+		return false;
+	}
+
 	private void runRecepion() {
 		try {
 			if (isbusy == 1) return;
@@ -1016,7 +1063,7 @@ public class ComWS extends PBase {
 
 	}
 
-	private void runPrecios() {
+	private void runPrecios_Original() {
 		try {
 			super.finish();
 			startActivity(new Intent(this, ComWSPrec.class));
@@ -3807,6 +3854,8 @@ public class ComWS extends PBase {
 				// JP20211018
 				if (modo_recepcion==1) {
 					cargaTodasTablas();
+				} else if (modo_recepcion==2) {
+					cargaTablasPrecio();
 				}
 
 			} else {
@@ -3837,6 +3886,18 @@ public class ComWS extends PBase {
 		}
 	}
 
+	// AT20211019
+	private void cargaTablasPrecio() {
+		try	{
+			listItems.clear();
+			indicetabla=0; nombretabla="TMP_PRECESPEC";
+			executaTabla();
+		} catch (Exception e) {
+			String ss = e.getMessage();
+			visibilidadBotones();
+		}
+
+	}
 	private class AsyncCallRec extends AsyncTask<String, Void, Void> {
 
 		@Override
@@ -5804,8 +5865,8 @@ public class ComWS extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//MU.msgbox(e.getMessage());
-			//URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
-			URL="*";txtWS.setText("http://192.168.1.142/wsAndr/wsandr.asmx");
+			//URL="*";txtWS.setText("http://190.140.109.34/wsAndr/wsandr.asmx");
+			URL="*";txtWS.setText("http://190.140.109.34/wsAndr/wsandr.asmx");
 			//URL="*";txtWS.setText("http://192.168.1.142/wsimagen/baktun1.asmx");
 			//txtWS.setText("");
 

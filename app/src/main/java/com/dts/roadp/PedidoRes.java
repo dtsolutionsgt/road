@@ -355,7 +355,7 @@ public class PedidoRes extends PBase {
 			ins.add("RECHAZADO",0);
 			ins.add("RAZON_RECHAZADO","");  // valor de percepcion 0 o xxx.xx
 			ins.add("INFORMADO",0);
-			ins.add("SUCURSAL","");
+			ins.add("SUCURSAL",gl.sucur);
 			ins.add("ID_DESPACHO",0);
 			ins.add("ID_FACTURACION",0);
 		

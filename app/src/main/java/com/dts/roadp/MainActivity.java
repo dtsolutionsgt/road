@@ -112,6 +112,20 @@ public class MainActivity extends PBase {
 
             lblVer.setText("Version " + gl.parVer);
 
+            try {
+
+                File file1 = new File(Environment.getExternalStorageDirectory(), "/debug.txt");
+                ffile = new File(file1.getPath());
+                if (ffile.exists()) {
+                    gl.debug=true;
+                }else {
+                    gl.debug=false;
+                }
+
+            } catch (Exception e) {
+                gl.debug=false;
+            }
+
             // DB VERSION
             dbVers = new BaseDatosVersion(this, db, Con);
             dbVers.checkVersion(1);
@@ -131,8 +145,8 @@ public class MainActivity extends PBase {
 
             //#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
             if (gl.debug) {
-                txtUser.setText("00100993");
-                txtPass.setText("2613");
+                txtUser.setText("1");
+                txtPass.setText("1");
             }
 
         } catch (Exception e) {

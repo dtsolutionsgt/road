@@ -200,7 +200,7 @@ public class ComWS extends PBase {
         txtUser = new EditText(this,null);
         txtPassword = new EditText(this,null);
 
-		txtVersion.setText("17-04-2019");
+		txtVersion.setText("24-04-2023");
 
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
@@ -3693,7 +3693,7 @@ public class ComWS extends PBase {
 		String lic;
 
 		try {
-			if (licResult==2) lic=licSerialEnc; else lic="";
+			if (licResult==0) lic=licSerialEnc; else lic="";
 			sql = "UPDATE Params SET lic='" + lic + "'";
 			dbT.execSQL(sql);
 		} catch (Exception e) {
@@ -3706,7 +3706,7 @@ public class ComWS extends PBase {
 		String lic;
 
 		try {
-			if (licResultRuta==1) lic=licRutaEnc; else lic="";
+			if (licResultRuta==0) lic=licRutaEnc; else lic="";
 			sql = "UPDATE Params SET licparam='" + lic + "'";
 			dbT.execSQL(sql);
 		} catch (Exception e) {

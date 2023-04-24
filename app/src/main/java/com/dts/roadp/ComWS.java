@@ -3693,7 +3693,7 @@ public class ComWS extends PBase {
 		String lic;
 
 		try {
-			if (licResult==0) lic=licSerialEnc; else lic="";
+			if (licResult==2 || licResult==0) lic=licSerialEnc; else lic="";
 			sql = "UPDATE Params SET lic='" + lic + "'";
 			dbT.execSQL(sql);
 		} catch (Exception e) {
@@ -3706,7 +3706,7 @@ public class ComWS extends PBase {
 		String lic;
 
 		try {
-			if (licResultRuta==0) lic=licRutaEnc; else lic="";
+			if (licResultRuta==1 || licResultRuta==0) lic=licRutaEnc; else lic="";
 			sql = "UPDATE Params SET licparam='" + lic + "'";
 			dbT.execSQL(sql);
 		} catch (Exception e) {

@@ -778,6 +778,8 @@ public class MainActivity extends PBase {
         String lic, lickey, licruta, rutaencrypt;
         Integer msgLic = 0;
 
+        if (gl.debug) return true;
+
         try {
 
             lickey = cu.encrypt(gl.deviceId);

@@ -5249,7 +5249,7 @@ public class ComWS extends PBase {
 
 			if (envioparcial) dbld.clear();
 
-			ss = "UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parVer+"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'";
+			ss = "UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parNumVer+"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'";
 			dbld.add(ss);
 
 			dbld.add("DELETE FROM D_REPFINDIA WHERE RUTA='" + gl.ruta + "'");
@@ -5754,9 +5754,9 @@ public class ComWS extends PBase {
 			dbld.clear();
 			dbld.add("DELETE FROM P_DOC_ENVIADOS_HH WHERE DOCUMENTO='"+docstock+"'");
 			dbld.add("INSERT INTO P_DOC_ENVIADOS_HH VALUES ('"+docstock+"','"+ActRuta+"','"+univdate+"',1)");
-			dbld.add("UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parVer+"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'");
+			dbld.add("UPDATE P_RUTA SET IDIMPRESORA='"+parImprID+"',NUMVERSION='"+gl.parNumVer+"',ARQUITECTURA='ANDR' WHERE CODIGO='" + gl.ruta + "'");
 			dbld.add("INSERT INTO P_BITACORA_VERSIONHH (RUTA,FECHA,NUMVERSION,ARQUITECTURA) " +
-					"VALUES('"+gl.ruta+"','"+ du.univfechaseg() +"','"+gl.parVer+"','ANDR')");
+					"VALUES('"+gl.ruta+"','"+ du.univfechaseg() +"','"+gl.parNumVer+"','ANDR')");
 
 			if (commitSQL()==1) conflag=1; else conflag=0;
 

@@ -96,6 +96,8 @@ public class MainActivity extends PBase {
 
     private void startApplication() {
 
+        File ffile;
+
         try {
             super.InitBase();
 
@@ -123,6 +125,20 @@ public class MainActivity extends PBase {
             txtUser.requestFocus();
 
             initSession();
+
+            try {
+
+                File file1 = new File(Environment.getExternalStorageDirectory(), "/debug.txt");
+                ffile = new File(file1.getPath());
+                if (ffile.exists()) {
+                    gl.debug=true;
+                }else {
+                    gl.debug=false;
+                }
+
+            } catch (Exception e) {
+                gl.debug=false;
+            }
 
             if (!validaLicencia()) {
                 startActivity(new Intent(this, comWSLic.class));

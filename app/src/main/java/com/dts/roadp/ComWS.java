@@ -3473,6 +3473,37 @@ public class ComWS extends PBase {
 			return SQL;
 		}
 
+		if (TN.equalsIgnoreCase("P_CATALOGO_PRODUCTO")) {
+			SQL = " SELECT CODIGO_PRODUCTO, ORDEN FROM P_CATALOGO_PRODUCTO " +
+					"	WHERE CODIGO_PRODUCTO IN (SELECT CODIGO ";
+			SQL += "FROM P_PRODUCTO WHERE ((CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCK WHERE RUTA='" + ActRuta + "') " +
+					" OR CODIGO IN (SELECT DISTINCT CODIGO FROM P_STOCKB WHERE RUTA='" + ActRuta + "'))" +
+					" OR LINEA IN (SELECT LINEA FROM P_LINEARUTA WHERE (RUTA='" + ActRuta + "')) OR UNIDMED='CAN' )" +
+					" AND CODIGO IN ( " +
+					" SELECT CODIGO FROM P_PRODPRECIO WHERE (NIVEL IN ( SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE " +
+					" WHERE (CODIGO IN ( SELECT DISTINCT CLIENTE FROM DS_PEDIDO WHERE (RUTA ='" + ActRuta + "') AND (BANDERA='D')))))OR " +
+					" NIVEL IN (SELECT DISTINCT NIVELPRECIO FROM P_CLIENTE  " +
+					" WHERE CODIGO IN (SELECT DISTINCT CLIENTE FROM P_CLIRUTA WHERE RUTA='" + ActRuta + "')))" +
+					" OR TIENE_VINETA_O_TUBO = 1 )";
+
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_PEDSUG")) {
+			SQL = " SELECT IDPEDIDOSUG, RUTA, VENDEDOR, CLIENTE, PRODUCTO, CANTIDAD, UNIDADMEDIDA, PESO, UNIDADMEDIDAPESO, PRECIO, " +
+					" TOTAL, ORDEN, ACIERTO, FECHAGENERACION, FECHASISTEMA, USERAGR, FECHAAGR, USERMOD, FECHAMOD "+
+					" FROM P_PEDSUG " +
+					" WHERE RUTA='" + ActRuta + "' AND (FECHAGENERACION>='" + fsqli + "') AND (FECHAGENERACION<='" + fsqlf + "')";
+			return SQL;
+		}
+
+		if (TN.equalsIgnoreCase("P_ULTIMOPRECIO")) {
+			SQL = " SELECT IDULTIMOPRECIO, RUTA, CLIENTE, PRODUCTO, PRECIO, FECHAGENERACION "+
+					" FROM P_ULTIMOPRECIO " +
+					" WHERE RUTA='" + ActRuta + "' AND (FECHAGENERACION>='" + fsqli + "') AND (FECHAGENERACION<='" + fsqlf + "')";
+			return SQL;
+		}
+
 		return SQL;
 	}
 
@@ -3778,16 +3809,16 @@ public class ComWS extends PBase {
 
 		try {
 
-			if (getTest() == 1) scon = 1;
+			/*if (getTest() == 1) scon = 1;
 
 			idbg = idbg + sstr;
 
-			if (scon == 1) {
+			if (scon == 1) {*/
 				fstr = "Sync OK";
 				if (!getData()) fstr = "Recepcion incompleta : " + fstr;
-			} else {
+			/*} else {
 				fstr = "No se puede conectar al web service : " + sstr;
-			}
+			}*/
 
 		} catch (Exception e) {
 			scon = 0;
@@ -5564,19 +5595,19 @@ public class ComWS extends PBase {
 
 		try {
 
-			if (getTest()==1) scon=1;
+		/*	if (getTest()==1) scon=1;
 
-			if (scon==1) {
+			if (scon==1) {*/
 				fstr="Sync OK";
 
 				if (!sendData()) {
 					fstr="Envio incompleto : "+sstr;
-				} else {
+				}// else {
 
-				}
-			} else {
+				//}
+			/*} else {
 				fstr="No se puede conectar al web service : "+sstr;
-			}
+			}*/
 
 		} catch (Exception e) {
 			scon=0;

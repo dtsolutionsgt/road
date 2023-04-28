@@ -2674,19 +2674,20 @@ public class ComWS extends PBase {
 
 				if (!pedidos) {
 					sql = "SELECT Codigo FROM P_STOCK UNION SELECT Codigo FROM P_STOCKB ";
+
+					Cursor dt = Con.OpenDT(sql);
+					if (dt.getCount() > 0){
+						stockflag = 1;
+						s = s + "\nSe actualizó inventario.";
+					}
+
+					clsAppM.estandartInventario();
+
+					if (stockflag == 1) {
+						sendConfirm();
+					}
 				}
 
-				Cursor dt = Con.OpenDT(sql);
-				if (dt.getCount() > 0){
-					stockflag = 1;
-					s = s + "\nSe actualizó inventario.";
-				}
-
-				clsAppM.estandartInventario();
-
-				if (stockflag == 1) {
-					sendConfirm();
-				}
 			}
 
 			if (modo_recepcion==1 ){
@@ -3969,7 +3970,9 @@ public class ComWS extends PBase {
 		protected void onProgressUpdate(Void... values) {
 			try {
 				synchronized (this) {
-					if (!lblInfo.getText().toString().matches("")) lblInfo.setText(fprog);
+					if (!lblInfo.getText().toString().matches("")) {
+						lblInfo.setText(fprog);
+					}
 				}
 			} catch (Exception e) {
 				Log.d("onProgressUpdate", e.getMessage());
@@ -4032,102 +4035,103 @@ public class ComWS extends PBase {
 				case 16:
 					nombretabla="P_BANCO";break;
 				case 17:
-					nombretabla="P_STOCKINV";break;
-				case 18:
 					nombretabla="P_CODATEN";break;
-				case 19:
+				case 18:
 					nombretabla="P_CODDEV";break;
-				case 20:
+				case 19:
 					nombretabla="P_CODNOLEC";break;
-				case 21:
+				case 20:
 					nombretabla="P_CORELNC";break;
-				case 22:
+				case 21:
 					nombretabla="P_CORRELREC";break;
-				case 23:
+				case 22:
 					nombretabla="P_CORREL_OTROS";break;
-				case 24:
+				case 23:
 					nombretabla="P_STOCK_APR";break;
-				case 25:
+				case 24:
 					nombretabla="P_STOCK";break;
-				case 26:
+				case 25:
 					nombretabla="P_STOCKB";break;
-				case 27:
+				case 26:
 					nombretabla="P_STOCK_PALLET";break;//#CKFK 20190304 10:48 Se agregó esta tabla para poder importar los pallets
-				case 28:
+				case 27:
 					nombretabla="P_COBRO";break;
-				case 29:
+				case 28:
 					nombretabla="P_CLIGRUPO";break;
-				case 30:
+				case 29:
 					nombretabla="P_MEDIAPAGO";break;
-				case 31:
+				case 30:
 					nombretabla="P_BONIF";break;
-				case 32:
+				case 31:
 					nombretabla="P_BONLIST";break;
-				case 33:
+				case 32:
 					nombretabla="P_PRODGRUP";break;
-				case 34:
+				case 33:
 					nombretabla="P_IMPUESTO";break;
-				case 35:
+				case 34:
 					nombretabla="P_VENDEDOR";break;
-				case 36:
+				case 35:
 					nombretabla="P_MUNI";break;
-				case 37:
+				case 36:
 					nombretabla="P_VEHICULO";break;
-				case 38:
+				case 37:
 					nombretabla="P_HANDHELD";break;
-				case 39:
+				case 38:
 					nombretabla="P_TRANSERROR";break;
-				case 40:
+				case 39:
 					nombretabla="P_CATALOGO_PRODUCTO";break;
-				case 41:
+				case 40:
 					nombretabla="P_GLOBPARAM";break;
-				case 42:
+				case 41:
 					nombretabla="P_REF1";break;
-				case 43:
+				case 42:
 					nombretabla="P_REF2";break;
-				case 44:
+				case 43:
 					nombretabla="P_REF3";break;
-				case 45:
+				case 44:
 					nombretabla="P_ARCHIVOCONF";break;
-				case 46:
+				case 45:
 					nombretabla="P_ENCABEZADO_REPORTESHH";break;
-				case 47:
+				case 46:
 					nombretabla="P_PORCMERMA";break;
 
 				// Objetivos
 
-				case 48:
+				case 47:
 					nombretabla="O_RUTA";break;
-				case 49:
+				case 48:
 					nombretabla="O_COBRO";break;
-				case 50:
+				case 49:
 					nombretabla="O_PROD";break;
-				case 51:
+				case 50:
 					nombretabla="O_LINEA";break;
 
 				// Mercadeo
 
-				case 52:
+				case 51:
 					nombretabla="P_MEREQTIPO";break;
-				case 53:
+				case 52:
 					nombretabla="P_MEREQUIPO";break;
-				case 54:
+				case 53:
 					nombretabla="P_MERESTADO";break;
-				case 55:
+				case 54:
 					nombretabla="P_MERPREGUNTA";break;
-				case 56:
+				case 55:
 					nombretabla="P_MERRESP";break;
-				case 57:
+				case 56:
 					nombretabla="P_MERMARCACOMP";break;
-				case 58:
+				case 57:
 					nombretabla="P_MERPRODCOMP";break;
-				case 59:
+				case 58:
 					dbld.clear();
 					dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");
 					dbld.add("EXEC SP_ULTIMOSPRECIOS '" + ruta + "'");
+					dbld.add("EXEC SP_INVENTARIOBODEGA");
 					commitSQL();
 					nombretabla = "";
 					break;
+				case 59:
+					nombretabla="P_STOCKINV";break;
 				case 60:
 					nombretabla="P_IMPRESORA";break;
 				case 61:

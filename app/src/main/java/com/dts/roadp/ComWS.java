@@ -3887,8 +3887,13 @@ public class ComWS extends PBase {
 				if (modo_recepcion==1) {
 					cargaTodasTablas();
 				} else if (modo_recepcion==2) {
+					cargaTablasExist();
+				} else if(modo_recepcion == 3) {
 					cargaTablasPrecio();
+				} else if(modo_recepcion == 4) {
+					cargaTablasRec();
 				}
+
 
 			} else {
 				lblInfo.setText(fstr);

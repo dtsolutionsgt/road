@@ -826,7 +826,7 @@ public class ComWSExist extends PBase {
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			//MU.msgbox(e.getMessage());
-			URL="*";txtWS.setText("http://192.168.1.1/wsAndr/wsandr.asmx");
+			URL="*";txtWS.setText("//190.140.109.34/wsAndr/wsandr.asmx");
 			//txtWS.setText("");
 			return;
 		}

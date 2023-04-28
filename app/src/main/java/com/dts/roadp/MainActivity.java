@@ -353,7 +353,7 @@ public class MainActivity extends PBase {
                 gl.rutanom = "";
                 gl.vend = "0";
                 gl.rutatipog = "V";
-                gl.wsURL = "http://192.168.1.1/wsAndr/wsAndr.asmx";
+                gl.wsURL = "http://190.140.109.34/wsAndr/wsAndr.asmx";
 
             }
 

@@ -3900,8 +3900,6 @@ public class ComWS extends PBase {
 					cargaTablasExist();
 				} else if(modo_recepcion == 3) {
 					cargaTablasPrecio();
-				} else if(modo_recepcion == 4) {
-					cargaTablasRec();
 				}
 
 

@@ -1052,7 +1052,17 @@ public class ComWS extends PBase {
 
 	}
 
-	private void runExist() {
+    // JP20211018
+    private void runExist() {
+        if (tieneCatalogo()) {
+            modo_recepcion=2;
+            runRecepion();
+        } else {
+            msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
+        }
+    }
+
+	private void runExist_original() {
 		try {
 			super.finish();
 			startActivity(new Intent(this, ComWSExist.class));

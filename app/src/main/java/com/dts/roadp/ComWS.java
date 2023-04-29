@@ -1333,6 +1333,10 @@ public class ComWS extends PBase {
 			conn.addRequestProperty("SOAPAction", "http://tempuri.org/" + methodName);
 
 			//#EJC 20200601: Set Timeout
+			if (methodName.equals("Commit")){
+				mTimeOut = 10000;
+			}
+
 			conn.setConnectTimeout(mTimeOut);
 			conn.setReadTimeout(mTimeOut);
 
@@ -2620,6 +2624,7 @@ public class ComWS extends PBase {
 
 			fprog = "Procesando ...";
 			wsRtask.onProgressUpdate();
+			lblInfo.setText(fprog);
 
 			ConT = new BaseDatos(this);
 			dbT = ConT.getWritableDatabase();
@@ -2675,6 +2680,7 @@ public class ComWS extends PBase {
 				try {
 					if (i % 10 == 0) {
 						fprog = "Procesando: " + i + " de: " + (rc - 1);
+						lblInfo.setText(fprog);
 						wsRtask.onProgressUpdate();
 						SystemClock.sleep(20);
 					}
@@ -2692,6 +2698,7 @@ public class ComWS extends PBase {
 			}
 
 			fprog = "Procesando: " + (rc - 1) + " de: " + (rc - 1);
+			lblInfo.setText(fprog);
 			wsRtask.onProgressUpdate();
 
 			if (modo_recepcion == 1) {
@@ -2723,6 +2730,7 @@ public class ComWS extends PBase {
 
 			fprog = "Fin de actualización";
 			wsRtask.onProgressUpdate();
+			lblInfo.setText(fprog);
 
 			scomp = 1;
 
@@ -2798,6 +2806,7 @@ public class ComWS extends PBase {
 
 		} catch (Exception e) {
 			fprog = "Actualización incompleta";
+			lblInfo.setText(fprog);
 			wsRtask.onProgressUpdate();
 
 			try {

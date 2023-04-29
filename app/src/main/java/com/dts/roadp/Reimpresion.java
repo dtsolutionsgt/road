@@ -324,7 +324,7 @@ public class Reimpresion extends PBase {
 							sf=DT.getString(0);
 						}else {
 							f=DT.getLong(2);
-							sf=du.sfecha(f)+" "+du.shora(f);
+							sf=du.sfecha(f)+" "+du.shoraseg(f);
 						}
 
 						vItem.Fecha=sf;

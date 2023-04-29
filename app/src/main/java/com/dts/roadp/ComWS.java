@@ -1334,7 +1334,7 @@ public class ComWS extends PBase {
 
 			//#EJC 20200601: Set Timeout
 			if (methodName.equals("Commit")){
-				mTimeOut = 10000;
+				mTimeOut = 15000;
 			}
 
 			conn.setConnectTimeout(mTimeOut);
@@ -4350,7 +4350,7 @@ public class ComWS extends PBase {
 
 		senv = "Envío terminado \n \n";
 
-		if (gl.peModal.equalsIgnoreCase("TOL")) {
+		/*if (gl.peModal.equalsIgnoreCase("TOL")) {
 			if (!validaLiquidacion()) {
 				liqid = false;
 				senv = "La liquidación no está cerrada, no se puede enviar datos";
@@ -4360,7 +4360,7 @@ public class ComWS extends PBase {
 			}
 		} else {
 			liqid = true;
-		}
+		}*/
 
 		items.clear();
 		dbld.clearlog();
@@ -5724,7 +5724,7 @@ public class ComWS extends PBase {
 			if (scon==1) {*/
 				fstr="Sync OK";
 
-				if (!sendData()) {
+				if (sendData()) {
 					fstr="Envio incompleto : "+sstr;
 				}// else {
 
@@ -5749,15 +5749,15 @@ public class ComWS extends PBase {
 		//senv="Envio completo\n";
 
 		try{
-			if (scon==0) {
-				lblInfo.setText(fstr);writeErrLog(fstr);
+			//if (scon==0) {
+		/*		lblInfo.setText(fstr);writeErrLog(fstr);
 				mu.msgbox(fstr);
 				lblInfo.setText(fstr);
 				isbusy = 0;
 				barInfo.setVisibility(View.INVISIBLE);
 				addlog("Envío", fterr + " " + fstr, esql);
-				return;
-			}
+				return;*/
+			//}
 
 			if (!errflag) {
 				lblInfo.setText(" ");
@@ -6347,7 +6347,8 @@ public class ComWS extends PBase {
 			else
 			{
 				if(((rutatipo.equalsIgnoreCase("V")) || (rutatipo.equalsIgnoreCase("D")) && !TieneInventario)
-						||((!rutatipo.equalsIgnoreCase("V")) && (!rutatipo.equalsIgnoreCase("D"))))
+						||(!rutatipo.equalsIgnoreCase("V") && (!rutatipo.equalsIgnoreCase("D") &&
+						(!rutatipo.equalsIgnoreCase("P")))))
 				{
 
 					lblRec.setVisibility(View.VISIBLE);imgRec.setVisibility(View.VISIBLE);

@@ -411,6 +411,22 @@ public class AppMethods {
             gl.fotos = false;
         }
 
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=21";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) {
+				gl.pTransBarra =false;
+			}else{
+				gl.pTransBarra =val.equalsIgnoreCase("S");
+			}
+
+		} catch (Exception e) {
+			gl.pTransBarra =false;
+		}
+
 
 		try {
 			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=22";

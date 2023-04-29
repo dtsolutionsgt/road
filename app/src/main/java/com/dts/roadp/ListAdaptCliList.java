@@ -21,21 +21,27 @@ public class ListAdaptCliList extends BaseAdapter {
 
 	private LayoutInflater l_Inflater;
 
-	public ListAdaptCliList(Context context, ArrayList<clsCDB> results) {
+	private  boolean pMostrarRazonNoAten, pMostrarCodCliente;
+
+	protected appGlobals gl;
+
+	public ListAdaptCliList(Context context, ArrayList<clsCDB> results, boolean mostrarRazonNoAten, boolean mostrarCodCliente) {
 		items = results;
 		l_Inflater = LayoutInflater.from(context);
 		selectedIndex = -1;
+		pMostrarRazonNoAten=mostrarRazonNoAten;
+		pMostrarCodCliente=mostrarCodCliente;
 	}
 
 	public void setSelectedIndex(int ind) {
-	    selectedIndex = ind;
-	    notifyDataSetChanged();
+		selectedIndex = ind;
+		notifyDataSetChanged();
 	}
-	
+
 	public void refreshItems() {
-	    notifyDataSetChanged();
-	}	
-	
+		notifyDataSetChanged();
+	}
+
 	public int getCount() {
 		return items.size();
 	}
@@ -51,26 +57,31 @@ public class ListAdaptCliList extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder;
 		int val,cobro,ppago,iconid;
-	
+
 		if (convertView == null) {
-			
+
 			convertView = l_Inflater.inflate(R.layout.activity_list_view_clilist, null);
 			holder = new ViewHolder();
-			
+
 			holder.lblCod  = (TextView) convertView.findViewById(R.id.lblETipo);
 			holder.lblDesc = (TextView) convertView.findViewById(R.id.lblPNum);
+			holder.lblRazNoAten = (TextView) convertView.findViewById(R.id.lblRazNoAten);
 			holder.imgBand = (ImageView) convertView.findViewById(R.id.imgNext);
 			holder.imgCobro = (ImageView) convertView.findViewById(R.id.imageView8);
 			holder.imgPPago = (ImageView) convertView.findViewById(R.id.imageView7);
-			
+
+			holder.lblRazNoAten.setVisibility((pMostrarRazonNoAten?View.VISIBLE:View.GONE));
+			holder.lblCod.setVisibility((pMostrarCodCliente?View.VISIBLE:View.GONE));
+
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-					
+
 		holder.lblCod.setText(items.get(position).Cod+" "+items.get(position).Adds);
 		holder.lblDesc.setText(items.get(position).Desc);
-		
+		holder.lblRazNoAten.setText(items.get(position).RazNoAten);
+
 		val= items.get(position).Bandera;
 		cobro= items.get(position).Cobro;
 		ppago= items.get(position).ppend;
@@ -83,19 +94,27 @@ public class ListAdaptCliList extends BaseAdapter {
 		if (cobro==1) holder.imgCobro.setImageResource(R.drawable.cobro48);else holder.imgCobro.setImageResource(R.drawable.blank24);
 		if (ppago==1) holder.imgPPago.setImageResource(R.drawable.pago_pend);else holder.imgPPago.setImageResource(R.drawable.blank24);
 
+		if (pMostrarRazonNoAten){
+			if(!holder.lblRazNoAten.getText().equals("")){
+				holder.lblRazNoAten.setBackgroundColor(Color.rgb(248,160,165));
+			}else{
+				holder.lblRazNoAten.setBackgroundColor(Color.rgb(255,255,255));
+			}
+		}
+
 		if(selectedIndex!= -1 && position == selectedIndex) {
 			convertView.setBackgroundColor(Color.rgb(26,138,198));
-        } else {
-        	convertView.setBackgroundColor(Color.TRANSPARENT);
-        }
-		
+		} else {
+			convertView.setBackgroundColor(Color.TRANSPARENT);
+		}
+
 		return convertView;
 	}
-	
-	
+
+
 	static class ViewHolder {
-		TextView  lblCod,lblDesc;
+		TextView  lblCod,lblDesc, lblRazNoAten;
 		ImageView  imgBand,imgCobro,imgPPago;
 	}
-	
+
 }

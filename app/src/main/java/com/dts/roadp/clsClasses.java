@@ -7,7 +7,7 @@ public class clsClasses {
 	}
 	
 	public class clsCDB {
-		public String Cod,Desc,Adds;
+		public String Cod,Desc,Adds,RazNoAten;
 		public int Bandera,Cobro,ppend;
 		public double valor,coorx,coory;
 	}

@@ -423,7 +423,7 @@ public class Clientes extends PBase {
 			mu.msgbox(e.getMessage());
 		}
 
-		adapter = new ListAdaptCliList(this, items);
+		adapter = new ListAdaptCliList(this, items,gl.pMostrarRazonNoAten, gl.pMostrarCodigoCliente);
 		listView.setAdapter(adapter);
 
 		if (selidx > -1) {
@@ -546,7 +546,7 @@ public class Clientes extends PBase {
 
 		Collections.sort(items, new distanceComparator());
 
-		adapter = new ListAdaptCliList(this, items);
+		adapter = new ListAdaptCliList(this, items,gl.pMostrarRazonNoAten, gl.pMostrarCodigoCliente);
 		listView.setAdapter(adapter);
 
 		adapter.setSelectedIndex(0);

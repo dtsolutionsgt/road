@@ -412,6 +412,38 @@ public class AppMethods {
         }
 
 
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=22";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) {
+				gl.pMostrarCodigoCliente =true;
+			}else{
+				gl.pMostrarCodigoCliente =val.equalsIgnoreCase("S");
+			}
+
+		} catch (Exception e) {
+			gl.pMostrarCodigoCliente =true;
+		}
+
+		try {
+			sql="SELECT VALOR FROM P_PARAMEXT WHERE ID=23";
+			dt=Con.OpenDT(sql);
+			dt.moveToFirst();
+
+			val=dt.getString(0);
+			if (emptystr(val)) {
+				gl.pMostrarRazonNoAten =false;
+			}else{
+				gl.pMostrarRazonNoAten =val.equalsIgnoreCase("S");
+			}
+
+		} catch (Exception e) {
+			gl.pMostrarRazonNoAten =false;
+		}
+
 	}
 
     // Productos

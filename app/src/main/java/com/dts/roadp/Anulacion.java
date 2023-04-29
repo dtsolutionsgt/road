@@ -176,7 +176,8 @@ public class Anulacion extends PBase {
 	public void listItems() {
 		Cursor DT;
 		clsClasses.clsCFDV vItem;	
-		int vP,f;
+		int vP;
+		long f;
 		double val;
 		String id,sf,sval;
 			
@@ -246,7 +247,8 @@ public class Anulacion extends PBase {
 					}else if(tipo==1||tipo==6){
 						sf=DT.getString(0);
 					}else{
-						f=DT.getInt(2);sf=du.sfecha(f)+" "+du.shora(f);
+						f=DT.getLong(2);
+						sf=du.sfecha(f)+" "+du.shora(f);
 					}
 					
 					vItem.Fecha=sf;

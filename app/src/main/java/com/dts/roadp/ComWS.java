@@ -17,6 +17,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -90,19 +91,19 @@ import javax.xml.transform.stream.StreamResult;
 
 public class ComWS extends PBase {
 
-	private TextView lblInfo, lblParam, lblRec, lblEnv, lblExis,lblEnvM;
+	private TextView lblInfo, lblParam, lblRec, lblEnv, lblExis, lblEnvM;
 	private ProgressBar barInfo;
 	private EditText txtRuta, txtWS, txtEmp;
-	private ImageView imgRec, imgEnv, imgExis,imgEnvM;
+	private ImageView imgRec, imgEnv, imgExis, imgEnvM;
 	private RelativeLayout ralBack, relExist, relPrecio, relStock;
-	private TextView lblUser,lblPassword,txtVersion;
+	private TextView lblUser, lblPassword, txtVersion;
 	private EditText txtUser, txtPassword;
 
 	private int isbusy, lin, reccnt, ultcor, ultcor_ant, licResult, licResultRuta, iRutaSupervisor;
 	private long fecha;
-	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant,rrs,sRutaSupervisor;
-	private String licSerial,licRuta,licSerialEnc,licRutaEnc,parImprID;
-	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag,esEnvioManual=false,errorFlag,pedidos;
+	private String err, ruta, rutatipo, sp, docstock, ultSerie, ultSerie_ant, rrs, sRutaSupervisor;
+	private String licSerial, licRuta, licSerialEnc, licRutaEnc, parImprID;
+	private boolean fFlag, showprogress, pendientes, envioparcial, findiaactivo, errflag, esEnvioManual = false, errorFlag, pedidos;
 
 	private SQLiteDatabase dbT;
 	private BaseDatos ConT;
@@ -120,7 +121,7 @@ public class ComWS extends PBase {
 	private clsFinDia claseFindia;
 	private DateUtils DU;
 	private String jsonWS;
-	private CryptUtil cu=new CryptUtil();
+	private CryptUtil cu = new CryptUtil();
 
 	protected PowerManager.WakeLock wakeLock;
 
@@ -128,7 +129,7 @@ public class ComWS extends PBase {
 	//private XMLObject xobj;
 
 	private String nombretabla;
-	private int indicetabla,modo_recepcion;
+	private int indicetabla, modo_recepcion;
 
 	// Web Service -
 
@@ -138,9 +139,9 @@ public class ComWS extends PBase {
 
 	private static String sstr, fstr, fprog, finf, ferr, fterr, idbg, dbg, ftmsg, esql, ffpos;
 	private int scon, running, pflag, stockflag, conflag;
-	private String ftext, slsync, senv, gEmpresa, ActRuta, mac,rootdir;
-	private String fsql, fsqli, fsqlf, strliqid,argstr,xmlresult, hEnvio;
-	private boolean rutapos, ftflag, esvacio, liqid, resultado,cargasuper;
+	private String ftext, slsync, senv, gEmpresa, ActRuta, mac, rootdir;
+	private String fsql, fsqli, fsqlf, strliqid, argstr, xmlresult, hEnvio;
+	private boolean rutapos, ftflag, esvacio, liqid, resultado, cargasuper;
 
 	private final String NAMESPACE = "http://tempuri.org/";
 	private String METHOD_NAME, URL, URL_Remota;
@@ -157,7 +158,7 @@ public class ComWS extends PBase {
 		addlog("ComWS", "" + du.getActDateTime(), gl.vend);
 
 		System.setProperty("line.separator", "\r\n");
-		rootdir=Environment.getExternalStorageDirectory()+"/RoadFotos/";
+		rootdir = Environment.getExternalStorageDirectory() + "/RoadFotos/";
 
 		dbld = new clsDataBuilder(this);
 		claseFindia = new clsFinDia(this);
@@ -193,14 +194,14 @@ public class ComWS extends PBase {
 		lblParam.setText("");
 		barInfo.setVisibility(View.INVISIBLE);
 
-		lblUser = new TextView(this,null);
-		lblPassword = new TextView(this,null);
+		lblUser = new TextView(this, null);
+		lblPassword = new TextView(this, null);
 		//txtVersion=new TextView(this, null);
 
-		txtUser = new EditText(this,null);
-		txtPassword = new EditText(this,null);
+		txtUser = new EditText(this, null);
+		txtPassword = new EditText(this, null);
 
-		txtVersion.setText("24-04-2023");
+		txtVersion.setText("28-04-2023");
 
 		//#CKFK 20190319 Para facilidades de desarrollo se debe colocar la variable debug en true
 		if (gl.debug) {
@@ -211,10 +212,10 @@ public class ComWS extends PBase {
 			}
 		}
 
-		if(gl.ruta.isEmpty()){
+		if (gl.ruta.isEmpty()) {
 			ruta = txtRuta.getText().toString();
-			gl.ruta=ruta;
-		}else {
+			gl.ruta = ruta;
+		} else {
 			ruta = gl.ruta;
 		}
 
@@ -229,15 +230,15 @@ public class ComWS extends PBase {
 			this.setTitle("Comunicación Local");
 		}
 
-		licSerial=gl.deviceId;
-		licRuta=ruta;
+		licSerial = gl.deviceId;
+		licRuta = ruta;
 
 		try {
-			licSerialEnc=cu.encrypt(licSerial);
-			licRutaEnc=cu.encrypt(licRuta);
+			licSerialEnc = cu.encrypt(licSerial);
+			licRutaEnc = cu.encrypt(licRuta);
 		} catch (Exception e) {
-			licSerialEnc="";
-			licRutaEnc="";
+			licSerialEnc = "";
+			licRutaEnc = "";
 		}
 
 		gl.isOnWifi = clsAppM.isOnWifi();
@@ -249,7 +250,7 @@ public class ComWS extends PBase {
 		fsqli = du.univfechasql(du.ffecha00(du.getActDate())) + " 00:00:00";
 		fsqlf = du.univfechasql(du.ffecha24(du.getActDate())) + " 23:59:59";
 
-		parImprID="0";
+		parImprID = "0";
 
 		lic = new clsLicence(this);
 
@@ -266,14 +267,15 @@ public class ComWS extends PBase {
 		if (esvacio) txtWS.setEnabled(true);
 
 		setHandlers();
-		pedidos=rutatipo.equals("P");
+		pedidos = rutatipo.equals("P");
 
 		try {
 			final PowerManager pm = (PowerManager) getSystemService(this.POWER_SERVICE);
 			this.wakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "myapp:mywakelocktag");
 			this.wakeLock.acquire();
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"wakeLock");
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "wakeLock");
 		}
 	}
 
@@ -286,22 +288,22 @@ public class ComWS extends PBase {
 			return;
 		}
 
-		if(gl.ruta.isEmpty()){
+		if (gl.ruta.isEmpty()) {
 			ruta = txtRuta.getText().toString();
-			gl.ruta=ruta;
-		}else {
+			gl.ruta = ruta;
+		} else {
 			ruta = gl.ruta;
 		}
 
-		licSerial=gl.deviceId;
-		licRuta=ruta;
+		licSerial = gl.deviceId;
+		licRuta = ruta;
 
 		try {
-			licSerialEnc=cu.encrypt(licSerial);
-			licRutaEnc=cu.encrypt(licRuta);
+			licSerialEnc = cu.encrypt(licSerial);
+			licRutaEnc = cu.encrypt(licRuta);
 		} catch (Exception e) {
-			licSerialEnc="";
-			licRutaEnc="";
+			licSerialEnc = "";
+			licRutaEnc = "";
 		}
 
 		//CKFK 20190222 Se agregó esta validación para no sobreescribir los datos si ya se importaron
@@ -427,7 +429,7 @@ public class ComWS extends PBase {
 
 			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					if (sendDataManual()){
+					if (sendDataManual()) {
 						askOk();
 					}
 				}
@@ -566,28 +568,28 @@ public class ComWS extends PBase {
 
 	private void DatosSupervisor() {
 
-		try{
+		try {
 
 			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 			alert.setTitle("Envío");
 
-			final LinearLayout layout   = new LinearLayout(this);
+			final LinearLayout layout = new LinearLayout(this);
 			layout.setOrientation(LinearLayout.VERTICAL);
 
-			if(lblUser.getParent()!= null){
+			if (lblUser.getParent() != null) {
 				((ViewGroup) lblUser.getParent()).removeView(lblUser);
 			}
 
-			if(lblPassword.getParent()!= null){
+			if (lblPassword.getParent() != null) {
 				((ViewGroup) lblPassword.getParent()).removeView(lblPassword);
 			}
 
-			if(txtUser.getParent()!= null){
+			if (txtUser.getParent() != null) {
 				((ViewGroup) txtUser.getParent()).removeView(txtUser);
 			}
 
-			if(txtPassword.getParent()!= null){
+			if (txtPassword.getParent() != null) {
 				((ViewGroup) txtPassword.getParent()).removeView(txtPassword);
 			}
 
@@ -628,11 +630,11 @@ public class ComWS extends PBase {
 						return;
 					}
 
-					dtCorrectos = validaDatos(usr,pwd);
+					dtCorrectos = validaDatos(usr, pwd);
 
-					if (dtCorrectos){
+					if (dtCorrectos) {
 						askSendContinue();
-					}else{
+					} else {
 						layout.removeAllViews();
 						return;
 					}
@@ -648,18 +650,19 @@ public class ComWS extends PBase {
 
 			alert.show();
 
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 
 	}
 
-	private boolean validaDatos(String user,String psw){
+	private boolean validaDatos(String user, String psw) {
 
 		Cursor DT;
-		boolean correctos=false;
+		boolean correctos = false;
 		String dpsw;
-		try{
+		try {
 
 
 			sql = "SELECT NOMBRE,CLAVE,NIVEL,NIVELPRECIO FROM P_VENDEDOR WHERE CODIGO='" + user + "' AND NIVEL=1";
@@ -680,13 +683,13 @@ public class ComWS extends PBase {
 
 			correctos = true;
 
-		}catch (Exception e){
+		} catch (Exception e) {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 			return false;
 		}
 
-		return  correctos;
+		return correctos;
 
 	}
 
@@ -741,17 +744,18 @@ public class ComWS extends PBase {
 
 			errflag = true;
 
-		}catch (Exception e){
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
+		} catch (Exception e) {
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			esEnvioManual = false;
 		}
 
 		return errflag;
 	}
 
-	private void Eliminatablas(){
+	private void Eliminatablas() {
 		boolean Eliminadas = false;
-		try{
+		try {
 
 			claseFindia.updateFinDia(du.getActDate());
 			claseFindia.updateComunicacion(2);
@@ -759,13 +763,13 @@ public class ComWS extends PBase {
 			ActualizaStatcom();
 			Eliminadas = claseFindia.eliminarTablasD();
 
-			if (Eliminadas){
+			if (Eliminadas) {
 				mu.msgbox("Envío de datos correcto");
 			}
 
 			visibilidadBotones();
 
-		}catch (Exception e){
+		} catch (Exception e) {
 
 		}
 	}
@@ -878,7 +882,7 @@ public class ComWS extends PBase {
 	}
 
 	public void doFotos(View view) {
-		startActivity(new Intent(this,ComWSFotos.class));
+		startActivity(new Intent(this, ComWSFotos.class));
 	}
 
 
@@ -904,14 +908,14 @@ public class ComWS extends PBase {
 
 			if (!setComParams()) return;
 
-			try{
+			try {
 				//#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
 				View view = this.getCurrentFocus();
 				view.clearFocus();
 				if (view != null) {
 					keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
 				}
-			}catch (Exception e){
+			} catch (Exception e) {
 
 			}
 
@@ -940,13 +944,13 @@ public class ComWS extends PBase {
 
 	// JP20211018
 	private void runRecep() {
-		modo_recepcion=1;
+		modo_recepcion = 1;
 		runRecepion();
 	}
 
 	// AT 20211019
 	private void runPrecios() {
-		if(tieneCatalogo()) {
+		if (tieneCatalogo()) {
 			modo_recepcion = 3;
 			runRecepion();
 		} else {
@@ -965,11 +969,11 @@ public class ComWS extends PBase {
 			String ntablas[] = {"P_RUTA", "P_CLIENTE", "P_PRODUCTO"};
 
 			for (int i = 0; i < ntablas.length; i++) {
-				sql ="SELECT CODIGO FROM "+ntablas[i];
-				DT=Con.OpenDT(sql);
+				sql = "SELECT CODIGO FROM " + ntablas[i];
+				DT = Con.OpenDT(sql);
 
 				if (DT.getCount() > 0) {
-					if (ntablas[i].equals("P_RUTA")){
+					if (ntablas[i].equals("P_RUTA")) {
 						TieneRuta = true;
 					} else if (ntablas[i].equals("P_CLIENTE")) {
 						TieneClientes = true;
@@ -984,7 +988,8 @@ public class ComWS extends PBase {
 			}
 
 		} catch (Exception e) {
-			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 			return false;
 		}
 
@@ -997,14 +1002,15 @@ public class ComWS extends PBase {
 
 			if (!setComParams()) return;
 
-			try{
+			try {
 				//#CKFK 20190313 Agregué esto para ocultar el teclado durante la carga de los datos
 				View view = this.getCurrentFocus();
 				if (view != null) {
 					view.clearFocus();
 					keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
 				}
-			}catch (Exception e){ }
+			} catch (Exception e) {
+			}
 
 			isbusy = 1;
 
@@ -1023,7 +1029,8 @@ public class ComWS extends PBase {
 			wsRtask.execute();
 
 		} catch (Exception e) {
-			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), "");
 		}
 	}
 
@@ -1052,15 +1059,15 @@ public class ComWS extends PBase {
 
 	}
 
-    // JP20211018
-    private void runExist() {
-        if (tieneCatalogo()) {
-            modo_recepcion=2;
-            runRecepion();
-        } else {
-            msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
-        }
-    }
+	// JP20211018
+	private void runExist() {
+		if (tieneCatalogo()) {
+			modo_recepcion = 2;
+			runRecepion();
+		} else {
+			msgbox("No tiene datos de la ruta, clientes y productos, debe hacer una carga de datos completa");
+		}
+	}
 
 	private void runExist_original() {
 		try {
@@ -1233,7 +1240,7 @@ public class ComWS extends PBase {
 	public int fillTableImpresora() {
 
 		int rc;
-		String s, ss, delcmd="DELETE FROM P_IMPRESORA";
+		String s, ss, delcmd = "DELETE FROM P_IMPRESORA";
 
 		METHOD_NAME = "getInsImpresora";
 
@@ -1313,14 +1320,14 @@ public class ComWS extends PBase {
 	}
 
 	public void callMethod(String methodName, Object... args) throws Exception {
-		int mTimeOut=5000;
-		String mResult,line="";
+		int mTimeOut = 5000;
+		String mResult, line = "";
 		URL mUrl = new URL(URL);
-		errorFlag=false;
+		errorFlag = false;
 
-		try{
-			mResult = "";xmlresult="";
-
+		try {
+			mResult = "";
+			xmlresult = "";
 			URLConnection conn = mUrl.openConnection();
 			conn.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
 			conn.addRequestProperty("SOAPAction", "http://tempuri.org/" + methodName);
@@ -1331,7 +1338,7 @@ public class ComWS extends PBase {
 
 			conn.setDoOutput(true);
 
-			OutputStream ostream = conn.getOutputStream();
+			OutputStream ostream = ostream = conn.getOutputStream();
 
 			OutputStreamWriter wr = new OutputStreamWriter(ostream);
 
@@ -1353,47 +1360,52 @@ public class ComWS extends PBase {
 			String responsemsg = ((HttpURLConnection) conn).getResponseMessage();
 
 			//#EJC20200702:Capturar excepcion de SQL (No se sabe el error pero sabemos que no se proceso)
-			if (responsecode==500) {
+			if (responsecode == 500) {
 				throw new Exception("Error 500: Esto es poco usual pero algún problema ocurrió del lado del motor de BD al ejecutar sentencia SQL: \n" +
 						"\n" + args[1].toString());
-			}else if (responsecode!=299 && responsecode!=404) {
+			} else if (responsecode != 299 && responsecode != 404) {
 
 				BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 				while ((line = rd.readLine()) != null) mResult += line;
-				rd.close();rd.close();
+				rd.close();
+				rd.close();
 
-				mResult=mResult.replace("ñ","n");
-				xmlresult=mResult;
+				mResult = mResult.replace("ñ", "n");
+				xmlresult = mResult;
 
-			} if (responsecode==299) {
+			}
+			if (responsecode == 299) {
 
 				BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 				while ((line = rd.readLine()) != null) mResult += line;
-				rd.close();rd.close();
+				rd.close();
+				rd.close();
 
-				mResult=mResult.replace("ñ","n");
-				xmlresult=mResult;
+				mResult = mResult.replace("ñ", "n");
+				xmlresult = mResult;
 
-				throw new Exception("Error al procesar la solicitud :\n " );
+				throw new Exception("Error al procesar la solicitud :\n ");
 
-			} if (responsecode==404) {
+			}
+			if (responsecode == 404) {
 				throw new Exception("Error 404: No se obtuvo acceso a: \n" + mUrl.toURI() +
 						"\n" + "Verifique que el WS Existe y es accesible desde el explorador.");
 			}
 
 		} catch (Exception e) {
-			sstr= "Error al conectarse a " + mUrl.toURI() + " " + e.getMessage();
-			errorFlag=true;fterr=e.getMessage();
+			sstr = "Error al conectarse a " + mUrl.toURI() + " " + e.getMessage();
+			errorFlag = true;
+			fterr = e.getMessage();
 			throw new Exception(sstr);
 		}
 	}
 
-	private String buildArgs(Object... args) throws IllegalArgumentException, IllegalAccessException    {
+	private String buildArgs(Object... args) throws IllegalArgumentException, IllegalAccessException {
 		String result = "";
 		String argName = "";
 		String valor = "";
 
-		for (int i = 0; i < args.length; i++)   {
+		for (int i = 0; i < args.length; i++) {
 			if (i % 2 == 0) {
 				argName = args[i].toString();
 			} else {
@@ -1409,11 +1421,11 @@ public class ComWS extends PBase {
 		return result;
 	}
 
-	private String buildArgValue(Object obj) throws IllegalArgumentException, IllegalAccessException   {
+	private String buildArgValue(Object obj) throws IllegalArgumentException, IllegalAccessException {
 
 		Class<?> cl = null;
 
-		try  {
+		try {
 			cl = obj.getClass();
 		} catch (Exception e) {
 			return "";
@@ -1423,12 +1435,12 @@ public class ComWS extends PBase {
 
 		if (cl.isPrimitive()) return obj.toString();
 		if (cl.getName().contains("java.lang.")) return obj.toString();
-		if (cl.getName().equals("java.util.Date"))  {
+		if (cl.getName().equals("java.util.Date")) {
 			DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 			return dfm.format((Date) obj);
 		}
 
-		if (cl.isArray())  {
+		if (cl.isArray()) {
 			String xmlName = cl.getName().substring(cl.getName().lastIndexOf(".") + 1);
 			xmlName = xmlName.replace(";", "");
 			Object[] arr = (Object[]) obj;
@@ -1478,15 +1490,15 @@ public class ComWS extends PBase {
 
 	public int commitSQL() {
 		int rc;
-		String s, ss="";
+		String s, ss = "";
 		//#CKFK 20190429 Creé esta variable para retornar si la comunicación fue correcta o no
 		//e hice modificaciones en la función para garantizar esta funcionalidad
-		int vCommit=0;
+		int vCommit = 0;
 
 		METHOD_NAME = "CommitEnvio";
 		sstr = "OK";
 
-		if (dbld.size() == 0) vCommit =1;//return 1
+		if (dbld.size() == 0) vCommit = 1;//return 1
 
 		s = "";
 		for (int i = 0; i < dbld.size(); i++) {
@@ -1498,11 +1510,11 @@ public class ComWS extends PBase {
 			wsStask.onProgressUpdate();
 		}
 
-		s=s.replace("&","&amp;");
-		s=s.replace("\"", "&quot;");
-		s=s.replace("'","&apos;");
-		s=s.replace("<", "&lt;");
-		s=s.replace(">", "&gt;");
+		s = s.replace("&", "&amp;");
+		s = s.replace("\"", "&quot;");
+		s = s.replace("'", "&apos;");
+		s = s.replace("<", "&lt;");
+		s = s.replace(">", "&gt;");
 
 		nombretabla = "CommitEnvio";
 
@@ -1513,8 +1525,38 @@ public class ComWS extends PBase {
 		if (validaHash()) {
 			vCommit = 1;
 		} else {
-			vCommit=fillTable2(s,"CommitEnvio");
+			vCommit = fillTable2(s, "CommitEnvio");
 		}
+
+		return vCommit;
+
+	}
+
+	public int commitSQL_SP() {
+		int rc;
+		String s, ss = "";
+		//#CKFK 20190429 Creé esta variable para retornar si la comunicación fue correcta o no
+		//e hice modificaciones en la función para garantizar esta funcionalidad
+		int vCommit = 0;
+
+		METHOD_NAME = "Commit";
+		sstr = "OK";
+
+		if (dbld.size() == 0) vCommit = 1;//return 1
+
+		s = "";
+		for (int i = 0; i < dbld.size(); i++) {
+			ss = dbld.items.get(i);
+			s = s + ss + "\n";
+		}
+
+		s = s.replace("&", "&amp;");
+		s = s.replace("\"", "&quot;");
+		s = s.replace("'", "&apos;");
+		s = s.replace("<", "&lt;");
+		s = s.replace(">", "&gt;");
+
+		vCommit = fillTable2(s, "CommitSQL");
 
 		return vCommit;
 
@@ -1525,12 +1567,12 @@ public class ComWS extends PBase {
 		String s, ss;
 		//#CKFK 20190429 Creé esta variable para retornar si la comunicación fue correcta o no
 		//e hice modificaciones en la función para garantizar esta funcionalidad
-		int vCommit=0;
+		int vCommit = 0;
 
 		METHOD_NAME = "Commit";
 		sstr = "OK";
 
-		if (dbld.size() == 0) vCommit =1;//return 1
+		if (dbld.size() == 0) vCommit = 1;//return 1
 
 		s = "";
 		for (int i = 0; i < dbld.size(); i++) {
@@ -1564,7 +1606,7 @@ public class ComWS extends PBase {
 			s = response.toString();
 
 			sstr = "#";
-			if (s.equalsIgnoreCase("#")) vCommit =1;// return 1;
+			if (s.equalsIgnoreCase("#")) vCommit = 1;// return 1;
 
 			sstr = s;
 			//return 0;
@@ -1573,7 +1615,7 @@ public class ComWS extends PBase {
 			addlog(new Object() {
 			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			sstr = e.getMessage();
-			vCommit=0;
+			vCommit = 0;
 		}
 
 		return vCommit;
@@ -1788,7 +1830,7 @@ public class ComWS extends PBase {
 
 	public int guardaImagen(String idprod) {
 		int rc;
-		String s, ss,resstr;
+		String s, ss, resstr;
 
 		METHOD_NAME = "getImage";
 		sstr = "OK";
@@ -1817,20 +1859,21 @@ public class ComWS extends PBase {
 			try {
 				//byte[] imgbytes = resstr.getBytes();
 
-				byte[] imgbytes=Base64.decode(resstr, Base64.DEFAULT);
+				byte[] imgbytes = Base64.decode(resstr, Base64.DEFAULT);
 
-				int bs=imgbytes.length;
+				int bs = imgbytes.length;
 
-				FileOutputStream fos = new FileOutputStream(rootdir+"0006.jpg");
+				FileOutputStream fos = new FileOutputStream(rootdir + "0006.jpg");
 				BufferedOutputStream outputStream = new BufferedOutputStream(fos);
 				outputStream.write(imgbytes);
 				outputStream.close();
 
 			} catch (Exception ee) {
-				sstr = ee.getMessage();return 0;
+				sstr = ee.getMessage();
+				return 0;
 			}
 
-			sstr =""+resstr.length();
+			sstr = "" + resstr.length();
 			return resstr.length();
 		} catch (Exception e) {
 			sstr = e.getMessage();
@@ -1840,7 +1883,7 @@ public class ComWS extends PBase {
 	}
 
 	public int fillTable2(String value, String delcmd) {
-		int rc,retFillTable = 0;
+		int rc, retFillTable = 0;
 		String str, ss, tabla;
 		String[] sitems;
 
@@ -1851,76 +1894,76 @@ public class ComWS extends PBase {
 
 			if (nombretabla.contains("P_IMPRESORA")) {
 
-				value=value.replace("&", "&amp;");
-				value=value.replace("\"", "&quot;");
-				value=value.replace("'", "&apos;");
-				value=value.replace("<", "&lt;");
-				value=value.replace(">", "&gt;");
+				value = value.replace("&", "&amp;");
+				value = value.replace("\"", "&quot;");
+				value = value.replace("'", "&apos;");
+				value = value.replace("<", "&lt;");
+				value = value.replace(">", "&gt;");
 
 				callMethod("getInsImpresora");
 				xr = getXMLRegionSingle("getInsImpresoraResult");
-			}else if (nombretabla.contains("CARGA_SUPERVISOR")){
+			} else if (nombretabla.contains("CARGA_SUPERVISOR")) {
 
-				value=value.replace("&", "&amp;");
-				value=value.replace("\"", "&quot;");
-				value=value.replace("'", "&apos;");
-				value=value.replace("<", "&lt;");
-				value=value.replace(">", "&gt;");
+				value = value.replace("&", "&amp;");
+				value = value.replace("\"", "&quot;");
+				value = value.replace("'", "&apos;");
+				value = value.replace("<", "&lt;");
+				value = value.replace(">", "&gt;");
 
 				callMethod("RutaSupervisor");
 				xr = getXMLRegionSingle("RutaSupervisorResult");
-				sRutaSupervisor = (String) getSingle(xr,"checkLicenceResult",String.class);
-				iRutaSupervisor =  0;
+				sRutaSupervisor = (String) getSingle(xr, "checkLicenceResult", String.class);
+				iRutaSupervisor = 0;
 				if (sRutaSupervisor.equalsIgnoreCase("S")) {
 					iRutaSupervisor = 1;
 				} else if (sRutaSupervisor.equalsIgnoreCase("N")) {
-					iRutaSupervisor= 0;
+					iRutaSupervisor = 0;
 				}
 				cargasuper = iRutaSupervisor == 1;
-			}else if (nombretabla.contains("checkLicenceRuta")){
+			} else if (nombretabla.contains("checkLicenceRuta")) {
 
-				value=value.replace("&", "&amp;");
-				value=value.replace("\"", "&quot;");
-				value=value.replace("'", "&apos;");
-				value=value.replace("<", "&lt;");
-				value=value.replace(">", "&gt;");
+				value = value.replace("&", "&amp;");
+				value = value.replace("\"", "&quot;");
+				value = value.replace("'", "&apos;");
+				value = value.replace("<", "&lt;");
+				value = value.replace(">", "&gt;");
 
-				callMethod("checkLicenceRuta", "Ruta",ruta);
-				xr=getXMLRegionSingle("checkLicenceRutaResult");
-				licResultRuta=(Integer) getSingle(xr,"checkLicenceRutaResult",Integer.class);
+				callMethod("checkLicenceRuta", "Ruta", ruta);
+				xr = getXMLRegionSingle("checkLicenceRutaResult");
+				licResultRuta = (Integer) getSingle(xr, "checkLicenceRutaResult", Integer.class);
 
-			}else if (nombretabla.contains("checkLicence")){
+			} else if (nombretabla.contains("checkLicence")) {
 
-				value=value.replace("&", "&amp;");
-				value=value.replace("\"", "&quot;");
-				value=value.replace("'", "&apos;");
-				value=value.replace("<", "&lt;");
-				value=value.replace(">", "&gt;");
+				value = value.replace("&", "&amp;");
+				value = value.replace("\"", "&quot;");
+				value = value.replace("'", "&apos;");
+				value = value.replace("<", "&lt;");
+				value = value.replace(">", "&gt;");
 
-				callMethod("checkLicence","Serial",licSerial,"Name", gl.devicename, "Ruta",ruta);
+				callMethod("checkLicence", "Serial", licSerial, "Name", gl.devicename, "Ruta", ruta);
 
-				xr=getXMLRegionSingle("checkLicenceResult");
-				licResult=(Integer) getSingle(xr,"checkLicenceResult",Integer.class);
+				xr = getXMLRegionSingle("checkLicenceResult");
+				licResult = (Integer) getSingle(xr, "checkLicenceResult", Integer.class);
 
-			}else if (nombretabla.contains("commitSQL")){
+			} else if (nombretabla.contains("EjecutaSP")) {
 
-				value=value.replace("&", "&amp;");
-				value=value.replace("\"", "&quot;");
-				value=value.replace("'", "&apos;");
-				value=value.replace("<", "&lt;");
-				value=value.replace(">", "&gt;");
+				value = value.replace("&", "&amp;");
+				value = value.replace("\"", "&quot;");
+				value = value.replace("'", "&apos;");
+				value = value.replace("<", "&lt;");
+				value = value.replace(">", "&gt;");
 
 				callMethod("Commit", "SQL", value);
-				xr=getXMLRegionSingle("CommitResult");
-				xr=(String) getSingle(xr,"CommitResult",String.class);
+				xr = getXMLRegionSingle("CommitResult");
+				xr = (String) getSingle(xr, "CommitResult", String.class);
 
 			} else if (nombretabla.contains("CommitEnvio")) {
 
-				value=value.replace("&", "&amp;");
-				value=value.replace("\"", "&quot;");
-				value=value.replace("'", "&apos;");
-				value=value.replace("<", "&lt;");
-				value=value.replace(">", "&gt;");
+				value = value.replace("&", "&amp;");
+				value = value.replace("\"", "&quot;");
+				value = value.replace("'", "&apos;");
+				value = value.replace("<", "&lt;");
+				value = value.replace(">", "&gt;");
 
 				String fecha = du.getActDateStr();
 
@@ -1928,20 +1971,20 @@ public class ComWS extends PBase {
 				xr = getXMLRegionSingle("CommitEnvioResult");
 				xr = (String) getSingle(xr, "CommitEnvioResult", String.class);
 
-			} else{
+			} else {
 
-				value=value.replace("&", "&amp;");
-				value=value.replace("\"", "&quot;");
-				value=value.replace("'", "&apos;");
-				value=value.replace("<", "&lt;");
-				value=value.replace(">", "&gt;");
+				value = value.replace("&", "&amp;");
+				value = value.replace("\"", "&quot;");
+				value = value.replace("'", "&apos;");
+				value = value.replace("<", "&lt;");
+				value = value.replace(">", "&gt;");
 
 				callMethod("getIns", "SQL", value);
-				xr=getXMLRegionSingle("getInsResult");
+				xr = getXMLRegionSingle("getInsResult");
 			}
 
-			sitems=xr.split("\n");
-			rc=sitems.length;
+			sitems = xr.split("\n");
+			rc = sitems.length;
 
 			s = "";
 
@@ -1963,12 +2006,12 @@ public class ComWS extends PBase {
 				}
 			}
 
-			if (!delcmd.equals("commitSQL") && !delcmd.contains("CommitEnvio")){
-				tabla=delcmd.substring(12);
-				switch (tabla){
+			if (!delcmd.equals("commitSQL") && !delcmd.contains("CommitEnvio")) {
+				tabla = delcmd.substring(12);
+				switch (tabla) {
 
 					case "P_RUTA":
-						if (rc==1){
+						if (rc == 1) {
 							borraDatos();
 							throw new Exception("La ruta ingresada no es válida, ruta: " + ruta + ", no se puede continuar la carga de datos");
 						}
@@ -1984,38 +2027,39 @@ public class ComWS extends PBase {
 						break;
 
 					case "P_PRODUCTO":
-						if (rc==1){
+						if (rc == 1) {
 							borraDatos();
 							throw new Exception("No hay productos definidos para esta ruta: " + ruta + ", no se puede continuar la carga de datos");
 						}
 						break;
 					case "P_PRODPRECIO":
-						if (rc==1){
+						if (rc == 1) {
 							borraDatos();
 							throw new Exception("No hay precios definidos para los productos de esta ruta:" + ruta + ", no se puede continuar la carga de datos");
 						}
 						break;
 					case "P_COREL":
-						if (rc==1 && gl.rutatipo.equals("V")){
+						if (rc == 1 && gl.rutatipo.equals("V")) {
 							borraDatos();
-							if (!pedidos) throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
+							if (!pedidos)
+								throw new Exception("No hay correlativos definidos para esta ruta:" + ruta + ", no se puede continuar la carga de datos");
 						}
 						break;
 				}
 
-				for (int i=1; i < rc-2; i++) {
+				for (int i = 1; i < rc - 2; i++) {
 
 					try {
-						ss=sitems[i];
-						ss=ss.replace("<string>","");
-						str=ss.replace("</string>","");
-						str=str.replace("&amp;", "&");
-						str=str.replace("&quot;", "\"");
-						str=str.replace("&apos;", "'");
-						str=str.replace("&lt;", "<");
-						str=str.replace("&gt;", ">");
+						ss = sitems[i];
+						ss = ss.replace("<string>", "");
+						str = ss.replace("</string>", "");
+						str = str.replace("&amp;", "&");
+						str = str.replace("&quot;", "\"");
+						str = str.replace("&apos;", "'");
+						str = str.replace("&lt;", "<");
+						str = str.replace("&gt;", ">");
 					} catch (Exception e) {
-						str="";
+						str = "";
 					}
 
 					if (i == 1) {
@@ -2037,15 +2081,16 @@ public class ComWS extends PBase {
 							listItems.add(sql);
 							sstr = str;
 						} catch (Exception e) {
-							addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+							addlog(new Object() {
+							}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 							sstr = e.getMessage();
 							return 0;
 						}
 					}
 				}
-			} else if (delcmd.contains("commitSQL") || delcmd.contains("CommitEnvio") ){
+			} else if (delcmd.contains("commitSQL") || delcmd.contains("CommitEnvio")) {
 				//Corregir esto
-				str=xr;
+				str = xr;
 				if (str.equalsIgnoreCase("#")) {
 					listItems.add(delcmd);
 				} else {
@@ -2057,53 +2102,53 @@ public class ComWS extends PBase {
 				}
 			}
 
-			retFillTable= 1;
+			retFillTable = 1;
 
 		} catch (Exception e) {
 			sstr = e.getMessage();
 			idbg = idbg + " ERR " + e.getMessage();
-			retFillTable= 0;
+			retFillTable = 0;
 		}
 
-		return  retFillTable;
+		return retFillTable;
 	}
 
 	public String getXMLRegionSingle(String nodename) throws Exception {
-		String st,ss,sv,en,sxml;
+		String st, ss, sv, en, sxml;
 		Node xmlnode;
 
 		try {
 
-			InputStream istream = new ByteArrayInputStream( xmlresult.getBytes() );
+			InputStream istream = new ByteArrayInputStream(xmlresult.getBytes());
 			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
 			Document doc = docBuilder.parse(istream);
 
-			Element root=doc.getDocumentElement();
+			Element root = doc.getDocumentElement();
 
-			NodeList children=root.getChildNodes();
-			Node bodyroot=children.item(0);
-			NodeList body=bodyroot.getChildNodes();
-			Node responseroot=body.item(0);
-			NodeList response=responseroot.getChildNodes();
+			NodeList children = root.getChildNodes();
+			Node bodyroot = children.item(0);
+			NodeList body = bodyroot.getChildNodes();
+			Node responseroot = body.item(0);
+			NodeList response = responseroot.getChildNodes();
 
-			ss="";
-			for(int i =0;i<response.getLength();i++) {
-				ss+=response.item(i).getNodeName()+",\n";
+			ss = "";
+			for (int i = 0; i < response.getLength(); i++) {
+				ss += response.item(i).getNodeName() + ",\n";
 
 				if (response.item(i).getNodeName().equalsIgnoreCase(nodename)) {
-					xmlnode=response.item(i);
-					sxml=nodeToString(xmlnode);
+					xmlnode = response.item(i);
+					sxml = nodeToString(xmlnode);
 					return sxml;
 				}
 			}
 		} catch (Exception e) {
-			throw new Exception(" XMLObject getXMLRegion : "+ e.getMessage());
+			throw new Exception(" XMLObject getXMLRegion : " + e.getMessage());
 		}
 		return "";
 	}
 
-	private String nodeToString(Node node)  throws Exception {
+	private String nodeToString(Node node) throws Exception {
 		StringWriter sw = new StringWriter();
 		try {
 			Transformer t = TransformerFactory.newInstance().newTransformer();
@@ -2111,17 +2156,19 @@ public class ComWS extends PBase {
 			t.setOutputProperty(OutputKeys.INDENT, "yes");
 			t.transform(new DOMSource(node), new StreamResult(sw));
 		} catch (Exception te) {
-			throw new Exception("XMLObject nodeToString : "+te.getMessage());
+			throw new Exception("XMLObject nodeToString : " + te.getMessage());
 		}
 		return sw.toString();
 	}
 
-	public Object getSingle( String body, String name, Class<?> cl)  throws Exception {
+	public Object getSingle(String body, String name, Class<?> cl) throws Exception {
 
 		int start = body.indexOf("<" + name + ">");
-		if (start>-1)  start += name.length() + 2;else start=0;//with <and > char
+		if (start > -1) start += name.length() + 2;
+		else start = 0;//with <and > char
 		int end = body.indexOf("</" + name + ">");
-		if (end == -1) body = "";else body = body.substring(start, end);
+		if (end == -1) body = "";
+		else body = body.substring(start, end);
 
 		String gname = cl.getName();
 
@@ -2129,11 +2176,13 @@ public class ComWS extends PBase {
 			return body;
 		}
 		if (cl.getName().toLowerCase().contains("double")) {
-			if (body.isEmpty()) return 0; else return
+			if (body.isEmpty()) return 0;
+			else return
 					Double.parseDouble(body);
 		}
 		if (cl.getName().toLowerCase().contains("int")) {
-			if (body.isEmpty()) return 0; else return
+			if (body.isEmpty()) return 0;
+			else return
 					Integer.parseInt(body);
 		}
 
@@ -2184,7 +2233,12 @@ public class ComWS extends PBase {
 		else gl.peStockItf = false;
 
 		listItems.clear();
-		scomp = 0;idbg = "";stockflag = 0;ftmsg = "";ftflag = false;rrs="...";
+		scomp = 0;
+		idbg = "";
+		stockflag = 0;
+		ftmsg = "";
+		ftflag = false;
+		rrs = "...";
 
 		try {
 
@@ -2234,8 +2288,8 @@ public class ComWS extends PBase {
 			if (!AddTable("P_HANDHELD")) return false;
 			if (!AddTable("P_TRANSERROR")) return false;
 
-			licResult=checkLicence(licSerial);
-			licResultRuta=checkLicenceRuta(licRuta);
+			licResult = checkLicence(licSerial);
+			licResultRuta = checkLicenceRuta(licRuta);
 
 			fillTableImpresora();
 
@@ -2288,21 +2342,25 @@ public class ComWS extends PBase {
 			ConT.vDatabase = dbT;
 			insT = ConT.Ins;
 
-			prn = 0;jj = 0;
+			prn = 0;
+			jj = 0;
 			Log.d("M", "So far so good");
 
 			dbT.beginTransaction();
 
 			for (int i = 0; i < rc; i++) {
 
-				sql = listItems.get(i);esql = sql;
+				sql = listItems.get(i);
+				esql = sql;
 				sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
 				sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
 				sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
 
 				try {
-					writer.write(sql);writer.write("\r\n");
-				} catch (Exception e) {}
+					writer.write(sql);
+					writer.write("\r\n");
+				} catch (Exception e) {
+				}
 
 				try {
 					dbT = ConT.getWritableDatabase();
@@ -2424,7 +2482,8 @@ public class ComWS extends PBase {
 			DT.close();
 
 		} catch (Exception e) {
-			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 			val = "N";
 		}
 
@@ -2432,7 +2491,12 @@ public class ComWS extends PBase {
 		else gl.peStockItf = false;
 
 		listItems.clear();
-		scomp = 0;idbg = "";stockflag = 0;ftmsg = "";ftflag = false;rrs="...";
+		scomp = 0;
+		idbg = "";
+		stockflag = 0;
+		ftmsg = "";
+		ftflag = false;
+		rrs = "...";
 
 		try {
 
@@ -2448,24 +2512,25 @@ public class ComWS extends PBase {
 			ferr = "";
 			return true;
 		} catch (Exception e) {
-			addlog(new Object() {}.getClass().getEnclosingMethod().getName(),idbg, fstr);
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), idbg, fstr);
 			return false;
 		}
 
 	}
 
 	//#CKFK 20190619 Agregué esta condición a la consulta AND DATEDIFF(D, FECHA, Getdate())<6
-	private boolean TieneInventarioSinVentas(){
+	private boolean TieneInventarioSinVentas() {
 
 		boolean vTieneInventarioSinVentas = false;
-		int rslv=0;
+		int rslv = 0;
 		String msg;
 
-		try	{
+		try {
 
 			msg = "";
 
-			sql =" SELECT DOCUMENTO " +
+			sql = " SELECT DOCUMENTO " +
 					" FROM P_STOCKB " +
 					" WHERE (RUTA='" + gl.ruta + "') AND DATEDIFF(D, FECHA, Getdate())>0 " +
 					" AND DATEDIFF(D, FECHA, Getdate())<6 " +
@@ -2478,7 +2543,7 @@ public class ComWS extends PBase {
 					" AND ANULADO = 0 AND STATUS = 'A' AND ENVIADO = 0  AND CODIGOLIQUIDACION = 0 " +
 					" AND DOCUMENTO IN (SELECT DOCUMENTO FROM P_DOC_ENVIADOS_HH) ";
 
-			rslv = fillTable(sql,"DELETE FROM CANTDOCPEND");
+			rslv = fillTable(sql, "DELETE FROM CANTDOCPEND");
 
 			if (rslv == 1) {
 				msg = "Tiene datos pendientes de subir al BOF, va a tener que facturar manual el día de hoy o subir los datos pendientes";
@@ -2488,11 +2553,11 @@ public class ComWS extends PBase {
 				vTieneInventarioSinVentas = false;
 			}
 
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			ferr += "Ocurrió un error validando existencia de inventario sin ventas " + ex.getMessage();
 		}
 
-		return  vTieneInventarioSinVentas;
+		return vTieneInventarioSinVentas;
 	}
 
 	private boolean borraDatos() {
@@ -2549,20 +2614,22 @@ public class ComWS extends PBase {
 				String fname = Environment.getExternalStorageDirectory() + "/roadcarga.txt";
 				wfile = new FileWriter(fname, false);
 				writer = new BufferedWriter(wfile);
-			} catch (IOException e) {}
+			} catch (IOException e) {
+			}
 
 
 			fprog = "Procesando ...";
 			wsRtask.onProgressUpdate();
 
-			ConT=new BaseDatos(this);
-			dbT=ConT.getWritableDatabase();
+			ConT = new BaseDatos(this);
+			dbT = ConT.getWritableDatabase();
 			ConT.vDatabase = dbT;
 			insT = ConT.Ins;
 
-			prn = 0;jj = 0;
+			prn = 0;
+			jj = 0;
 
-			try{
+			try {
 
 				for (int i = 0; i < rc; i++) {
 
@@ -2573,14 +2640,15 @@ public class ComWS extends PBase {
 					sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
 
 					try {
-						writer.write(sql);writer.write("\r\n");
+						writer.write(sql);
+						writer.write("\r\n");
 					} catch (Exception e) {
 					}
 				}
 
 				writer.close();
 
-			} catch (Exception ex){
+			} catch (Exception ex) {
 
 			}
 
@@ -2589,7 +2657,8 @@ public class ComWS extends PBase {
 
 			for (int i = 0; i < rc; i++) {
 
-				sql = listItems.get(i);esql = sql;
+				sql = listItems.get(i);
+				esql = sql;
 				sql = sql.replace("INTO VENDEDORES", "INTO P_VENDEDOR");
 				sql = sql.replace("INTO P_RAZONNOSCAN", "INTO P_CODNOLEC");
 				sql = sql.replace("INTO P_ENCABEZADO_REPORTESHH_II", "INTO P_ENCABEZADO_REPORTESHH");
@@ -2598,31 +2667,34 @@ public class ComWS extends PBase {
 					dbT = ConT.getWritableDatabase();
 					dbT.execSQL(sql);
 				} catch (Exception e) {
-					ferr += " " +e.getMessage();
-					addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					ferr += " " + e.getMessage();
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 				}
 
 				try {
 					if (i % 10 == 0) {
 						fprog = "Procesando: " + i + " de: " + (rc - 1);
-						wsRtask.onProgressUpdate();SystemClock.sleep(20);
+						wsRtask.onProgressUpdate();
+						SystemClock.sleep(20);
 					}
 				} catch (Exception e) {
-					ferr += " " +e.getMessage();
-					addlog(new Object() {}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
+					ferr += " " + e.getMessage();
+					addlog(new Object() {
+					}.getClass().getEnclosingMethod().getName(), e.getMessage(), sql);
 				}
 			}
 
 			try {
 				writer.close();
 			} catch (Exception e) {
-				String ss=e.getMessage();
+				String ss = e.getMessage();
 			}
 
 			fprog = "Procesando: " + (rc - 1) + " de: " + (rc - 1);
 			wsRtask.onProgressUpdate();
 
-			if (modo_recepcion==1){
+			if (modo_recepcion == 1) {
 				Actualiza_FinDia();
 				encodeLicence();
 				encodeLicenceRuta();
@@ -2633,11 +2705,11 @@ public class ComWS extends PBase {
 				//SetStatusRecToTrans("1");
 			}
 
-			if (modo_recepcion==1 || modo_recepcion==2){
+			if (modo_recepcion == 1 || modo_recepcion == 2) {
 				SetStatusRecToTrans("1");
 			}
 
-			if (modo_recepcion!=3){
+			if (modo_recepcion != 3) {
 				fprog = "Documento de inventario recibido en BOF...";
 				wsRtask.onProgressUpdate();
 
@@ -2649,7 +2721,8 @@ public class ComWS extends PBase {
 			dbT.setTransactionSuccessful();
 			dbT.endTransaction();
 
-			fprog = "Fin de actualización";wsRtask.onProgressUpdate();
+			fprog = "Fin de actualización";
+			wsRtask.onProgressUpdate();
 
 			scomp = 1;
 
@@ -2662,7 +2735,7 @@ public class ComWS extends PBase {
 			lblInfo.setText(" ");
 			s = "Recepción completa.";
 
-			if (modo_recepcion!=3 ){
+			if (modo_recepcion != 3) {
 				try {
 					Cursor dt1 = Con.OpenDT(sql);
 					sql = "SELECT VENTA FROM P_RUTA";
@@ -2678,7 +2751,7 @@ public class ComWS extends PBase {
 
 				gl.rutatipo = val;
 				rutatipo = gl.rutatipo;
-				pedidos=rutatipo.equals("P");
+				pedidos = rutatipo.equals("P");
 
 				// if (stockflag == 1) s = s + "\nSe actualizó inventario.";
 
@@ -2686,7 +2759,7 @@ public class ComWS extends PBase {
 					sql = "SELECT Codigo FROM P_STOCK UNION SELECT Codigo FROM P_STOCKB ";
 
 					Cursor dt = Con.OpenDT(sql);
-					if (dt.getCount() > 0){
+					if (dt.getCount() > 0) {
 						stockflag = 1;
 						s = s + "\nSe actualizó inventario.";
 					}
@@ -2700,7 +2773,7 @@ public class ComWS extends PBase {
 
 			}
 
-			if (modo_recepcion==1 ){
+			if (modo_recepcion == 1) {
 				validaDatos(true);
 
 				comparaCorrel();
@@ -2730,15 +2803,19 @@ public class ComWS extends PBase {
 			try {
 				ConT.close();
 			} catch (Exception ee) {
-				sstr = e.getMessage();ferr += " " + sstr;
+				sstr = e.getMessage();
+				ferr += " " + sstr;
 			}
 
-			sstr = e.getMessage();ferr += " " + sstr + "\n" + sql;esql = sql;
-			addlog(new Object() {}.getClass().getEnclosingMethod().getName(), ferr, esql);
+			sstr = e.getMessage();
+			ferr += " " + sstr + "\n" + sql;
+			esql = sql;
+			addlog(new Object() {
+			}.getClass().getEnclosingMethod().getName(), ferr, esql);
 
 			return false;
 
-		}finally {
+		} finally {
 			visibilidadBotones();
 		}
 
@@ -2855,14 +2932,15 @@ public class ComWS extends PBase {
 				sql = listItems.get(i);
 				esql = sql;
 
-				if (sql.contains("p_empresa")){
+				if (sql.contains("p_empresa")) {
 					msgbox("Si");
 				}
 				dbT.execSQL(sql);
 
 				try {
 					if (i % 10 == 0) SystemClock.sleep(20);
-				} catch (Exception e) {}
+				} catch (Exception e) {
+				}
 			}
 
 			dbT.setTransactionSuccessful();
@@ -2996,7 +3074,7 @@ public class ComWS extends PBase {
 
 		} catch (Exception ex) {
 			vActualizaFD = false;
-			fstr=ex.getMessage();
+			fstr = ex.getMessage();
 		}
 
 		return vActualizaFD;
@@ -3008,19 +3086,33 @@ public class ComWS extends PBase {
 
 		try {
 
-			fprog = TN;idbg = TN;
+			fprog = TN;
+			idbg = TN;
 			wsRtask.onProgressUpdate();
-			SQL = getTableSQL(TN);
 
-			if (fillTable2(SQL, "DELETE FROM " + TN) == 1) {
-				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " ok ";
-				idbg = idbg + SQL + "#" + "PASS OK";
+			if (nombretabla.equals("EjecutaSP")) {
+				dbld.clear();
+				dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");
+				dbld.add("EXEC SP_ULTIMOSPRECIOS '" + ruta + "'");
+				dbld.add("EXEC SP_INVENTARIOBODEGA");
+				commitSQL_SP();
 				return true;
+
 			} else {
-				if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " fail " + sstr;
-				idbg = idbg + SQL + "#" + " PASS FAIL  ";
-				fstr = "Tab:" + TN + " " + sstr;
-				return false;
+
+				SQL = getTableSQL(TN);
+
+				if (fillTable2(SQL, "DELETE FROM " + TN) == 1) {
+					if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " ok ";
+					idbg = idbg + SQL + "#" + "PASS OK";
+					return true;
+				} else {
+					if (TN.equalsIgnoreCase("P_STOCK")) dbg = dbg + " fail " + sstr;
+					idbg = idbg + SQL + "#" + " PASS FAIL  ";
+					fstr = "Tab:" + TN + " " + sstr;
+					return false;
+				}
+
 			}
 
 		} catch (Exception e) {
@@ -3931,6 +4023,17 @@ public class ComWS extends PBase {
 		}
 	}
 
+	private void cargaTablasExist() {
+		try {
+			listItems.clear();
+			indicetabla=0; nombretabla="P_STOCKINV";
+			executaTabla();
+		} catch (Exception e) {
+			String ss=e.getMessage();
+			visibilidadBotones();
+		}
+	}
+
 	// AT20211019
 	private void cargaTablasPrecio() {
 		try	{
@@ -4136,12 +4239,7 @@ public class ComWS extends PBase {
 				case 57:
 					nombretabla="P_MERPRODCOMP";break;
 				case 58:
-					dbld.clear();
-					dbld.add("EXEC SP_GENERA_PEDIDO_SUGERIDO_POR_RUTA '" + ruta + "'");
-					dbld.add("EXEC SP_ULTIMOSPRECIOS '" + ruta + "'");
-					dbld.add("EXEC SP_INVENTARIOBODEGA");
-					commitSQL();
-					nombretabla = "";
+					nombretabla = "EjecutaSP";
 					break;
 				case 59:
 					nombretabla="P_STOCKINV";break;

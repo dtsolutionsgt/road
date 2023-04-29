@@ -757,8 +757,7 @@ public class Menu extends PBase {
 	public void showVoidMenuPreventa() {
 
 		try{
-
-		}catch (Exception e){final AlertDialog Dialog;
+			final AlertDialog Dialog;
 			final String[] selitems = {"Pedido","Recibo","Deposito", "Nota crédito"};
 
 			menudlg = new AlertDialog.Builder(this);
@@ -797,6 +796,7 @@ public class Menu extends PBase {
 			Button nbutton = Dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
 			nbutton.setBackgroundColor(Color.parseColor("#1A8AC6"));
 			nbutton.setTextColor(Color.WHITE);
+		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
 		}
 

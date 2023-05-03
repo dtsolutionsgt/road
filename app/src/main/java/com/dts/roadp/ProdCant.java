@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,6 +40,8 @@ public class ProdCant extends PBase {
 
 	//#CKFK 20190613 Objetos creados para poder modificar el precio de un producto
 	private EditText txtNuevoPrecio;
+
+	private CheckBox chkMediaCaja;
 	private TextView lblNuevoPrecio, lblPrecioMinimo;
 
 	private Precio prc;
@@ -95,6 +98,7 @@ public class ProdCant extends PBase {
 		txtNuevoPrecio.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 		//Limita cantidad de decimales para los EditText.
 		txtNuevoPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(2)});
+		chkMediaCaja = (CheckBox) findViewById(R.id.checkBox8); chkMediaCaja.setChecked(false); chkMediaCaja.setVisibility(View.INVISIBLE);
 
 		setHandlers();
 
@@ -259,6 +263,7 @@ public class ProdCant extends PBase {
 			dt.moveToFirst();			
 			um=dt.getString(0);ubas=um;umfact=um;
 			lblBU.setText(ubas);gl.ubas=ubas;upres=ubas;
+
 		} catch (Exception e) {
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 			mu.msgbox("1-"+ e.getMessage());
@@ -274,7 +279,14 @@ public class ProdCant extends PBase {
 				
 			ubas=dt.getString(0);gl.ubas=ubas;			
 			lblDesc.setText(dt.getString(7));
-			
+			unimedfact= dt.getDouble(2);
+
+			if (unimedfact!=0){
+				chkMediaCaja.setVisibility(View.VISIBLE);
+			}else{
+				chkMediaCaja.setVisibility(View.INVISIBLE);
+			}
+
 			//prodimg=DT.getString(6);
 			prodimg=prodid;
 			proddesc=dt.getString(7);
@@ -346,7 +358,18 @@ public class ProdCant extends PBase {
 
 			if(dt.getCount()>0){
 				dt.moveToFirst();
-				icant=dt.getDouble(0);
+
+				double nCant = dt.getDouble(0);
+
+				double parteDecimal = nCant % 1; // Lo que sobra de dividir al número entre 1
+				double parteEntera = nCant - parteDecimal; // Le quitamos la parte decimal usando una resta
+
+				icant=parteEntera;
+
+				if(parteDecimal>0) {
+					chkMediaCaja.setChecked(parteDecimal>0?true:false);
+				}
+
 				ippeso=dt.getDouble(1);
 				gl.nuevoprecio = dt.getDouble(2);;
 			}
@@ -699,7 +722,7 @@ public class ProdCant extends PBase {
 		}
 
 		// ajuste a unidades menores
-		if (esdecimal) {
+		/*if (esdecimal) {
 
 			if (umfactor==0) {
 				//msgbox("Factor de conversion incorrecto");return -1;
@@ -712,6 +735,12 @@ public class ProdCant extends PBase {
 
 			if (adcant!=cant) {
 				ajust=true;cant=adcant;
+			}
+		}*/
+
+		if (unimedfact!=0){
+			if (chkMediaCaja.isChecked()){
+				cant=cant+0.5;
 			}
 		}
 

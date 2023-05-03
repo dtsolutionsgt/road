@@ -1134,12 +1134,15 @@ public class ProdCant extends PBase {
 
 	//region ModificarPrecio
 
+
+	//region ModificarPrecio
+
 	//#CKFK 20190613 Modificar el precio del producto
 	public void ModificarPrecio(final View view) {
 
 		try{
 
-            final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 			alert.setTitle("Modificar precio");
 
@@ -1162,18 +1165,18 @@ public class ProdCant extends PBase {
 			lblPrecioMinimo.setTypeface(lblPrecioMinimo.getTypeface(), Typeface.BOLD_ITALIC);
 			lblPrecioMinimo.setGravity(Gravity.CENTER);
 			lblPrecioMinimo.setTextColor(Color.rgb(51,131,55));
-			lblPrecioMinimo.setText("Precio mínimo: " + mu.frmcur(costo));
+			lblPrecioMinimo.setText("Precio mínimo: " + mu.frmcur(precioMinimo));
 
 			lblNuevoPrecio.setTypeface(lblPrecioMinimo.getTypeface(), Typeface.BOLD_ITALIC);
 			lblNuevoPrecio.setTextSize(20);
 			lblNuevoPrecio.setGravity(Gravity.CENTER);
 			lblNuevoPrecio.setText("Nuevo precio");
 
-            txtNuevoPrecio.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-            //Limita cantidad de decimales para los EditText.
-            txtNuevoPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(2)});
+			txtNuevoPrecio.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			//Limita cantidad de decimales para los EditText.
+			txtNuevoPrecio.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(2)});
 			txtNuevoPrecio.setTextSize(20);
-			txtNuevoPrecio.setText(mu.frmcur_sm(costo));
+			txtNuevoPrecio.setText(mu.frmcur_sm(precioMinimo));
 			txtNuevoPrecio.selectAll();
 
 			layout.addView(lblPrecioMinimo);
@@ -1189,22 +1192,22 @@ public class ProdCant extends PBase {
 			alert.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 
-				    nuevoprecio=Double.parseDouble((txtNuevoPrecio.getText().toString().isEmpty()?"0.00":txtNuevoPrecio.getText().toString()));
+					nuevoprecio=Double.parseDouble((txtNuevoPrecio.getText().toString().isEmpty()?"0.00":txtNuevoPrecio.getText().toString()));
 
 					if(nuevoprecio==0){
-                        mu.toast("El precio debe ser mayor que 0");
+						mu.toast("El precio debe ser mayor que 0");
 						ModificarPrecio(view);
-                    }else if (nuevoprecio < costo) {
-                        mu.toast("El precio debe ser mayor o igual que el precio mínimo");
+					}else if (nuevoprecio < precioMinimo) {
+						mu.toast("El precio debe ser mayor o igual que el precio mínimo");
 						ModificarPrecio(view);
-                    } else {
+					} else {
 						lblPrec.setText("Precio: "+mu.frmcur(nuevoprecio));
 						gl.nuevoprecio = nuevoprecio;
 						prec=gl.nuevoprecio;
 						setCant(true);
-                        closekeyb();
-                        layout.removeAllViews();
-                    }
+						closekeyb();
+						layout.removeAllViews();
+					}
 				}
 
 			});
@@ -1227,5 +1230,6 @@ public class ProdCant extends PBase {
 	}
 
 	//endregion
+
 
 }

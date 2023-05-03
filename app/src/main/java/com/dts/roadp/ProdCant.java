@@ -48,7 +48,7 @@ public class ProdCant extends PBase {
 	
 	private String prodid,prodimg,proddesc,rutatipo,um,umstock,ubas,upres,umfact;
 	private int nivel,browse=0,deccant, modifprecio;
-	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0, costo=0, nuevoprecio=0;
+	private double cant,prec,icant,idisp,ipeso,umfactor,pesoprom=0,pesostock=0, costo=0, nuevoprecio=0, unimedfact = 0;;
 	private boolean pexist,esdecimal,porpeso,esbarra;
 
 	@Override

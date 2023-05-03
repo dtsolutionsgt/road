@@ -273,7 +273,7 @@ public class ProdCant extends PBase {
 		try {
 							
 			sql="SELECT UNIDBAS,UNIDMED,UNIMEDFACT,UNIGRA,UNIGRAFACT,DESCCORTA,IMAGEN,DESCLARGA,TIPO,PESO_PROMEDIO,FACTORCONV, "+
-                "COSTO, MODIF_PRECIO "+
+                "COSTO, MODIF_PRECIO, PRECIO_VINETA_O_TUBO "+
 				"FROM P_PRODUCTO WHERE CODIGO='"+prodid+"'";
            	dt=Con.OpenDT(sql);
 			dt.moveToFirst();
@@ -295,8 +295,9 @@ public class ProdCant extends PBase {
 			pesoprom = dt.getDouble(10);
 			if (pesoprom==0) pesoprom = dt.getDouble(9);
 
-            costo=dt.getDouble(11);
-            modifprecio=dt.getInt(12);
+			costo=dt.getDouble(11);
+			modifprecio=dt.getInt(12);
+			precioMinimo=dt.getDouble(13);
 
             //#CKFK 20190612 Modificar el formato del label para que al hacer clic pueda ingresar el nuevo precio
             if (modifprecio==1){

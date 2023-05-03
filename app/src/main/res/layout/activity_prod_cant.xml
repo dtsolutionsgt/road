@@ -500,6 +500,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/layPres"
-        android:text="1/2 caja" />
+        android:text="1/2 caja"
+        tools:visibility="visible" />
 
 </RelativeLayout>

@@ -516,7 +516,6 @@ public class Venta extends PBase {
 			lblCant.setText(mu.frmdecimal(cant, gl.peDecImp) + " " + ltrim(um, 6));
 			lblPres.setText("");
 
-
 			// Bonificacion
 
 			// Borra la anterior, si existe

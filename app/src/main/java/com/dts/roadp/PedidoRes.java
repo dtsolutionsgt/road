@@ -34,7 +34,7 @@ public class PedidoRes extends PBase {
 	final int anio = c.get(Calendar.YEAR);
 
 	private ListView listView;
-	private EditText txtDir;
+	private EditText txtDir, txtReferencia;
 	private TextView lblFecha;
 	private ImageView imgBon;
 	private Spinner spinList;
@@ -66,6 +66,7 @@ public class PedidoRes extends PBase {
 		
 		listView = (ListView) findViewById(R.id.listView1);
 		txtDir = (EditText) findViewById(R.id.txtMonto);
+		txtReferencia = (EditText) findViewById(R.id.txtReferencia);
 		lblFecha = (TextView) findViewById(R.id.lblpSaldo);
 		imgBon = (ImageView) findViewById(R.id.imageView1);
 		

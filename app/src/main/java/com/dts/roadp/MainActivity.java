@@ -41,8 +41,8 @@ public class MainActivity extends PBase {
     private boolean rutapos, scanning = false;
     private String cs1, cs2, cs3, barcode;
 
-    private String parNumVer = "9.5.7 / ";
-    private String parVerFecha= "05-Mayo-2024";
+    private String parNumVer = "9.5.8 / ";
+    private String parVerFecha= "15-Mayo-2023";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

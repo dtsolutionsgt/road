@@ -43,6 +43,7 @@ public class Producto extends PBase {
 	private Spinner spinFam;
 	private Spinner spinTipo;
 
+	private TextView porNombre, porCodigo;
 	private ArrayList<String> spincode= new ArrayList<String>();
 	private ArrayList<String> spinlist = new ArrayList<String>();
 
@@ -82,6 +83,8 @@ public class Producto extends PBase {
 		spinFam = (Spinner) findViewById(R.id.spinner1);
 		spinTipo = (Spinner) findViewById(R.id.spinner10);
 		gridView = (GridView) findViewById(R.id.gridPrd);
+		porNombre=(TextView) findViewById(R.id.textView28);
+		porCodigo=(TextView) findViewById(R.id.textView27);
 
 		xBegin = gridView.getScaleX();
 		yBegin = gridView.getScaleY();
@@ -92,6 +95,14 @@ public class Producto extends PBase {
 		gl.prodtipo=0;
 		this.setTitle("Producto");
 		if (prodtipo==1) this.setTitle("Producto con existencia");
+
+		if (prodtipo==0){
+			porNombre.setVisibility(View.INVISIBLE);
+			porCodigo.setVisibility(View.INVISIBLE);
+		}else{
+			porNombre.setVisibility(View.VISIBLE);
+			porCodigo.setVisibility(View.VISIBLE);
+		}
 
 		//#CKFK 20190624 Incializo la variable en falso
 		gl.mostrarPedidoSugerido=0;

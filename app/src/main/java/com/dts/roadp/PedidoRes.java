@@ -351,7 +351,7 @@ public class PedidoRes extends PBase {
 			ins.add("IMPRES",0);
 			ins.add("ADD1",gl.media);//Se está guardando aquí la media de pago del cliente ya que La gran Fortuna lo necesita
 			ins.add("ADD2","");
-			ins.add("ADD3","");
+			ins.add("ADD3",txtReferencia.getText().toString());
 			ins.add("STATPROC","");
 			ins.add("RECHAZADO",0);
 			ins.add("RAZON_RECHAZADO","");  // valor de percepcion 0 o xxx.xx

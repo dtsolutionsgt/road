@@ -885,12 +885,12 @@ public class DevolCli extends PBase {
 				if (ConexionValida()) {
 					//#AT20230309 Intenta certificar 3 veces
 					try {
-						RespuestaEdoc = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+						RespuestaEdoc = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaCredito, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 						if (RespuestaEdoc.Cufe == null) {
 							for (int i = 0; i < 2; i++) {
 								if (RespuestaEdoc.Cufe == null && !RespuestaEdoc.Estado.equals("15")) {
-									RespuestaEdoc = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+									RespuestaEdoc = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaCredito, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 									if (RespuestaEdoc.Cufe != null) {
 										break;

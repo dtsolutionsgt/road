@@ -1113,13 +1113,13 @@ public class Anulacion extends PBase {
 			if (ConexionValida()) {
 				//#AT20230309 Intenta certificar 3 veces
 				try {
-					RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+					RespuestaEdocND = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 					if (RespuestaEdocND != null) {
 						if (RespuestaEdocND.Cufe == null) {
 							for (int i = 0; i < 2; i++) {
 								if (RespuestaEdocND.Cufe == null && !RespuestaEdocND.Estado.equals("15")) {
-									RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+									RespuestaEdocND = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 									if (RespuestaEdocND.Cufe != null) {
 										break;
@@ -1512,13 +1512,13 @@ public class Anulacion extends PBase {
 			if (ConexionValida()) {
 				//#AT20230309 Intenta certificar 3 veces
 				try {
-					RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+					RespuestaEdocND = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 					if (RespuestaEdocND != null) {
 						if (RespuestaEdocND.Cufe == null) {
 							for (int i = 0; i < 2; i++) {
 								if (RespuestaEdocND.Cufe == null && !RespuestaEdocND.Estado.equals("15")) {
-									RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+									RespuestaEdocND = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 									if (RespuestaEdocND.Cufe != null) {
 										break;
@@ -1878,12 +1878,12 @@ public class Anulacion extends PBase {
 			if (ConexionValida()) {
 				//#AT20230309 Intenta certificar 3 veces
 				try {
-					RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+					RespuestaEdocND = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 					if (RespuestaEdocND.Cufe == null) {
 						for (int i = 0; i < 2; i++) {
 							if (RespuestaEdocND.Cufe == null && !RespuestaEdocND.Estado.equals("15")) {
-								RespuestaEdocND = Firmador.EmisionDocumentoBTB(NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+								RespuestaEdocND = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaDebito, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 								if (RespuestaEdocND.Cufe != null) {
 									break;

@@ -2156,12 +2156,12 @@ public class FacturaRes extends PBase {
 			if (ConexionValida()) {
 				//#AT20230309 Intenta certificar 3 veces
 				try {
-					RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
+					RespuestaEdocFac = Firmador.EmisionDocumentoBTBTimeOut(5000,Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 					if (RespuestaEdocFac.Cufe == null) {
 						for (int i = 0; i < 2; i++) {
 							if (RespuestaEdocFac.Cufe == null && (RespuestaEdocFac.Estado == null || !RespuestaEdocFac.Estado.equals("15"))) {
-								RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
+								RespuestaEdocFac = Firmador.EmisionDocumentoBTBTimeOut(5000,Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 								if (RespuestaEdocFac.Cufe != null) {
 									break;
@@ -2359,12 +2359,12 @@ public class FacturaRes extends PBase {
 			if (ConexionValida()) {
 				//#AT20230309 Intenta certificar 3 veces
 				try {
-					RespuestaEdocNC = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, gl.ambiente);
+					RespuestaEdocNC = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaCredito, urltoken, usuario, clave, urlDocNT, gl.ambiente);
 
 					if (RespuestaEdocNC.Cufe == null) {
 						for (int i = 0; i < 2; i++) {
 							if (RespuestaEdocNC.Cufe == null && !RespuestaEdocNC.Estado.equals("15")) {
-								RespuestaEdocNC = Firmador.EmisionDocumentoBTB(NotaCredito, urltoken, usuario, clave, urlDocNT, gl.ambiente);
+								RespuestaEdocNC = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaCredito, urltoken, usuario, clave, urlDocNT, gl.ambiente);
 
 								if (RespuestaEdocNC.Cufe != null) {
 									break;

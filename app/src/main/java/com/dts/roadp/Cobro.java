@@ -1289,12 +1289,12 @@ public class Cobro extends PBase {
 			if (ConexionValida()) {
 				//#AT20230309 Intenta certificar 3 veces
 				try {
-					RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
+					RespuestaEdocFac = Firmador.EmisionDocumentoBTBTimeOut(5000,Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 					if (RespuestaEdocFac.Cufe == null) {
 						for (int i = 0; i < 2; i++) {
 							if (RespuestaEdocFac.Cufe == null && !RespuestaEdocFac.Estado.equals("15")) {
-								RespuestaEdocFac = Firmador.EmisionDocumentoBTB(Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
+								RespuestaEdocFac = Firmador.EmisionDocumentoBTBTimeOut(5000,Factura, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
 								if (RespuestaEdocFac.Cufe != null) {
 									break;

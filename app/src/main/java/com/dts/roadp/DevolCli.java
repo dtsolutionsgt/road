@@ -889,14 +889,26 @@ public class DevolCli extends PBase {
 
 						if (RespuestaEdoc.Cufe == null) {
 							for (int i = 0; i < 2; i++) {
-								if (RespuestaEdoc.Cufe == null && !RespuestaEdoc.Estado.equals("15")) {
-									RespuestaEdoc = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaCredito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+								if(RespuestaEdoc.Estado!=null){
+									if (RespuestaEdoc.Cufe == null && !RespuestaEdoc.Estado.equals("15")) {
+										RespuestaEdoc = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaCredito, urltoken, usuario, clave, urlDoc, gl.ambiente);
 
-									if (RespuestaEdoc.Cufe != null) {
+										if (RespuestaEdoc.Cufe != null) {
+											break;
+										}
+									} else {
 										break;
 									}
-								} else {
-									break;
+								}else{
+									if (RespuestaEdoc.Cufe == null) {
+										RespuestaEdoc = Firmador.EmisionDocumentoBTBTimeOut(5000,NotaCredito, urltoken, usuario, clave, urlDoc, gl.ambiente);
+
+										if (RespuestaEdoc.Cufe != null) {
+											break;
+										}
+									} else {
+										break;
+									}
 								}
 
 							}
@@ -925,6 +937,7 @@ public class DevolCli extends PBase {
 					FacturaControl.ValorXml = RespuestaEdoc.XML != null ? Catalogo.ReplaceXML(RespuestaEdoc.XML) : "";
 					FacturaControl.Fecha_Autorizacion = RespuestaEdoc.FechaAutorizacion;
 					FacturaControl.Numero_Autorizacion = (RespuestaEdoc.NumAutorizacion == null ? "": RespuestaEdoc.NumAutorizacion);
+					FacturaControl.QR = RespuestaEdoc.UrlCodeQR;
 				}
 
 				FacturaControl.TipoDoc = NotaCredito.gDGen.iDoc;
@@ -936,16 +949,20 @@ public class DevolCli extends PBase {
 				FacturaControl.FechaEnvio = FechaEnv[0];
 				FacturaControl.TipFac = NotaCredito.gDGen.iDoc;
 				FacturaControl.FechaAgr = String.valueOf(du.getFechaCompleta());
-				FacturaControl.QR = RespuestaEdoc.UrlCodeQR;
+				FacturaControl.QR = "";
 				FacturaControl.Corel = gl.devcornc;
 				FacturaControl.Ruta = gl.ruta;
 				FacturaControl.Vendedor = gl.vend;
 				FacturaControl.Correlativo = String.valueOf(vNroDF);
 
-				if (RespuestaEdoc.Estado.equals("2")) {
-					toastlongd("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + (RespuestaEdoc.MensajeRespuesta == null ? "":RespuestaEdoc.MensajeRespuesta));
-				} else {
-					toastlongd("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + (RespuestaEdoc.MensajeRespuesta == null ? "":RespuestaEdoc.MensajeRespuesta));
+				if(RespuestaEdoc.Estado!=null && RespuestaEdoc!=null){
+					if (RespuestaEdoc.Estado.equals("2")) {
+						toastlongd("NOTA DE CREDITO CERTIFICADA CON EXITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + (RespuestaEdoc.MensajeRespuesta == null ? "":RespuestaEdoc.MensajeRespuesta));
+					} else {
+						toastlongd("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: " + RespuestaEdoc.Estado + " - " + (RespuestaEdoc.MensajeRespuesta == null ? "":RespuestaEdoc.MensajeRespuesta));
+					}
+				}else{
+					toastlongd("NO SE LOGRÓ CERTIFICAR LA NOTA DE CREDITO -- " + " ESTADO: No definido - No se obtuvo respuesta ");
 				}
 
 				try{

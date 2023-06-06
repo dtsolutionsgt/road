@@ -193,6 +193,19 @@ public class DevolCli extends PBase {
 				return;
 			}
 
+			if(cntotl==0){
+				mu.msgbox("¡No puede continuar, el total es 0!");
+
+				aplicandoDevol = false;
+				imgNext.setVisibility(View.VISIBLE);
+				imgNext.setEnabled(true);
+
+				imgImg.setVisibility(View.VISIBLE);
+				imgImg.setEnabled(true);
+
+				return;
+			}
+
 			msgAskComplete("Aplicar la devolución");
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");

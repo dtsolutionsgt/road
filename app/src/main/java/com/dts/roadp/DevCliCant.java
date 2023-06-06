@@ -193,9 +193,20 @@ public class DevCliCant extends PBase {
 				gl.tienelote = 1;
 			}
 
+			if(gl.dvprec==0){
+				gl.dvError = true;
+				mu.msgbox("El precio no puede ser 0");return;
+			}
+
+			if(gl.dvtotal==0){
+				gl.dvError = true;
+				mu.msgbox("El total no puede ser 0");return;
+			}
+
 			gl.dvprec = mu.round2(gl.dvprec);
 			gl.dvtotal= mu.round2(gl.dvtotal);
 			gl.dvpreclista = mu.round2(gl.dvpreclista);
+
 			//hidekeyb();
 			super.finish();
 

@@ -146,6 +146,11 @@ public class Menu extends PBase {
 			//#CKFK 20190423 Quité esta validación de configuración de impresora
 			//ConfImpresora();
 
+/*			sql = "UPDATE P_CLIENTE SET MEDIAPAGO = 4";
+			db.execSQL(sql);
+			sql = "UPDATE P_RUTA SET VENTA = 'V'";
+			db.execSQL(sql);*/
+
             validaParametros();
 
 		} catch (Exception e) 		{

@@ -457,9 +457,9 @@ public class Deposito extends PBase {
 				
 			}
 
-			tot=mu.round(tot,2);
-			efect=mu.round(efect,2);
-			chec=mu.round(chec,2);
+			tot=mu.round2(tot);
+			efect=mu.round2(efect);
+			chec=mu.round2(chec);
 
 			corel=((appGlobals) vApp).ruta+"_"+mu.getCorelBase();
 			
@@ -498,7 +498,7 @@ public class Deposito extends PBase {
 					if (item.Efect>0) {
 						
 						it+=1;
-						item.Efect=mu.round(item.Efect,2);
+						item.Efect=mu.round2(item.Efect);
 						
 						ins.init("D_DEPOSD");
 						ins.add("COREL",corel);

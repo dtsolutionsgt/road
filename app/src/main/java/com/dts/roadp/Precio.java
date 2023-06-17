@@ -102,7 +102,7 @@ public class Precio {
 			}
 	    }
 		
-		totsin=pr*cant;tsimp=mu.round(totsin,ndec);
+		totsin=pr*cant;tsimp=mu.round2(totsin);
 		
 		//percep=0;
 		
@@ -110,9 +110,9 @@ public class Precio {
 		pr=pr*(1+imp/100);
 
 		// total
-		stot=pr*cant;stot=mu.round(stot,ndec);
+		stot=pr*cant;stot=mu.round2(stot);
 		if (imp>0) impval=stot-tsimp; else impval=0;
-		descmon=(double) (stot*desc/100);descmon=mu.round(descmon,ndec);
+		descmon=(double) (stot*desc/100);descmon=mu.round2(descmon);
 		tot=stot-descmon;
 
 		if (cant>0) prec=(double) (tot/cant); else prec=pr;
@@ -120,7 +120,7 @@ public class Precio {
 		try {
 			sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
 			pprec=Double.parseDouble(sprec);
-			precdoc=mu.round(pprec,ndec);
+			precdoc=mu.round2(pprec);
 		} catch (Exception e) {
 			precdoc=prec;
 		}
@@ -130,28 +130,28 @@ public class Precio {
 		try {
 			sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
 			pprec=Double.parseDouble(sprec);
-			pprec=mu.round(pprec,ndec);
+			pprec=mu.round2(pprec);
 		} catch (Exception e) {
 			pprec=prec;
 		}
 		prec=pprec;
 
 		// total
-		stot=prec*cant;stot=mu.round(stot,ndec);
+		stot=prec*cant;stot=mu.round2(stot);
 		if (imp>0) impval=stot-tsimp; else impval=0;
-		descmon=(double) (stot*desc/100);descmon=mu.round(descmon,ndec);
+		descmon=(double) (stot*desc/100);descmon=mu.round2(descmon);
 		tot=stot-descmon;
 
 		if (imp==0) precsin=prec; else precsin=prec/(1+imp/100);
 		//Toast.makeText(cont,sprec+" - "+pprec+" / "+prec+" prec sin : "+precsin, Toast.LENGTH_SHORT).show();
 		
-		totsin=mu.round(precsin*cant,ndec);
+		totsin=mu.round2(precsin*cant);
 		if (cant>0) precsin=(double) (totsin/cant);	
 		
 		try {
 			sprec=ffrmprec.format(precsin);sprec=sprec.replace(",",".");
 			pprec=Double.parseDouble(sprec);
-			pprec=mu.round(pprec,ndec);
+			pprec=mu.round2(pprec);
 		} catch (Exception e) {
 			pprec=precsin;
 		}
@@ -177,12 +177,12 @@ public class Precio {
 			pr=0;
 	    }	
 		
-		totsin=pr;tsimp=mu.round(totsin,ndec);
+		totsin=pr;tsimp=mu.round2(totsin);
 		
 		imp=getImp();
 		pr=pr*(1+imp/100);
 		
-		stot=pr;stot=mu.round(stot,ndec);
+		stot=pr;stot=mu.round2(stot);
 		
 		if (imp>0) impval=stot-tsimp; else impval=0;
 		
@@ -194,7 +194,7 @@ public class Precio {
 		try {
 			sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
 			pprec=Double.parseDouble(sprec);
-			pprec=mu.round(pprec,ndec);
+			pprec=mu.round2(pprec);
 		} catch (Exception e) {
 			pprec=prec;
 		}
@@ -202,13 +202,13 @@ public class Precio {
 		
 		if (imp==0) precsin=prec; else precsin=prec/(1+imp/100);
 		
-		totsin=mu.round(precsin,ndec);
+		totsin=mu.round2(precsin);
 		precsin=totsin;	
 		
 		try {
 			sprec=ffrmprec.format(precsin);sprec=sprec.replace(",",".");
 			pprec=Double.parseDouble(sprec);
-			pprec=mu.round(pprec,ndec);
+			pprec=mu.round2(pprec);
 		} catch (Exception e) {
 			pprec=precsin;
 		}
@@ -315,14 +315,14 @@ public class Precio {
 
 				//#CKFK 20190607 Inicio: Solo modifica el precio base si existe algún precio especial
 
-                totsin=pr*cant;tsimp=mu.round(totsin,ndec);
+                totsin=pr*cant;tsimp=mu.round2(totsin);
                 imp=0;
                 pr=pr*(1+imp/100);
 
                 // total
-                stot=pr*cant;stot=mu.round(stot,ndec);
+                stot=pr*cant;stot=mu.round2(stot);
                 if (imp>0) impval=stot-tsimp; else impval=0;
-                descmon=(double) (stot*desc/100);descmon=mu.round(descmon,ndec);
+                descmon=(double) (stot*desc/100);descmon=mu.round2(descmon);
                 tot=stot-descmon;
 
                 if (cant>0) prec=(double) (tot/cant); else prec=pr;
@@ -330,7 +330,7 @@ public class Precio {
                 try {
                     sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
                     pprec=Double.parseDouble(sprec);
-                    precdoc=mu.round(pprec,ndec);
+                    precdoc=mu.round2(pprec);
                 } catch (Exception e) {
                     precdoc=prec;
                 }
@@ -340,26 +340,26 @@ public class Precio {
                 try {
                     sprec=ffrmprec.format(prec);sprec=sprec.replace(",",".");
                     pprec=Double.parseDouble(sprec);
-                    pprec=mu.round(pprec,ndec);
+                    pprec=mu.round2(pprec);
                 } catch (Exception e) {
                     pprec=prec;
                 }
                 prec=pprec;
 
                 // total
-                stot=prec*cant;stot=mu.round(stot,ndec);
+                stot=prec*cant;stot=mu.round2(stot);
                 if (imp>0) impval=stot-tsimp; else impval=0;
-                descmon=(double) (stot*desc/100);descmon=mu.round(descmon,ndec);
+                descmon=(double) (stot*desc/100);descmon=mu.round2(descmon);
                 tot=stot-descmon;
 
                 if (imp==0) precsin=prec; else precsin=prec/(1+imp/100);
-                totsin=mu.round(precsin*cant,ndec);
+                totsin=mu.round2(precsin*cant);
                 if (cant>0) precsin=(double) (totsin/cant);
 
                 try {
                     sprec=ffrmprec.format(precsin);sprec=sprec.replace(",",".");
                     pprec=Double.parseDouble(sprec);
-                    pprec=mu.round(pprec,ndec);
+                    pprec=mu.round2(pprec);
                 } catch (Exception e) {
                     pprec=precsin;
                 }

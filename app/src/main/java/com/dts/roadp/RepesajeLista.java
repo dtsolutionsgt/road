@@ -163,7 +163,7 @@ public class RepesajeLista extends PBase {
                 item = clsCls.new clsCD();
 
                 ppeso=mu.round(dt.getDouble(1),gl.peDecImp);tpeso+=ppeso;
-                pprec=mu.round(dt.getDouble(2),2);tprec+=pprec;
+                pprec=mu.round2(dt.getDouble(2));tprec+=pprec;
 
                 item.Cod = dt.getString(0);
                 item.Desc = mu.frmdecimal(ppeso,gl.peDecImp);

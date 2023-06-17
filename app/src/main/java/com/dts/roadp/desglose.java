@@ -230,14 +230,14 @@ public class desglose extends PBase {
                     if (!editando) {
                         if (gl.totDep < valtot) {
                             LimpiaValores();
-                            lblTotal.setText(String.valueOf(mu.frmcur(mu.round(gl.totDep, gl.peDec))));
-                            lblFaltantes.setText(String.valueOf(mu.frmcur(mu.round(gl.totDep, gl.peDec))));
+                            lblTotal.setText(String.valueOf(mu.frmcur(mu.round2(gl.totDep))));
+                            lblFaltantes.setText(String.valueOf(mu.frmcur(mu.round2(gl.totDep))));
                             return;
                         }
                     } else {
                         LimpiaValores();
-                        lblTotal.setText(String.valueOf(mu.frmcur(mu.round(gl.totDep, gl.peDec))));
-                        lblFaltantes.setText(String.valueOf(mu.frmcur(mu.round(gl.totDep, gl.peDec))));
+                        lblTotal.setText(String.valueOf(mu.frmcur(mu.round2(gl.totDep))));
+                        lblFaltantes.setText(String.valueOf(mu.frmcur(mu.round2(gl.totDep))));
                         return;
                     }
 
@@ -252,7 +252,7 @@ public class desglose extends PBase {
                 Totdos.setText(String.valueOf(mu.frmcur(val2)));
                 Totuno.setText(String.valueOf(mu.frmcur(val1)));
 
-                lblTotC1.setText(String.valueOf(mu.frmcur(mu.round(valtotc1, gl.peDec))));
+                lblTotC1.setText(String.valueOf(mu.frmcur(mu.round2(valtotc1))));
 
 
                 TotCntCvs.setText(String.valueOf(mu.frmcur(val050)));
@@ -261,10 +261,10 @@ public class desglose extends PBase {
                 totCincoCvs.setText(String.valueOf(mu.frmcur(val005)));
                 totUnCv.setText(String.valueOf(mu.frmcur(val001)));
 
-                lblTotC2.setText(String.valueOf(mu.frmcur(mu.round(valtotc2, gl.peDec))));
+                lblTotC2.setText(String.valueOf(mu.frmcur(mu.round2(valtotc2))));
 
-                lblTotal.setText(String.valueOf(mu.frmcur(mu.round(gl.totDep, gl.peDec))));
-                lblFaltantes.setText(String.valueOf(mu.frmcur(mu.round(flt, gl.peDec))));
+                lblTotal.setText(String.valueOf(mu.frmcur(mu.round2(gl.totDep))));
+                lblFaltantes.setText(String.valueOf(mu.frmcur(mu.round2(flt))));
 
                 txtcien.setText(String.valueOf(c100));
                 txtcint.setText(String.valueOf(c50));
@@ -315,7 +315,7 @@ public class desglose extends PBase {
         Totcinco.setText(String.valueOf(mu.frmcur(0)));
         Totdos.setText(String.valueOf(mu.frmcur(0)));
         Totuno.setText(String.valueOf(mu.frmcur(0)));
-        lblTotC1.setText(String.valueOf(mu.frmcur(mu.round(0, gl.peDec))));
+        lblTotC1.setText(String.valueOf(mu.frmcur(mu.round2(0))));
 
         txtcien.setText("");
         txtcint.setText("");
@@ -336,7 +336,7 @@ public class desglose extends PBase {
         totCincoCvs.setText(String.valueOf(mu.frmcur(0)));
         totUnCv.setText(String.valueOf(mu.frmcur(0)));
 
-        lblTotC2.setText(String.valueOf(mu.frmcur(mu.round(0, gl.peDec))));
+        lblTotC2.setText(String.valueOf(mu.frmcur(mu.round2(0))));
 
     }
 
@@ -366,7 +366,7 @@ public class desglose extends PBase {
 
                         val100 = 0;
                         val100 = 100 * txtS;
-                        Totcien.setText(String.valueOf(mu.frmcur(mu.round(val100, gl.peDec))));
+                        Totcien.setText(String.valueOf(mu.frmcur(mu.round2(val100))));
 
                         CalculaTotales();
 
@@ -395,7 +395,7 @@ public class desglose extends PBase {
 
                             val100 = 0;
                             val100 = 100 * Double.parseDouble(txtcien.getText().toString());
-                            Totcien.setText(String.valueOf(mu.frmcur(mu.round(val100, gl.peDec))));
+                            Totcien.setText(String.valueOf(mu.frmcur(mu.round2(val100))));
 
                             CalculaTotales();
 
@@ -419,7 +419,7 @@ public class desglose extends PBase {
 
                         val100 = 0;
                         val100 = 100 * txtS;
-                        Totcien.setText(String.valueOf(mu.frmcur(mu.round(val100, gl.peDec))));
+                        Totcien.setText(String.valueOf(mu.frmcur(mu.round2(val100))));
 
                         CalculaTotales();
 
@@ -453,7 +453,7 @@ public class desglose extends PBase {
 
                         val50 = 0;
                         val50 = 50 * txtS;
-                        Totcnt.setText(String.valueOf(mu.frmcur(mu.round(val50, gl.peDec))));
+                        Totcnt.setText(String.valueOf(mu.frmcur(mu.round2(val50))));
 
                         CalculaTotales();
 
@@ -482,7 +482,7 @@ public class desglose extends PBase {
 
                             val50 = 0;
                             val50 = 50 * Double.parseDouble(txtcint.getText().toString());
-                            Totcnt.setText(String.valueOf(mu.frmcur(mu.round(val50, gl.peDec))));
+                            Totcnt.setText(String.valueOf(mu.frmcur(mu.round2(val50))));
 
                             CalculaTotales();
 
@@ -506,7 +506,7 @@ public class desglose extends PBase {
 
                         val50 = 0;
                         val50 = 50 * txtS;
-                        Totcnt.setText(String.valueOf(mu.frmcur(mu.round(val50, gl.peDec))));
+                        Totcnt.setText(String.valueOf(mu.frmcur(mu.round2(val50))));
 
                         CalculaTotales();
 
@@ -540,7 +540,7 @@ public class desglose extends PBase {
 
                         val20 = 0;
                         val20 = 20 * txtS;
-                        Totvein.setText(String.valueOf(mu.frmcur(mu.round(val20, gl.peDec))));
+                        Totvein.setText(String.valueOf(mu.frmcur(mu.round2(val20))));
 
                         CalculaTotales();
 
@@ -569,7 +569,7 @@ public class desglose extends PBase {
 
                             val20 = 0;
                             val20 = 20 * Double.parseDouble(txtveint.getText().toString());
-                            Totvein.setText(String.valueOf(mu.frmcur(mu.round(val20, gl.peDec))));
+                            Totvein.setText(String.valueOf(mu.frmcur(mu.round2(val20))));
 
                             CalculaTotales();
 
@@ -593,7 +593,7 @@ public class desglose extends PBase {
 
                         val20 = 0;
                         val20 = 20 * txtS;
-                        Totvein.setText(String.valueOf(mu.frmcur(mu.round(val20, gl.peDec))));
+                        Totvein.setText(String.valueOf(mu.frmcur(mu.round2(val20))));
 
                         CalculaTotales();
 
@@ -627,7 +627,7 @@ public class desglose extends PBase {
 
                         val10 = 0;
                         val10 = 10 * txtS;
-                        Totdies.setText(String.valueOf(mu.frmcur(mu.round(val10, gl.peDec))));
+                        Totdies.setText(String.valueOf(mu.frmcur(mu.round2(val10))));
 
                         CalculaTotales();
 
@@ -656,7 +656,7 @@ public class desglose extends PBase {
 
                             val10 = 0;
                             val10 = 10 * Double.parseDouble(txtdies.getText().toString());
-                            Totdies.setText(String.valueOf(mu.frmcur(mu.round(val10, gl.peDec))));
+                            Totdies.setText(String.valueOf(mu.frmcur(mu.round2(val10))));
 
                             CalculaTotales();
 
@@ -680,7 +680,7 @@ public class desglose extends PBase {
 
                         val10 = 0;
                         val10 = 10 * txtS;
-                        Totdies.setText(String.valueOf(mu.frmcur(mu.round(val10, gl.peDec))));
+                        Totdies.setText(String.valueOf(mu.frmcur(mu.round2(val10))));
 
                         CalculaTotales();
 
@@ -715,7 +715,7 @@ public class desglose extends PBase {
 
                         val5 = 0;
                         val5 = 5 * txtS;
-                        Totcinco.setText(String.valueOf(mu.frmcur(mu.round(val5, gl.peDec))));
+                        Totcinco.setText(String.valueOf(mu.frmcur(mu.round2(val5))));
 
                         CalculaTotales();
 
@@ -744,7 +744,7 @@ public class desglose extends PBase {
 
                             val5 = 0;
                             val5 = 5 * Double.parseDouble(txtcinco.getText().toString());
-                            Totcinco.setText(String.valueOf(mu.frmcur(mu.round(val5, gl.peDec))));
+                            Totcinco.setText(String.valueOf(mu.frmcur(mu.round2(val5))));
 
                             CalculaTotales();
 
@@ -769,7 +769,7 @@ public class desglose extends PBase {
 
                         val5 = 0;
                         val5 = 5 * txtS;
-                        Totcinco.setText(String.valueOf(mu.frmcur(mu.round(val5, gl.peDec))));
+                        Totcinco.setText(String.valueOf(mu.frmcur(mu.round2(val5))));
 
                         CalculaTotales();
 
@@ -803,7 +803,7 @@ public class desglose extends PBase {
 
                         val2 = 0;
                         val2 = 2 * txtS;
-                        Totdos.setText(String.valueOf(mu.frmcur(mu.round(val2, gl.peDec))));
+                        Totdos.setText(String.valueOf(mu.frmcur(mu.round2(val2))));
 
                         CalculaTotales();
 
@@ -832,7 +832,7 @@ public class desglose extends PBase {
 
                             val2 = 0;
                             val2 = 2 * Double.parseDouble(txtdos.getText().toString());
-                            Totdos.setText(String.valueOf(mu.frmcur(mu.round(val2, gl.peDec))));
+                            Totdos.setText(String.valueOf(mu.frmcur(mu.round2(val2))));
 
                             CalculaTotales();
 
@@ -856,7 +856,7 @@ public class desglose extends PBase {
 
                         val2 = 0;
                         val2 = 2 * txtS;
-                        Totdos.setText(String.valueOf(mu.frmcur(mu.round(val2, gl.peDec))));
+                        Totdos.setText(String.valueOf(mu.frmcur(mu.round2(val2))));
 
                         CalculaTotales();
 
@@ -890,7 +890,7 @@ public class desglose extends PBase {
 
                         val1 = 0;
                         val1 = 1 * txtS;
-                        Totuno.setText(String.valueOf(mu.frmcur(mu.round(val1, gl.peDec))));
+                        Totuno.setText(String.valueOf(mu.frmcur(mu.round2(val1))));
 
                         CalculaTotales();
 
@@ -919,7 +919,7 @@ public class desglose extends PBase {
 
                             val1 = 0;
                             val1 = 1 * Double.parseDouble(txtuno.getText().toString());
-                            Totuno.setText(String.valueOf(mu.frmcur(mu.round(val1, gl.peDec))));
+                            Totuno.setText(String.valueOf(mu.frmcur(mu.round2(val1))));
 
                             CalculaTotales();
 
@@ -940,7 +940,7 @@ public class desglose extends PBase {
 
                             val1 = 0;
                             val1 = 1 * txtS;
-                            Totuno.setText(String.valueOf(mu.frmcur(mu.round(val1, gl.peDec))));
+                            Totuno.setText(String.valueOf(mu.frmcur(mu.round2(val1))));
 
                             CalculaTotales();
 
@@ -977,7 +977,7 @@ public class desglose extends PBase {
 
                         val050 = 0;
                         val050 = 0.50 * txtS;
-                        TotCntCvs.setText(String.valueOf(mu.frmcur(mu.round(val050, gl.peDec))));
+                        TotCntCvs.setText(String.valueOf(mu.frmcur(mu.round2(val050))));
 
                         CalculaTotales();
 
@@ -1006,7 +1006,7 @@ public class desglose extends PBase {
 
                             val050 = 0;
                             val050 = 0.50 * Double.parseDouble(txtCntCvs.getText().toString());
-                            TotCntCvs.setText(String.valueOf(mu.frmcur(mu.round(val050, gl.peDec))));
+                            TotCntCvs.setText(String.valueOf(mu.frmcur(mu.round2(val050))));
 
                             CalculaTotales();
 
@@ -1030,7 +1030,7 @@ public class desglose extends PBase {
 
                         val050 = 0;
                         val050 = 0.50 * txtS;
-                        TotCntCvs.setText(String.valueOf(mu.frmcur(mu.round(val050, gl.peDec))));
+                        TotCntCvs.setText(String.valueOf(mu.frmcur(mu.round2(val050))));
 
                         CalculaTotales();
 
@@ -1064,7 +1064,7 @@ public class desglose extends PBase {
 
                         val025 = 0;
                         val025 = 0.25 * txtS;
-                        totVCCvs.setText(String.valueOf(mu.frmcur(mu.round(val025, gl.peDec))));
+                        totVCCvs.setText(String.valueOf(mu.frmcur(mu.round2(val025))));
 
                         CalculaTotales();
 
@@ -1093,7 +1093,7 @@ public class desglose extends PBase {
 
                             val025 = 0;
                             val025 = 0.25 * Double.parseDouble(txtVCCvs.getText().toString());
-                            totVCCvs.setText(String.valueOf(mu.frmcur(mu.round(val025, gl.peDec))));
+                            totVCCvs.setText(String.valueOf(mu.frmcur(mu.round2(val025))));
 
                             CalculaTotales();
 
@@ -1118,7 +1118,7 @@ public class desglose extends PBase {
 
                         val025 = 0;
                         val025 = 0.25 * txtS;
-                        totVCCvs.setText(String.valueOf(mu.frmcur(mu.round(val025, gl.peDec))));
+                        totVCCvs.setText(String.valueOf(mu.frmcur(mu.round2(val025))));
 
                         CalculaTotales();
 
@@ -1152,7 +1152,7 @@ public class desglose extends PBase {
 
                         val010 = 0;
                         val010 = 0.10 * txtS;
-                        totDiezCvs.setText(String.valueOf(mu.frmcur(mu.round(val010, gl.peDec))));
+                        totDiezCvs.setText(String.valueOf(mu.frmcur(mu.round2(val010))));
 
                         CalculaTotales();
 
@@ -1181,7 +1181,7 @@ public class desglose extends PBase {
 
                             val010 = 0;
                             val010 = 0.10 * Double.parseDouble(txtDiezCvs.getText().toString());
-                            totDiezCvs.setText(String.valueOf(mu.frmcur(mu.round(val010, gl.peDec))));
+                            totDiezCvs.setText(String.valueOf(mu.frmcur(mu.round2(val010))));
 
                             CalculaTotales();
 
@@ -1205,7 +1205,7 @@ public class desglose extends PBase {
 
                         val010 = 0;
                         val010 = 0.10 * txtS;
-                        totDiezCvs.setText(String.valueOf(mu.frmcur(mu.round(val010, gl.peDec))));
+                        totDiezCvs.setText(String.valueOf(mu.frmcur(mu.round2(val010))));
 
                         CalculaTotales();
 
@@ -1238,7 +1238,7 @@ public class desglose extends PBase {
 
                         val005 = 0;
                         val005 = 0.05 * txtS;
-                        totCincoCvs.setText(String.valueOf(mu.frmcur(mu.round(val005, gl.peDec))));
+                        totCincoCvs.setText(String.valueOf(mu.frmcur(mu.round2(val005))));
 
                         CalculaTotales();
 
@@ -1267,7 +1267,7 @@ public class desglose extends PBase {
 
                             val005 = 0;
                             val005 = 0.05 * Double.parseDouble(txtCincoCvs.getText().toString());
-                            totCincoCvs.setText(String.valueOf(mu.frmcur(mu.round(val005, gl.peDec))));
+                            totCincoCvs.setText(String.valueOf(mu.frmcur(mu.round2(val005))));
 
                             CalculaTotales();
 
@@ -1291,7 +1291,7 @@ public class desglose extends PBase {
 
                         val005 = 0;
                         val005 = 0.05 * txtS;
-                        totCincoCvs.setText(String.valueOf(mu.frmcur(mu.round(val005, gl.peDec))));
+                        totCincoCvs.setText(String.valueOf(mu.frmcur(mu.round2(val005))));
 
                         CalculaTotales();
 
@@ -1325,7 +1325,7 @@ public class desglose extends PBase {
 
                         val001 = 0;
                         val001 = 0.01 * txtS;
-                        totUnCv.setText(String.valueOf(mu.frmcur(mu.round(val001, gl.peDec))));
+                        totUnCv.setText(String.valueOf(mu.frmcur(mu.round2(val001))));
 
                         CalculaTotales();
 
@@ -1354,7 +1354,7 @@ public class desglose extends PBase {
 
                             val001 = 0;
                             val001 = 0.01 * Double.parseDouble(txtUnCv.getText().toString());
-                            totUnCv.setText(String.valueOf(mu.frmcur(mu.round(val001, gl.peDec))));
+                            totUnCv.setText(String.valueOf(mu.frmcur(mu.round2(val001))));
 
                             CalculaTotales();
 
@@ -1378,7 +1378,7 @@ public class desglose extends PBase {
 
                         val001 = 0;
                         val001 = 0.01 * txtS;
-                        totUnCv.setText(String.valueOf(mu.frmcur(mu.round(val001, gl.peDec))));
+                        totUnCv.setText(String.valueOf(mu.frmcur(mu.round2(val001))));
 
                         CalculaTotales();
 
@@ -1401,18 +1401,18 @@ public class desglose extends PBase {
 
             valtotc1 = val100 + val50 + val20 + val10 + val5 + val2 + val1;
 
-            lblTotC1.setText(String.valueOf(mu.frmcur(mu.round(valtotc1, gl.peDec))));
+            lblTotC1.setText(String.valueOf(mu.frmcur(mu.round2(valtotc1))));
 
             valtotc2 = val050 + val025 + val010 + val005 + val001;
 
-            lblTotC2.setText(String.valueOf(mu.frmcur(mu.round(valtotc2, gl.peDec))));
+            lblTotC2.setText(String.valueOf(mu.frmcur(mu.round2(valtotc2))));
 
             valtot = valtotc1 + valtotc2;
 
             falta = gl.totDep - valtot;
 
             //lblTotal.setText(String.valueOf(valtot));
-            lblFaltantes.setText(String.valueOf(mu.frmcur(mu.round(falta, gl.peDec))));
+            lblFaltantes.setText(String.valueOf(mu.frmcur(mu.round2(falta))));
 
         } catch (Exception e) {
             addlog(new Object() {
@@ -1439,7 +1439,7 @@ public class desglose extends PBase {
 
                 CalculaTotales();
 
-                if (mu.round(falta, 2) != 0) {
+                if (mu.round2(falta) != 0) {
                     msgbox("Cantidad faltante distinta a 0");
                     return false;
                 }

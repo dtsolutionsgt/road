@@ -100,7 +100,7 @@ public class FacturaRes extends PBase {
 		media=gl.media;
 		credito=gl.credito;
 		gl.cobroPendiente = false;
-		dispventa = gl.dvdispventa;dispventa=mu.round(dispventa,2);
+		dispventa = gl.dvdispventa;dispventa=mu.round2(dispventa);
 		notaC = gl.tiponcredito;
 
 		app = new AppMethods(this, gl, Con, db);
@@ -1758,7 +1758,7 @@ public class FacturaRes extends PBase {
             if (gl.dvbrowse!=0){
                 double totdv;
                 if (tot>=dispventa){
-                    totdv = mu.round(tot-dispventa,2);
+                    totdv = mu.round2(tot-dispventa);
                     alert.setTitle("A pagar : "+mu.frmcur(totdv));
                 }
             }else{
@@ -1877,7 +1877,7 @@ public class FacturaRes extends PBase {
 
 					if (gl.dvbrowse!=0){
 						double totdv;
-						totdv = mu.round(tot-dispventa,2);
+						totdv = mu.round2(tot-dispventa);
 
 						if (pg<totdv) {
 							msgbox("Monto menor que total");
@@ -1956,7 +1956,7 @@ public class FacturaRes extends PBase {
 
 			if(gl.dvbrowse!=0){
 				if (epago>=dispventa) {
-					epago=mu.round(epago-dispventa,2);
+					epago=mu.round2(epago-dispventa);
 				}
 			}
 

@@ -157,9 +157,9 @@ public class DevCliCant extends PBase {
 			}
 
 
-			gl.dvprec = mu.round(gl.dvprec,2);
-			gl.dvtotal= mu.round(gl.dvtotal,2);
-			gl.dvpreclista = mu.round(gl.dvpreclista,2);
+			gl.dvprec = mu.round2(gl.dvprec);
+			gl.dvtotal= mu.round2(gl.dvtotal);
+			gl.dvpreclista = mu.round2(gl.dvpreclista);
 			//hidekeyb();
 			super.finish();
 			
@@ -222,12 +222,12 @@ public class DevCliCant extends PBase {
 						if (mu.emptystr(txtCant.getText().toString())) txtCant.setText("0");
 
 						if (gl.dvporpeso==false){
-							lblPrec.setText(String.valueOf(mu.round(getPrecio(),2)));
-							txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+							lblPrec.setText(String.valueOf(mu.round2(getPrecio())));
+							txtkgs.setText(String.valueOf(mu.round2(clcpeso*Double.parseDouble(txtCant.getText().toString()))));
 						} else {
 							if (!vEditando){
 								lblPrec.setText(String.valueOf(precioventa));
-								txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+								txtkgs.setText(String.valueOf(mu.round2(clcpeso*Double.parseDouble(txtCant.getText().toString()))));
 							}
 							vEditando = false;
 						}
@@ -276,13 +276,13 @@ public class DevCliCant extends PBase {
 
 								if (gl.dvporpeso==false){
 									if (clcpeso!=0){
-										txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+										txtkgs.setText(String.valueOf(mu.round2(clcpeso*Double.parseDouble(txtCant.getText().toString()))));
 									}else{
-										txtkgs.setText(String.valueOf(mu.round(pesoprom*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+										txtkgs.setText(String.valueOf(mu.round2(pesoprom*Double.parseDouble(txtCant.getText().toString()))));
 									}
 
 								}else{
-									txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+									txtkgs.setText(String.valueOf(mu.round2(clcpeso*Double.parseDouble(txtCant.getText().toString()))));
 								}
 							}
 
@@ -310,13 +310,13 @@ public class DevCliCant extends PBase {
 
 							if (gl.dvporpeso==false){
 								if (clcpeso!=0){
-									txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+									txtkgs.setText(String.valueOf(mu.round2(clcpeso*Double.parseDouble(txtCant.getText().toString()))));
 								}else{
-									txtkgs.setText(String.valueOf(mu.round(pesoprom*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+									txtkgs.setText(String.valueOf(mu.round2(pesoprom*Double.parseDouble(txtCant.getText().toString()))));
 								}
 
 							}else{
-								txtkgs.setText(String.valueOf(mu.round(clcpeso*Double.parseDouble(txtCant.getText().toString()),gl.peDec)));
+								txtkgs.setText(String.valueOf(mu.round2(clcpeso*Double.parseDouble(txtCant.getText().toString()))));
 							}
 
 						}
@@ -373,7 +373,7 @@ public class DevCliCant extends PBase {
 				msgSinPrecio("El producto no tiene definido precio");return;
 			}
 
-			precioventa = mu.round(precioventa,2);
+			precioventa = mu.round2(precioventa);
 
 			sql="SELECT CANT,PESO,PRECIO,UMVENTA,LOTE,TIENE_LOTE FROM T_CxCD WHERE CODIGO='"+prodid+"'";
 			DT=Con.OpenDT(sql);

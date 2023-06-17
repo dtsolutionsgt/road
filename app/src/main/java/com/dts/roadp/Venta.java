@@ -441,10 +441,10 @@ public class Venta extends PBase {
 
 		if (sinimp) {
 			ttsin=tot-ttimp-ttperc;
-			ttsin=mu.round(ttsin,2);
+			ttsin=mu.round2(ttsin);
 			lblTot.setText(mu.frmcur(ttsin));
 		} else {
-			tot=mu.round(tot,2);
+			tot=mu.round2(tot);
 			lblTot.setText(mu.frmcur(tot));
 		}
 
@@ -525,11 +525,11 @@ public class Venta extends PBase {
 			desc = 0;
 			prodPrecio();
 
-			prec = mu.round(prec, 2);
+			prec = mu.round2(prec);
 			gl.bonprodcant = cant;
 			gl.bonus.clear();
 
-			vv = cant * prec;vv = mu.round(vv, 2);
+			vv = cant * prec;vv = mu.round2(vv);
 
 			clsBonif = new clsBonif(this, prodid, cant, vv);
 			if (clsBonif.tieneBonif()) {
@@ -621,7 +621,7 @@ public class Venta extends PBase {
                 if (prc.precioespecial>0) prec=prc.precioespecial;
             }
 
-			prec=mu.round(prec,2);
+			prec=mu.round2(prec);
 		}catch (Exception e){
 			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),sql);
 		}
@@ -659,7 +659,7 @@ public class Venta extends PBase {
 		}
 
 		cantbas=cant*fact;
-		//peso=mu.round(cant*fact,gl.peDec);
+		//peso=mu.round2(cant*fact,gl.peDec);
 
 		porpeso=prodPorPeso(prodid);
 		if (porpeso) {
@@ -669,9 +669,9 @@ public class Venta extends PBase {
 		}
 
 		if (porpeso) {
-			prodtot=mu.round(gl.prectemp*peso,2);
+			prodtot=mu.round2(gl.prectemp*peso);
 		} else {
-			prodtot=mu.round(prec*cant,2);
+			prodtot=mu.round2(prec*cant);
 		}
 
 		try {
@@ -851,8 +851,8 @@ public class Venta extends PBase {
 					}
 				}
 
-				prec=mu.round(prec,2);
-				prodtot=mu.round(prodtot,2);
+				prec=mu.round2(prec);
+				prodtot=mu.round2(prodtot);
 
 				ins.init("T_VENTA");
 

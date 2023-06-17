@@ -211,8 +211,8 @@ public class DevolCli extends PBase {
 
             cntprd = cntprd+1;
             cntunis = cntunis + Double.parseDouble(s);
-            cntkgs = mu.round(cntkgs + DT.getDouble(5),gl.peDec);
-            cntotl = mu.round(cntotl + DT.getDouble(6),2);
+            cntkgs = mu.round2(cntkgs + DT.getDouble(5));
+            cntotl = mu.round2(cntotl + DT.getDouble(6));
 
 			  items.add(vItem);	
 
@@ -399,7 +399,7 @@ public class DevolCli extends PBase {
 		fecha=du.getActDateTime();
 		if (gl.peModal.equalsIgnoreCase("TOL")) fecha=app.fechaFactTol(du.getActDate());
 
-		cntotl=mu.round(cntotl,2);
+		cntotl=mu.round2(cntotl);
 
 		try {
 

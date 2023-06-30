@@ -213,8 +213,10 @@ public class clsBonif {
 						if (iid.equalsIgnoreCase(marcaid)) val=DT.getDouble(4);break;
 				}
 				
-				if (val>0) {				
-					mcant=cant-DT.getDouble(2)+1;
+				if (val>0) {
+					//#CKFK20230629 Cambié esto porque no aplica para la cantidad igual al múltiplo
+					//mcant=cant-DT.getDouble(2)+1;
+					mcant=cant;
 					mul=DT.getDouble(3);
 
 					if (mul>0) {

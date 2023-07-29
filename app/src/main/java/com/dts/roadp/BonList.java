@@ -407,7 +407,45 @@ public class BonList extends PBase {
 		}
 
 	}
-	
+
+	public void cancelAnulacion(View view) {
+		try{
+			msgAskCancelarBonif("Está seguro de no aplicar bonificación?");
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+	}
+
+	private void msgAskCancelarBonif(String msg) {
+		try{
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+			dialog.setCancelable(false);
+			dialog.setTitle(R.string.app_name);
+			dialog.setMessage(msg  + " ?");
+			dialog.setIcon(R.drawable.ic_quest);
+
+			dialog.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					BonList.super.finish();
+				}
+			});
+
+			dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					;
+				}
+			});
+
+			dialog.show();
+		}catch (Exception e){
+			addlog(new Object(){}.getClass().getEnclosingMethod().getName(),e.getMessage(),"");
+		}
+
+
+	}
+
 	private void processItem() {
 		clsClasses.clsBonifProd item;
 		String pid,pname;

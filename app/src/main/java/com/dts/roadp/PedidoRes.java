@@ -86,6 +86,7 @@ public class PedidoRes extends PBase {
 
 		cliid=gl.cliente;
 		gl.pedsend = false;
+        txtDir.setText("");
 
 		setActDate();
 		fechae=fecha;

@@ -554,7 +554,8 @@ public class PedidoRes extends PBase {
 
 		try {
 
-				vSQL = "SELECT COD_SAP FROM P_CLIDIR WHERE DIRECCION_ENTREGA = '" + vDireccion + "'";
+				vSQL = "SELECT COD_SAP FROM P_CLIDIR WHERE DIRECCION_ENTREGA = '" + vDireccion + "' " +
+						" AND CODIGO_CLIENTE = '" + cliid + "' ";
 				DT=Con.OpenDT(vSQL);
 				DT.moveToFirst();
 
